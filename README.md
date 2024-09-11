@@ -48,4 +48,4 @@ playSound(soundName:): Plays the specified sound for game events.
 
 Future Enhancements
 
-Handling Deprecated Items: Update deprecated SwiftUI items to ensure compatibility with the latest iOS versions. 
+Helpful hints for each word guessed, making the game even more engaging and accessible for players!
