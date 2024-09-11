@@ -4,7 +4,6 @@
 //
 //  Created by user on 9/11/24.
 //
-
 import SwiftUI
 import AVFAudio
 
@@ -15,7 +14,7 @@ struct ContentView: View {
     @State private var wordToGuess = ""
     @State private var revealedWord = ""
     @State private var lettersGuessed = ""
-    @State private var guessesRemaining = 8 // 8 due to petals on flower and imagecount in assest catalog
+    @State private var guessesRemaining = 8
     @State private var gameStatusMessage = "How Many Guesses to Uncover the Hidden Word?"
     @State private var guessedLetter = ""
     @State private var imageName = "flower8"
@@ -24,7 +23,7 @@ struct ContentView: View {
     @State private var audioPlayer: AVAudioPlayer!
     @FocusState private var textFieldIsFocused: Bool
 
-    @State private var wordsToGuess: [String] = [] // Words fetched from API
+    @State private var wordsToGuess: [String] = []
     private let maximumGuesses = 8
 
     var body: some View {
@@ -66,9 +65,10 @@ struct ContentView: View {
                         .submitLabel(.done)
                         .autocorrectionDisabled()
                         .textInputAutocapitalization(.characters)
-                        .onChange(of: guessedLetter) { _ in
-                            guessedLetter.trimmingCharacters(in: .letters.inverted)
-                            guard let lastChar = guessedLetter.last else {
+                        .onChange(of: guessedLetter) { oldValue, newValue in
+                            let trimmedLetter = newValue.trimmingCharacters(in: .letters.inverted)
+                            guard let lastChar = trimmedLetter.last else {
+                                guessedLetter = ""
                                 return
                             }
                             guessedLetter = String(lastChar).uppercased()
@@ -125,7 +125,7 @@ struct ContentView: View {
     }
 
     func fetchWords() {
-        let urlString = "https://random-word-api.herokuapp.com/word?number=10"
+        let urlString = "https://random-word-api.herokuapp.com/word?number=5"
 
         guard let url = URL(string: urlString) else {
             print("Invalid URL")
@@ -144,10 +144,9 @@ struct ContentView: View {
             }
 
             do {
-                // Assume the response is a JSON array of strings
                 let fetchedWords = try JSONDecoder().decode([String].self, from: data)
                 DispatchQueue.main.async {
-                    wordsToGuess = fetchedWords.map { $0.uppercased() } // Convert words to uppercase
+                    wordsToGuess = fetchedWords.map { $0.uppercased() }
                     if !wordsToGuess.isEmpty {
                         wordToGuess = wordsToGuess[currentWordIndex]
                         revealedWord = "_" + String(repeating: " _", count: wordToGuess.count - 1)
