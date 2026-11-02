@@ -97,8 +97,8 @@ WordFlora/
 - **Rose of Jericho used:** petals regrow with a bloom animation (4 petals restored)
 
 ### Win / Lose
-- **Win:** plant collectible earned, `PlantEarnedView` presented, Rose of Jericho drop evaluated
-- **Lose (no revival):** word revealed, `GameRecord` written (won: false), next word option shown
+- **Win:** a random plant from the current level's plant set is awarded (duplicates allowed, reflected in `earnedCount`), `PlantEarnedView` presented, then Rose of Jericho drop evaluated
+- **Lose (no revival):** word revealed, `GameRecord` written (won: false), Rose of Jericho drop evaluated, next word option shown
 
 ---
 
@@ -121,8 +121,8 @@ WordFlora/
 **Botanical basis:** *Selaginella lepidophylla* can lose 95% of its water content, appear completely dead, and fully revive when placed in water — a true resurrection plant.
 
 **In-game mechanic:**
-- Drops randomly after any completed game (small fixed probability, e.g. ~15%)
-- When dropped, a status bar notification appears mid-`GameView`: *"A Rose of Jericho has been added to your garden!"*
+- Drops randomly after any completed game round, win or lose (small fixed probability, e.g. ~15%)
+- When dropped, a status bar notification appears at end-of-round while still on `GameView`: *"A Rose of Jericho has been added to your garden!"*
 - Stored as `roseOfJerichoCount` in `PlayerProfile`
 - Inventory count shown in `GameView` status bar at all times
 - Tap the Rose of Jericho icon when flower is dead to revive: 4 petals restored, game continues
