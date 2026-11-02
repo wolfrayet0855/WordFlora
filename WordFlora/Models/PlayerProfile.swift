@@ -1,16 +1,25 @@
 import SwiftData
+import Foundation
 
 @Model
 final class PlayerProfile {
-    var currentLevel: Int
-    var plantsEarnedThisLevel: Int
-    var roseOfJerichoCount: Int
-    var gamesPlayed: Int
+    var currentLevel: Int = 1
+    var plantsEarnedThisLevel: Int = 0
+    var roseOfJerichoCount: Int = 0
+    var gamesPlayed: Int = 0
 
-    init() {
-        currentLevel = 1
-        plantsEarnedThisLevel = 0
-        roseOfJerichoCount = 0
-        gamesPlayed = 0
-    }
+    // Tending + engagement (spec sections 3, 4, 11-12)
+    var water: Int = 0
+    var soil: Int = 0
+    var lastTrickleAt: Date = Date.now
+    var widgetPlantID: String?
+    var streak: Int = 0
+    var bestStreak: Int = 0
+    var streakFreezes: Int = 0
+    var lastPlayedDay: Date?
+    var seenIds: [String] = []
+    var roundsSinceAd: Int = 0
+    var ageBand: String?
+
+    init() {}
 }

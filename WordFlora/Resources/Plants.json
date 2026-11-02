@@ -1,0 +1,352 @@
+[
+  {
+    "name": "Dandelion",
+    "botanicalName": "Taraxacum officinale",
+    "botanicalFact": "Every part is edible and each seed can drift for miles.",
+    "level": 1,
+    "imageName": "plant_dandelion"
+  },
+  {
+    "name": "Daisy",
+    "botanicalName": "Bellis perennis",
+    "botanicalFact": "Its name comes from 'day's eye': petals close at night.",
+    "level": 1,
+    "imageName": "plant_daisy"
+  },
+  {
+    "name": "Clover",
+    "botanicalName": "Trifolium repens",
+    "botanicalFact": "Fixes nitrogen, feeding the soil it grows in.",
+    "level": 1,
+    "imageName": "plant_clover"
+  },
+  {
+    "name": "Marigold",
+    "botanicalName": "Tagetes erecta",
+    "botanicalFact": "Roots release compounds that deter harmful nematodes.",
+    "level": 1,
+    "imageName": "plant_marigold"
+  },
+  {
+    "name": "Sunflower",
+    "botanicalName": "Helianthus annuus",
+    "botanicalFact": "Young blooms track the sun: heliotropism.",
+    "level": 1,
+    "imageName": "plant_sunflower"
+  },
+  {
+    "name": "Tulip",
+    "botanicalName": "Tulipa gesneriana",
+    "botanicalFact": "Tulip bulbs fueled a speculative price bubble in the Netherlands in the 1630s.",
+    "level": 1,
+    "imageName": "plant_tulip"
+  },
+  {
+    "name": "Rose",
+    "botanicalName": "Rosa gallica",
+    "botanicalFact": "Its fruits, called rose hips, are rich in vitamin C.",
+    "level": 1,
+    "imageName": "plant_rose"
+  },
+  {
+    "name": "Poppy",
+    "botanicalName": "Papaver rhoeas",
+    "botanicalFact": "Its seeds can lie dormant in soil for decades, sprouting when the ground is disturbed.",
+    "level": 1,
+    "imageName": "plant_poppy"
+  },
+  {
+    "name": "Fern",
+    "botanicalName": "Nephrolepis exaltata",
+    "botanicalFact": "Ferns reproduce with spores rather than seeds or flowers.",
+    "level": 1,
+    "imageName": "plant_fern"
+  },
+  {
+    "name": "Strawberry",
+    "botanicalName": "Fragaria x ananassa",
+    "botanicalFact": "The tiny 'seeds' on its surface are actually separate fruits; the red flesh is an enlarged flower base.",
+    "level": 1,
+    "imageName": "plant_strawberry"
+  },
+  {
+    "name": "Orchid",
+    "botanicalName": "Phalaenopsis",
+    "botanicalFact": "One of the two largest flowering plant families.",
+    "level": 2,
+    "imageName": "plant_orchid"
+  },
+  {
+    "name": "Lavender",
+    "botanicalName": "Lavandula angustifolia",
+    "botanicalFact": "Its oil has been used in perfumery for over 2,500 years.",
+    "level": 2,
+    "imageName": "plant_lavender"
+  },
+  {
+    "name": "Lotus",
+    "botanicalName": "Nelumbo nucifera",
+    "botanicalFact": "Leaves repel water: the 'lotus effect'.",
+    "level": 2,
+    "imageName": "plant_lotus"
+  },
+  {
+    "name": "Jasmine",
+    "botanicalName": "Jasminum officinale",
+    "botanicalFact": "Blooms release most scent at night.",
+    "level": 2,
+    "imageName": "plant_jasmine"
+  },
+  {
+    "name": "Snapdragon",
+    "botanicalName": "Antirrhinum majus",
+    "botanicalFact": "Squeeze a bloom's sides and the 'dragon' opens its mouth.",
+    "level": 2,
+    "imageName": "plant_snapdragon"
+  },
+  {
+    "name": "Saguaro Cactus",
+    "botanicalName": "Carnegiea gigantea",
+    "botanicalFact": "It can take 50 years or more to grow its first arm.",
+    "level": 2,
+    "imageName": "plant_saguaro_cactus"
+  },
+  {
+    "name": "Aloe Vera",
+    "botanicalName": "Aloe vera",
+    "botanicalFact": "Its thick leaves store a water-rich gel inside.",
+    "level": 2,
+    "imageName": "plant_aloe_vera"
+  },
+  {
+    "name": "Bamboo",
+    "botanicalName": "Phyllostachys edulis",
+    "botanicalFact": "Some bamboo species can grow nearly a metre in a single day.",
+    "level": 2,
+    "imageName": "plant_bamboo"
+  },
+  {
+    "name": "Hibiscus",
+    "botanicalName": "Hibiscus rosa-sinensis",
+    "botanicalFact": "Each bloom typically lasts only a day.",
+    "level": 2,
+    "imageName": "plant_hibiscus"
+  },
+  {
+    "name": "Cherry Blossom",
+    "botanicalName": "Prunus serrulata",
+    "botanicalFact": "Japan's hanami custom of viewing the blossoms is centuries old.",
+    "level": 2,
+    "imageName": "plant_cherry_blossom"
+  },
+  {
+    "name": "Venus Flytrap",
+    "botanicalName": "Dionaea muscipula",
+    "botanicalFact": "Traps shut in about 0.1s when two hairs are touched.",
+    "level": 3,
+    "imageName": "plant_venus_flytrap"
+  },
+  {
+    "name": "Baobab",
+    "botanicalName": "Adansonia digitata",
+    "botanicalFact": "Trunks store up to 120,000 L of water.",
+    "level": 3,
+    "imageName": "plant_baobab"
+  },
+  {
+    "name": "Corpse Flower",
+    "botanicalName": "Amorphophallus titanum",
+    "botanicalFact": "Smells like rotting flesh to attract pollinators.",
+    "level": 3,
+    "imageName": "plant_corpse_flower"
+  },
+  {
+    "name": "Welwitschia",
+    "botanicalName": "Welwitschia mirabilis",
+    "botanicalFact": "Grows only two leaves in its life, for 1,000+ years.",
+    "level": 3,
+    "imageName": "plant_welwitschia"
+  },
+  {
+    "name": "Dragon Blood Tree",
+    "botanicalName": "Dracaena cinnabari",
+    "botanicalFact": "Its bark bleeds a deep red resin.",
+    "level": 3,
+    "imageName": "plant_dragon_blood_tree"
+  },
+  {
+    "name": "Pitcher Plant",
+    "botanicalName": "Nepenthes alata",
+    "botanicalFact": "Its pitcher-shaped leaves hold digestive fluid that drowns insects.",
+    "level": 3,
+    "imageName": "plant_pitcher_plant"
+  },
+  {
+    "name": "Sensitive Plant",
+    "botanicalName": "Mimosa pudica",
+    "botanicalFact": "Its leaflets fold shut within seconds of being touched.",
+    "level": 3,
+    "imageName": "plant_sensitive_plant"
+  },
+  {
+    "name": "Bird of Paradise",
+    "botanicalName": "Strelitzia reginae",
+    "botanicalFact": "Native to South Africa, its bloom resembles a colorful bird's head.",
+    "level": 3,
+    "imageName": "plant_bird_of_paradise"
+  },
+  {
+    "name": "Joshua Tree",
+    "botanicalName": "Yucca brevifolia",
+    "botanicalFact": "It depends on yucca moths for pollination.",
+    "level": 3,
+    "imageName": "plant_joshua_tree"
+  },
+  {
+    "name": "Lithops",
+    "botanicalName": "Lithops pseudotruncatella",
+    "botanicalFact": "These 'living stones' from southern Africa are camouflaged to look like pebbles.",
+    "level": 3,
+    "imageName": "plant_lithops"
+  },
+  {
+    "name": "Rafflesia",
+    "botanicalName": "Rafflesia arnoldii",
+    "botanicalFact": "Produces the world's largest single flower, about a metre across.",
+    "level": 4,
+    "imageName": "plant_rafflesia"
+  },
+  {
+    "name": "Monkey Puzzle Tree",
+    "botanicalName": "Araucaria araucana",
+    "botanicalFact": "Native to Chile and Argentina, it is the national tree of Chile.",
+    "level": 4,
+    "imageName": "plant_monkey_puzzle_tree"
+  },
+  {
+    "name": "Sago Palm",
+    "botanicalName": "Cycas revoluta",
+    "botanicalFact": "Despite the name it is not a palm but a cycad, an ancient seed-plant lineage.",
+    "level": 4,
+    "imageName": "plant_sago_palm"
+  },
+  {
+    "name": "Ghost Pipe",
+    "botanicalName": "Monotropa uniflora",
+    "botanicalFact": "It has no chlorophyll and draws nutrients through fungi linked to tree roots.",
+    "level": 4,
+    "imageName": "plant_ghost_pipe"
+  },
+  {
+    "name": "Passionflower",
+    "botanicalName": "Passiflora caerulea",
+    "botanicalFact": "Its name comes from Spanish missionaries who saw symbols of the Passion in the bloom.",
+    "level": 4,
+    "imageName": "plant_passionflower"
+  },
+  {
+    "name": "King Protea",
+    "botanicalName": "Protea cynaroides",
+    "botanicalFact": "It is the national flower of South Africa.",
+    "level": 4,
+    "imageName": "plant_king_protea"
+  },
+  {
+    "name": "Bleeding Heart",
+    "botanicalName": "Lamprocapnos spectabilis",
+    "botanicalFact": "Native to Siberia, northern China, Korea and Japan.",
+    "level": 4,
+    "imageName": "plant_bleeding_heart"
+  },
+  {
+    "name": "Giant Water Lily",
+    "botanicalName": "Victoria amazonica",
+    "botanicalFact": "Its floating leaves can exceed 2 m across.",
+    "level": 4,
+    "imageName": "plant_giant_water_lily"
+  },
+  {
+    "name": "Sundew",
+    "botanicalName": "Drosera rotundifolia",
+    "botanicalFact": "Sticky tentacles on its leaves trap and digest small insects.",
+    "level": 4,
+    "imageName": "plant_sundew"
+  },
+  {
+    "name": "Lady's Slipper Orchid",
+    "botanicalName": "Paphiopedilum",
+    "botanicalFact": "Its slipper-shaped pouch acts as a trap that guides insects past the pollen.",
+    "level": 4,
+    "imageName": "plant_ladys_slipper_orchid"
+  },
+  {
+    "name": "Wollemi Pine",
+    "botanicalName": "Wollemia nobilis",
+    "botanicalFact": "Known only from fossils until living trees were found in Australia in 1994.",
+    "level": 5,
+    "imageName": "plant_wollemi_pine"
+  },
+  {
+    "name": "Jade Vine",
+    "botanicalName": "Strongylodon macrobotrys",
+    "botanicalFact": "Its turquoise, claw-shaped flowers are pollinated by bats.",
+    "level": 5,
+    "imageName": "plant_jade_vine"
+  },
+  {
+    "name": "Coco de Mer",
+    "botanicalName": "Lodoicea maldivica",
+    "botanicalFact": "It produces the heaviest seed of any plant.",
+    "level": 5,
+    "imageName": "plant_coco_de_mer"
+  },
+  {
+    "name": "Black Bat Flower",
+    "botanicalName": "Tacca chantrieri",
+    "botanicalFact": "Long whisker-like bracts dangle from its near-black blooms.",
+    "level": 5,
+    "imageName": "plant_black_bat_flower"
+  },
+  {
+    "name": "Franklin Tree",
+    "botanicalName": "Franklinia alatamaha",
+    "botanicalFact": "It has not been seen in the wild since the early 1800s; all living trees descend from cultivated ones.",
+    "level": 5,
+    "imageName": "plant_franklin_tree"
+  },
+  {
+    "name": "Chocolate Cosmos",
+    "botanicalName": "Cosmos atrosanguineus",
+    "botanicalFact": "Extinct in the wild, its blooms smell of chocolate.",
+    "level": 5,
+    "imageName": "plant_chocolate_cosmos"
+  },
+  {
+    "name": "Ghost Orchid",
+    "botanicalName": "Dendrophylax lindenii",
+    "botanicalFact": "It has no leaves and photosynthesizes through its roots.",
+    "level": 5,
+    "imageName": "plant_ghost_orchid"
+  },
+  {
+    "name": "Silversword",
+    "botanicalName": "Argyroxiphium sandwicense",
+    "botanicalFact": "Found only in Hawaii, on high volcanic slopes.",
+    "level": 5,
+    "imageName": "plant_silversword"
+  },
+  {
+    "name": "Rainbow Eucalyptus",
+    "botanicalName": "Eucalyptus deglupta",
+    "botanicalFact": "Bark peels in strips at different times, revealing multicolored layers.",
+    "level": 5,
+    "imageName": "plant_rainbow_eucalyptus"
+  },
+  {
+    "name": "Puya Raimondii",
+    "botanicalName": "Puya raimondii",
+    "botanicalFact": "The largest bromeliad, it flowers once after many decades, then dies.",
+    "level": 5,
+    "imageName": "plant_puya_raimondii"
+  }
+]

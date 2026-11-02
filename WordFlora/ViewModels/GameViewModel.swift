@@ -109,18 +109,7 @@ final class GameViewModel {
     }
 
     func seedPlantsIfNeeded() {
-        let descriptor = FetchDescriptor<PlantCollectible>()
-        guard (try? modelContext.fetch(descriptor))?.isEmpty == true else { return }
-        for seed in PlantSeedData.all {
-            modelContext.insert(PlantCollectible(
-                name: seed.name,
-                botanicalName: seed.botanicalName,
-                botanicalFact: seed.botanicalFact,
-                level: seed.level,
-                imageName: seed.imageName
-            ))
-        }
-        try? modelContext.save()
+        try? PlantCatalog.seedIfNeeded(context: modelContext)
     }
 
     // MARK: - Private

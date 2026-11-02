@@ -20,7 +20,9 @@
 		9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E6F2C922C06007E28B8 /* Assets.xcassets */; };
 		9A467E732C922C06007E28B8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E722C922C06007E28B8 /* Preview Assets.xcassets */; };
 		BB839A507E257E427EDF327E /* WordBank.json in Resources */ = {isa = PBXBuildFile; fileRef = CB90B347AD42770BB38CF941 /* WordBank.json */; };
-		BF0956145017D499FCE46439 /* PlantSeedData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 125F052A68559D0F9E18024B /* PlantSeedData.swift */; };
+		CEE0A8C8A89FF4365D45F346 /* PlantCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9331FDFC4EAE840666B50749 /* PlantCatalog.swift */; };
+		CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */; };
+		D61844C609FE7631DFFBF7CF /* Plants.json in Resources */ = {isa = PBXBuildFile; fileRef = 437318BFC10E7CDE04AF1603 /* Plants.json */; };
 		DEE6BE19D0E9729C1907EB2C /* TriviaServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DCC6AD5F15EE8C53AB9F7 /* TriviaServiceTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -35,14 +37,16 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		125F052A68559D0F9E18024B /* PlantSeedData.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantSeedData.swift; sourceTree = "<group>"; };
 		153A01FF2679CA86ABE5DFBE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		437318BFC10E7CDE04AF1603 /* Plants.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Plants.json; sourceTree = "<group>"; };
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
 		6406AFD4A968B89AEFEE8100 /* WordFloraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		71229EAE4924516E464A11B5 /* WordBankService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordBankService.swift; sourceTree = "<group>"; };
 		71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModelTests.swift; sourceTree = "<group>"; };
+		7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCatalogTests.swift; sourceTree = "<group>"; };
 		9075581718316A5EDE6C92FD /* GameViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
 		916DCC6AD5F15EE8C53AB9F7 /* TriviaServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TriviaServiceTests.swift; sourceTree = "<group>"; };
+		9331FDFC4EAE840666B50749 /* PlantCatalog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCatalog.swift; sourceTree = "<group>"; };
 		9A467E682C922C05007E28B8 /* WordFlora.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WordFlora.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A467E6B2C922C05007E28B8 /* WordFloraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordFloraApp.swift; sourceTree = "<group>"; };
 		9A467E6D2C922C05007E28B8 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -86,6 +90,7 @@
 			isa = PBXGroup;
 			children = (
 				CB90B347AD42770BB38CF941 /* WordBank.json */,
+				437318BFC10E7CDE04AF1603 /* Plants.json */,
 			);
 			name = Resources;
 			path = Resources;
@@ -97,7 +102,6 @@
 				B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */,
 				D7C771AB1111BA1267E678AF /* PlantCollectible.swift */,
 				4A6305635D642316CCE8610F /* GameRecord.swift */,
-				125F052A68559D0F9E18024B /* PlantSeedData.swift */,
 			);
 			name = Models;
 			path = Models;
@@ -108,6 +112,7 @@
 			children = (
 				916DCC6AD5F15EE8C53AB9F7 /* TriviaServiceTests.swift */,
 				71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */,
+				7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -161,6 +166,7 @@
 			children = (
 				71229EAE4924516E464A11B5 /* WordBankService.swift */,
 				E78257300F1A3AAEFFF20767 /* TriviaService.swift */,
+				9331FDFC4EAE840666B50749 /* PlantCatalog.swift */,
 			);
 			name = Services;
 			path = Services;
@@ -270,6 +276,7 @@
 				9A467E732C922C06007E28B8 /* Preview Assets.xcassets in Resources */,
 				9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */,
 				BB839A507E257E427EDF327E /* WordBank.json in Resources */,
+				D61844C609FE7631DFFBF7CF /* Plants.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +289,7 @@
 			files = (
 				DEE6BE19D0E9729C1907EB2C /* TriviaServiceTests.swift in Sources */,
 				05B7E3F9F4DC0094781F5022 /* GameViewModelTests.swift in Sources */,
+				CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -294,10 +302,10 @@
 				68EF45C14F3CEC72F7042540 /* PlayerProfile.swift in Sources */,
 				2FAAC760A0B5D1B374DD5839 /* PlantCollectible.swift in Sources */,
 				8CDA4D0BA93F589962585DB8 /* GameRecord.swift in Sources */,
-				BF0956145017D499FCE46439 /* PlantSeedData.swift in Sources */,
 				659ABF3B10DF2D1EE3B7B3F7 /* WordBankService.swift in Sources */,
 				878B847E459F79C19DF9C963 /* TriviaService.swift in Sources */,
 				9603333091B94F1CE68C0A45 /* GameViewModel.swift in Sources */,
+				CEE0A8C8A89FF4365D45F346 /* PlantCatalog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
