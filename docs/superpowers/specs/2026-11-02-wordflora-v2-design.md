@@ -189,3 +189,12 @@ Phase 3 candidates: Game Center achievements + daily leaderboard (access point o
 - The 10-minute and 3-per-day caps from section 11 are replaced by this rule, with these guards: ad load failure -> skip silently (never block play); offline -> skip; ad audio follows the silent switch.
 - Banner on Home/Garden and optional rewarded drops stay.
 - Risk (from App Store review mining: ads are the #1 1-2 star driver, 35% vs 3%, worst when they run after every word or freeze the app): mitigate by placing the ad at the round boundary with a calm transition, never stacking with a paywall prompt or rating prompt in the same session beat, and tracking ad-related reviews, D1/D7 retention and session length. Remote kill-switch lets the frequency be changed (3 -> 4/5) without an app update. Under-13 players keep child-directed ad settings (max rating G, no personalization).
+
+## 13. Final subscription packaging (supersedes the per-product plans in sections 11-12)
+
+One subscription group, "WordFlora Plus", two auto-renewable products:
+- `plus_yearly`: $12.99/year, 3-day free trial (introductory offer, new subscribers only, one per group).
+- `plus_monthly`: $3.99/month, NO trial.
+Plus includes BOTH remove-ads and iCloud sync (`hasRemoveAds` and `hasCloudSync` both derive from any active Plus entitlement). Family Sharing enabled. Optional later: lifetime remove-ads (~$19.99), not in launch scope.
+Paywall copy: trial length, first charge date and price, renewal terms, how to cancel; trial wording only when `isEligibleForIntroOffer`. Yearly is the default-highlighted plan, shown with the per-month equivalent and honest savings. Parental gate for under-13. Apple Small Business Program enrollment is a user action (15% commission).
+Ad cadence (section 12) unchanged; Plus removes it.
