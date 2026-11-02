@@ -231,3 +231,51 @@ Ad cadence (section 12) unchanged; Plus removes it.
 ## 15. Decisions log (Round 3/4 review)
 - Night visitors (fireflies, luna moth) are tied to the DEVICE CLOCK evening hours (default ~6pm-5am local), independent of light/dark mode, so both themes can meet them. Exact window, time-zone and kid-bedtime handling to be finalised from the economy/design research.
 - "Free drop" in the rewarded-ad card means one water drop.
+
+## 16. Economy v1 (tunable defaults; every number lives in one `Economy.json`/remote-config table, none hard-coded)
+
+Source: Sonnet economy research + 60-day expected-value simulation (`scratchpad/econ_sim.py`). Inputs are assumptions, not data: treat as starting values and tune with real telemetry.
+
+| Item | Default |
+|---|---|
+| Water per win | avg ~1.6: 1 base, +1 for <=2 misses, +1 on Daily Bloom/streak days; none on a loss |
+| Free trickle | 1 per 4h, bank refills to 5; bank hard cap 40 |
+| Growth points | water 4, soil scoop 12 (trowel T2 x1.25, T3 x1.5), sun +2/3/4 by lamp tier, prune +4/6/8 once per plant per 2 days |
+| Per-plant daily absorb cap | 10 gp (main pacing lever; a cooldown, not punishment) |
+| Level cost per plant | 180 gp x [1.0, 1.1, 1.2, 1.3, 1.4]; stage-ups at 6%/22%/50%/100% |
+| Level complete | all 10 plants of the level at stage 4 (flourishing) |
+| Soil scoops | +2 first win of a new plant, +10 level complete, +0.25 per win, +1 Daily Bloom, 30% per butterfly play; stop granting from wins when stock >= 20 |
+| Shed points | +1 per win (cap 6/day from rounds), Daily Bloom +3, butterfly play +2, level complete +25, streak 7/30/100 = 10/30/100 |
+| Tool upgrades | T2 = 30 shed points, T3 = 120 (total 900 for 6 tools); if heavy players finish too fast raise T3 to ~200 |
+| Butterfly game | 3 rewarded plays/day; each: 1 water, 2 shed points, 30% chance of 1 scoop |
+| Rewarded ad | 2 water per ad, max 3/day |
+| Rose of Jericho | 10% per completed round, max 1 drop/day, stock cap 3, pity guarantee after 15 rounds without one, guaranteed at streak 7/30/100 (supersedes the 15% in section 7) |
+| Streak freezes | earned at streak day 5 and 14, then +1 per 14 days; stock cap 2; used automatically |
+| Badge grants | Bronze 3 shed; Silver 10 shed + 2 scoops; Gold 25 shed + 5 scoops + 1 Rose; no water (avoids inflation) |
+
+Sinks needed (simulation shows heavy players pile up ~800 scoops / ~1,300 shed points by day 90): cosmetic shed-point shop (pots, plant labels, garden decor; assets for visual agent), scoop-stock soft cap, hard-capped water bank.
+Expected pacing (casual 3 rounds/day / daily 8 / heavy 25): all 5 levels complete around day 183 / 115 / 110; casual sees a stage-up on ~75% of active days.
+
+**Ads (consolidated; supersedes the ad text in sections 6, 11 and 12 where they differ)**
+- Free users: banner on Home/Garden only; optional rewarded ads (max 3/day, each = 2 water); a full-screen ad between rounds after every 3rd completed regular round, BUT only after a grace period (not before the player has completed 3 sessions or their first level-up), with a minimum 3-minute gap and a max of 6/day. Shown at the round boundary, i.e. after the player dismisses `PlantEarnedView`/result and before the next round starts; never mid-round, never around the Daily Bloom, never after the butterfly game, no ads in widgets/notifications.
+- Frequency (3 -> 4/5) and the caps are remote-config. A 10% holdout cohort sees no interstitials for comparison.
+- Measure for 14 days by cohort: D1/D3/D7 retention, session length, rounds/session, ad impressions/session, ad-related share of new 1-2 star reviews, crash-free rate, paywall conversion, refund/support volume.
+- Kill-switch thresholds (inferred; revisit with real data): D1 < 25% or > 3 pts below holdout; D7 < 8% or > 2 pts below holdout; session length down > 15%; ad-related > 25% of new 1-2 star reviews or >= 3 in a day; crash-free < 99.5%. First response: move to every 5 rounds, then rewarded-only.
+- Under-13: child-directed settings, max rating G, no personalization.
+
+**Night visitors**
+- Window 17:30-21:30 local device time, evaluated once at butterfly-game start via `Calendar.current` (DST/travel handled by the calendar, `startOfDay` boundaries, never 86400s math, never server time). No spawns after 21:30; no night-visitor notifications.
+- Dusk palette applies to the scene during the window independent of dark mode.
+- "Glow Lantern" consumable (stock cap 1; earned from a weekly streak, Visitors badge, first Daily Bloom of the week) summons night visitors for one play at any hour so no one is locked out; album shows silhouettes with "Comes out in the evening".
+
+**Tool tier legibility (for the visual agent)**
+- Plate shape per tier (bronze circle, silver hexagon, gold 8-point scalloped star), 1/2/3 concentric rim lines, >= 5px pips on a dark pill, silhouette change (T2 collar/band, T3 spark/crown notch), palette bronze #8C5A2B / silver #A9BCD0 with 1.5px #3B3B3B outline / gold #F2B705, static gold halo only (none under Reduce Motion), VoiceOver "Watering can, tier 2 of 3, silver"; verify in greyscale at 40px and under protan/deutan simulation.
+
+**Open inconsistencies to resolve in mockups/specs (found by research)**
+1. Badge thresholds exceed what 5 levels allow ("Level Sets 3/6/10", "Level Up 5/15/30"): rebase to 5 levels / 50 plants (e.g. Level Sets 1/3/5, Level Up 2/4/5).
+2. Visitor rarity count on the page is wrong (shows 6/3/3; actual 5/4/3).
+3. "All 12 species" badge needs the Glow Lantern (night species), see above.
+4. Tool ownership/unlock order and watering-can cost (assumed 1 drop per plant per use) must be defined: start with can + trowel, unlock others via early levels/badges.
+5. Gold badges asking 200 feeds / 50 repots must be rebased to the scoop economy.
+6. "Plants never die" vs wilted look: wilting is cosmetic only; copy must say so.
+7. Stale pricing text in section 11 (two-product plans) is superseded by section 13.
