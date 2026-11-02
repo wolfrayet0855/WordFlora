@@ -198,3 +198,32 @@ One subscription group, "WordFlora Plus", two auto-renewable products:
 Plus includes BOTH remove-ads and iCloud sync (`hasRemoveAds` and `hasCloudSync` both derive from any active Plus entitlement). Family Sharing enabled. Optional later: lifetime remove-ads (~$19.99), not in launch scope.
 Paywall copy: trial length, first charge date and price, renewal terms, how to cancel; trial wording only when `isEligibleForIntroOffer`. Yearly is the default-highlighted plan, shown with the per-month equivalent and honest savings. Parental gate for under-13. Apple Small Business Program enrollment is a user action (15% commission).
 Ad cadence (section 12) unchanged; Plus removes it.
+
+## 14. Tools, activities, badges, butterfly catching (user-approved additions; part of the first release)
+
+**Tools (garden shed)**
+- Basic set: watering can, trowel, pruning shears, mister, sun lamp, butterfly net. Each is a collectible with 3 upgrade tiers (e.g. bigger can waters 1 -> 2 -> 3 plants per use; better trowel = richer soil boost; finer shears = bigger prune bonus).
+- Earned (never bought): level-ups, streak milestones, Daily Bloom completions, butterfly-catch rewards, badge rewards. Upgrades cost soil/water-free "shed points" earned the same ways.
+- "Picking up a tool" is the interaction: the player takes a tool from the shed (tap/drag), the cursor/hand carries it, and tapping a plant uses it with a tool-specific animation + haptic. The widget exposes the active tool (water can by default) through App Intents.
+
+**Activities (all gentle, none punishing)**
+- Water, Feed (fertilizer scoop), Repot (choose soil type: loam, sandy, peaty, rich compost; plants have a preferred soil via `preferredSoil`; a match gives faster growth and a "happy" reaction, a mismatch is just slower, never harmful), Prune (small trim minigame: drag shears along highlighted stems; improves fullness cosmetic + bonus), Mist (quick tap for humidity-loving plants), Sunny spot (toggle).
+- Each activity grants growth points; stages remain forward-only; limits come from currencies and cooldowns, not punishment.
+
+**Butterfly catching (mini-game, first release)**
+- A short (~30-45s) calm mini-game reachable from the Garden and as a reward after some rounds: butterflies, bees and ladybugs drift across the garden; the player swipes/taps with the net to catch them; healthy/flowering plants attract more.
+- Rewards: stickers for a "Garden Visitors" collection (about 12 species at launch, with real facts, e.g. monarch, swallowtail, honeybee, ladybug), plus water/soil/shed points. A rare visitor adds tension but there is no fail state: the round ends on a timer and always awards something.
+- Gentle by design: no lives, no losses, no penalty for misses, no pay-to-win; free-to-play only. Reduce Motion version: butterflies rest on flowers and are tapped (no chasing). Accessible alternative: VoiceOver "a monarch is nearby" with a button to catch.
+- Daily cap on bonus rewards (e.g. 3 plays/day with rewards, unlimited for fun) to avoid grind; no ads inside the minigame; no ad forced after it.
+- Optional AI: Foundation Models writes a one-line "visitor journal" per species from the vetted fact; Vision/camera discovery can map to the same Visitors collection.
+
+**Badges (in-app, positive-only, never revoked)**
+- Shelf in the Garden profile + shareable card per badge. Families: Collection (level sets, all 50, all visitors), Play (streak 7/30/100, Perfect Bloom = no wrong guesses, Resurrected = used a Rose of Jericho, first Daily Bloom), Tending (first bloom, Green Thumb = 100 waterings, Master Repotter, Pruning pro), Explorer (first butterfly, all species, discovered-in-the-wild), Seasonal (later).
+- Each badge: id, title, description, tier (bronze/silver/gold), progress counter, unlockedAt. Unlocking plays a short celebration (CelebrationRain variant) with a haptic; unlock toast respects the one-prompt-per-beat rule (never stacks with paywall/ad/rating).
+- Game Center achievements can mirror these in phase 3.
+
+**Data model additions**
+- `ToolInventory` (toolId, tier, owned), `Badge` (id, tier, progress, unlockedAt), `VisitorSticker` (speciesId, count, firstCaughtAt), `PlantCollectible.preferredSoil`, `PlayerProfile.shedPoints`, `activeToolId`, `butterflyPlaysToday`, `butterflyLastPlayDay`. All CloudKit-compatible (defaults, no unique constraints) and merge by max/union.
+
+**Assets for the visual designer** (user reviews on localhost before code)
+- Tool icons (6 tools x 3 tiers, color + monochrome), shed screen, pickup/use animations per tool (pour, scoop, snip, mist, glow, net swoosh), soil type swatches + repot flow, prune minigame stems, species art for ~12 visitors (idle, flying 2-frame, caught sticker), butterfly minigame scene storyboard (light/dark, Reduce Motion variant), 30-40 badge emblems (3 tiers), badge shelf + unlock celebration, widget tool states.

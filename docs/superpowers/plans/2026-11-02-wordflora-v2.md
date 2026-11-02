@@ -73,6 +73,26 @@ Rework the committed `GameViewModel` (keep its tests, adjust):
 - [ ] Tests first: `water(plant)` consumes 1 drop, raises hydration/growth; `addSoil` consumes 1 scoop, raises soilRichness and a growth multiplier for 3 days; `sun` toggle gives small bonus once per day; stages are forward-only thresholds; `isWilted(plant, now)` true after 48h without water, plant never removed, a single water clears it; trickle grants 1 drop per 4h, cap 5, computed from `lastTrickleAt` (no background job); decay is computed from timestamps only.
 - [ ] Implement with injected `now`. Commit.
 
+## Task 6b: Tools, activities, repotting (logic)
+
+- [ ] Models: `ToolInventory`, `PlantCollectible.preferredSoil`, profile fields (`shedPoints`, `activeToolId`).
+- [ ] `ToolEngine` tests first: pickup sets active tool; each tool's effect (water, feed, repot with soil match/mismatch multipliers, prune bonus, mist for humidity-loving plants, sun); tier upgrades spend shed points and are forward-only; no tool effect can reduce a plant's stage or remove it; cooldowns/limits computed from timestamps; can waters N plants per tier.
+- [ ] Prune minigame scoring pure function (path coverage -> bonus) with tests.
+- [ ] Shed + tool UI after Task 8 asset approval.
+
+## Task 6c: Butterfly catching mini-game
+
+- [ ] `VisitorCatalog` (JSON, ~12 species with real facts; same schema discipline as plants) + `VisitorSticker` model + tests (seeding upsert, collection counts).
+- [ ] `VisitorSpawner` (pure, seeded): spawn rates scale with healthy flowering plants; deterministic with seed for tests; caps on simultaneous visitors; rare species weights.
+- [ ] `ButterflyGameModel`: 30-45s timer, catch hit-testing with generous radius, rewards always >= 1 item, daily reward cap (3) with unlimited free play, no fail state; tests for timer, reward math, daily cap across day boundaries and time zones.
+- [ ] View: SpriteKit-free SwiftUI `Canvas` + `TimelineView` scene (60fps budget), net swoosh animation, Reduce Motion mode (resting visitors, tap to catch), VoiceOver alternative, haptics, sound toggle; built from approved storyboard.
+- [ ] Hook into Garden and as an occasional post-round reward; no ads in or after the minigame.
+
+## Task 6d: Badges
+
+- [ ] `BadgeCatalog` (JSON: id, title, description, family, tier thresholds, counter key) + `Badge` model + `BadgeEngine` (event-driven: `record(.waterPlant)`, `.streak(n)`, `.perfectBloom`, `.visitorCaught(species)`, etc.). Tests: threshold crossing unlocks exactly once, progress persists, never revoked, tier ordering, duplicate events idempotent, CloudKit merge (max progress, earliest unlockedAt).
+- [ ] Unlock presentation queue (one per beat, never stacked with paywall/ad/rating), shelf view, shareable badge card (ImageRenderer), celebration rain variant. UI from approved mockups.
+
 ## Task 7: Persistence in App Group + migration
 
 - [ ] Add App Group capability `group.beta.WordFlora` (app + widget targets; entitlements files). Needs the user's Apple Developer account for signing; flag if provisioning blocks.
