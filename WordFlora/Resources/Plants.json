@@ -2,7 +2,7 @@
   {
     "name": "Dandelion",
     "botanicalName": "Taraxacum officinale",
-    "botanicalFact": "Every part is edible and each seed can drift for miles.",
+    "botanicalFact": "Dandelion leaves, flowers and roots are edible, but ask a grown-up first. Seeds can drift for miles on the wind.",
     "level": 1,
     "imageName": "plant_dandelion"
   },
@@ -16,7 +16,7 @@
   {
     "name": "Clover",
     "botanicalName": "Trifolium repens",
-    "botanicalFact": "Fixes nitrogen, feeding the soil it grows in.",
+    "botanicalFact": "Clover's root bacteria turn nitrogen from the air into plant food for the soil.",
     "level": 1,
     "imageName": "plant_clover"
   },
@@ -79,7 +79,7 @@
   {
     "name": "Lavender",
     "botanicalName": "Lavandula angustifolia",
-    "botanicalFact": "Its oil has been used in perfumery for over 2,500 years.",
+    "botanicalFact": "People have used lavender for scent and bathing for thousands of years.",
     "level": 2,
     "imageName": "plant_lavender"
   },
@@ -107,7 +107,7 @@
   {
     "name": "Saguaro Cactus",
     "botanicalName": "Carnegiea gigantea",
-    "botanicalFact": "It can take 50 years or more to grow its first arm.",
+    "botanicalFact": "A saguaro often waits 50 to 70 years before it grows its first arm.",
     "level": 2,
     "imageName": "plant_saguaro_cactus"
   },
@@ -121,7 +121,7 @@
   {
     "name": "Bamboo",
     "botanicalName": "Phyllostachys edulis",
-    "botanicalFact": "Some bamboo species can grow nearly a metre in a single day.",
+    "botanicalFact": "Giant moso bamboo can grow about a metre in one day.",
     "level": 2,
     "imageName": "plant_bamboo"
   },
@@ -149,7 +149,7 @@
   {
     "name": "Baobab",
     "botanicalName": "Adansonia digitata",
-    "botanicalFact": "Trunks store up to 120,000 L of water.",
+    "botanicalFact": "Big baobab trunks can store over 100,000 litres of water.",
     "level": 3,
     "imageName": "plant_baobab"
   },
@@ -226,7 +226,7 @@
   {
     "name": "Sago Palm",
     "botanicalName": "Cycas revoluta",
-    "botanicalFact": "Despite the name it is not a palm but a cycad, an ancient seed-plant lineage.",
+    "botanicalFact": "Despite the name it is not a palm but a cycad, an ancient seed-plant lineage. Every part is poisonous, so never eat it.",
     "level": 4,
     "imageName": "plant_sago_palm"
   },
