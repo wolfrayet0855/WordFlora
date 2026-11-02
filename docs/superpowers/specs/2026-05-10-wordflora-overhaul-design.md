@@ -6,7 +6,7 @@
 
 ## Overview
 
-WordFlora is being overhauled from a basic word-guessing game into a fully-featured "Happy Hangman" plant education game for iOS 17+. Players receive a trivia hint, guess the answer letter by letter, earn collectible plants with real botanical facts, and progress through difficulty levels. The flower loses petals on wrong guesses; a rare Rose of Jericho drop can revive a dead flower. Google AdMob and social sharing are integrated throughout.
+WordFlora is being overhauled from a basic word-guessing game into a fully-featured word-guessing plant education game for iOS 17+. Players receive a trivia hint, guess the answer letter by letter, earn collectible plants with real botanical facts, and progress through difficulty levels. The flower loses petals on wrong guesses; a rare Rose of Jericho drop can revive a dead flower. Google AdMob and social sharing are integrated throughout.
 
 ---
 
@@ -74,7 +74,7 @@ WordFlora/
 |---|---|
 | `HomeView` | Title, Play button, Garden shortcut |
 | `LevelMapView` | Visual level map — locked/unlocked tiers with plant previews |
-| `GameView` | Core Happy Hangman loop + AdMob banner + Rose of Jericho status |
+| `GameView` | Core word-guessing loop + AdMob banner + Rose of Jericho status |
 | `GardenView` | 2-column grid of collected plants with botanical facts + share |
 | `PlantEarnedView` | Full-screen celebration on earning a plant + `ShareLink` |
 

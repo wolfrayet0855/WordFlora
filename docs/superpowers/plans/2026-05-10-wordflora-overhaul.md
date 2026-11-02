@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Rebuild WordFlora into a "Happy Hangman" plant education game with trivia hints, animated petal flower, collectible plants, level progression, Rose of Jericho power-up, AdMob ads, sharing, and dark/light mode — all on iOS 17+ patterns.
+**Goal:** Rebuild WordFlora into a word-guessing plant education game with trivia hints, animated petal flower, collectible plants, level progression, Rose of Jericho power-up, AdMob ads, sharing, and dark/light mode — all on iOS 17+ patterns.
 
 **Architecture:** SwiftData persists three model types (PlayerProfile, PlantCollectible, GameRecord); `@Observable` view models own all game logic; `NavigationStack` + `GameRouter` coordinator owns all navigation. Open Trivia DB (Science: Nature, difficulty matched to level) provides hints, with a bundled WordBank.json fallback. AdMob banner lives in GameView; interstitial fires on level-up.
 
@@ -1507,7 +1507,7 @@ struct HomeView: View {
                         .font(.system(size: 48, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.appPrimaryText)
 
-                    Text("The Happy Hangman")
+                    Text("Guess words. Grow a garden.")
                         .font(.system(.title3, design: .rounded))
                         .foregroundStyle(Color.appAccent)
                 }
