@@ -1,0 +1,98 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordFlora intro: flower rain</title>
+<link rel="stylesheet" href="../../theme.css"><script src="../../theme.js"></script>
+<style>
+body{padding:24px 20px 80px;max-width:1100px;margin:0 auto}
+h1{margin:0 0 4px;font-size:28px}h2{margin:40px 0 8px;font-size:20px}p.s{color:var(--muted);margin:0 0 14px;max-width:72ch;line-height:1.45}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button,select{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:8px 14px;cursor:pointer}
+button.on{background:var(--accent);color:var(--accent-ink);border-color:transparent;font-weight:700}
+.stage{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.phone{width:390px;height:844px;background:var(--bg);border-radius:48px;position:relative;overflow:hidden;box-shadow:0 0 0 10px #111,0 0 0 11px #333,0 30px 60px rgba(0,0,0,.35);flex:none;cursor:pointer;touch-action:manipulation}
+.phone canvas{position:absolute;inset:0;width:390px;height:844px}
+.phone .wm{position:absolute;left:0;right:0;top:250px;display:flex;justify-content:center;pointer-events:none}.phone .wm img{width:260px}
+[data-theme=dark] .wm .l,:root:not([data-theme=dark]) .wm .d{display:none}
+.phone .msg{position:absolute;left:0;right:0;top:250px;text-align:center;pointer-events:none;font-weight:900;font-size:34px;letter-spacing:-.01em}
+.phone .msg small{display:block;font-size:15px;font-weight:700;color:var(--muted);margin-top:6px;letter-spacing:0}
+.phone .skip{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:12px;color:var(--muted);pointer-events:none}
+.phone .toast{position:absolute;left:50%;top:60px;transform:translateX(-50%);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px;font-size:13px;opacity:0;transition:opacity .2s}
+.ctl{flex:1;min-width:300px;max-width:560px}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;align-items:center}
+input[type=range]{flex:1;min-width:200px}
+table{border-collapse:collapse;width:100%;font-size:13px}td,th{border-bottom:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+.stills{display:flex;gap:10px;flex-wrap:wrap}.stills figure{margin:0;font-size:11px;color:var(--muted);text-align:center}.stills canvas{width:150px;height:325px;border-radius:14px;border:1px solid var(--line);background:var(--bg);display:block}
+code{font-size:12px}
+body.still{padding:0;margin:0;max-width:none}body.still .chrome>*:not(.stage),body.still .ctl{display:none}body.still .phone{border-radius:0;box-shadow:none;position:absolute;left:0;top:0}
+</style></head><body>
+<div class="chrome">
+<div class="bar"><div><h1>Flower rain intro</h1><p class="s" style="margin:0">In-app intro (not the launch screen): blossoms and petals drift down and settle into the garden ground while the wordmark fades in. About 2.4 s, tap anywhere to skip.</p></div><button onclick="wfToggle();setTimeout(redrawAll,50)">Light / Dark</button></div>
+<h2>Live storyboard</h2>
+<div class="stage">
+<div class="phone" id="phone"><canvas id="cv" width="780" height="1688"></canvas>
+ <div class="wm" id="wm"><img class="l" src="../v2/wordmark/wordmark-light.svg" alt="WordFlora"><img class="d" src="../v2/wordmark/wordmark-dark.svg" alt=""></div>
+ <div class="msg" id="msg" style="opacity:0"><span id="mt">Nice one!</span><small id="ms">You grew a Sunflower</small></div>
+ <div class="skip" id="skiphint">Tap to skip</div><div class="toast" id="toast">Skipped: continue to Home</div></div>
+<div class="ctl">
+ <div class="row" id="vbtns"></div>
+ <div class="row"><button id="replay">Replay</button><button id="pause">Pause</button><span id="tl" style="font-variant-numeric:tabular-nums;color:var(--muted)">0.00 s</span></div>
+ <div class="row"><input type="range" id="scrub" min="0" max="1" step="0.01" value="0"></div>
+ <p class="s">Scrub to inspect any frame. Every frame is a pure function of time, so the same engine renders the stills below and (later) the SwiftUI/Canvas or SpriteKit port can be checked against them.</p>
+ <h2 style="margin-top:20px">Particle spec</h2>
+ <table id="spec"></table>
+</div></div>
+
+<h2>Keyframe stills: standard intro (t = 0, 0.5, 1.0, 1.5, 2.0, 2.4 s)</h2><div class="stills" id="st1"></div>
+<h2>Keyframe stills: celebration (t = 0.6, 1.4, 2.2, 3.0 s)</h2><div class="stills" id="st2"></div>
+<h2>Reduce Motion variant</h2>
+<p class="s">When Reduce Motion is on there is no falling and no sway: the garden and its already-settled blossoms and plants cross-fade in (0.5 s), then the wordmark fades in (0.3 to 0.8 s). Total 1.0 s, still tappable to skip. Celebration under Reduce Motion: a static settled-blossom frame with the message fading in, no falling particles (use haptic and sound instead if enabled). Stills:</p>
+<div class="stills" id="st3"></div>
+<h2>Spec details and notes</h2>
+<table>
+<tr><th>Topic</th><th>Spec</th></tr>
+<tr><td>Canvas</td><td>390 x 844 pt logical; draw at screen scale. Layers back to front: ground, far blossoms, plant sprites, mid and near blossoms, wordmark (UI layer, above particles so text is never covered).</td></tr>
+<tr><td>Motion model</td><td>Fall: y = lerp(-40, landY, u^1.12) with u = elapsed/fall (a slight ease-in so nothing feels like a constant-speed scroll). Sway: x = x0 + A sin(2pi f t + phase), damped to 0 over the last 14% of the fall (easeOutCubic). Rotation: spin over the fall, damped to the resting angle on landing. Landing: vertical scale eases to 0.55 (petal lies flat), alpha 1 to 0.92, then rests.</td></tr>
+<tr><td>Plant sprites</td><td>5 of the real plant SVGs (daisy, tulip, sunflower, poppy, cherry blossom, marigold, lavender, hibiscus; a seeded pick) fall at 46 px tall, then "plant themselves" with a 0.5 s easeOutBack grow to 92 px standing in the ground. They never overlap the wordmark (it sits at y 250, ground starts at y 694).</td></tr>
+<tr><td>Ground</td><td>Soft grass and soil band rises 0 to 150 pt over 0.1 to 1.0 s (easeOutCubic). Light: #6DB06A grass over #7A5A42 soil. Dark: #3E7A3A grass over #3A2E22 soil.</td></tr>
+<tr><td>Wordmark</td><td>Fades in 0.45 to 1.15 s, easeOutCubic, 10 pt rise. Contrast checked on both themes (see brand index).</td></tr>
+<tr><td>Palette</td><td>#F4A6B7, #E8586F, #F98FA2, #E65C4F, #E88A2E, #F2B53E, #FBF6E6, #B79AE0, #8E6BC9, #F7D3DC (sampled from the plant art). In dark theme blossoms are lightened 12% so they do not sink into #1A2E1A. Celebration adds gold sparkles #F0C060 / #FFE08A. Pink is one of ten colours, not dominant.</td></tr>
+<tr><td>Calm rules</td><td>Max about 2 particles visible per 100 pt column at once; no particle faster than 0.7 screen heights per second; no flashing; fade-in over the first 8% of each fall so particles never pop in; wordmark and tap target never occluded.</td></tr>
+<tr><td>Celebration</td><td>About 2.5x denser (80 blossoms + 22 sparkles), 3.4 s, faster near layer, no ground: particles fall through and fade out so the screen underneath (win result, streak) stays usable. Message card fades in at 0.25 to 0.8 s and out in the last 0.6 s. Reuse for win and streak milestones (streak variant swaps the message only).</td></tr>
+<tr><td>Skip and a11y</td><td>Tap anywhere jumps to the final frame and navigates on (Home). Reduce Motion: see above. VoiceOver: announce "WordFlora" only, particles are decorative (hidden). Never block input longer than the skippable 2.4 s; do not replay on every foreground, only on cold start.</td></tr>
+<tr><td>Performance</td><td>About 37 draw calls per frame standard, about 105 celebration. Pre-render each sprite kind to an offscreen bitmap per colour (10 colours x 4 kinds); avoid per-frame blur filters (the blur here only on the far and near layers: pre-blur the cached bitmaps instead).</td></tr>
+</table>
+</div>
+<img src="../../plants/plant_daisy.svg" style="display:none" alt=""><img src="../../plants/plant_tulip.svg" style="display:none" alt=""><img src="../../plants/plant_sunflower.svg" style="display:none" alt=""><img src="../../plants/plant_poppy.svg" style="display:none" alt=""><img src="../../plants/plant_cherry_blossom.svg" style="display:none" alt=""><img src="../../plants/plant_marigold.svg" style="display:none" alt=""><img src="../../plants/plant_lavender.svg" style="display:none" alt=""><img src="../../plants/plant_hibiscus.svg" style="display:none" alt=""><img src="../v2/wordmark/wordmark-light.svg" style="display:none"><img src="../v2/wordmark/wordmark-dark.svg" style="display:none"><script src="rain.js"></script>
+<script>
+var q=new URLSearchParams(location.search);
+var VAR=[['standard','Standard intro'],['reduce','Reduce Motion'],['celebration','Celebration'],['streak','Streak milestone']];
+var cur=q.get('still')?q.get('still').split(':')[0]:'standard';
+var rains={};
+function getRain(k){if(!rains[k]){rains[k]=FlowerRain.create({variant:k==='reduce'?'standard':(k==='streak'?'celebration':k),reduce:k==='reduce',seed:k==='celebration'||k==='streak'?11:7})}return rains[k]}
+var theme=function(){return document.documentElement.getAttribute('data-theme')||'light'};
+var cv=document.getElementById('cv'),ctx=cv.getContext('2d');ctx.scale(2,2);
+var t=0,playing=true,last=null,skipped=false;
+function msgFor(k){return k==='streak'?['7-day streak!','Keep it growing']:['Nice one!','You grew a Sunflower']}
+function render(tt){var r=getRain(cur);ctx.clearRect(0,0,390,844);r.draw(ctx,tt,theme());
+ var wm=document.getElementById('wm');wm.style.opacity=r.wordmarkOpacity(tt);wm.style.transform='translateY('+r.wordmarkRise(tt)+'px)';
+ var m=document.getElementById('msg'),mm=msgFor(cur);document.getElementById('mt').textContent=mm[0];document.getElementById('ms').textContent=mm[1];
+ m.style.opacity=(cur==='celebration'||cur==='streak')?(cur&&r.reduce?1:r.messageOpacity(tt)):0;
+ document.getElementById('tl').textContent=tt.toFixed(2)+' s / '+r.duration.toFixed(1)+' s';document.getElementById('scrub').value=tt/r.duration}
+function frame(ts){if(playing){if(last==null)last=ts;t+=(ts-last)/1000;last=ts;var d=getRain(cur).duration;if(t>=d){t=d;playing=false;document.getElementById('pause').textContent='Play'}}else last=null;render(t);requestAnimationFrame(frame)}
+function setVar(k){cur=k;[].forEach.call(document.querySelectorAll('#vbtns button'),function(b){b.classList.toggle('on',b.dataset.k===k)});t=0;playing=true;last=null;skipped=false;document.getElementById('pause').textContent='Pause';document.getElementById('skiphint').style.opacity=1}
+document.getElementById('vbtns').innerHTML=VAR.map(function(v){return '<button data-k="'+v[0]+'" onclick="setVar(\''+v[0]+'\')">'+v[1]+'</button>'}).join('');
+document.getElementById('replay').onclick=function(){setVar(cur)};
+document.getElementById('pause').onclick=function(){playing=!playing;this.textContent=playing?'Pause':'Play'};
+document.getElementById('scrub').oninput=function(){playing=false;document.getElementById('pause').textContent='Play';t=this.value*getRain(cur).duration;render(t)};
+document.getElementById('phone').onclick=function(){t=getRain(cur).duration;playing=false;var to=document.getElementById('toast');to.style.opacity=1;document.getElementById('skiphint').style.opacity=0;setTimeout(function(){to.style.opacity=0},1400)};
+function stillSet(id,k,times){var el=document.getElementById(id);el.innerHTML='';times.forEach(function(tt){var f=document.createElement('figure'),c=document.createElement('canvas');c.width=300;c.height=650;f.appendChild(c);f.appendChild(document.createTextNode('t = '+tt.toFixed(1)+' s'));el.appendChild(f);c._k=k;c._t=tt})}
+function redrawStills(){[].forEach.call(document.querySelectorAll('.stills canvas'),function(c){var x=c.getContext('2d');x.setTransform(1,0,0,1,0,0);x.clearRect(0,0,300,650);x.scale(300/390,650/844);var r=getRain(c._k);var tt=Math.min(c._t,r.duration);r.draw(x,tt,theme());
+ var wo=r.wordmarkOpacity(tt);if(wo>0){var im=wmImg();x.save();x.globalAlpha=wo;var w=260,h=w*im.naturalHeight/im.naturalWidth;if(im.complete&&im.naturalWidth)x.drawImage(im,65,250+r.wordmarkRise(tt),w,h);x.restore()}})}
+var wmL=new Image(),wmD=new Image();wmL.src='../v2/wordmark/wordmark-light.svg';wmD.src='../v2/wordmark/wordmark-dark.svg';function wmImg(){return theme()==='dark'?wmD:wmL}
+function redrawAll(){render(t);redrawStills()}
+stillSet('st1','standard',[0,.5,1,1.5,2,2.4]);stillSet('st2','celebration',[.6,1.4,2.2,3.0]);stillSet('st3','reduce',[.2,.5,1.0]);
+document.getElementById('spec').innerHTML='<tr><th>Layer</th><th>Count</th><th>Size (px)</th><th>Fall (s)</th><th>Sway amp (px) @ Hz</th><th>Spin</th><th>Alpha</th><th>Blur</th><th>Lands at y</th></tr>'+
+ ['standard','celebration'].map(function(k){var V=FlowerRain.VARIANTS[k];return '<tr><th colspan="9">'+k+' (duration '+V.dur+' s)</th></tr>'+V.layers.map(function(L){return '<tr><td>'+L.name+'</td><td>'+L.n+'</td><td>'+L.size.join('-')+'</td><td>'+L.fall.join('-')+'</td><td>'+L.amp.join('-')+' @ '+L.freq.join('-')+'</td><td>up to '+L.spin+' deg</td><td>'+L.alpha+'</td><td>'+L.blur+'</td><td>'+(L.land[0]>844?'off-screen (fall through)':L.land.join('-'))+'</td></tr>'}).join('')+(V.heroes?'<tr><td>plant sprites</td><td>'+V.heroes+'</td><td>46 tall, grow to 92</td><td>1.5-1.85</td><td>10-18 @ 0.5-0.8</td><td>25 deg</td><td>1</td><td>0</td><td>stand at y 780-800</td></tr>':'')+(V.sparks?'<tr><td>gold sparks</td><td>'+V.sparks+'</td><td>6-12</td><td>1.4-2.2</td><td>6-14 @ 0.7-1.3</td><td>90 deg</td><td>.95</td><td>0</td><td>fall through</td></tr>':'')}).join('');
+if(q.get('still')){document.body.classList.add('still');var s=q.get('still').split(':');cur=s[0];var th=q.get('theme');if(th)document.documentElement.setAttribute('data-theme',th);document.getElementById('skiphint').style.display='none';
+ playing=false;t=parseFloat(s[1]||'0');window.addEventListener('load',function(){render(t);setTimeout(function(){render(t)},50)})}
+else{setVar('standard');requestAnimationFrame(frame);window.addEventListener('load',function(){setTimeout(redrawStills,400);setTimeout(redrawStills,1200)});}
+</script></body></html>

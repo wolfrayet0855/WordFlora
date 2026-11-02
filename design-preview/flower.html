@@ -1,0 +1,49 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flower states</title><link rel="stylesheet" href="theme.css"><script src="theme.js"></script>
+<style>
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 60px}h1{font-size:30px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 24px}
+.row{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}.c{background:var(--surface);border-radius:20px;padding:12px 8px;text-align:center;box-shadow:var(--shadow)}.c img{width:100%}.c b{display:block}.c span{font-size:12px;color:var(--muted)}
+h2{margin:40px 0 10px}.demo{display:flex;gap:30px;flex-wrap:wrap;align-items:center;background:var(--surface);border-radius:24px;padding:24px;box-shadow:var(--shadow)}
+#stage{position:relative;width:260px;height:310px}#stage svg{width:100%;height:100%;overflow:visible}
+button{font-family:inherit;font-weight:800;border:0;border-radius:14px;padding:12px 18px;margin:4px;font-size:15px;cursor:pointer;background:var(--accent);color:var(--accent-ink)}button.s{background:var(--bg);color:var(--text);border:1.5px solid var(--line)}
+.pt{transform-box:view-box;transform-origin:0 0}
+.petal{transform-origin:0 0;transition:fill .5s}
+.petal.fall{animation:fall 1.3s cubic-bezier(.4,.0,.9,.6) forwards}
+@keyframes fall{0%{transform:rotate(var(--a)) translate(0,0)}15%{transform:rotate(var(--a)) translate(0,-6px) scale(1.05)}100%{opacity:0;transform:translate(var(--dx),240px) rotate(calc(var(--a) + var(--spin)))}}
+.petal.bloom{animation:bloom .8s cubic-bezier(.2,1.5,.4,1) both;animation-delay:var(--d)}
+@keyframes bloom{0%{transform:rotate(var(--a)) scale(0);opacity:0}100%{transform:rotate(var(--a)) scale(1);opacity:1}}
+.petal.pulse{animation:pulse .6s ease-out}@keyframes pulse{50%{transform:rotate(var(--a)) scale(1.12);filter:brightness(1.15)}}
+.petal.gone{opacity:0}.ghost{fill:none;stroke:#7C867C;stroke-width:2;stroke-dasharray:4 5;opacity:.38}
+.head{transition:transform .8s cubic-bezier(.4,0,.2,1)}
+code{background:var(--bg);padding:2px 6px;border-radius:6px}ul{line-height:1.7}
+.glow{animation:glow 1s ease-out}@keyframes glow{0%{filter:drop-shadow(0 0 0 #F0C060)}40%{filter:drop-shadow(0 0 18px #F0C060)}100%{filter:none}}
+</style></head><body><div class="wrap">
+<a href="index.html" style="color:var(--accent)">&larr; All screens</a><h1>Flower component</h1><p class="sub">Petal color shifts warm &rarr; cool as petals are lost. Missing petals leave a dashed ghost so players can see what they have lost.</p>
+<div class="row">
+<div class="c"><img src="flowers/flower_8.svg"><b>8 petals</b><span>full bloom</span></div><div class="c"><img src="flowers/flower_6.svg"><b>6 petals</b><span>peach</span></div><div class="c"><img src="flowers/flower_4.svg"><b>4 petals</b><span>dusty mauve</span></div><div class="c"><img src="flowers/flower_2.svg"><b>2 petals</b><span>cold blue</span></div><div class="c"><img src="flowers/flower_0.svg"><b>0 petals</b><span>wilted, Rose of Jericho offered</span></div></div>
+<h2>Motion demo</h2><div class="demo"><div id="stage"></div><div style="flex:1;min-width:260px">
+<div><button onclick="wrong()">Wrong guess (petal falls)</button><button onclick="right()" class="s">Correct guess (pulse)</button><button onclick="revive()" class="s">Rose of Jericho (revive 4)</button><button onclick="reset()" class="s">Reset</button></div>
+<ul><li><b>Wrong guess:</b> petal lifts 6pt, then drops ~240pt while spinning and fading, 1.3s, ease-in. Remaining petals recolor over 0.5s.</li><li><b>Correct guess:</b> nearest petal pulses 1.12x with a brief brightness lift, 0.6s.</li><li><b>Zero petals:</b> head droops 55 degrees on the stem over 0.8s, center greys.</li><li><b>Revival:</b> head rises, 4 petals bloom in a staggered 0.12s sequence with overshoot spring, golden glow.</li></ul></div></div>
+</div><script>
+const COL={8:['#F2788A','#D9566C'],7:['#F2788A','#D9566C'],6:['#E9A36C','#CF8247'],5:['#E9A36C','#CF8247'],4:['#C7A9B0','#A98791'],3:['#C7A9B0','#A98791'],2:['#8EA6C4','#6E87A8'],1:['#8EA6C4','#6E87A8'],0:['#9AA39A','#7C867C']};
+const ORDER=[3,7,1,5,0,4,2,6],PD="M0 -14 C-19 -26 -17 -58 0 -68 C17 -58 19 -26 0 -14Z";
+let alive,fallen;const NS='http://www.w3.org/2000/svg';
+function build(){const s=document.getElementById('stage');
+ let h='<svg viewBox="0 0 200 240"><ellipse cx="100" cy="236" rx="40" ry="5" fill="#2C3E2C" opacity=".14"/><path id="stem" d="M100 236 C100 190 100 150 100 100" fill="none" stroke="#4E9A55" stroke-width="7" stroke-linecap="round"/><path d="M100 208 C74 208 54 190 50 168 C78 168 98 184 100 208Z" fill="#5FA860"/><path d="M100 196 C124 196 144 178 150 156 C122 156 102 172 100 196Z" fill="#3F8A4A"/><g id="head" class="head" transform="translate(100 88)">';
+ for(let i=0;i<8;i++){h+=`<path class="ghost" d="${PD}" transform="rotate(${i*45})"/>`}
+ for(let i=0;i<8;i++){h+=`<g class="pt"><path id="p${i}" class="petal" style="--a:${i*45}deg" transform="rotate(${i*45})" d="${PD}" stroke-width="2"/></g>`}
+ h+='<circle id="ctr" r="20" fill="#E8A838"/><circle id="ctr2" r="12" fill="#F5C858"/></g></svg>';s.innerHTML=h;}
+function paint(){const n=alive.size,c=COL[n];for(let i=0;i<8;i++){const p=document.getElementById('p'+i);p.setAttribute('fill',c[0]);p.setAttribute('stroke',c[1]);p.classList.remove('fall','bloom','pulse');p.style.opacity=alive.has(i)?1:0;}
+ const dead=n==0;document.getElementById('ctr').setAttribute('fill',dead?'#8E968E':'#E8A838');document.getElementById('ctr2').setAttribute('fill',dead?'#A9B0A9':'#F5C858');
+ const hd=document.getElementById('head');hd.setAttribute('transform',dead?'translate(128 120) rotate(55) scale(.85)':'translate(100 88)');
+ document.getElementById('stem').setAttribute('d',dead?'M100 236 C100 200 104 160 122 134':'M100 236 C100 190 100 150 100 100');}
+function reset(){alive=new Set([0,1,2,3,4,5,6,7]);fallen=[];build();paint()}
+function wrong(){if(!alive.size)return;const i=ORDER.find(k=>alive.has(k));alive.delete(i);
+ const p=document.getElementById('p'+i);p.style.setProperty('--dx',(Math.random()*60-30)+'px');p.style.setProperty('--spin',(Math.random()>.5?1:-1)*(90+Math.random()*120)+'deg');p.classList.add('fall');p.style.opacity='';
+ const c=COL[alive.size];for(let k=0;k<8;k++){if(alive.has(k)){const q=document.getElementById('p'+k);q.setAttribute('fill',c[0]);q.setAttribute('stroke',c[1])}}
+ if(!alive.size){setTimeout(paint,500)}}
+function right(){const l=[...alive];if(!l.length)return;const p=document.getElementById('p'+l[Math.floor(Math.random()*l.length)]);p.classList.remove('pulse');void p.getBBox();p.classList.add('pulse')}
+function revive(){if(alive.size>0&&alive.size>4)return;const back=ORDER.slice().reverse().filter(k=>!alive.has(k)).slice(0,4);back.forEach(k=>alive.add(k));paint();
+ document.getElementById('stage').classList.remove('glow');void document.getElementById('stage').offsetWidth;document.getElementById('stage').classList.add('glow');
+ back.forEach((k,j)=>{const p=document.getElementById('p'+k);p.style.setProperty('--d',(j*.12)+'s');p.classList.add('bloom');p.style.opacity=''});}
+reset();
+</script></body></html>
