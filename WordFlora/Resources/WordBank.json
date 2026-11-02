@@ -1,0 +1,38 @@
+{
+  "easy": [
+    {"word": "DAISY",    "hint": "A small white flower common in lawns and meadows worldwide"},
+    {"word": "CLOVER",   "hint": "A three-leafed plant associated with good luck"},
+    {"word": "FERN",     "hint": "An ancient plant that reproduces via spores rather than seeds"},
+    {"word": "MOSS",     "hint": "A soft, low-growing plant that thrives in damp environments"},
+    {"word": "TULIP",    "hint": "A spring bulb flower native to Central Asia"},
+    {"word": "MAPLE",    "hint": "A tree known for its lobed leaves and the syrup tapped from its sap"},
+    {"word": "PINE",     "hint": "An evergreen conifer that produces woody cones"},
+    {"word": "LEAF",     "hint": "The primary photosynthetic organ of most vascular plants"},
+    {"word": "STEM",     "hint": "The structural axis of a plant that supports leaves and flowers"},
+    {"word": "ROOT",     "hint": "The underground organ that anchors a plant and absorbs water"}
+  ],
+  "medium": [
+    {"word": "ORCHID",   "hint": "A vast flowering plant family with over 28,000 known species"},
+    {"word": "CACTUS",   "hint": "A succulent plant adapted to arid desert environments"},
+    {"word": "BAMBOO",   "hint": "The fastest-growing woody plant on Earth"},
+    {"word": "WILLOW",   "hint": "A tree with long drooping branches typically found near water"},
+    {"word": "BONSAI",   "hint": "The Japanese art of cultivating miniaturised trees in containers"},
+    {"word": "NECTAR",   "hint": "The sweet fluid produced by flowers to attract pollinating animals"},
+    {"word": "POLLEN",   "hint": "Fine powder produced by flowering plants for reproduction"},
+    {"word": "LICHEN",   "hint": "A composite organism formed by a symbiotic fungus and algae"},
+    {"word": "MANGROVE", "hint": "A coastal tree uniquely adapted to grow in saltwater tidal zones"},
+    {"word": "SPORE",    "hint": "A single-cell reproductive unit used by ferns, mosses, and fungi"}
+  ],
+  "hard": [
+    {"word": "PHOTOSYNTHESIS", "hint": "The process by which plants convert sunlight and carbon dioxide into food"},
+    {"word": "CHLOROPHYLL",    "hint": "The green pigment inside chloroplasts that captures light energy"},
+    {"word": "TRANSPIRATION",  "hint": "The process by which plants lose water vapour through tiny leaf pores"},
+    {"word": "GERMINATION",    "hint": "The biological process by which a dormant seed begins to sprout"},
+    {"word": "POLLINATION",    "hint": "The transfer of pollen grains from anther to stigma for fertilisation"},
+    {"word": "DECIDUOUS",      "hint": "Describes a tree or shrub that sheds all its leaves seasonally"},
+    {"word": "PERENNIAL",      "hint": "A plant that completes its life cycle over more than two years"},
+    {"word": "CARNIVOROUS",    "hint": "Describes a plant that supplements nutrients by trapping and digesting insects"},
+    {"word": "SYMBIOSIS",      "hint": "A long-term close interaction between two different biological species"},
+    {"word": "MYCORRHIZAE",    "hint": "Fungal networks that form nutrient-sharing partnerships with plant roots"}
+  ]
+}
