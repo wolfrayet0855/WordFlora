@@ -101,9 +101,30 @@ HomeView (tagline "Guess words. Grow a garden.", Daily Bloom card, banner slot),
 
 ## Task 11: Ads and privacy
 
+(Ad policy updated by spec section 11: banner Home/Garden only, optional rewarded, capped level-up interstitial, all disabled for subscribers.)
+
 - [ ] Add Google Mobile Ads SPM package (needs user to confirm in Xcode if the gem route fails). Test IDs in Debug, real IDs via xcconfig.
 - [ ] Age screen (neutral), UMP then ATT, child-directed/under-age-of-consent flags and max content rating via `RequestConfiguration`; banner only on Home/Garden; interstitial rules per spec; "Report ad" link; privacy policy link in Settings. Unit-test the policy object (`AdPolicy.configuration(for: ageBand)`) and interstitial gating (`shouldShowInterstitial` false mid-round/after loss/less than 2 actions since last).
 - [ ] Rating prompt gate `ReviewPromptPolicy` (after level-up only, 14+ days apart, never after loss). Unit-tested.
+
+## Task 11b: Subscriptions (StoreKit 2)
+
+- [ ] StoreKit configuration file for local testing (`Configuration.storekit`) with group "WordFlora Plus": `remove_ads_monthly` $0.99, `icloud_sync_monthly` $0.99. Products also created in App Store Connect by the user (flag as a user action).
+- [ ] `EntitlementService` (`@Observable`): loads `Product`s, `purchase`, `restore` (`AppStore.sync`), listens to `Transaction.updates`, exposes `hasRemoveAds`, `hasCloudSync`. Protocol + `MockEntitlements` for tests. Tests: purchase -> entitled; refund/revoke -> not entitled; expired -> not entitled; restore; unverified transaction ignored; under-13 requires parental gate before purchase call.
+- [ ] `AdPolicy` consumes entitlements: no ad load/present when `hasRemoveAds` (tests: banner view hidden, interstitial gate false, rewarded still available).
+- [ ] Paywall view built from approved mockup: prices, renewal terms, Restore, Manage Subscriptions link, Terms/Privacy links, no dark patterns; reachable from Settings and the ad-free button only.
+- [ ] Use StoreKit testing in Simulator via the .storekit file; document sandbox test steps.
+
+## Task 7b: iCloud sync (entitled users)
+
+- [ ] Audit all models for CloudKit compatibility (defaults, no unique, optional relationships); add test that builds a CloudKit-configured container in memory-compatible mode where possible.
+- [ ] Container factory chooses `.private` vs `.none` from `EntitlementService`; switching triggers rebuild flow; tests for the decision function and for the merge policy (`ProgressMerger`: max for monotonic fields, union for seenIds, latest timestamp) with simulated two-device states.
+- [ ] Entitlements: iCloud/CloudKit capability + container id (user action in Apple Developer portal). Widget reads the App Group store as before.
+
+## Task 9c: Landing experience
+
+- [ ] Launch: `UILaunchScreen` with only the named color; no image.
+- [ ] `IntroRainView`: Canvas/TimelineView falling blossoms using the approved flower/plant sprites, wordmark fade-in (SVG/text per approved mockup), tap to skip, once per cold launch, Reduce Motion fallback; reused by `CelebrationRain` for wins and milestones. Tests: emitter determinism with seed, particle count cap, skip callback, reduce-motion path; frame-time check in a UI performance test.
 
 ## Task 12: Widget extension
 

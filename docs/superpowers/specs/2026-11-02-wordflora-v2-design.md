@@ -143,3 +143,34 @@ Principle: maximize delight, keep safety. Every AI feature is optional, on-devic
 
 Multiplayer, leaderboards beyond optional Game Center (phase 3), IAP, iPad layouts, Live Activities, pollinators, large widget, localization (schema is ready for it).
 Phase 3 candidates: Game Center achievements + daily leaderboard (access point on Home only), spaced Garden review rounds at ~1/3/7 days.
+
+## 11. Monetization, launch, and brand decisions (later decisions; these OVERRIDE sections 6, 9 and 10 where they conflict)
+
+**Brand/launch**
+- Icon: Evergreen with smiling face, YELLOW-GREEN ground (user decision, after Round 2 review; the designer advised the blue-leaning green stays more distinct from Duolingo's green, so the visual agent must re-check contrast and distinctness at 40/60px on the final colour and the user signs off on the render). Dark-mode centre contrast (~1.4:1, separated by hue and face) accepted.
+- Launch screen (HIG best practice): static plain colour only, no image, no text (LaunchScreenColor #FAF7F0 / #1A2E1A).
+- Branded moment lives IN the app: the first frame of Home is an animated intro. A gentle RAINFALL OF FLOWERS (petals/blossoms from the 50-plant art falling and drifting, landing and settling into the garden scene) while the two-tone wordmark fades in. It is skippable by tap, plays once per cold launch (short, ~2s, hands off to Home), uses Canvas/TimelineView particles, respects Reduce Motion (static fade), and is paused when off screen. The same rain is reused for win celebrations and the Daily Bloom streak milestones.
+
+**Monetization (auto-renewable subscriptions via StoreKit 2, one subscription group)**
+- `remove_ads_monthly`: $0.99/month. Removes banners and interstitials. (Rewarded ads, if any exist, are optional and become free rewards for subscribers.)
+- `icloud_sync_monthly`: $0.99/month. Syncs progress (profile, collection, tending state, streaks) across the player's devices via CloudKit.
+- Both are independent products so a player can buy either or both. Evaluate later: a bundle ("WordFlora Plus"), an annual price (~$7.99 each), a free trial, Family Sharing. Pricing/packaging is a product decision to A/B using Product Page / Subscription offers.
+- Required: clear price + renewal terms on the paywall, Restore Purchases, link to manage subscriptions, working cancel path, visible support contact (App Store review data: unwanted charges, refund friction and "paid but still seeing ads" are top 1-2 star drivers). Entitlement is verified with `Transaction.currentEntitlements` and updated on `Transaction.updates`; ads never load for entitled users, and a lapse never deletes data.
+- Under-13 players (age screen): purchases are behind a parental gate; no paywall nags.
+- Paywall is shown only on explicit player action (Settings / "Remove ads" button / sync prompt in Garden), never as a pop-up on launch or mid-round, and never gates the Daily Bloom.
+
+**Ads for free users (reconciling revenue with review data, which shows ads are the #1 reason for 1-2 star reviews; ruling, adjust with data)**
+- Banner on Home and Garden only (never next to the letter input).
+- Optional rewarded ads for bonus water/hint (player-initiated).
+- Level-up interstitial KEPT but capped: max 1 per 10 minutes and 3 per day, never mid-round, never before/after the Daily Bloom, never after a loss, no auto-play audio, visible close, "Report ad" link. Kill-switch via remote config if reviews/retention show harm.
+- No ads in widgets or notifications.
+
+**iCloud sync design**
+- SwiftData + CloudKit private database (`ModelConfiguration(cloudKitDatabase: .private(...))`) enabled ONLY for entitled users; others use `.none`. Model constraints for CloudKit: all properties optional or defaulted, no unique constraints, relationships optional (audit the v2 models). The shared App Group store (widget) stays the source of truth on device.
+- Switching sync on/off rebuilds the container (prompt to relaunch or hot-swap with a tested migration). Lapsed subscription: sync stops, local data kept, a note explains.
+- Conflict policy: take max of monotonic fields (earnedCount, stage, streak best), latest-wins for timestamps, union for seenIds. Test with simulated two-device edits.
+- Free tier still benefits from normal iOS device backup/restore. The paid product is multi-device sync; the paywall copy must not imply otherwise.
+
+**Engagement levers added (data-informed; measure each)**
+- Streak with freezes, Daily Bloom with spoiler-free share, gentle tending, rain-of-flowers celebrations, collection completion bars per level, "almost there" level progress, weekly garden journal (AI optional), notifications within one-per-day budget, widget glance + tend.
+- Analytics: privacy-light, first-party events only (no third-party tracking for under-13s): D1/D7/D30 retention, round completion rate, ad impressions per session, paywall views/conversions, churn reasons. Consent per section 6.
