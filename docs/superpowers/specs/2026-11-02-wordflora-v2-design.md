@@ -227,3 +227,7 @@ Ad cadence (section 12) unchanged; Plus removes it.
 
 **Assets for the visual designer** (user reviews on localhost before code)
 - Tool icons (6 tools x 3 tiers, color + monochrome), shed screen, pickup/use animations per tool (pour, scoop, snip, mist, glow, net swoosh), soil type swatches + repot flow, prune minigame stems, species art for ~12 visitors (idle, flying 2-frame, caught sticker), butterfly minigame scene storyboard (light/dark, Reduce Motion variant), 30-40 badge emblems (3 tiers), badge shelf + unlock celebration, widget tool states.
+
+## 15. Decisions log (Round 3/4 review)
+- Night visitors (fireflies, luna moth) are tied to the DEVICE CLOCK evening hours (default ~6pm-5am local), independent of light/dark mode, so both themes can meet them. Exact window, time-zone and kid-bedtime handling to be finalised from the economy/design research.
+- "Free drop" in the rewarded-ad card means one water drop.
