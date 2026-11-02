@@ -101,7 +101,8 @@ HomeView (tagline "Guess words. Grow a garden.", Daily Bloom card, banner slot),
 
 ## Task 11: Ads and privacy
 
-(Ad policy updated by spec section 11: banner Home/Garden only, optional rewarded, capped level-up interstitial, all disabled for subscribers.)
+(Ad policy per spec sections 11-12: banner Home/Garden only, optional rewarded drops, and a full-screen ad after every 3rd completed regular round for free users; Daily Bloom exempt; all disabled for subscribers; load failure/offline skips silently; remote kill-switch for frequency.)
+- [ ] `AdCadence` (pure, unit-tested): `roundsSinceAd` increments on round end, fires at 3, resets on show or entitlement, ignores Daily Bloom, never fires mid-round, load failure leaves counter at 3 so the next boundary retries once then skips; frequency read from remote config with local default 3.
 
 - [ ] Add Google Mobile Ads SPM package (needs user to confirm in Xcode if the gem route fails). Test IDs in Debug, real IDs via xcconfig.
 - [ ] Age screen (neutral), UMP then ATT, child-directed/under-age-of-consent flags and max content rating via `RequestConfiguration`; banner only on Home/Garden; interstitial rules per spec; "Report ad" link; privacy policy link in Settings. Unit-test the policy object (`AdPolicy.configuration(for: ageBand)`) and interstitial gating (`shouldShowInterstitial` false mid-round/after loss/less than 2 actions since last).
@@ -109,8 +110,9 @@ HomeView (tagline "Guess words. Grow a garden.", Daily Bloom card, banner slot),
 
 ## Task 11b: Subscriptions (StoreKit 2)
 
-- [ ] StoreKit configuration file for local testing (`Configuration.storekit`) with group "WordFlora Plus": `remove_ads_monthly` $0.99, `icloud_sync_monthly` $0.99. Products also created in App Store Connect by the user (flag as a user action).
+- [ ] StoreKit configuration file for local testing (`Configuration.storekit`) with group "WordFlora Plus": `remove_ads_monthly` $0.99 + `remove_ads_yearly` $7.99, `icloud_sync_monthly` $0.99 + `icloud_sync_yearly` $7.99; yearly plans have a 3-day free-trial introductory offer. Products also created in App Store Connect by the user (flag as a user action).
 - [ ] `EntitlementService` (`@Observable`): loads `Product`s, `purchase`, `restore` (`AppStore.sync`), listens to `Transaction.updates`, exposes `hasRemoveAds`, `hasCloudSync`. Protocol + `MockEntitlements` for tests. Tests: purchase -> entitled; refund/revoke -> not entitled; expired -> not entitled; restore; unverified transaction ignored; under-13 requires parental gate before purchase call.
+- [ ] Trial eligibility via `isEligibleForIntroOffer`; paywall copy shows trial/price/renewal only for eligible users. Tests with MockEntitlements for eligible/ineligible.
 - [ ] `AdPolicy` consumes entitlements: no ad load/present when `hasRemoveAds` (tests: banner view hidden, interstitial gate false, rewarded still available).
 - [ ] Paywall view built from approved mockup: prices, renewal terms, Restore, Manage Subscriptions link, Terms/Privacy links, no dark patterns; reachable from Settings and the ad-free button only.
 - [ ] Use StoreKit testing in Simulator via the .storekit file; document sandbox test steps.

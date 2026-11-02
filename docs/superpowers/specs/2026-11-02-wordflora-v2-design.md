@@ -174,3 +174,18 @@ Phase 3 candidates: Game Center achievements + daily leaderboard (access point o
 **Engagement levers added (data-informed; measure each)**
 - Streak with freezes, Daily Bloom with spoiler-free share, gentle tending, rain-of-flowers celebrations, collection completion bars per level, "almost there" level progress, weekly garden journal (AI optional), notifications within one-per-day budget, widget glance + tend.
 - Analytics: privacy-light, first-party events only (no third-party tracking for under-13s): D1/D7/D30 retention, round completion rate, ad impressions per session, paywall views/conversions, churn reasons. Consent per section 6.
+
+## 12. Pricing and ad cadence update (supersedes the interstitial cap in section 11)
+
+**Plans (each of the two products gets both periods)**
+- `remove_ads_monthly` $0.99/mo and `remove_ads_yearly` $7.99/yr
+- `icloud_sync_monthly` $0.99/mo and `icloud_sync_yearly` $7.99/yr
+- Yearly plans carry a 3-day free trial (StoreKit introductory offer, free trial, 3 days) for new subscribers per subscription group. Paywall states plainly: trial length, the price that follows, the renewal date, and how to cancel. Trial eligibility is checked via `Product.SubscriptionInfo.isEligibleForIntroOffer`; ineligible users see no trial wording.
+- Open: a combined "Plus" yearly bundle is still a candidate to test later.
+
+**Ad cadence for free users (user decision)**
+- After every 3rd completed regular round, the free player watches an ad before the next round starts (full-screen interstitial or rewarded-format video; the network's own timer/close rules apply; Apple 2.5.18 needs a visible, easy close and the in-app Report ad link, so the ad can never be made unskippable by our code).
+- Counter lives in `PlayerProfile.roundsSinceAd`; increments on round end (win or loss); resets after an ad is shown OR the player holds `hasRemoveAds`. Never triggers mid-round. Daily Bloom rounds do not count and are never preceded or interrupted by an ad. Subscribers never see it.
+- The 10-minute and 3-per-day caps from section 11 are replaced by this rule, with these guards: ad load failure -> skip silently (never block play); offline -> skip; ad audio follows the silent switch.
+- Banner on Home/Garden and optional rewarded drops stay.
+- Risk (from App Store review mining: ads are the #1 1-2 star driver, 35% vs 3%, worst when they run after every word or freeze the app): mitigate by placing the ad at the round boundary with a calm transition, never stacking with a paywall prompt or rating prompt in the same session beat, and tracking ad-related reviews, D1/D7 retention and session length. Remote kill-switch lets the frequency be changed (3 -> 4/5) without an app update. Under-13 players keep child-directed ad settings (max rating G, no personalization).
