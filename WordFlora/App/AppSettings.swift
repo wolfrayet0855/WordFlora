@@ -16,6 +16,8 @@ final class AppSettings {
     var showStreak: Bool { didSet { defaults.set(showStreak, forKey: "showStreak") } }
     var showEverything: Bool { didSet { defaults.set(showEverything, forKey: "showEverything") } }
     var remindMe: Bool { didSet { defaults.set(remindMe, forKey: "remindMe") } }
+    var reminderHour: Int { didSet { defaults.set(reminderHour, forKey: "reminderHour") } }
+    var reminderMinute: Int { didSet { defaults.set(reminderMinute, forKey: "reminderMinute") } }
     var appearance: Appearance { didSet { defaults.set(appearance.rawValue, forKey: "appearance") } }
     var difficulty: Difficulty { didSet { defaults.set(difficulty.rawValue, forKey: "difficulty") } }
     var assistLevel: Int { didSet { defaults.set(assistLevel, forKey: "assistLevel") } }
@@ -41,6 +43,8 @@ final class AppSettings {
         showStreak = bool("showStreak", age != .under13)
         showEverything = bool("showEverything", false)
         remindMe = bool("remindMe", false)
+        reminderHour = defaults.object(forKey: "reminderHour") == nil ? 17 : defaults.integer(forKey: "reminderHour")
+        reminderMinute = defaults.integer(forKey: "reminderMinute")
         appearance = defaults.string(forKey: "appearance").flatMap(Appearance.init(rawValue:)) ?? .system
         difficulty = defaults.string(forKey: "difficulty").flatMap(Difficulty.init(rawValue:)) ?? .auto
         assistLevel = defaults.object(forKey: "assistLevel") == nil ? AssistTuner.defaultLevel(isUnderThirteen: age == .under13) : defaults.integer(forKey: "assistLevel")

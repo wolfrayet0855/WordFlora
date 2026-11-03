@@ -13,6 +13,7 @@ final class AppModel {
     private(set) var badges = BadgeState(defs: [])
     let entitlements: EntitlementService
     let ads = AdsService()
+    let reminders: ReminderScheduler
     private var lastPeakAt: Date?
     /// Master switch used by UI tests; real launches always have ads available (subject to every rule in AdGate).
     var adsEnabled = true
@@ -21,8 +22,10 @@ final class AppModel {
 
     var context: ModelContext { container.mainContext }
 
-    init(container: ModelContainer, settings: AppSettings = AppSettings(), bank: WordBank? = nil, now: @escaping () -> Date = { .now }, storeEnabled: Bool = false) {
+    init(container: ModelContainer, settings: AppSettings = AppSettings(), bank: WordBank? = nil, now: @escaping () -> Date = { .now }, storeEnabled: Bool = false,
+         notifications: NotificationCenterProviding = SystemNotificationCenter()) {
         self.now = now
+        self.reminders = ReminderScheduler(center: notifications)
         self.entitlements = EntitlementService(startListening: storeEnabled)
         self.container = container
         self.settings = settings
@@ -326,5 +329,31 @@ final class AppModel {
         try? context.save()
         syncToolUnlocks()
         return summary
+    }
+
+    // MARK: Reminders
+
+    private var dailyBloomDoneToday: Bool {
+        let records = (try? context.fetch(FetchDescriptor<GameRecord>())) ?? []
+        return records.contains { $0.isDaily && Calendar.current.isDate($0.date, inSameDayAs: now()) }
+    }
+
+    /// Asks for permission only now, because the player just turned reminders on.
+    func enableReminders() async -> Bool {
+        let ok = await reminders.enable(now: now(), hour: settings.reminderHour, minute: settings.reminderMinute,
+                                        lastOpened: now(), dailyBloomDoneToday: dailyBloomDoneToday)
+        settings.remindMe = ok
+        return ok
+    }
+
+    func disableReminders() {
+        reminders.disable()
+        settings.remindMe = false
+    }
+
+    /// Re-plans from "now" every time the player leaves the app, so the 3-days-without-a-visit rule always holds.
+    func refreshReminders() {
+        guard settings.remindMe else { return }
+        reminders.refresh(now: now(), hour: settings.reminderHour, minute: settings.reminderMinute, lastOpened: now(), dailyBloomDoneToday: dailyBloomDoneToday)
     }
 }

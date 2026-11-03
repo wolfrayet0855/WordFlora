@@ -4,13 +4,13 @@ import SwiftData
 
 @MainActor
 final class AppModelTendingTests: XCTestCase {
-    func makeApp(quiet: Bool = false, now: @escaping () -> Date = { .now }) throws -> AppModel {
+    func makeApp(quiet: Bool = false, now: @escaping () -> Date = { .now }, center: NotificationCenterProviding = ReminderTests.FakeCenter()) throws -> AppModel {
         let container = try SharedContainer.make(inMemory: true)
         let suite = UserDefaults(suiteName: "wf-tests-\(UUID().uuidString)")!
         let settings = AppSettings(defaults: suite)
         settings.quietGarden = quiet
         let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
-        let app = AppModel(container: container, settings: settings, bank: bank, now: now)
+        let app = AppModel(container: container, settings: settings, bank: bank, now: now, notifications: center)
         return app
     }
     func firstPlant(_ app: AppModel) throws -> PlantCollectible {
@@ -312,6 +312,35 @@ final class AppModelTendingTests: XCTestCase {
         for p in app.plants().prefix(6) { p.earnedCount = 1; p.stage = 3 }     // only plants the player owns attract visitors
         let g1 = app.startButterflyGame(seed: 1)
         XCTAssertGreaterThan(g1.maxVisitorsForTests, g0.maxVisitorsForTests)
+    }
+
+    // MARK: reminders through the app
+    func testRemindersTurnOnOnlyWhenPermissionIsGranted() async throws {
+        let granted = ReminderTests.FakeCenter()
+        let app = try makeApp(center: granted)
+        XCTAssertFalse(app.settings.remindMe)
+        let ok = await app.enableReminders()
+        XCTAssertTrue(ok); XCTAssertTrue(app.settings.remindMe); XCTAssertFalse(granted.scheduled.isEmpty)
+
+        let denied = ReminderTests.FakeCenter(); denied.allow = false
+        let app2 = try makeApp(center: denied)
+        let ok2 = await app2.enableReminders()
+        XCTAssertFalse(ok2); XCTAssertFalse(app2.settings.remindMe); XCTAssertTrue(denied.scheduled.isEmpty)
+    }
+
+    func testTurningRemindersOffClearsThePlan() async throws {
+        let center = ReminderTests.FakeCenter(); let app = try makeApp(center: center)
+        _ = await app.enableReminders()
+        app.disableReminders()
+        XCTAssertFalse(app.settings.remindMe); XCTAssertTrue(center.scheduled.isEmpty)
+    }
+
+    func testRefreshingAfterAVisitReschedulesFromNow() async throws {
+        let center = ReminderTests.FakeCenter(); let app = try makeApp(center: center)
+        _ = await app.enableReminders()
+        let before = center.scheduled.map(\.date)
+        app.refreshReminders()
+        XCTAssertEqual(center.scheduled.count, before.count)
     }
 }
 

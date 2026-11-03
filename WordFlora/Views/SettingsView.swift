@@ -3,6 +3,7 @@ import SwiftUI
 struct SettingsView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
+    @State private var reminderDenied = false
 
     var body: some View {
         @Bindable var s = app.settings
@@ -23,6 +24,24 @@ struct SettingsView: View {
                 Toggle("Quiet Garden", isOn: $s.quietGarden)
                 Text("Calm mode removes the thirsty look and halves celebrations. Quiet Garden hides counters and timers so tending is just relaxing.")
                     .font(.footnote).foregroundStyle(.secondary)
+            }
+            Section("Reminders") {
+                Toggle("Gentle daily reminder", isOn: Binding(
+                    get: { s.remindMe },
+                    set: { on in
+                        if on { Task { reminderDenied = !(await app.enableReminders()) } } else { app.disableReminders(); reminderDenied = false }
+                    }))
+                if s.remindMe {
+                    DatePicker("Time", selection: Binding(
+                        get: { Calendar.current.date(bySettingHour: s.reminderHour, minute: s.reminderMinute, second: 0, of: .now) ?? .now },
+                        set: { d in
+                            let c = Calendar.current.dateComponents([.hour, .minute], from: d)
+                            s.reminderHour = min(20, max(8, c.hour ?? 17)); s.reminderMinute = c.minute ?? 0
+                            app.refreshReminders()
+                        }), displayedComponents: .hourAndMinute)
+                }
+                Text("At most one a day, never at night, and they stop on their own if you take a break.").font(.footnote).foregroundStyle(.secondary)
+                if reminderDenied { Text("Notifications are off for WordFlora. You can allow them in your device settings.").font(.footnote).foregroundStyle(Color.appDanger) }
             }
             Section("Appearance") {
                 Picker("Theme", selection: $s.appearance) {
