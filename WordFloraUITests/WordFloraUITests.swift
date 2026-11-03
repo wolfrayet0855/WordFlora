@@ -113,5 +113,23 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Choose a soil"].waitForExistence(timeout: 3))
         shot("repot")
     }
+
+    func testPaywallShowsBothPlansHonestlyAndSubscriberStateHidesThem() {
+        launch()
+        app.buttons["Settings"].tap()
+        app.buttons["Remove ads and sync with iCloud"].tap()
+        XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["No ads, ever"].exists)
+        shot("paywall")
+    }
+
+    func testSubscriberSeesThankYouNotPlans() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-plus"]
+        app.launch()
+        app.buttons["Settings"].tap()
+        app.buttons["Remove ads and sync with iCloud"].tap()
+        XCTAssertTrue(app.staticTexts["You have WordFlora Plus"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Subscribe"].exists)
+    }
 }
 

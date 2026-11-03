@@ -49,7 +49,11 @@ final class StoreKitConfigTests: XCTestCase {
         try await session.buyProduct(identifier: "plus_monthly")
         await svc.refresh(); XCTAssertTrue(svc.state.hasPlus)
         try session.expireSubscription(productIdentifier: "plus_monthly")
-        await svc.refresh()
+        // StoreKit applies the expiry asynchronously; poll briefly instead of racing it.
+        for _ in 0..<20 where svc.state.hasPlus {
+            try await Task.sleep(nanoseconds: 100_000_000)
+            await svc.refresh()
+        }
         XCTAssertFalse(svc.state.hasPlus)
     }
 

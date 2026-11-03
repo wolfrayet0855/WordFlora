@@ -11,12 +11,14 @@ final class AppModel {
     let bank: WordBank
     var onboarding: OnboardingFlow
     private(set) var badges = BadgeState(defs: [])
+    let entitlements: EntitlementService
     private let now: () -> Date
 
     var context: ModelContext { container.mainContext }
 
-    init(container: ModelContainer, settings: AppSettings = AppSettings(), bank: WordBank? = nil, now: @escaping () -> Date = { .now }) {
+    init(container: ModelContainer, settings: AppSettings = AppSettings(), bank: WordBank? = nil, now: @escaping () -> Date = { .now }, storeEnabled: Bool = false) {
         self.now = now
+        self.entitlements = EntitlementService(startListening: storeEnabled)
         self.container = container
         self.settings = settings
         let loaded = bank ?? (try? WordBank.load()) ?? WordBank(schemaVersion: 1, bankVersion: "empty", entries: [],

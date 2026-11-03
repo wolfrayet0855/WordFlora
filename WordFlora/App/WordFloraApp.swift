@@ -35,12 +35,15 @@ struct WordFloraApp: App {
                 bank = WordBank(schemaVersion: 1, bankVersion: "ui", entries: [entry], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
             }
         }
-        let model = AppModel(container: container, settings: settings, bank: bank)
+        let model = AppModel(container: container, settings: settings, bank: bank, storeEnabled: !uiTesting)
         if uiTesting && args.contains("-uitest-gardened") {
             // A garden with one found plant and some supplies, for tending UI tests.
             model.plants().first?.earnedCount = 1
             model.profile?.water = 5; model.profile?.soil = 3
             try? model.context.save()
+        }
+        if uiTesting && args.contains("-uitest-plus") {
+            model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
         _app = State(initialValue: model)
     }

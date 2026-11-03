@@ -79,6 +79,9 @@
             ReferencedContainer = "container:WordFlora.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+         <StoreKitConfigurationFileReference
+         identifier = "../../Config/WordFlora.storekit">
+      </StoreKitConfigurationFileReference>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
