@@ -121,7 +121,7 @@
   {
     "name": "Bamboo",
     "botanicalName": "Phyllostachys edulis",
-    "botanicalFact": "Giant moso bamboo can grow about a metre in one day.",
+    "botanicalFact": "Giant moso bamboo can grow about a meter in one day.",
     "level": 2,
     "imageName": "plant_bamboo"
   },
@@ -149,7 +149,7 @@
   {
     "name": "Baobab",
     "botanicalName": "Adansonia digitata",
-    "botanicalFact": "Big baobab trunks can store over 100,000 litres of water.",
+    "botanicalFact": "Big baobab trunks can store over 100,000 liters of water.",
     "level": 3,
     "imageName": "plant_baobab"
   },
@@ -212,7 +212,7 @@
   {
     "name": "Rafflesia",
     "botanicalName": "Rafflesia arnoldii",
-    "botanicalFact": "Produces the world's largest single flower, about a metre across.",
+    "botanicalFact": "Produces the world's largest single flower, about a meter across.",
     "level": 4,
     "imageName": "plant_rafflesia"
   },
@@ -343,7 +343,7 @@
     "imageName": "plant_rainbow_eucalyptus"
   },
   {
-    "name": "Puya Raimondii",
+    "name": "Puya raimondii",
     "botanicalName": "Puya raimondii",
     "botanicalFact": "The largest bromeliad flowers once after many decades, then sets seed.",
     "level": 5,

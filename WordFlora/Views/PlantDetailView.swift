@@ -43,7 +43,7 @@ struct PlantDetailView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { withAnimation(.interpolatingSpring(stiffness: 90, damping: 5)) { sway = 0 } }
                         }
                         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.5), trigger: hellos)
-                        .popoverTip(PlantHelloTip(), arrowEdge: .bottom)
+                        .modifier(HelloTipModifier())
                         .scaleEffect(bump ? 1.06 : 1)
                         .animation(.spring(response: 0.4, dampingFraction: 0.45), value: bump)
                         .accessibilityHidden(true)
@@ -55,7 +55,7 @@ struct PlantDetailView: View {
                 .frame(maxWidth: .infinity).padding(.top, 8)
 
                 VStack(spacing: 4) {
-                    Button { draftName = plant.nickname; renaming = true; NicknameTip().invalidate(reason: .actionPerformed) } label: {
+                    Button { draftName = plant.nickname; renaming = true } label: {
                         HStack(spacing: 6) {
                             Text(plant.nickname.isEmpty ? plant.name : plant.nickname).font(Theme.font(.title2, weight: .bold))
                             Image(systemName: "pencil").font(.footnote)
@@ -153,7 +153,7 @@ struct PlantDetailView: View {
     private func repotSheet(_ plant: PlantCollectible) -> some View {
         VStack(spacing: 14) {
             Text("Choose a soil").font(Theme.font(.title3, weight: .bold))
-            Text("Plants have favourite soils. Try one and see how it reacts.").font(Theme.font(.callout)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
+            Text("Plants have favorite soils. Try one and see how it reacts.").font(Theme.font(.callout)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                 ForEach(SoilType.allCases, id: \.self) { soil in
                     Button { showRepot = false; run(.repot(soil), plant) } label: { Text(soil.rawValue.capitalized) }
@@ -198,5 +198,12 @@ struct PlantDetailView: View {
         if outcome.stageUp { bump.toggle() }
         AccessibilityNotification.Announcement(outcome.message).post()
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) { withAnimation { toast = nil } }
+    }
+}
+
+/// The "tap your plant" hint is hidden while VoiceOver runs, since the image is not a VoiceOver target.
+private struct HelloTipModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if UIAccessibility.isVoiceOverRunning { content } else { content.popoverTip(PlantHelloTip(), arrowEdge: .bottom) }
     }
 }

@@ -94,6 +94,33 @@ enum TendingEngine {
         plant.lastTendedAt = now
     }
 
+    // MARK: Daily capacity (shown as a soft fill, never as a count)
+
+    enum Capacity: Equatable { case room, nearly, plenty }
+
+    private static func absorbedNow(_ plant: PlantCollectible, now: Date, calendar: Calendar) -> Int {
+        guard let d = plant.absorbDay, calendar.isDate(d, inSameDayAs: now) else { return 0 }
+        return plant.absorbedToday
+    }
+
+    static func capacityState(_ plant: PlantCollectible, now: Date, calendar: Calendar, economy: Economy) -> Capacity {
+        let a = absorbedNow(plant, now: now, calendar: calendar)
+        if a >= economy.dailyAbsorbCap { return .plenty }
+        return a >= 6 ? .nearly : .room
+    }
+
+    static func capacityFill(_ plant: PlantCollectible, now: Date, calendar: Calendar, economy: Economy) -> Double {
+        min(1, Double(absorbedNow(plant, now: now, calendar: calendar)) / Double(max(1, economy.dailyAbsorbCap)))
+    }
+
+    static func capacityLine(_ c: Capacity, name: String) -> String {
+        switch c {
+        case .room: return "Room for a little more."
+        case .nearly: return "Almost full of sunshine today."
+        case .plenty: return "\(name) has had plenty for today. Fresh start tomorrow."
+        }
+    }
+
     private static func resetDay(_ plant: PlantCollectible, now: Date, calendar: Calendar) {
         if let d = plant.absorbDay, calendar.isDate(d, inSameDayAs: now) { return }
         plant.absorbDay = calendar.startOfDay(for: now)

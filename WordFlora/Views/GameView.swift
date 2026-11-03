@@ -61,6 +61,7 @@ struct GameView: View {
             if tutorial { vm.startTutorial(entry: Self.tutorialEntry(in: app.bank)) }
             else if daily { vm.startDaily() } else { vm.startRound(level: level) }
         }
+        .onDisappear { ReadAloud.shared.stop() }
         .onChange(of: vm.phase) { _, phase in
             if phase == .won || phase == .rested { showBadges(app.roundFinished()) }
             if phase == .won {

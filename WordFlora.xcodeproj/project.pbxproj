@@ -68,6 +68,7 @@
 		70C01EAA5FB7F523FBF1C46C /* AIValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71331D82B79C4FF1610AFEA9 /* AIValidators.swift */; };
 		7134B8F63F8B167F415D50C5 /* AdsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307B6C22876E273992182CE6 /* AdsService.swift */; };
 		72563F46E520B7D22ECEAB04 /* WordTilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19C4668A7EFD195748409A0 /* WordTilesView.swift */; };
+		73A960D878B4124A30601B58 /* CapacityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB0A3A61951013C0E5506F /* CapacityTests.swift */; };
 		7414B32D8EE9EB1450BE77C1 /* wf-badgeSilver.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ACF0034A28D0F546B9B9DB9 /* wf-badgeSilver.m4a */; };
 		77DC9100629457266EDDA0DB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1AAA9FCAE4CF29BBA16A8 /* SettingsView.swift */; };
 		802F6E198FE55EE761BBF216 /* Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045A383C28CF63B7AA1690E5 /* Economy.swift */; };
@@ -235,6 +236,7 @@
 		616F9C7CA1B8EB8C04DD8F97 /* Theme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		6406AFD4A968B89AEFEE8100 /* WordFloraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6624B0783F70383BBF4A343C /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		6ABB0A3A61951013C0E5506F /* CapacityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CapacityTests.swift; sourceTree = "<group>"; };
 		6ACF0034A28D0F546B9B9DB9 /* wf-badgeSilver.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeSilver.m4a"; sourceTree = "<group>"; };
 		6BA2FA0C2D96FAD52648169E /* Sound.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Sound.swift; sourceTree = "<group>"; };
 		6E08620029509154DEB72456 /* AssistTuner.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AssistTuner.swift; sourceTree = "<group>"; };
@@ -520,6 +522,7 @@
 				D4518C576DB5D58EC7724F97 /* ReadAloudTests.swift */,
 				C884E85DCD91B1E264D8D134 /* WelcomeBackTests.swift */,
 				BA36455C53FE74BB10637F1D /* PlantVoiceTests.swift */,
+				6ABB0A3A61951013C0E5506F /* CapacityTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -915,6 +918,7 @@
 				DA87831AB341BABA3053A681 /* ReadAloudTests.swift in Sources */,
 				29C834FF07AE008DC3D27B74 /* WelcomeBackTests.swift in Sources */,
 				9AC2628E6C5C075B764C235A /* PlantVoiceTests.swift in Sources */,
+				73A960D878B4124A30601B58 /* CapacityTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -12,14 +12,14 @@ enum DataReconciler {
         var report = Report()
         let profiles = (try? context.fetch(FetchDescriptor<PlayerProfile>())) ?? []
         if profiles.count > 1 {
-            let ordered = profiles.sorted { $0.gamesPlayed > $1.gamesPlayed }
+            let ordered = profiles.sorted { ($0.gamesPlayed, $1.createdAt) > ($1.gamesPlayed, $0.createdAt) }   // ties go to the oldest record, the same choice on every device
             let keeper = ordered[0]
             for other in ordered.dropFirst() { merge(other, into: keeper, defs: badgeDefs); context.delete(other); report.profilesMerged += 1 }
         }
         let plants = (try? context.fetch(FetchDescriptor<PlantCollectible>())) ?? []
         let groups = Dictionary(grouping: plants, by: \.plantId)
         for (_, group) in groups where group.count > 1 {
-            let ordered = group.sorted { ($0.earnedCount, $0.growthPoints) > ($1.earnedCount, $1.growthPoints) }
+            let ordered = group.sorted { ($0.earnedCount, $0.growthPoints, $1.createdAt) > ($1.earnedCount, $1.growthPoints, $0.createdAt) }
             let keeper = ordered[0]
             for other in ordered.dropFirst() { merge(other, into: keeper); context.delete(other); report.plantsMerged += 1 }
         }

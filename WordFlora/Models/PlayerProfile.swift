@@ -37,5 +37,7 @@ final class PlayerProfile {
     var rewardedToday: Int = 0
     var rewardedDay: Date?
 
+    var createdAt: Date = Date.now
+
     init() {}
 }

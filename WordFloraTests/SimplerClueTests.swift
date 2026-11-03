@@ -57,4 +57,29 @@ final class SimplerClueTests: XCTestCase {
         vm.startRound()
         XCTAssertNil(vm.simplerClue)
     }
+
+    func testAClueThatRepeatsTheHelpHintIsNotShown() async {
+        let e = WordEntry(id: "a", word: "LOTUS", display: "Lotus", hint: "a hint", hint2: "Second clue here.", fact: "f", level: 1, kind: .vocab, plantId: nil,
+                          tags: [], minAge: 6, dailyEligible: true, source: "o", license: "p", reviewedBy: "t")
+        let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [e], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
+        let vm = GameViewModel(modelContext: container.mainContext, bank: bank, seed: 1)
+        vm.soundEnabled = false; vm.seedPlantsIfNeeded(); vm.ai = FakeAI(hint: "Second clue here."); vm.aiIsModelBacked = true
+        vm.startRound()
+        await vm.askSimplerClue()
+        XCTAssertNil(vm.simplerClue)
+    }
+
+    struct SlowAI: GardenAI {
+        func simplerHint(for entry: WordEntry) async -> String? { try? await Task.sleep(nanoseconds: 150_000_000); return "A calm pond flower." }
+        func explain(entry: WordEntry) async -> String? { nil }
+    }
+    func testAnAnswerFromAnEarlierRoundNeverLandsOnTheNextOne() async {
+        let vm = makeVM(ai: SlowAI(), backed: true)       // a one-word bank: the same word comes back next round
+        let pending = Task { await vm.askSimplerClue() }
+        try? await Task.sleep(nanoseconds: 30_000_000)
+        vm.startRound()
+        await pending.value
+        XCTAssertNil(vm.simplerClue)
+        XCTAssertTrue(vm.canAskSimplerClue)
+    }
 }

@@ -54,12 +54,18 @@ final class AppModel {
         let defs = (try? BadgeCatalog.load()) ?? []
         badges = BadgeState(json: game.playerProfile?.badgesJSON ?? "", defs: defs)
         refreshFreeDrops()
-        let lastOpen = settings.lastOpenedAt
-        if settings.onboardingComplete, WelcomeBack.shouldShow(lastOpened: lastOpen, now: now(), calendar: .current) {
+        checkWelcomeBack()
+        GardenIntentHost.container = container
+    }
+
+    /// Evaluated at launch and every time the app comes to the front, so a resume after a long absence is noticed too.
+    func checkWelcomeBack() {
+        guard settings.onboardingComplete else { return }
+        if WelcomeBack.shouldShow(lastOpened: settings.lastOpenedAt, now: now(), calendar: .current) {
             showWelcomeBack = true
             welcomeLine = WelcomeBack.lines[abs(Int(now().timeIntervalSince1970 / 86_400)) % WelcomeBack.lines.count]
         }
-        if settings.onboardingComplete { settings.lastOpenedAt = now() }
+        settings.lastOpenedAt = now()
     }
 
     func dismissWelcomeBack() { showWelcomeBack = false }

@@ -34,4 +34,15 @@ final class WelcomeBackTests: XCTestCase {
         back.dismissWelcomeBack(); XCTAssertFalse(back.showWelcomeBack)
         XCTAssertFalse(try launch(at: days(7)).showWelcomeBack)       // the earlier visit was recorded
     }
+
+    func testResumingAfterALongAbsenceWithoutARelaunchStillWelcomesYouBack() throws {
+        var clock = t0
+        let suite = UserDefaults(suiteName: "wf-wb2-\(UUID().uuidString)")!
+        let s = AppSettings(defaults: suite); s.onboardingComplete = true
+        let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
+        let app = AppModel(container: try SharedContainer.make(inMemory: true), settings: s, bank: bank, now: { clock }, notifications: ReminderTests.FakeCenter())
+        XCTAssertFalse(app.showWelcomeBack)
+        clock = days(1); app.checkWelcomeBack(); XCTAssertFalse(app.showWelcomeBack)      // a daily resume never shows it
+        clock = days(10); app.checkWelcomeBack(); XCTAssertTrue(app.showWelcomeBack)
+    }
 }

@@ -7,9 +7,3 @@ struct PlantHelloTip: Tip {
     var message: Text? { Text("Tap your plant. It likes company.") }
     var image: Image? { Image(systemName: "hand.tap.fill") }
 }
-
-struct NicknameTip: Tip {
-    var title: Text { Text("Give it a name") }
-    var message: Text? { Text("Tap the name to make this plant yours.") }
-    var image: Image? { Image(systemName: "pencil") }
-}

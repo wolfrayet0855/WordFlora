@@ -141,4 +141,18 @@ final class ReconcileTests: XCTestCase {
         XCTAssertTrue(AppModel.degradedStoreMessage.contains("saved garden"))
         XCTAssertEqual(CopySafety.check(AppModel.degradedStoreMessage), [])
     }
+
+    func testTiesPickTheSameKeeperRegardlessOfInsertionOrder() {
+        func run(oldFirst: Bool) -> Date {
+            let c = try! SharedContainer.make(inMemory: true)
+            let old = PlayerProfile(); old.createdAt = Date(timeIntervalSince1970: 100)
+            let new = PlayerProfile(); new.createdAt = Date(timeIntervalSince1970: 200)
+            for p in (oldFirst ? [old, new] : [new, old]) { c.mainContext.insert(p) }
+            try! c.mainContext.save()
+            DataReconciler.reconcile(context: c.mainContext, badgeDefs: [])
+            return try! c.mainContext.fetch(FetchDescriptor<PlayerProfile>())[0].createdAt
+        }
+        XCTAssertEqual(run(oldFirst: true), Date(timeIntervalSince1970: 100))
+        XCTAssertEqual(run(oldFirst: false), Date(timeIntervalSince1970: 100))
+    }
 }

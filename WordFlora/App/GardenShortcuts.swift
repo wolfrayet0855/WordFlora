@@ -8,3 +8,12 @@ struct GardenShortcuts: AppShortcutsProvider {
                     shortTitle: "Open my garden", systemImageName: "leaf.fill")
     }
 }
+
+/// Opens the app (to Home, where today's Daily Bloom is the main card). App target only.
+struct OpenGardenIntent: AppIntent {
+    static var title: LocalizedStringResource = "Open my garden"
+    static var openAppWhenRun: Bool { true }
+
+    @MainActor
+    func perform() async throws -> some IntentResult { .result() }
+}

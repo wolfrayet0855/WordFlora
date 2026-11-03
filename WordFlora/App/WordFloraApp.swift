@@ -67,7 +67,7 @@ struct WordFloraApp: App {
                 .modelContainer(app.container)
                 .onOpenURL { url in if app.onboarding.isComplete { router.open(url) } }
                 .onChange(of: scenePhase) { _, phase in
-                    if phase == .active { app.reconcileSyncedData() }
+                    if phase == .active { app.reconcileSyncedData(); app.checkWelcomeBack() }
                     // Keep the home-screen widget in step with what the player just did.
                     if phase == .background || phase == .inactive { WidgetCenter.shared.reloadAllTimelines(); app.refreshReminders() }
                     if phase == .active { app.refreshFreeDrops(); app.updateAmbience(); app.updateSyncFlag() }

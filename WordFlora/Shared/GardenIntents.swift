@@ -1,5 +1,10 @@
 import AppIntents
 import SwiftData
+import WidgetKit
+
+/// Set by the app so Siri and Shortcuts use the app's own store while the app is running (no second container).
+@MainActor
+enum GardenIntentHost { static var container: ModelContainer? }
 
 /// Water the garden from Siri, Shortcuts or Control Center. Same store and rules as the widget button;
 /// no ads or consent screens ever appear inside an intent.
@@ -9,19 +14,11 @@ struct WaterGardenIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        guard let container = try? SharedContainer.make(createIfMissing: false) else {
+        guard let container = GardenIntentHost.container ?? (try? SharedContainer.make(createIfMissing: false)) else {
             return .result(dialog: "Open WordFlora once to start your garden.")
         }
         let line = WidgetActions.waterGarden(context: container.mainContext, now: .now, calendar: .current, quiet: SharedDefaults.quietGarden)
+        WidgetCenter.shared.reloadAllTimelines()
         return .result(dialog: IntentDialog(stringLiteral: line))
     }
-}
-
-/// Opens the app (to Home, where today's Daily Bloom is the main card).
-struct OpenGardenIntent: AppIntent {
-    static var title: LocalizedStringResource = "Open my garden"
-    static var openAppWhenRun: Bool { true }
-
-    @MainActor
-    func perform() async throws -> some IntentResult { .result() }
 }

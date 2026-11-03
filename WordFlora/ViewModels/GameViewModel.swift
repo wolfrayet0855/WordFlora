@@ -37,6 +37,7 @@ final class GameViewModel {
     var aiIsModelBacked = false
     private(set) var simplerClue: String?
     private(set) var askingClue = false
+    private var roundToken = UUID()
     private(set) var revealedAnswer: String?
     private(set) var wrongStreak = 0
     private(set) var isTutorial = false
@@ -130,6 +131,8 @@ final class GameViewModel {
         usedRungs = []
         extraHint = nil
         simplerClue = nil
+        askingClue = false
+        roundToken = UUID()
         helpersUsed = 0
         revealedAnswer = nil
         wrongStreak = 0
@@ -183,10 +186,14 @@ final class GameViewModel {
 
     func askSimplerClue() async {
         guard canAskSimplerClue, let e = currentEntry else { return }
-        askingClue = true; defer { askingClue = false }
+        let token = roundToken
+        askingClue = true
         let text = await ai.simplerHint(for: e)
-        guard phase == .playing, currentEntry?.id == e.id, let t = text, HintValidator.isSafe(t, answer: e.word) else { return }
-        simplerClue = t.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard token == roundToken else { return }           // the round changed while the model was thinking
+        askingClue = false
+        guard phase == .playing, let t = text?.trimmingCharacters(in: .whitespacesAndNewlines), HintValidator.isSafe(t, answer: e.word),
+              t != e.hint2, t != extraHint, t != e.hint else { return }
+        simplerClue = t
     }
 
     enum KeyState: Equatable { case unused, correct, wrong }
