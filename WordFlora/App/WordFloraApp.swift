@@ -35,7 +35,14 @@ struct WordFloraApp: App {
                 bank = WordBank(schemaVersion: 1, bankVersion: "ui", entries: [entry], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
             }
         }
-        _app = State(initialValue: AppModel(container: container, settings: settings, bank: bank))
+        let model = AppModel(container: container, settings: settings, bank: bank)
+        if uiTesting && args.contains("-uitest-gardened") {
+            // A garden with one found plant and some supplies, for tending UI tests.
+            model.plants().first?.earnedCount = 1
+            model.profile?.water = 5; model.profile?.soil = 3
+            try? model.context.save()
+        }
+        _app = State(initialValue: model)
     }
 
     var body: some Scene {

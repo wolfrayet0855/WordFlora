@@ -23,6 +23,7 @@ final class PlantCollectible {
     var soilBoostUntil: Date?
     var lastPrunedAt: Date?
     var soilType: String = ""
+    var nickname: String = ""
 
     init(name: String, botanicalName: String, botanicalFact: String,
          level: Int, imageName: String, plantId: String? = nil) {

@@ -20,6 +20,7 @@ struct RootView: View {
                     switch route {
                     case .garden: GardenView()
                     case .game(let daily, let level): GameView(daily: daily, level: level)
+                    case .plant(let id): PlantDetailView(plantId: id)
                     case .settings: SettingsView()
                     case .levelMap: LevelMapView()
                     default: ComingSoonView(title: String(describing: route))

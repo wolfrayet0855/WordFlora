@@ -27,6 +27,9 @@ final class PlayerProfile {
     var shedPoints: Int = 0
     var toolsJSON: String = ""
     var activeToolId: String = "can"
+    var badgesJSON: String = ""
+    var albumJSON: String = ""
+    var butterflyPlaysJSON: String = ""
 
     init() {}
 }

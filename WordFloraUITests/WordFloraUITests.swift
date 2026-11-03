@@ -98,5 +98,20 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(app.switches["Haptics"].waitForExistence(timeout: 5))
         shot("settings")
     }
+
+    func testTendingAPlantShowsGentleFeedback() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened"]
+        app.launch()
+        app.buttons["Garden"].tap()
+        XCTAssertTrue(app.staticTexts["Level 1 · Seedling"].waitForExistence(timeout: 5))
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
+        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5))
+        shot("plant-detail")
+        app.buttons["Water"].tap()
+        XCTAssertTrue(app.staticTexts["+4 growth"].waitForExistence(timeout: 3))
+        app.buttons["Repot"].tap()
+        XCTAssertTrue(app.staticTexts["Choose a soil"].waitForExistence(timeout: 3))
+        shot("repot")
+    }
 }
 
