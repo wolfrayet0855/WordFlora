@@ -116,7 +116,7 @@ struct GameView: View {
                     Text(vm.hint).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                     Spacer(minLength: 0)
                     if ReadAloud.shouldOffer(voiceOverRunning: UIAccessibility.isVoiceOverRunning) {
-                        Button { ReadAloud.shared.speak(ReadAloud.script(hint: vm.hint, extra: vm.extraHint, simpler: vm.simplerClue)) } label: {
+                        Button { ReadAloud.shared.speak(hint: vm.hint, extra: vm.extraHint, simpler: vm.simplerClue) } label: {
                             Image(systemName: "speaker.wave.2.fill").frame(width: Theme.minTap, height: Theme.minTap)
                         }
                         .accessibilityLabel("Read the clue aloud")

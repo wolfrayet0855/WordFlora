@@ -112,4 +112,9 @@ final class SoundPlayer: SoundPlaying {
     }
 
     func stopAmbient() { ambient?.stop(); ambient = nil }
+
+    /// Lowers the garden bed while a clue is read aloud, then brings it back.
+    func duckAmbient(_ on: Bool) {
+        ambient?.setVolume(on ? 0.08 : SoundCatalog.ambientVolume, fadeDuration: on ? 0.25 : 0.6)
+    }
 }

@@ -19,6 +19,7 @@
 		170893E1A2616D1CEACC9A9D /* wf-earned.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5510B1B69285FC4D97F91D07 /* wf-earned.m4a */; };
 		1A0DEDAC7F9EC16779453E20 /* WordFloraWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 99F163FA4DA73F8563DD08F0 /* WordFloraWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1A1EF2246D18FBC822B23F43 /* wf-butterfly.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B3C67B3F3D18A565BC91069D /* wf-butterfly.m4a */; };
+		1B1F6E25CDDEF290B4E2EDA4 /* VoicePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673807997651A94A74A50735 /* VoicePickerTests.swift */; };
 		1CEC41D7155EFBA55139F8BF /* ButterflyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F887962950E79A156ED26A3F /* ButterflyView.swift */; };
 		1D3676A7C18FACB6F1FC68CD /* RoseMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */; };
 		204098414E074C6111011CE4 /* TendingEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A934E0013AAE5EB7DE9896 /* TendingEngineTests.swift */; };
@@ -98,6 +99,7 @@
 		9C64E00429B6E0B94A88592A /* FlowerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0AF7DB096B1ADC301F75FE /* FlowerView.swift */; };
 		9CD2F602E0C7313FD3967ACE /* WordProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B62098E04C3095B889397EC /* WordProvider.swift */; };
 		A098A91A27E224C0263F98F9 /* wf-wake.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A567F6286A4FDF9DA2E6D05B /* wf-wake.m4a */; };
+		A14AD4EB4C33371F7270A10C /* VoicePicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6A01FC491120FB6F06CDF63 /* VoicePicker.swift */; };
 		A3860B5AF44F5DF4BC8E92A4 /* PlantVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2732222DBF50FDA29A7C62BE /* PlantVoice.swift */; };
 		AA4693D64441616078B1A314 /* GardenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED57CCECFEDB2A2033A60F12 /* GardenView.swift */; };
 		AA753988BC83E23E320FFC56 /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53AF4373CF0983348711216 /* Badges.swift */; };
@@ -236,6 +238,7 @@
 		616F9C7CA1B8EB8C04DD8F97 /* Theme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		6406AFD4A968B89AEFEE8100 /* WordFloraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6624B0783F70383BBF4A343C /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		673807997651A94A74A50735 /* VoicePickerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoicePickerTests.swift; sourceTree = "<group>"; };
 		6ABB0A3A61951013C0E5506F /* CapacityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CapacityTests.swift; sourceTree = "<group>"; };
 		6ACF0034A28D0F546B9B9DB9 /* wf-badgeSilver.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeSilver.m4a"; sourceTree = "<group>"; };
 		6BA2FA0C2D96FAD52648169E /* Sound.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Sound.swift; sourceTree = "<group>"; };
@@ -279,6 +282,7 @@
 		A2BDF97F749985947F3401F0 /* WordFloraWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = WordFloraWidget.entitlements; sourceTree = "<group>"; };
 		A52DDAFDFAE9419F12ADE568 /* WordFloraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A567F6286A4FDF9DA2E6D05B /* wf-wake.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-wake.m4a"; sourceTree = "<group>"; };
+		A6A01FC491120FB6F06CDF63 /* VoicePicker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoicePicker.swift; sourceTree = "<group>"; };
 		A86EDC2288FBFA94769434C1 /* wf-rest.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-rest.m4a"; sourceTree = "<group>"; };
 		B0DEEEBD8B052299970213DD /* wf-key.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-key.m4a"; sourceTree = "<group>"; };
 		B1A188B4F331705EAF0FD7F2 /* ProgressionPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProgressionPolicy.swift; sourceTree = "<group>"; };
@@ -455,6 +459,7 @@
 			children = (
 				6BA2FA0C2D96FAD52648169E /* Sound.swift */,
 				78762A5E58BEBD2ED663551F /* ReadAloud.swift */,
+				A6A01FC491120FB6F06CDF63 /* VoicePicker.swift */,
 			);
 			name = Audio;
 			path = Audio;
@@ -523,6 +528,7 @@
 				C884E85DCD91B1E264D8D134 /* WelcomeBackTests.swift */,
 				BA36455C53FE74BB10637F1D /* PlantVoiceTests.swift */,
 				6ABB0A3A61951013C0E5506F /* CapacityTests.swift */,
+				673807997651A94A74A50735 /* VoicePickerTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -919,6 +925,7 @@
 				29C834FF07AE008DC3D27B74 /* WelcomeBackTests.swift in Sources */,
 				9AC2628E6C5C075B764C235A /* PlantVoiceTests.swift in Sources */,
 				73A960D878B4124A30601B58 /* CapacityTests.swift in Sources */,
+				1B1F6E25CDDEF290B4E2EDA4 /* VoicePickerTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1016,6 +1023,7 @@
 				3BE600FC34C69EEF9EDACA75 /* WelcomeBack.swift in Sources */,
 				A3860B5AF44F5DF4BC8E92A4 /* PlantVoice.swift in Sources */,
 				B5125DC1F13A03C81A450D4F /* GardenTips.swift in Sources */,
+				A14AD4EB4C33371F7270A10C /* VoicePicker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
