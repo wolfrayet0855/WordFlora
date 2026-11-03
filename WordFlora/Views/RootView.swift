@@ -6,18 +6,26 @@ struct RootView: View {
 
     var body: some View {
         @Bindable var router = router
-        NavigationStack(path: $router.path) {
+        Group {
+            if app.onboarding.isComplete { mainStack(router: $router.path) } else { OnboardingView() }
+        }
+        .tint(Color.appSuccess)
+        .preferredColorScheme(app.settings.colorScheme)
+    }
+
+    private func mainStack(router path: Binding<[GameRoute]>) -> some View {
+        NavigationStack(path: path) {
             HomeView()
                 .navigationDestination(for: GameRoute.self) { route in
                     switch route {
                     case .garden: GardenView()
-                    case .game(let daily): GameView(daily: daily)
+                    case .game(let daily, let level): GameView(daily: daily, level: level)
+                    case .settings: SettingsView()
+                    case .levelMap: LevelMapView()
                     default: ComingSoonView(title: String(describing: route))
                     }
                 }
         }
-        .tint(Color.appSuccess)
-        .preferredColorScheme(app.settings.colorScheme)
     }
 }
 

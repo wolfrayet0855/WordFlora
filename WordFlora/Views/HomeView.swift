@@ -35,13 +35,13 @@ struct HomeView: View {
                                    best: profile?.bestStreak ?? 0)
                 }
 
-                Button { router.go(.game(daily: false)) } label: {
+                Button { router.go(.game(daily: false, level: nil)) } label: {
                     Label("Play", systemImage: "play.fill")
                 }
                 .buttonStyle(PrimaryButtonStyle())
 
                 if app.isUnlocked(.dailyBloom) {
-                    Button { router.go(.game(daily: true)) } label: {
+                    Button { router.go(.game(daily: true, level: nil)) } label: {
                         HStack {
                             Image(systemName: "sun.max.fill").foregroundStyle(Color.appAccent)
                             VStack(alignment: .leading, spacing: 2) {

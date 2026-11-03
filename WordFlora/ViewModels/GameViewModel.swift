@@ -32,6 +32,7 @@ final class GameViewModel {
     private(set) var helpersUsed = 0
     private(set) var revealedAnswer: String?
     private(set) var wrongStreak = 0
+    private(set) var isTutorial = false
 
     // Round result
     private(set) var earnedPlantName: String?
@@ -92,8 +93,14 @@ final class GameViewModel {
         begin(e, daily: true)
     }
 
-    /// Direct start (tutorial word, tests).
+    /// Direct start (tests, previews).
     func start(entry: WordEntry) { begin(entry, daily: false) }
+
+    /// First-session word: cannot be lost (the flower keeps one petal) and does not count toward ad or session counters.
+    func startTutorial(entry: WordEntry) {
+        begin(entry, daily: false)
+        isTutorial = true
+    }
 
     private func begin(_ e: WordEntry, daily: Bool) {
         currentEntry = e
@@ -106,6 +113,7 @@ final class GameViewModel {
         helpersUsed = 0
         revealedAnswer = nil
         wrongStreak = 0
+        isTutorial = false
         reviveUsedThisRound = false
         earnedPlantName = nil
         earnedPlantIsNew = false
@@ -130,7 +138,7 @@ final class GameViewModel {
             wrongStreak = 0
             playSound("correct")
         } else {
-            petalsRemaining -= 1
+            if !(isTutorial && petalsRemaining <= 1) { petalsRemaining -= 1 }   // tutorial floor: keep going!
             wrongStreak += 1
             playSound("incorrect")
         }
@@ -279,11 +287,11 @@ final class GameViewModel {
         writeRoseMeter(meter)
 
         // Ad cadence counter and session beat (regular rounds only)
-        if !isDaily {
+        if !isDaily && !isTutorial {
             profile.roundsSinceAd += 1
             regularRoundsThisSitting += 1
         }
-        sessionBeat = isDaily || (regularRoundsThisSitting > 0 && regularRoundsThisSitting % 3 == 0)
+        sessionBeat = !isTutorial && (isDaily || (regularRoundsThisSitting > 0 && regularRoundsThisSitting % 3 == 0))
 
         try? modelContext.save()
         playSound(won ? "word-guessed" : "word-not-guessed")

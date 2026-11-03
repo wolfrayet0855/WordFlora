@@ -3,6 +3,9 @@ import AVFoundation
 
 struct GameView: View {
     let daily: Bool
+    var level: Int? = nil
+    var tutorial = false
+    var onTutorialFinished: () -> Void = {}
 
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
@@ -25,6 +28,10 @@ struct GameView: View {
                 hintCard
                 WordTilesView(word: vm.currentWord, guessed: vm.guessedLetters, revealAll: vm.phase == .rested)
                     .padding(.horizontal, 8)
+                if tutorial && vm.guessedLetters.isEmpty {
+                    Text("Tap a letter to guess").font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appSuccess)
+                        .symbolEffect(.pulse)
+                }
                 Spacer(minLength: 4)
                 KeyboardView(state: { vm.keyState(for: $0) }, onTap: tap, enabled: vm.phase == .playing)
                     .padding(.bottom, 8)
@@ -44,7 +51,8 @@ struct GameView: View {
             guard !started else { return }
             started = true
             vm.soundEnabled = app.settings.soundOn
-            if daily { vm.startDaily() } else { vm.startRound(level: nil) }
+            if tutorial { vm.startTutorial(entry: Self.tutorialEntry(in: app.bank)) }
+            else if daily { vm.startDaily() } else { vm.startRound(level: level) }
         }
         .onChange(of: vm.phase) { _, phase in
             if phase == .won {
@@ -58,11 +66,15 @@ struct GameView: View {
 
     private var topBar: some View {
         HStack {
-            Button { router.home() } label: { Image(systemName: "house.fill").frame(width: Theme.minTap, height: Theme.minTap) }
-                .accessibilityLabel("Home")
+            if tutorial {
+                Color.clear.frame(width: Theme.minTap, height: Theme.minTap)
+            } else {
+                Button { router.home() } label: { Image(systemName: "house.fill").frame(width: Theme.minTap, height: Theme.minTap) }
+                    .accessibilityLabel("Home")
+            }
             Spacer()
             VStack(spacing: 0) {
-                Text(daily ? "Daily Bloom" : "Level \(vm.currentLevel)").font(Theme.font(.headline))
+                Text(tutorial ? "Your first word" : daily ? "Daily Bloom" : "Level \(level ?? vm.currentLevel)").font(Theme.font(.headline))
                 if let e = vm.currentEntry { Text(e.kind == .hero ? "A plant" : "A garden word").font(Theme.font(.caption2)).foregroundStyle(Color.appPrimaryText.opacity(0.6)) }
             }
             Spacer()
@@ -176,7 +188,12 @@ struct GameView: View {
         withAnimation { vm.submitGuess() }
     }
 
+    static func tutorialEntry(in bank: WordBank) -> WordEntry {
+        bank.entries.first { $0.id == "l1-seed" } ?? bank.entries.first { $0.level == 1 && $0.kind == .vocab } ?? bank.entries[0]
+    }
+
     private func afterRound() {
+        if tutorial { onTutorialFinished(); return }
         if vm.sessionBeat { showRestCard = true } else if daily { router.home() } else { vm.startRound() }
     }
 

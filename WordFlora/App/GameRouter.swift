@@ -1,7 +1,7 @@
 import SwiftUI
 
 enum GameRoute: Hashable {
-    case game(daily: Bool)
+    case game(daily: Bool, level: Int?)
     case garden
     case plant(String)          // plantId
     case levelMap

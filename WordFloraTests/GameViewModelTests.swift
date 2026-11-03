@@ -273,5 +273,29 @@ final class GameViewModelTests: XCTestCase {
         let daily = DailyBloom(bank: bank(words), calendar: cal).wordId(for: now)
         for _ in 0..<20 { vm.startRound(); XCTAssertNotEqual(vm.currentEntry?.id, daily) }
     }
+
+    // MARK: tutorial word (first session)
+    func testTutorialWordCanNeverBeLost() throws {
+        let vm = try makeVM(); vm.startTutorial(entry: entry("t", "SEED"))
+        XCTAssertTrue(vm.isTutorial)
+        guess(vm, "ZXQJKVWYUPMN")
+        XCTAssertEqual(vm.petalsRemaining, 1)
+        XCTAssertEqual(vm.phase, .playing)
+        guess(vm, "SED")
+        XCTAssertEqual(vm.phase, .won)
+    }
+
+    func testTutorialWinDoesNotCountTowardTheAdCounterOrSessionBeat() throws {
+        let vm = try makeVM(); vm.startTutorial(entry: entry("t", "SEED")); guess(vm, "SED")
+        XCTAssertEqual(vm.playerProfile?.roundsSinceAd, 0)
+        XCTAssertFalse(vm.sessionBeat)
+        XCTAssertNotNil(vm.earnedPlantName)       // it still earns the first plant
+    }
+
+    func testTutorialFlagClearsOnTheNextRegularRound() throws {
+        let vm = try makeVM(); vm.startTutorial(entry: entry("t", "SEED"))
+        vm.start(entry: entry("a", "LOTUS"))
+        XCTAssertFalse(vm.isTutorial)
+    }
 }
 

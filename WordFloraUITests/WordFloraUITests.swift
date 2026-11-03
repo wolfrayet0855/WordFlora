@@ -69,4 +69,34 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Level 1 · Seedling"].waitForExistence(timeout: 5))
         shot("garden")
     }
+
+    // MARK: first session
+    func testFirstSessionFlowFromIntroToHome() {
+        app.launchArguments = ["-uitest", "-uitest-word=SEED"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Under 13"].waitForExistence(timeout: 8))      // intro rain, then the age question
+        shot("age")
+        XCTAssertFalse(app.buttons["Play"].exists)                              // no home chrome in session one
+        app.buttons["18 or older"].tap()
+        XCTAssertTrue(app.staticTexts["Tap a letter to guess"].waitForExistence(timeout: 5))
+        for ch in "ZXQJKVWYUPMN" { app.buttons[String(ch)].tap() }              // wrong guesses cannot end the tutorial
+        XCTAssertFalse(app.staticTexts["This one's resting."].exists)
+        for ch in "SED" { app.buttons[String(ch)].tap() }
+        XCTAssertTrue(app.staticTexts["New plant found!"].waitForExistence(timeout: 6))
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(app.buttons["Water your plant"].waitForExistence(timeout: 5))
+        shot("first-tip")
+        app.buttons["Water your plant"].tap()
+        app.buttons["Play another word"].tap()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["Levels"].exists)                            // later features stay hidden
+    }
+
+    func testSettingsAndLevelMapOpen() {
+        launch()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.switches["Haptics"].waitForExistence(timeout: 5))
+        shot("settings")
+    }
 }
+
