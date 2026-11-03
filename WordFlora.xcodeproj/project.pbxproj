@@ -25,18 +25,22 @@
 		6D2F71A8A90D3F1FF82FEB03 /* AssistTuner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E08620029509154DEB72456 /* AssistTuner.swift */; };
 		812CC68498F635B4E42F0D32 /* FeatureUnlockPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */; };
 		8CDA4D0BA93F589962585DB8 /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6305635D642316CCE8610F /* GameRecord.swift */; };
+		8EE94A601E0EFA010CB76EE6 /* Badges.json in Resources */ = {isa = PBXBuildFile; fileRef = DE3B9B93CE1A034E8C165CB7 /* Badges.json */; };
 		94D8860C3740EB26ADB252F0 /* ToolEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D9F7603039699D755A5EDB /* ToolEngineTests.swift */; };
 		9603333091B94F1CE68C0A45 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9075581718316A5EDE6C92FD /* GameViewModel.swift */; };
 		9640E4CF89AD1324C08B70FE /* CoreRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03162041D3ADF3CEE1CCF23B /* CoreRulesTests.swift */; };
+		97840C908C8D6F794ACC028D /* Butterfly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C2253A511FED21EE98FCD0 /* Butterfly.swift */; };
 		9A467E6C2C922C05007E28B8 /* WordFloraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A467E6B2C922C05007E28B8 /* WordFloraApp.swift */; };
 		9A467E6E2C922C05007E28B8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A467E6D2C922C05007E28B8 /* ContentView.swift */; };
 		9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E6F2C922C06007E28B8 /* Assets.xcassets */; };
 		9A467E732C922C06007E28B8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E722C922C06007E28B8 /* Preview Assets.xcassets */; };
 		9B7A786AE42686E5A3545E3B /* TendingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 545F60B78CCEA135D7B2E627 /* TendingEngine.swift */; };
 		9CD2F602E0C7313FD3967ACE /* WordProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B62098E04C3095B889397EC /* WordProvider.swift */; };
+		AA753988BC83E23E320FFC56 /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53AF4373CF0983348711216 /* Badges.swift */; };
 		AC0534FE4A3F995C8A301AB0 /* RulesBatch2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188352F473E5A34955BC4F03 /* RulesBatch2Tests.swift */; };
 		C2FB34C4102FCBD97EADB91E /* CopySafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21DF9A95AEA44F66C376C83 /* CopySafety.swift */; };
 		C56399AF5A9FB677D166E85A /* WordEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1953888CF19BF643304ED9AC /* WordEntry.swift */; };
+		CAF520953ACDC90D8798366B /* ButterflyAndBadgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB4718BD77C51EDD77A1A10A /* ButterflyAndBadgeTests.swift */; };
 		CEE0A8C8A89FF4365D45F346 /* PlantCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9331FDFC4EAE840666B50749 /* PlantCatalog.swift */; };
 		CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */; };
 		D61844C609FE7631DFFBF7CF /* Plants.json in Resources */ = {isa = PBXBuildFile; fileRef = 437318BFC10E7CDE04AF1603 /* Plants.json */; };
@@ -71,6 +75,7 @@
 		437318BFC10E7CDE04AF1603 /* Plants.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Plants.json; sourceTree = "<group>"; };
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
 		507CD36D0F85A153026420C3 /* WordBankValidator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordBankValidator.swift; sourceTree = "<group>"; };
+		51C2253A511FED21EE98FCD0 /* Butterfly.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Butterfly.swift; sourceTree = "<group>"; };
 		545F60B78CCEA135D7B2E627 /* TendingEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendingEngine.swift; sourceTree = "<group>"; };
 		5CB68790025C9135B9C9E7DA /* OnboardingFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingFlow.swift; sourceTree = "<group>"; };
 		6406AFD4A968B89AEFEE8100 /* WordFloraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,11 +97,14 @@
 		B1A188B4F331705EAF0FD7F2 /* ProgressionPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProgressionPolicy.swift; sourceTree = "<group>"; };
 		B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerProfile.swift; sourceTree = "<group>"; };
 		B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SplitMix64.swift; sourceTree = "<group>"; };
+		BB4718BD77C51EDD77A1A10A /* ButterflyAndBadgeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyAndBadgeTests.swift; sourceTree = "<group>"; };
 		BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyBloom.swift; sourceTree = "<group>"; };
 		D1A934E0013AAE5EB7DE9896 /* TendingEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendingEngineTests.swift; sourceTree = "<group>"; };
 		D7C771AB1111BA1267E678AF /* PlantCollectible.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCollectible.swift; sourceTree = "<group>"; };
+		DE3B9B93CE1A034E8C165CB7 /* Badges.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Badges.json; sourceTree = "<group>"; };
 		E6170EEBB1FE8D65905545EE /* HelpLadder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HelpLadder.swift; sourceTree = "<group>"; };
 		E6D611CA0D8CDFFDC0D1E80D /* AdGate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AdGate.swift; sourceTree = "<group>"; };
+		F53AF4373CF0983348711216 /* Badges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,6 +150,8 @@
 				6E08620029509154DEB72456 /* AssistTuner.swift */,
 				5CB68790025C9135B9C9E7DA /* OnboardingFlow.swift */,
 				354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */,
+				51C2253A511FED21EE98FCD0 /* Butterfly.swift */,
+				F53AF4373CF0983348711216 /* Badges.swift */,
 			);
 			name = Rules;
 			path = Rules;
@@ -152,6 +162,7 @@
 			children = (
 				437318BFC10E7CDE04AF1603 /* Plants.json */,
 				9D91134EF7A4DA4C11EB9E23 /* Words.json */,
+				DE3B9B93CE1A034E8C165CB7 /* Badges.json */,
 			);
 			name = Resources;
 			path = Resources;
@@ -179,6 +190,7 @@
 				D1A934E0013AAE5EB7DE9896 /* TendingEngineTests.swift */,
 				188352F473E5A34955BC4F03 /* RulesBatch2Tests.swift */,
 				08D9F7603039699D755A5EDB /* ToolEngineTests.swift */,
+				BB4718BD77C51EDD77A1A10A /* ButterflyAndBadgeTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -346,6 +358,7 @@
 				9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */,
 				D61844C609FE7631DFFBF7CF /* Plants.json in Resources */,
 				59896F4A896FCF2AAA27E877 /* Words.json in Resources */,
+				8EE94A601E0EFA010CB76EE6 /* Badges.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,6 +376,7 @@
 				204098414E074C6111011CE4 /* TendingEngineTests.swift in Sources */,
 				AC0534FE4A3F995C8A301AB0 /* RulesBatch2Tests.swift in Sources */,
 				94D8860C3740EB26ADB252F0 /* ToolEngineTests.swift in Sources */,
+				CAF520953ACDC90D8798366B /* ButterflyAndBadgeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,6 +409,8 @@
 				6D2F71A8A90D3F1FF82FEB03 /* AssistTuner.swift in Sources */,
 				F935EF5C075DD18A90D60D6E /* OnboardingFlow.swift in Sources */,
 				6B6F1DB72D2C6C1D6C0E5390 /* ToolEngine.swift in Sources */,
+				97840C908C8D6F794ACC028D /* Butterfly.swift in Sources */,
+				AA753988BC83E23E320FFC56 /* Badges.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
