@@ -16,7 +16,7 @@ struct WaterPlantIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        if let container = try? SharedContainer.make(createIfMissing: false) {
+        if let container = try? SharedContainer.make(role: .appExtension) {
             WidgetActions.water(plantId: plantId, context: container.mainContext, now: .now, calendar: .current, quiet: SharedDefaults.quietGarden)
         }
         return .result()
@@ -29,6 +29,7 @@ struct GardenEntry: TimelineEntry {
     let date: Date
     let snapshot: WidgetActions.GardenSnapshot
     let quiet: Bool
+    var unavailable = false
 }
 
 struct GardenProvider: TimelineProvider {
@@ -43,14 +44,15 @@ struct GardenProvider: TimelineProvider {
     func getTimeline(in context: Context, completion: @escaping (Timeline<GardenEntry>) -> Void) {
         Task { @MainActor in
             // One entry; the thirsty look is computed when the widget draws, so a slow refresh is enough (spec section 4).
-            completion(Timeline(entries: [load()], policy: .after(Date().addingTimeInterval(6 * 3600))))
+            let entry = load()
+            completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(entry.unavailable ? 15 * 60 : 6 * 3600))))
         }
     }
 
     @MainActor private func load() -> GardenEntry {
         let calm = true /* never the thirsty look in a widget */, quiet = SharedDefaults.quietGarden
-        guard let container = try? SharedContainer.make(createIfMissing: false) else {
-            return GardenEntry(date: .now, snapshot: .init(hero: nil, others: [], water: 0), quiet: quiet)
+        guard let container = try? SharedContainer.make(role: .appExtension) else {
+            return GardenEntry(date: .now, snapshot: .init(hero: nil, others: [], water: 0), quiet: quiet, unavailable: true)
         }
         return GardenEntry(date: .now, snapshot: WidgetActions.snapshot(context: container.mainContext, now: .now, calm: calm), quiet: quiet)
     }
@@ -158,7 +160,7 @@ struct GardenWidgetView: View {
                     Text("Growing nicely").font(.caption)
                     Gauge(value: s.growthFraction) { EmptyView() }.gaugeStyle(.accessoryLinearCapacity)
                 }
-            } else { Text("Play a word to find your first plant").font(.caption) }
+            } else { Text(entry.unavailable ? GardenFallback.widgetLine : "Play a word to find your first plant").font(.caption) }
         }
     }
 

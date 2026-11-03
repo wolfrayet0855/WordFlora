@@ -14,8 +14,8 @@ struct WaterGardenIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult & ProvidesDialog {
-        guard let container = GardenIntentHost.container ?? (try? SharedContainer.make(createIfMissing: false)) else {
-            return .result(dialog: "Open WordFlora once to start your garden.")
+        guard let container = GardenIntentHost.container ?? (try? SharedContainer.make(role: .appExtension)) else {
+            return .result(dialog: IntentDialog(stringLiteral: GardenFallback.intentLine))
         }
         let line = WidgetActions.waterGarden(context: container.mainContext, now: .now, calendar: .current, quiet: SharedDefaults.quietGarden)
         WidgetCenter.shared.reloadAllTimelines()

@@ -13,8 +13,9 @@ enum StoreMigrator {
 
         func temp(_ suffix: String) -> URL { URL(fileURLWithPath: new.path + suffix + ".migrating") }
 
-        // Clean up anything a crashed earlier attempt left behind.
+        // Clean up anything a crashed earlier attempt left behind, including sidecars with no main file.
         for s in sidecars { try? fm.removeItem(at: temp(s)) }
+        for s in sidecars where s != "" { try? fm.removeItem(atPath: new.path + s) }
 
         do {
             try fm.createDirectory(at: new.deletingLastPathComponent(), withIntermediateDirectories: true)

@@ -103,31 +103,7 @@ final class ReconcileTests: XCTestCase {
         XCTAssertEqual(app.badges.progress(of: .feeds), 30)
     }
 
-    // MARK: store location (reviewer C2)
-    func testFailedMigrationOpensTheLegacyStoreInsteadOfCreatingAnEmptyOne() throws {
-        let fm = FileManager.default
-        let dir = fm.temporaryDirectory.appendingPathComponent("wf-resolve-\(UUID().uuidString)"); try fm.createDirectory(at: dir, withIntermediateDirectories: true)
-        defer { try? fm.removeItem(at: dir) }
-        let support = dir.appendingPathComponent("support"); try fm.createDirectory(at: support, withIntermediateDirectories: true)
-        try "DATA".write(to: support.appendingPathComponent("default.store"), atomically: true, encoding: .utf8)
-        let blocker = dir.appendingPathComponent("group"); try "file, not a folder".write(to: blocker, atomically: true, encoding: .utf8)   // migration cannot succeed
-        let r = SharedContainer.resolveStoreURL(groupContainer: blocker, appSupport: support)
-        XCTAssertEqual(r.url.lastPathComponent, "default.store"); XCTAssertTrue(r.usedLegacy)
-    }
-
-    func testSuccessfulMigrationUsesTheGroupStoreAndFreshInstallsToo() throws {
-        let fm = FileManager.default
-        let dir = fm.temporaryDirectory.appendingPathComponent("wf-resolve2-\(UUID().uuidString)"); try fm.createDirectory(at: dir, withIntermediateDirectories: true)
-        defer { try? fm.removeItem(at: dir) }
-        let support = dir.appendingPathComponent("support"); try fm.createDirectory(at: support, withIntermediateDirectories: true)
-        let group = dir.appendingPathComponent("group"); try fm.createDirectory(at: group, withIntermediateDirectories: true)
-        try "DATA".write(to: support.appendingPathComponent("default.store"), atomically: true, encoding: .utf8)
-        let migrated = SharedContainer.resolveStoreURL(groupContainer: group, appSupport: support)
-        XCTAssertEqual(migrated.url.lastPathComponent, "WordFlora.store"); XCTAssertFalse(migrated.usedLegacy)
-        XCTAssertEqual(try String(contentsOf: migrated.url, encoding: .utf8), "DATA")
-        let fresh = SharedContainer.resolveStoreURL(groupContainer: dir.appendingPathComponent("group2"), appSupport: dir.appendingPathComponent("nothing"))
-        XCTAssertEqual(fresh.url.lastPathComponent, "WordFlora.store"); XCTAssertFalse(fresh.usedLegacy)
-    }
+    // MARK: store location is covered by StoreResolveTests
 
     func testTheWidgetNeverCreatesAStoreThatDoesNotExist() {
         XCTAssertThrowsError(try SharedContainer.make(createIfMissing: false, storeURLOverride: URL(fileURLWithPath: "/tmp/wf-definitely-missing-\(UUID().uuidString).store")))
