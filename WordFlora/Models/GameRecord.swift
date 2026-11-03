@@ -3,13 +3,13 @@ import Foundation
 
 @Model
 final class GameRecord {
-    var date: Date
-    var wordGuessed: String
-    var triviaQuestion: String
-    var won: Bool
-    var petalsRemaining: Int
+    var date: Date = Date.now
+    var wordGuessed: String = ""
+    var triviaQuestion: String = ""
+    var won: Bool = false
+    var petalsRemaining: Int = 0
     var plantEarned: String?
-    var level: Int
+    var level: Int = 1
     var wordId: String = ""
     var isDaily: Bool = false
 

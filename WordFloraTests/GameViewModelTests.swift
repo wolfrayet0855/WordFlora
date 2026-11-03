@@ -34,7 +34,7 @@ final class GameViewModelTests: XCTestCase {
     override func setUp() async throws {
         container = try ModelContainer(
             for: PlayerProfile.self, PlantCollectible.self, GameRecord.self,
-            configurations: ModelConfiguration(isStoredInMemoryOnly: true))
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
     }
 
     // MARK: basics
