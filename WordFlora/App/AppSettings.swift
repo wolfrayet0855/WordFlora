@@ -9,6 +9,7 @@ final class AppSettings {
     private let defaults: UserDefaults
 
     var soundOn: Bool { didSet { defaults.set(soundOn, forKey: "soundOn") } }
+    var ambienceOn: Bool { didSet { defaults.set(ambienceOn, forKey: "ambienceOn") } }
     var hapticsOn: Bool { didSet { defaults.set(hapticsOn, forKey: "hapticsOn") } }
     var reduceMotionOverride: Bool { didSet { defaults.set(reduceMotionOverride, forKey: "reduceMotionOverride") } }
     var calmMode: Bool { didSet { defaults.set(calmMode, forKey: "calmMode") } }
@@ -36,6 +37,7 @@ final class AppSettings {
         let age = defaults.string(forKey: "ageBand").flatMap(AgeBand.init(rawValue:))
         soundOn = bool("soundOn", true)
         hapticsOn = bool("hapticsOn", true)
+        ambienceOn = bool("ambienceOn", false)     // off by default, offered once
         reduceMotionOverride = bool("reduceMotionOverride", false)
         // Younger players start in the gentlest configuration.
         calmMode = bool("calmMode", age == .under13)

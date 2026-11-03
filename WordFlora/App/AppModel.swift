@@ -37,6 +37,7 @@ final class AppModel {
         game.soundEnabled = settings.soundOn
         game.seedPlantsIfNeeded()
         game.refreshLevel()
+        SoundPlayer.configureSession()
         if settings.onboardingComplete { settings.completedSessions += 1 }
         let defs = (try? BadgeCatalog.load()) ?? []
         badges = BadgeState(json: game.playerProfile?.badgesJSON ?? "", defs: defs)
@@ -278,6 +279,7 @@ final class AppModel {
         let before = profile?.roseOfJerichoCount ?? 0
         game.wakeUp()
         guard (profile?.roseOfJerichoCount ?? 0) < before else { return }
+        play(.wake)
         badges.record(.revives, now: now(), quiet: settings.quietGarden)
         profile?.badgesJSON = badges.json
         try? context.save()
@@ -355,5 +357,18 @@ final class AppModel {
     func refreshReminders() {
         guard settings.remindMe else { return }
         reminders.refresh(now: now(), hour: settings.reminderHour, minute: settings.reminderMinute, lastOpened: now(), dailyBloomDoneToday: dailyBloomDoneToday)
+    }
+
+    // MARK: Sound
+
+    /// One place that honours the Sound setting for every non-round sound.
+    func play(_ event: SoundEvent) {
+        SoundPlayer.shared.enabled = settings.soundOn
+        SoundPlayer.shared.play(event)
+    }
+
+    func updateAmbience() {
+        SoundPlayer.shared.enabled = settings.soundOn
+        if settings.soundOn && settings.ambienceOn { SoundPlayer.shared.startAmbient() } else { SoundPlayer.shared.stopAmbient() }
     }
 }

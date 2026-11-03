@@ -18,7 +18,8 @@ struct SettingsView: View {
                 Toggle("Show streak", isOn: $s.showStreak)
             }
             Section("Comfort") {
-                Toggle("Sound", isOn: $s.soundOn).onChange(of: s.soundOn) { _, v in app.game.soundEnabled = v }
+                Toggle("Sound", isOn: $s.soundOn).onChange(of: s.soundOn) { _, v in app.game.soundEnabled = v; app.updateAmbience() }
+                Toggle("Garden ambience", isOn: $s.ambienceOn).onChange(of: s.ambienceOn) { _, _ in app.updateAmbience() }
                 Toggle("Haptics", isOn: $s.hapticsOn)
                 Toggle("Calm mode", isOn: $s.calmMode)
                 Toggle("Quiet Garden", isOn: $s.quietGarden)

@@ -147,6 +147,14 @@ struct PlantDetailView: View {
 
     private func run(_ action: AppModel.TendAction, _ plant: PlantCollectible) {
         let outcome = app.tend(action, plant: plant)
+        if outcome.applied {
+            switch action {
+            case .water: app.play(.water)
+            case .feed, .repot: app.play(.soil)
+            case .sun: app.play(.sun)
+            case .prune: app.play(.snip)
+            }
+        }
         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { toast = outcome.message }
         if outcome.stageUp { bump.toggle() }
         AccessibilityNotification.Announcement(outcome.message).post()

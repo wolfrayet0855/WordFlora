@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import AVFAudio
 
 /// Round logic for WordFlora v2 (spec sections 2, 3, 18, 19). No network: words come from the bundled bank.
 @Observable
@@ -14,13 +13,16 @@ final class GameViewModel {
     private let now: () -> Date
     private let calendar: Calendar
     private var rng: SplitMix64
-    private var audioPlayer: AVAudioPlayer?
+    private let sounds: SoundPlaying
     private var usedRungs: Set<HelpLadder.Rung> = []
     private var reviveUsedThisRound = false
     private var roundId = UUID().uuidString
     private var regularRoundsThisSitting = 0
 
-    var soundEnabled = true
+    var soundEnabled: Bool {
+        get { sounds.enabled }
+        set { sounds.enabled = newValue }
+    }
 
     // Round state
     private(set) var currentEntry: WordEntry?
@@ -64,7 +66,9 @@ final class GameViewModel {
     var petalsAccessibilityLabel: String { "\(petalsRemaining) of \(economy.maxPetals) petals left" }
 
     init(modelContext: ModelContext, bank: WordBank, economy: Economy = .default,
-         now: @escaping () -> Date = { .now }, calendar: Calendar = .current, seed: UInt64 = UInt64.random(in: .min ... .max)) {
+         now: @escaping () -> Date = { .now }, calendar: Calendar = .current, seed: UInt64 = UInt64.random(in: .min ... .max),
+         sounds: SoundPlaying = SoundPlayer.shared) {
+        self.sounds = sounds
         self.modelContext = modelContext
         self.bank = bank
         self.economy = economy
@@ -140,12 +144,12 @@ final class GameViewModel {
 
         if currentWord.contains(letter) {
             wrongStreak = 0
-            playSound("correct")
+            sounds.play(.correct)
         } else {
             if !(isTutorial && petalsRemaining <= 1) { petalsRemaining -= 1 }   // tutorial floor: keep going!
             wrongStreak += 1
             missesThisRound += 1
-            playSound("incorrect")
+            sounds.play(.wrong)
         }
 
         if isWordComplete {
@@ -301,7 +305,7 @@ final class GameViewModel {
         sessionBeat = !isTutorial && (isDaily || (regularRoundsThisSitting > 0 && regularRoundsThisSitting % 3 == 0))
 
         try? modelContext.save()
-        playSound(won ? "word-guessed" : "word-not-guessed")
+        sounds.play(won ? .word : .rest)
     }
 
     /// One water for a win, +1 for a clean round (<= 2 misses), +1 on the Daily Bloom. Help never reduces it below 1.
@@ -331,12 +335,5 @@ final class GameViewModel {
             return (pick.name, false)
         }
         return nil
-    }
-
-    private func playSound(_ name: String) {
-        guard soundEnabled, let asset = NSDataAsset(name: name),
-              let player = try? AVAudioPlayer(data: asset.data) else { return }
-        audioPlayer = player
-        player.play()
     }
 }

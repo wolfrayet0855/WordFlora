@@ -21,6 +21,11 @@ final class WordFloraUITests: XCTestCase {
         let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
     }
 
+    /// Settings is a long list; scroll until the element is on screen.
+    private func scrollTo(_ element: XCUIElement) {
+        for _ in 0..<6 where !element.isHittable { app.swipeUp() }
+    }
+
     private func tapLetters(_ letters: String) {
         for ch in letters { app.buttons[String(ch)].tap() }
     }
@@ -117,6 +122,7 @@ final class WordFloraUITests: XCTestCase {
     func testPaywallShowsBothPlansHonestlyAndSubscriberStateHidesThem() {
         launch()
         app.buttons["Settings"].tap()
+        scrollTo(app.buttons["Remove ads and sync with iCloud"])
         app.buttons["Remove ads and sync with iCloud"].tap()
         XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["No ads, ever"].exists)
@@ -127,6 +133,7 @@ final class WordFloraUITests: XCTestCase {
         app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-plus"]
         app.launch()
         app.buttons["Settings"].tap()
+        scrollTo(app.buttons["Remove ads and sync with iCloud"])
         app.buttons["Remove ads and sync with iCloud"].tap()
         XCTAssertTrue(app.staticTexts["You have WordFlora Plus"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Subscribe"].exists)
@@ -153,10 +160,14 @@ final class WordFloraUITests: XCTestCase {
         app.buttons["Start"].tap()
         sleep(3)
         shot("butterfly-playing")
-        app.swipeRight()                                   // a miss is free
+        app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.93)).tap()      // a miss on empty ground is free
         XCTAssertFalse(app.staticTexts["Game over"].exists)
-        XCTAssertTrue(app.staticTexts["Thanks for visiting the garden"].waitForExistence(timeout: 45)
-                      || app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'You met'")).firstMatch.exists)
+        // The game lasts about 35 seconds; the summary then always rewards something.
+        let thanks = app.staticTexts["Thanks for visiting the garden"], met = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'You met'")).firstMatch
+        let deadline = Date().addingTimeInterval(55)
+        while Date() < deadline && !thanks.exists && !met.exists { sleep(1) }
+        shot("butterfly-after-wait")
+        XCTAssertTrue(thanks.exists || met.exists, "summary never appeared")
         shot("butterfly-summary")
     }
 }

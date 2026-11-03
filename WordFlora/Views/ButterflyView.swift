@@ -11,6 +11,7 @@ struct ButterflyView: View {
     @State private var popups: [Popup] = []
     @State private var useLantern = false
     @State private var showAlbum = false
+    @State private var lastTick = Date()
     private let ticker = Timer.publish(every: 1.0 / 30.0, on: .main, in: .common).autoconnect()
 
     struct Popup: Identifiable { let id = UUID(); var species: String; var at: CGPoint }
@@ -26,9 +27,12 @@ struct ButterflyView: View {
         .navigationTitle("Butterfly game")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showAlbum) { AlbumView().environment(app) }
-        .onReceive(ticker) { _ in
-            guard var g = game, summary == nil else { return }
-            g.tick(1.0 / 30.0)
+        .onReceive(ticker) { now in
+            guard var g = game, summary == nil else { lastTick = now; return }
+            // Real elapsed time, so a busy screen can never slow the game down; capped so a long pause isn't a jump.
+            let dt = min(0.1, max(0, now.timeIntervalSince(lastTick)))
+            lastTick = now
+            g.tick(dt)
             game = g
             if g.isFinished { finish(g) }
         }
@@ -151,6 +155,7 @@ struct ButterflyView: View {
 
     private func start() {
         game = app.startButterflyGame(useLantern: useLantern, reduceMotion: reduceMotion)
+        lastTick = Date()
         summary = nil
     }
 
@@ -160,6 +165,7 @@ struct ButterflyView: View {
         let radius = 48 / size.width
         guard let species = g.catchAt(x: point.x / size.width, y: point.y / size.height, radius: max(0.08, radius)) else { return }
         game = g
+        app.play(.butterfly)
         let popup = Popup(species: species, at: point)
         withAnimation(.spring(response: 0.3, dampingFraction: 0.55)) { popups.append(popup) }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { withAnimation { popups.removeAll { $0.id == popup.id } } }
@@ -168,6 +174,7 @@ struct ButterflyView: View {
 
     private func finish(_ g: ButterflyGameModel) {
         summary = app.finishButterflyGame(g)
+        app.play(.earned)
         app.markPeakDismissed()
     }
 }

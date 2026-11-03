@@ -58,6 +58,7 @@ struct GameView: View {
         .onChange(of: vm.phase) { _, phase in
             if phase == .won || phase == .rested { showBadges(app.roundFinished()) }
             if phase == .won {
+                app.play(vm.leveledUp ? .levelUp : .earned)
                 showRain = !app.settings.calmMode
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { showEarned = true }
             }
@@ -205,6 +206,7 @@ struct GameView: View {
         let tier = ["Bronze", "Silver", "Gold"][max(0, min(2, u.tier - 1))]
         app.markPeakDismissed()
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            app.play(.badge(tier: u.tier))
             withAnimation { badgeToast = "\(tier) \(title)" }
             DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) { withAnimation { badgeToast = nil } }
         }

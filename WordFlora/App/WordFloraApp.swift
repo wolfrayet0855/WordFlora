@@ -63,7 +63,8 @@ struct WordFloraApp: App {
                 .onChange(of: scenePhase) { _, phase in
                     // Keep the home-screen widget in step with what the player just did.
                     if phase == .background || phase == .inactive { WidgetCenter.shared.reloadAllTimelines(); app.refreshReminders() }
-                    if phase == .active { app.refreshFreeDrops() }
+                    if phase == .active { app.refreshFreeDrops(); app.updateAmbience() }
+                    if phase == .background { SoundPlayer.shared.stopAmbient() }
                 }
         }
     }
