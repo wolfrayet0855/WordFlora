@@ -33,9 +33,9 @@ final class RulesBatch2Tests: XCTestCase {
         XCTAssertTrue(AdGate.shouldShowInterstitial(ctx { $0.adsToday = 5 }))
     }
 
-    func testNoAdWithinTwoMinutesOfAPeakMoment() {
-        XCTAssertFalse(AdGate.shouldShowInterstitial(ctx { $0.lastPeakAt = t0.addingTimeInterval(-119) }))
-        XCTAssertTrue(AdGate.shouldShowInterstitial(ctx { $0.lastPeakAt = t0.addingTimeInterval(-121) }))
+    func testNoAdInsideTheCelebrationWindowAfterAPeakIsDismissed() {
+        XCTAssertFalse(AdGate.shouldShowInterstitial(ctx { $0.lastPeakAt = t0.addingTimeInterval(-4) }))
+        XCTAssertTrue(AdGate.shouldShowInterstitial(ctx { $0.lastPeakAt = t0.addingTimeInterval(-6) }))
     }
 
     func testRemoteFrequencyIsHonoured() {

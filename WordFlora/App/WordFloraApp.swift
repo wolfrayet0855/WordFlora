@@ -45,6 +45,7 @@ struct WordFloraApp: App {
         if uiTesting && args.contains("-uitest-plus") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
+        if uiTesting && !args.contains("-uitest-ads") { model.adsEnabled = false }
         _app = State(initialValue: model)
     }
 

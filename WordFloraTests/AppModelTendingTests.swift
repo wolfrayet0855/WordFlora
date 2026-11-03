@@ -82,4 +82,77 @@ final class AppModelTendingTests: XCTestCase {
         XCTAssertEqual(app.badges.progress(of: .waterings), 3)
         XCTAssertFalse(app.profile?.badgesJSON.isEmpty ?? true)       // persisted
     }
+
+    // MARK: ads accounting
+    func testAdContextReflectsTheProfileSettingsAndEntitlements() throws {
+        let t = Date(timeIntervalSince1970: 1_780_000_000)
+        let app = try makeApp(now: { t })
+        app.profile?.roundsSinceAd = 3; app.profile?.currentLevel = 2
+        app.settings.ageBand = .eighteenPlus; app.settings.completedSessions = 3
+        let c = app.adContext(choice: .oneMore)
+        XCTAssertEqual(c.roundsSinceAd, 3); XCTAssertEqual(c.wordLevelUps, 1); XCTAssertEqual(c.completedSessions, 3)
+        XCTAssertEqual(c.choice, .oneMore); XCTAssertFalse(c.isUnderThirteen); XCTAssertFalse(c.hasRemoveAds)
+        XCTAssertTrue(AdGate.shouldShowInterstitial(c))
+        app.settings.ageBand = .under13
+        XCTAssertFalse(AdGate.shouldShowInterstitial(app.adContext(choice: .oneMore)))
+        app.settings.ageBand = .eighteenPlus
+        app.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_monthly"]))
+        XCTAssertFalse(AdGate.shouldShowInterstitial(app.adContext(choice: .oneMore)))
+    }
+
+    func testAnUnknownAgeNeverGetsAds() throws {
+        let app = try makeApp(); app.settings.ageBand = nil; app.profile?.roundsSinceAd = 9; app.settings.completedSessions = 9
+        XCTAssertFalse(AdGate.shouldShowInterstitial(app.adContext(choice: .oneMore)))
+    }
+
+    func testRecordingAShownAdResetsTheCounterAndCountsToday() throws {
+        var clock = Date(timeIntervalSince1970: 1_780_000_000)
+        let app = try makeApp(now: { clock }); app.profile?.roundsSinceAd = 3
+        app.recordAdShown()
+        XCTAssertEqual(app.profile?.roundsSinceAd, 0); XCTAssertEqual(app.profile?.adsToday, 1)
+        XCTAssertEqual(app.adContext(choice: .oneMore).lastAdAt, clock)
+        app.recordAdShown(); XCTAssertEqual(app.profile?.adsToday, 2)
+        clock = clock.addingTimeInterval(86_400 + 60)
+        XCTAssertEqual(app.adContext(choice: .oneMore).adsToday, 0)               // a new local day starts fresh
+    }
+
+    func testPeakDismissalIsRemembered() throws {
+        let t = Date(timeIntervalSince1970: 1_780_000_000)
+        let app = try makeApp(now: { t }); app.markPeakDismissed()
+        XCTAssertEqual(app.adContext(choice: .oneMore).lastPeakAt, t)
+    }
+
+    func testALossBlocksTheNextAdBoundary() throws {
+        let app = try makeApp()
+        app.game.start(entry: WordEntry(id: "x", word: "LOTUS", display: "Lotus", hint: "h", hint2: nil, fact: "f", level: 1, kind: .vocab, plantId: nil,
+                                        tags: [], minAge: 6, dailyEligible: true, source: "t", license: "t", reviewedBy: "t"))
+        for ch in "ZXQJKVWY" { app.game.guessInput = String(ch); app.game.submitGuess() }
+        XCTAssertTrue(app.adContext(choice: .oneMore).lastRoundWasLoss)
+    }
+
+    // MARK: rewarded ads (optional, player-initiated)
+    func testRewardedOfferRules() throws {
+        let app = try makeApp(); app.settings.ageBand = .eighteenPlus
+        XCTAssertTrue(app.canOfferRewarded)
+        app.settings.ageBand = .under13; XCTAssertFalse(app.canOfferRewarded)
+        app.settings.ageBand = .eighteenPlus
+        app.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"])); XCTAssertFalse(app.canOfferRewarded)
+    }
+
+    func testRewardedGrantsTwoDropsThreeTimesADay() throws {
+        var clock = Date(timeIntervalSince1970: 1_780_000_000)
+        let app = try makeApp(now: { clock }); app.settings.ageBand = .eighteenPlus; app.profile?.water = 0
+        for _ in 0..<3 { XCTAssertTrue(app.canOfferRewarded); app.grantRewardedDrops() }
+        XCTAssertEqual(app.profile?.water, 6)
+        XCTAssertFalse(app.canOfferRewarded)
+        clock = clock.addingTimeInterval(86_400 + 60)
+        XCTAssertTrue(app.canOfferRewarded)
+    }
+
+    func testRewardedDropsRespectTheWaterBankCap() throws {
+        let app = try makeApp(); app.settings.ageBand = .eighteenPlus; app.profile?.water = 39
+        app.grantRewardedDrops()
+        XCTAssertEqual(app.profile?.water, 40)
+    }
 }
+

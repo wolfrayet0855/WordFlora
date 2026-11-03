@@ -330,3 +330,12 @@ The research doc holds paste-ready text for each proposal (P-numbers below). Whe
 **P-19 Sync with Economy v1:** plan Tasks 5 and 11 numbers are superseded by spec sections 16, 18, 19; Economy.json is the single source.
 
 Owner open questions in the research doc (12) are resolved by the lead under the autonomy agreement unless they affect money, legal exposure or publishing; those get flagged in summaries.
+
+## 20. Implementation rulings (lead, found while building; flagged for the owner)
+
+- **Peak window for ads (corrects sections 18-19):** every win earns a plant, so "no ad within 120 s of a peak" meant the every-3rd-round ad could almost never appear. The protection that matters is structural and unchanged: an ad appears ONLY after the player taps "One more" on the resting card, never as part of a celebration, never after a loss, never in Daily Bloom, never for under-13/unknown age or Plus. The time window is now 5 s measured from when a celebration is dismissed (`AdGate.Context.peakWindowSeconds`, remote-tunable).
+- **Unknown age is treated as young:** no ads, parental gate before purchase, until an age answer exists.
+- **Ads start in session 2:** banner (Home + Garden only) shows from the second session; the interstitial additionally needs 3 sessions or the first word level-up (grace period).
+- **Rewarded ads:** optional, player-initiated "2 drops" button on a plant when the bank is empty; max 3/day; hidden for under-13/unknown, Plus, and Quiet Garden.
+- **SDK facts verified against the headers (Google Mobile Ads 13.12, UMP 3.1):** child/teen treatment uses `ageRestrictedTreatment`; content rating `.general` is set for everyone; consent (UMP) then ATT run only immediately before the first ad request.
+- **Entitlements and signing:** automatic signing under team P9Z5QB8965; App Group `group.beta.WordFlora` and iCloud container `iCloud.beta.WordFlora` are in the provisioning profile and the signed app. Local StoreKit config (`Config/WordFlora.storekit`) is verified by tests to match App Store Connect (`plus_yearly` $12.99 with 3-day free trial, `plus_monthly` $3.99, Family Sharing).

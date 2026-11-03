@@ -12,6 +12,10 @@ final class AppModel {
     var onboarding: OnboardingFlow
     private(set) var badges = BadgeState(defs: [])
     let entitlements: EntitlementService
+    let ads = AdsService()
+    private var lastPeakAt: Date?
+    /// Master switch used by UI tests; real launches always have ads available (subject to every rule in AdGate).
+    var adsEnabled = true
     private let now: () -> Date
 
     var context: ModelContext { container.mainContext }
@@ -133,5 +137,81 @@ final class AppModel {
         case .cooldown: return "Pruned recently. Give it a couple of days."
         case nil: return "Not right now."
         }
+    }
+
+    // MARK: Ads (spec sections 12, 16, 18, 19; ruling in section 20)
+
+    func markPeakDismissed() { lastPeakAt = now() }
+
+    func adContext(choice: AdGate.Choice?) -> AdGate.Context {
+        var c = AdGate.Context(now: now())
+        let p = profile
+        c.roundsSinceAd = p?.roundsSinceAd ?? 0
+        c.choice = choice
+        c.isUnderThirteen = ParentalGate.isRequired(ageBand: settings.ageBand)     // unknown age is treated as young
+        c.hasRemoveAds = entitlements.state.hasRemoveAds
+        c.midRound = game.phase == .playing
+        c.aroundDailyBloom = game.isDaily
+        c.lastRoundWasLoss = game.lastRoundWasLoss
+        c.completedSessions = settings.completedSessions
+        c.wordLevelUps = max(0, (p?.currentLevel ?? 1) - 1)
+        c.lastAdAt = p?.lastAdAt
+        if let day = p?.adsDay, Calendar.current.isDate(day, inSameDayAs: now()) { c.adsToday = p?.adsToday ?? 0 }
+        c.lastPeakAt = lastPeakAt
+        return c
+    }
+
+    func recordAdShown() {
+        guard let p = profile else { return }
+        let d = now(), cal = Calendar.current
+        p.roundsSinceAd = 0
+        p.lastAdAt = d
+        if let day = p.adsDay, cal.isDate(day, inSameDayAs: d) { p.adsToday += 1 } else { p.adsDay = cal.startOfDay(for: d); p.adsToday = 1 }
+        try? context.save()
+    }
+
+    var canOfferRewarded: Bool {
+        guard let p = profile else { return false }
+        guard !ParentalGate.isRequired(ageBand: settings.ageBand), !entitlements.state.hasRemoveAds else { return false }
+        let today = p.rewardedDay.map { Calendar.current.isDate($0, inSameDayAs: now()) } ?? false
+        return (today ? p.rewardedToday : 0) < ButterflyRewards.rewardedPlaysPerDay
+    }
+
+    /// Two water drops per watched ad, three a day, never above the bank cap.
+    func grantRewardedDrops() {
+        guard let p = profile else { return }
+        let d = now(), cal = Calendar.current
+        if let day = p.rewardedDay, cal.isDate(day, inSameDayAs: d) { p.rewardedToday += 1 } else { p.rewardedDay = cal.startOfDay(for: d); p.rewardedToday = 1 }
+        p.water = min(Economy.default.waterBankCap, p.water + 2)
+        try? context.save()
+    }
+
+    /// Banner shows on Home and Garden only, from the second session, for free players who are not young.
+    var showBanner: Bool {
+        adsEnabled && onboarding.isComplete && settings.completedSessions >= 1
+            && AdGate.mayLoadAnyAd(isUnderThirteen: ParentalGate.isRequired(ageBand: settings.ageBand), hasRemoveAds: entitlements.state.hasRemoveAds)
+    }
+
+    /// Runs when the player taps "One more" on the resting card: at most one ad, only if every rule allows it.
+    func adBeforeNextRound() async {
+        guard adsEnabled else { return }
+        let ctx = adContext(choice: .oneMore)
+        guard AdGate.shouldShowInterstitial(ctx) else { return }
+        await ads.prepare(ageBand: settings.ageBand)
+        if await ads.showInterstitial() { recordAdShown() }
+    }
+
+    func prepareBannerIfAllowed() async {
+        guard showBanner else { return }
+        await ads.prepare(ageBand: settings.ageBand)
+    }
+
+    /// Shows a player-initiated rewarded ad and, if completed, grants the drops.
+    func watchRewardedAd() async -> Bool {
+        guard adsEnabled, canOfferRewarded else { return false }
+        await ads.prepare(ageBand: settings.ageBand)
+        let earned = await ads.showRewarded()
+        if earned { grantRewardedDrops() }
+        return earned
     }
 }

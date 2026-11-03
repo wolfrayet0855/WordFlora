@@ -36,6 +36,7 @@
 		6D2F71A8A90D3F1FF82FEB03 /* AssistTuner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E08620029509154DEB72456 /* AssistTuner.swift */; };
 		6F482CD15D77232746B4BDE5 /* PlusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A4C64F5ADBB45D602E50A5F /* PlusView.swift */; };
 		70C01EAA5FB7F523FBF1C46C /* AIValidators.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71331D82B79C4FF1610AFEA9 /* AIValidators.swift */; };
+		7134B8F63F8B167F415D50C5 /* AdsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307B6C22876E273992182CE6 /* AdsService.swift */; };
 		72563F46E520B7D22ECEAB04 /* WordTilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19C4668A7EFD195748409A0 /* WordTilesView.swift */; };
 		77DC9100629457266EDDA0DB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1AAA9FCAE4CF29BBA16A8 /* SettingsView.swift */; };
 		812CC68498F635B4E42F0D32 /* FeatureUnlockPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */; };
@@ -60,6 +61,7 @@
 		AA753988BC83E23E320FFC56 /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53AF4373CF0983348711216 /* Badges.swift */; };
 		AC0534FE4A3F995C8A301AB0 /* RulesBatch2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188352F473E5A34955BC4F03 /* RulesBatch2Tests.swift */; };
 		ACC9581C7D1D2D18374CEEFE /* PaywallRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D0D46981E2EFDF577D4AE4 /* PaywallRulesTests.swift */; };
+		B0D223341F847F11B0CC15B9 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = C82352716A0D56522A4B1A64 /* GoogleMobileAds */; };
 		B24D06A2299AB7B8A363531F /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9888DEE09FE8404AD2E6B806 /* SharedContainer.swift */; };
 		B42D0E3153A7414966317C6A /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801243E3923ADEAD47B705CE /* AppSettings.swift */; };
 		BF85587E45FCFE74CE68D2B7 /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F94DF6CFF0C826E3155B6 /* EntitlementService.swift */; };
@@ -114,6 +116,7 @@
 		25BA2007B9E2490E80F9FDF0 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FeatureUnlockPolicy.swift; sourceTree = "<group>"; };
 		2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoseMeter.swift; sourceTree = "<group>"; };
+		307B6C22876E273992182CE6 /* AdsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AdsService.swift; sourceTree = "<group>"; };
 		33F34A41B64213EA36BFAD0A /* WordFlora.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = WordFlora.entitlements; sourceTree = "<group>"; };
 		354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ToolEngine.swift; sourceTree = "<group>"; };
 		395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordFloraUITests.swift; sourceTree = "<group>"; };
@@ -193,6 +196,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B0D223341F847F11B0CC15B9 /* GoogleMobileAds in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -237,6 +241,15 @@
 			);
 			name = Rules;
 			path = Rules;
+			sourceTree = "<group>";
+		};
+		200F8C46C9630D7B831DEE92 /* Ads */ = {
+			isa = PBXGroup;
+			children = (
+				307B6C22876E273992182CE6 /* AdsService.swift */,
+			);
+			name = Ads;
+			path = Ads;
 			sourceTree = "<group>";
 		};
 		25D6FB48ABA4617FA21AE593 /* Resources */ = {
@@ -368,6 +381,7 @@
 				27B840FB9C84E6D66ABA601C /* Theme */,
 				7C8C4C1EA579A0F4D8DB0F37 /* Components */,
 				A841EEEF90C43CD8DE8C83AB /* Views */,
+				200F8C46C9630D7B831DEE92 /* Ads */,
 			);
 			path = WordFlora;
 			sourceTree = "<group>";
@@ -500,6 +514,9 @@
 			dependencies = (
 			);
 			name = WordFlora;
+			packageProductDependencies = (
+				C82352716A0D56522A4B1A64 /* GoogleMobileAds */,
+			);
 			productName = WordFlora;
 			productReference = 9A467E682C922C05007E28B8 /* WordFlora.app */;
 			productType = "com.apple.product-type.application";
@@ -528,6 +545,9 @@
 				Base,
 			);
 			mainGroup = 9A467E5F2C922C05007E28B8;
+			packageReferences = (
+				40C5FAA29BC636EFE8110034 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */,
+			);
 			productRefGroup = 9A467E692C922C05007E28B8 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -653,6 +673,7 @@
 				F1EC73BEF7CC700E3392A9D0 /* Paywall.swift in Sources */,
 				BF85587E45FCFE74CE68D2B7 /* EntitlementService.swift in Sources */,
 				6F482CD15D77232746B4BDE5 /* PlusView.swift in Sources */,
+				7134B8F63F8B167F415D50C5 /* AdsService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -963,6 +984,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		40C5FAA29BC636EFE8110034 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/googleads/swift-package-manager-google-mobile-ads.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 13.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		C82352716A0D56522A4B1A64 /* GoogleMobileAds */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 40C5FAA29BC636EFE8110034 /* XCRemoteSwiftPackageReference "swift-package-manager-google-mobile-ads" */;
+			productName = GoogleMobileAds;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 9A467E602C922C05007E28B8 /* Project object */;
 }

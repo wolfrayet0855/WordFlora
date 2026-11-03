@@ -35,6 +35,13 @@ struct SettingsView: View {
             Section("WordFlora Plus") {
                 Button { router.go(.plus) } label: { Label("Remove ads and sync with iCloud", systemImage: "sparkles") }
             }
+            Section("Privacy and ads") {
+                Link("Report an ad", destination: Links.reportAd)
+                Link("Privacy Policy", destination: Links.privacy)
+                if app.ads.privacyOptionsRequired {
+                    Button("Ad privacy choices") { Task { await app.ads.presentPrivacyOptions() } }
+                }
+            }
             Section("About") {
                 LabeledContent("Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
             }

@@ -151,7 +151,7 @@ struct GameView: View {
                     Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
                 }
                 if vm.roseDropped { Label("A Rose of Jericho is in your satchel", systemImage: "leaf.circle.fill").font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appSuccess) }
-                Button("Continue") { showEarned = false; afterRound() }.buttonStyle(PrimaryButtonStyle())
+                Button("Continue") { showEarned = false; app.markPeakDismissed(); afterRound() }.buttonStyle(PrimaryButtonStyle())
             }
         }
     }
@@ -163,8 +163,12 @@ struct GameView: View {
                 Text("The garden is resting").font(Theme.font(.title2, weight: .bold))
                 Text("Take a breath. Come back whenever you like.").font(Theme.font(.callout)).multilineTextAlignment(.center)
                 HStack(spacing: 12) {
-                    Button("One more") { showRestCard = false; vm.startRound() }.buttonStyle(PrimaryButtonStyle())
+                    Button("One more") { showRestCard = false; Task { await app.adBeforeNextRound(); vm.startRound() } }.buttonStyle(PrimaryButtonStyle())
                     Button("That's enough for now") { showRestCard = false; router.home() }.buttonStyle(SecondaryButtonStyle())
+                }
+                if app.showBanner {
+                    Button("Go ad-free") { showRestCard = false; router.home(); router.go(.plus) }
+                        .font(Theme.font(.footnote)).foregroundStyle(Color.appPrimaryText.opacity(0.6)).frame(minHeight: Theme.minTap)
                 }
             }
         }

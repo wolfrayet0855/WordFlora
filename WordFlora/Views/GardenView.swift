@@ -33,6 +33,10 @@ struct GardenView: View {
             .padding(20)
         }
         .background(Color.appBackground.ignoresSafeArea())
+        .safeAreaInset(edge: .bottom) {
+            if app.showBanner && app.ads.started { AdBannerView().frame(height: 60).frame(maxWidth: .infinity).background(Color.appBackground) }
+        }
+        .task { await app.prepareBannerIfAllowed() }
         .navigationTitle("My Garden")
         .navigationBarTitleDisplayMode(.inline)
     }

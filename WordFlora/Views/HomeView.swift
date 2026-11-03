@@ -78,7 +78,22 @@ struct HomeView: View {
             .padding(.bottom, 32)
         }
         .background(Color.appBackground.ignoresSafeArea())
+        .safeAreaInset(edge: .bottom) { bannerArea }
+        .task { await app.prepareBannerIfAllowed() }
         .navigationBarHidden(true)
+    }
+
+    @ViewBuilder private var bannerArea: some View {
+        if app.showBanner && app.ads.started {
+            VStack(spacing: 2) {
+                AdBannerView().frame(height: 60)
+                HStack(spacing: 16) {
+                    Button("Go ad-free") { router.go(.plus) }
+                    Link("Report an ad", destination: Links.reportAd)
+                }.font(Theme.font(.caption2)).foregroundStyle(Color.appPrimaryText.opacity(0.6))
+            }
+            .padding(.vertical, 4).frame(maxWidth: .infinity).background(Color.appBackground)
+        }
     }
 }
 

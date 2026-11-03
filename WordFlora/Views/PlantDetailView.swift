@@ -58,6 +58,12 @@ struct PlantDetailView: View {
 
                 actions(plant)
 
+                if app.canOfferRewarded && !quiet && (app.profile?.water ?? 0) == 0 {
+                    Button { Task { if await app.watchRewardedAd() { run(.water, plant) } } } label: {
+                        Label("Watch a short video for 2 drops", systemImage: "play.rectangle.fill")
+                    }.buttonStyle(SecondaryButtonStyle())
+                }
+
                 Card { Text(plant.botanicalFact).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText) }
             }
             .padding(20)

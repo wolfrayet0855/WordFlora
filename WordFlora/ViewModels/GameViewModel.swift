@@ -33,6 +33,7 @@ final class GameViewModel {
     private(set) var revealedAnswer: String?
     private(set) var wrongStreak = 0
     private(set) var isTutorial = false
+    private(set) var lastRoundWasLoss = false
 
     // Round result
     private(set) var earnedPlantName: String?
@@ -254,6 +255,7 @@ final class GameViewModel {
         guard let profile = playerProfile, let e = currentEntry else { return }
         let petals = petalsRemaining
         var plantName: String?
+        lastRoundWasLoss = !won
 
         if won {
             let award = awardPlant(for: e)

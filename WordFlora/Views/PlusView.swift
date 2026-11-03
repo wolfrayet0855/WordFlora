@@ -154,4 +154,5 @@ enum Links {
     /// Owner to confirm the hosted privacy policy address (spec section 6).
     static let privacy = URL(string: "https://wordflora.app/privacy")!
     static let support = URL(string: "https://wordflora.app/support")!
+    static let reportAd = URL(string: "mailto:support@wordflora.app?subject=Report%20an%20ad")!
 }

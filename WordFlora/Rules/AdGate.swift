@@ -22,7 +22,9 @@ enum AdGate {
         var frequency = 3
         var minGapSeconds = 180.0
         var maxPerDay = 6
-        var peakWindowSeconds = 120.0
+        /// Measured from when a celebration is dismissed. The real protection is structural: an ad can only follow
+        /// the player's own "One more" tap, never a celebration itself (ruling, spec section 20).
+        var peakWindowSeconds = 5.0
 
         init(now: Date) { self.now = now }
     }
