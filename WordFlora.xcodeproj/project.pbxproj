@@ -8,7 +8,11 @@
 
 /* Begin PBXBuildFile section */
 		05B7E3F9F4DC0094781F5022 /* GameViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */; };
+		21F06B6221D6075031D257BC /* WordProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E6A1305C8A4BB87A255C2F /* WordProviderTests.swift */; };
 		2FAAC760A0B5D1B374DD5839 /* PlantCollectible.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C771AB1111BA1267E678AF /* PlantCollectible.swift */; };
+		5141753B3BD93463C3BA567A /* SplitMix64.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */; };
+		54A55D75B18066AED5586050 /* WordBankValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507CD36D0F85A153026420C3 /* WordBankValidator.swift */; };
+		59896F4A896FCF2AAA27E877 /* Words.json in Resources */ = {isa = PBXBuildFile; fileRef = 9D91134EF7A4DA4C11EB9E23 /* Words.json */; };
 		659ABF3B10DF2D1EE3B7B3F7 /* WordBankService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71229EAE4924516E464A11B5 /* WordBankService.swift */; };
 		68EF45C14F3CEC72F7042540 /* PlayerProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */; };
 		699CBEF5F63C97810EC87BF4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
@@ -19,11 +23,14 @@
 		9A467E6E2C922C05007E28B8 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A467E6D2C922C05007E28B8 /* ContentView.swift */; };
 		9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E6F2C922C06007E28B8 /* Assets.xcassets */; };
 		9A467E732C922C06007E28B8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E722C922C06007E28B8 /* Preview Assets.xcassets */; };
+		9CD2F602E0C7313FD3967ACE /* WordProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B62098E04C3095B889397EC /* WordProvider.swift */; };
 		BB839A507E257E427EDF327E /* WordBank.json in Resources */ = {isa = PBXBuildFile; fileRef = CB90B347AD42770BB38CF941 /* WordBank.json */; };
+		C56399AF5A9FB677D166E85A /* WordEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1953888CF19BF643304ED9AC /* WordEntry.swift */; };
 		CEE0A8C8A89FF4365D45F346 /* PlantCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9331FDFC4EAE840666B50749 /* PlantCatalog.swift */; };
 		CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */; };
 		D61844C609FE7631DFFBF7CF /* Plants.json in Resources */ = {isa = PBXBuildFile; fileRef = 437318BFC10E7CDE04AF1603 /* Plants.json */; };
 		DEE6BE19D0E9729C1907EB2C /* TriviaServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DCC6AD5F15EE8C53AB9F7 /* TriviaServiceTests.swift */; };
+		E7EE45CC3E1C7571FF926CB0 /* DailyBloom.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -37,9 +44,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		07E6A1305C8A4BB87A255C2F /* WordProviderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordProviderTests.swift; sourceTree = "<group>"; };
 		153A01FF2679CA86ABE5DFBE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		1953888CF19BF643304ED9AC /* WordEntry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordEntry.swift; sourceTree = "<group>"; };
+		3B62098E04C3095B889397EC /* WordProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordProvider.swift; sourceTree = "<group>"; };
 		437318BFC10E7CDE04AF1603 /* Plants.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Plants.json; sourceTree = "<group>"; };
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
+		507CD36D0F85A153026420C3 /* WordBankValidator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordBankValidator.swift; sourceTree = "<group>"; };
 		6406AFD4A968B89AEFEE8100 /* WordFloraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		71229EAE4924516E464A11B5 /* WordBankService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordBankService.swift; sourceTree = "<group>"; };
 		71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModelTests.swift; sourceTree = "<group>"; };
@@ -53,7 +64,10 @@
 		9A467E6F2C922C06007E28B8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		9A467E722C922C06007E28B8 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		9A467E792C9230E2007E28B8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		9D91134EF7A4DA4C11EB9E23 /* Words.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Words.json; sourceTree = "<group>"; };
 		B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerProfile.swift; sourceTree = "<group>"; };
+		B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SplitMix64.swift; sourceTree = "<group>"; };
+		BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyBloom.swift; sourceTree = "<group>"; };
 		CB90B347AD42770BB38CF941 /* WordBank.json */ = {isa = PBXFileReference; includeInIndex = 1; path = WordBank.json; sourceTree = "<group>"; };
 		D7C771AB1111BA1267E678AF /* PlantCollectible.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCollectible.swift; sourceTree = "<group>"; };
 		E78257300F1A3AAEFFF20767 /* TriviaService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TriviaService.swift; sourceTree = "<group>"; };
@@ -91,6 +105,7 @@
 			children = (
 				CB90B347AD42770BB38CF941 /* WordBank.json */,
 				437318BFC10E7CDE04AF1603 /* Plants.json */,
+				9D91134EF7A4DA4C11EB9E23 /* Words.json */,
 			);
 			name = Resources;
 			path = Resources;
@@ -102,6 +117,7 @@
 				B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */,
 				D7C771AB1111BA1267E678AF /* PlantCollectible.swift */,
 				4A6305635D642316CCE8610F /* GameRecord.swift */,
+				1953888CF19BF643304ED9AC /* WordEntry.swift */,
 			);
 			name = Models;
 			path = Models;
@@ -113,6 +129,7 @@
 				916DCC6AD5F15EE8C53AB9F7 /* TriviaServiceTests.swift */,
 				71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */,
 				7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */,
+				07E6A1305C8A4BB87A255C2F /* WordProviderTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -167,6 +184,10 @@
 				71229EAE4924516E464A11B5 /* WordBankService.swift */,
 				E78257300F1A3AAEFFF20767 /* TriviaService.swift */,
 				9331FDFC4EAE840666B50749 /* PlantCatalog.swift */,
+				B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */,
+				507CD36D0F85A153026420C3 /* WordBankValidator.swift */,
+				3B62098E04C3095B889397EC /* WordProvider.swift */,
+				BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */,
 			);
 			name = Services;
 			path = Services;
@@ -277,6 +298,7 @@
 				9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */,
 				BB839A507E257E427EDF327E /* WordBank.json in Resources */,
 				D61844C609FE7631DFFBF7CF /* Plants.json in Resources */,
+				59896F4A896FCF2AAA27E877 /* Words.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -290,6 +312,7 @@
 				DEE6BE19D0E9729C1907EB2C /* TriviaServiceTests.swift in Sources */,
 				05B7E3F9F4DC0094781F5022 /* GameViewModelTests.swift in Sources */,
 				CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */,
+				21F06B6221D6075031D257BC /* WordProviderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -306,6 +329,11 @@
 				878B847E459F79C19DF9C963 /* TriviaService.swift in Sources */,
 				9603333091B94F1CE68C0A45 /* GameViewModel.swift in Sources */,
 				CEE0A8C8A89FF4365D45F346 /* PlantCatalog.swift in Sources */,
+				C56399AF5A9FB677D166E85A /* WordEntry.swift in Sources */,
+				5141753B3BD93463C3BA567A /* SplitMix64.swift in Sources */,
+				54A55D75B18066AED5586050 /* WordBankValidator.swift in Sources */,
+				9CD2F602E0C7313FD3967ACE /* WordProvider.swift in Sources */,
+				E7EE45CC3E1C7571FF926CB0 /* DailyBloom.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

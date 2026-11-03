@@ -1,0 +1,536 @@
+{
+  "schemaVersion": 1,
+  "bankVersion": "2026.11.0-starter",
+  "entries": [
+    {
+      "id": "l1-rose",
+      "word": "ROSE",
+      "display": "Rose",
+      "hint": "A thorny shrub famous for sweet-smelling flowers in many colors",
+      "fact": "The fruit of the rose, called a hip, is rich in vitamin C.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "rose",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-tulip",
+      "word": "TULIP",
+      "display": "Tulip",
+      "hint": "A spring bulb flower shaped like a cup",
+      "fact": "Tulips grow from bulbs planted in autumn and bloom in spring.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "tulip",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-fern",
+      "word": "FERN",
+      "display": "Fern",
+      "hint": "A feathery green plant that unrolls from curled-up fiddleheads and makes spores instead of seeds",
+      "fact": "Ferns were growing on Earth long before flowering plants appeared.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "fern",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-seed",
+      "word": "SEED",
+      "display": "Seed",
+      "hint": "A tiny package holding a baby plant and its first food",
+      "fact": "Some lotus seeds have sprouted after hundreds of years.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "parts"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-leaf",
+      "word": "LEAF",
+      "display": "Leaf",
+      "hint": "The flat green part of a plant that catches sunlight",
+      "fact": "Leaves make food for the plant using sunlight, air and water.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "parts"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-root",
+      "word": "ROOT",
+      "display": "Root",
+      "hint": "The part of a plant that grows underground to drink water",
+      "fact": "Roots also anchor a plant so wind does not tip it over.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "parts"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-bamboo",
+      "word": "BAMBOO",
+      "display": "Bamboo",
+      "hint": "A giant grass with hollow stems that can grow very tall, very fast",
+      "fact": "Giant moso bamboo can grow about a metre in one day.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "bamboo",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-aloe-vera",
+      "word": "ALOE VERA",
+      "display": "Aloe Vera",
+      "hint": "A spiky succulent whose thick leaves hold a soothing gel",
+      "fact": "Aloe stores water in its thick leaves to get through dry weather.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "aloe_vera",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-cherry-blossom",
+      "word": "CHERRY BLOSSOM",
+      "display": "Cherry Blossom",
+      "hint": "Pink spring flowers from trees that people celebrate with festivals in Japan",
+      "fact": "In Japan, people gather under the blooming trees for picnics called hanami.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "cherry_blossom",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-acorn",
+      "word": "ACORN",
+      "display": "Acorn",
+      "hint": "The nut that grows into a mighty oak tree",
+      "fact": "Jays bury acorns and forget some, which then grow into new oaks.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "seed"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-petal",
+      "word": "PETAL",
+      "display": "Petal",
+      "hint": "A colorful leaf-like part of a flower that attracts visitors",
+      "fact": "Petal colors help bees and butterflies find flowers.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "parts"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-nectar",
+      "word": "NECTAR",
+      "display": "Nectar",
+      "hint": "Sweet liquid that flowers offer to bees",
+      "fact": "Bees turn nectar into honey back at their hive.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "parts"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-venus-flytrap",
+      "word": "VENUS FLYTRAP",
+      "display": "Venus Flytrap",
+      "hint": "A meat-eating plant with hinged leaves that snap shut",
+      "fact": "It closes only after two touches in quick succession, which helps it ignore raindrops.",
+      "level": 3,
+      "kind": "hero",
+      "plantId": "venus_flytrap",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-baobab",
+      "word": "BAOBAB",
+      "display": "Baobab",
+      "hint": "An African tree with a thick bottle-shaped trunk",
+      "fact": "Big baobab trunks can store over 100,000 litres of water.",
+      "level": 3,
+      "kind": "hero",
+      "plantId": "baobab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-lithops",
+      "word": "LITHOPS",
+      "display": "Lithops",
+      "hint": "A desert plant that looks just like a pebble",
+      "fact": "Lithops are called living stones because they blend in with the pebbles around them.",
+      "level": 3,
+      "kind": "hero",
+      "plantId": "lithops",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-pollen",
+      "word": "POLLEN",
+      "display": "Pollen",
+      "hint": "Yellow dust that bees carry from flower to flower",
+      "fact": "Pollen grains have shapes so distinct that scientists can identify plants from them.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "parts"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-seedling",
+      "word": "SEEDLING",
+      "display": "Seedling",
+      "hint": "A baby plant that has just sprouted",
+      "fact": "A seedling uses the food stored in its seed until its leaves can make more.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "growth"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-meadow",
+      "word": "MEADOW",
+      "display": "Meadow",
+      "hint": "A grassy field full of wildflowers",
+      "fact": "A meadow can be home to many kinds of flowers and insects.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "habitat"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-sundew",
+      "word": "SUNDEW",
+      "display": "Sundew",
+      "hint": "A small bog plant with sticky glistening drops that trap insects",
+      "fact": "Its sticky drops look like morning dew, which gives the plant its name.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "sundew",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-passionflower",
+      "word": "PASSIONFLOWER",
+      "display": "Passionflower",
+      "hint": "A climbing vine with an intricate, star-shaped bloom",
+      "fact": "Its complex blooms have many frilly filaments in the center.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "passionflower",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-ghost-pipe",
+      "word": "GHOST PIPE",
+      "display": "Ghost Pipe",
+      "hint": "A pale white woodland plant with no green at all",
+      "fact": "It has no chlorophyll and gets its food through fungi in the soil.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "ghost_pipe",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-germinate",
+      "word": "GERMINATE",
+      "display": "Germinate",
+      "hint": "What a seed does when it wakes up and starts to grow",
+      "fact": "Most seeds germinate when they get enough water and warmth.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "growth"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-perennial",
+      "word": "PERENNIAL",
+      "display": "Perennial",
+      "hint": "A plant that comes back year after year",
+      "fact": "Perennials rest in winter and sprout again in spring.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "growth"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-deciduous",
+      "word": "DECIDUOUS",
+      "display": "Deciduous",
+      "hint": "Describes trees that drop their leaves in autumn",
+      "fact": "Deciduous trees shed leaves to save energy through the winter.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-welwitschia",
+      "word": "WELWITSCHIA",
+      "display": "Welwitschia",
+      "hint": "A Namib desert plant that grows only two leaves, ever",
+      "fact": "Its two leaves keep growing for centuries, splitting into ribbons.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "welwitschia",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-silversword",
+      "word": "SILVERSWORD",
+      "display": "Silversword",
+      "hint": "A silvery spiky plant that grows on high Hawaiian volcanoes",
+      "fact": "It grows for many years, blooms once, then sets seed.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "silversword",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-rainbow-eucalyptus",
+      "word": "RAINBOW EUCALYPTUS",
+      "display": "Rainbow Eucalyptus",
+      "hint": "A tree whose peeling bark reveals streaks of green, orange and purple",
+      "fact": "Its bark sheds in strips, showing fresh colorful layers beneath.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "rainbow_eucalyptus",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-chlorophyll",
+      "word": "CHLOROPHYLL",
+      "display": "Chlorophyll",
+      "hint": "The green stuff in leaves that captures sunlight",
+      "fact": "Chlorophyll gives leaves their green color.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-photosynthesis",
+      "word": "PHOTOSYNTHESIS",
+      "display": "Photosynthesis",
+      "hint": "How plants use sunlight, water and air to make their own food",
+      "fact": "Plants release oxygen as part of photosynthesis.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-pollination",
+      "word": "POLLINATION",
+      "display": "Pollination",
+      "hint": "When pollen moves from one flower to another so seeds can form",
+      "fact": "Bees, butterflies, birds and wind all help with pollination.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    }
+  ],
+  "daily": {
+    "epoch": "2026-01-01",
+    "seed": 20260101
+  }
+}
