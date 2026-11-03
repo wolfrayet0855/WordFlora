@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordFlora clickable prototype</title>
+<link rel="stylesheet" href="../theme.css"><link rel="stylesheet" href="../screens/screen.css"><link rel="stylesheet" href="base.css"><link rel="stylesheet" href="proto.css">
+<script src="../theme.js"></script></head><body class="proto">
+<div class="tb" id="tb">
+ <button id="tTheme">Light / Dark</button>
+ <label><input type="checkbox" id="tRm"> Reduce Motion</label>
+ <span class="seg"><button id="tFree">Free</button><button id="tPlus">Plus</button></span>
+ <label><input type="checkbox" id="tEve"> Evening (17:30 to 21:30)</label>
+ <button id="tReset">Reset</button>
+ <button id="tReal">Real vs placeholder</button>
+</div>
+<div id="log">Haptic and sound cues appear here when you tap.</div>
+<div id="wrap"><div id="fit"><div id="phone"><svg width="0" height="0" style="position:absolute"><defs id="gdefs"></defs></svg>
+ <div class="island"></div><div id="screen"></div><div id="ov"></div><canvas id="rainCv" width="780" height="1688"></canvas><div id="toast"></div><div class="hind"></div></div></div></div>
+<aside id="real"><h4>What is real vs placeholder</h4><b>Real (approved art and flows):</b><ul><li>All art: flower mascot, 50 plants, tools and tiers, 12 visitors, badges, flower rain, wordmark, icon.</li><li>Screens and copy: Home, round, plant earned, garden, shed, repot, prune, net game, album, badges, level map, settings, paywall, ad moment.</li><li>Rules: 8-petal round with Rose of Jericho revive, ad after every 3rd round (Free only), badge thresholds, tool unlock order and tier costs, evening visitors.</li></ul><b>Placeholder / not simulated:</b><ul><li>Economy numbers (drop, scoop and shed-point rewards, growth points, cooldowns) are simplified, not the tuned values. There is no daily cap on growth or trickle refill.</li><li>No real haptics or sounds: the line above the phone only names the cue that would play.</li><li>No purchases, no real ads, no iCloud, notifications, widgets, Game Center or parental gate/age screen.</li><li>The word list is 12 sample words. Net and Mister unlock together at Level 2 here.</li></ul>Progress is kept in this browser (localStorage); Reset clears it. Settings has Prototype helpers to jump ahead.</aside><script src="art.js"></script><script src="rain.js"></script><script src="app.js"></script>
+</body></html>
