@@ -87,6 +87,15 @@ Rework the committed `GameViewModel` (keep its tests, adjust):
 
 - [ ] Name your plant + personality lines (P1), Garden Diary memories (P2), first-bloom ceremony + gratitude moment (P3), real local season/weather mood/time-of-day (P4, WeatherKit optional/off by default; seasonal by calendar hemisphere otherwise), awe-framed Wonder Facts schema + content (P6), gentle welcome-back (P8), data export/delete (P18). Visual agent mockups first (Task 8); copy passes CopySafety.
 
+## Task 5 final scope (consolidated; supersedes all earlier Task 5 bullets)
+
+`GameViewModel` v2 + pure helpers, test-first:
+- WordProvider source; spaces pre-revealed; `revealedAnswer` on loss; "resting" result (no coins); Rose offered before reveal; review queue +1 day.
+- `ProgressionPolicy`: wordLevel (10 unique plants earned) vs gardenLevel (stage 4); selectable levels <= wordLevel; award rule (unowned first).
+- `RoseMeter` (5b), `GardenDays`/streak (5c), `SessionBeats` (5d), `HelpLadder`, `AssistTuner` (P-04), `WordDifficulty.expectedMisses` + Python validator parity (P-02), `FeatureUnlockPolicy` (P-07), `OnboardingFlow` state machine (P-03), `CopySafety` banned words incl. dead/died/lost.
+- Injectable clock/rng; all numbers from `Economy.json`.
+- Remove TriviaService/Difficulty/WordBankService/old WordBank.json in this task.
+
 ## Task 6: Tending engine
 
 **Files:** `Services/TendingEngine.swift`, tests. Pure logic, no UI.
