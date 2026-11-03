@@ -175,7 +175,7 @@ final class AppModel {
         switch reason {
         case .noWater: return "No drops left. Win a word to earn more."
         case .noSoil: return "No soil scoops left. Finding new plants earns more."
-        case .fullForToday: return "\(plant.name) has had enough for today. Come back tomorrow!"
+        case .fullForToday: return TendingEngine.capacityLine(.plenty, name: plant.name)
         case .alreadyDoneToday: return "\(plant.name) already soaked up the sun today."
         case .notOwned: return "You need the shears first."
         case .cooldown: return "Pruned recently. Give it a couple of days."

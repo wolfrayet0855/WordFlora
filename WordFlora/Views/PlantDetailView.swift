@@ -34,7 +34,15 @@ struct PlantDetailView: View {
         ScrollView {
             VStack(spacing: 16) {
                 ZStack(alignment: .topTrailing) {
-                    Image(plant.imageName).resizable().scaledToFit().frame(height: 190)
+                    if !quiet {          // a soft ring shows how much of today this plant has enjoyed; never a count
+                        let fill = TendingEngine.capacityFill(plant, now: .now, calendar: .current, economy: .default)
+                        Circle().stroke(Color.appSurface, lineWidth: 6).frame(width: 178, height: 178).frame(maxWidth: .infinity)
+                            .overlay(Circle().trim(from: 0, to: fill).stroke(Color.accentText.opacity(0.85), style: StrokeStyle(lineWidth: 6, lineCap: .round))
+                                .rotationEffect(.degrees(-90)).frame(width: 178, height: 178))
+                            .animation(.easeInOut(duration: 0.5), value: fill)
+                            .accessibilityHidden(true)
+                    }
+                    Image(plant.imageName).resizable().scaledToFit().frame(height: 156)
                         .rotationEffect(.degrees(thirsty ? 5 : sway), anchor: .bottom)
                         .onTapGesture {            // a small hello: the plant sways back and settles
                             hellos += 1
@@ -67,9 +75,18 @@ struct PlantDetailView: View {
                         .font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText)
                 }
 
-                if !quiet { growthBar(plant) ; resources }
+                if !quiet { growthBar(plant); resources }
 
                 actions(plant)
+
+                if quiet {
+                    Text("Take your time. Plants grow at their own pace.").font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                } else {
+                    let cap = TendingEngine.capacityState(plant, now: .now, calendar: .current, economy: .default)
+                    Label(TendingEngine.capacityLine(cap, name: plant.nickname.isEmpty ? plant.name : plant.nickname),
+                          systemImage: cap == .plenty ? "checkmark.seal.fill" : "leaf.fill")
+                        .font(Theme.font(.footnote, weight: .semibold)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
+                }
 
                 if app.canOfferRewarded && !quiet && (app.profile?.water ?? 0) == 0 {
                     Button { Task { if await app.watchRewardedAd() { run(.water, plant) } } } label: {
