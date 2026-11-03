@@ -279,4 +279,52 @@ final class AppModel {
         profile?.badgesJSON = badges.json
         try? context.save()
     }
+
+    // MARK: Butterfly game
+
+    var album: StickerAlbum { StickerAlbum(json: profile?.albumJSON ?? "") }
+
+    var butterflyPlaysToday: Int {
+        guard let json = profile?.butterflyPlaysJSON, let data = json.data(using: .utf8),
+              let counter = try? JSONDecoder().decode(DailyPlayCounter.self, from: data) else { return 0 }
+        return counter.playsToday(on: now(), calendar: .current)
+    }
+
+    func startButterflyGame(seed: UInt64 = UInt64.random(in: .min ... .max), useLantern: Bool = false, reduceMotion: Bool = false) -> ButterflyGameModel {
+        let evening = VisitorSpawner.isEvening(now(), calendar: .current)
+        var lantern = false
+        if useLantern, !evening, let p = profile, p.glowLanterns > 0 { p.glowLanterns -= 1; lantern = true; try? context.save() }
+        let flowering = plants().filter { $0.earnedCount > 0 && $0.stage >= 3 }.count
+        return ButterflyGameModel(pool: VisitorSpawner.pool(evening: evening, lantern: lantern), floweringPlants: flowering,
+                                  reduceMotion: reduceMotion, seed: seed)
+    }
+
+    /// Applies the end-of-game rewards. Stickers always count; currency respects the 3-a-day limit and Quiet Garden.
+    @discardableResult
+    func finishButterflyGame(_ game: ButterflyGameModel) -> ButterflyRewards.Summary {
+        guard let p = profile else { return ButterflyRewards.Summary() }
+        let quiet = settings.quietGarden, t = now()
+        var rng = SystemRandomNumberGenerator()
+        var summary = ButterflyRewards.summary(catches: game.caught, playsToday: butterflyPlaysToday, using: &rng)
+        if quiet { summary.water = 0; summary.shedPoints = 0; summary.scoops = 0 }
+
+        p.water = min(Economy.default.waterBankCap, p.water + summary.water)
+        p.shedPoints += summary.shedPoints
+        p.soil += summary.scoops
+
+        var a = album
+        a.add(game.caught)
+        p.albumJSON = a.json
+
+        var counter = (p.butterflyPlaysJSON.data(using: .utf8).flatMap { try? JSONDecoder().decode(DailyPlayCounter.self, from: $0) }) ?? DailyPlayCounter()
+        counter.record(on: t, calendar: .current)
+        p.butterflyPlaysJSON = (try? JSONEncoder().encode(counter)).flatMap { String(data: $0, encoding: .utf8) } ?? ""
+
+        badges.record(.visitorSpecies, value: a.species, now: t, quiet: quiet)
+        badges.record(.butterflyPlays, now: t, quiet: quiet)
+        p.badgesJSON = badges.json
+        try? context.save()
+        syncToolUnlocks()
+        return summary
+    }
 }

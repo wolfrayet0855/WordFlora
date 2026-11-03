@@ -68,6 +68,10 @@ struct HomeView: View {
                         Button { router.go(.shed) } label: { Label("Shed", systemImage: "wrench.and.screwdriver.fill") }
                             .buttonStyle(SecondaryButtonStyle())
                     }
+                    if app.isUnlocked(.butterfly) {
+                        Button { router.go(.butterfly) } label: { Label("Visitors", systemImage: "ladybug.fill") }
+                            .buttonStyle(SecondaryButtonStyle())
+                    }
                     if app.isUnlocked(.badges) {
                         Button { router.go(.badges) } label: { Label("Badges", systemImage: "rosette") }
                             .buttonStyle(SecondaryButtonStyle())

@@ -143,5 +143,21 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Green Thumb"].waitForExistence(timeout: 5))
         shot("badges")
     }
+
+    func testButterflyGameStartsAndCanBeFinishedWithARewardingSummary() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything"]
+        app.launch()
+        app.buttons["Visitors"].tap()
+        XCTAssertTrue(app.staticTexts["Meet your garden visitors"].waitForExistence(timeout: 5))
+        shot("butterfly-intro")
+        app.buttons["Start"].tap()
+        sleep(3)
+        shot("butterfly-playing")
+        app.swipeRight()                                   // a miss is free
+        XCTAssertFalse(app.staticTexts["Game over"].exists)
+        XCTAssertTrue(app.staticTexts["Thanks for visiting the garden"].waitForExistence(timeout: 45)
+                      || app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'You met'")).firstMatch.exists)
+        shot("butterfly-summary")
+    }
 }
 

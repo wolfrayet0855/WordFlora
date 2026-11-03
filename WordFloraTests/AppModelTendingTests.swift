@@ -240,5 +240,78 @@ final class AppModelTendingTests: XCTestCase {
         _ = app.roundFinished()
         XCTAssertEqual(app.badges.progress(of: .streak), 8)
     }
+
+    // MARK: butterfly game
+    private func localDate(hour: Int, minute: Int = 0) -> Date {
+        Calendar.current.date(bySettingHour: hour, minute: minute, second: 0, of: Date(timeIntervalSince1970: 1_780_000_000))!
+    }
+
+    func testDaytimeGamesNeverSpawnNightSpeciesUnlessALanternIsUsed() throws {
+        let app = try makeApp(now: { self.localDate(hour: 11) })
+        var g = app.startButterflyGame(seed: 1)
+        for _ in 0..<300 { g.tick(0.1); for v in g.visitors { XCTAssertFalse(["firefly", "luna"].contains(v.speciesId)) } }
+    }
+
+    func testEveningGamesSpawnOnlyNightSpecies() throws {
+        let app = try makeApp(now: { self.localDate(hour: 19) })
+        var g = app.startButterflyGame(seed: 1)
+        for _ in 0..<300 { g.tick(0.1); for v in g.visitors { XCTAssertTrue(["firefly", "luna"].contains(v.speciesId)) } }
+    }
+
+    func testGlowLanternBringsNightVisitorsAtAnyHourAndIsUsedUp() throws {
+        let app = try makeApp(now: { self.localDate(hour: 11) }); app.profile?.glowLanterns = 1
+        var g = app.startButterflyGame(seed: 2, useLantern: true)
+        XCTAssertEqual(app.profile?.glowLanterns, 0)
+        var saw = Set<String>(); for _ in 0..<600 { g.tick(0.05); g.visitors.forEach { saw.insert($0.speciesId) } }
+        XCTAssertTrue(saw.contains("firefly") || saw.contains("luna"))
+        _ = app.startButterflyGame(seed: 3, useLantern: true)                   // none left, falls back to the normal pool
+        XCTAssertEqual(app.profile?.glowLanterns, 0)
+    }
+
+    func testFinishingAppliesRewardsRecordsStickersAndBadges() throws {
+        let app = try makeApp(now: { self.localDate(hour: 11) }); app.profile?.water = 0; app.profile?.shedPoints = 0
+        var g = app.startButterflyGame(seed: 5)
+        g.visitors = [ButterflyGameModel.Visitor(id: 90, speciesId: "monarch", x: 0.5, y: 0.5, vx: 0, vy: 0, born: 0, resting: false)]
+        g.catchAt(x: 0.5, y: 0.5)
+        let s = app.finishButterflyGame(g)
+        XCTAssertEqual(s.water, 1); XCTAssertGreaterThanOrEqual(s.shedPoints, 2)
+        XCTAssertEqual(app.profile?.water, 1)
+        XCTAssertEqual(StickerAlbum(json: app.profile?.albumJSON ?? "").count(of: "monarch"), 1)
+        XCTAssertEqual(app.badges.progress(of: .visitorSpecies), 1)
+        XCTAssertEqual(app.badges.progress(of: .butterflyPlays), 1)
+    }
+
+    func testOnlyThreeRewardedPlaysADayButStickersAlwaysCount() throws {
+        let app = try makeApp(now: { self.localDate(hour: 11) }); app.profile?.water = 0
+        func play(_ species: String) -> ButterflyRewards.Summary {
+            var g = app.startButterflyGame(seed: 1)
+            g.visitors = [ButterflyGameModel.Visitor(id: 90, speciesId: species, x: 0.5, y: 0.5, vx: 0, vy: 0, born: 0, resting: false)]
+            g.catchAt(x: 0.5, y: 0.5)
+            return app.finishButterflyGame(g)
+        }
+        for _ in 0..<3 { XCTAssertEqual(play("honeybee").water, 1) }
+        let fourth = play("ladybug")
+        XCTAssertEqual(fourth.water, 0); XCTAssertEqual(app.profile?.water, 3)
+        XCTAssertEqual(StickerAlbum(json: app.profile?.albumJSON ?? "").count(of: "ladybug"), 1)
+    }
+
+    func testQuietGardenKeepsStickersButEarnsNoCurrency() throws {
+        let app = try makeApp(quiet: true, now: { self.localDate(hour: 11) }); app.profile?.water = 0
+        var g = app.startButterflyGame(seed: 5)
+        g.visitors = [ButterflyGameModel.Visitor(id: 90, speciesId: "monarch", x: 0.5, y: 0.5, vx: 0, vy: 0, born: 0, resting: false)]
+        g.catchAt(x: 0.5, y: 0.5)
+        _ = app.finishButterflyGame(g)
+        XCTAssertEqual(app.profile?.water, 0); XCTAssertEqual(app.profile?.shedPoints, 0)
+        XCTAssertEqual(StickerAlbum(json: app.profile?.albumJSON ?? "").count(of: "monarch"), 1)
+        XCTAssertEqual(app.badges.progress(of: .visitorSpecies), 0)       // quiet mode advances no badge
+    }
+
+    func testFloweringPlantsRaiseTheVisitorCap() throws {
+        let app = try makeApp()
+        let g0 = app.startButterflyGame(seed: 1)
+        for p in app.plants().prefix(6) { p.earnedCount = 1; p.stage = 3 }     // only plants the player owns attract visitors
+        let g1 = app.startButterflyGame(seed: 1)
+        XCTAssertGreaterThan(g1.maxVisitorsForTests, g0.maxVisitorsForTests)
+    }
 }
 

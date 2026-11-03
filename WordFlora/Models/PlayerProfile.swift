@@ -30,6 +30,7 @@ final class PlayerProfile {
     var badgesJSON: String = ""
     var albumJSON: String = ""
     var butterflyPlaysJSON: String = ""
+    var glowLanterns: Int = 0
     var lastAdAt: Date?
     var adsToday: Int = 0
     var adsDay: Date?
