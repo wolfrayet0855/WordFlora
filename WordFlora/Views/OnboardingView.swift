@@ -55,7 +55,7 @@ private struct AgeQuestionView: View {
                 Text("How old are you?").font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                 Text("This helps us set up the right experience. You can still play whichever way you like.")
-                    .font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText).fixedSize(horizontal: false, vertical: true)
+                    .font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
                 VStack(spacing: 12) {
                     ageButton("Under 13", .under13)
                     ageButton("13 to 17", .thirteenPlus)
