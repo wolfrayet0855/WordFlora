@@ -39,6 +39,9 @@ struct GuardedGardenAI: GardenAI {
 }
 
 enum GardenAIProvider {
+    /// True only when a real on-device model will answer (not the static fallback); drives whether AI buttons appear.
+    static func isModelBacked() -> Bool { current() is GuardedGardenAI }
+
     static func make(foundationAvailable: Bool) -> any GardenAI {
         #if canImport(FoundationModels)
         if foundationAvailable, #available(iOS 26.0, *) {

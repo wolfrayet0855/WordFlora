@@ -17,13 +17,17 @@ final class AppModel {
     private var lastPeakAt: Date?
     /// Master switch used by UI tests; real launches always have ads available (subject to every rule in AdGate).
     var adsEnabled = true
+    /// True when this launch opened the iCloud-synced store.
+    let launchedWithCloud: Bool
+    private(set) var syncNeedsRestart = false
     private var lastBadgedRoundId: String?
     private let now: () -> Date
 
     var context: ModelContext { container.mainContext }
 
     init(container: ModelContainer, settings: AppSettings = AppSettings(), bank: WordBank? = nil, now: @escaping () -> Date = { .now }, storeEnabled: Bool = false,
-         notifications: NotificationCenterProviding = SystemNotificationCenter()) {
+         notifications: NotificationCenterProviding = SystemNotificationCenter(), launchedWithCloud: Bool = false) {
+        self.launchedWithCloud = launchedWithCloud
         self.now = now
         self.reminders = ReminderScheduler(center: notifications)
         self.entitlements = EntitlementService(startListening: storeEnabled)
@@ -370,5 +374,15 @@ final class AppModel {
     func updateAmbience() {
         SoundPlayer.shared.enabled = settings.soundOn
         if settings.soundOn && settings.ambienceOn { SoundPlayer.shared.startAmbient() } else { SoundPlayer.shared.stopAmbient() }
+    }
+
+    // MARK: iCloud sync (WordFlora Plus)
+
+    /// SwiftData opens its store once per launch, so entitlement changes take effect on the next launch.
+    /// A lapsed subscription reopens the same store without sync: nothing is deleted or reset.
+    func updateSyncFlag() {
+        let entitled = entitlements.state.hasCloudSync
+        settings.cloudSyncEnabled = entitled
+        syncNeedsRestart = entitled != launchedWithCloud
     }
 }

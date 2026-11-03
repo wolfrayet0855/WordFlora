@@ -93,4 +93,14 @@ final class StorageTests: XCTestCase {
         XCTAssertFalse(off.contains("iCloud.beta.WordFlora"))
         XCTAssertTrue(on.contains("iCloud.beta.WordFlora"), on)
     }
+
+    /// SwiftData validates the schema against CloudKit's rules (defaults or optionals, no unique constraints) when the
+    /// container opens in sync mode, so a successful open proves the models are ready for iCloud.
+    @MainActor
+    func testSchemaOpensInICloudSyncMode() throws {
+        let url = dir.appendingPathComponent("sync-check.store")
+        let config = ModelConfiguration(schema: SharedContainer.schema, url: url, cloudKitDatabase: SharedContainer.cloudDatabase(entitled: true))
+        XCTAssertNoThrow(try ModelContainer(for: SharedContainer.schema, configurations: config))
+    }
 }
+

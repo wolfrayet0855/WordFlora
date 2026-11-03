@@ -4,13 +4,13 @@ import SwiftData
 
 @MainActor
 final class AppModelTendingTests: XCTestCase {
-    func makeApp(quiet: Bool = false, now: @escaping () -> Date = { .now }, center: NotificationCenterProviding = ReminderTests.FakeCenter()) throws -> AppModel {
+    func makeApp(quiet: Bool = false, now: @escaping () -> Date = { .now }, center: NotificationCenterProviding = ReminderTests.FakeCenter(), launchedWithCloud: Bool = false) throws -> AppModel {
         let container = try SharedContainer.make(inMemory: true)
         let suite = UserDefaults(suiteName: "wf-tests-\(UUID().uuidString)")!
         let settings = AppSettings(defaults: suite)
         settings.quietGarden = quiet
         let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
-        let app = AppModel(container: container, settings: settings, bank: bank, now: now, notifications: center)
+        let app = AppModel(container: container, settings: settings, bank: bank, now: now, notifications: center, launchedWithCloud: launchedWithCloud)
         return app
     }
     func firstPlant(_ app: AppModel) throws -> PlantCollectible {
@@ -341,6 +341,36 @@ final class AppModelTendingTests: XCTestCase {
         let before = center.scheduled.map(\.date)
         app.refreshReminders()
         XCTAssertEqual(center.scheduled.count, before.count)
+    }
+
+    // MARK: iCloud sync (Plus)
+    func testBecomingASubscriberFlagsSyncAndAsksForARestart() throws {
+        let app = try makeApp()
+        XCTAssertFalse(app.settings.cloudSyncEnabled); XCTAssertFalse(app.syncNeedsRestart)
+        app.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
+        app.updateSyncFlag()
+        XCTAssertTrue(app.settings.cloudSyncEnabled); XCTAssertTrue(app.syncNeedsRestart)
+    }
+
+    func testAlreadySyncingSubscriberNeedsNoRestart() throws {
+        let app = try makeApp(launchedWithCloud: true)
+        app.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_monthly"]))
+        app.updateSyncFlag()
+        XCTAssertTrue(app.settings.cloudSyncEnabled); XCTAssertFalse(app.syncNeedsRestart)
+    }
+
+    func testALapsedSubscriptionStopsSyncingButKeepsEverythingLocal() throws {
+        let app = try makeApp(launchedWithCloud: true)
+        app.profile?.water = 7
+        app.updateSyncFlag()                                           // not entitled any more
+        XCTAssertFalse(app.settings.cloudSyncEnabled); XCTAssertTrue(app.syncNeedsRestart)
+        XCTAssertEqual(app.profile?.water, 7)                          // nothing is deleted or reset
+    }
+
+    func testSyncIsNeverRequestedForFreePlayers() throws {
+        let app = try makeApp()
+        app.updateSyncFlag()
+        XCTAssertFalse(app.settings.cloudSyncEnabled); XCTAssertFalse(app.syncNeedsRestart)
     }
 }
 

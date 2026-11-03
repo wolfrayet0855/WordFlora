@@ -152,9 +152,24 @@ struct GameView: View {
                     PlantCard(plant: plant).frame(maxWidth: 220)
                     Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
                 }
+                shareButton
                 if vm.roseDropped { Label("A Rose of Jericho is in your satchel", systemImage: "leaf.circle.fill").font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.successText) }
                 Button("Continue") { showEarned = false; app.markPeakDismissed(); afterRound() }.buttonStyle(PrimaryButtonStyle())
             }
+        }
+    }
+
+    @ViewBuilder private var shareButton: some View {
+        if vm.isDaily {
+            ShareLink(item: DailyShare.text(date: .now, calendar: .current, solved: true, petalsRemaining: vm.petalsRemaining,
+                                            maxPetals: Economy.default.maxPetals, helpers: vm.helpersUsed, word: vm.currentWord)) {
+                Label("Share your Daily Bloom", systemImage: "square.and.arrow.up")
+            }.buttonStyle(SecondaryButtonStyle())
+        } else if let name = vm.earnedPlantName, let plant = app.plants().first(where: { $0.name == name }),
+                  let card = PlantShareCard(plantName: plant.name, botanicalName: plant.botanicalName, imageName: plant.imageName, fact: plant.botanicalFact).rendered() {
+            ShareLink(item: card, preview: SharePreview(PlantShare.caption(plantName: plant.name, nickname: plant.nickname), image: card)) {
+                Label("Share this plant", systemImage: "square.and.arrow.up")
+            }.buttonStyle(SecondaryButtonStyle())
         }
     }
 

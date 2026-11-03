@@ -10,6 +10,8 @@ final class AppSettings {
 
     var soundOn: Bool { didSet { defaults.set(soundOn, forKey: "soundOn") } }
     var ambienceOn: Bool { didSet { defaults.set(ambienceOn, forKey: "ambienceOn") } }
+    /// Set when the player is entitled to iCloud sync; read at the NEXT launch to open the synced store.
+    var cloudSyncEnabled: Bool { didSet { defaults.set(cloudSyncEnabled, forKey: "cloudSyncEnabled") } }
     var hapticsOn: Bool { didSet { defaults.set(hapticsOn, forKey: "hapticsOn") } }
     var reduceMotionOverride: Bool { didSet { defaults.set(reduceMotionOverride, forKey: "reduceMotionOverride") } }
     var calmMode: Bool { didSet { defaults.set(calmMode, forKey: "calmMode") } }
@@ -37,6 +39,7 @@ final class AppSettings {
         let age = defaults.string(forKey: "ageBand").flatMap(AgeBand.init(rawValue:))
         soundOn = bool("soundOn", true)
         hapticsOn = bool("hapticsOn", true)
+        cloudSyncEnabled = bool("cloudSyncEnabled", false)
         ambienceOn = bool("ambienceOn", false)     // off by default, offered once
         reduceMotionOverride = bool("reduceMotionOverride", false)
         // Younger players start in the gentlest configuration.

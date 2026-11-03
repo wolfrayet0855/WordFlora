@@ -31,7 +31,7 @@ struct PlusView: View {
                 if store.state.hasPlus { activeCard } else { plans }
 
                 VStack(spacing: 2) {
-                    Button("Restore purchases") { Task { await store.restore() } }.tapTarget()
+                    Button("Restore purchases") { Task { await store.restore(); app.updateSyncFlag() } }.tapTarget()
                     Button("Manage subscription") { openURL(Links.manageSubscriptions) }.tapTarget()
                     HStack(spacing: 8) {
                         Link("Terms of Use", destination: Links.terms).tapTarget()
@@ -122,7 +122,7 @@ struct PlusView: View {
             let outcome = await store.purchase(selected)
             busy = false
             switch outcome {
-            case .success: message = "Welcome to WordFlora Plus!"
+            case .success: message = "Welcome to WordFlora Plus!"; app.updateSyncFlag()
             case .pending: message = "Waiting for approval. We will turn Plus on as soon as it comes through."
             case .cancelled: message = nil
             case .failed: message = "That didn't go through. You have not been charged."

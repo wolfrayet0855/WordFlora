@@ -10,6 +10,8 @@ struct PlantDetailView: View {
     @State private var renaming = false
     @State private var draftName = ""
     @State private var bump = false
+    @State private var aiText: String?
+    @State private var aiBusy = false
 
     private var plant: PlantCollectible? { app.plants().first { $0.plantId == plantId } }
     private static let stageNames = ["Seed", "Sprout", "Bud", "Bloom", "Flourishing"]
@@ -65,6 +67,20 @@ struct PlantDetailView: View {
                 }
 
                 Card { Text(plant.botanicalFact).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText) }
+
+                if GardenAIProvider.isModelBacked() {
+                    if let aiText {
+                        Card {
+                            VStack(alignment: .leading, spacing: 6) {
+                                Text(aiText).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText)
+                                Label("Written by on-device AI", systemImage: "sparkles").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
+                            }
+                        }
+                    } else {
+                        Button { Task { await tellMore(plant) } } label: { Label(aiBusy ? "Thinking…" : "Tell me more", systemImage: "sparkles") }
+                            .buttonStyle(SecondaryButtonStyle()).disabled(aiBusy)
+                    }
+                }
             }
             .padding(20)
         }
@@ -145,6 +161,16 @@ struct PlantDetailView: View {
                 .transition(.move(edge: .bottom).combined(with: .opacity))
                 .accessibilityAddTraits(.updatesFrequently)
         }
+    }
+
+    /// Grounded in the plant's reviewed fact; unsafe or empty output falls back to the fact itself (spec section 5).
+    private func tellMore(_ plant: PlantCollectible) async {
+        aiBusy = true
+        let entry = WordEntry(id: plant.plantId, word: plant.name.uppercased().filter { $0.isLetter || $0 == " " }, display: plant.name, hint: "", hint2: nil,
+                              fact: plant.botanicalFact, level: plant.level, kind: .vocab, plantId: nil, tags: [], minAge: 6, dailyEligible: false,
+                              source: "bank", license: "proprietary", reviewedBy: nil)
+        aiText = await GardenAIProvider.current().explain(entry: entry)
+        aiBusy = false
     }
 
     private func run(_ action: AppModel.TendAction, _ plant: PlantCollectible) {
