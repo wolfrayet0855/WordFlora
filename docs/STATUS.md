@@ -40,3 +40,8 @@ Rulings:
 Deferred:
 - Two-process store writes (app + widget at once): wait for real-device testing.
 - Minor wording/polish items from the review, plus word bank growth (30 starter, ~270 needed).
+
+## Apple Intelligence + delight pass (branch 2-feat-apple-intelligence)
+Built (unit 363 + UI 17 green in simulator): optional "Simpler clue" (on-device model, validated, free, once per round), Siri/Shortcuts + Control Center "Water my garden" (same store/rules as widget; iOS 18+ for the control), read-aloud clue (system voice, hidden under VoiceOver), welcome-back card (3+ days away, no streak talk), tap-to-sway plant hello.
+Rulings: PlantEntity/Spotlight skipped for now (needs iOS 18, little gain); Smart Stack relevance dropped (watchOS only); journal/whispers and weekly summary deferred; keep 3-day trial and ad cadence until real cohort data (engagement research suggests testing a 7-day trial and delaying the interstitial to ~day 7; owner decision).
+Device-only unverified: Siri phrases, Control Center control, speech voice/silent switch, haptic feel, on-device model latency.

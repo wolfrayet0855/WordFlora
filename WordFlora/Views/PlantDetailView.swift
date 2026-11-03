@@ -6,6 +6,8 @@ struct PlantDetailView: View {
 
     @Environment(AppModel.self) private var app
     @State private var toast: String?
+    @State private var sway = 0.0
+    @State private var hellos = 0
     @State private var showRepot = false
     @State private var renaming = false
     @State private var draftName = ""
@@ -32,7 +34,14 @@ struct PlantDetailView: View {
             VStack(spacing: 16) {
                 ZStack(alignment: .topTrailing) {
                     Image(plant.imageName).resizable().scaledToFit().frame(height: 190)
-                        .rotationEffect(.degrees(thirsty ? 5 : 0), anchor: .bottom)
+                        .rotationEffect(.degrees(thirsty ? 5 : sway), anchor: .bottom)
+                        .onTapGesture {            // a small hello: the plant sways back and settles
+                            hellos += 1
+                            guard !UIAccessibility.isReduceMotionEnabled else { return }
+                            withAnimation(.interpolatingSpring(stiffness: 90, damping: 5)) { sway = 7 }
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { withAnimation(.interpolatingSpring(stiffness: 90, damping: 5)) { sway = 0 } }
+                        }
+                        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.5), trigger: hellos)
                         .scaleEffect(bump ? 1.06 : 1)
                         .animation(.spring(response: 0.4, dampingFraction: 0.45), value: bump)
                         .accessibilityHidden(true)
