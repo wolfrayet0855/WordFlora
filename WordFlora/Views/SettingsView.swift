@@ -1,9 +1,14 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct SettingsView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
     @State private var reminderDenied = false
+    @State private var exportDoc: GardenBackupDocument?
+    @State private var exporting = false
+    @State private var importing = false
+    @State private var backupMessage: (text: String, ok: Bool)?
 
     var body: some View {
         @Bindable var s = app.settings
@@ -59,6 +64,15 @@ struct SettingsView: View {
                         .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 }
             }
+            Section("Your garden") {
+                Button { prepareBackup() } label: { Label(GardenBackup.Copy.backupTitle, systemImage: "square.and.arrow.up") }
+                Button { importing = true } label: { Label(GardenBackup.Copy.restoreTitle, systemImage: "square.and.arrow.down") }
+                Text(GardenBackup.Copy.footnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                if let m = backupMessage {
+                    Text(m.text).font(.footnote).foregroundStyle(m.ok ? Color.successText : Color.appDanger)
+                        .accessibilityIdentifier("backup-message")
+                }
+            }
             Section("Privacy and ads") {
                 Link("Report an ad", destination: Links.reportAd)
                 Link("Privacy Policy", destination: Links.privacy)
@@ -70,7 +84,31 @@ struct SettingsView: View {
                 LabeledContent("Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
             }
         }
+        .fileExporter(isPresented: $exporting, document: exportDoc, contentType: .json,
+                      defaultFilename: GardenBackup.filename(for: .now)) { result in
+            if case .success = result { backupMessage = (GardenBackup.Copy.backedUp, true) }
+        }
+        .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in
+            guard case .success(let url) = result else { return }
+            restore(from: url)
+        }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func prepareBackup() {
+        guard let data = try? GardenBackup.make(context: app.context, now: .now).encoded() else { return }
+        exportDoc = GardenBackupDocument(data: data)
+        exporting = true
+    }
+
+    private func restore(from url: URL) {
+        let scoped = url.startAccessingSecurityScopedResource()
+        defer { if scoped { url.stopAccessingSecurityScopedResource() } }
+        guard let data = try? Data(contentsOf: url) else { backupMessage = (GardenBackup.ImportError.unreadable.message, false); return }
+        switch app.restoreGarden(from: data) {
+        case .success: backupMessage = (GardenBackup.Copy.restored, true)
+        case .failure(let e): backupMessage = (e.message, false)
+        }
     }
 }

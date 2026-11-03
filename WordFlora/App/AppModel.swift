@@ -81,6 +81,14 @@ final class AppModel {
         badges = BadgeState(json: game.playerProfile?.badgesJSON ?? "", defs: defs)
     }
 
+    /// Merges a garden backup file best-of-each, then reloads what depends on the profile.
+    func restoreGarden(from data: Data) -> Result<GardenBackup.RestoreReport, GardenBackup.ImportError> {
+        let defs = (try? BadgeCatalog.load()) ?? []
+        let result = GardenBackup.restore(data, into: context, badgeDefs: defs)
+        if case .success = result { reconcileSyncedData(); syncToolUnlocks() }
+        return result
+    }
+
     func plants() -> [PlantCollectible] {
         let d = FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.level), SortDescriptor(\.name)])
         return (try? context.fetch(d)) ?? []
@@ -230,6 +238,7 @@ final class AppModel {
         guard let p = profile else { return }
         let d = now(), cal = Calendar.current
         p.roundsSinceAd = 0
+        adShownThisSession = true
         p.lastAdAt = d
         if let day = p.adsDay, cal.isDate(day, inSameDayAs: d) { p.adsToday += 1 } else { p.adsDay = cal.startOfDay(for: d); p.adsToday = 1 }
         try? context.save()
@@ -283,9 +292,42 @@ final class AppModel {
         guard adsEnabled, canOfferRewarded else { return false }
         await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
         let earned = await ads.showRewarded()
+        adShownThisSession = true
         if earned { grantRewardedDrops() }
         return earned
     }
+
+    // MARK: Gentle Plus offer (PlusOfferPolicy)
+
+    /// Switched off for UI tests so launches stay deterministic.
+    var plusOfferEnabled = true
+    /// An interstitial or rewarded ad appeared during this launch; the Plus card then waits for another session.
+    private(set) var adShownThisSession = false
+    private(set) var plusOffer: PlusOfferPolicy.Milestone?
+
+    /// Called when Home appears. Records the offer as soon as it shows, so it appears once per milestone.
+    func checkPlusOffer() {
+        guard plusOfferEnabled, plusOffer == nil else { return }
+        var c = PlusOfferPolicy.Context(now: now())
+        c.ageBand = settings.ageBand
+        c.hasPlus = entitlements.state.hasPlus
+        c.entitlementsLoaded = entitlements.hasLoaded
+        c.quietGarden = settings.quietGarden
+        c.adShownThisSession = adShownThisSession
+        c.lastRoundWasRest = game.lastRoundWasLoss
+        c.currentLevel = profile?.currentLevel ?? 1
+        c.plantsEarned = plants().filter { $0.earnedCount > 0 }.count
+        c.offered = Set(settings.plusOfferMilestones.compactMap(PlusOfferPolicy.Milestone.init(rawValue:)))
+        c.lastOfferAt = settings.plusOfferLastAt
+        guard let m = PlusOfferPolicy.milestoneToOffer(c) else { return }
+        plusOffer = m
+        // Every milestone already reached is covered by this one card.
+        let covered = PlusOfferPolicy.reached(currentLevel: c.currentLevel, plantsEarned: c.plantsEarned).map(\.rawValue)
+        settings.plusOfferMilestones = Array(Set(settings.plusOfferMilestones).union(covered)).sorted()
+        settings.plusOfferLastAt = now()
+    }
+
+    func dismissPlusOffer() { plusOffer = nil }
 
     // MARK: Shed and badges
 

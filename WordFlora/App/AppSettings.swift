@@ -28,6 +28,9 @@ final class AppSettings {
     var onboardingComplete: Bool { didSet { defaults.set(onboardingComplete, forKey: "onboardingComplete") } }
     var completedSessions: Int { didSet { defaults.set(completedSessions, forKey: "completedSessions") } }
     var lastOpenedAt: Date? { didSet { defaults.set(lastOpenedAt, forKey: "lastOpenedAt") } }
+    /// Milestones the Plus card has already appeared for, and when it last appeared (PlusOfferPolicy).
+    var plusOfferMilestones: [String] { didSet { defaults.set(plusOfferMilestones, forKey: "plusOfferMilestones") } }
+    var plusOfferLastAt: Date? { didSet { defaults.set(plusOfferLastAt, forKey: "plusOfferLastAt") } }
 
     var isUnderThirteen: Bool { ageBand == .under13 }
     var colorScheme: ColorScheme? {
@@ -58,6 +61,8 @@ final class AppSettings {
         onboardingComplete = bool("onboardingComplete", false)
         completedSessions = defaults.integer(forKey: "completedSessions")
         lastOpenedAt = defaults.object(forKey: "lastOpenedAt") as? Date
+        plusOfferMilestones = defaults.stringArray(forKey: "plusOfferMilestones") ?? []
+        plusOfferLastAt = defaults.object(forKey: "plusOfferLastAt") as? Date
     }
 
     /// Applies the defaults that depend on the age answer (called once, when the player answers).

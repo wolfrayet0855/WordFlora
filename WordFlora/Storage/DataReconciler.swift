@@ -27,7 +27,7 @@ enum DataReconciler {
         return report
     }
 
-    private static func merge(_ o: PlayerProfile, into k: PlayerProfile, defs: [BadgeDef]) {
+    static func merge(_ o: PlayerProfile, into k: PlayerProfile, defs: [BadgeDef]) {
         k.currentLevel = max(k.currentLevel, o.currentLevel)
         k.plantsEarnedThisLevel = max(k.plantsEarnedThisLevel, o.plantsEarnedThisLevel)
         k.roseOfJerichoCount = max(k.roseOfJerichoCount, o.roseOfJerichoCount)
@@ -49,7 +49,7 @@ enum DataReconciler {
         k.albumJSON = StickerAlbum(json: k.albumJSON).merged(with: StickerAlbum(json: o.albumJSON)).json
     }
 
-    private static func merge(_ o: PlantCollectible, into k: PlantCollectible) {
+    static func merge(_ o: PlantCollectible, into k: PlantCollectible) {
         k.earnedCount = max(k.earnedCount, o.earnedCount)
         k.growthPoints = max(k.growthPoints, o.growthPoints)
         k.stage = max(k.stage, o.stage)

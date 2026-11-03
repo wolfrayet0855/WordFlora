@@ -55,6 +55,7 @@ struct WordFloraApp: App {
         }
         if uiTesting && args.contains("-uitest-everything") { model.settings.showEverything = true; model.syncToolUnlocks() }
         if uiTesting && !args.contains("-uitest-ads") { model.adsEnabled = false }
+        if uiTesting { model.plusOfferEnabled = false }
         if !uiTesting { try? Tips.configure([.displayFrequency(.daily)]) }
         _app = State(initialValue: model)
     }

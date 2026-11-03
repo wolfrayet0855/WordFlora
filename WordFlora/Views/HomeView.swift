@@ -51,6 +51,8 @@ struct HomeView: View {
                     .transition(.opacity)
                 }
 
+                if app.plusOffer != nil { plusOfferCard.transition(.opacity) }
+
                 FlowerView(petals: 8)
                     .frame(height: 220)
                     .padding(.vertical, 4)
@@ -99,7 +101,29 @@ struct HomeView: View {
         .background(Color.appBackground.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) { bannerArea }
         .task { await app.prepareBannerIfAllowed() }
+        .onAppear { app.checkPlusOffer() }
         .navigationBarHidden(true)
+    }
+
+    /// One gentle, dismissible card after a milestone (PlusOfferPolicy decides when).
+    private var plusOfferCard: some View {
+        Card {
+            VStack(alignment: .leading, spacing: 8) {
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: "icloud.fill").font(.title2).foregroundStyle(Color.accentText)
+                    Text(PlusOfferPolicy.Copy.headline).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Spacer(minLength: 0)
+                    Button { withAnimation { app.dismissPlusOffer() } } label: { Image(systemName: "xmark").frame(width: Theme.minTap, height: Theme.minTap) }
+                        .accessibilityLabel("Dismiss")
+                }
+                Text(PlusOfferPolicy.Copy.detail).font(Theme.font(.callout)).foregroundStyle(Color.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button(PlusOfferPolicy.Copy.button) { app.dismissPlusOffer(); router.go(.plus) }
+                    .font(Theme.font(.callout, weight: .semibold))
+            }
+        }
+        .accessibilityIdentifier("plus-offer-card")
     }
 
     @ViewBuilder private var bannerArea: some View {
