@@ -1,51 +1,40 @@
-Overview
+# WordFlora
 
-WordFlora is a SwiftUI-based word-guessing game where players try to uncover a hidden word by guessing individual letters. The game keeps track of the number of words guessed and missed, provides feedback through animations and sounds, and supports restarting or playing again with different words.
+**Guess words. Grow a garden.** A calm word-guessing game for iPhone. Guess a plant word from a clue; each wrong guess lets a petal drift off the flower. Win to find real plants (50 across 5 levels), tend them with water, soil and sun, catch garden visitors, earn badges, and come back for a shared Daily Bloom.
 
-Features
+Mixed kid/adult audience, not in the Kids Category. SwiftUI, SwiftData, iOS 17.5+ (built with the iOS 26.5 SDK).
 
-Game State Tracking:
+## What's in the app
+- **Word game:** bundled, reviewed plant word bank; help ladder; losses are "resting", never failure; Rose of Jericho wake-up.
+- **Garden:** 50 plants, two progression tracks (words found / garden flourishing), tending, tools, repotting, nicknames.
+- **Butterfly game:** 35-second no-fail mini-game, sticker album, evening-only visitors.
+- **Badges** (positive-only), **Daily Bloom** (deterministic, no server), spoiler-free sharing.
+- **Home-screen widget:** small, medium and Lock Screen, with an interactive water button (App Intents).
+- **WordFlora Plus:** one subscription group, `plus_yearly` $12.99 (3-day trial) and `plus_monthly` $3.99; removes ads, enables iCloud sync.
+- **Ads (free adults only):** Google AdMob banner (Home/Garden), optional rewarded drops, and an every-third-round ad only after the player taps "One more". Never for under-13, unknown age, or subscribers.
+- **Optional on-device AI** (Apple Intelligence, iOS 26+): "Tell me more", validated and with a static fallback.
+- **Gentle reminders** (opt-in, at most one a day), **sound** (ambient session), **haptics**, Reduce Motion, Calm mode, Quiet Garden.
 
-Tracks words guessed and missed. Keeps track of the current word, the revealed letters, and remaining guesses.
+## Layout
+```
+WordFlora/            app (App, Views, Components, Rules, Services, Storage, Ads, AI, Audio, Notifications, Shared)
+WordFloraWidget/      home-screen widget extension
+WordFloraTests/       unit tests (rules, view models, StoreKit config, storage, sound, ...)
+WordFloraUITests/     UI tests incl. Apple's accessibility audit on every screen
+Config/               Ads.xcconfig (test ad ids), WordFlora.storekit (local StoreKit)
+design-preview/       approved mockups, art sources, prototype (served on localhost:8765 during design)
+docs/                 specs, plans, research, owner setup steps, STATUS.md
+```
+Shared with the widget through the App Group: models, `TendingEngine`, `WidgetActions`, settings.
 
-UI Components: Displays the number of words guessed and missed. Shows the number of words remaining and total words in the game. Provides a text field for letter input and buttons for guessing and restarting the game. Displays a changing image based on the number of remaining guesses, using flower images. Game Mechanics: The player guesses letters to reveal the hidden word. The game updates the displayed word with correct guesses and provides feedback on incorrect guesses. The game transitions between words and provides feedback when all guesses are used or a word is successfully guessed. Sound Effects: Plays sounds for correct guesses, incorrect guesses, and when a word is guessed. Code Summary
+## Run and test
+```bash
+xcodebuild test -scheme WordFlora -destination 'platform=iOS Simulator,name=iPhone 16'
+```
+UI tests launch with `-uitest` flags (fresh in-memory store, ads off). Real ad ids go in `Config/Ads.local.xcconfig` (git-ignored).
 
-State Variables
+## Identifiers
+Bundle `beta.WordFlora`, widget `beta.WordFlora.WordFloraWidget`, team `P9Z5QB8965`, App Group `group.beta.WordFlora`, iCloud `iCloud.beta.WordFlora`, products `plus_yearly` / `plus_monthly` (group "WordFlora Plus").
 
-wordsGuessed: Counts the number of words successfully guessed.
-
-wordsMissed: Counts the number of words that were not guessed within the allowed attempts.
-
-currentWordIndex: Keeps track of the index of the current word.
-
-wordToGuess: The current word that the player needs to guess.
-
-revealedWord: Shows the partially guessed word with underscores for unguessed letters.
-
-lettersGuessed: Tracks all guessed letters.
-
-guessesRemaining: Number of guesses remaining before the player runs out of attempts.
-
-gameStatusMessage: Displays messages about the game status.
-
-guessedLetter: The most recent letter guessed by the player.
-
-imageName: The name of the image representing the current state of the flower, based on remaining guesses.
-
-playAgainHidden: Controls the visibility of the "play again" button.
-
-playingagainButtonLabel: Text label for the "play again" button.
-
-audioPlayer: Manages audio playback for game sounds.
-
-textFieldIsFocused: Manages focus state for the text field.
-
-Functions guessALetter(): Updates the revealed word based on the guessed letter and tracks guessed letters.
-
-updateGamePlay(): Updates the game state based on whether the guessed letter is correct or incorrect, adjusts the flower image, and manages game status messages.
-
-playSound(soundName:): Plays the specified sound for game events.
-
-Future Enhancements
-
-Helpful hints for each word guessed, making the game even more engaging and accessible for players!
+## Status
+See [`docs/STATUS.md`](docs/STATUS.md) for what is verified, how, and what still needs an owner or a real device.
