@@ -1,0 +1,303 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WordFlora tending and pots</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+:root,[data-theme=light]{--leaf:#9BCB3C;--leaf-ink:#22331A;--leafd:#5E8F1F;--water:#4C93D6;--sun:#F2B632;--heart:#E0627F;--soil:#7A5238;--card:#FFFFFF;--lock:#D9D4C6;--lockink:#6B6A5E;--txt2:#4F5F4F}
+[data-theme=dark]{--leaf:#A8D84A;--leaf-ink:#1A2E1A;--leafd:#B7E26A;--water:#7DB6EE;--sun:#F6C85A;--heart:#F08AA3;--soil:#A47550;--card:#2C3E2C;--lock:#3A4A3A;--lockink:#B9C9B9;--txt2:#B9D0B9}
+body{line-height:1.45}
+.wrap{max-width:1240px;margin:0 auto;padding:28px 20px 80px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+h1{font-size:32px;margin:0}h2{font-size:26px;margin:56px 0 4px}h3{font-size:18px;margin:0 0 6px}
+.sub{color:var(--txt2);margin:4px 0 20px;max-width:70ch}
+.btn{font:inherit;font-weight:800;border:0;border-radius:999px;padding:10px 18px;background:var(--leaf);color:var(--leaf-ink);cursor:pointer;font-size:15px}
+.btn:focus-visible,.seg button:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+.btn.ghost{background:var(--card);color:var(--text);box-shadow:inset 0 0 0 2px var(--line)}
+nav a{color:var(--text);font-weight:700;margin-right:14px}
+.potgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+.pcard{background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:14px 14px 16px;display:grid;grid-template-columns:1fr 64px;gap:4px 8px;align-items:end}
+.pcard .main{grid-column:1}.pcard .lk{grid-column:2;text-align:center;font-size:11px;color:var(--lockink)}
+.pcard .info{grid-column:1/3;margin-top:6px}.pcard b{display:block;font-size:16px}.pcard .un{color:var(--txt2);font-size:14px;display:flex;gap:6px;align-items:center}
+.pip{position:relative;width:var(--w,150px);height:calc(var(--w,150px)*1.44);margin:0 auto}
+.pip img{position:absolute;left:0;top:0;width:100%}
+.pip .pot{position:absolute;left:14%;top:84%;width:72%}
+.pot svg,.lk svg{display:block;width:100%;height:auto}
+.locked-pot{opacity:1}
+.tw{transform-box:fill-box;transform-origin:center;animation:tw 2.2s ease-in-out infinite}
+@keyframes tw{0%,100%{opacity:.25;transform:scale(.6)}50%{opacity:1;transform:scale(1.15)}}
+.phones{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.phone{width:390px;height:844px;border:10px solid #22301f;border-radius:52px;box-sizing:content-box;overflow:hidden;position:relative;background:var(--bg);box-shadow:var(--shadow);flex:none}
+.phone.short{height:640px}
+.cap{margin:10px 0 0;font-weight:700}
+.sbar{height:44px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 4px;font-size:13px;font-weight:700}
+.ph-title{font-size:30px;font-weight:800;padding:8px 22px 4px}
+.ph-sub{padding:0 22px;color:var(--txt2);font-size:14px}
+.sec-h{padding:16px 22px 8px;font-weight:800;font-size:18px}
+.tools{display:flex;gap:12px;padding:6px 22px}
+.tool{flex:1;background:var(--card);border-radius:18px;padding:10px 4px;text-align:center;font-size:12px;font-weight:700;box-shadow:var(--shadow)}
+.tool svg{width:44px;height:44px;display:block;margin:0 auto 2px}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 22px}
+.pc{background:var(--card);border-radius:18px;padding:8px 6px 8px;text-align:center;position:relative;font-size:12px;box-shadow:var(--shadow)}
+.pc svg{width:78%;margin:0 auto;display:block}
+.pc b{display:block;font-size:13px}.pc span{color:var(--txt2);font-size:11.5px;display:block;line-height:1.25}
+.pc.sel{box-shadow:0 0 0 3px var(--leaf),var(--shadow)}
+.pc .chk{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--leaf);color:var(--leaf-ink);font-size:14px;font-weight:900;display:grid;place-items:center}
+.pc.lock{background:transparent;box-shadow:inset 0 0 0 2px var(--line);border-radius:18px}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:28px 28px 0 0;padding:12px 18px 28px;box-shadow:0 -10px 30px rgba(0,0,0,.2)}
+.scrim{position:absolute;inset:0;background:rgba(20,30,20,.45)}
+.grab{width:44px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 10px}
+.prow{display:flex;gap:10px;overflow:hidden;padding:4px 2px 8px}
+.pr{flex:none;width:76px;text-align:center;font-size:12px;font-weight:700;border-radius:16px;padding:6px 2px;background:var(--card)}
+.pr svg{width:60px;display:block;margin:0 auto}
+.pr.sel{box-shadow:0 0 0 3px var(--leaf)}.pr.lock{box-shadow:inset 0 0 0 2px var(--line);background:transparent;color:var(--lockink)}
+.soils{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.soil{background:var(--card);border-radius:16px;padding:10px 6px;text-align:center;font-size:12px;font-weight:700;box-shadow:inset 0 0 0 2px var(--line);position:relative}
+.soil i{display:block;width:44px;height:30px;border-radius:50% 50% 14px 14px;margin:0 auto 6px}
+.soil small{display:block;font-weight:600;color:var(--txt2)}
+.soil.fav{box-shadow:0 0 0 3px var(--sun)}
+.soil .fv{position:absolute;top:4px;right:6px;color:var(--sun);font-size:15px}
+.pillbtn{margin-top:14px;width:100%;padding:14px;border-radius:999px;border:0;background:var(--leaf);color:var(--leaf-ink);font:inherit;font-weight:800;font-size:16px}
+.fine{font-size:12.5px;color:var(--txt2);margin:2px 2px 8px}
+/* storyboards */
+.sbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:24px}
+.sbcard{background:var(--card);border-radius:24px;box-shadow:var(--shadow);padding:16px}
+.sbtop{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lab{font-size:13px;font-weight:800;margin-bottom:4px;color:var(--txt2)}
+.st{position:relative;width:100%;max-width:250px;height:290px;margin:0 auto;border-radius:20px;overflow:hidden;background:linear-gradient(#EAF4DA,#F7F3E4 70%);box-shadow:inset 0 0 0 2px var(--line)}
+[data-theme=dark] .st{background:linear-gradient(#26402A,#1D311F 70%)}
+.st>*{position:absolute}
+.st .pip{left:50%;top:26px;transform:translateX(-50%);--w:150px;z-index:1}
+.beats{font-size:13px;color:var(--txt2);margin:8px 0 0}
+.st .a{pointer-events:none}
+/* water */
+.w-can{left:138px;top:14px;width:84px;opacity:0;z-index:5}
+.w-drop{width:9px;height:13px;top:76px;opacity:0;z-index:4}
+.w-rip{left:76px;top:184px;width:96px;height:18px;border-radius:50%;border:3px solid var(--water);opacity:0;z-index:3}
+.st:not(.run) .w-can{opacity:1;transform:rotate(-35deg)}
+.st:not(.run) .w-drop{opacity:1}
+.full.run .w-can{animation:wcan 3s ease-in-out infinite}
+@keyframes wcan{0%{opacity:0;transform:rotate(0)}12%{opacity:1;transform:rotate(0)}28%,72%{opacity:1;transform:rotate(-35deg)}88%,100%{opacity:0;transform:rotate(0)}}
+.full.run .w-drop{animation:wdrop 3s linear infinite}
+@keyframes wdrop{0%,28%{opacity:0;transform:translateY(0)}31%{opacity:1}56%{opacity:1;transform:translateY(104px)}58%,100%{opacity:0;transform:translateY(108px)}}
+.full.run .w-rip{animation:wrip 3s ease-out infinite}
+@keyframes wrip{0%,54%{opacity:0;transform:scale(.3)}58%{opacity:.9}82%,100%{opacity:0;transform:scale(1.5)}}
+.full.run .pip{animation:wpl 3s ease-in-out infinite}
+@keyframes wpl{0%,56%,76%,100%{transform:translateX(-50%) scale(1)}66%{transform:translateX(-50%) scale(1.04)}}
+.rm .w-drop{left:104px!important;top:112px;opacity:0}
+.rm.run .w-can{animation:rmfade 2.4s ease-in-out infinite}.rm .w-can{transform:rotate(-35deg)}
+.rm.run .w-drop{animation:rmfade2 2.4s ease-in-out infinite}
+@keyframes rmfade{0%{opacity:0}25%,70%{opacity:1}100%{opacity:0}}
+@keyframes rmfade2{0%,15%{opacity:0}40%,60%{opacity:.9}100%{opacity:0}}
+/* soil */
+.s-mound{left:6px;top:226px;width:70px;z-index:2}
+.s-trowel{left:14px;top:170px;width:60px;z-index:5;opacity:0}
+.s-dot{width:8px;height:8px;border-radius:50%;background:var(--soil);top:140px;opacity:0;z-index:4}
+.s-level{left:70px;top:174px;width:110px;height:24px;border-radius:50%;background:var(--soil);z-index:3;box-shadow:inset 0 -4px 0 rgba(0,0,0,.18)}
+.st:not(.run) .s-trowel{opacity:1}
+.full.run .s-trowel{animation:strow 3s ease-in-out infinite}
+@keyframes strow{0%{opacity:0;transform:translate(0,0) rotate(0)}8%{opacity:1}18%{transform:translate(0,14px) rotate(-10deg)}38%{transform:translate(50px,-70px) rotate(20deg)}58%{opacity:1;transform:translate(110px,-34px) rotate(75deg)}74%{opacity:1;transform:translate(112px,-34px) rotate(85deg)}90%,100%{opacity:0;transform:translate(60px,0) rotate(0)}}
+.full.run .s-dot{animation:sdot 3s linear infinite}
+@keyframes sdot{0%,56%{opacity:0;transform:translateY(0)}59%{opacity:1}74%{opacity:1;transform:translateY(40px)}77%,100%{opacity:0;transform:translateY(42px)}}
+.full.run .s-level{animation:slev 3s ease-in-out infinite}
+@keyframes slev{0%,60%{transform:scaleY(.45) translateY(10px)}80%,92%{transform:scaleY(1) translateY(-3px)}100%{transform:scaleY(.45) translateY(10px)}}
+.rm .s-trowel,.rm .s-dot{display:none}
+.rm.run .s-level{animation:rmlev 2.4s ease-in-out infinite}
+@keyframes rmlev{0%{opacity:.25}35%,75%{opacity:1}100%{opacity:.25}}
+/* sun */
+.u-tint{inset:0;background:radial-gradient(circle at 85% 8%,rgba(255,214,90,.7),transparent 65%);opacity:0;z-index:4}
+.u-sun{right:6px;top:2px;width:96px;opacity:0;z-index:5}
+.u-sun .rays{transform-origin:50% 50%;animation:spin 8s linear infinite;transform-box:fill-box}
+.rm .u-sun .rays{animation:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.u-sp{width:18px;opacity:0;z-index:6}
+.st:not(.run) .u-sun,.st:not(.run) .u-sp{opacity:1}.st:not(.run) .u-tint{opacity:.5}
+.full.run .u-sun{animation:usun 3.2s ease-in-out infinite}
+@keyframes usun{0%{opacity:0;transform:scale(.7)}18%,80%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.7)}}
+.full.run .u-tint{animation:utint 3.2s ease-in-out infinite}
+@keyframes utint{0%{opacity:0}30%,70%{opacity:.6}100%{opacity:0}}
+.full.run .u-sp{animation:usp 3.2s ease-in-out infinite}
+@keyframes usp{0%,30%{opacity:0;transform:scale(.3) rotate(0)}45%{opacity:1;transform:scale(1.1) rotate(45deg)}60%{opacity:.2;transform:scale(.5) rotate(90deg)}72%{opacity:1;transform:scale(1) rotate(120deg)}90%,100%{opacity:0;transform:scale(.3)}}
+.full.run .pip{animation:uflut 3.2s ease-in-out infinite;transform-origin:50% 62%}
+@keyframes uflut{0%,52%,90%,100%{transform:translateX(-50%) rotate(0)}58%{transform:translateX(-50%) rotate(-2.2deg)}64%{transform:translateX(-50%) rotate(2.2deg)}70%{transform:translateX(-50%) rotate(-1.6deg)}76%{transform:translateX(-50%) rotate(1.2deg)}82%{transform:translateX(-50%) rotate(0)}}
+.rm .u-sp:nth-of-type(n+8){display:none}
+.rm.run .u-sun,.rm.run .u-tint,.rm.run .u-sp{animation:rmfade 2.4s ease-in-out infinite}
+.rm.run .u-tint{animation-name:rmtint}@keyframes rmtint{0%{opacity:0}30%,70%{opacity:.5}100%{opacity:0}}
+/* repot */
+.r-old,.r-new{left:50%;margin-left:-54px;top:212px;width:108px;z-index:3}
+.r-new{opacity:0}
+.st:not(.run) .r-old{opacity:0}.st:not(.run) .r-new{opacity:1}
+.r-plant{left:50%;top:26px;width:150px;margin-left:-75px;z-index:1}
+.r-dot{width:8px;height:8px;border-radius:50%;background:var(--soil);top:170px;opacity:0;z-index:4}
+.r-sp{width:18px;top:210px;left:50%;margin-left:-9px;opacity:0;z-index:6}
+.full.run .r-old{animation:rold 3.4s ease-in-out infinite}
+@keyframes rold{0%,12%{opacity:1;transform:translateX(0)}34%,100%{opacity:0;transform:translateX(-170px)}}
+.full.run .r-new{animation:rnew 3.4s ease-in-out infinite}
+@keyframes rnew{0%,38%{opacity:0;transform:translateX(170px)}58%,92%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(0)}}
+.full.run .r-plant{animation:rpl 3.4s ease-in-out infinite}
+@keyframes rpl{0%,12%{transform:translateY(0)}28%,60%{transform:translateY(-16px)}74%,100%{transform:translateY(0)}}
+.full.run .r-dot{animation:rdot 3.4s linear infinite}
+@keyframes rdot{0%,60%{opacity:0;transform:translateY(-20px)}63%{opacity:1}76%{opacity:1;transform:translateY(22px)}79%,100%{opacity:0}}
+.full.run .r-sp{animation:rsp 3.4s ease-out infinite}
+@keyframes rsp{0%,76%{opacity:0;transform:translate(0,0) scale(.3)}82%{opacity:1}96%,100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.1) rotate(90deg)}}
+.rm.run .r-old{animation:rmold 2.4s ease-in-out infinite}.rm.run .r-new{animation:rmnew 2.4s ease-in-out infinite}.rm.run .r-sp{animation:rmsp 2.4s ease-in-out infinite;transform:translate(var(--dx),var(--dy))}
+@keyframes rmold{0%,20%{opacity:1}50%,100%{opacity:0}}@keyframes rmnew{0%,20%{opacity:0}50%,90%{opacity:1}100%{opacity:0}}@keyframes rmsp{0%,50%{opacity:0}65%,80%{opacity:1}100%{opacity:0}}
+.rm .r-dot{display:none}
+/* hello */
+.h-it{width:22px;opacity:0;left:50%;top:104px;margin-left:-11px;z-index:6}
+.full.run .pip{animation:hbounce 2.6s ease-in-out infinite;transform-origin:50% 100%}
+@keyframes hbounce{0%,6%,40%,100%{transform:translateX(-50%) scale(1,1)}14%{transform:translateX(-50%) scale(1.05,.93)}24%{transform:translateX(-50%) scale(.97,1.06)}32%{transform:translateX(-50%) scale(1.01,.99)}}
+.full.run .h-it{animation:hit 2.6s ease-out infinite}
+@keyframes hit{0%,14%{opacity:0;transform:translate(0,0) scale(.3)}22%{opacity:1}70%,100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.15)}}
+.st:not(.run) .h-it{opacity:.9;transform:translate(var(--dx),var(--dy))}
+.rm .h-it{transform:translate(var(--dx),var(--dy))}
+.rm.run .h-it{animation:rmfade 2.4s ease-in-out infinite}
+.rm .h-it:nth-of-type(n+7){display:none}
+/* life stats */
+.ls{margin:0 22px 0;background:var(--card);border-radius:22px;box-shadow:var(--shadow);padding:14px 16px}
+.ls h4{margin:0 0 8px;font-size:15px}
+.stage{display:flex;justify-content:center;padding:6px 0}
+.stage .pip{--w:150px}
+.met{display:grid;grid-template-columns:30px 1fr;gap:2px 10px;align-items:center;margin:9px 0}
+.met svg{width:28px;height:28px}
+.met .nm{font-weight:800;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.met .nm em{font-style:normal;font-weight:600;color:var(--txt2);font-size:13px}
+.bar{grid-column:2;height:12px;border-radius:8px;background:color-mix(in srgb,var(--text) 10%,transparent);overflow:hidden;box-shadow:inset 0 0 0 1.5px var(--line)}
+.bar i{display:block;height:100%;width:92%;border-radius:8px;background:var(--c);transition:width .5s;background-image:repeating-linear-gradient(115deg,rgba(255,255,255,.35) 0 6px,transparent 6px 12px)}
+.v-care .bar i{width:48%}
+.t-ok,.t-care{display:inline}.v-care .t-ok{display:none}.v-ok .t-care{display:none}
+.moodrow{display:flex;gap:16px;align-items:center}
+.moodrow svg.face{width:84px;height:84px;flex:none}
+.hearts{display:flex;gap:4px;margin:4px 0}.hearts svg{width:28px;height:28px}
+.hearts .off{opacity:1}
+.v-care .hearts svg:nth-child(n+3) .fill{display:none}
+.mtxt{font-weight:800;font-size:16px}.mtxt2{color:var(--txt2);font-size:13.5px}
+.path{display:flex;align-items:flex-start;justify-content:space-between;position:relative;padding:8px 2px 0}
+.path:before{content:"";position:absolute;left:30px;right:30px;top:27px;height:6px;border-radius:3px;background:repeating-linear-gradient(90deg,var(--line) 0 8px,transparent 8px 14px)}
+.path .fillline{position:absolute;left:30px;top:27px;height:6px;border-radius:3px;background:var(--leaf);width:56%}
+.node{position:relative;z-index:1;text-align:center;width:70px;font-size:12px;font-weight:800}
+.node .dot{width:38px;height:38px;border-radius:50%;margin:0 auto 4px;display:grid;place-items:center;background:var(--card);box-shadow:inset 0 0 0 3px var(--line)}
+.node.done .dot{background:var(--leaf);box-shadow:none;color:var(--leaf-ink)}
+.node.now .dot{background:var(--leaf);box-shadow:0 0 0 4px color-mix(in srgb,var(--leaf) 35%,transparent);color:var(--leaf-ink)}
+.node.next{color:var(--txt2)}.node .dot svg{width:22px;height:22px}
+.seg{display:inline-flex;background:var(--card);border-radius:999px;box-shadow:inset 0 0 0 2px var(--line);padding:3px}
+.seg button{font:inherit;font-weight:700;border:0;background:none;color:var(--text);padding:8px 14px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--leaf);color:var(--leaf-ink)}
+.tile{height:48px;border-radius:14px;background:color-mix(in srgb,var(--text) 8%,transparent)}
+.tiles{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;padding:14px 22px}
+@media (prefers-reduced-motion:reduce){.tw,.u-sun .rays{animation:none!important}}
+@media (max-width:600px){.sbs{grid-template-columns:1fr}.pair{grid-template-columns:1fr}}
+</style></head><body>
+<div class="wrap">
+<header><div><h1>Tending, pots and life stats</h1><p class="sub">Design review on localhost. Nothing here is built in SwiftUI yet. Art is placeholder-grade vector in the Evergreen palette.</p></div>
+<div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><nav aria-label="Sections"><a href="#pots">1 Pots</a><a href="#fx">2 Tending</a><a href="#life">3 Life stats</a></nav><button class="btn ghost" id="theme" aria-pressed="false">Dark mode</button></div></header>
+
+<h2 id="pots">1. Pot collection</h2>
+<p class="sub">Ten cosmetic pots, all on the same 120x100 shape so they swap cleanly. Each card shows the unlocked pot with a sample plant, and the locked silhouette (right) the player sees in the Shed. Unlock rules are fixed and predictable, no random drops.</p>
+<div class="potgrid" id="potgrid"></div>
+
+<div class="phones" style="margin-top:34px">
+ <div><div class="phone" id="shed"></div><p class="cap">Shed: Pots section (selected pot has a check and a ring; locked ones are dashed with a lock and a plain unlock hint)</p></div>
+ <div><div class="phone" id="repot"></div><p class="cap">Repot sheet: "Pick a pot" row above the soil choices</p></div>
+</div>
+
+<h2 id="fx">2. Tending effect storyboards</h2>
+<p class="sub">Each effect is under 2 seconds in the app; the loops here add a rest at the end so you can see the beats. Left is full motion, right is the Reduce Motion version (fades only, nothing travels or scales). Everything is an overlay on the plant, no layout shift.</p>
+<div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap"><button class="btn" id="playall">Pause all</button></div>
+<div class="sbs" id="sbs"></div>
+
+<h2 id="life">3. Life stats (replaces the daily capacity ring)</h2>
+<p class="sub">Three options. Toggle the state to see both: thriving, and "could use a little care". Care state never goes red and never reads as empty; meters keep a soft floor and the words carry the meaning, not only the colour. Growth is never lost.</p>
+<div class="seg" role="group" aria-label="Plant state" id="lseg"><button aria-pressed="true" data-s="ok">Thriving</button><button aria-pressed="false" data-s="care">Could use some care</button></div>
+<div class="phones" style="margin-top:20px" id="lphones"></div>
+
+<h2>Design questions</h2>
+<ul><li>Should "Happiness" decay at all, or only react to recent care (so a long break never looks sad)?</li><li>Option a (clear, familiar), b (most emotional, ties to bond hearts), c (shows progression). Pick one, or a + c?</li><li>Pot unlock order and the two sparkly pots' triggers.</li></ul>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const STAR='<path d="M0 -7 Q1 -1.5 7 0 Q1 1.5 0 7 Q-1 1.5 -7 0 Q-1 -1.5 0 -7Z"/>';
+const HEART='<path d="M0 5 C-8 -1 -8 -8 -3 -8 C-1 -8 0 -6 0 -6 C0 -6 1 -8 3 -8 C8 -8 8 -1 0 5Z"/>';
+function star(x,y,s,f,cls,d){return `<g transform="translate(${x} ${y}) scale(${s})" fill="${f}"><g class="${cls||''}" style="animation-delay:${d||0}s">${STAR}</g></g>`}
+const POTS={
+ blue:{n:'Plain blue',u:'Start',b:'#5B8FD0',r:'#7AA6DE',d:'#4677B3',deco:()=>'<rect x="24" y="44" width="72" height="6" rx="3" fill="#fff" opacity=".35"/>',pl:'daisy'},
+ terra:{n:'Terracotta',u:'First plant',b:'#C8734A',r:'#DD8C63',d:'#A85A36',deco:()=>'<rect x="24" y="42" width="72" height="5" rx="2.5" fill="#A85A36"/><rect x="26" y="52" width="68" height="5" rx="2.5" fill="#A85A36" opacity=".6"/>',pl:'marigold'},
+ sage:{n:'Sage glaze',u:'10 plants',b:'#8FB08C',r:'#B4CCB1',d:'#76996F',deco:()=>'<path d="M18 22 H102 L101 30 Q98 36 94 30 Q90 52 85 30 Q80 40 76 30 Q71 62 66 30 Q60 44 55 30 Q50 56 44 30 Q38 42 33 30 Q28 50 23 30 Q20 34 18 28Z" fill="#DCEBD8"/>',pl:'lavender'},
+ shell:{n:'Seashell',u:'Finish level 1',b:'#F1CFC4',r:'#F8E4DC',d:'#DDB1A3',deco:()=>'<g stroke="#DDB1A3" stroke-width="3" stroke-linecap="round" fill="none"><path d="M60 92 L36 32"/><path d="M60 92 L48 32"/><path d="M60 92 L60 32"/><path d="M60 92 L72 32"/><path d="M60 92 L84 32"/></g>',pl:'tulip'},
+ moon:{n:'Moonlight',u:'Finish level 2',b:'#3E4D84',r:'#5A6BA6',d:'#2E3B68',deco:()=>'<circle cx="56" cy="56" r="17" fill="#F6E08A"/><circle cx="65" cy="51" r="15" fill="#3E4D84"/>'+star(86,44,.8,'#F6E08A')+star(84,74,.6,'#F6E08A')+star(34,40,.5,'#F6E08A'),pl:'jasmine'},
+ sun:{n:'Sunflower',u:'Finish level 3',b:'#F2C230',r:'#F8D95F',d:'#D9A514',deco:()=>'<g transform="translate(60 58)"><g fill="#E8913A">'+[0,45,90,135].map(a=>`<ellipse rx="5" ry="15" transform="rotate(${a})"/>`).join('')+'</g><circle r="8" fill="#6B4528"/></g>',pl:'sunflower'},
+ rose:{n:'Rose pink',u:'25 plants',b:'#E8869F',r:'#F2A9BC',d:'#CC6683',deco:()=>[[38,46,1],[82,46,1],[60,68,1.3]].map(([x,y,s])=>`<g transform="translate(${x} ${y}) scale(${s})" fill="#FFE9EF">${HEART}</g>`).join(''),pl:'rose'},
+ mint:{n:'Mint',u:'50 plants',b:'#86D6B0',r:'#ABE7CC',d:'#63B88F',deco:()=>'<g fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".8"><path d="M24 44 q9 -8 18 0 t18 0 t18 0 t18 0"/><path d="M26 62 q9 -8 17 0 t17 0 t17 0 t17 0"/></g>',pl:'clover'},
+ gem:{n:'Crystal',u:'150 shed points',b:'#A98BE2',r:'#C9B3F0',d:'#8869C7',deco:()=>'<path d="M60 38 L74 52 L60 70 L46 52Z" fill="#E9DDFF"/><path d="M46 52 H74" stroke="#A98BE2" stroke-width="2"/>'+star(32,48,.8,'#fff')+star(90,64,.7,'#fff')+star(86,38,.5,'#fff'),pl:'poppy',spark:1},
+ star:{n:'Starlight',u:'Finish level 5',b:'#2F6670',r:'#47838D',d:'#224C54',deco:()=>star(36,44,1,'#FFE27A','tw',0)+star(82,50,.8,'#FFE27A','tw',.7)+star(60,70,1.2,'#FFE27A','tw',1.3)+star(92,76,.6,'#fff','tw',.3)+star(28,72,.6,'#fff','tw',1.0),pl:'hibiscus',spark:1,anim:1}
+};
+function pot(k,locked){
+ const p=POTS[k];
+ if(locked) return `<svg viewBox="0 0 120 100" aria-hidden="true"><rect x="10" y="4" width="100" height="18" rx="9" fill="var(--lock)" stroke="var(--lockink)" stroke-width="2" stroke-dasharray="5 4"/><path d="M18 22 H102 L92 88 Q91 96 82 96 H38 Q29 96 28 88Z" fill="var(--lock)" stroke="var(--lockink)" stroke-width="2" stroke-dasharray="5 4"/><g transform="translate(60 60)" fill="none" stroke="var(--lockink)" stroke-width="4" stroke-linecap="round"><rect x="-11" y="-3" width="22" height="17" rx="4" fill="var(--lockink)"/><path d="M-6 -3 V-9 a6 6 0 0 1 12 0 V-3"/></g></svg>`;
+ return `<svg viewBox="0 0 120 100" role="img" aria-label="${p.n} pot"><path d="M18 20 H102 L92 88 Q91 96 82 96 H38 Q29 96 28 88Z" fill="${p.b}"/><path d="M18 20 H34 L42 96 H38 Q29 96 28 88Z" fill="#fff" opacity=".14"/><path d="M102 20 H88 L82 96 Q91 96 92 88Z" fill="${p.d}" opacity=".45"/>${p.deco()}<rect x="10" y="4" width="100" height="18" rx="9" fill="${p.r}"/><rect x="16" y="8" width="88" height="5" rx="2.5" fill="#fff" opacity=".35"/></svg>`;
+}
+const LOCK_ICON='<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><rect x="4" y="10" width="16" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="2.5"/></svg>';
+const pip=(k,w)=>`<div class="pip" style="--w:${w}px"><img src="../plants/plant_${POTS[k].pl}.svg" alt=""><div class="pot">${pot(k)}</div></div>`;
+$('#potgrid').innerHTML=Object.keys(POTS).map(k=>{const p=POTS[k];return `<article class="pcard"><div class="main">${pip(k,130)}</div><div class="lk">${pot(k,1)}Locked look</div><div class="info"><b>${p.n}${p.spark?' (sparkly)':''}</b><span class="un">${LOCK_ICON} Unlock: ${p.u}</span></div></article>`}).join('');
+
+/* Shed */
+const sbar='<div class="sbar"><span>9:41</span><span aria-hidden="true">5G</span></div>';
+const unl=['blue','terra','sage'];
+const toolSvg={can:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M10 20 H30 L28 38 Q28 41 25 41 H15 Q12 41 12 38Z" fill="#4C93D6"/><path d="M30 24 L42 14" stroke="#4C93D6" stroke-width="4" stroke-linecap="round"/><path d="M10 24 Q2 24 4 31 Q5 34 11 34" fill="none" stroke="#4C93D6" stroke-width="3"/></svg>',trowel:'<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M8 40 L24 20 L32 28Z" fill="#8FA3A0"/><rect x="26" y="8" width="7" height="22" rx="3" transform="rotate(40 29 19)" fill="#9B6B43"/></svg>',lamp:'<svg viewBox="0 0 48 48" aria-hidden="true"><circle cx="24" cy="24" r="9" fill="#F2B632"/><g stroke="#F2B632" stroke-width="3" stroke-linecap="round"><path d="M24 6V10M24 38V42M6 24H10M38 24H42M11 11L14 14M34 34L37 37M37 11L34 14M14 34L11 37"/></g></svg>'};
+$('#shed').innerHTML=sbar+`<div class="ph-title">Shed</div><div class="ph-sub">Your tools and pots</div><div class="sec-h">Tools</div><div class="tools"><div class="tool">${toolSvg.can}Watering can</div><div class="tool">${toolSvg.trowel}Trowel</div><div class="tool">${toolSvg.lamp}Sun lamp</div></div><div class="sec-h">Pots <span style="font-weight:600;color:var(--txt2);font-size:14px">&nbsp;3 of 10 collected</span></div><div class="pgrid">`+Object.keys(POTS).map(k=>{const u=unl.includes(k),p=POTS[k];return u?`<div class="pc${k==='terra'?' sel':''}">${k==='terra'?'<span class="chk" aria-label="In use">&#10003;</span>':''}${pot(k)}<b>${p.n}</b><span>${k==='terra'?'In use':'Collected'}</span></div>`:`<div class="pc lock">${pot(k,1)}<b>${p.n}</b><span>${p.u}</span></div>`}).join('')+`</div><p class="fine" style="padding:12px 22px">Pots are just for fun. Locked pots show how to earn them.</p>`;
+
+/* Repot */
+$('#repot').innerHTML=sbar+`<div class="ph-title">Daisy</div><div class="ph-sub">Garden bed</div><div style="padding-top:10px">${pip('terra',190)}</div><div class="scrim"></div><div class="sheet"><div class="grab"></div><div style="font-weight:800;font-size:20px;margin-bottom:6px">Repot Daisy</div>
+<div class="sec-h" style="padding:6px 0 2px;font-size:15px">Pick a pot <span style="font-weight:600;color:var(--txt2);font-size:13px">&nbsp;free to change</span></div>
+<div class="prow">${['blue','terra','sage'].map(k=>`<div class="pr${k==='terra'?' sel':''}">${pot(k)}${POTS[k].n.split(' ')[0]}${k==='terra'?'<br>&#10003; In use':''}</div>`).join('')}${['shell','moon'].map(k=>`<div class="pr lock">${pot(k,1)}${POTS[k].n}</div>`).join('')}</div>
+<div class="sec-h" style="padding:6px 0 4px;font-size:15px">Choose soil <span style="font-weight:600;color:var(--txt2);font-size:13px">&nbsp;each costs a scoop</span></div>
+<div class="soils"><div class="soil"><i style="background:#7A5238"></i>Garden soil<small>1 scoop</small></div><div class="soil fav"><span class="fv" aria-hidden="true">&#9733;</span><i style="background:#5A4030"></i>Rich loam<small>Daisy's favourite</small></div><div class="soil"><i style="background:#B7A27A"></i>Sandy mix<small>1 scoop</small></div></div>
+<button class="pillbtn">Repot</button></div>`;
+
+/* Storyboards */
+const CAN='<svg viewBox="0 0 84 70" aria-hidden="true"><path d="M26 22 H58 L55 58 Q55 63 50 63 H34 Q29 63 29 58Z" fill="#4C93D6"/><path d="M26 22 H58 L57 30 H27Z" fill="#7DB6EE"/><path d="M26 36 L6 24" stroke="#4C93D6" stroke-width="7" stroke-linecap="round"/><ellipse cx="5" cy="23" rx="5" ry="7" fill="#2F78BC" transform="rotate(-30 5 23)"/><path d="M58 28 Q78 28 76 44 Q75 52 58 52" fill="none" stroke="#4C93D6" stroke-width="5" stroke-linecap="round"/></svg>';
+const TROWEL='<svg viewBox="0 0 60 60" aria-hidden="true"><rect x="30" y="3" width="9" height="26" rx="4" transform="rotate(35 34 16)" fill="#9B6B43"/><path d="M4 56 L20 30 L36 40Z" fill="#9FB2AE"/></svg>';
+const SUN='<svg viewBox="0 0 96 96" aria-hidden="true"><g class="rays" stroke="#F2B632" stroke-width="5" stroke-linecap="round">'+Array.from({length:8},(_,i)=>`<path d="M48 8 V20" transform="rotate(${i*45} 48 48)"/>`).join('')+'</g><circle cx="48" cy="48" r="20" fill="#F8CB4A"/></svg>';
+const drop='<svg viewBox="0 0 9 13" aria-hidden="true"><path d="M4.5 0 C7 4 9 6.5 9 8.6 A4.5 4.5 0 0 1 0 8.6 C0 6.5 2 4 4.5 0Z" fill="#4C93D6"/></svg>';
+const sp=(c)=>`<svg viewBox="-8 -8 16 16" aria-hidden="true" fill="${c||'#F2B632'}">${STAR}</svg>`;
+const hrt=(c)=>`<svg viewBox="-9 -9 18 18" aria-hidden="true" fill="${c||'#E0627F'}">${HEART}</svg>`;
+const mound='<svg viewBox="0 0 70 34" aria-hidden="true"><path d="M0 34 Q8 6 35 6 Q62 6 70 34Z" fill="#7A5238"/><circle cx="22" cy="20" r="3" fill="#5A3A26"/><circle cx="46" cy="16" r="3" fill="#5A3A26"/></svg>';
+function plantP(w){return pip('blue',w)}
+function stage(kind,mode){
+ let inner='';
+ if(kind==='water'){
+  inner=plantP(150)+`<div class="w-can a">${CAN}</div>`+[0,1,2,3,4,5,6,7].map(i=>`<div class="w-drop a" style="left:${100+i*4-(i%3)*5}px;animation-delay:-${(i*.045).toFixed(2)}s">${drop}</div>`).join('')+'<div class="w-rip a"></div>';
+ }else if(kind==='soil'){
+  inner=plantP(150)+`<div class="s-mound a">${mound}</div><div class="s-trowel a">${TROWEL}</div><div class="s-level a"></div>`+[0,1,2,3,4,5,6,7,8,9].map(i=>`<div class="s-dot a" style="left:${96+(i*7)%46}px;animation-delay:-${(i*.05).toFixed(2)}s"></div>`).join('');
+ }else if(kind==='sun'){
+  inner=plantP(150)+`<div class="u-tint a"></div><div class="u-sun a">${SUN}</div>`+[[70,60],[110,46],[150,70],[88,100],[134,108],[62,120],[118,84],[100,70]].map(([x,y],i)=>`<div class="u-sp a" style="left:${x}px;top:${y}px;animation-delay:-${(i*.12).toFixed(2)}s">${sp('#F2B632')}</div>`).join('');
+ }else if(kind==='repot'){
+  const dirs=[[0,-70],[50,-50],[70,-8],[-50,-50],[-70,-8],[30,-84],[-30,-84],[0,-98]];
+  inner=`<img class="r-plant a" src="../plants/plant_daisy.svg" alt=""><div class="r-old a">${pot('blue')}</div><div class="r-new a">${pot('terra')}</div>`+[0,1,2,3,4,5,6].map(i=>`<div class="r-dot a" style="left:${100+i*9}px;animation-delay:-${(i*.05).toFixed(2)}s"></div>`).join('')+dirs.map(([x,y],i)=>`<div class="r-sp a" style="--dx:${x}px;--dy:${y}px">${sp(i%2?'#F2B632':'#9BCB3C')}</div>`).join('');
+ }else{
+  const it=[[-80,-40,'h'],[70,-50,'s'],[-50,-90,'s'],[55,-100,'h'],[-90,10,'s'],[90,0,'h'],[0,-120,'h'],[20,-80,'s']];
+  inner=plantP(150)+it.map(([x,y,t],i)=>`<div class="h-it a" style="--dx:${x}px;--dy:${y}px;animation-delay:-${(i*.07).toFixed(2)}s">${t==='h'?hrt():sp('#F2B632')}</div>`).join('');
+ }
+ return `<div class="st fx-${kind} ${mode} run" role="img" aria-label="${kind} animation preview, ${mode==='rm'?'reduced motion':'full motion'}">${inner}</div>`;
+}
+const SB=[['water','Water pour','Can fades in and tilts, drops fall, ripple at the soil, plant gives a soft 4% drink. Reduce Motion: can and drop cluster simply fade in and out.'],['soil','Soil scoop','Trowel arcs from the mound to the rim, soil dots fall, soil level rises. Reduce Motion: soil level fades up.'],['sun','Sun glisten','Sun fades in with slow rays, warm tint, sparkles on the leaves, small flutter. Reduce Motion: static glow and fading sparkles.'],['repot','Repot','Old pot slides out, plant lifts and settles, new pot slides in, soil falls, favourite-soil sparkle burst. Needs plant art without the pot baked in (these plants already have none). Reduce Motion: pots crossfade.'],['hello','Tap hello','Plant squashes and stretches once, hearts and sparkles burst outward. It stays centred. Reduce Motion: hearts and sparkles fade in place.']];
+$('#sbs').innerHTML=SB.map(([k,t,d])=>`<section class="sbcard" aria-labelledby="t-${k}"><div class="sbtop"><h3 id="t-${k}">${t}</h3><button class="btn play" aria-pressed="true">Pause</button></div><div class="pair"><div><div class="lab">Full motion</div>${stage(k,'full')}</div><div><div class="lab">Reduce Motion</div>${stage(k,'rm')}</div></div><p class="beats">${d}</p></section>`).join('');
+function setRun(card,on){card.querySelectorAll('.st').forEach(s=>{s.classList.remove('run');void s.offsetWidth;if(on)s.classList.add('run')});const b=card.querySelector('.play');b.textContent=on?'Pause':'Play';b.setAttribute('aria-pressed',on)}
+document.querySelectorAll('.sbcard').forEach(c=>c.querySelector('.play').onclick=e=>setRun(c,e.target.getAttribute('aria-pressed')!=='true'));
+let all=true;$('#playall').onclick=e=>{all=!all;document.querySelectorAll('.sbcard').forEach(c=>setRun(c,all));e.target.textContent=all?'Pause all':'Play all'};
+if(matchMedia('(prefers-reduced-motion:reduce)').matches){document.querySelectorAll('.sbcard').forEach(c=>setRun(c,false));$('#playall').textContent='Play all';all=false}
+
+/* Life stats */
+const ICO={water:'<svg viewBox="0 0 28 28" aria-hidden="true"><path d="M14 2 C19 9 23 13 23 17.5 A9 9 0 0 1 5 17.5 C5 13 9 9 14 2Z" fill="#4C93D6"/><path d="M10 18 a4 4 0 0 0 4 4" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',sun:'<svg viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="6" fill="#F2B632"/><g stroke="#F2B632" stroke-width="2.6" stroke-linecap="round">'+Array.from({length:8},(_,i)=>`<path d="M14 2.5 V5.5" transform="rotate(${i*45} 14 14)"/>`).join('')+'</g></svg>',heart:'<svg viewBox="-10 -10 20 20" aria-hidden="true" fill="#E0627F">'+HEART+'</svg>'};
+const heartSvg=(i)=>`<svg viewBox="-10 -10 20 20" aria-hidden="true"><path d="M0 5 C-8 -1 -8 -8 -3 -8 C-1 -8 0 -6 0 -6 C0 -6 1 -8 3 -8 C8 -8 8 -1 0 5Z" fill="none" stroke="#C94F6D" stroke-width="1.4"/><path class="fill" d="M0 5 C-8 -1 -8 -8 -3 -8 C-1 -8 0 -6 0 -6 C0 -6 1 -8 3 -8 C8 -8 8 -1 0 5Z" fill="#E0627F" stroke="#C94F6D" stroke-width="1.4"/></svg>`;
+const face=`<svg class="face" viewBox="0 0 84 84" role="img" aria-label="Plant mood"><circle cx="42" cy="42" r="38" fill="#FFE18A"/><circle cx="42" cy="42" r="38" fill="none" stroke="#E8B73F" stroke-width="3"/><g class="t-ok"><circle cx="30" cy="36" r="4.5" fill="#4A3A1A"/><circle cx="54" cy="36" r="4.5" fill="#4A3A1A"/><path d="M26 50 Q42 68 58 50" stroke="#4A3A1A" stroke-width="4" fill="none" stroke-linecap="round"/><circle cx="22" cy="50" r="5" fill="#F5A3A3" opacity=".7"/><circle cx="62" cy="50" r="5" fill="#F5A3A3" opacity=".7"/></g><g class="t-care"><path d="M24 37 Q30 32 36 37" stroke="#4A3A1A" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M48 37 Q54 32 60 37" stroke="#4A3A1A" stroke-width="3.5" fill="none" stroke-linecap="round"/><path d="M32 54 Q42 60 52 54" stroke="#4A3A1A" stroke-width="3.5" fill="none" stroke-linecap="round"/><text x="60" y="22" font-size="13" font-weight="800" fill="#4A3A1A">z</text></g></svg>`;
+const lpl=`<div class="stage">${pip('blue',130)}</div>`;
+const tiles='<div class="tiles">'+'<div class="tile"></div>'.repeat(10)+'</div>';
+const frame=(t,body)=>`<div><div class="phone short v-ok">${sbar}<div class="ph-title">Daisy</div>${lpl}${body}${tiles}</div><p class="cap">${t}</p></div>`;
+const meter=(ic,nm,ok,care,c)=>`<div class="met" style="--c:${c}">${ic}<div class="nm">${nm}<em><span class="t-ok">${ok}</span><span class="t-care">${care}</span></em></div><div class="bar" aria-hidden="true"><i></i></div></div>`;
+const bondN=`<span class="t-ok">You two are growing close</span><span class="t-care">Your bond is waiting for you</span>`;
+$('#lphones').innerHTML=
+ frame('(a) Three icon meters: Water, Sunshine, Happiness',`<div class="ls"><h4>How Daisy is doing</h4>${meter(ICO.water,'Water','Nicely watered','Would love a drink','#4C93D6')}${meter(ICO.sun,'Sunshine','Soaking it up','Would enjoy some sun','#F2B632')}${meter(ICO.heart,'Happiness','Beaming','Ready for a hello','#E0627F')}</div>`)+
+ frame('(b) Mood face plus bond hearts',`<div class="ls"><div class="moodrow">${face}<div><div class="mtxt"><span class="t-ok">Daisy feels cheerful</span><span class="t-care">Daisy is resting happily</span></div><div class="hearts" role="img" aria-label="Bond hearts, growing">${[0,1,2,3,4].map(heartSvg).join('')}</div><div class="mtxt2">${bondN}</div></div></div></div>`)+
+ frame('(c) Stage path with growth',`<div class="ls"><h4>Daisy is budding</h4><div class="path"><div class="fillline"></div>`+[['Seed','done','<svg viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="13" rx="5" ry="7" fill="#7A5238"/></svg>'],['Sprout','done','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21V11M12 12C12 7 8 6 4 6c0 4 3 6 8 6zM12 12c0-4 3-6 8-6 0 4-3 6-8 6z" fill="#3F8A4A" stroke="#3F8A4A" stroke-width="1.5" stroke-linejoin="round"/></svg>'],['Budding','now','<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22V13" stroke="#3F8A4A" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="12" cy="9" rx="4" ry="6" fill="#E8869F"/></svg>'],['In bloom','next','<svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 2.5"><circle cx="12" cy="12" r="3"/>'+[0,72,144,216,288].map(a=>`<ellipse cx="12" cy="5.5" rx="2.8" ry="4" transform="rotate(${a} 12 12)"/>`).join('')+'</g></svg>']].map(([n,s,i])=>`<div class="node ${s}"><div class="dot">${i}</div>${n}${s==='now'?'<br><span style="font-weight:600;color:var(--txt2)">You are here</span>':''}</div>`).join('')+`</div><p class="mtxt2" style="margin:12px 0 0"><span class="t-ok">Lovely care so far. A little more and it will bloom.</span><span class="t-care">Growing steadily. A visit will help it along.</span></p></div>`);
+document.querySelectorAll('#lseg button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#lseg button').forEach(x=>x.setAttribute('aria-pressed',x===b));document.querySelectorAll('#lphones .phone').forEach(p=>{p.classList.toggle('v-ok',b.dataset.s==='ok');p.classList.toggle('v-care',b.dataset.s==='care')})});
+$('#theme').onclick=e=>{const d=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=d?'dark':'light';e.target.setAttribute('aria-pressed',d);e.target.textContent=d?'Light mode':'Dark mode'};
+</script></body></html>
