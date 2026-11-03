@@ -45,3 +45,9 @@ Deferred:
 Built (unit 363 + UI 17 green in simulator): optional "Simpler clue" (on-device model, validated, free, once per round), Siri/Shortcuts + Control Center "Water my garden" (same store/rules as widget; iOS 18+ for the control), read-aloud clue (system voice, hidden under VoiceOver), welcome-back card (3+ days away, no streak talk), tap-to-sway plant hello.
 Rulings: PlantEntity/Spotlight skipped for now (needs iOS 18, little gain); Smart Stack relevance dropped (watchOS only); journal/whispers and weekly summary deferred; keep 3-day trial and ad cadence until real cohort data (engagement research suggests testing a 7-day trial and delaying the interstitial to ~day 7; owner decision).
 Device-only unverified: Siri phrases, Control Center control, speech voice/silent switch, haptic feel, on-device model latency.
+
+## Owner rulings, 2026-11-03 (late)
+- **Love, rain and seeds:** a plant with no love (tap hello or any tending) for 24 h gets rain and loses a petal; one more each day; with no petals left it shows as a seed in a pot. Nothing earned is removed (stage, growth, collection kept). A seed wakes with a challenge (word puzzle or butterfly catching). Quiet Garden and Calm mode are exempt. This replaces the "plants never wilt" rule for the visual state only. Engine: `Rules/LoveEngine.swift`; UI pending mockup review (`design-preview/tending/lifestats.html`).
+- **Life stats:** left-edge collapsible panel combining meters (a), stage path (c) and love hearts (b).
+- **Pots:** unlock triggers approved as mocked (sunflower L3, Starlight L5, rose pink 25 plants, mint 50 plants).
+- **Visibility:** every Home destination is shown; locked ones are dimmed with an unlock hint.

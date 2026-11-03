@@ -113,6 +113,7 @@
 		B0D223341F847F11B0CC15B9 /* GoogleMobileAds in Frameworks */ = {isa = PBXBuildFile; productRef = C82352716A0D56522A4B1A64 /* GoogleMobileAds */; };
 		B0E129A407B3E68D0AC5BD33 /* ShedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA96D7DD8E3103D3D959B4A /* ShedView.swift */; };
 		B24D06A2299AB7B8A363531F /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9888DEE09FE8404AD2E6B806 /* SharedContainer.swift */; };
+		B2D7AF20A245D095F5421AF1 /* LoveEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF908A564AC2DBFD8ADCFBBA /* LoveEngineTests.swift */; };
 		B42D0E3153A7414966317C6A /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801243E3923ADEAD47B705CE /* AppSettings.swift */; };
 		B5125DC1F13A03C81A450D4F /* GardenTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76256AC312EE57C1A3CD1F7D /* GardenTips.swift */; };
 		BA042FFFFC29EF40C286AF09 /* wf-wrong.m4a in Resources */ = {isa = PBXBuildFile; fileRef = FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */; };
@@ -130,6 +131,7 @@
 		CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */; };
 		D107E764254121AC6777295F /* WordFloraUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */; };
 		D3A2B4BA77495A79674750BD /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6305635D642316CCE8610F /* GameRecord.swift */; };
+		D51839FD5EE99D7181E304F0 /* LoveEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2004661176B5B7000630E9F /* LoveEngine.swift */; };
 		D61844C609FE7631DFFBF7CF /* Plants.json in Resources */ = {isa = PBXBuildFile; fileRef = 437318BFC10E7CDE04AF1603 /* Plants.json */; };
 		D6E3215F0B7EB9ED5C2DD218 /* WordDifficulty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909E3EE9D33E5BC4BBD0BBE2 /* WordDifficulty.swift */; };
 		D7CEF9FF813CBF12C7375099 /* wf-badgeBronze.m4a in Resources */ = {isa = PBXBuildFile; fileRef = FBB3484DBA881E17BA5D174F /* wf-badgeBronze.m4a */; };
@@ -302,6 +304,7 @@
 		BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyBloom.swift; sourceTree = "<group>"; };
 		C00FA8B6C6AAB943BB16239C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C19C4668A7EFD195748409A0 /* WordTilesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordTilesView.swift; sourceTree = "<group>"; };
+		C2004661176B5B7000630E9F /* LoveEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoveEngine.swift; sourceTree = "<group>"; };
 		C73101B54140F34289C21BFD /* KeyboardView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyboardView.swift; sourceTree = "<group>"; };
 		C884E85DCD91B1E264D8D134 /* WelcomeBackTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WelcomeBackTests.swift; sourceTree = "<group>"; };
 		C8CFA5BED25190317B98E622 /* GardenShortcuts.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenShortcuts.swift; sourceTree = "<group>"; };
@@ -322,6 +325,7 @@
 		E96DC5D77A1287D3DF73CD43 /* WordFloraWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordFloraWidgetBundle.swift; sourceTree = "<group>"; };
 		ED57CCECFEDB2A2033A60F12 /* GardenView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenView.swift; sourceTree = "<group>"; };
 		EE6B054B52FF203A9392E361 /* StorageTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StorageTests.swift; sourceTree = "<group>"; };
+		EF908A564AC2DBFD8ADCFBBA /* LoveEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoveEngineTests.swift; sourceTree = "<group>"; };
 		F53AF4373CF0983348711216 /* Badges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
 		F887962950E79A156ED26A3F /* ButterflyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyView.swift; sourceTree = "<group>"; };
 		F9B200507C4629386A0C486C /* GardenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidget.swift; sourceTree = "<group>"; };
@@ -411,6 +415,7 @@
 				8B9B774A2FBD3D010315D9DD /* BreakPolicy.swift */,
 				6E7E67B085EBE6FF23F4D631 /* WelcomeBack.swift */,
 				2732222DBF50FDA29A7C62BE /* PlantVoice.swift */,
+				C2004661176B5B7000630E9F /* LoveEngine.swift */,
 			);
 			name = Rules;
 			path = Rules;
@@ -535,6 +540,7 @@
 				6ABB0A3A61951013C0E5506F /* CapacityTests.swift */,
 				673807997651A94A74A50735 /* VoicePickerTests.swift */,
 				CA4FB003E686D225F4D94B47 /* StoreResolveTests.swift */,
+				EF908A564AC2DBFD8ADCFBBA /* LoveEngineTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -933,6 +939,7 @@
 				73A960D878B4124A30601B58 /* CapacityTests.swift in Sources */,
 				1B1F6E25CDDEF290B4E2EDA4 /* VoicePickerTests.swift in Sources */,
 				E5108E2647FAB92A41BE8E53 /* StoreResolveTests.swift in Sources */,
+				B2D7AF20A245D095F5421AF1 /* LoveEngineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1032,6 +1039,7 @@
 				B5125DC1F13A03C81A450D4F /* GardenTips.swift in Sources */,
 				A14AD4EB4C33371F7270A10C /* VoicePicker.swift in Sources */,
 				62DF6A94C532BAA7B67A1EC7 /* TapBurst.swift in Sources */,
+				D51839FD5EE99D7181E304F0 /* LoveEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

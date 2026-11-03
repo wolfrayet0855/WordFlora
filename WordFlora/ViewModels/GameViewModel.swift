@@ -356,20 +356,20 @@ final class GameViewModel {
         let level = playerProfile?.currentLevel ?? 1
 
         if e.kind == .hero, let pid = e.plantId, let hero = plants.first(where: { $0.plantId == pid }), hero.earnedCount == 0 {
-            hero.earnedCount += 1
+            hero.earnedCount += 1; hero.lastLovedAt = now()
             return (hero.name, true)
         }
         let inLevel = plants.filter { $0.level == level }
         if let pick = inLevel.filter({ $0.earnedCount == 0 }).randomElement(using: &rng) {
-            pick.earnedCount += 1
+            pick.earnedCount += 1; pick.lastLovedAt = now()
             return (pick.name, true)
         }
         if e.kind == .hero, let pid = e.plantId, let hero = plants.first(where: { $0.plantId == pid }) {
-            hero.earnedCount += 1
+            hero.earnedCount += 1; hero.lastLovedAt = now()
             return (hero.name, false)
         }
         if let pick = inLevel.randomElement(using: &rng) {
-            pick.earnedCount += 1
+            pick.earnedCount += 1; pick.lastLovedAt = now()
             return (pick.name, false)
         }
         return nil

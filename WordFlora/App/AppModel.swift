@@ -131,8 +131,28 @@ final class AppModel {
         try? context.save()
     }
 
+    // MARK: Love (petals, rain, seed)
+
+    private var loveExempt: Bool { settings.quietGarden || settings.calmMode }
+
+    func loveState(_ plant: PlantCollectible) -> LoveEngine.State {
+        LoveEngine.state(lastLoved: plant.lastLovedAt, now: now(), exempt: loveExempt)
+    }
+
+    /// A tap hello, or any tending, counts as love. A seed ignores it until it has been woken.
+    func love(_ plant: PlantCollectible) {
+        guard !loveState(plant).isSeed else { return }
+        plant.lastLovedAt = now(); try? context.save()
+    }
+
+    /// Called when a wake-up challenge succeeds.
+    func wake(_ plant: PlantCollectible) {
+        plant.lastLovedAt = now(); try? context.save()
+    }
+
     func tend(_ action: TendAction, plant: PlantCollectible) -> TendOutcome {
         guard let p = profile else { return TendOutcome(applied: false, message: "Something went wrong. Try again.") }
+        if loveState(plant).isSeed { return TendOutcome(applied: false, message: LoveEngine.seedLine(name: plant.nickname.isEmpty ? plant.name : plant.nickname)) }
         let quiet = settings.quietGarden
         let date = now(), cal = Calendar.current, eco = Economy.default
         let inv = inventory
@@ -152,6 +172,7 @@ final class AppModel {
 
         guard result.applied else { return TendOutcome(applied: false, message: Self.message(for: result.reason, plant: plant)) }
 
+        plant.lastLovedAt = date
         let counter: BadgeCounter? = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return nil } }()
         if let counter { badges.record(counter, now: date, quiet: quiet); p.badgesJSON = badges.json }
         try? context.save()
