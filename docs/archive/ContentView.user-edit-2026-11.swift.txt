@@ -1,0 +1,305 @@
+// ===== ContentView.swift =====
+//
+//  ContentView.swift
+//  WordFlora
+//
+//  Created by user on 9/11/24.
+//
+
+import SwiftUI
+import AVFAudio
+
+struct ContentView: View {
+    // Game state properties
+    @State private var wordsGuessed = 0
+    @State private var wordsMissed = 0
+    @State private var currentWordIndex = 0
+    @State private var wordToGuess = ""
+    @State private var revealedWord = ""
+    @State private var lettersGuessed = ""
+    @State private var guessesRemaining = 8
+    @State private var gameStatusMessage = "Guess the hidden word!"
+    @State private var guessedLetter = ""
+    @State private var imageName = "flower8"
+    @State private var playAgainHidden = true
+    @State private var playingagainButtonLabel = "Next Word?"
+    @State private var audioPlayer: AVAudioPlayer!
+    @FocusState private var textFieldIsFocused: Bool
+    
+    @State private var wordsToGuess: [String] = []
+    private let maximumGuesses = 8
+    
+    var body: some View {
+        ZStack {
+            // Background gradient for a rich gaming feel
+            LinearGradient(gradient: Gradient(colors: [Color("DarkPurple"), Color("DeepBlue")]),
+                           startPoint: .topLeading,
+                           endPoint: .bottomTrailing)
+                .ignoresSafeArea()
+            
+            VStack {
+                // Game Title Banner
+                Text("WordFlora")
+                    .font(.system(size: 36, weight: .bold, design: .rounded))
+                    .foregroundColor(.white)
+                    .shadow(color: .black, radius: 2, x: 0, y: 2)
+                    .padding(.top, 20)
+                
+                // Scoreboard Card
+                HStack {
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("Guessed: \(wordsGuessed)")
+                        Text("Missed: \(wordsMissed)")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    
+                    Spacer()
+                    
+                    VStack(alignment: .trailing, spacing: 5) {
+                        Text("Remaining: \(wordsToGuess.count - (wordsGuessed + wordsMissed))")
+                        Text("Total: \(wordsToGuess.count)")
+                    }
+                    .font(.headline)
+                    .foregroundColor(.white)
+                }
+                .padding()
+                .background(
+                    RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.black.opacity(0.3))
+                )
+                .padding(.horizontal)
+                
+                Spacer()
+                
+                // Game Status Message
+                Text(gameStatusMessage)
+                    .font(.title2)
+                    .foregroundColor(.white)
+                    .multilineTextAlignment(.center)
+                    .padding()
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .fill(Color.black.opacity(0.3))
+                    )
+                    .padding(.horizontal)
+                
+                // Revealed Word Display with a monospaced, bold style
+                Text(revealedWord)
+                    .font(.system(size: 40, weight: .bold, design: .monospaced))
+                    .foregroundColor(.yellow)
+                    .shadow(color: .black, radius: 2, x: 0, y: 2)
+                    .padding()
+                
+                // Input Area
+                if playAgainHidden {
+                    HStack(spacing: 20) {
+                        TextField("A", text: $guessedLetter)
+                            .font(.title)
+                            .multilineTextAlignment(.center)
+                            .frame(width: 50, height: 50)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.white.opacity(0.8))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .stroke(Color.blue, lineWidth: 2)
+                            )
+                            .keyboardType(.asciiCapable)
+                            .submitLabel(.done)
+                            .autocorrectionDisabled()
+                            .textInputAutocapitalization(.characters)
+                            .onChange(of: guessedLetter) { _, newValue in
+                                let trimmedLetter = newValue.trimmingCharacters(in: CharacterSet.letters.inverted)
+                                guard let lastChar = trimmedLetter.last else {
+                                    guessedLetter = ""
+                                    return
+                                }
+                                guessedLetter = String(lastChar).uppercased()
+                            }
+                            .onSubmit {
+                                processGuess()
+                            }
+                            .focused($textFieldIsFocused)
+                        
+                        Button(action: {
+                            processGuess()
+                        }) {
+                            Text("Guess!")
+                                .font(.headline)
+                                .padding()
+                                .frame(width: 120, height: 50)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .fill(Color.blue)
+                                )
+                                .foregroundColor(.white)
+                                .shadow(radius: 5)
+                        }
+                        .disabled(guessedLetter.isEmpty)
+                    }
+                } else {
+                    Button(action: {
+                        nextWord()
+                    }) {
+                        Text(playingagainButtonLabel)
+                            .font(.headline)
+                            .padding()
+                            .frame(maxWidth: .infinity)
+                            .background(
+                                RoundedRectangle(cornerRadius: 10)
+                                    .fill(Color.green)
+                            )
+                            .foregroundColor(.white)
+                            .shadow(radius: 5)
+                            .padding(.horizontal)
+                    }
+                }
+                
+                Spacer()
+                
+                // Animated Game Image
+                Image(imageName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(height: 200)
+                    .shadow(radius: 10)
+                    .padding(.bottom, 20)
+            }
+        }
+        .onAppear {
+            fetchWords()
+        }
+    }
+    
+    // Process the guessed letter
+    func processGuess() {
+        guard !guessedLetter.isEmpty else { return }
+        guessALetter()
+        updateGamePlay()
+    }
+    
+    // Fetch words from remote API
+    func fetchWords() {
+        let urlString = "https://random-word-api.herokuapp.com/word?number=5"
+        guard let url = URL(string: urlString) else {
+            print("Invalid URL")
+            return
+        }
+        URLSession.shared.dataTask(with: url) { data, response, error in
+            if let error = error {
+                print("Error fetching words: \(error)")
+                return
+            }
+            guard let data = data else {
+                print("No data received")
+                return
+            }
+            do {
+                let fetchedWords = try JSONDecoder().decode([String].self, from: data)
+                DispatchQueue.main.async {
+                    wordsToGuess = fetchedWords.map { $0.uppercased() }
+                    if !wordsToGuess.isEmpty {
+                        wordToGuess = wordsToGuess[currentWordIndex]
+                        revealedWord = String(repeating: "_ ", count: wordToGuess.count).trimmingCharacters(in: .whitespaces)
+                        guessesRemaining = maximumGuesses
+                    }
+                }
+            } catch {
+                print("Error decoding words: \(error)")
+            }
+        }.resume()
+    }
+    
+    // Update revealed word based on current guesses
+    func guessALetter() {
+        textFieldIsFocused = false
+        lettersGuessed += guessedLetter
+        revealedWord = ""
+        for letter in wordToGuess {
+            if lettersGuessed.contains(letter) {
+                revealedWord += "\(letter) "
+            } else {
+                revealedWord += "_ "
+            }
+        }
+        revealedWord = revealedWord.trimmingCharacters(in: .whitespaces)
+    }
+    
+    // Update gameplay logic after each guess
+    func updateGamePlay() {
+        if !wordToGuess.contains(guessedLetter) {
+            guessesRemaining -= 1
+            imageName = "wilt\(guessesRemaining)"
+            playSound(soundName: "incorrect")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.75) {
+                imageName = "flower\(guessesRemaining)"
+            }
+        } else {
+            playSound(soundName: "correct")
+        }
+        
+        if !revealedWord.contains("_") {
+            gameStatusMessage = "You guessed it in \(lettersGuessed.count) guesses!"
+            wordsGuessed += 1
+            currentWordIndex += 1
+            playAgainHidden = false
+            playSound(soundName: "word-guessed")
+        } else if guessesRemaining == 0 {
+            gameStatusMessage = "Out of guesses! The word was \(wordToGuess)."
+            wordsMissed += 1
+            currentWordIndex += 1
+            playAgainHidden = false
+            playSound(soundName: "word-not-guessed")
+        } else {
+            gameStatusMessage = "Guesses so far: \(lettersGuessed.count)"
+        }
+        
+        if currentWordIndex == wordsToGuess.count {
+            playingagainButtonLabel = "Restart Game?"
+            gameStatusMessage += "\nYou've completed all words. Restart?"
+        }
+        guessedLetter = ""
+    }
+    
+    // Prepare the next word or restart the game
+    func nextWord() {
+        if currentWordIndex == wordsToGuess.count {
+            currentWordIndex = 0
+            wordsGuessed = 0
+            wordsMissed = 0
+            playingagainButtonLabel = "Next Word?"
+        }
+        if !wordsToGuess.isEmpty {
+            wordToGuess = wordsToGuess[currentWordIndex]
+            revealedWord = String(repeating: "_ ", count: wordToGuess.count).trimmingCharacters(in: .whitespaces)
+            lettersGuessed = ""
+            guessesRemaining = maximumGuesses
+            imageName = "flower\(guessesRemaining)"
+            gameStatusMessage = "Guess the hidden word!"
+            playAgainHidden = true
+        }
+    }
+    
+    // Play sound effects for correct/incorrect actions
+    func playSound(soundName: String) {
+        guard let soundFile = NSDataAsset(name: soundName) else {
+            print("😡 Could not read file named \(soundName)")
+            return
+        }
+        do {
+            audioPlayer = try AVAudioPlayer(data: soundFile.data)
+            audioPlayer.play()
+        } catch {
+            print("😡 ERROR: \(error.localizedDescription) creating audioPlayer.")
+        }
+    }
+}
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
+}
+
