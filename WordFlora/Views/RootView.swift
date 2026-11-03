@@ -9,6 +9,14 @@ struct RootView: View {
         Group {
             if app.onboarding.isComplete { mainStack(router: $router.path) } else { OnboardingView() }
         }
+        .safeAreaInset(edge: .top) {
+            if app.storeDegraded {
+                Text(AppModel.degradedStoreMessage)
+                    .font(Theme.font(.footnote, weight: .semibold)).multilineTextAlignment(.center)
+                    .padding(10).frame(maxWidth: .infinity).background(Color.appBackground.opacity(0.95))
+                    .accessibilityIdentifier("degraded-store-banner")
+            }
+        }
         .tint(Color.successText)
         .preferredColorScheme(app.settings.colorScheme)
     }

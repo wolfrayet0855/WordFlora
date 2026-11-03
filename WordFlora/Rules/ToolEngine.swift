@@ -22,6 +22,12 @@ struct ToolInventory: Codable, Equatable {
 
     func tier(of tool: ToolID) -> Int { tiers[tool.rawValue] ?? 0 }
 
+    func merged(with other: ToolInventory) -> ToolInventory {
+        var m = self
+        for (k, v) in other.tiers { m.tiers[k] = max(m.tiers[k] ?? 0, v) }
+        return m
+    }
+
     mutating func unlock(_ tool: ToolID) { if tier(of: tool) == 0 { tiers[tool.rawValue] = 1 } }
 
     static func upgradeCost(toTier t: Int) -> Int? {

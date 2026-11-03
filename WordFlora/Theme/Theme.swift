@@ -2,7 +2,7 @@ import SwiftUI
 
 extension Color {
     /// Secondary text that still meets 4.5:1 on both backgrounds (the plain 0.6-0.7 opacities did not).
-    static let secondaryText = Color.appPrimaryText.opacity(0.78)
+    static let secondaryText = Color.appPrimaryText.opacity(0.88)
 }
 
 enum Theme {

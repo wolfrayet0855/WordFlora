@@ -15,6 +15,7 @@ struct WordFloraApp: App {
         let wantsCloud = !uiTesting && SharedDefaults.store.bool(forKey: "cloudSyncEnabled")
         var openedWithCloud = false
         let container: ModelContainer
+        var degraded = false
         if uiTesting {
             container = try! SharedContainer.make(inMemory: true)
         } else if wantsCloud, let synced = try? SharedContainer.make(cloudSync: true) {
@@ -23,7 +24,7 @@ struct WordFloraApp: App {
             container = local          // free players, a lapsed subscription, or no usable iCloud account
         } else {
             // Never crash on a bad store: fall back to an in-memory container so the app still opens.
-            container = try! SharedContainer.make(inMemory: true)
+            container = try! SharedContainer.make(inMemory: true); degraded = true
         }
 
         var settings = AppSettings()
@@ -41,7 +42,7 @@ struct WordFloraApp: App {
                 bank = WordBank(schemaVersion: 1, bankVersion: "ui", entries: [entry], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
             }
         }
-        let model = AppModel(container: container, settings: settings, bank: bank, storeEnabled: !uiTesting, launchedWithCloud: openedWithCloud)
+        let model = AppModel(container: container, settings: settings, bank: bank, storeEnabled: !uiTesting, launchedWithCloud: openedWithCloud, storeDegraded: degraded)
         if uiTesting && args.contains("-uitest-gardened") {
             // A garden with one found plant and some supplies, for tending UI tests.
             model.plants().first?.earnedCount = 1
@@ -64,6 +65,7 @@ struct WordFloraApp: App {
                 .modelContainer(app.container)
                 .onOpenURL { url in if app.onboarding.isComplete { router.open(url) } }
                 .onChange(of: scenePhase) { _, phase in
+                    if phase == .active { app.reconcileSyncedData() }
                     // Keep the home-screen widget in step with what the player just did.
                     if phase == .background || phase == .inactive { WidgetCenter.shared.reloadAllTimelines(); app.refreshReminders() }
                     if phase == .active { app.refreshFreeDrops(); app.updateAmbience(); app.updateSyncFlag() }

@@ -27,3 +27,16 @@ Privacy policy and support URLs (`Links.swift` currently points at placeholder `
 - No Game Center, spaced-review rounds, camera "Find a plant", voice guessing, Image Playground sticker.
 - Daily Bloom share is text only; no ShareLink for badges.
 - Prototype-only ideas not built: plant diary, first-bloom ceremony, season/weather mood, welcome-back card.
+
+## Review-fix pass: rulings and deferrals (2026-11-03)
+Rulings:
+- Ad peak window is 5 seconds after a win; ads start in session 2 (never session 1); interstitial only after the player taps "One more" at the every-3rd-round boundary.
+- Evening visitors (17:30-21:30) draw from day + night species so the mixed audience always sees something.
+- Quiet Garden still grows plants at the capped pace, without costs, cooldowns or numbers.
+- Unknown age is treated as under 13 (no ads, parental gate).
+- iCloud duplicates (two profiles / two copies of a plant) merge by best-of-each field, never summed (`DataReconciler`, runs at launch and on foreground).
+- Widget opens the store read-only-if-present (`createIfMissing: false`); a failed store move falls back to the old store.
+- A store that cannot open shows a visible message instead of silently running in memory.
+Deferred:
+- Two-process store writes (app + widget at once): wait for real-device testing.
+- Minor wording/polish items from the review, plus word bank growth (30 starter, ~270 needed).

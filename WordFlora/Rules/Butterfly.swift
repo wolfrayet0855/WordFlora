@@ -74,6 +74,12 @@ struct StickerAlbum: Codable, Equatable {
     }
     var json: String { (try? JSONEncoder().encode(self)).flatMap { String(data: $0, encoding: .utf8) } ?? "" }
 
+    func merged(with other: StickerAlbum) -> StickerAlbum {
+        var m = self
+        for (k, v) in other.counts { m.counts[k] = max(m.counts[k] ?? 0, v) }
+        return m
+    }
+
     mutating func add(_ ids: [String]) { for id in ids { counts[id, default: 0] += 1 } }
     func count(of id: String) -> Int { counts[id] ?? 0 }
     var species: Int { counts.values.filter { $0 > 0 }.count }

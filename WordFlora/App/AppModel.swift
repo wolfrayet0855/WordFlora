@@ -20,13 +20,17 @@ final class AppModel {
     /// True when this launch opened the iCloud-synced store.
     let launchedWithCloud: Bool
     private(set) var syncNeedsRestart = false
+    /// True when the saved garden could not be opened and this launch is running on a temporary store.
+    let storeDegraded: Bool
+    static let degradedStoreMessage = "We couldn't open your saved garden just now. Please close and reopen the app. Your saved garden is safe."
     private var lastBadgedRoundId: String?
     private let now: () -> Date
 
     var context: ModelContext { container.mainContext }
 
     init(container: ModelContainer, settings: AppSettings = AppSettings(), bank: WordBank? = nil, now: @escaping () -> Date = { .now }, storeEnabled: Bool = false,
-         notifications: NotificationCenterProviding = SystemNotificationCenter(), launchedWithCloud: Bool = false) {
+         notifications: NotificationCenterProviding = SystemNotificationCenter(), launchedWithCloud: Bool = false, storeDegraded: Bool = false) {
+        self.storeDegraded = storeDegraded
         self.launchedWithCloud = launchedWithCloud
         self.now = now
         self.reminders = ReminderScheduler(center: notifications)
@@ -40,7 +44,7 @@ final class AppModel {
         self.onboarding = OnboardingFlow(restoredComplete: settings.onboardingComplete, ageBand: settings.ageBand)
         game.soundEnabled = settings.soundOn
         game.seedPlantsIfNeeded()
-        game.refreshLevel()
+        reconcileSyncedData()
         SoundPlayer.configureSession()
         if settings.onboardingComplete { settings.completedSessions += 1 }
         if settings.remindMe { reminders.restore() }
@@ -50,6 +54,15 @@ final class AppModel {
     }
 
     // MARK: Data
+
+    /// Merges duplicates that iCloud sync can create, then reloads what depends on them.
+    func reconcileSyncedData() {
+        let defs = (try? BadgeCatalog.load()) ?? []
+        DataReconciler.reconcile(context: context, badgeDefs: defs)
+        game.reloadProfile()
+        game.refreshLevel()
+        badges = BadgeState(json: game.playerProfile?.badgesJSON ?? "", defs: defs)
+    }
 
     func plants() -> [PlantCollectible] {
         let d = FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.level), SortDescriptor(\.name)])

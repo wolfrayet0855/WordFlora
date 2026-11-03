@@ -1,0 +1,63 @@
+import Foundation
+import SwiftData
+
+/// iCloud sync can leave two profiles or two copies of a plant (each device seeds its own before the first
+/// sync lands). Merge them by taking the best progress of each field, never summing, so nothing is lost
+/// and nothing is double counted.
+enum DataReconciler {
+    struct Report: Equatable { var profilesMerged = 0; var plantsMerged = 0 }
+
+    @discardableResult
+    static func reconcile(context: ModelContext, badgeDefs: [BadgeDef]) -> Report {
+        var report = Report()
+        let profiles = (try? context.fetch(FetchDescriptor<PlayerProfile>())) ?? []
+        if profiles.count > 1 {
+            let ordered = profiles.sorted { $0.gamesPlayed > $1.gamesPlayed }
+            let keeper = ordered[0]
+            for other in ordered.dropFirst() { merge(other, into: keeper, defs: badgeDefs); context.delete(other); report.profilesMerged += 1 }
+        }
+        let plants = (try? context.fetch(FetchDescriptor<PlantCollectible>())) ?? []
+        let groups = Dictionary(grouping: plants, by: \.plantId)
+        for (_, group) in groups where group.count > 1 {
+            let ordered = group.sorted { ($0.earnedCount, $0.growthPoints) > ($1.earnedCount, $1.growthPoints) }
+            let keeper = ordered[0]
+            for other in ordered.dropFirst() { merge(other, into: keeper); context.delete(other); report.plantsMerged += 1 }
+        }
+        if report.profilesMerged > 0 || report.plantsMerged > 0 { try? context.save() }
+        return report
+    }
+
+    private static func merge(_ o: PlayerProfile, into k: PlayerProfile, defs: [BadgeDef]) {
+        k.currentLevel = max(k.currentLevel, o.currentLevel)
+        k.plantsEarnedThisLevel = max(k.plantsEarnedThisLevel, o.plantsEarnedThisLevel)
+        k.roseOfJerichoCount = max(k.roseOfJerichoCount, o.roseOfJerichoCount)
+        k.gamesPlayed = max(k.gamesPlayed, o.gamesPlayed)
+        k.water = max(k.water, o.water); k.soil = max(k.soil, o.soil)
+        k.streak = max(k.streak, o.streak); k.bestStreak = max(k.bestStreak, o.bestStreak)
+        k.streakFreezes = max(k.streakFreezes, o.streakFreezes)
+        k.roseSeedProgress = max(k.roseSeedProgress, o.roseSeedProgress)
+        k.gardenDays = max(k.gardenDays, o.gardenDays)
+        k.shedPoints = max(k.shedPoints, o.shedPoints)
+        k.glowLanterns = max(k.glowLanterns, o.glowLanterns)
+        k.lastPlayedDay = [k.lastPlayedDay, o.lastPlayedDay].compactMap { $0 }.max()
+        k.lastAdAt = [k.lastAdAt, o.lastAdAt].compactMap { $0 }.max()
+        if k.ageBand == nil { k.ageBand = o.ageBand }
+        if k.widgetPlantID == nil { k.widgetPlantID = o.widgetPlantID }
+        var seen = k.seenIds; for id in o.seenIds where !seen.contains(id) { seen.append(id) }; k.seenIds = seen
+        k.badgesJSON = BadgeState(json: k.badgesJSON, defs: defs).merged(with: BadgeState(json: o.badgesJSON, defs: defs)).json
+        k.toolsJSON = ToolInventory(json: k.toolsJSON).merged(with: ToolInventory(json: o.toolsJSON)).json
+        k.albumJSON = StickerAlbum(json: k.albumJSON).merged(with: StickerAlbum(json: o.albumJSON)).json
+    }
+
+    private static func merge(_ o: PlantCollectible, into k: PlantCollectible) {
+        k.earnedCount = max(k.earnedCount, o.earnedCount)
+        k.growthPoints = max(k.growthPoints, o.growthPoints)
+        k.stage = max(k.stage, o.stage)
+        k.hydration = max(k.hydration, o.hydration); k.soilRichness = max(k.soilRichness, o.soilRichness)
+        k.lastTendedAt = [k.lastTendedAt, o.lastTendedAt].compactMap { $0 }.max()
+        k.lastSunnyAt = [k.lastSunnyAt, o.lastSunnyAt].compactMap { $0 }.max()
+        k.lastPrunedAt = [k.lastPrunedAt, o.lastPrunedAt].compactMap { $0 }.max()
+        if k.nickname.isEmpty { k.nickname = o.nickname }
+        if k.soilType.isEmpty { k.soilType = o.soilType }
+    }
+}

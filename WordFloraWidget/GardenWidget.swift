@@ -16,7 +16,7 @@ struct WaterPlantIntent: AppIntent {
 
     @MainActor
     func perform() async throws -> some IntentResult {
-        if let container = try? SharedContainer.make() {
+        if let container = try? SharedContainer.make(createIfMissing: false) {
             WidgetActions.water(plantId: plantId, context: container.mainContext, now: .now, calendar: .current, quiet: SharedDefaults.quietGarden)
         }
         return .result()
@@ -49,7 +49,7 @@ struct GardenProvider: TimelineProvider {
 
     @MainActor private func load() -> GardenEntry {
         let calm = true /* never the thirsty look in a widget */, quiet = SharedDefaults.quietGarden
-        guard let container = try? SharedContainer.make() else {
+        guard let container = try? SharedContainer.make(createIfMissing: false) else {
             return GardenEntry(date: .now, snapshot: .init(hero: nil, others: [], water: 0), quiet: quiet)
         }
         return GardenEntry(date: .now, snapshot: WidgetActions.snapshot(context: container.mainContext, now: .now, calm: calm), quiet: quiet)

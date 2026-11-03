@@ -246,6 +246,8 @@ final class GameViewModel {
         playerProfile?.lastRoundId = m.lastRoundId
     }
 
+    func reloadProfile() { loadOrCreateProfile() }
+
     private func loadOrCreateProfile() {
         if let existing = try? modelContext.fetch(FetchDescriptor<PlayerProfile>()).first {
             playerProfile = existing
