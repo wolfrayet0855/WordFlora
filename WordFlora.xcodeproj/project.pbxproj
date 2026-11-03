@@ -21,9 +21,11 @@
 		68EF45C14F3CEC72F7042540 /* PlayerProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */; };
 		699CBEF5F63C97810EC87BF4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
 		6B62D39E700D7780A2D24F90 /* AdGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D611CA0D8CDFFDC0D1E80D /* AdGate.swift */; };
+		6B6F1DB72D2C6C1D6C0E5390 /* ToolEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */; };
 		6D2F71A8A90D3F1FF82FEB03 /* AssistTuner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E08620029509154DEB72456 /* AssistTuner.swift */; };
 		812CC68498F635B4E42F0D32 /* FeatureUnlockPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */; };
 		8CDA4D0BA93F589962585DB8 /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6305635D642316CCE8610F /* GameRecord.swift */; };
+		94D8860C3740EB26ADB252F0 /* ToolEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D9F7603039699D755A5EDB /* ToolEngineTests.swift */; };
 		9603333091B94F1CE68C0A45 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9075581718316A5EDE6C92FD /* GameViewModel.swift */; };
 		9640E4CF89AD1324C08B70FE /* CoreRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03162041D3ADF3CEE1CCF23B /* CoreRulesTests.swift */; };
 		9A467E6C2C922C05007E28B8 /* WordFloraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A467E6B2C922C05007E28B8 /* WordFloraApp.swift */; };
@@ -58,11 +60,13 @@
 		03162041D3ADF3CEE1CCF23B /* CoreRulesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoreRulesTests.swift; sourceTree = "<group>"; };
 		045A383C28CF63B7AA1690E5 /* Economy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Economy.swift; sourceTree = "<group>"; };
 		07E6A1305C8A4BB87A255C2F /* WordProviderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordProviderTests.swift; sourceTree = "<group>"; };
+		08D9F7603039699D755A5EDB /* ToolEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ToolEngineTests.swift; sourceTree = "<group>"; };
 		153A01FF2679CA86ABE5DFBE /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		188352F473E5A34955BC4F03 /* RulesBatch2Tests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RulesBatch2Tests.swift; sourceTree = "<group>"; };
 		1953888CF19BF643304ED9AC /* WordEntry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordEntry.swift; sourceTree = "<group>"; };
 		273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FeatureUnlockPolicy.swift; sourceTree = "<group>"; };
 		2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoseMeter.swift; sourceTree = "<group>"; };
+		354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ToolEngine.swift; sourceTree = "<group>"; };
 		3B62098E04C3095B889397EC /* WordProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordProvider.swift; sourceTree = "<group>"; };
 		437318BFC10E7CDE04AF1603 /* Plants.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Plants.json; sourceTree = "<group>"; };
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
@@ -137,6 +141,7 @@
 				273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */,
 				6E08620029509154DEB72456 /* AssistTuner.swift */,
 				5CB68790025C9135B9C9E7DA /* OnboardingFlow.swift */,
+				354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */,
 			);
 			name = Rules;
 			path = Rules;
@@ -173,6 +178,7 @@
 				03162041D3ADF3CEE1CCF23B /* CoreRulesTests.swift */,
 				D1A934E0013AAE5EB7DE9896 /* TendingEngineTests.swift */,
 				188352F473E5A34955BC4F03 /* RulesBatch2Tests.swift */,
+				08D9F7603039699D755A5EDB /* ToolEngineTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -356,6 +362,7 @@
 				9640E4CF89AD1324C08B70FE /* CoreRulesTests.swift in Sources */,
 				204098414E074C6111011CE4 /* TendingEngineTests.swift in Sources */,
 				AC0534FE4A3F995C8A301AB0 /* RulesBatch2Tests.swift in Sources */,
+				94D8860C3740EB26ADB252F0 /* ToolEngineTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -387,6 +394,7 @@
 				812CC68498F635B4E42F0D32 /* FeatureUnlockPolicy.swift in Sources */,
 				6D2F71A8A90D3F1FF82FEB03 /* AssistTuner.swift in Sources */,
 				F935EF5C075DD18A90D60D6E /* OnboardingFlow.swift in Sources */,
+				6B6F1DB72D2C6C1D6C0E5390 /* ToolEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

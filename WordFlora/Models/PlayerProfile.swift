@@ -24,6 +24,9 @@ final class PlayerProfile {
     var lastRoundId: String?
     var gardenDays: Int = 0
     var lastGraceDay: Date?
+    var shedPoints: Int = 0
+    var toolsJSON: String = ""
+    var activeToolId: String = "can"
 
     init() {}
 }

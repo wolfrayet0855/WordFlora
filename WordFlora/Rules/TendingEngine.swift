@@ -1,7 +1,7 @@
 import Foundation
 
 struct TendResult: Equatable {
-    enum Reason: Equatable { case noWater, noSoil, fullForToday, alreadyDoneToday }
+    enum Reason: Equatable { case noWater, noSoil, fullForToday, alreadyDoneToday, notOwned, cooldown }
     var applied = false
     var gpGained = 0
     var stageUp = false
@@ -33,7 +33,7 @@ enum TendingEngine {
     }
 
     static func addSoil(_ plant: PlantCollectible, profile: PlayerProfile, now: Date, calendar: Calendar,
-                        economy: Economy, quiet: Bool = false) -> TendResult {
+                        economy: Economy, quiet: Bool = false, multiplier: Double = 1.0) -> TendResult {
         if quiet { return TendResult(applied: true) }
         guard profile.soil > 0 else { return .blocked(.noSoil) }
         resetDay(plant, now: now, calendar: calendar)
@@ -43,18 +43,18 @@ enum TendingEngine {
         profile.soil -= 1
         plant.soilRichness = min(1.0, plant.soilRichness + economy.soilRichnessStep)
         plant.soilBoostUntil = now.addingTimeInterval(Double(economy.soilBoostDays) * 86_400)
-        return grow(plant, by: min(economy.soilGrowth, remaining))
+        return grow(plant, by: min(Int((Double(economy.soilGrowth) * multiplier).rounded()), remaining))
     }
 
     static func sun(_ plant: PlantCollectible, profile: PlayerProfile, now: Date, calendar: Calendar,
-                    economy: Economy, quiet: Bool = false) -> TendResult {
+                    economy: Economy, quiet: Bool = false, growth: Int? = nil) -> TendResult {
         if quiet { return TendResult(applied: true) }
         if let last = plant.lastSunnyAt, calendar.isDate(last, inSameDayAs: now) { return .blocked(.alreadyDoneToday) }
         resetDay(plant, now: now, calendar: calendar)
         let remaining = economy.dailyAbsorbCap - plant.absorbedToday
         guard remaining > 0 else { return .blocked(.fullForToday) }
         plant.lastSunnyAt = now
-        return grow(plant, by: min(economy.sunGrowth, remaining))
+        return grow(plant, by: min(growth ?? economy.sunGrowth, remaining))
     }
 
     // MARK: Stages
@@ -80,6 +80,14 @@ enum TendingEngine {
         guard n > 0 else { return }
         profile.water += min(n, economy.trickleCap - profile.water)
         profile.lastTrickleAt = profile.water >= economy.trickleCap ? now : profile.lastTrickleAt.addingTimeInterval(Double(n) * interval)
+    }
+
+    /// Shared by tools: grow within the per-plant daily absorb cap (no cost handling here).
+    static func applyGrowth(_ plant: PlantCollectible, desired: Int, now: Date, calendar: Calendar, economy: Economy) -> TendResult {
+        resetDay(plant, now: now, calendar: calendar)
+        let remaining = economy.dailyAbsorbCap - plant.absorbedToday
+        guard remaining > 0 else { return .blocked(.fullForToday) }
+        return grow(plant, by: min(desired, remaining))
     }
 
     // MARK: Helpers
