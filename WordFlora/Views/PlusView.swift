@@ -22,7 +22,7 @@ struct PlusView: View {
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(PaywallCopy.benefits, id: \.self) { b in
                         HStack(spacing: 10) {
-                            Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.appSuccess)
+                            Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.successText)
                             Text(b).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                         }
                     }
@@ -31,14 +31,14 @@ struct PlusView: View {
                 if store.state.hasPlus { activeCard } else { plans }
 
                 VStack(spacing: 2) {
-                    Button("Restore purchases") { Task { await store.restore() } }.frame(minHeight: Theme.minTap)
-                    Button("Manage subscription") { openURL(Links.manageSubscriptions) }.frame(minHeight: Theme.minTap)
-                    HStack(spacing: 24) {
-                        Link("Terms of Use", destination: Links.terms)
-                        Link("Privacy Policy", destination: Links.privacy)
-                    }.frame(minHeight: Theme.minTap)
+                    Button("Restore purchases") { Task { await store.restore() } }.tapTarget()
+                    Button("Manage subscription") { openURL(Links.manageSubscriptions) }.tapTarget()
+                    HStack(spacing: 8) {
+                        Link("Terms of Use", destination: Links.terms).tapTarget()
+                        Link("Privacy Policy", destination: Links.privacy).tapTarget()
+                    }
                 }
-                .font(Theme.font(.footnote)).foregroundStyle(Color.appPrimaryText.opacity(0.7))
+                .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
             .padding(20).padding(.bottom, 24)
         }
@@ -66,8 +66,8 @@ struct PlusView: View {
             let copy = PaywallCopy.make(plan: selected, displayPrice: price, trialEligible: store.trialEligible && selected == .yearly)
             Button { buy() } label: { Text(busy ? "One moment…" : copy.cta) }
                 .buttonStyle(PrimaryButtonStyle()).disabled(busy || store.products[selected] == nil)
-            Text(copy.finePrint).font(Theme.font(.caption)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.7))
-            if let message { Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appSuccess).multilineTextAlignment(.center) }
+            Text(copy.finePrint).font(Theme.font(.caption)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText)
+            if let message { Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText).multilineTextAlignment(.center) }
         }
     }
 
@@ -80,19 +80,19 @@ struct PlusView: View {
                 VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 8) {
                         Text(copy.headline).font(Theme.font(.headline))
-                        if plan == .yearly { Text(copy.detail).font(Theme.font(.caption2, weight: .bold)).padding(.horizontal, 8).padding(.vertical, 3).background(Color.appAccent.opacity(0.3), in: Capsule()) }
+                        if plan == .yearly { Text(copy.detail).font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.appPrimaryText).fixedSize().padding(.horizontal, 8).padding(.vertical, 3).background(Color.appAccent.opacity(0.3), in: Capsule()) }
                     }
-                    if plan == .yearly && store.trialEligible { Text("3 days free to start").font(Theme.font(.caption)).foregroundStyle(Color.appSuccess) }
-                    if let extra { Text(extra).font(Theme.font(.caption)).foregroundStyle(Color.appPrimaryText.opacity(0.7)) }
+                    if plan == .yearly && store.trialEligible { Text("3 days free to start").font(Theme.font(.caption)).foregroundStyle(Color.successText) }
+                    if let extra { Text(extra).font(Theme.font(.caption)).foregroundStyle(Color.secondaryText) }
                 }
                 Spacer()
                 Text(product.map { $0.displayPrice + (plan == .yearly ? "/yr" : "/mo") } ?? "").font(Theme.font(.headline))
-                Image(systemName: isSelected ? "largecircle.fill.circle" : "circle").foregroundStyle(isSelected ? Color.appSuccess : Color.appPrimaryText.opacity(0.3))
+                Image(systemName: isSelected ? "largecircle.fill.circle" : "circle").foregroundStyle(isSelected ? Color.successText : Color.appPrimaryText.opacity(0.3))
             }
             .foregroundStyle(Color.appPrimaryText)
             .padding(14).frame(maxWidth: .infinity)
             .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
-            .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(isSelected ? Color.appSuccess : Color.appPrimaryText.opacity(0.1), lineWidth: isSelected ? 2 : 1))
+            .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(isSelected ? Color.successText : Color.appPrimaryText.opacity(0.1), lineWidth: isSelected ? 2 : 1))
         }
         .buttonStyle(.plain)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
@@ -101,7 +101,7 @@ struct PlusView: View {
     private var activeCard: some View {
         Card {
             VStack(alignment: .leading, spacing: 6) {
-                Label("You have WordFlora Plus", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.appSuccess)
+                Label("You have WordFlora Plus", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.successText)
                 Text("Ads are off and your garden can sync across your devices. Thank you for supporting WordFlora.").font(Theme.font(.callout))
             }
         }

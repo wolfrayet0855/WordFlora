@@ -1,5 +1,10 @@
 import SwiftUI
 
+extension Color {
+    /// Secondary text that still meets 4.5:1 on both backgrounds (the plain 0.6-0.7 opacities did not).
+    static let secondaryText = Color.appPrimaryText.opacity(0.78)
+}
+
 enum Theme {
     static func font(_ style: Font.TextStyle, weight: Font.Weight = .regular) -> Font {
         .system(style, design: .rounded, weight: weight)
@@ -7,6 +12,11 @@ enum Theme {
     static let cornerRadius: CGFloat = 18
     static let cardRadius: CGFloat = 16
     static let minTap: CGFloat = 44
+}
+
+extension View {
+    /// Guarantees a 44x44 point hit area (Apple's minimum) without changing how the content looks.
+    func tapTarget() -> some View { frame(minWidth: Theme.minTap, minHeight: Theme.minTap).contentShape(Rectangle()) }
 }
 
 struct WordmarkView: View {

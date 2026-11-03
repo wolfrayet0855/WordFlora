@@ -13,7 +13,7 @@ struct HomeView: View {
                     Button { router.go(.settings) } label: {
                         Image(systemName: "gearshape.fill").font(.title3).frame(width: Theme.minTap, height: Theme.minTap)
                     }
-                    .foregroundStyle(Color.appPrimaryText.opacity(0.7))
+                    .foregroundStyle(Color.secondaryText)
                     .accessibilityLabel("Settings")
                 }
 
@@ -21,7 +21,7 @@ struct HomeView: View {
                     WordmarkView()
                     Text("Guess words. Grow a garden.")
                         .font(Theme.font(.callout, weight: .medium))
-                        .foregroundStyle(Color.appPrimaryText.opacity(0.75))
+                        .foregroundStyle(Color.secondaryText)
                 }
 
                 FlowerView(petals: 8)
@@ -46,7 +46,7 @@ struct HomeView: View {
                             Image(systemName: "sun.max.fill").foregroundStyle(Color.appAccent)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Daily Bloom").font(Theme.font(.headline))
-                                Text("One word for everyone today").font(Theme.font(.caption)).foregroundStyle(Color.appPrimaryText.opacity(0.7))
+                                Text("One word for everyone today").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
                             }
                             Spacer()
                             Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Color.appPrimaryText.opacity(0.4))
@@ -94,7 +94,7 @@ struct HomeView: View {
                 HStack(spacing: 16) {
                     Button("Go ad-free") { router.go(.plus) }
                     Link("Report an ad", destination: Links.reportAd)
-                }.font(Theme.font(.caption2)).foregroundStyle(Color.appPrimaryText.opacity(0.6))
+                }.font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
             }
             .padding(.vertical, 4).frame(maxWidth: .infinity).background(Color.appBackground)
         }
@@ -112,13 +112,13 @@ struct RoseSeedChip: View {
             ZStack {
                 Circle().stroke(Color.appPrimaryText.opacity(0.12), lineWidth: 5)
                 Circle().trim(from: 0, to: full ? 1 : CGFloat(progress) / CGFloat(threshold))
-                    .stroke(Color.appSuccess, style: StrokeStyle(lineWidth: 5, lineCap: .round)).rotationEffect(.degrees(-90))
+                    .stroke(Color.successText, style: StrokeStyle(lineWidth: 5, lineCap: .round)).rotationEffect(.degrees(-90))
                 Image("rose_of_jericho").resizable().scaledToFit().padding(8)
             }
             .frame(width: 44, height: 44)
             VStack(alignment: .leading, spacing: 1) {
                 Text("×\(stock)").font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
-                Text(full ? "Your satchel is full" : "\(progress) of \(threshold)").font(Theme.font(.caption2)).foregroundStyle(Color.appPrimaryText.opacity(0.7))
+                Text(full ? "Your satchel is full" : "\(progress) of \(threshold)").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).fixedSize(horizontal: false, vertical: true)
             }
         }
         .padding(10).frame(maxWidth: .infinity, minHeight: 76, alignment: .leading)
@@ -141,7 +141,7 @@ struct GardenDaysChip: View {
                     .font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
                 if let streak, days > 0 {
                     Text(streak > 1 ? "Streak \(streak)" : "Streak resting - your best was \(max(best, streak))")
-                        .font(Theme.font(.caption2)).foregroundStyle(Color.appPrimaryText.opacity(0.7)).lineLimit(2)
+                        .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).lineLimit(2)
                 }
             }
         }

@@ -123,7 +123,7 @@ struct ButterflyView: View {
                         HStack { ForEach(s.newStickerIds, id: \.self) { id in
                             VStack(spacing: 2) {
                                 Image("visitor_\(id)_sticker").resizable().scaledToFit().frame(width: 64, height: 64)
-                                Text(VisitorCatalog.species(id)?.name ?? "").font(Theme.font(.caption2))
+                                Text(VisitorCatalog.species(id)?.name ?? "").font(Theme.font(.caption))
                             }
                         } }
                         if let fact = s.newStickerIds.compactMap({ VisitorCatalog.species($0)?.fact }).first {
@@ -195,8 +195,8 @@ struct AlbumView: View {
                             Image("visitor_\(v.id)_sticker").resizable().scaledToFit().frame(height: 80)
                                 .saturation(met ? 1 : 0).brightness(met ? 0 : -0.5).opacity(met ? 1 : 0.5).accessibilityHidden(true)
                             Text(met ? v.name : "Not met yet").font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                            if met, let fact = v.fact { Text(fact).font(Theme.font(.caption2)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.75)) }
-                            if !met && v.nightOnly { Text("Comes out in the evening").font(Theme.font(.caption2)).foregroundStyle(Color.appPrimaryText.opacity(0.6)) }
+                            if met, let fact = v.fact { Text(fact).font(Theme.font(.caption)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText) }
+                            if !met && v.nightOnly { Text("Comes out in the evening").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText) }
                         }
                         .padding(12).frame(maxWidth: .infinity, minHeight: 150)
                         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))

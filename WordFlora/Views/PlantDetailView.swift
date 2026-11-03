@@ -35,7 +35,7 @@ struct PlantDetailView: View {
                         .animation(.spring(response: 0.4, dampingFraction: 0.45), value: bump)
                         .accessibilityHidden(true)
                     if thirsty {
-                        Image(systemName: "drop.fill").foregroundStyle(Color.appSuccess).padding(10)
+                        Image(systemName: "drop.fill").foregroundStyle(Color.successText).padding(10)
                             .background(Color.appSurface, in: Circle()).accessibilityLabel("Thirsty")
                     }
                 }
@@ -49,9 +49,9 @@ struct PlantDetailView: View {
                         }.foregroundStyle(Color.appPrimaryText)
                     }
                     .accessibilityHint("Give your plant a name")
-                    Text(plant.botanicalName).font(Theme.font(.subheadline)).italic().foregroundStyle(Color.appPrimaryText.opacity(0.65))
+                    Text(plant.botanicalName).font(Theme.font(.subheadline)).italic().foregroundStyle(Color.secondaryText)
                     Text(thirsty ? "Thirsty. A drink will perk it right up." : Self.stageNames[min(4, plant.stage)])
-                        .font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appSuccess)
+                        .font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText)
                 }
 
                 if !quiet { growthBar(plant) ; resources }
@@ -82,11 +82,13 @@ struct PlantDetailView: View {
         let cost = eco.levelBaseCost * eco.levelCostMultipliers[max(0, min(4, plant.level - 1))]
         let next = plant.stage >= 4 ? cost : (eco.stageThresholds[min(3, plant.stage)] * cost)
         return VStack(alignment: .leading, spacing: 6) {
-            ProgressView(value: min(Double(plant.growthPoints), next), total: next).tint(Color.appSuccess)
+            ProgressView(value: min(Double(plant.growthPoints), next), total: next).tint(Color.successText)
             HStack { ForEach(0..<5, id: \.self) { i in
-                Circle().fill(i <= plant.stage ? Color.appSuccess : Color.appPrimaryText.opacity(0.15)).frame(width: 8, height: 8)
+                Circle().fill(i <= plant.stage ? Color.successText : Color.appPrimaryText.opacity(0.15)).frame(width: 8, height: 8)
             } }
         }
+        .frame(minHeight: Theme.minTap)
+        .contentShape(Rectangle())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Growth: \(Self.stageNames[min(4, plant.stage)]), stage \(plant.stage + 1) of 5")
     }
@@ -124,7 +126,7 @@ struct PlantDetailView: View {
     private func repotSheet(_ plant: PlantCollectible) -> some View {
         VStack(spacing: 14) {
             Text("Choose a soil").font(Theme.font(.title3, weight: .bold))
-            Text("Plants have favourite soils. Try one and see how it reacts.").font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText.opacity(0.75)).multilineTextAlignment(.center)
+            Text("Plants have favourite soils. Try one and see how it reacts.").font(Theme.font(.callout)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                 ForEach(SoilType.allCases, id: \.self) { soil in
                     Button { showRepot = false; run(.repot(soil), plant) } label: { Text(soil.rawValue.capitalized) }

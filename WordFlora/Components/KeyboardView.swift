@@ -37,7 +37,7 @@ struct KeyboardView: View {
     }
 
     private func background(_ s: GameViewModel.KeyState) -> Color {
-        switch s { case .unused: return .appSurface; case .correct: return Color.appSuccess.opacity(0.85); case .wrong: return Color.appDanger.opacity(0.22) }
+        switch s { case .unused: return .appSurface; case .correct: return Color.successText; case .wrong: return Color.appDanger.opacity(0.22) }
     }
     private func foreground(_ s: GameViewModel.KeyState) -> Color {
         switch s { case .unused: return .appPrimaryText; case .correct: return .white; case .wrong: return Color.appPrimaryText.opacity(0.45) }

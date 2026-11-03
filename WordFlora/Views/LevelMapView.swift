@@ -39,21 +39,22 @@ struct LevelMapView: View {
                     Button { router.go(.game(daily: false, level: level)) } label: { Label("Play level \(level)", systemImage: "play.fill") }
                         .buttonStyle(SecondaryButtonStyle())
                 } else {
-                    Text("Earn all 10 plants in level \(level - 1) to open this one.").font(Theme.font(.caption)).foregroundStyle(Color.appPrimaryText.opacity(0.6))
+                    Text("Earn all 10 plants in level \(level - 1) to open this one.").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
                 }
             }
         }
-        .opacity(unlocked ? 1 : 0.7)
         .accessibilityElement(children: .contain)
     }
 
     private func track(_ title: String, value: Int, icon: String) -> some View {
         HStack(spacing: 10) {
-            Image(systemName: icon).foregroundStyle(Color.appSuccess).frame(width: 22)
+            Image(systemName: icon).foregroundStyle(Color.successText).frame(width: 22)
             Text(title).font(Theme.font(.subheadline)).frame(width: 60, alignment: .leading)
-            ProgressView(value: Double(value), total: 10).tint(Color.appSuccess)
+            ProgressView(value: Double(value), total: 10).tint(Color.successText)
             Text("\(value)/10").font(Theme.font(.caption, weight: .semibold)).frame(width: 40, alignment: .trailing)
         }
+        .frame(minHeight: Theme.minTap)
+        .contentShape(Rectangle())
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(title): \(value) of 10")
     }

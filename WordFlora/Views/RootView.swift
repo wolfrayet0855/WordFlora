@@ -9,7 +9,7 @@ struct RootView: View {
         Group {
             if app.onboarding.isComplete { mainStack(router: $router.path) } else { OnboardingView() }
         }
-        .tint(Color.appSuccess)
+        .tint(Color.successText)
         .preferredColorScheme(app.settings.colorScheme)
     }
 

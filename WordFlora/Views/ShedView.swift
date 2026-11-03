@@ -20,11 +20,11 @@ struct ShedView: View {
             VStack(spacing: 12) {
                 if !app.settings.quietGarden {
                     Label("\(points) shed points", systemImage: "star.fill").font(Theme.font(.headline))
-                        .foregroundStyle(Color.appAccent).frame(maxWidth: .infinity, alignment: .leading)
+                        .foregroundStyle(Color.accentText).frame(maxWidth: .infinity, alignment: .leading)
                         .accessibilityLabel("\(points) shed points")
                 }
                 ForEach(Self.info, id: \.0) { tool, name, blurb in card(tool, name, blurb, tier: inv.tier(of: tool), points: points) }
-                if let message { Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appSuccess) }
+                if let message { Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText) }
             }
             .padding(20)
         }
@@ -42,16 +42,20 @@ struct ShedView: View {
                 Image("tool_\(tool.rawValue)_t\(max(1, tier))").resizable().scaledToFit().frame(width: 64, height: 64)
                     .saturation(owned ? 1 : 0).opacity(owned ? 1 : 0.4).accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 4) {
-                    HStack {
-                        Text(name).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
-                        if owned { Text("Tier \(tier)").font(Theme.font(.caption2, weight: .bold)).padding(.horizontal, 6).padding(.vertical, 2).background(Color.appAccent.opacity(0.25), in: Capsule()) }
+                    Text(name).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
+                    if owned {
+                        Text("Tier \(tier) of 3").font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                            .fixedSize().padding(.horizontal, 8).padding(.vertical, 2).background(Color.appAccent.opacity(0.25), in: Capsule())
                     }
-                    Text(blurb).font(Theme.font(.caption)).foregroundStyle(Color.appPrimaryText.opacity(0.7))
+                    Text(blurb).font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).fixedSize(horizontal: false, vertical: true)
                     if owned, let cost = next {
-                        Button { upgrade(tool, name) } label: { Text("Upgrade · \(cost) points") }
-                            .font(Theme.font(.footnote, weight: .semibold)).disabled(points < cost).frame(minHeight: Theme.minTap, alignment: .leading)
+                        Button { upgrade(tool, name) } label: {
+                            Text("Upgrade for \(cost) points").font(Theme.font(.footnote, weight: .semibold))
+                                .foregroundStyle(points >= cost ? Color.successText : Color.secondaryText).fixedSize(horizontal: false, vertical: true)
+                        }
+                        .disabled(points < cost).tapTarget()
                     } else if owned {
-                        Text("Fully upgraded").font(Theme.font(.caption, weight: .semibold)).foregroundStyle(Color.appSuccess)
+                        Text("Fully upgraded").font(Theme.font(.caption, weight: .semibold)).foregroundStyle(Color.successText)
                     }
                 }
                 Spacer(minLength: 0)

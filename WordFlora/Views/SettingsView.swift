@@ -24,7 +24,7 @@ struct SettingsView: View {
                 Toggle("Calm mode", isOn: $s.calmMode)
                 Toggle("Quiet Garden", isOn: $s.quietGarden)
                 Text("Calm mode removes the thirsty look and halves celebrations. Quiet Garden hides counters and timers so tending is just relaxing.")
-                    .font(.footnote).foregroundStyle(.secondary)
+                    .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
             Section("Reminders") {
                 Toggle("Gentle daily reminder", isOn: Binding(
@@ -41,7 +41,7 @@ struct SettingsView: View {
                             app.refreshReminders()
                         }), displayedComponents: .hourAndMinute)
                 }
-                Text("At most one a day, never at night, and they stop on their own if you take a break.").font(.footnote).foregroundStyle(.secondary)
+                Text("At most one a day, never at night, and they stop on their own if you take a break.").font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 if reminderDenied { Text("Notifications are off for WordFlora. You can allow them in your device settings.").font(.footnote).foregroundStyle(Color.appDanger) }
             }
             Section("Appearance") {
@@ -68,7 +68,5 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
-        .scrollContentBackground(.hidden)
-        .background(Color.appBackground.ignoresSafeArea())
     }
 }

@@ -34,7 +34,7 @@ private struct IntroView: View {
         ZStack {
             VStack(spacing: 8) {
                 WordmarkView(style: .largeTitle).scaleEffect(1.25)
-                Text("Guess words. Grow a garden.").font(Theme.font(.callout, weight: .medium)).foregroundStyle(Color.appPrimaryText.opacity(0.75))
+                Text("Guess words. Grow a garden.").font(Theme.font(.callout, weight: .medium)).foregroundStyle(Color.secondaryText)
             }
             .opacity(showTitle ? 1 : 0)
             FlowerRainView(onFinish: { withAnimation { app.onboarding.introFinished() } })
@@ -48,20 +48,22 @@ private struct AgeQuestionView: View {
     @Environment(AppModel.self) private var app
 
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer()
-            FlowerView(petals: 8).frame(height: 140)
-            Text("How old are you?").font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-            Text("This helps us set up the right experience. You can still play whichever way you like.")
-                .font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.75))
-            VStack(spacing: 12) {
-                ageButton("Under 13", .under13)
-                ageButton("13 to 17", .thirteenPlus)
-                ageButton("18 or older", .eighteenPlus)
+        ScrollView {
+            VStack(spacing: 24) {
+                FlowerView(petals: 8).frame(height: 140)
+                Text("How old are you?").font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                Text("This helps us set up the right experience. You can still play whichever way you like.")
+                    .font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText).fixedSize(horizontal: false, vertical: true)
+                VStack(spacing: 12) {
+                    ageButton("Under 13", .under13)
+                    ageButton("13 to 17", .thirteenPlus)
+                    ageButton("18 or older", .eighteenPlus)
+                }
             }
-            Spacer()
+            .padding(24).frame(maxWidth: .infinity)
         }
-        .padding(24)
+        .scrollBounceBehavior(.basedOnSize)
     }
 
     private func ageButton(_ title: String, _ band: AgeBand) -> some View {
@@ -88,12 +90,12 @@ private struct FirstGardenTipView: View {
                     .scaleEffect(watered ? 1.04 : 1).animation(.spring(response: 0.4, dampingFraction: 0.5), value: watered)
             }
             Text(watered ? "Plants need water, sun and soil. You will find them all in your garden." : "Plants like a drink. Tap the button to water it.")
-                .font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.8))
+                .font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText)
             if watered {
                 Button("Play another word") { app.finishOnboarding() }.buttonStyle(PrimaryButtonStyle())
             } else {
                 Button { water() } label: { Label("Water your plant", systemImage: "drop.fill") }.buttonStyle(PrimaryButtonStyle())
-                Button("Skip") { app.finishOnboarding() }.font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText.opacity(0.6)).frame(minHeight: Theme.minTap)
+                Button("Skip") { app.finishOnboarding() }.font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText).frame(minHeight: Theme.minTap)
             }
             Spacer()
         }

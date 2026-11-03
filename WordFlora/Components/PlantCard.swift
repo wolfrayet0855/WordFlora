@@ -23,13 +23,13 @@ struct PlantCard: View {
             Text(earned ? plant.name : "Not found yet")
                 .font(Theme.font(compact ? .footnote : .subheadline, weight: .bold))
                 .foregroundStyle(Color.appPrimaryText)
-                .lineLimit(2).multilineTextAlignment(.center)
+                .lineLimit(3).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             if earned && !compact {
                 Text(plant.botanicalName).font(Theme.font(.caption)).italic()
-                    .foregroundStyle(Color.appPrimaryText.opacity(0.65)).lineLimit(1)
+                    .foregroundStyle(Color.secondaryText).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             }
             if plant.earnedCount > 1 {
-                Label("×\(plant.earnedCount)", systemImage: "leaf.fill").font(Theme.font(.caption2, weight: .bold)).foregroundStyle(Color.appSuccess)
+                Label("×\(plant.earnedCount)", systemImage: "leaf.fill").font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.successText)
             }
         }
         .padding(compact ? 8 : 12)

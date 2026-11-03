@@ -27,11 +27,11 @@ struct BadgesView: View {
         return VStack(spacing: 8) {
             Image("badge_\(def.id)_t\(max(1, tier))").resizable().scaledToFit().frame(height: 84)
                 .saturation(tier > 0 ? 1 : 0).opacity(tier > 0 ? 1 : 0.35).accessibilityHidden(true)
-            Text(def.title ?? def.id).font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center)
-            Text(def.blurb ?? "").font(Theme.font(.caption2)).foregroundStyle(Color.appPrimaryText.opacity(0.7)).multilineTextAlignment(.center).lineLimit(3)
+            Text(def.title ?? def.id).font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+            Text(def.blurb ?? "").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             if !app.settings.quietGarden {
-                ProgressView(value: Double(min(progress, nextThreshold)), total: Double(nextThreshold)).tint(Color.appSuccess)
-                Text(tier == 3 ? "Gold!" : "\(progress) of \(nextThreshold)").font(Theme.font(.caption2, weight: .semibold)).foregroundStyle(Color.appPrimaryText.opacity(0.7))
+                ProgressView(value: Double(min(progress, nextThreshold)), total: Double(nextThreshold)).tint(Color.successText)
+                Text(tier == 3 ? "Gold!" : "\(progress) of \(nextThreshold)").font(Theme.font(.caption, weight: .semibold)).foregroundStyle(Color.secondaryText)
             }
         }
         .padding(12).frame(maxWidth: .infinity)

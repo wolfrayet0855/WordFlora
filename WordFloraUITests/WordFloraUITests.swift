@@ -170,5 +170,57 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(thanks.exists || met.exists, "summary never appeared")
         shot("butterfly-summary")
     }
+
+    // MARK: accessibility audits (Apple's automated audit: labels, hit areas, Dynamic Type, contrast)
+    /// `ignoring` is only for stock iOS rows we do not style (the Settings form's toggles and pickers), where the audit
+    /// reports Dynamic Type and contrast findings on system-drawn controls.
+    private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = []) {
+        var findings = [String]()
+        do {
+            try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
+                findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | \(issue.element?.elementType.rawValue ?? 0) '\(issue.element?.label ?? "")'")
+                return true            // collect everything instead of stopping at the first issue
+            }
+        } catch { findings.append("\(name): audit failed to run: \(error)") }
+        if let dir = ProcessInfo.processInfo.environment["SCREENSHOT_DIR"] {
+            try? findings.joined(separator: "\n").write(toFile: dir + "/audit-\(name).txt", atomically: true, encoding: .utf8)
+        }
+        XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
+    }
+
+    func testAuditHome() { launch(); XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5)); audit("home") }
+
+    func testAuditGameAndResting() {
+        launch(word: "LOTUS"); app.buttons["Play"].tap()
+        XCTAssertTrue(app.buttons["Z"].waitForExistence(timeout: 5)); audit("game")
+    }
+
+    func testAuditGardenSettingsAndPlus() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened"]; app.launch()
+        app.buttons["Garden"].tap(); XCTAssertTrue(app.staticTexts["Level 1 · Seedling"].waitForExistence(timeout: 5)); audit("garden")
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
+        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5)); audit("plant")
+    }
+
+    func testAuditMoreScreens() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything"]; app.launch()
+        app.buttons["Shed"].tap(); XCTAssertTrue(app.staticTexts["Watering can"].waitForExistence(timeout: 5)); audit("shed")
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Badges"].tap(); XCTAssertTrue(app.staticTexts["Green Thumb"].waitForExistence(timeout: 5)); audit("badges")
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Levels"].tap(); XCTAssertTrue(app.staticTexts["Level 1 · Seedling"].waitForExistence(timeout: 5)); audit("levels")
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Settings"].tap(); XCTAssertTrue(app.switches["Haptics"].waitForExistence(timeout: 5)); audit("settings", ignoring: [.dynamicType, .contrast, .textClipped])
+    }
+
+    func testAuditPaywallAndOnboarding() {
+        launch()
+        app.buttons["Settings"].tap(); scrollTo(app.buttons["Remove ads and sync with iCloud"])
+        app.buttons["Remove ads and sync with iCloud"].tap()
+        XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5)); audit("plus")
+        app.terminate()
+        app.launchArguments = ["-uitest"]; app.launch()
+        XCTAssertTrue(app.buttons["Under 13"].waitForExistence(timeout: 8)); audit("age")
+    }
 }
 

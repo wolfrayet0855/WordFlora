@@ -13,7 +13,7 @@ struct GardenView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
                 Text("\(plants.filter { $0.earnedCount > 0 }.count) of \(plants.count) plants found")
-                    .font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText.opacity(0.7))
+                    .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
                 ForEach(1...5, id: \.self) { level in
                     let inLevel = plants.filter { $0.level == level }
                     if !inLevel.isEmpty {

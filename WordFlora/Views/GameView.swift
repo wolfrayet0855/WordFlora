@@ -30,7 +30,7 @@ struct GameView: View {
                 WordTilesView(word: vm.currentWord, guessed: vm.guessedLetters, revealAll: vm.phase == .rested)
                     .padding(.horizontal, 8)
                 if tutorial && vm.guessedLetters.isEmpty {
-                    Text("Tap a letter to guess").font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appSuccess)
+                    Text("Tap a letter to guess").font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText)
                         .symbolEffect(.pulse)
                 }
                 Spacer(minLength: 4)
@@ -76,10 +76,8 @@ struct GameView: View {
                     .accessibilityLabel("Home")
             }
             Spacer()
-            VStack(spacing: 0) {
-                Text(tutorial ? "Your first word" : daily ? "Daily Bloom" : "Level \(level ?? vm.currentLevel)").font(Theme.font(.headline))
-                if let e = vm.currentEntry { Text(e.kind == .hero ? "A plant" : "A garden word").font(Theme.font(.caption2)).foregroundStyle(Color.appPrimaryText.opacity(0.6)) }
-            }
+            Text(tutorial ? "Your first word" : daily ? "Daily Bloom" : "Level \(level ?? vm.currentLevel)").font(Theme.font(.headline))
+                .lineLimit(2).multilineTextAlignment(.center)
             Spacer()
             Button { vm.useHelp() } label: {
                 Label("Help", systemImage: "lightbulb.fill").labelStyle(.titleAndIcon).font(Theme.font(.subheadline, weight: .semibold))
@@ -104,7 +102,7 @@ struct GameView: View {
                 Text(vm.hint).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                 if let extra = vm.extraHint {
                     Divider()
-                    Text(extra).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText.opacity(0.8)).transition(.opacity)
+                    Text(extra).font(Theme.font(.callout)).foregroundStyle(Color.secondaryText).transition(.opacity)
                 }
             }
         }
@@ -148,13 +146,13 @@ struct GameView: View {
     private var earnedCard: some View {
         dimmed(rain: showRain) {
             VStack(spacing: 12) {
-                if vm.leveledUp { Label("Level up! New plants are waiting", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.appAccent) }
+                if vm.leveledUp { Label("Level up! New plants are waiting", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.accentText) }
                 Text(vm.earnedPlantIsNew ? "New plant found!" : "Your garden grew").font(Theme.font(.title2, weight: .bold))
                 if let name = vm.earnedPlantName, let plant = app.plants().first(where: { $0.name == name }) {
                     PlantCard(plant: plant).frame(maxWidth: 220)
                     Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
                 }
-                if vm.roseDropped { Label("A Rose of Jericho is in your satchel", systemImage: "leaf.circle.fill").font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appSuccess) }
+                if vm.roseDropped { Label("A Rose of Jericho is in your satchel", systemImage: "leaf.circle.fill").font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.successText) }
                 Button("Continue") { showEarned = false; app.markPeakDismissed(); afterRound() }.buttonStyle(PrimaryButtonStyle())
             }
         }
@@ -172,7 +170,7 @@ struct GameView: View {
                 }
                 if app.showBanner {
                     Button("Go ad-free") { showRestCard = false; router.home(); router.go(.plus) }
-                        .font(Theme.font(.footnote)).foregroundStyle(Color.appPrimaryText.opacity(0.6)).frame(minHeight: Theme.minTap)
+                        .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText).frame(minHeight: Theme.minTap)
                 }
             }
         }
