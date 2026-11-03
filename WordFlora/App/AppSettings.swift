@@ -28,7 +28,7 @@ final class AppSettings {
         switch appearance { case .system: return nil; case .light: return .light; case .dark: return .dark }
     }
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = SharedDefaults.store) {
         self.defaults = defaults
         func bool(_ k: String, _ d: Bool) -> Bool { defaults.object(forKey: k) == nil ? d : defaults.bool(forKey: k) }
         let age = defaults.string(forKey: "ageBand").flatMap(AgeBand.init(rawValue:))

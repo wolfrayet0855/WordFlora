@@ -19,3 +19,20 @@ final class GameRouter {
     func home() { path.removeAll() }
     func back() { if !path.isEmpty { path.removeLast() } }
 }
+
+extension GameRouter {
+    /// Deep links from the widget: wordflora://plant/<plantId> and wordflora://play
+    func open(_ url: URL) {
+        guard url.scheme == "wordflora" else { return }
+        home()
+        switch url.host {
+        case "plant":
+            let id = url.pathComponents.dropFirst().first ?? ""
+            go(.garden)
+            if !id.isEmpty { go(.plant(id)) }
+        case "play": go(.game(daily: false, level: nil))
+        default: break
+        }
+    }
+}
+

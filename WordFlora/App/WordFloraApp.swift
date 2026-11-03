@@ -1,10 +1,12 @@
 import SwiftUI
 import SwiftData
+import WidgetKit
 
 @main
 struct WordFloraApp: App {
     @State private var app: AppModel
     @State private var router = GameRouter()
+    @Environment(\.scenePhase) private var scenePhase
 
     init() {
         let args = CommandLine.arguments
@@ -26,6 +28,7 @@ struct WordFloraApp: App {
         if uiTesting {
             // Deterministic launches for UI tests: fresh settings, optional fixed word.
             UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier ?? "beta.WordFlora")
+            UserDefaults(suiteName: SharedDefaults.groupID)?.removePersistentDomain(forName: SharedDefaults.groupID)
             settings = AppSettings()
             if args.contains("-uitest-onboarded") { settings.onboardingComplete = true; settings.ageBand = .eighteenPlus }
             if let w = args.first(where: { $0.hasPrefix("-uitest-word=") })?.dropFirst("-uitest-word=".count) {
@@ -56,6 +59,12 @@ struct WordFloraApp: App {
                 .environment(app)
                 .environment(router)
                 .modelContainer(app.container)
+                .onOpenURL { url in if app.onboarding.isComplete { router.open(url) } }
+                .onChange(of: scenePhase) { _, phase in
+                    // Keep the home-screen widget in step with what the player just did.
+                    if phase == .background || phase == .inactive { WidgetCenter.shared.reloadAllTimelines() }
+                    if phase == .active { app.refreshFreeDrops() }
+                }
         }
     }
 }

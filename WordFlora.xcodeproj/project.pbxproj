@@ -11,16 +11,22 @@
 		06A793E2BE60065077304675 /* PlantDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41DC0A749A7EEA71E7F67108 /* PlantDetailView.swift */; };
 		081FDAAA5F68B19D48B13354 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6624B0783F70383BBF4A343C /* HomeView.swift */; };
 		1581D6A2E8210D4686510D56 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
+		1A0DEDAC7F9EC16779453E20 /* WordFloraWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 99F163FA4DA73F8563DD08F0 /* WordFloraWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1CEC41D7155EFBA55139F8BF /* ButterflyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F887962950E79A156ED26A3F /* ButterflyView.swift */; };
 		1D3676A7C18FACB6F1FC68CD /* RoseMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */; };
 		204098414E074C6111011CE4 /* TendingEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A934E0013AAE5EB7DE9896 /* TendingEngineTests.swift */; };
+		2152B2B444259D51618BC231 /* WidgetActionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5A871D657C5B861E3C18DD0 /* WidgetActionsTests.swift */; };
 		21F06B6221D6075031D257BC /* WordProviderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07E6A1305C8A4BB87A255C2F /* WordProviderTests.swift */; };
 		23CA57C0B1237EF911FBA04C /* AppModelTendingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 494B19877C303C1C4B6F6D08 /* AppModelTendingTests.swift */; };
 		2CB40AB3EF042B4E535ACFA5 /* HelpLadder.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6170EEBB1FE8D65905545EE /* HelpLadder.swift */; };
 		2FAAC760A0B5D1B374DD5839 /* PlantCollectible.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C771AB1111BA1267E678AF /* PlantCollectible.swift */; };
+		32B0BDF2B9904F58C4465D04 /* WidgetActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF5CF61BBF7BC272D7B55BB /* WidgetActions.swift */; };
 		35E6F9E2E0FBEFA232A6E0B1 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25BA2007B9E2490E80F9FDF0 /* OnboardingView.swift */; };
+		3A604584883B42745568A096 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9888DEE09FE8404AD2E6B806 /* SharedContainer.swift */; };
 		3B0ACB4FD72E0B1901B947AA /* BadgesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DA8F2D5FF4FD7D8DEFF8E5 /* BadgesView.swift */; };
+		3E4D8C4B5FD7B1BA5171F2A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E6F2C922C06007E28B8 /* Assets.xcassets */; };
 		3FB067A9083992E85076DBC5 /* GardenAITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC3E4954AD70EC6DCF36AF7C /* GardenAITests.swift */; };
+		4168EEC8F6585C8E1ED7ADC1 /* StoreMigrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717814646BD471A214A01C4B /* StoreMigrator.swift */; };
 		423B9277680D308402B3B6CD /* AppModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439E45E6B9B1F70CB95378CC /* AppModel.swift */; };
 		49C9AEE30C6B929F87BAB3EF /* KeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73101B54140F34289C21BFD /* KeyboardView.swift */; };
 		49FAB31C34389B1250039A76 /* GameRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */; };
@@ -31,7 +37,9 @@
 		5731534192B9E4F7B8B0B453 /* GardenAI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA11973C4913D16F50F3654D /* GardenAI.swift */; };
 		597D0D97668D3B3901F9F7FA /* ProgressionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A188B4F331705EAF0FD7F2 /* ProgressionPolicy.swift */; };
 		59896F4A896FCF2AAA27E877 /* Words.json in Resources */ = {isa = PBXBuildFile; fileRef = 9D91134EF7A4DA4C11EB9E23 /* Words.json */; };
+		5AC90C63AFA3930519F129FF /* WordFloraWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96DC5D77A1287D3DF73CD43 /* WordFloraWidgetBundle.swift */; };
 		5E0A335D5FF8885586260FAB /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99940443AEBC1F94C00E15D2 /* StreakEngine.swift */; };
+		617E6838EBE8B27619FA5225 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */; };
 		68EF45C14F3CEC72F7042540 /* PlayerProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */; };
 		699CBEF5F63C97810EC87BF4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
 		6B62D39E700D7780A2D24F90 /* AdGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D611CA0D8CDFFDC0D1E80D /* AdGate.swift */; };
@@ -42,12 +50,15 @@
 		7134B8F63F8B167F415D50C5 /* AdsService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 307B6C22876E273992182CE6 /* AdsService.swift */; };
 		72563F46E520B7D22ECEAB04 /* WordTilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19C4668A7EFD195748409A0 /* WordTilesView.swift */; };
 		77DC9100629457266EDDA0DB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1AAA9FCAE4CF29BBA16A8 /* SettingsView.swift */; };
+		802F6E198FE55EE761BBF216 /* Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045A383C28CF63B7AA1690E5 /* Economy.swift */; };
 		812CC68498F635B4E42F0D32 /* FeatureUnlockPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */; };
 		86050D07DBF30E19DA387BC3 /* LevelMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025558730A17C81DFFB5A5C3 /* LevelMapView.swift */; };
 		867CAC1CAA12369D5294EA65 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2209A1734F0A48837A37BC23 /* RootView.swift */; };
+		8B908579FF1372C98EF7FB86 /* PlantCollectible.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C771AB1111BA1267E678AF /* PlantCollectible.swift */; };
 		8BA0C0274738EDD5F16D3E9E /* Haptics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C551225618EF3D1793A9C2D /* Haptics.swift */; };
 		8CDA4D0BA93F589962585DB8 /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6305635D642316CCE8610F /* GameRecord.swift */; };
 		8D0713077E5F0FB67B6E3389 /* PlantCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9112EA0C7C78CD5C0BBDF205 /* PlantCard.swift */; };
+		8D183901C6FE706E07BB9C19 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */; };
 		8EE94A601E0EFA010CB76EE6 /* Badges.json in Resources */ = {isa = PBXBuildFile; fileRef = DE3B9B93CE1A034E8C165CB7 /* Badges.json */; };
 		94D8860C3740EB26ADB252F0 /* ToolEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D9F7603039699D755A5EDB /* ToolEngineTests.swift */; };
 		9603333091B94F1CE68C0A45 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9075581718316A5EDE6C92FD /* GameViewModel.swift */; };
@@ -57,6 +68,7 @@
 		9A467E6C2C922C05007E28B8 /* WordFloraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A467E6B2C922C05007E28B8 /* WordFloraApp.swift */; };
 		9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E6F2C922C06007E28B8 /* Assets.xcassets */; };
 		9A467E732C922C06007E28B8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E722C922C06007E28B8 /* Preview Assets.xcassets */; };
+		9B460760742D6A8755710F2F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
 		9B7A786AE42686E5A3545E3B /* TendingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 545F60B78CCEA135D7B2E627 /* TendingEngine.swift */; };
 		9C64E00429B6E0B94A88592A /* FlowerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0AF7DB096B1ADC301F75FE /* FlowerView.swift */; };
 		9CD2F602E0C7313FD3967ACE /* WordProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B62098E04C3095B889397EC /* WordProvider.swift */; };
@@ -72,9 +84,12 @@
 		C2FB34C4102FCBD97EADB91E /* CopySafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21DF9A95AEA44F66C376C83 /* CopySafety.swift */; };
 		C56399AF5A9FB677D166E85A /* WordEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1953888CF19BF643304ED9AC /* WordEntry.swift */; };
 		CAF520953ACDC90D8798366B /* ButterflyAndBadgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB4718BD77C51EDD77A1A10A /* ButterflyAndBadgeTests.swift */; };
+		CDFE68830861208BA674F799 /* PlayerProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */; };
 		CEE0A8C8A89FF4365D45F346 /* PlantCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9331FDFC4EAE840666B50749 /* PlantCatalog.swift */; };
+		CF06501B6BB571201B5FD908 /* GardenWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9B200507C4629386A0C486C /* GardenWidget.swift */; };
 		CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */; };
 		D107E764254121AC6777295F /* WordFloraUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */; };
+		D3A2B4BA77495A79674750BD /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6305635D642316CCE8610F /* GameRecord.swift */; };
 		D61844C609FE7631DFFBF7CF /* Plants.json in Resources */ = {isa = PBXBuildFile; fileRef = 437318BFC10E7CDE04AF1603 /* Plants.json */; };
 		D6E3215F0B7EB9ED5C2DD218 /* WordDifficulty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909E3EE9D33E5BC4BBD0BBE2 /* WordDifficulty.swift */; };
 		D889FB2265DAEACB57CD87E9 /* StoreKitConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 50C9D359377B349CAE2D2189 /* StoreKitConfigTests.swift */; };
@@ -83,9 +98,11 @@
 		DAF56180207E14B1B5DB828C /* StoreMigrator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 717814646BD471A214A01C4B /* StoreMigrator.swift */; };
 		DD628744087E1FD65B092F00 /* WordFlora.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 437A27B2E9B24CF220BF4444 /* WordFlora.storekit */; };
 		E7EE45CC3E1C7571FF926CB0 /* DailyBloom.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */; };
+		EF9467241BBA43B535D516F9 /* WidgetActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF5CF61BBF7BC272D7B55BB /* WidgetActions.swift */; };
 		F1EC73BEF7CC700E3392A9D0 /* Paywall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235887FB6ABDC2ED7F728A3C /* Paywall.swift */; };
 		F71D413F98EA5AE19AADA1C0 /* Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045A383C28CF63B7AA1690E5 /* Economy.swift */; };
 		F935EF5C075DD18A90D60D6E /* OnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB68790025C9135B9C9E7DA /* OnboardingFlow.swift */; };
+		F99A70A6E0D4D6CBCB8204F2 /* TendingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 545F60B78CCEA135D7B2E627 /* TendingEngine.swift */; };
 		FDE23E6797130C5C56A65DA1 /* StorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6B054B52FF203A9392E361 /* StorageTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -104,7 +121,28 @@
 			remoteGlobalIDString = 9A467E672C922C05007E28B8;
 			remoteInfo = WordFlora;
 		};
+		72ACBD6CBCA9D761904BCDCE /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9A467E602C922C05007E28B8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C6CA644852E26A439045962F;
+			remoteInfo = WordFloraWidget;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		2DDA59AFCA2346E49496338B /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				1A0DEDAC7F9EC16779453E20 /* WordFloraWidget.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		025558730A17C81DFFB5A5C3 /* LevelMapView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LevelMapView.swift; sourceTree = "<group>"; };
@@ -127,6 +165,7 @@
 		307B6C22876E273992182CE6 /* AdsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AdsService.swift; sourceTree = "<group>"; };
 		33F34A41B64213EA36BFAD0A /* WordFlora.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = WordFlora.entitlements; sourceTree = "<group>"; };
 		354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ToolEngine.swift; sourceTree = "<group>"; };
+		36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedDefaults.swift; sourceTree = "<group>"; };
 		395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordFloraUITests.swift; sourceTree = "<group>"; };
 		3B62098E04C3095B889397EC /* WordProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordProvider.swift; sourceTree = "<group>"; };
 		3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRouter.swift; sourceTree = "<group>"; };
@@ -152,6 +191,7 @@
 		717814646BD471A214A01C4B /* StoreMigrator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StoreMigrator.swift; sourceTree = "<group>"; };
 		71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModelTests.swift; sourceTree = "<group>"; };
 		7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCatalogTests.swift; sourceTree = "<group>"; };
+		7FF5CF61BBF7BC272D7B55BB /* WidgetActions.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetActions.swift; sourceTree = "<group>"; };
 		801243E3923ADEAD47B705CE /* AppSettings.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
 		817BDFFB914DD9808C9046EE /* FlowerRainView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FlowerRainView.swift; sourceTree = "<group>"; };
 		9075581718316A5EDE6C92FD /* GameViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
@@ -161,6 +201,7 @@
 		93D0D46981E2EFDF577D4AE4 /* PaywallRulesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PaywallRulesTests.swift; sourceTree = "<group>"; };
 		9888DEE09FE8404AD2E6B806 /* SharedContainer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedContainer.swift; sourceTree = "<group>"; };
 		99940443AEBC1F94C00E15D2 /* StreakEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreakEngine.swift; sourceTree = "<group>"; };
+		99F163FA4DA73F8563DD08F0 /* WordFloraWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = WordFloraWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A467E682C922C05007E28B8 /* WordFlora.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WordFlora.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		9A467E6B2C922C05007E28B8 /* WordFloraApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App/WordFloraApp.swift; sourceTree = "<group>"; };
 		9A467E6F2C922C06007E28B8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -171,13 +212,16 @@
 		A064112F63D975A2963D7B00 /* GameView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		A1C1AAA9FCAE4CF29BBA16A8 /* SettingsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A21DF9A95AEA44F66C376C83 /* CopySafety.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CopySafety.swift; sourceTree = "<group>"; };
+		A2BDF97F749985947F3401F0 /* WordFloraWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = WordFloraWidget.entitlements; sourceTree = "<group>"; };
 		A52DDAFDFAE9419F12ADE568 /* WordFloraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		B1A188B4F331705EAF0FD7F2 /* ProgressionPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProgressionPolicy.swift; sourceTree = "<group>"; };
 		B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerProfile.swift; sourceTree = "<group>"; };
 		B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SplitMix64.swift; sourceTree = "<group>"; };
+		B5A871D657C5B861E3C18DD0 /* WidgetActionsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetActionsTests.swift; sourceTree = "<group>"; };
 		BB4718BD77C51EDD77A1A10A /* ButterflyAndBadgeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyAndBadgeTests.swift; sourceTree = "<group>"; };
 		BC3E4954AD70EC6DCF36AF7C /* GardenAITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenAITests.swift; sourceTree = "<group>"; };
 		BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyBloom.swift; sourceTree = "<group>"; };
+		C00FA8B6C6AAB943BB16239C /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C19C4668A7EFD195748409A0 /* WordTilesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordTilesView.swift; sourceTree = "<group>"; };
 		C73101B54140F34289C21BFD /* KeyboardView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = KeyboardView.swift; sourceTree = "<group>"; };
 		CA11973C4913D16F50F3654D /* GardenAI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenAI.swift; sourceTree = "<group>"; };
@@ -187,10 +231,12 @@
 		DE3B9B93CE1A034E8C165CB7 /* Badges.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Badges.json; sourceTree = "<group>"; };
 		E6170EEBB1FE8D65905545EE /* HelpLadder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HelpLadder.swift; sourceTree = "<group>"; };
 		E6D611CA0D8CDFFDC0D1E80D /* AdGate.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AdGate.swift; sourceTree = "<group>"; };
+		E96DC5D77A1287D3DF73CD43 /* WordFloraWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordFloraWidgetBundle.swift; sourceTree = "<group>"; };
 		ED57CCECFEDB2A2033A60F12 /* GardenView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenView.swift; sourceTree = "<group>"; };
 		EE6B054B52FF203A9392E361 /* StorageTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StorageTests.swift; sourceTree = "<group>"; };
 		F53AF4373CF0983348711216 /* Badges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
 		F887962950E79A156ED26A3F /* ButterflyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyView.swift; sourceTree = "<group>"; };
+		F9B200507C4629386A0C486C /* GardenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidget.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -199,6 +245,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				699CBEF5F63C97810EC87BF4 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		0EABFFCE204E37B29C129091 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9B460760742D6A8755710F2F /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,6 +281,18 @@
 				153A01FF2679CA86ABE5DFBE /* Foundation.framework */,
 			);
 			name = iOS;
+			sourceTree = "<group>";
+		};
+		05261808C46E81C6BB9F10F5 /* WordFloraWidget */ = {
+			isa = PBXGroup;
+			children = (
+				E96DC5D77A1287D3DF73CD43 /* WordFloraWidgetBundle.swift */,
+				F9B200507C4629386A0C486C /* GardenWidget.swift */,
+				C00FA8B6C6AAB943BB16239C /* Info.plist */,
+				A2BDF97F749985947F3401F0 /* WordFloraWidget.entitlements */,
+			);
+			name = WordFloraWidget;
+			path = WordFloraWidget;
 			sourceTree = "<group>";
 		};
 		0566861B1A43EDA120F46097 /* Rules */ = {
@@ -336,6 +402,7 @@
 				93D0D46981E2EFDF577D4AE4 /* PaywallRulesTests.swift */,
 				50C9D359377B349CAE2D2189 /* StoreKitConfigTests.swift */,
 				1D7290C3761A8148AC6E5A94 /* ButterflyGameModelTests.swift */,
+				B5A871D657C5B861E3C18DD0 /* WidgetActionsTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -361,6 +428,7 @@
 				52200CB2DFCDDA761EAF9AE0 /* Ads.xcconfig */,
 				EBAECBCEA5F2B91D55A725B8 /* WordFloraUITests */,
 				437A27B2E9B24CF220BF4444 /* WordFlora.storekit */,
+				05261808C46E81C6BB9F10F5 /* WordFloraWidget */,
 			);
 			sourceTree = "<group>";
 		};
@@ -370,6 +438,7 @@
 				9A467E682C922C05007E28B8 /* WordFlora.app */,
 				6406AFD4A968B89AEFEE8100 /* WordFloraTests.xctest */,
 				A52DDAFDFAE9419F12ADE568 /* WordFloraUITests.xctest */,
+				99F163FA4DA73F8563DD08F0 /* WordFloraWidget.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -394,6 +463,7 @@
 				7C8C4C1EA579A0F4D8DB0F37 /* Components */,
 				A841EEEF90C43CD8DE8C83AB /* Views */,
 				200F8C46C9630D7B831DEE92 /* Ads */,
+				AE2937F166A551D693B560B2 /* Shared */,
 			);
 			path = WordFlora;
 			sourceTree = "<group>";
@@ -449,6 +519,16 @@
 			);
 			name = Services;
 			path = Services;
+			sourceTree = "<group>";
+		};
+		AE2937F166A551D693B560B2 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				7FF5CF61BBF7BC272D7B55BB /* WidgetActions.swift */,
+				36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */,
+			);
+			name = Shared;
+			path = Shared;
 			sourceTree = "<group>";
 		};
 		EBAECBCEA5F2B91D55A725B8 /* WordFloraUITests */ = {
@@ -523,10 +603,12 @@
 				9A467E642C922C05007E28B8 /* Sources */,
 				9A467E652C922C05007E28B8 /* Frameworks */,
 				9A467E662C922C05007E28B8 /* Resources */,
+				2DDA59AFCA2346E49496338B /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				21BB69ABEDD49D7680A04E4A /* PBXTargetDependency */,
 			);
 			name = WordFlora;
 			packageProductDependencies = (
@@ -535,6 +617,23 @@
 			productName = WordFlora;
 			productReference = 9A467E682C922C05007E28B8 /* WordFlora.app */;
 			productType = "com.apple.product-type.application";
+		};
+		C6CA644852E26A439045962F /* WordFloraWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BC23A36AE7BA0613B016EB14 /* Build configuration list for PBXNativeTarget "WordFloraWidget" */;
+			buildPhases = (
+				9072130640F59D37C5B4154D /* Sources */,
+				0EABFFCE204E37B29C129091 /* Frameworks */,
+				9F641CAF18CE5DC5F7BAFB9B /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = WordFloraWidget;
+			productName = WordFloraWidget;
+			productReference = 99F163FA4DA73F8563DD08F0 /* WordFloraWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -570,6 +669,7 @@
 				9A467E672C922C05007E28B8 /* WordFlora */,
 				9686800B799FA1558C3162A6 /* WordFloraTests */,
 				7C5EF5A91EADA424F000C750 /* WordFloraUITests */,
+				C6CA644852E26A439045962F /* WordFloraWidget */,
 			);
 		};
 /* End PBXProject section */
@@ -602,6 +702,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		9F641CAF18CE5DC5F7BAFB9B /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				3E4D8C4B5FD7B1BA5171F2A2 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -631,6 +739,25 @@
 				ACC9581C7D1D2D18374CEEFE /* PaywallRulesTests.swift in Sources */,
 				D889FB2265DAEACB57CD87E9 /* StoreKitConfigTests.swift in Sources */,
 				DAE60FB4D61EEACE65965736 /* ButterflyGameModelTests.swift in Sources */,
+				2152B2B444259D51618BC231 /* WidgetActionsTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9072130640F59D37C5B4154D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				5AC90C63AFA3930519F129FF /* WordFloraWidgetBundle.swift in Sources */,
+				CF06501B6BB571201B5FD908 /* GardenWidget.swift in Sources */,
+				CDFE68830861208BA674F799 /* PlayerProfile.swift in Sources */,
+				8B908579FF1372C98EF7FB86 /* PlantCollectible.swift in Sources */,
+				D3A2B4BA77495A79674750BD /* GameRecord.swift in Sources */,
+				802F6E198FE55EE761BBF216 /* Economy.swift in Sources */,
+				F99A70A6E0D4D6CBCB8204F2 /* TendingEngine.swift in Sources */,
+				4168EEC8F6585C8E1ED7ADC1 /* StoreMigrator.swift in Sources */,
+				3A604584883B42745568A096 /* SharedContainer.swift in Sources */,
+				EF9467241BBA43B535D516F9 /* WidgetActions.swift in Sources */,
+				8D183901C6FE706E07BB9C19 /* SharedDefaults.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -694,12 +821,20 @@
 				3B0ACB4FD72E0B1901B947AA /* BadgesView.swift in Sources */,
 				4B412E233E82E83F1C3BA7B8 /* ButterflyGameModel.swift in Sources */,
 				1CEC41D7155EFBA55139F8BF /* ButterflyView.swift in Sources */,
+				32B0BDF2B9904F58C4465D04 /* WidgetActions.swift in Sources */,
+				617E6838EBE8B27619FA5225 /* SharedDefaults.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		21BB69ABEDD49D7680A04E4A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = WordFloraWidget;
+			target = C6CA644852E26A439045962F /* WordFloraWidget */;
+			targetProxy = 72ACBD6CBCA9D761904BCDCE /* PBXContainerItemProxy */;
+		};
 		73C2F9632D04BE2E229CD1D1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = WordFlora;
@@ -715,6 +850,32 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		02FA98492F38B71F8CEA2BFF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = WordFloraWidget/WordFloraWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P9Z5QB8965;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WordFloraWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = beta.WordFlora.WordFloraWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		0AC453F5A9C031FA2212030D /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -933,6 +1094,33 @@
 			};
 			name = Release;
 		};
+		C0D3FABD32985B9D28BECFF3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = WordFloraWidget/WordFloraWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P9Z5QB8965;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WordFloraWidget/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = beta.WordFlora.WordFloraWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 		C852093E07A113EDA3BFBFA6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -990,6 +1178,15 @@
 			buildConfigurations = (
 				9A467E772C922C06007E28B8 /* Debug */,
 				9A467E782C922C06007E28B8 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BC23A36AE7BA0613B016EB14 /* Build configuration list for PBXNativeTarget "WordFloraWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C0D3FABD32985B9D28BECFF3 /* Release */,
+				02FA98492F38B71F8CEA2BFF /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

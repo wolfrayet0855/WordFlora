@@ -17,6 +17,17 @@
 	<string>$(ADMOB_REWARDED_ID)</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>This lets us show ads that are more relevant to you. You can still play fully if you say no.</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>beta.WordFlora</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>wordflora</string>
+			</array>
+		</dict>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
