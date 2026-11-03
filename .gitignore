@@ -1,0 +1,5 @@
+Config/Ads.local.xcconfig
+.superpowers/
+build/
+DerivedData/
+*.xcuserstate

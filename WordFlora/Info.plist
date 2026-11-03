@@ -6,10 +6,20 @@
 	<dict>
 		<key>UIColorName</key>
 		<string>LaunchScreenColor</string>
-		<key>UIImageName</key>
-		<string>wordGardenLaunchScreen</string>
-		<key>UILaunchScreen</key>
-		<dict/>
 	</dict>
+	<key>GADApplicationIdentifier</key>
+	<string>$(ADMOB_APP_ID)</string>
+	<key>AdMobBannerUnitID</key>
+	<string>$(ADMOB_BANNER_ID)</string>
+	<key>AdMobInterstitialUnitID</key>
+	<string>$(ADMOB_INTERSTITIAL_ID)</string>
+	<key>AdMobRewardedUnitID</key>
+	<string>$(ADMOB_REWARDED_ID)</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This lets us show ads that are more relevant to you. You can still play fully if you say no.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 </dict>
 </plist>
