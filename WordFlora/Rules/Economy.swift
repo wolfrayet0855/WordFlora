@@ -13,5 +13,21 @@ struct Economy: Codable, Equatable {
     var roseMilestones = [7, 30, 100]
     var maxPetals = 8
 
+    // Tending (spec section 16)
+    var waterGrowth = 4
+    var soilGrowth = 12
+    var sunGrowth = 2
+    var dailyAbsorbCap = 10
+    var soilBoostMultiplier = 1.5
+    var soilBoostDays = 3
+    var soilRichnessStep = 0.34
+    var thirstyHours = 48.0
+    var trickleHours = 4.0
+    var trickleCap = 5
+    var waterBankCap = 40
+    var stageThresholds = [0.06, 0.22, 0.50, 1.0]
+    var levelBaseCost = 180.0
+    var levelCostMultipliers = [1.0, 1.1, 1.2, 1.3, 1.4]
+
     static let `default` = Economy()
 }

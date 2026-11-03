@@ -18,6 +18,9 @@ final class PlantCollectible {
     var soilRichness: Double = 0.0
     var lastTendedAt: Date?
     var lastSunnyAt: Date?
+    var absorbedToday: Int = 0
+    var absorbDay: Date?
+    var soilBoostUntil: Date?
 
     init(name: String, botanicalName: String, botanicalFact: String,
          level: Int, imageName: String, plantId: String? = nil) {
