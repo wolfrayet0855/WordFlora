@@ -31,6 +31,7 @@ final class GameViewModel {
     private(set) var extraHint: String?
     private(set) var helpersUsed = 0
     private(set) var revealedAnswer: String?
+    private(set) var wrongStreak = 0
 
     // Round result
     private(set) var earnedPlantName: String?
@@ -76,7 +77,10 @@ final class GameViewModel {
         let lvl = min(level ?? currentLevel, currentLevel)
         let provider = WordProvider(bank: bank)
         let dailyId = DailyBloom(bank: bank, calendar: calendar).wordId(for: now())
-        guard let e = provider.next(level: lvl, seen: playerProfile?.seenIds ?? [], excluding: dailyId, using: &rng) else {
+        let seen = playerProfile?.seenIds ?? []
+        // Keep today's Daily Bloom word fresh for the daily round, but never leave a player without a word.
+        guard let e = provider.next(level: lvl, seen: seen, excluding: dailyId, using: &rng)
+                ?? provider.next(level: lvl, seen: seen, excluding: nil, using: &rng) else {
             phase = .idle; return
         }
         begin(e, daily: false)
@@ -101,6 +105,7 @@ final class GameViewModel {
         extraHint = nil
         helpersUsed = 0
         revealedAnswer = nil
+        wrongStreak = 0
         reviveUsedThisRound = false
         earnedPlantName = nil
         earnedPlantIsNew = false
@@ -122,9 +127,11 @@ final class GameViewModel {
         guessedLetters.insert(letter)
 
         if currentWord.contains(letter) {
+            wrongStreak = 0
             playSound("correct")
         } else {
             petalsRemaining -= 1
+            wrongStreak += 1
             playSound("incorrect")
         }
 
@@ -134,6 +141,19 @@ final class GameViewModel {
         } else if petalsRemaining == 0 {
             if canWakeUpNow { phase = .restingOffer } else { finalizeLoss() }
         }
+    }
+
+    /// True while the help ladder still has a rung to offer.
+    var canUseHelp: Bool {
+        guard phase == .playing, let e = currentEntry else { return false }
+        return HelpLadder.next(used: usedRungs, word: e.word, guessed: guessedLetters, hint2: e.hint2) != nil
+    }
+
+    enum KeyState: Equatable { case unused, correct, wrong }
+
+    func keyState(for letter: Character) -> KeyState {
+        guard guessedLetters.contains(letter) else { return .unused }
+        return currentWord.contains(letter) ? .correct : .wrong
     }
 
     private var canWakeUpNow: Bool { roseOfJerichoCount > 0 && !reviveUsedThisRound }

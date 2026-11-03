@@ -233,4 +233,45 @@ final class GameViewModelTests: XCTestCase {
         let rec = try container.mainContext.fetch(FetchDescriptor<GameRecord>()).first
         XCTAssertEqual(rec?.isDaily, true)
     }
+
+    // MARK: wrong streak (drives the Help pulse)
+    func testWrongStreakCountsConsecutiveMissesAndResetsOnAHit() throws {
+        let vm = try makeVM(); vm.start(entry: entry("a", "LOTUS"))
+        guess(vm, "ZX"); XCTAssertEqual(vm.wrongStreak, 2)
+        guess(vm, "L"); XCTAssertEqual(vm.wrongStreak, 0)
+        guess(vm, "Q"); XCTAssertEqual(vm.wrongStreak, 1)
+        vm.start(entry: entry("b", "SEED")); XCTAssertEqual(vm.wrongStreak, 0)
+    }
+
+    func testLettersStateForTheKeyboard() throws {
+        let vm = try makeVM(); vm.start(entry: entry("a", "LOTUS"))
+        guess(vm, "LZ")
+        XCTAssertEqual(vm.keyState(for: "L"), .correct)
+        XCTAssertEqual(vm.keyState(for: "Z"), .wrong)
+        XCTAssertEqual(vm.keyState(for: "A"), .unused)
+    }
+
+    func testCanUseHelpUntilTheLadderIsExhausted() throws {
+        let vm = try makeVM(); vm.start(entry: entry("a", "LOTUS", hint2: "clue"))
+        XCTAssertTrue(vm.canUseHelp)
+        vm.useHelp(); vm.useHelp(); vm.useHelp()
+        XCTAssertFalse(vm.canUseHelp)
+        vm.start(entry: entry("b", "SEED")); guess(vm, "ZXQJKVWY")
+        XCTAssertFalse(vm.canUseHelp)      // round over
+    }
+
+    func testRegularRoundStillStartsWhenTheOnlyWordIsTodaysDaily() throws {
+        let vm = try makeVM([entry("only", "LOTUS")])
+        vm.startRound()
+        XCTAssertEqual(vm.phase, .playing)
+        XCTAssertEqual(vm.currentEntry?.id, "only")
+    }
+
+    func testRegularRoundAvoidsTodaysDailyWhenThereIsAChoice() throws {
+        let words = [entry("a", "LOTUS"), entry("b", "SEED"), entry("c", "LEAF")]
+        let vm = try makeVM(words)
+        let daily = DailyBloom(bank: bank(words), calendar: cal).wordId(for: now)
+        for _ in 0..<20 { vm.startRound(); XCTAssertNotEqual(vm.currentEntry?.id, daily) }
+    }
 }
+

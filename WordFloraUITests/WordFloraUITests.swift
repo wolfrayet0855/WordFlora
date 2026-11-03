@@ -1,0 +1,72 @@
+import XCTest
+
+final class WordFloraUITests: XCTestCase {
+    var app: XCUIApplication!
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        app = XCUIApplication()
+    }
+
+    private func launch(word: String? = nil) {
+        app.launchArguments = ["-uitest", "-uitest-onboarded"] + (word.map { ["-uitest-word=\($0)"] } ?? [])
+        app.launch()
+    }
+
+    private func shot(_ name: String) {
+        let data = XCUIScreen.main.screenshot().pngRepresentation
+        if let dir = ProcessInfo.processInfo.environment["SCREENSHOT_DIR"] {
+            try? data.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+        }
+        let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
+    }
+
+    private func tapLetters(_ letters: String) {
+        for ch in letters { app.buttons[String(ch)].tap() }
+    }
+
+    func testHomeShowsPlayAndGarden() {
+        launch()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Garden"].exists)
+        shot("home")
+    }
+
+    func testSolvingAWordShowsANewPlant() {
+        launch(word: "LOTUS")
+        app.buttons["Play"].tap()
+        XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
+        shot("game-start")
+        tapLetters("ZX")
+        shot("game-two-wrong")
+        tapLetters("LOTUS")
+        XCTAssertTrue(app.staticTexts["New plant found!"].waitForExistence(timeout: 6))
+        shot("plant-earned")
+        app.buttons["Continue"].tap()
+    }
+
+    func testWrongGuessesEndWithARestingReveal() {
+        launch(word: "LOTUS")
+        app.buttons["Play"].tap()
+        XCTAssertTrue(app.buttons["Z"].waitForExistence(timeout: 5))
+        tapLetters("ZXQJKVWY")
+        XCTAssertTrue(app.staticTexts["This one's resting."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Here's the word:"].exists)
+        shot("resting")
+    }
+
+    func testHelpRevealsASecondClue() {
+        launch(word: "LOTUS")
+        app.buttons["Play"].tap()
+        XCTAssertTrue(app.buttons["Help"].waitForExistence(timeout: 5))
+        app.buttons["Help"].tap()
+        XCTAssertTrue(app.staticTexts["Second clue"].waitForExistence(timeout: 3))
+    }
+
+    func testGardenOpensFromHome() {
+        launch()
+        app.buttons["Garden"].tap()
+        XCTAssertTrue(app.staticTexts["Level 1 · Seedling"].waitForExistence(timeout: 5))
+        shot("garden")
+    }
+}
