@@ -131,5 +131,17 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["You have WordFlora Plus"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Subscribe"].exists)
     }
+
+    func testShedAndBadgesOpenWhenEverythingIsShown() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything"]
+        app.launch()
+        app.buttons["Shed"].tap()
+        XCTAssertTrue(app.staticTexts["Watering can"].waitForExistence(timeout: 5))
+        shot("shed")
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Badges"].tap()
+        XCTAssertTrue(app.staticTexts["Green Thumb"].waitForExistence(timeout: 5))
+        shot("badges")
+    }
 }
 

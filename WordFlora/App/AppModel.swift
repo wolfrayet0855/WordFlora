@@ -16,6 +16,7 @@ final class AppModel {
     private var lastPeakAt: Date?
     /// Master switch used by UI tests; real launches always have ads available (subject to every rule in AdGate).
     var adsEnabled = true
+    private var lastBadgedRoundId: String?
     private let now: () -> Date
 
     var context: ModelContext { container.mainContext }
@@ -53,6 +54,7 @@ final class AppModel {
         var s = UnlockStats()
         s.plantsEarned = plants().filter { $0.earnedCount > 0 }.count
         s.gardenDays = p?.gardenDays ?? 0
+        s.badgesEarned = badges.unlocked.count
         s.wordLevelUps = max(0, (p?.currentLevel ?? 1) - 1)
         s.sawTwoPetalsLeft = (p?.roseSeedProgress ?? 0) > 0 || (p?.roseOfJerichoCount ?? 0) > 0 || game.petalsRemaining <= 2
         return s
@@ -213,5 +215,68 @@ final class AppModel {
         let earned = await ads.showRewarded()
         if earned { grantRewardedDrops() }
         return earned
+    }
+
+    // MARK: Shed and badges
+
+    private func plantProgress() -> [PlantProgress] {
+        plants().map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) }
+    }
+
+    /// Tools arrive through play and are never taken away: the net with the butterfly game, then the
+    /// mister, shears and lamp as garden levels are completed (prototype round 8).
+    func syncToolUnlocks() {
+        var inv = inventory
+        let before = inv
+        let progress = plantProgress()
+        if settings.showEverything { ToolID.allCases.forEach { inv.unlock($0) } }
+        if isUnlocked(.butterfly) { inv.unlock(.net) }
+        let completed = (1...5).filter { ProgressionPolicy.gardenLevelComplete($0, plants: progress) }.count
+        FeatureUnlockPolicy.gardenTools(completedGardenLevels: completed).forEach { inv.unlock($0) }
+        if inv != before { inventory = inv }
+    }
+
+    @discardableResult
+    func upgradeTool(_ tool: ToolID) -> Bool {
+        guard let p = profile else { return false }
+        var inv = inventory
+        var points = p.shedPoints
+        guard inv.upgrade(tool, shedPoints: &points) else { return false }
+        p.shedPoints = points
+        inventory = inv
+        return true
+    }
+
+    /// Records badge progress for the round that just ended, once. Returns any newly unlocked tiers.
+    @discardableResult
+    func roundFinished() -> [BadgeUnlock] {
+        guard let p = profile, let id = game.finishedRoundId, id != lastBadgedRoundId,
+              game.phase == .won || game.phase == .rested else { return [] }
+        lastBadgedRoundId = id
+        let t = now(), quiet = settings.quietGarden
+        var unlocks = [BadgeUnlock]()
+        if game.phase == .won && !game.isTutorial {
+            let all = plants()
+            unlocks += badges.record(.plantsOwned, value: all.filter { $0.earnedCount > 0 }.count, now: t, quiet: quiet)
+            let levelsDone = (1...5).filter { lvl in let inLvl = all.filter { $0.level == lvl }; return inLvl.count == 10 && inLvl.allSatisfy { $0.earnedCount > 0 } }.count
+            unlocks += badges.record(.levelSets, value: levelsDone, now: t, quiet: quiet)
+            if game.missesThisRound == 0 { unlocks += badges.record(.perfectBlooms, now: t, quiet: quiet) }
+            if game.isDaily { unlocks += badges.record(.dailyBloomsDone, now: t, quiet: quiet) }
+        }
+        unlocks += badges.record(.streak, value: p.streak, now: t, quiet: quiet)
+        p.badgesJSON = badges.json
+        try? context.save()
+        syncToolUnlocks()
+        return unlocks
+    }
+
+    /// Uses a Rose of Jericho and records the badge when the flower wakes up.
+    func wakeFlower() {
+        let before = profile?.roseOfJerichoCount ?? 0
+        game.wakeUp()
+        guard (profile?.roseOfJerichoCount ?? 0) < before else { return }
+        badges.record(.revives, now: now(), quiet: settings.quietGarden)
+        profile?.badgesJSON = badges.json
+        try? context.save()
     }
 }

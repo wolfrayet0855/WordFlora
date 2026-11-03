@@ -166,7 +166,7 @@ final class ButterflyAndBadgeTests: XCTestCase {
         _ = b.record(.feeds, amount: 60, now: at(8))
         let m = a.merged(with: b)
         XCTAssertEqual(m.progress(of: .feeds), 60)
-        XCTAssertEqual(m.unlockedDate(badge: "good_feeder", tier: 1), at(8))   // earliest wins
+        XCTAssertEqual(m.unlockedDate(badge: "feeder", tier: 1), at(8))   // earliest wins
     }
 
     func testQuietGardenAdvancesNoBadgeProgress() throws {
@@ -174,4 +174,24 @@ final class ButterflyAndBadgeTests: XCTestCase {
         XCTAssertEqual(s.record(.waterings, amount: 500, now: at(9), quiet: true), [])
         XCTAssertEqual(s.progress(of: .waterings), 0)
     }
+
+    // MARK: shipped art and copy
+    func testEveryBadgeHasTitleBlurbAndArtForAllThreeTiers() throws {
+        for d in try BadgeCatalog.load() {
+            XCTAssertFalse((d.title ?? "").isEmpty, d.id); XCTAssertFalse((d.blurb ?? "").isEmpty, d.id)
+            XCTAssertEqual(CopySafety.check(d.title ?? ""), [], d.id); XCTAssertEqual(CopySafety.check(d.blurb ?? ""), [], d.id)
+            for tier in 1...3 { XCTAssertNotNil(UIImage(named: "badge_\(d.id)_t\(tier)"), "missing art badge_\(d.id)_t\(tier)") }
+        }
+    }
+
+    func testEveryToolHasArtForAllThreeTiers() {
+        for tool in ToolID.allCases { for tier in 1...3 { XCTAssertNotNil(UIImage(named: "tool_\(tool.rawValue)_t\(tier)"), "\(tool) t\(tier)") } }
+    }
+
+    func testEveryVisitorHasIdleAndStickerArt() {
+        for v in VisitorCatalog.all {
+            XCTAssertNotNil(UIImage(named: "visitor_\(v.id)_idle"), v.id); XCTAssertNotNil(UIImage(named: "visitor_\(v.id)_sticker"), v.id)
+        }
+    }
 }
+

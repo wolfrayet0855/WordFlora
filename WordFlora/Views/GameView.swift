@@ -13,6 +13,7 @@ struct GameView: View {
     @State private var showEarned = false
     @State private var showRain = false
     @State private var showRestCard = false
+    @State private var badgeToast: String?
     @State private var speaker = AVSpeechSynthesizer()
 
     private var vm: GameViewModel { app.game }
@@ -55,6 +56,7 @@ struct GameView: View {
             else if daily { vm.startDaily() } else { vm.startRound(level: level) }
         }
         .onChange(of: vm.phase) { _, phase in
+            if phase == .won || phase == .rested { showBadges(app.roundFinished()) }
             if phase == .won {
                 showRain = !app.settings.calmMode
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { showEarned = true }
@@ -113,6 +115,7 @@ struct GameView: View {
         if vm.phase == .rested { restedCard }
         if showEarned { earnedCard }
         if showRestCard { restCard }
+        if let badgeToast { badgeBanner(badgeToast) }
     }
 
     private var restingOffer: some View {
@@ -121,7 +124,7 @@ struct GameView: View {
                 Image("rose_of_jericho").resizable().scaledToFit().frame(height: 80)
                 Text("This one's resting").font(Theme.font(.title2, weight: .bold))
                 Text("Your Rose of Jericho can wake it up with 4 petals.").font(Theme.font(.callout)).multilineTextAlignment(.center)
-                Button("Wake it up") { vm.wakeUp() }.buttonStyle(PrimaryButtonStyle())
+                Button("Wake it up") { app.wakeFlower() }.buttonStyle(PrimaryButtonStyle())
                 Button("Show me the word") { vm.declineWake() }.buttonStyle(SecondaryButtonStyle())
             }
         }
@@ -183,6 +186,28 @@ struct GameView: View {
                 .scrollBounceBehavior(.basedOnSize)
         }
         .transition(.opacity.combined(with: .scale(scale: 0.96)))
+    }
+
+    private func badgeBanner(_ text: String) -> some View {
+        VStack {
+            Label(text, systemImage: "rosette").font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                .padding(.horizontal, 16).padding(.vertical, 10).background(Color.appSurface, in: Capsule()).shadow(radius: 6, y: 2)
+                .transition(.move(edge: .top).combined(with: .opacity))
+            Spacer()
+        }.padding(.top, 8).allowsHitTesting(false)
+    }
+
+    /// One badge toast at a time, shown after the round's own celebration so it never stacks with it.
+    private func showBadges(_ unlocks: [BadgeUnlock]) {
+        guard let u = unlocks.max(by: { $0.tier < $1.tier }) else { return }
+        let defs = (try? BadgeCatalog.load()) ?? []
+        let title = defs.first { $0.id == u.badgeId }?.title ?? "Badge"
+        let tier = ["Bronze", "Silver", "Gold"][max(0, min(2, u.tier - 1))]
+        app.markPeakDismissed()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            withAnimation { badgeToast = "\(tier) \(title)" }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) { withAnimation { badgeToast = nil } }
+        }
     }
 
     // MARK: Actions

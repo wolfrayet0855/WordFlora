@@ -15,6 +15,8 @@ struct BadgeDef: Codable, Equatable {
     var family: String
     var counter: String
     var thresholds: [Int]
+    var title: String?
+    var blurb: String?
 }
 
 enum BadgeCatalog {

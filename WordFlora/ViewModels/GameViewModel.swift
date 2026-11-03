@@ -34,6 +34,8 @@ final class GameViewModel {
     private(set) var wrongStreak = 0
     private(set) var isTutorial = false
     private(set) var lastRoundWasLoss = false
+    private(set) var missesThisRound = 0
+    private(set) var finishedRoundId: String?
 
     // Round result
     private(set) var earnedPlantName: String?
@@ -114,6 +116,7 @@ final class GameViewModel {
         helpersUsed = 0
         revealedAnswer = nil
         wrongStreak = 0
+        missesThisRound = 0
         isTutorial = false
         reviveUsedThisRound = false
         earnedPlantName = nil
@@ -141,6 +144,7 @@ final class GameViewModel {
         } else {
             if !(isTutorial && petalsRemaining <= 1) { petalsRemaining -= 1 }   // tutorial floor: keep going!
             wrongStreak += 1
+            missesThisRound += 1
             playSound("incorrect")
         }
 
@@ -256,6 +260,7 @@ final class GameViewModel {
         let petals = petalsRemaining
         var plantName: String?
         lastRoundWasLoss = !won
+        finishedRoundId = roundId
 
         if won {
             let award = awardPlant(for: e)

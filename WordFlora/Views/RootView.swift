@@ -21,6 +21,8 @@ struct RootView: View {
                     case .garden: GardenView()
                     case .game(let daily, let level): GameView(daily: daily, level: level)
                     case .plant(let id): PlantDetailView(plantId: id)
+                    case .shed: ShedView()
+                    case .badges: BadgesView()
                     case .plus: PlusView()
                     case .settings: SettingsView()
                     case .levelMap: LevelMapView()

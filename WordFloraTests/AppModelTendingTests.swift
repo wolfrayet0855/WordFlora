@@ -154,5 +154,91 @@ final class AppModelTendingTests: XCTestCase {
         app.grantRewardedDrops()
         XCTAssertEqual(app.profile?.water, 40)
     }
+
+    // MARK: tools unlock and upgrade
+    func testNetArrivesWithTheButterflyUnlock() throws {
+        let app = try makeApp()
+        app.syncToolUnlocks()
+        XCTAssertEqual(app.inventory.tier(of: .net), 0)
+        app.profile?.currentLevel = 2                         // first word level-up unlocks the butterfly game
+        app.syncToolUnlocks()
+        XCTAssertEqual(app.inventory.tier(of: .net), 1)
+    }
+
+    func testGardenLevelsUnlockMisterShearsLamp() throws {
+        let app = try makeApp()
+        for plant in app.plants() where plant.level == 1 { plant.earnedCount = 1; plant.stage = 4 }
+        app.syncToolUnlocks()
+        XCTAssertEqual(app.inventory.tier(of: .mister), 1)
+        XCTAssertEqual(app.inventory.tier(of: .shears), 0)
+        for plant in app.plants() where plant.level == 2 { plant.earnedCount = 1; plant.stage = 4 }
+        app.syncToolUnlocks()
+        XCTAssertEqual(app.inventory.tier(of: .shears), 1)
+    }
+
+    func testSyncingUnlocksNeverTakesAToolAway() throws {
+        let app = try makeApp()
+        var inv = app.inventory; inv.unlock(.lamp); app.inventory = inv
+        app.syncToolUnlocks()
+        XCTAssertEqual(app.inventory.tier(of: .lamp), 1)
+    }
+
+    func testUpgradeSpendsShedPointsAndReportsWhyNot() throws {
+        let app = try makeApp(); app.profile?.shedPoints = 40
+        XCTAssertTrue(app.upgradeTool(.can))
+        XCTAssertEqual(app.profile?.shedPoints, 10); XCTAssertEqual(app.inventory.tier(of: .can), 2)
+        XCTAssertFalse(app.upgradeTool(.can))                    // tier 3 costs 120
+        XCTAssertFalse(app.upgradeTool(.net))                    // not owned
+        XCTAssertEqual(app.profile?.shedPoints, 10)
+    }
+
+    // MARK: badges after rounds
+    func testWinningUpdatesCollectionAndPerfectBloomBadges() throws {
+        let app = try makeApp()
+        let e = WordEntry(id: "x", word: "LOTUS", display: "Lotus", hint: "h", hint2: nil, fact: "f", level: 1, kind: .vocab, plantId: nil,
+                          tags: [], minAge: 6, dailyEligible: true, source: "t", license: "t", reviewedBy: "t")
+        app.game.start(entry: e)
+        for ch in "LOTUS" { app.game.guessInput = String(ch); app.game.submitGuess() }
+        let unlocks = app.roundFinished()
+        XCTAssertEqual(app.badges.progress(of: .plantsOwned), 1)
+        XCTAssertEqual(app.badges.progress(of: .perfectBlooms), 1)
+        XCTAssertTrue(unlocks.contains { $0.badgeId == "perfect_bloom" && $0.tier == 1 })
+        XCTAssertTrue(app.roundFinished().isEmpty)               // asking again never re-awards
+    }
+
+    func testARestingRoundDoesNotAwardWinBadges() throws {
+        let app = try makeApp()
+        let e = WordEntry(id: "x", word: "LOTUS", display: "Lotus", hint: "h", hint2: nil, fact: "f", level: 1, kind: .vocab, plantId: nil,
+                          tags: [], minAge: 6, dailyEligible: true, source: "t", license: "t", reviewedBy: "t")
+        app.game.start(entry: e)
+        for ch in "ZXQJKVWY" { app.game.guessInput = String(ch); app.game.submitGuess() }
+        _ = app.roundFinished()
+        XCTAssertEqual(app.badges.progress(of: .perfectBlooms), 0)
+        XCTAssertEqual(app.badges.progress(of: .plantsOwned), 0)
+    }
+
+    func testReviveRecordsItsBadge() throws {
+        let app = try makeApp(); app.profile?.roseOfJerichoCount = 1
+        let e = WordEntry(id: "x", word: "LOTUS", display: "Lotus", hint: "h", hint2: nil, fact: "f", level: 1, kind: .vocab, plantId: nil,
+                          tags: [], minAge: 6, dailyEligible: true, source: "t", license: "t", reviewedBy: "t")
+        app.game.start(entry: e)
+        for ch in "ZXQJKVWY" { app.game.guessInput = String(ch); app.game.submitGuess() }
+        app.wakeFlower()
+        XCTAssertEqual(app.game.phase, .playing)
+        XCTAssertEqual(app.badges.progress(of: .revives), 1)
+    }
+
+    func testStreakIsTrackedAsAHighWaterBadgeCounter() throws {
+        let app = try makeApp(); app.profile?.streak = 8
+        _ = app.roundFinished()
+        XCTAssertEqual(app.badges.progress(of: .streak), 0)       // no finished round yet, nothing recorded
+        let e = WordEntry(id: "x", word: "LOTUS", display: "Lotus", hint: "h", hint2: nil, fact: "f", level: 1, kind: .vocab, plantId: nil,
+                          tags: [], minAge: 6, dailyEligible: true, source: "t", license: "t", reviewedBy: "t")
+        app.game.start(entry: e)
+        for ch in "LOTUS" { app.game.guessInput = String(ch); app.game.submitGuess() }
+        app.profile?.streak = 8
+        _ = app.roundFinished()
+        XCTAssertEqual(app.badges.progress(of: .streak), 8)
+    }
 }
 
