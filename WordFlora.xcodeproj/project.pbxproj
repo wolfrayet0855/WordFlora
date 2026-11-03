@@ -90,12 +90,14 @@
 		9A467E6C2C922C05007E28B8 /* WordFloraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A467E6B2C922C05007E28B8 /* WordFloraApp.swift */; };
 		9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E6F2C922C06007E28B8 /* Assets.xcassets */; };
 		9A467E732C922C06007E28B8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E722C922C06007E28B8 /* Preview Assets.xcassets */; };
+		9AC2628E6C5C075B764C235A /* PlantVoiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BA36455C53FE74BB10637F1D /* PlantVoiceTests.swift */; };
 		9B460760742D6A8755710F2F /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
 		9B7A786AE42686E5A3545E3B /* TendingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 545F60B78CCEA135D7B2E627 /* TendingEngine.swift */; };
 		9BAC542CEEBB0C3D4878282D /* GardenIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34AFDFFEBD739E2F6A94842 /* GardenIntents.swift */; };
 		9C64E00429B6E0B94A88592A /* FlowerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E0AF7DB096B1ADC301F75FE /* FlowerView.swift */; };
 		9CD2F602E0C7313FD3967ACE /* WordProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B62098E04C3095B889397EC /* WordProvider.swift */; };
 		A098A91A27E224C0263F98F9 /* wf-wake.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A567F6286A4FDF9DA2E6D05B /* wf-wake.m4a */; };
+		A3860B5AF44F5DF4BC8E92A4 /* PlantVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2732222DBF50FDA29A7C62BE /* PlantVoice.swift */; };
 		AA4693D64441616078B1A314 /* GardenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED57CCECFEDB2A2033A60F12 /* GardenView.swift */; };
 		AA753988BC83E23E320FFC56 /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53AF4373CF0983348711216 /* Badges.swift */; };
 		AC0534FE4A3F995C8A301AB0 /* RulesBatch2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188352F473E5A34955BC4F03 /* RulesBatch2Tests.swift */; };
@@ -108,6 +110,7 @@
 		B0E129A407B3E68D0AC5BD33 /* ShedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2EA96D7DD8E3103D3D959B4A /* ShedView.swift */; };
 		B24D06A2299AB7B8A363531F /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9888DEE09FE8404AD2E6B806 /* SharedContainer.swift */; };
 		B42D0E3153A7414966317C6A /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801243E3923ADEAD47B705CE /* AppSettings.swift */; };
+		B5125DC1F13A03C81A450D4F /* GardenTips.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76256AC312EE57C1A3CD1F7D /* GardenTips.swift */; };
 		BA042FFFFC29EF40C286AF09 /* wf-wrong.m4a in Resources */ = {isa = PBXBuildFile; fileRef = FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */; };
 		BBD809AA53056AA81E77D918 /* GardenShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CFA5BED25190317B98E622 /* GardenShortcuts.swift */; };
 		BD2A8358AA71C44082C046C0 /* Sound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA2FA0C2D96FAD52648169E /* Sound.swift */; };
@@ -200,6 +203,7 @@
 		235887FB6ABDC2ED7F728A3C /* Paywall.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Paywall.swift; sourceTree = "<group>"; };
 		25BA2007B9E2490E80F9FDF0 /* OnboardingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		266B16D2FBF38C233CD39A05 /* DataReconciler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DataReconciler.swift; sourceTree = "<group>"; };
+		2732222DBF50FDA29A7C62BE /* PlantVoice.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantVoice.swift; sourceTree = "<group>"; };
 		273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FeatureUnlockPolicy.swift; sourceTree = "<group>"; };
 		2EA96D7DD8E3103D3D959B4A /* ShedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShedView.swift; sourceTree = "<group>"; };
 		2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoseMeter.swift; sourceTree = "<group>"; };
@@ -239,6 +243,7 @@
 		71331D82B79C4FF1610AFEA9 /* AIValidators.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AIValidators.swift; sourceTree = "<group>"; };
 		717814646BD471A214A01C4B /* StoreMigrator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StoreMigrator.swift; sourceTree = "<group>"; };
 		71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModelTests.swift; sourceTree = "<group>"; };
+		76256AC312EE57C1A3CD1F7D /* GardenTips.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenTips.swift; sourceTree = "<group>"; };
 		78262DDD42B5B0B95B53888A /* wf-sun.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-sun.m4a"; sourceTree = "<group>"; };
 		78762A5E58BEBD2ED663551F /* ReadAloud.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReadAloud.swift; sourceTree = "<group>"; };
 		7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCatalogTests.swift; sourceTree = "<group>"; };
@@ -281,6 +286,7 @@
 		B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerProfile.swift; sourceTree = "<group>"; };
 		B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SplitMix64.swift; sourceTree = "<group>"; };
 		B5A871D657C5B861E3C18DD0 /* WidgetActionsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetActionsTests.swift; sourceTree = "<group>"; };
+		BA36455C53FE74BB10637F1D /* PlantVoiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantVoiceTests.swift; sourceTree = "<group>"; };
 		BB4718BD77C51EDD77A1A10A /* ButterflyAndBadgeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyAndBadgeTests.swift; sourceTree = "<group>"; };
 		BC3E4954AD70EC6DCF36AF7C /* GardenAITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenAITests.swift; sourceTree = "<group>"; };
 		BC96D8FD408D4A3C5C97BD6A /* ShareTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareTests.swift; sourceTree = "<group>"; };
@@ -394,6 +400,7 @@
 				13457F8B016917B22CB55A1C /* Share.swift */,
 				8B9B774A2FBD3D010315D9DD /* BreakPolicy.swift */,
 				6E7E67B085EBE6FF23F4D631 /* WelcomeBack.swift */,
+				2732222DBF50FDA29A7C62BE /* PlantVoice.swift */,
 			);
 			name = Rules;
 			path = Rules;
@@ -480,6 +487,7 @@
 				C73101B54140F34289C21BFD /* KeyboardView.swift */,
 				9C551225618EF3D1793A9C2D /* Haptics.swift */,
 				5B58C1C833EE44A8A7BE2B94 /* ShareCard.swift */,
+				76256AC312EE57C1A3CD1F7D /* GardenTips.swift */,
 			);
 			name = Components;
 			path = Components;
@@ -511,6 +519,7 @@
 				1C993C4217CD453C7424D842 /* GardenIntentTests.swift */,
 				D4518C576DB5D58EC7724F97 /* ReadAloudTests.swift */,
 				C884E85DCD91B1E264D8D134 /* WelcomeBackTests.swift */,
+				BA36455C53FE74BB10637F1D /* PlantVoiceTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -905,6 +914,7 @@
 				B04BB4C45B4050CD4D7C3FA1 /* GardenIntentTests.swift in Sources */,
 				DA87831AB341BABA3053A681 /* ReadAloudTests.swift in Sources */,
 				29C834FF07AE008DC3D27B74 /* WelcomeBackTests.swift in Sources */,
+				9AC2628E6C5C075B764C235A /* PlantVoiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1000,6 +1010,8 @@
 				BBD809AA53056AA81E77D918 /* GardenShortcuts.swift in Sources */,
 				ADA50B2C6D75FE3F14514190 /* ReadAloud.swift in Sources */,
 				3BE600FC34C69EEF9EDACA75 /* WelcomeBack.swift in Sources */,
+				A3860B5AF44F5DF4BC8E92A4 /* PlantVoice.swift in Sources */,
+				B5125DC1F13A03C81A450D4F /* GardenTips.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
