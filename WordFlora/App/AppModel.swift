@@ -151,10 +151,13 @@ final class AppModel {
         try? context.save()
 
         let name = plant.nickname.isEmpty ? plant.name : plant.nickname
-        if result.stageUp { return TendOutcome(applied: true, stageUp: true, message: "\(name) grew a little!") }
+        let day = Int(date.timeIntervalSince1970 / 86_400) &+ plant.earnedCount
+        let event: PlantVoice.Event = { switch action { case .water: return .water; case .feed, .repot: return .soil; case .sun: return .sun; case .prune: return .prune } }()
+        if result.stageUp { return TendOutcome(applied: true, stageUp: true, message: "\(name) grew a little! " + PlantVoice.line(plantId: plant.plantId, event: .grew, daySeed: day)) }
         if repotOutcome == .happy { return TendOutcome(applied: true, message: "\(name) loves its new pot!") }
         if repotOutcome == .neutral { return TendOutcome(applied: true, message: "Repotted.") }
-        return TendOutcome(applied: true, message: quiet ? "Lovely." : "+\(result.gpGained) growth")
+        let voice = PlantVoice.line(plantId: plant.plantId, event: event, daySeed: day)
+        return TendOutcome(applied: true, message: quiet ? voice : "\(voice) +\(result.gpGained) growth")
     }
 
     /// The sun tap is free for everyone; owning the lamp only makes it stronger.

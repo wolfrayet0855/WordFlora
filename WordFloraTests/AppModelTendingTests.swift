@@ -72,7 +72,7 @@ final class AppModelTendingTests: XCTestCase {
     func testStageUpIsReportedGently() throws {
         let app = try makeApp(); let plant = try firstPlant(app); app.profile?.water = 3; plant.growthPoints = 8
         let r = app.tend(.water, plant: plant)
-        XCTAssertTrue(r.stageUp); XCTAssertEqual(r.message, "\(plant.name) grew a little!")
+        XCTAssertTrue(r.stageUp); XCTAssertTrue(r.message.hasPrefix("\(plant.name) grew a little!"))
     }
 
     func testFreeDropsTrickleInOnStartupAndOnDemand() throws {

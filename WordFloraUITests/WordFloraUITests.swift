@@ -113,7 +113,7 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5))
         shot("plant-detail")
         app.buttons["Water"].tap()
-        XCTAssertTrue(app.staticTexts["+4 growth"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "+4 growth")).firstMatch.waitForExistence(timeout: 3))
         app.buttons["Repot"].tap()
         XCTAssertTrue(app.staticTexts["Choose a soil"].waitForExistence(timeout: 3))
         shot("repot")
