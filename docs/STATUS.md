@@ -51,3 +51,5 @@ Device-only unverified: Siri phrases, Control Center control, speech voice/silen
 - **Life stats:** left-edge collapsible panel combining meters (a), stage path (c) and love hearts (b).
 - **Pots:** unlock triggers approved as mocked (sunflower L3, Starlight L5, rose pink 25 plants, mint 50 plants).
 - **Visibility:** every Home destination is shown; locked ones are dimmed with an unlock hint.
+
+- **Ruling (owner, same day, later):** petal loss, rain and the seed state apply at every age with the same 24 h rule. The researchers' under-13 72 h delay and default Gentle mode are NOT adopted. Safeguards that remain: nothing earned is ever removed, Quiet Garden and Calm mode turn it off, copy stays gentle and positive-only.
