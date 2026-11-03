@@ -12,6 +12,9 @@ final class AdsService {
     enum Unit: String { case banner = "AdMobBannerUnitID", interstitial = "AdMobInterstitialUnitID", rewarded = "AdMobRewardedUnitID" }
 
     private(set) var started = false
+    private var preparing = false
+    private var loadingInterstitial = false
+    private var loadingRewarded = false
     private(set) var canRequestAds = false
     private var interstitial: InterstitialAd?
     private var rewarded: RewardedAd?
@@ -22,17 +25,21 @@ final class AdsService {
     }
 
     /// Call only when `AdGate.mayLoadAnyAd` is true. Shows the consent form on first use, then starts the SDK.
-    func prepare(ageBand: AgeBand?) async {
-        guard !started else { return }
+    /// `isStillAllowed` is re-checked after every await, so a subscription or age change mid-setup stops everything.
+    func prepare(ageBand: AgeBand?, isStillAllowed: () -> Bool) async {
+        guard !started, !preparing, isStillAllowed() else { return }
+        preparing = true
+        defer { preparing = false }
         let config = MobileAds.shared.requestConfiguration
         config.maxAdContentRating = .general                                   // G for everyone
         config.ageRestrictedTreatment = ageBand == .thirteenPlus ? .teen : .unspecified
         await requestConsent()
-        if canRequestAds {
-            await requestTrackingIfNeeded()
-            MobileAds.shared.start(completionHandler: nil)
-            started = true
-        }
+        guard canRequestAds, isStillAllowed() else { return }
+        await requestTrackingIfNeeded()
+        guard isStillAllowed() else { return }
+        MobileAds.shared.start(completionHandler: nil)
+        started = true
+        Task { await preloadInterstitial(); await preloadRewarded() }
     }
 
     private func requestConsent() async {
@@ -62,15 +69,18 @@ final class AdsService {
     // MARK: Interstitial
 
     func preloadInterstitial() async {
-        guard started, interstitial == nil else { return }
+        guard started, interstitial == nil, !loadingInterstitial else { return }
+        loadingInterstitial = true
+        defer { loadingInterstitial = false }
         interstitial = try? await InterstitialAd.load(with: Self.unitID(.interstitial), request: Request())
     }
 
-    /// Returns true if an ad was shown and closed. A failed or missing ad never blocks play.
+    /// Returns true if an ad was shown and closed. Only an ad that is already loaded is shown: a missing or slow ad
+    /// never makes the player wait, it simply loads for next time.
     func showInterstitial() async -> Bool {
         guard started else { return false }
-        if interstitial == nil { await preloadInterstitial() }
-        guard let ad = interstitial, let vc = Self.rootViewController() else { return false }
+        guard let ad = interstitial else { Task { await preloadInterstitial() }; return false }
+        guard let vc = Self.rootViewController() else { return false }
         interstitial = nil
         let closed = await present { delegate in ad.fullScreenContentDelegate = delegate; ad.present(from: vc) }
         Task { await preloadInterstitial() }
@@ -80,7 +90,9 @@ final class AdsService {
     // MARK: Rewarded (player-initiated, optional)
 
     func preloadRewarded() async {
-        guard started, rewarded == nil else { return }
+        guard started, rewarded == nil, !loadingRewarded else { return }
+        loadingRewarded = true
+        defer { loadingRewarded = false }
         rewarded = try? await RewardedAd.load(with: Self.unitID(.rewarded), request: Request())
     }
 

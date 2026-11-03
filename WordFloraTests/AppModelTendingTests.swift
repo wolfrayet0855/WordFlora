@@ -54,10 +54,19 @@ final class AppModelTendingTests: XCTestCase {
         XCTAssertEqual(ToolInventory(json: app.profile?.toolsJSON ?? "").tier(of: .lamp), 1)
     }
 
-    func testQuietGardenSpendsAndEarnsNothing() throws {
+    /// Quiet Garden hides numbers and removes costs and cooldowns, but plants still grow at the normal daily pace, so the
+    /// garden track and the tools it unlocks are never blocked (spec section 18, P11 "never affects main progression").
+    func testQuietGardenSpendsNothingButPlantsStillGrow() throws {
         let app = try makeApp(quiet: true); let plant = try firstPlant(app); app.profile?.water = 0; app.profile?.soil = 0
         XCTAssertTrue(app.tend(.water, plant: plant).applied)
-        XCTAssertEqual(plant.growthPoints, 0)
+        XCTAssertEqual(plant.growthPoints, 4)
+        XCTAssertEqual(app.profile?.water, 0)
+    }
+
+    func testQuietGardenStillRespectsTheDailyGrowthCap() throws {
+        let app = try makeApp(quiet: true); let plant = try firstPlant(app)
+        for _ in 0..<10 { _ = app.tend(.water, plant: plant) }
+        XCTAssertEqual(plant.growthPoints, 10)
     }
 
     func testStageUpIsReportedGently() throws {
@@ -132,7 +141,7 @@ final class AppModelTendingTests: XCTestCase {
 
     // MARK: rewarded ads (optional, player-initiated)
     func testRewardedOfferRules() throws {
-        let app = try makeApp(); app.settings.ageBand = .eighteenPlus
+        let app = try makeApp(); app.settings.ageBand = .eighteenPlus; app.settings.completedSessions = 1
         XCTAssertTrue(app.canOfferRewarded)
         app.settings.ageBand = .under13; XCTAssertFalse(app.canOfferRewarded)
         app.settings.ageBand = .eighteenPlus
@@ -141,7 +150,7 @@ final class AppModelTendingTests: XCTestCase {
 
     func testRewardedGrantsTwoDropsThreeTimesADay() throws {
         var clock = Date(timeIntervalSince1970: 1_780_000_000)
-        let app = try makeApp(now: { clock }); app.settings.ageBand = .eighteenPlus; app.profile?.water = 0
+        let app = try makeApp(now: { clock }); app.settings.ageBand = .eighteenPlus; app.settings.completedSessions = 1; app.profile?.water = 0
         for _ in 0..<3 { XCTAssertTrue(app.canOfferRewarded); app.grantRewardedDrops() }
         XCTAssertEqual(app.profile?.water, 6)
         XCTAssertFalse(app.canOfferRewarded)
@@ -150,7 +159,7 @@ final class AppModelTendingTests: XCTestCase {
     }
 
     func testRewardedDropsRespectTheWaterBankCap() throws {
-        let app = try makeApp(); app.settings.ageBand = .eighteenPlus; app.profile?.water = 39
+        let app = try makeApp(); app.settings.ageBand = .eighteenPlus; app.settings.completedSessions = 1; app.profile?.water = 39
         app.grantRewardedDrops()
         XCTAssertEqual(app.profile?.water, 40)
     }
@@ -252,10 +261,13 @@ final class AppModelTendingTests: XCTestCase {
         for _ in 0..<300 { g.tick(0.1); for v in g.visitors { XCTAssertFalse(["firefly", "luna"].contains(v.speciesId)) } }
     }
 
-    func testEveningGamesSpawnOnlyNightSpecies() throws {
+    func testEveningGamesFeatureNightSpeciesAndStillAllowDayOnes() throws {
         let app = try makeApp(now: { self.localDate(hour: 19) })
         var g = app.startButterflyGame(seed: 1)
-        for _ in 0..<300 { g.tick(0.1); for v in g.visitors { XCTAssertTrue(["firefly", "luna"].contains(v.speciesId)) } }
+        var saw = Set<String>()
+        for _ in 0..<2000 { g.tick(0.05); g.visitors.forEach { saw.insert($0.speciesId) }; if g.isFinished { g = app.startButterflyGame(seed: UInt64(saw.count) + 7) } }
+        XCTAssertTrue(saw.contains("firefly") || saw.contains("luna"))
+        XCTAssertTrue(saw.contains { !["firefly", "luna"].contains($0) })
     }
 
     func testGlowLanternBringsNightVisitorsAtAnyHourAndIsUsedUp() throws {
@@ -371,6 +383,74 @@ final class AppModelTendingTests: XCTestCase {
         let app = try makeApp()
         app.updateSyncFlag()
         XCTAssertFalse(app.settings.cloudSyncEnabled); XCTAssertFalse(app.syncNeedsRestart)
+    }
+
+    // MARK: review fixes
+    func testRemindersKeepWorkingAfterARelaunch() throws {
+        let center = ReminderTests.FakeCenter()
+        let container = try SharedContainer.make(inMemory: true)
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "wf-relaunch-\(UUID().uuidString)")!)
+        settings.remindMe = true                                   // saved by an earlier launch
+        let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
+        let app = AppModel(container: container, settings: settings, bank: bank, notifications: center)
+        app.refreshReminders()
+        XCTAssertFalse(center.scheduled.isEmpty, "the plan must be rebuilt without asking for permission again")
+        XCTAssertEqual(center.asked, 0)
+    }
+
+    func testSyncFlagIsNotTouchedBeforeEntitlementsHaveLoaded() throws {
+        let app = try makeApp(launchedWithCloud: true)
+        app.settings.cloudSyncEnabled = true
+        app.entitlements.debugSetLoaded(false)
+        app.updateSyncFlag()
+        XCTAssertTrue(app.settings.cloudSyncEnabled)               // a slow StoreKit start must not switch sync off
+        XCTAssertFalse(app.syncNeedsRestart)
+    }
+
+    func testNoBannerUntilEntitlementsAreKnown() throws {
+        let app = try makeApp()
+        app.finishOnboarding(); app.settings.ageBand = .eighteenPlus; app.settings.completedSessions = 2
+        XCTAssertTrue(app.showBanner)
+        app.entitlements.debugSetLoaded(false)
+        XCTAssertFalse(app.showBanner)                             // subscribers must never see a banner flash at launch
+    }
+
+    func testRewardedAdsNeverOfferedInTheFirstSession() throws {
+        let app = try makeApp(); app.settings.ageBand = .eighteenPlus; app.settings.completedSessions = 0
+        XCTAssertFalse(app.canOfferRewarded)
+    }
+
+    func testDailyBloomCanOnlyBePlayedOncePerDay() throws {
+        var clock = Date(timeIntervalSince1970: 1_780_000_000)
+        let words = (0..<3).map { i in WordEntry(id: "d\(i)", word: ["SEED", "LEAF", "ROOT"][i], display: "x", hint: "h", hint2: nil, fact: "f", level: 1, kind: .vocab,
+                                              plantId: nil, tags: [], minAge: 6, dailyEligible: true, source: "t", license: "t", reviewedBy: "t") }
+        let container = try SharedContainer.make(inMemory: true)
+        let suite = UserDefaults(suiteName: "wf-daily-\(UUID().uuidString)")!
+        let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: words, daily: DailyConfig(epoch: "2026-01-01", seed: 3))
+        let app = AppModel(container: container, settings: AppSettings(defaults: suite), bank: bank, now: { clock }, notifications: ReminderTests.FakeCenter())
+        app.game.startDaily()
+        for ch in app.game.currentWord { app.game.guessInput = String(ch); app.game.submitGuess() }
+        XCTAssertEqual(app.game.phase, .won)
+        XCTAssertTrue(app.dailyBloomDoneToday)
+        let water = app.profile?.water
+        app.game.startDaily()
+        XCTAssertNotEqual(app.game.phase, .playing)                // already done today: no replay for bonus rewards
+        XCTAssertEqual(app.profile?.water, water)
+        clock = clock.addingTimeInterval(86_400 + 60)
+        XCTAssertFalse(app.dailyBloomDoneToday)
+        app.game.startDaily(); XCTAssertEqual(app.game.phase, .playing)
+    }
+
+    func testSittingClockStartsAndResetsForBreakSuggestions() throws {
+        var clock = Date(timeIntervalSince1970: 1_780_000_000)
+        let app = try makeApp(now: { clock }); app.settings.ageBand = .under13
+        app.beginSitting()
+        clock = clock.addingTimeInterval(21 * 60)
+        XCTAssertTrue(app.shouldSuggestBreak)
+        app.markBreakSuggested()
+        XCTAssertFalse(app.shouldSuggestBreak)
+        app.settings.ageBand = .eighteenPlus; clock = clock.addingTimeInterval(3_600)
+        XCTAssertFalse(app.shouldSuggestBreak)
     }
 }
 

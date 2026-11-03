@@ -34,6 +34,7 @@ enum AdGate {
         guard c.choice == .oneMore else { return false }                    // only after the player picks "One more"
         guard !c.midRound, !c.aroundDailyBloom, !c.lastRoundWasLoss else { return false }
         guard c.roundsSinceAd >= c.frequency else { return false }
+        guard c.completedSessions >= 1 else { return false }                              // never in the first session
         guard c.completedSessions >= 3 || c.wordLevelUps >= 1 else { return false }   // grace period
         if let last = c.lastAdAt, c.now.timeIntervalSince(last) < c.minGapSeconds { return false }
         guard c.adsToday < c.maxPerDay else { return false }

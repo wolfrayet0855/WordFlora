@@ -14,6 +14,8 @@ struct GameView: View {
     @State private var showRain = false
     @State private var showRestCard = false
     @State private var badgeToast: String?
+    @State private var showBreak = false
+    private let breakTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
     @State private var speaker = AVSpeechSynthesizer()
 
     private var vm: GameViewModel { app.game }
@@ -48,7 +50,11 @@ struct GameView: View {
         }
         .navigationBarBackButtonHidden(true)
         .modifier(GameHaptics(enabled: app.settings.hapticsOn, correctCount: correctCount, petals: vm.petalsRemaining, won: vm.phase == .won))
+        .onReceive(breakTimer) { _ in
+            if app.shouldSuggestBreak && vm.phase != .restingOffer { app.markBreakSuggested(); showBreak = true }
+        }
         .onAppear {
+            app.beginSitting()
             guard !started else { return }
             started = true
             vm.soundEnabled = app.settings.soundOn
@@ -115,6 +121,7 @@ struct GameView: View {
         if showEarned { earnedCard }
         if showRestCard { restCard }
         if let badgeToast { badgeBanner(badgeToast) }
+        if showBreak { breakCard }
     }
 
     private var restingOffer: some View {
@@ -146,7 +153,7 @@ struct GameView: View {
     private var earnedCard: some View {
         dimmed(rain: showRain) {
             VStack(spacing: 12) {
-                if vm.leveledUp { Label("Level up! New plants are waiting", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.accentText) }
+                if vm.leveledUp { Label("Level up! New plants to find", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.accentText) }
                 Text(vm.earnedPlantIsNew ? "New plant found!" : "Your garden grew").font(Theme.font(.title2, weight: .bold))
                 if let name = vm.earnedPlantName, let plant = app.plants().first(where: { $0.name == name }) {
                     PlantCard(plant: plant).frame(maxWidth: 220)
@@ -170,6 +177,18 @@ struct GameView: View {
             ShareLink(item: card, preview: SharePreview(PlantShare.caption(plantName: plant.name, nickname: plant.nickname), image: card)) {
                 Label("Share this plant", systemImage: "square.and.arrow.up")
             }.buttonStyle(SecondaryButtonStyle())
+        }
+    }
+
+    private var breakCard: some View {
+        dimmed {
+            VStack(spacing: 14) {
+                FlowerView(petals: 8, sway: false).frame(height: 100)
+                Text("Time for a little break").font(Theme.font(.title2, weight: .bold)).multilineTextAlignment(.center)
+                Text(BreakPolicy.message).font(Theme.font(.callout)).multilineTextAlignment(.center)
+                Button("Take a break") { showBreak = false; router.home() }.buttonStyle(PrimaryButtonStyle())
+                Button("Keep playing") { showBreak = false }.buttonStyle(SecondaryButtonStyle())
+            }
         }
     }
 

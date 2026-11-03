@@ -150,13 +150,13 @@ final class TendingEngineTests: XCTestCase {
     }
 
     // MARK: quiet garden
-    func testQuietGardenSpendsAndEarnsNothing() {
+    func testQuietGardenSpendsNothingButGrowsAtTheNormalCappedPace() {
         let p = plant(), pr = profile(water: 0, soil: 0)
         let r = TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true)
         XCTAssertTrue(r.applied)
-        XCTAssertEqual(pr.water, 0); XCTAssertEqual(p.growthPoints, 0)
+        XCTAssertEqual(pr.water, 0); XCTAssertEqual(p.growthPoints, 4)
         XCTAssertTrue(TendingEngine.addSoil(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).applied)
-        XCTAssertEqual(pr.soil, 0)
-        for _ in 0..<10 { XCTAssertTrue(TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).applied) }
+        XCTAssertEqual(pr.soil, 0); XCTAssertEqual(p.growthPoints, 10)                 // capped at the daily absorb limit
+        XCTAssertEqual(TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).reason, .fullForToday)
     }
 }

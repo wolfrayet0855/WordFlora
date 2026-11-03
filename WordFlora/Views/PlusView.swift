@@ -59,7 +59,7 @@ struct PlusView: View {
             let yearlyPrice = store.products[.yearly].map { ($0.price as NSDecimalNumber).doubleValue } ?? 0
             let monthlyPrice = store.products[.monthly].map { ($0.price as NSDecimalNumber).doubleValue } ?? 0
             VStack(spacing: 12) {
-                planCard(.yearly, extra: yearlyPrice > 0 ? "About \(String(format: "$%.2f", PaywallMath.perMonth(yearly: yearlyPrice))) a month · save \(PaywallMath.savingsPercent(yearly: yearlyPrice, monthly: monthlyPrice))%" : nil)
+                planCard(.yearly, extra: yearlyPrice > 0 ? "About \(perMonthText(store.products[.yearly], yearlyPrice)) a month · save \(PaywallMath.savingsPercent(yearly: yearlyPrice, monthly: monthlyPrice))%" : nil)
                 planCard(.monthly, extra: nil)
             }
             let price = store.products[selected]?.displayPrice ?? ""
@@ -69,6 +69,12 @@ struct PlusView: View {
             Text(copy.finePrint).font(Theme.font(.caption)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText)
             if let message { Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText).multilineTextAlignment(.center) }
         }
+    }
+
+    /// Formatted in the store's own currency, never a hard-coded "$".
+    private func perMonthText(_ product: Product?, _ yearly: Double) -> String {
+        let perMonth = Decimal(PaywallMath.perMonth(yearly: yearly))
+        return product?.priceFormatStyle.format(perMonth) ?? String(format: "%.2f", PaywallMath.perMonth(yearly: yearly))
     }
 
     private func planCard(_ plan: PlusPlan, extra: String?) -> some View {
@@ -123,16 +129,16 @@ struct PlusView: View {
             busy = false
             switch outcome {
             case .success: message = "Welcome to WordFlora Plus!"; app.updateSyncFlag()
-            case .pending: message = "Waiting for approval. We will turn Plus on as soon as it comes through."
+            case .pending: message = "Almost there. If Plus is not on in a moment, tap Restore purchases."
             case .cancelled: message = nil
-            case .failed: message = "That didn't go through. You have not been charged."
+            case .failed: message = "We couldn't confirm that purchase. If you see a charge, tap Restore purchases."
             }
         }
     }
 
     private func gateSheet(_ c: ParentalGate.Challenge) -> some View {
         VStack(spacing: 16) {
-            Text("Grown-ups only").font(Theme.font(.title2, weight: .bold))
+            Text("For grown-ups").font(Theme.font(.title2, weight: .bold))
             Text("Please ask a grown-up to answer this before continuing.").font(Theme.font(.callout)).multilineTextAlignment(.center)
             Text(c.question).font(Theme.font(.title, weight: .heavy))
             TextField("Answer", text: $gateAnswer).keyboardType(.numberPad).textFieldStyle(.roundedBorder).frame(maxWidth: 160).multilineTextAlignment(.center)

@@ -41,18 +41,19 @@ struct HomeView: View {
                 .buttonStyle(PrimaryButtonStyle())
 
                 if app.isUnlocked(.dailyBloom) {
+                    let done = app.dailyBloomDoneToday
                     Button { router.go(.game(daily: true, level: nil)) } label: {
                         HStack {
-                            Image(systemName: "sun.max.fill").foregroundStyle(Color.appAccent)
+                            Image(systemName: done ? "checkmark.circle.fill" : "sun.max.fill").foregroundStyle(done ? Color.successText : Color.accentText)
                             VStack(alignment: .leading, spacing: 2) {
                                 Text("Daily Bloom").font(Theme.font(.headline))
-                                Text("One word for everyone today").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
+                                Text(done ? "Done for today. See you tomorrow!" : "One word for everyone today").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
                             }
                             Spacer()
-                            Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Color.appPrimaryText.opacity(0.4))
+                            if !done { Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Color.appPrimaryText.opacity(0.4)) }
                         }
                     }
-                    .buttonStyle(SecondaryButtonStyle())
+                    .buttonStyle(SecondaryButtonStyle()).disabled(done)
                 }
 
                 HStack(spacing: 12) {

@@ -3,6 +3,9 @@ import SwiftData
 
 /// Logic shared by the app and the home-screen widget, so both run exactly the same rules (spec section 4).
 enum WidgetActions {
+    /// Spec section 18 (P15): the thirsty look never appears in widgets or notifications.
+    static let widgetShowsThirstyLook = false
+
     struct PlantSnapshot: Equatable {
         var plantId: String
         var name: String

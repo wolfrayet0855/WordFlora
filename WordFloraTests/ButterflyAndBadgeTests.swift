@@ -43,10 +43,17 @@ final class ButterflyAndBadgeTests: XCTestCase {
     func testPoolsByTimeOfDayAndLantern() {
         let day = VisitorSpawner.pool(evening: false, lantern: false)
         XCTAssertEqual(day.count, 10); XCTAssertFalse(day.contains("firefly"))
-        let dusk = VisitorSpawner.pool(evening: true, lantern: false)
-        XCTAssertEqual(Set(dusk), ["firefly", "luna"])
         let lantern = VisitorSpawner.pool(evening: false, lantern: true)
         XCTAssertEqual(lantern.count, 12)
+    }
+
+    /// Evening brings the night species AND keeps every day species, so someone who only plays in the evening can still
+    /// complete the album and the Visitors badge. Night species count double in the draw.
+    func testEveningFeaturesNightSpeciesButNeverLocksOutDayVisitors() {
+        let dusk = VisitorSpawner.pool(evening: true, lantern: false)
+        XCTAssertEqual(Set(dusk), Set(VisitorCatalog.all.map(\.id)))
+        XCTAssertEqual(dusk.filter { $0 == "firefly" }.count, 2); XCTAssertEqual(dusk.filter { $0 == "luna" }.count, 2)
+        XCTAssertEqual(dusk.filter { $0 == "monarch" }.count, 1)
     }
 
     func testSpawnIsDeterministicForASeedAndNeverEmptyPoolSafe() {

@@ -48,7 +48,7 @@ struct GardenProvider: TimelineProvider {
     }
 
     @MainActor private func load() -> GardenEntry {
-        let calm = SharedDefaults.calmMode, quiet = SharedDefaults.quietGarden
+        let calm = true /* never the thirsty look in a widget */, quiet = SharedDefaults.quietGarden
         guard let container = try? SharedContainer.make() else {
             return GardenEntry(date: .now, snapshot: .init(hero: nil, others: [], water: 0), quiet: quiet)
         }
@@ -87,7 +87,7 @@ struct GardenWidgetView: View {
 
     private func plantImage(_ s: WidgetActions.PlantSnapshot, height: CGFloat) -> some View {
         Image(s.imageName).resizable().scaledToFit().frame(height: height)
-            .rotationEffect(.degrees(s.thirsty ? 4 : 0), anchor: .bottom)
+            
     }
 
     private func waterButton(_ s: WidgetActions.PlantSnapshot) -> some View {
@@ -114,7 +114,7 @@ struct GardenWidgetView: View {
                 VStack(spacing: 4) {
                     plantImage(s, height: 74)
                     Text(s.name).font(.system(.subheadline, design: .rounded, weight: .bold)).foregroundStyle(Color("appPrimaryText")).lineLimit(1)
-                    Text(s.thirsty ? "Would love a drink" : "Happy").font(.system(.caption2, design: .rounded)).foregroundStyle(Color("appPrimaryText").opacity(0.7))
+                    Text("Growing nicely").font(.system(.caption2, design: .rounded)).foregroundStyle(Color("appPrimaryText").opacity(0.7))
                     waterButton(s)
                 }
                 .widgetURL(URL(string: "wordflora://plant/\(s.plantId)"))
@@ -132,7 +132,7 @@ struct GardenWidgetView: View {
                     }.frame(maxWidth: .infinity)
                     VStack(spacing: 8) {
                         HStack(spacing: 6) { ForEach(entry.snapshot.others, id: \.plantId) { o in plantImage(o, height: 44) } }
-                        Text(s.thirsty ? "Would love a drink" : "Everyone looks happy").font(.system(.caption, design: .rounded)).foregroundStyle(Color("appPrimaryText").opacity(0.75)).multilineTextAlignment(.center)
+                        Text("Your garden says hello").font(.system(.caption, design: .rounded)).foregroundStyle(Color("appPrimaryText").opacity(0.75)).multilineTextAlignment(.center)
                         waterButton(s)
                     }.frame(maxWidth: .infinity)
                 }
@@ -155,7 +155,7 @@ struct GardenWidgetView: View {
             if let s = hero {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(s.name).font(.headline).lineLimit(1)
-                    Text(s.thirsty ? "Would love a drink" : "Happy").font(.caption)
+                    Text("Growing nicely").font(.caption)
                     Gauge(value: s.growthFraction) { EmptyView() }.gaugeStyle(.accessoryLinearCapacity)
                 }
             } else { Text("Play a word to find your first plant").font(.caption) }

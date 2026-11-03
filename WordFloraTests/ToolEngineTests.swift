@@ -128,11 +128,13 @@ final class ToolEngineTests: XCTestCase {
     }
 
     // MARK: quiet garden
-    func testQuietGardenIgnoresCostsOwnershipAndCooldowns() {
+    func testQuietGardenIgnoresCostsOwnershipAndCooldownsButGrowthStaysCapped() {
         let p = plant(), pr = profile(water: 0, soil: 0)
-        XCTAssertTrue(ToolEngine.prune(p, inventory: ToolInventory(), now: t0, calendar: cal, economy: eco, quiet: true).applied)
-        XCTAssertTrue(ToolEngine.prune(p, inventory: ToolInventory(), now: t0, calendar: cal, economy: eco, quiet: true).applied)
+        XCTAssertTrue(ToolEngine.prune(p, inventory: ToolInventory(), now: t0, calendar: cal, economy: eco, quiet: true).applied)   // no shears needed
+        XCTAssertTrue(ToolEngine.prune(p, inventory: ToolInventory(), now: t0, calendar: cal, economy: eco, quiet: true).applied)   // no cooldown
         XCTAssertTrue(ToolEngine.repot(p, to: .peaty, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).applied)
-        XCTAssertEqual(pr.soil, 0); XCTAssertEqual(p.growthPoints, 0)
+        XCTAssertEqual(pr.soil, 0)
+        XCTAssertLessThanOrEqual(p.growthPoints, eco.dailyAbsorbCap)
+        XCTAssertGreaterThan(p.growthPoints, 0)
     }
 }

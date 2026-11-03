@@ -36,13 +36,14 @@ final class AppModel {
         let loaded = bank ?? (try? WordBank.load()) ?? WordBank(schemaVersion: 1, bankVersion: "empty", entries: [],
                                                             daily: DailyConfig(epoch: "2026-01-01", seed: 1))
         self.bank = loaded
-        self.game = GameViewModel(modelContext: container.mainContext, bank: loaded)
+        self.game = GameViewModel(modelContext: container.mainContext, bank: loaded, now: now)
         self.onboarding = OnboardingFlow(restoredComplete: settings.onboardingComplete, ageBand: settings.ageBand)
         game.soundEnabled = settings.soundOn
         game.seedPlantsIfNeeded()
         game.refreshLevel()
         SoundPlayer.configureSession()
         if settings.onboardingComplete { settings.completedSessions += 1 }
+        if settings.remindMe { reminders.restore() }
         let defs = (try? BadgeCatalog.load()) ?? []
         badges = BadgeState(json: game.playerProfile?.badgesJSON ?? "", defs: defs)
         refreshFreeDrops()
@@ -182,7 +183,8 @@ final class AppModel {
 
     var canOfferRewarded: Bool {
         guard let p = profile else { return false }
-        guard !ParentalGate.isRequired(ageBand: settings.ageBand), !entitlements.state.hasRemoveAds else { return false }
+        guard settings.completedSessions >= 1, entitlements.hasLoaded,
+              !ParentalGate.isRequired(ageBand: settings.ageBand), !entitlements.state.hasRemoveAds else { return false }
         let today = p.rewardedDay.map { Calendar.current.isDate($0, inSameDayAs: now()) } ?? false
         return (today ? p.rewardedToday : 0) < ButterflyRewards.rewardedPlaysPerDay
     }
@@ -196,9 +198,15 @@ final class AppModel {
         try? context.save()
     }
 
+    /// Checked again after every wait inside ad setup, so changes mid-way (age, subscription) stop everything.
+    var mayStillLoadAds: Bool {
+        adsEnabled && entitlements.hasLoaded
+            && AdGate.mayLoadAnyAd(isUnderThirteen: ParentalGate.isRequired(ageBand: settings.ageBand), hasRemoveAds: entitlements.state.hasRemoveAds)
+    }
+
     /// Banner shows on Home and Garden only, from the second session, for free players who are not young.
     var showBanner: Bool {
-        adsEnabled && onboarding.isComplete && settings.completedSessions >= 1
+        adsEnabled && entitlements.hasLoaded && onboarding.isComplete && settings.completedSessions >= 1
             && AdGate.mayLoadAnyAd(isUnderThirteen: ParentalGate.isRequired(ageBand: settings.ageBand), hasRemoveAds: entitlements.state.hasRemoveAds)
     }
 
@@ -207,19 +215,19 @@ final class AppModel {
         guard adsEnabled else { return }
         let ctx = adContext(choice: .oneMore)
         guard AdGate.shouldShowInterstitial(ctx) else { return }
-        await ads.prepare(ageBand: settings.ageBand)
+        await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
         if await ads.showInterstitial() { recordAdShown() }
     }
 
     func prepareBannerIfAllowed() async {
         guard showBanner else { return }
-        await ads.prepare(ageBand: settings.ageBand)
+        await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
     }
 
     /// Shows a player-initiated rewarded ad and, if completed, grants the drops.
     func watchRewardedAd() async -> Bool {
         guard adsEnabled, canOfferRewarded else { return false }
-        await ads.prepare(ageBand: settings.ageBand)
+        await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
         let earned = await ads.showRewarded()
         if earned { grantRewardedDrops() }
         return earned
@@ -339,10 +347,7 @@ final class AppModel {
 
     // MARK: Reminders
 
-    private var dailyBloomDoneToday: Bool {
-        let records = (try? context.fetch(FetchDescriptor<GameRecord>())) ?? []
-        return records.contains { $0.isDaily && Calendar.current.isDate($0.date, inSameDayAs: now()) }
-    }
+    var dailyBloomDoneToday: Bool { game.dailyBloomDoneToday }
 
     /// Asks for permission only now, because the player just turned reminders on.
     func enableReminders() async -> Bool {
@@ -381,8 +386,23 @@ final class AppModel {
     /// SwiftData opens its store once per launch, so entitlement changes take effect on the next launch.
     /// A lapsed subscription reopens the same store without sync: nothing is deleted or reset.
     func updateSyncFlag() {
+        guard entitlements.hasLoaded else { return }          // a slow StoreKit start must never switch sync off
         let entitled = entitlements.state.hasCloudSync
         settings.cloudSyncEnabled = entitled
         syncNeedsRestart = entitled != launchedWithCloud
     }
+
+    // MARK: Break suggestion for young players
+
+    private var sittingStart: Date?
+    private var lastBreakSuggestedAt: Date?
+
+    func beginSitting() { if sittingStart == nil { sittingStart = now() } }
+
+    var shouldSuggestBreak: Bool {
+        guard let start = sittingStart else { return false }
+        return BreakPolicy.shouldSuggest(isUnderThirteen: settings.isUnderThirteen, sittingStart: start, now: now(), lastSuggestedAt: lastBreakSuggestedAt)
+    }
+
+    func markBreakSuggested() { lastBreakSuggestedAt = now() }
 }

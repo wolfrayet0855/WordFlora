@@ -41,7 +41,8 @@ enum VisitorSpawner {
     static func pool(evening: Bool, lantern: Bool) -> [String] {
         let day = VisitorCatalog.all.filter { !$0.nightOnly }.map(\.id)
         let night = VisitorCatalog.all.filter(\.nightOnly).map(\.id)
-        if evening { return night }
+        // Evening features the night species (drawn twice as often) without locking out any day visitor.
+        if evening { return day + night + night }
         return lantern ? day + night : day
     }
 

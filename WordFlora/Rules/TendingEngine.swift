@@ -18,8 +18,7 @@ enum TendingEngine {
 
     static func water(_ plant: PlantCollectible, profile: PlayerProfile, now: Date, calendar: Calendar,
                       economy: Economy, quiet: Bool = false) -> TendResult {
-        if quiet { refresh(plant, now: now); return TendResult(applied: true) }
-        guard profile.water > 0 else { return .blocked(.noWater) }
+        guard quiet || profile.water > 0 else { return .blocked(.noWater) }
         resetDay(plant, now: now, calendar: calendar)
         let remaining = economy.dailyAbsorbCap - plant.absorbedToday
         guard remaining > 0 else { return .blocked(.fullForToday) }
@@ -27,20 +26,19 @@ enum TendingEngine {
         var desired = Double(economy.waterGrowth)
         if let until = plant.soilBoostUntil, until > now { desired *= economy.soilBoostMultiplier }
         let gain = min(Int(desired.rounded()), remaining)
-        profile.water -= 1
+        if !quiet { profile.water -= 1 }
         refresh(plant, now: now)
         return grow(plant, by: gain)
     }
 
     static func addSoil(_ plant: PlantCollectible, profile: PlayerProfile, now: Date, calendar: Calendar,
                         economy: Economy, quiet: Bool = false, multiplier: Double = 1.0) -> TendResult {
-        if quiet { return TendResult(applied: true) }
-        guard profile.soil > 0 else { return .blocked(.noSoil) }
+        guard quiet || profile.soil > 0 else { return .blocked(.noSoil) }
         resetDay(plant, now: now, calendar: calendar)
         let remaining = economy.dailyAbsorbCap - plant.absorbedToday
         guard remaining > 0 else { return .blocked(.fullForToday) }
 
-        profile.soil -= 1
+        if !quiet { profile.soil -= 1 }
         plant.soilRichness = min(1.0, plant.soilRichness + economy.soilRichnessStep)
         plant.soilBoostUntil = now.addingTimeInterval(Double(economy.soilBoostDays) * 86_400)
         return grow(plant, by: min(Int((Double(economy.soilGrowth) * multiplier).rounded()), remaining))
@@ -48,8 +46,7 @@ enum TendingEngine {
 
     static func sun(_ plant: PlantCollectible, profile: PlayerProfile, now: Date, calendar: Calendar,
                     economy: Economy, quiet: Bool = false, growth: Int? = nil) -> TendResult {
-        if quiet { return TendResult(applied: true) }
-        if let last = plant.lastSunnyAt, calendar.isDate(last, inSameDayAs: now) { return .blocked(.alreadyDoneToday) }
+        if !quiet, let last = plant.lastSunnyAt, calendar.isDate(last, inSameDayAs: now) { return .blocked(.alreadyDoneToday) }
         resetDay(plant, now: now, calendar: calendar)
         let remaining = economy.dailyAbsorbCap - plant.absorbedToday
         guard remaining > 0 else { return .blocked(.fullForToday) }

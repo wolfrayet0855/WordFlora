@@ -73,6 +73,9 @@ final class ReminderScheduler {
         return true
     }
 
+    /// Called at launch when the player already opted in earlier: permission was granted then, so no prompt appears.
+    func restore() { enabled = true }
+
     func refresh(now: Date, hour: Int, minute: Int, lastOpened: Date, dailyBloomDoneToday: Bool) {
         guard enabled else { return }
         plan(now: now, hour: hour, minute: minute, lastOpened: lastOpened, dailyBloomDoneToday: dailyBloomDoneToday)

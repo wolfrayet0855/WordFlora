@@ -15,8 +15,8 @@ final class GameRecord {
 
     init(wordGuessed: String, triviaQuestion: String, won: Bool,
          petalsRemaining: Int, plantEarned: String?, level: Int,
-         wordId: String = "", isDaily: Bool = false) {
-        self.date = .now
+         wordId: String = "", isDaily: Bool = false, date: Date = .now) {
+        self.date = date
         self.wordGuessed = wordGuessed
         self.triviaQuestion = triviaQuestion
         self.won = won

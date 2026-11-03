@@ -223,5 +223,25 @@ final class CoreRulesTests: XCTestCase {
     func testVisitorFactsPassCopySafety() {
         for v in VisitorCatalog.all { if let f = v.fact { XCTAssertEqual(CopySafety.check(f), [], "\(v.id): \(f)") } }
     }
+
+    // MARK: under-13 break suggestion (spec section 18, P12)
+    func testBreakIsSuggestedAfterTwentyMinutesForYoungPlayersOnly() {
+        let start = Date(timeIntervalSince1970: 1_780_000_000)
+        XCTAssertFalse(BreakPolicy.shouldSuggest(isUnderThirteen: true, sittingStart: start, now: start.addingTimeInterval(19 * 60), lastSuggestedAt: nil))
+        XCTAssertTrue(BreakPolicy.shouldSuggest(isUnderThirteen: true, sittingStart: start, now: start.addingTimeInterval(20 * 60), lastSuggestedAt: nil))
+        XCTAssertFalse(BreakPolicy.shouldSuggest(isUnderThirteen: false, sittingStart: start, now: start.addingTimeInterval(60 * 60), lastSuggestedAt: nil))
+    }
+
+    func testBreakSuggestionsAreSpacedAndNeverNag() {
+        let start = Date(timeIntervalSince1970: 1_780_000_000)
+        let first = start.addingTimeInterval(20 * 60)
+        XCTAssertFalse(BreakPolicy.shouldSuggest(isUnderThirteen: true, sittingStart: start, now: first.addingTimeInterval(5 * 60), lastSuggestedAt: first))
+        XCTAssertTrue(BreakPolicy.shouldSuggest(isUnderThirteen: true, sittingStart: start, now: first.addingTimeInterval(20 * 60), lastSuggestedAt: first))
+    }
+
+    func testBreakCopyIsKindAndPassesTheLinter() {
+        XCTAssertEqual(CopySafety.check(BreakPolicy.message), [])
+        XCTAssertTrue(BreakPolicy.message.lowercased().contains("window") || BreakPolicy.message.lowercased().contains("sky"))
+    }
 }
 

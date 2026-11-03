@@ -94,7 +94,14 @@ final class GameViewModel {
         begin(e, daily: false)
     }
 
+    /// True once today's Daily Bloom has been played; it can only be played once per local day.
+    var dailyBloomDoneToday: Bool {
+        let records = (try? modelContext.fetch(FetchDescriptor<GameRecord>())) ?? []
+        return records.contains { $0.isDaily && calendar.isDate($0.date, inSameDayAs: now()) }
+    }
+
     func startDaily() {
+        guard !dailyBloomDoneToday else { phase = .idle; return }
         let daily = DailyBloom(bank: bank, calendar: calendar)
         guard let id = daily.wordId(for: now()), let e = WordProvider(bank: bank).entry(id: id) else { phase = .idle; return }
         begin(e, daily: true)
@@ -280,7 +287,7 @@ final class GameViewModel {
 
         modelContext.insert(GameRecord(wordGuessed: e.word, triviaQuestion: e.hint, won: won,
                                        petalsRemaining: petals, plantEarned: plantName, level: e.level,
-                                       wordId: e.id, isDaily: isDaily))
+                                       wordId: e.id, isDaily: isDaily, date: now()))
         profile.gamesPlayed += 1
         profile.seenIds = Array((profile.seenIds + [e.id]).suffix(200))
 

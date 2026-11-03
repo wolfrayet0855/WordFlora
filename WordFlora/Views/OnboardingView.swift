@@ -46,6 +46,7 @@ private struct IntroView: View {
 
 private struct AgeQuestionView: View {
     @Environment(AppModel.self) private var app
+    @State private var offerQuiet = false
 
     var body: some View {
         ScrollView {
@@ -69,9 +70,13 @@ private struct AgeQuestionView: View {
     private func ageButton(_ title: String, _ band: AgeBand) -> some View {
         Button {
             app.settings.applyAgeDefaults(band)
-            app.onboarding.selectAge(band)
+            if band == .under13 { offerQuiet = true } else { app.onboarding.selectAge(band) }
         } label: { Text(title) }
         .buttonStyle(SecondaryButtonStyle())
+        .confirmationDialog("Would you like a quieter garden?", isPresented: $offerQuiet, titleVisibility: .visible) {
+            Button("Yes, keep it quiet") { app.settings.quietGarden = true; app.onboarding.selectAge(.under13) }
+            Button("No thanks") { app.onboarding.selectAge(.under13) }
+        } message: { Text("Quiet Garden hides numbers and timers so tending is just relaxing. You can change it any time in Settings.") }
     }
 }
 

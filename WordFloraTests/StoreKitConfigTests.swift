@@ -40,7 +40,8 @@ final class StoreKitConfigTests: XCTestCase {
         await svc.loadProducts()
         XCTAssertFalse(svc.state.hasPlus)
         try await session.buyProduct(identifier: "plus_monthly")
-        await svc.refresh()
+        // StoreKit publishes the new entitlement asynchronously; poll briefly instead of racing it.
+        for _ in 0..<20 where !svc.state.hasPlus { try await Task.sleep(nanoseconds: 100_000_000); await svc.refresh() }
         XCTAssertTrue(svc.state.hasPlus); XCTAssertTrue(svc.state.hasRemoveAds); XCTAssertTrue(svc.state.hasCloudSync)
     }
 
@@ -61,5 +62,14 @@ final class StoreKitConfigTests: XCTestCase {
         let svc = EntitlementService(startListening: false)
         await svc.loadProducts()
         XCTAssertTrue(svc.trialEligible)
+    }
+
+    /// The app must never say "Welcome" while Plus is still off: purchase() waits for the entitlement to appear.
+    func testPurchaseOnlyReportsSuccessOnceTheEntitlementIsLive() async throws {
+        let svc = EntitlementService(startListening: false)
+        await svc.loadProducts()
+        let outcome = await svc.purchase(.monthly)
+        XCTAssertEqual(outcome, .success)
+        XCTAssertTrue(svc.state.hasPlus)
     }
 }

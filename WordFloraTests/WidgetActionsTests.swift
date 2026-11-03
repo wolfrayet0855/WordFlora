@@ -72,10 +72,16 @@ final class WidgetActionsTests: XCTestCase {
         XCTAssertEqual(profile.water, 1)
     }
 
-    func testQuietGardenWateringSpendsAndEarnsNothing() {
+    func testQuietGardenWateringSpendsNothingAndStillGrowsThePlant() {
         let ps = plants(["rose"]); profile.water = 0
         let r = WidgetActions.water(plantId: "rose", context: ctx, now: t0, calendar: cal, quiet: true)
-        XCTAssertTrue(r.applied); XCTAssertEqual(ps[0].growthPoints, 0); XCTAssertEqual(profile.water, 0)
+        XCTAssertTrue(r.applied); XCTAssertEqual(ps[0].growthPoints, 4); XCTAssertEqual(profile.water, 0)
+    }
+
+    func testWidgetNeverShowsTheThirstyLook() {
+        let ps = plants(["rose"]); ps[0].lastTendedAt = t0.addingTimeInterval(-100 * 3600)
+        XCTAssertFalse(WidgetActions.snapshot(context: ctx, now: t0, calm: true).hero?.thirsty ?? true)
+        XCTAssertTrue(WidgetActions.widgetShowsThirstyLook == false)
     }
 
     func testWateringTwiceInARowIsSafeAndRespectsTheDailyCap() {

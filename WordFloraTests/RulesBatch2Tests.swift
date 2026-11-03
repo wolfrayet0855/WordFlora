@@ -23,7 +23,12 @@ final class RulesBatch2Tests: XCTestCase {
 
     func testGracePeriodNeedsThreeSessionsOrAFirstLevelUp() {
         XCTAssertFalse(AdGate.shouldShowInterstitial(ctx { $0.completedSessions = 2 }))
-        XCTAssertTrue(AdGate.shouldShowInterstitial(ctx { $0.completedSessions = 0; $0.wordLevelUps = 1 }))
+        XCTAssertTrue(AdGate.shouldShowInterstitial(ctx { $0.completedSessions = 1; $0.wordLevelUps = 1 }))
+    }
+
+    func testNeverInTheFirstSessionEvenAfterALevelUp() {
+        XCTAssertFalse(AdGate.shouldShowInterstitial(ctx { $0.completedSessions = 0; $0.wordLevelUps = 1 }))
+        XCTAssertFalse(AdGate.shouldShowInterstitial(ctx { $0.completedSessions = 0; $0.wordLevelUps = 4 }))
     }
 
     func testMinimumGapAndDailyCap() {

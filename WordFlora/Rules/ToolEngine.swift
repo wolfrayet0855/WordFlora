@@ -90,10 +90,11 @@ enum ToolEngine {
 
     static func prune(_ plant: PlantCollectible, inventory: ToolInventory, now: Date, calendar: Calendar,
                       economy: Economy, quiet: Bool = false) -> TendResult {
-        if quiet { return TendResult(applied: true) }
-        let tier = inventory.tier(of: .shears)
-        guard tier > 0 else { return .blocked(.notOwned) }
-        if let last = plant.lastPrunedAt, now.timeIntervalSince(last) < pruneCooldownDays * 86_400 { return .blocked(.cooldown) }
+        let tier = max(1, inventory.tier(of: .shears))
+        if !quiet {
+            guard inventory.tier(of: .shears) > 0 else { return .blocked(.notOwned) }
+            if let last = plant.lastPrunedAt, now.timeIntervalSince(last) < pruneCooldownDays * 86_400 { return .blocked(.cooldown) }
+        }
         let r = TendingEngine.applyGrowth(plant, desired: pruneGrowth[tier - 1], now: now, calendar: calendar, economy: economy)
         if r.applied { plant.lastPrunedAt = now }
         return r
@@ -103,12 +104,8 @@ enum ToolEngine {
     static func repot(_ plant: PlantCollectible, to soil: SoilType, profile: PlayerProfile, now: Date,
                       calendar: Calendar, economy: Economy, quiet: Bool = false) -> RepotResult {
         let happy = soil == SoilType.preferred(forPlantId: plant.plantId)
-        if quiet {
-            plant.soilType = soil.rawValue
-            return RepotResult(applied: true, outcome: happy ? .happy : .neutral)
-        }
-        guard profile.soil > 0 else { return RepotResult() }
-        profile.soil -= 1
+        guard quiet || profile.soil > 0 else { return RepotResult() }
+        if !quiet { profile.soil -= 1 }
         plant.soilType = soil.rawValue
         plant.soilRichness = min(1.0, plant.soilRichness + economy.soilRichnessStep)
         var tend = TendResult()

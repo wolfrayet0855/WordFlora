@@ -12,10 +12,12 @@ final class EntitlementService {
     private(set) var products: [PlusPlan: Product] = [:]
     private(set) var trialEligible = false
     private(set) var loadFailed = false
+    /// False until the first look at the player's transactions has finished. Ads and sync decisions wait for it.
+    private(set) var hasLoaded = false
     @ObservationIgnored nonisolated(unsafe) private var listener: Task<Void, Never>?
 
     init(startListening: Bool = true) {
-        guard startListening else { return }
+        guard startListening else { hasLoaded = true; return }
         listener = Task { [weak self] in
             for await update in Transaction.updates {
                 guard case .verified(let t) = update else { continue }
@@ -49,6 +51,7 @@ final class EntitlementService {
             if case .verified(let t) = result, t.revocationDate == nil { ids.insert(t.productID) }
         }
         state = EntitlementState(activeProductIDs: ids)
+        hasLoaded = true
     }
 
     func purchase(_ plan: PlusPlan) async -> PurchaseOutcome {
@@ -59,7 +62,9 @@ final class EntitlementService {
                 guard case .verified(let t) = verification else { return .failed }
                 await t.finish()
                 await refresh()
-                return .success
+                // Never report success while Plus is still off: StoreKit can take a moment to publish the entitlement.
+                for _ in 0..<10 where !state.hasPlus { try? await Task.sleep(nanoseconds: 200_000_000); await refresh() }
+                return state.hasPlus ? .success : .pending
             case .pending: return .pending            // Ask to Buy: the listener finishes it when approved
             case .userCancelled: return .cancelled
             @unknown default: return .failed
@@ -73,5 +78,6 @@ final class EntitlementService {
     }
 
     /// Test and preview hook: pretend a subscription is active.
-    func debugForce(_ s: EntitlementState) { state = s }
+    func debugForce(_ s: EntitlementState) { state = s; hasLoaded = true }
+    func debugSetLoaded(_ v: Bool) { hasLoaded = v }
 }
