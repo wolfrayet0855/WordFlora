@@ -67,6 +67,26 @@ Rework the committed `GameViewModel` (keep its tests, adjust):
 - [ ] Expose `petalsAccessibilityLabel` ("5 of 8 petals left").
 - [ ] Injectable `Clock`/`Random` for deterministic tests. Commit.
 
+## Task 5 rework addendum (supersedes the Rose/streak/ad bullets above; spec section 18)
+
+- [ ] **5b RoseMeter** (replaces random Rose drops): +1 per completed round idempotent by round id (relaunch mid-round safe), arrives at threshold from Economy.json (default 8), paused at cap 3, streak milestone grants unaffected, one revive per round, regression test that no code path awards a Rose from `Random`.
+- [ ] **5c GardenDays + gentle streak**: `gardenDays` never decreases; `recordPlay` with a 2-day gap and no freeze leaves gardenDays/bestStreak intact; grace day (1 per rolling 14 days) consumed before a freeze; freezes earned day 5/14 then +1/14 days cap 2; `showStreak` default false for under-13; no loss words in streak strings.
+- [ ] **5d SessionBeats**: emit `sessionBeat` after every 3rd completed regular round and after a Daily Bloom; no auto-start.
+
+## Task 10c: Session shape + ad gate
+
+- [ ] Resting card ("One more" / "That's enough for now"); "That's enough" returns Home at dusk and suppresses the ad; under-13 20-minute break suggestion with injected clock.
+- [ ] `AdGate.shouldShowInterstitial(context)`: false for under-13; false at "That's enough"; false within 120 s after any peak event (PlantEarned, stage-up, first bloom, level-up, badge unlock, new visitor, Rose revive); false mid-round and around Daily Bloom; true only after "One more" at the every-3rd-round boundary (plus grace period/caps from spec section 16). Under-13 profiles load no ads at all.
+
+## Task 16b: Copy safety + Calm/Quiet modes
+
+- [ ] `CopySafety.check` + unit test over the whole string catalog and AI outputs (word lists in spec section 18).
+- [ ] `isThirsty` rename, Calm mode (default on for under-13) hides the thirsty look; Quiet Garden mode hides currencies/cooldowns/streaks/badge progress, tending unlimited and earns nothing, never touches Daily Bloom (tests per research P11).
+
+## Task 10d: Attachment features (High wave)
+
+- [ ] Name your plant + personality lines (P1), Garden Diary memories (P2), first-bloom ceremony + gratitude moment (P3), real local season/weather mood/time-of-day (P4, WeatherKit optional/off by default; seasonal by calendar hemisphere otherwise), awe-framed Wonder Facts schema + content (P6), gentle welcome-back (P8), data export/delete (P18). Visual agent mockups first (Task 8); copy passes CopySafety.
+
 ## Task 6: Tending engine
 
 **Files:** `Services/TendingEngine.swift`, tests. Pure logic, no UI.
