@@ -66,7 +66,13 @@ struct GameView: View {
             if phase == .won {
                 app.play(vm.leveledUp ? .levelUp : .earned)
                 showRain = !app.settings.calmMode
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { showEarned = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                    showEarned = true
+                    if app.settings.hapticsOn {      // a soft lub-dub as the new plant appears
+                        let g = UIImpactFeedbackGenerator(style: .soft); g.impactOccurred(intensity: 0.6)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) { g.impactOccurred(intensity: 0.9) }
+                    }
+                }
             }
         }
     }

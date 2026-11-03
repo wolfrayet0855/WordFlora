@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import WidgetKit
+import TipKit
 
 @main
 struct WordFloraApp: App {
@@ -54,6 +55,7 @@ struct WordFloraApp: App {
         }
         if uiTesting && args.contains("-uitest-everything") { model.settings.showEverything = true; model.syncToolUnlocks() }
         if uiTesting && !args.contains("-uitest-ads") { model.adsEnabled = false }
+        if !uiTesting { try? Tips.configure([.displayFrequency(.daily)]) }
         _app = State(initialValue: model)
     }
 

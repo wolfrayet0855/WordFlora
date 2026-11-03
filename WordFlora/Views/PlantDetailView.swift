@@ -1,4 +1,5 @@
 import SwiftUI
+import TipKit
 import SwiftData
 
 struct PlantDetailView: View {
@@ -42,6 +43,7 @@ struct PlantDetailView: View {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { withAnimation(.interpolatingSpring(stiffness: 90, damping: 5)) { sway = 0 } }
                         }
                         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.5), trigger: hellos)
+                        .popoverTip(PlantHelloTip(), arrowEdge: .bottom)
                         .scaleEffect(bump ? 1.06 : 1)
                         .animation(.spring(response: 0.4, dampingFraction: 0.45), value: bump)
                         .accessibilityHidden(true)
@@ -53,7 +55,7 @@ struct PlantDetailView: View {
                 .frame(maxWidth: .infinity).padding(.top, 8)
 
                 VStack(spacing: 4) {
-                    Button { draftName = plant.nickname; renaming = true } label: {
+                    Button { draftName = plant.nickname; renaming = true; NicknameTip().invalidate(reason: .actionPerformed) } label: {
                         HStack(spacing: 6) {
                             Text(plant.nickname.isEmpty ? plant.name : plant.nickname).font(Theme.font(.title2, weight: .bold))
                             Image(systemName: "pencil").font(.footnote)
