@@ -32,6 +32,11 @@ final class GameViewModel {
     private(set) var isDaily = false
     private(set) var extraHint: String?
     private(set) var helpersUsed = 0
+    /// Optional on-device rewording of the clue (free, once per round). Only offered when a real model backs it.
+    var ai: any GardenAI = StaticGardenAI()
+    var aiIsModelBacked = false
+    private(set) var simplerClue: String?
+    private(set) var askingClue = false
     private(set) var revealedAnswer: String?
     private(set) var wrongStreak = 0
     private(set) var isTutorial = false
@@ -124,6 +129,7 @@ final class GameViewModel {
         guessInput = ""
         usedRungs = []
         extraHint = nil
+        simplerClue = nil
         helpersUsed = 0
         revealedAnswer = nil
         wrongStreak = 0
@@ -171,6 +177,16 @@ final class GameViewModel {
     var canUseHelp: Bool {
         guard phase == .playing, let e = currentEntry else { return false }
         return HelpLadder.next(used: usedRungs, word: e.word, guessed: guessedLetters, hint2: e.hint2) != nil
+    }
+
+    var canAskSimplerClue: Bool { aiIsModelBacked && phase == .playing && simplerClue == nil && !askingClue }
+
+    func askSimplerClue() async {
+        guard canAskSimplerClue, let e = currentEntry else { return }
+        askingClue = true; defer { askingClue = false }
+        let text = await ai.simplerHint(for: e)
+        guard phase == .playing, currentEntry?.id == e.id, let t = text, HintValidator.isSafe(t, answer: e.word) else { return }
+        simplerClue = t.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     enum KeyState: Equatable { case unused, correct, wrong }

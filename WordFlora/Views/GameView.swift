@@ -110,9 +110,20 @@ struct GameView: View {
                     Divider()
                     Text(extra).font(Theme.font(.callout)).foregroundStyle(Color.secondaryText).transition(.opacity)
                 }
+                if let simpler = vm.simplerClue {
+                    Divider()
+                    Label(simpler, systemImage: "sparkles").font(Theme.font(.callout)).foregroundStyle(Color.secondaryText).transition(.opacity)
+                    Text("Written on this device").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
+                } else if vm.canAskSimplerClue {
+                    Button { Task { await vm.askSimplerClue() } } label: {
+                        Label("Simpler clue", systemImage: "sparkles").font(Theme.font(.subheadline, weight: .semibold)).frame(minHeight: Theme.minTap)
+                    }
+                    .accessibilityHint("Asks the on-device assistant to say the clue more simply. Free.")
+                }
             }
         }
         .animation(.easeInOut(duration: 0.25), value: vm.extraHint)
+        .animation(.easeInOut(duration: 0.25), value: vm.simplerClue)
     }
 
     @ViewBuilder private var overlays: some View {

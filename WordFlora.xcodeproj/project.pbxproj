@@ -103,6 +103,7 @@
 		B42D0E3153A7414966317C6A /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 801243E3923ADEAD47B705CE /* AppSettings.swift */; };
 		BA042FFFFC29EF40C286AF09 /* wf-wrong.m4a in Resources */ = {isa = PBXBuildFile; fileRef = FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */; };
 		BD2A8358AA71C44082C046C0 /* Sound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA2FA0C2D96FAD52648169E /* Sound.swift */; };
+		BF1505CF8E342EDAE2B067A9 /* SimplerClueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDA79853A58ADD9A3C086E7 /* SimplerClueTests.swift */; };
 		BF85587E45FCFE74CE68D2B7 /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F94DF6CFF0C826E3155B6 /* EntitlementService.swift */; };
 		C01954BECB8A0A87686D11CE /* Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13457F8B016917B22CB55A1C /* Share.swift */; };
 		C2FB34C4102FCBD97EADB91E /* CopySafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21DF9A95AEA44F66C376C83 /* CopySafety.swift */; };
@@ -293,6 +294,7 @@
 		F9B200507C4629386A0C486C /* GardenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidget.swift; sourceTree = "<group>"; };
 		FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-wrong.m4a"; sourceTree = "<group>"; };
 		FBB3484DBA881E17BA5D174F /* wf-badgeBronze.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeBronze.m4a"; sourceTree = "<group>"; };
+		FBDA79853A58ADD9A3C086E7 /* SimplerClueTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SimplerClueTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -485,6 +487,7 @@
 				B2C1238F02F6B7F38D8F11C7 /* SoundTests.swift */,
 				BC96D8FD408D4A3C5C97BD6A /* ShareTests.swift */,
 				E5603BA4007B124D652F8467 /* ReconcileTests.swift */,
+				FBDA79853A58ADD9A3C086E7 /* SimplerClueTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -873,6 +876,7 @@
 				86156687C026EBE9B3D0545A /* SoundTests.swift in Sources */,
 				8C948E1D10D95B62874FDD00 /* ShareTests.swift in Sources */,
 				EC4500E6CD3A54445703ACAF /* ReconcileTests.swift in Sources */,
+				BF1505CF8E342EDAE2B067A9 /* SimplerClueTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

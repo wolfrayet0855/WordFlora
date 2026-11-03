@@ -43,6 +43,7 @@ final class AppModel {
         self.game = GameViewModel(modelContext: container.mainContext, bank: loaded, now: now)
         self.onboarding = OnboardingFlow(restoredComplete: settings.onboardingComplete, ageBand: settings.ageBand)
         game.soundEnabled = settings.soundOn
+        game.ai = GardenAIProvider.current(); game.aiIsModelBacked = GardenAIProvider.isModelBacked()
         game.seedPlantsIfNeeded()
         reconcileSyncedData()
         SoundPlayer.configureSession()
