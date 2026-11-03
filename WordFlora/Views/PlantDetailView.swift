@@ -33,10 +33,10 @@ struct PlantDetailView: View {
         let quiet = app.settings.quietGarden
         ScrollView {
             VStack(spacing: 16) {
-                ZStack(alignment: .topTrailing) {
+                ZStack(alignment: .center) {
                     if !quiet {          // a soft ring shows how much of today this plant has enjoyed; never a count
                         let fill = TendingEngine.capacityFill(plant, now: .now, calendar: .current, economy: .default)
-                        Circle().stroke(Color.appSurface, lineWidth: 6).frame(width: 178, height: 178).frame(maxWidth: .infinity)
+                        Circle().stroke(Color.appSurface, lineWidth: 6).frame(width: 178, height: 178)
                             .overlay(Circle().trim(from: 0, to: fill).stroke(Color.accentText.opacity(0.85), style: StrokeStyle(lineWidth: 6, lineCap: .round))
                                 .rotationEffect(.degrees(-90)).frame(width: 178, height: 178))
                             .animation(.easeInOut(duration: 0.5), value: fill)
@@ -55,12 +55,15 @@ struct PlantDetailView: View {
                         .scaleEffect(bump ? 1.06 : 1)
                         .animation(.spring(response: 0.4, dampingFraction: 0.45), value: bump)
                         .accessibilityHidden(true)
+                    TapBurst(trigger: hellos)
+                }
+                .overlay(alignment: .topTrailing) {
                     if thirsty {
                         Image(systemName: "drop.fill").foregroundStyle(Color.successText).padding(10)
                             .background(Color.appSurface, in: Circle()).accessibilityLabel("Thirsty")
                     }
                 }
-                .frame(maxWidth: .infinity).padding(.top, 8)
+                .frame(width: 200, height: 200).frame(maxWidth: .infinity).padding(.top, 8)
 
                 VStack(spacing: 4) {
                     Button { draftName = plant.nickname; renaming = true } label: {

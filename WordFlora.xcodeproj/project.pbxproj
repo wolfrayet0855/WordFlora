@@ -60,6 +60,7 @@
 		5AC90C63AFA3930519F129FF /* WordFloraWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96DC5D77A1287D3DF73CD43 /* WordFloraWidgetBundle.swift */; };
 		5E0A335D5FF8885586260FAB /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99940443AEBC1F94C00E15D2 /* StreakEngine.swift */; };
 		617E6838EBE8B27619FA5225 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */; };
+		62DF6A94C532BAA7B67A1EC7 /* TapBurst.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9550E7376E237963E1CA789 /* TapBurst.swift */; };
 		68EF45C14F3CEC72F7042540 /* PlayerProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */; };
 		699CBEF5F63C97810EC87BF4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
 		6B62D39E700D7780A2D24F90 /* AdGate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E6D611CA0D8CDFFDC0D1E80D /* AdGate.swift */; };
@@ -310,6 +311,7 @@
 		D4DB9132C916E5B75B28BE77 /* wf-button.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-button.m4a"; sourceTree = "<group>"; };
 		D7C771AB1111BA1267E678AF /* PlantCollectible.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCollectible.swift; sourceTree = "<group>"; };
 		D7DA8F2D5FF4FD7D8DEFF8E5 /* BadgesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgesView.swift; sourceTree = "<group>"; };
+		D9550E7376E237963E1CA789 /* TapBurst.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TapBurst.swift; sourceTree = "<group>"; };
 		DA61364BB027900BC30E6C17 /* wf-badgeGold.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeGold.m4a"; sourceTree = "<group>"; };
 		DE3B9B93CE1A034E8C165CB7 /* Badges.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Badges.json; sourceTree = "<group>"; };
 		E5603BA4007B124D652F8467 /* ReconcileTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReconcileTests.swift; sourceTree = "<group>"; };
@@ -495,6 +497,7 @@
 				9C551225618EF3D1793A9C2D /* Haptics.swift */,
 				5B58C1C833EE44A8A7BE2B94 /* ShareCard.swift */,
 				76256AC312EE57C1A3CD1F7D /* GardenTips.swift */,
+				D9550E7376E237963E1CA789 /* TapBurst.swift */,
 			);
 			name = Components;
 			path = Components;
@@ -1024,6 +1027,7 @@
 				A3860B5AF44F5DF4BC8E92A4 /* PlantVoice.swift in Sources */,
 				B5125DC1F13A03C81A450D4F /* GardenTips.swift in Sources */,
 				A14AD4EB4C33371F7270A10C /* VoicePicker.swift in Sources */,
+				62DF6A94C532BAA7B67A1EC7 /* TapBurst.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

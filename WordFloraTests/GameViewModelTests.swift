@@ -299,3 +299,22 @@ final class GameViewModelTests: XCTestCase {
     }
 }
 
+
+@MainActor
+final class RoseHintTests: XCTestCase {
+    func testRestedCardExplainsHowToEarnARoseWhenNoneIsHeld() throws {
+        let container = try ModelContainer(for: PlayerProfile.self, PlantCollectible.self, GameRecord.self,
+                                           configurations: ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none))
+        let e = WordEntry(id: "a", word: "LOTUS", display: "Lotus", hint: "h", hint2: nil, fact: "f", level: 1, kind: .vocab, plantId: nil,
+                          tags: [], minAge: 6, dailyEligible: true, source: "o", license: "p", reviewedBy: "t")
+        let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [e], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
+        let vm = GameViewModel(modelContext: container.mainContext, bank: bank, seed: 1)
+        vm.soundEnabled = false; vm.seedPlantsIfNeeded()
+        let line = vm.roseHint
+        XCTAssertNotNil(line)
+        XCTAssertTrue(line!.contains("Rose of Jericho"))
+        XCTAssertEqual(CopySafety.check(line!), [], line!)
+        vm.playerProfile?.roseOfJerichoCount = 1
+        XCTAssertNil(vm.roseHint)               // nothing to explain once one is held
+    }
+}

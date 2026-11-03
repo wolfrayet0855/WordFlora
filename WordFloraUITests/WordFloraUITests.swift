@@ -94,7 +94,7 @@ final class WordFloraUITests: XCTestCase {
         app.buttons["Water your plant"].tap()
         app.buttons["Play another word"].tap()
         XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
-        XCTAssertFalse(app.buttons["Levels"].exists)                            // later features stay hidden
+        XCTAssertFalse(app.buttons["Levels"].isEnabled)                         // later features are visible but not open yet
     }
 
     func testSettingsAndLevelMapOpen() {

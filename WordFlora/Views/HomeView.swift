@@ -4,6 +4,20 @@ struct HomeView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
 
+    /// Every destination is visible. Ones that are not open yet are dimmed with a kind line on how to reach them.
+    @ViewBuilder private func featureTile(_ feature: Feature?, _ title: String, _ icon: String, _ route: GameRoute) -> some View {
+        let open = feature.map { app.isUnlocked($0) } ?? true
+        VStack(spacing: 4) {
+            Button { router.go(route) } label: { Label(title, systemImage: icon) }
+                .buttonStyle(SecondaryButtonStyle()).disabled(!open)
+            if !open, let f = feature, let hint = FeatureUnlockPolicy.hint(for: f) {
+                Text(hint).font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .frame(maxWidth: .infinity)
+    }
+
     var body: some View {
         let profile = app.profile
         ScrollView {
@@ -69,27 +83,14 @@ struct HomeView: View {
                     .buttonStyle(SecondaryButtonStyle()).disabled(done)
                 }
 
-                HStack(spacing: 12) {
-                    Button { router.go(.garden) } label: { Label("Garden", systemImage: "leaf.fill") }
-                        .buttonStyle(SecondaryButtonStyle())
-                    if app.isUnlocked(.butterfly) {
-                        Button { router.go(.levelMap) } label: { Label("Levels", systemImage: "map.fill") }
-                            .buttonStyle(SecondaryButtonStyle())
-                    }
+                HStack(alignment: .top, spacing: 12) {
+                    featureTile(nil, "Garden", "leaf.fill", .garden)
+                    featureTile(.butterfly, "Levels", "map.fill", .levelMap)
                 }
-                HStack(spacing: 12) {
-                    if app.isUnlocked(.shed) {
-                        Button { router.go(.shed) } label: { Label("Shed", systemImage: "wrench.and.screwdriver.fill") }
-                            .buttonStyle(SecondaryButtonStyle())
-                    }
-                    if app.isUnlocked(.butterfly) {
-                        Button { router.go(.butterfly) } label: { Label("Visitors", systemImage: "ladybug.fill") }
-                            .buttonStyle(SecondaryButtonStyle())
-                    }
-                    if app.isUnlocked(.badges) {
-                        Button { router.go(.badges) } label: { Label("Badges", systemImage: "rosette") }
-                            .buttonStyle(SecondaryButtonStyle())
-                    }
+                HStack(alignment: .top, spacing: 12) {
+                    featureTile(.shed, "Shed", "wrench.and.screwdriver.fill", .shed)
+                    featureTile(.butterfly, "Visitors", "ladybug.fill", .butterfly)
+                    featureTile(.badges, "Badges", "rosette", .badges)
                 }
             }
             .padding(.horizontal, 20)
@@ -154,7 +155,7 @@ struct GardenDaysChip: View {
                 Text(days == 0 ? "Your garden is new" : "\(days) Garden \(days == 1 ? "Day" : "Days")")
                     .font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
                 if let streak, days > 0 {
-                    Text(streak > 1 ? "Streak \(streak)" : "Streak resting - your best was \(max(best, streak))")
+                    Text(streak > 1 ? "Streak \(streak)" : "Best streak: \(max(best, streak))")
                         .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).lineLimit(2)
                 }
             }

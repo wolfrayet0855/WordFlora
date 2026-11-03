@@ -30,6 +30,18 @@ enum FeatureUnlockPolicy {
         }
     }
 
+    /// A gentle line shown under a not-yet-open feature so players know how to reach it.
+    static func hint(for f: Feature) -> String? {
+        switch f {
+        case .butterfly: return "Opens after 3 garden days or your first level up."
+        case .shed: return "Opens at your second level up."
+        case .badges: return "Opens with your first badge."
+        case .sun: return "Opens when you find 3 plants."
+        case .soil: return "Opens when you find 5 plants."
+        default: return nil
+        }
+    }
+
     /// Tool unlock order (prototype round 8): the net arrives with the butterfly unlock; mister, shears and lamp come
     /// with completed garden levels 1, 2 and 3. The can and trowel are owned from the start.
     static func gardenTools(completedGardenLevels n: Int) -> [ToolID] {

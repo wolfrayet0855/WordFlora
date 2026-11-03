@@ -61,6 +61,12 @@ final class GameViewModel {
     var factAfterRound: String? { currentEntry?.fact }
     var roseOfJerichoCount: Int { playerProfile?.roseOfJerichoCount ?? 0 }
     var currentLevel: Int { playerProfile?.currentLevel ?? 1 }
+    /// Shown on the resting card when no Rose of Jericho is held, so players know how to earn one.
+    var roseHint: String? {
+        guard roseOfJerichoCount == 0 else { return nil }
+        let left = max(1, economy.roseThreshold - (playerProfile?.roseSeedProgress ?? 0))
+        return "Finish \(left) more \(left == 1 ? "word" : "words") to earn a Rose of Jericho. It can wake a resting flower."
+    }
     var canWakeUp: Bool { phase == .restingOffer && roseOfJerichoCount > 0 && !reviveUsedThisRound }
 
     var revealedWord: String {

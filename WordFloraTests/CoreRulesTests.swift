@@ -245,3 +245,16 @@ final class CoreRulesTests: XCTestCase {
     }
 }
 
+
+final class UnlockHintTests: XCTestCase {
+    func testEveryLockableFeatureHasAKindHint() {
+        for f in Feature.allCases where !f.isBaseline {
+            guard let hint = FeatureUnlockPolicy.hint(for: f) else { continue }
+            XCTAssertEqual(CopySafety.check(hint), [], hint)
+        }
+        XCTAssertNotNil(FeatureUnlockPolicy.hint(for: .shed))
+        XCTAssertNotNil(FeatureUnlockPolicy.hint(for: .butterfly))
+        XCTAssertNotNil(FeatureUnlockPolicy.hint(for: .badges))
+        XCTAssertNil(FeatureUnlockPolicy.hint(for: .play))
+    }
+}

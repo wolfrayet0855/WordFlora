@@ -170,6 +170,10 @@ struct GameView: View {
                 Text("Here's the word:").font(Theme.font(.callout))
                 WordTilesView(word: vm.currentWord, guessed: [], revealAll: true)
                 if let fact = vm.factAfterRound { Text(fact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85)) }
+                if let hint = vm.roseHint {
+                    Label(hint, systemImage: "sparkles").font(Theme.font(.footnote)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 Button { speak(vm.currentWord.capitalized) } label: { Label("Say it", systemImage: "speaker.wave.2.fill") }
                     .buttonStyle(SecondaryButtonStyle())
                 Button("Next word") { afterRound() }.buttonStyle(PrimaryButtonStyle())
