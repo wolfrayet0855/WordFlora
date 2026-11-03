@@ -10,9 +10,12 @@ final class GameRecord {
     var petalsRemaining: Int
     var plantEarned: String?
     var level: Int
+    var wordId: String = ""
+    var isDaily: Bool = false
 
     init(wordGuessed: String, triviaQuestion: String, won: Bool,
-         petalsRemaining: Int, plantEarned: String?, level: Int) {
+         petalsRemaining: Int, plantEarned: String?, level: Int,
+         wordId: String = "", isDaily: Bool = false) {
         self.date = .now
         self.wordGuessed = wordGuessed
         self.triviaQuestion = triviaQuestion
@@ -20,5 +23,7 @@ final class GameRecord {
         self.petalsRemaining = petalsRemaining
         self.plantEarned = plantEarned
         self.level = level
+        self.wordId = wordId
+        self.isDaily = isDaily
     }
 }

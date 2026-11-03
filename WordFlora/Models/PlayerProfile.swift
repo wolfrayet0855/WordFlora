@@ -20,6 +20,10 @@ final class PlayerProfile {
     var seenIds: [String] = []
     var roundsSinceAd: Int = 0
     var ageBand: String?
+    var roseSeedProgress: Int = 0
+    var lastRoundId: String?
+    var gardenDays: Int = 0
+    var lastGraceDay: Date?
 
     init() {}
 }

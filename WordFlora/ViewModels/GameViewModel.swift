@@ -2,82 +2,124 @@ import SwiftUI
 import SwiftData
 import AVFAudio
 
+/// Round logic for WordFlora v2 (spec sections 2, 3, 18, 19). No network: words come from the bundled bank.
 @Observable
 @MainActor
 final class GameViewModel {
+    enum Phase: Equatable { case idle, playing, won, restingOffer, rested }
+
     private let modelContext: ModelContext
-    private let triviaService = TriviaService()
+    private let bank: WordBank
+    private let economy: Economy
+    private let now: () -> Date
+    private let calendar: Calendar
+    private var rng: SplitMix64
     private var audioPlayer: AVAudioPlayer?
+    private var usedRungs: Set<HelpLadder.Rung> = []
+    private var reviveUsedThisRound = false
+    private var roundId = UUID().uuidString
+    private var regularRoundsThisSitting = 0
 
-    // Game state
-    private(set) var currentWord: String = ""
-    private(set) var triviaQuestion: String = ""
+    var soundEnabled = true
+
+    // Round state
+    private(set) var currentEntry: WordEntry?
     private(set) var guessedLetters: Set<Character> = []
-    private(set) var petalsRemaining: Int = 8
-    private(set) var phase: GamePhase = .idle
-    private(set) var roseOfJerichoDropped: Bool = false
-    private(set) var earnedPlantName: String? = nil
+    private(set) var petalsRemaining = 8
+    private(set) var phase: Phase = .idle
+    private(set) var isDaily = false
+    private(set) var extraHint: String?
+    private(set) var helpersUsed = 0
+    private(set) var revealedAnswer: String?
 
-    // Input (two-way bound from view)
-    var guessInput: String = ""
+    // Round result
+    private(set) var earnedPlantName: String?
+    private(set) var earnedPlantIsNew = false
+    private(set) var leveledUp = false
+    private(set) var roseDropped = false
+    private(set) var sessionBeat = false
 
-    // Player convenience
+    var guessInput = ""
+
     private(set) var playerProfile: PlayerProfile?
-    var roseOfJerichoCount: Int  { playerProfile?.roseOfJerichoCount ?? 0 }
-    var currentLevel: Int        { playerProfile?.currentLevel ?? 1 }
-    var plantsEarnedThisLevel: Int { playerProfile?.plantsEarnedThisLevel ?? 0 }
 
-    // Computed display
+    var currentWord: String { currentEntry?.word ?? "" }
+    var hint: String { currentEntry?.hint ?? "" }
+    var factAfterRound: String? { currentEntry?.fact }
+    var roseOfJerichoCount: Int { playerProfile?.roseOfJerichoCount ?? 0 }
+    var currentLevel: Int { playerProfile?.currentLevel ?? 1 }
+    var canWakeUp: Bool { phase == .restingOffer && roseOfJerichoCount > 0 && !reviveUsedThisRound }
+
     var revealedWord: String {
-        currentWord.map { guessedLetters.contains($0) ? String($0) : "_" }.joined(separator: " ")
+        currentWord.map { $0 == " " ? " " : (guessedLetters.contains($0) ? String($0) : "_") }.joined(separator: " ")
     }
     var isWordComplete: Bool {
-        !currentWord.isEmpty && currentWord.allSatisfy { guessedLetters.contains($0) }
+        !currentWord.isEmpty && currentWord.filter { $0.isLetter }.allSatisfy { guessedLetters.contains($0) }
     }
-    var wrongGuessCount: Int { 8 - petalsRemaining }
+    var petalsAccessibilityLabel: String { "\(petalsRemaining) of \(economy.maxPetals) petals left" }
 
-    enum GamePhase: Equatable {
-        case idle, loading, playing, won, dead, gameOver
-    }
-
-    init(modelContext: ModelContext) {
+    init(modelContext: ModelContext, bank: WordBank, economy: Economy = .default,
+         now: @escaping () -> Date = { .now }, calendar: Calendar = .current, seed: UInt64 = UInt64.random(in: .min ... .max)) {
         self.modelContext = modelContext
+        self.bank = bank
+        self.economy = economy
+        self.now = now
+        self.calendar = calendar
+        self.rng = SplitMix64(seed: seed)
         loadOrCreateProfile()
     }
 
-    // MARK: - Public API
+    // MARK: - Starting rounds
 
-    func startNewRound() async {
-        phase = .loading
-        resetRoundState()
-        do {
-            let trivia = try await triviaService.fetchQuestion(difficulty: Difficulty(level: currentLevel))
-            currentWord = trivia.answer
-            triviaQuestion = trivia.question
-            phase = .playing
-        } catch {
-            phase = .idle
+    /// Regular round from the bank at the chosen level (default: the player's word level).
+    func startRound(level: Int? = nil) {
+        let lvl = min(level ?? currentLevel, currentLevel)
+        let provider = WordProvider(bank: bank)
+        let dailyId = DailyBloom(bank: bank, calendar: calendar).wordId(for: now())
+        guard let e = provider.next(level: lvl, seen: playerProfile?.seenIds ?? [], excluding: dailyId, using: &rng) else {
+            phase = .idle; return
         }
+        begin(e, daily: false)
     }
 
-    /// Used by tests to inject a word directly (bypasses network).
-    func startGame(word: String, question: String) {
-        resetRoundState()
-        currentWord = word.uppercased()
-        triviaQuestion = question
+    func startDaily() {
+        let daily = DailyBloom(bank: bank, calendar: calendar)
+        guard let id = daily.wordId(for: now()), let e = WordProvider(bank: bank).entry(id: id) else { phase = .idle; return }
+        begin(e, daily: true)
+    }
+
+    /// Direct start (tutorial word, tests).
+    func start(entry: WordEntry) { begin(entry, daily: false) }
+
+    private func begin(_ e: WordEntry, daily: Bool) {
+        currentEntry = e
+        isDaily = daily
+        guessedLetters = []
+        petalsRemaining = economy.maxPetals
+        guessInput = ""
+        usedRungs = []
+        extraHint = nil
+        helpersUsed = 0
+        revealedAnswer = nil
+        reviveUsedThisRound = false
+        earnedPlantName = nil
+        earnedPlantIsNew = false
+        leveledUp = false
+        roseDropped = false
+        sessionBeat = false
+        roundId = UUID().uuidString
         phase = .playing
     }
 
+    // MARK: - Playing
+
     func submitGuess() {
+        defer { guessInput = "" }
         guard phase == .playing,
               let letter = guessInput.uppercased().first,
               letter.isLetter,
-              !guessedLetters.contains(letter) else {
-            guessInput = ""
-            return
-        }
+              !guessedLetters.contains(letter) else { return }
         guessedLetters.insert(letter)
-        guessInput = ""
 
         if currentWord.contains(letter) {
             playSound("correct")
@@ -90,43 +132,78 @@ final class GameViewModel {
             phase = .won
             finishRound(won: true)
         } else if petalsRemaining == 0 {
-            phase = .dead
+            if canWakeUpNow { phase = .restingOffer } else { finalizeLoss() }
         }
     }
 
-    func useRoseOfJericho() {
-        guard phase == .dead, roseOfJerichoCount > 0 else { return }
-        playerProfile?.roseOfJerichoCount -= 1
+    private var canWakeUpNow: Bool { roseOfJerichoCount > 0 && !reviveUsedThisRound }
+
+    func useHelp() {
+        guard phase == .playing, let e = currentEntry else { return }
+        guard let step = HelpLadder.next(used: usedRungs, word: e.word, guessed: guessedLetters, hint2: e.hint2) else { return }
+        switch step {
+        case .hint2(let text):
+            usedRungs.insert(.hint2); extraHint = text
+        case .reveal(let ch):
+            if "AEIOU".contains(ch) && !usedRungs.contains(.vowel) { usedRungs.insert(.vowel) } else { usedRungs.insert(.firstLetter) }
+            guessedLetters.insert(ch)
+        }
+        helpersUsed += 1
+    }
+
+    // MARK: - Resting (loss)
+
+    /// Wake the flower with a Rose of Jericho (offered before the answer is revealed).
+    func wakeUp() {
+        guard canWakeUp else { return }
+        var meter = roseMeter
+        guard meter.consume() else { return }
+        writeRoseMeter(meter)
+        reviveUsedThisRound = true
         petalsRemaining = 4
         phase = .playing
         try? modelContext.save()
     }
 
-    func giveUp() {
-        guard phase == .dead else { return }
-        phase = .gameOver
+    func declineWake() {
+        guard phase == .restingOffer else { return }
+        finalizeLoss()
+    }
+
+    private func finalizeLoss() {
+        phase = .rested
+        revealedAnswer = currentWord
         finishRound(won: false)
     }
+
+    // MARK: - Seeding / level
 
     func seedPlantsIfNeeded() {
         try? PlantCatalog.seedIfNeeded(context: modelContext)
     }
 
-    // MARK: - Private
+    /// Recompute the word level from the collection (call on appear, after sync, etc.).
+    func refreshLevel() {
+        guard let profile = playerProfile else { return }
+        let plants = allPlants()
+        let level = ProgressionPolicy.wordLevel(plants: progress(of: plants), economy: economy)
+        profile.currentLevel = level
+        profile.plantsEarnedThisLevel = plants.filter { $0.level == level && $0.earnedCount > 0 }.count
+    }
 
-    private func resetRoundState() {
-        guessedLetters = []
-        petalsRemaining = 8
-        guessInput = ""
-        roseOfJerichoDropped = false
-        earnedPlantName = nil
-        currentWord = ""
-        triviaQuestion = ""
+    // MARK: - Private: profile and persistence
+
+    private var roseMeter: RoseMeter {
+        RoseMeter(progress: playerProfile?.roseSeedProgress ?? 0, stock: roseOfJerichoCount, lastRoundId: playerProfile?.lastRoundId)
+    }
+    private func writeRoseMeter(_ m: RoseMeter) {
+        playerProfile?.roseSeedProgress = m.progress
+        playerProfile?.roseOfJerichoCount = m.stock
+        playerProfile?.lastRoundId = m.lastRoundId
     }
 
     private func loadOrCreateProfile() {
-        let descriptor = FetchDescriptor<PlayerProfile>()
-        if let existing = try? modelContext.fetch(descriptor).first {
+        if let existing = try? modelContext.fetch(FetchDescriptor<PlayerProfile>()).first {
             playerProfile = existing
         } else {
             let profile = PlayerProfile()
@@ -136,51 +213,93 @@ final class GameViewModel {
         }
     }
 
+    private func allPlants() -> [PlantCollectible] {
+        (try? modelContext.fetch(FetchDescriptor<PlantCollectible>())) ?? []
+    }
+    private func progress(of plants: [PlantCollectible]) -> [PlantProgress] {
+        plants.map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) }
+    }
+
+    // MARK: - Private: round end
+
     private func finishRound(won: Bool) {
-        let plantName: String? = won ? awardPlant() : nil
-        earnedPlantName = plantName
+        guard let profile = playerProfile, let e = currentEntry else { return }
+        let petals = petalsRemaining
+        var plantName: String?
 
-        modelContext.insert(GameRecord(
-            wordGuessed: currentWord,
-            triviaQuestion: triviaQuestion,
-            won: won,
-            petalsRemaining: petalsRemaining,
-            plantEarned: plantName,
-            level: currentLevel
-        ))
-        playerProfile?.gamesPlayed += 1
-
-        // ~15% random Rose of Jericho drop
-        if Double.random(in: 0..<1) < 0.15 {
-            playerProfile?.roseOfJerichoCount += 1
-            roseOfJerichoDropped = true
+        if won {
+            let award = awardPlant(for: e)
+            plantName = award?.name
+            earnedPlantName = award?.name
+            earnedPlantIsNew = award?.isNew ?? false
+            if award?.isNew == true { profile.soil += 2 }
+            profile.water = min(40, profile.water + waterReward(misses: economy.maxPetals - petals))
+            let oldLevel = profile.currentLevel
+            refreshLevel()
+            leveledUp = profile.currentLevel > oldLevel
         }
+
+        modelContext.insert(GameRecord(wordGuessed: e.word, triviaQuestion: e.hint, won: won,
+                                       petalsRemaining: petals, plantEarned: plantName, level: e.level,
+                                       wordId: e.id, isDaily: isDaily))
+        profile.gamesPlayed += 1
+        profile.seenIds = Array((profile.seenIds + [e.id]).suffix(200))
+
+        // Rose meter (win or lose), once per round id
+        var meter = roseMeter
+        if meter.recordRound(id: roundId, economy: economy) { roseDropped = true }
+
+        // Garden Days + gentle streak
+        var state = StreakState(gardenDays: profile.gardenDays, streak: profile.streak, bestStreak: profile.bestStreak,
+                                freezes: profile.streakFreezes, lastPlayedDay: profile.lastPlayedDay, lastGraceDay: profile.lastGraceDay)
+        let events = state.recordPlay(on: now(), calendar: calendar, economy: economy)
+        profile.gardenDays = state.gardenDays; profile.streak = state.streak; profile.bestStreak = state.bestStreak
+        profile.streakFreezes = state.freezes; profile.lastPlayedDay = state.lastPlayedDay; profile.lastGraceDay = state.lastGraceDay
+        if events.milestoneRose { meter.grant(economy: economy); roseDropped = true }
+        writeRoseMeter(meter)
+
+        // Ad cadence counter and session beat (regular rounds only)
+        if !isDaily {
+            profile.roundsSinceAd += 1
+            regularRoundsThisSitting += 1
+        }
+        sessionBeat = isDaily || (regularRoundsThisSitting > 0 && regularRoundsThisSitting % 3 == 0)
 
         try? modelContext.save()
         playSound(won ? "word-guessed" : "word-not-guessed")
     }
 
-    private func awardPlant() -> String? {
-        let level = currentLevel
-        let descriptor = FetchDescriptor<PlantCollectible>(
-            predicate: #Predicate { $0.level == level }
-        )
-        guard let plants = try? modelContext.fetch(descriptor),
-              let plant = plants.randomElement() else { return nil }
+    /// One water for a win, +1 for a clean round (<= 2 misses), +1 on the Daily Bloom. Help never reduces it below 1.
+    private func waterReward(misses: Int) -> Int {
+        1 + (misses <= 2 ? 1 : 0) + (isDaily ? 1 : 0)
+    }
 
-        plant.earnedCount += 1
-        playerProfile?.plantsEarnedThisLevel += 1
+    private func awardPlant(for e: WordEntry) -> (name: String, isNew: Bool)? {
+        let plants = allPlants()
+        let level = playerProfile?.currentLevel ?? 1
 
-        if (playerProfile?.plantsEarnedThisLevel ?? 0) >= 5 && currentLevel < 3 {
-            playerProfile?.currentLevel += 1
-            playerProfile?.plantsEarnedThisLevel = 0
+        if e.kind == .hero, let pid = e.plantId, let hero = plants.first(where: { $0.plantId == pid }), hero.earnedCount == 0 {
+            hero.earnedCount += 1
+            return (hero.name, true)
         }
-        try? modelContext.save()
-        return plant.name
+        let inLevel = plants.filter { $0.level == level }
+        if let pick = inLevel.filter({ $0.earnedCount == 0 }).randomElement(using: &rng) {
+            pick.earnedCount += 1
+            return (pick.name, true)
+        }
+        if e.kind == .hero, let pid = e.plantId, let hero = plants.first(where: { $0.plantId == pid }) {
+            hero.earnedCount += 1
+            return (hero.name, false)
+        }
+        if let pick = inLevel.randomElement(using: &rng) {
+            pick.earnedCount += 1
+            return (pick.name, false)
+        }
+        return nil
     }
 
     private func playSound(_ name: String) {
-        guard let asset = NSDataAsset(name: name),
+        guard soundEnabled, let asset = NSDataAsset(name: name),
               let player = try? AVAudioPlayer(data: asset.data) else { return }
         audioPlayer = player
         player.play()

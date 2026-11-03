@@ -17,10 +17,8 @@
 		597D0D97668D3B3901F9F7FA /* ProgressionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A188B4F331705EAF0FD7F2 /* ProgressionPolicy.swift */; };
 		59896F4A896FCF2AAA27E877 /* Words.json in Resources */ = {isa = PBXBuildFile; fileRef = 9D91134EF7A4DA4C11EB9E23 /* Words.json */; };
 		5E0A335D5FF8885586260FAB /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99940443AEBC1F94C00E15D2 /* StreakEngine.swift */; };
-		659ABF3B10DF2D1EE3B7B3F7 /* WordBankService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71229EAE4924516E464A11B5 /* WordBankService.swift */; };
 		68EF45C14F3CEC72F7042540 /* PlayerProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */; };
 		699CBEF5F63C97810EC87BF4 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
-		878B847E459F79C19DF9C963 /* TriviaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = E78257300F1A3AAEFFF20767 /* TriviaService.swift */; };
 		8CDA4D0BA93F589962585DB8 /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6305635D642316CCE8610F /* GameRecord.swift */; };
 		9603333091B94F1CE68C0A45 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9075581718316A5EDE6C92FD /* GameViewModel.swift */; };
 		9640E4CF89AD1324C08B70FE /* CoreRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03162041D3ADF3CEE1CCF23B /* CoreRulesTests.swift */; };
@@ -29,14 +27,12 @@
 		9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E6F2C922C06007E28B8 /* Assets.xcassets */; };
 		9A467E732C922C06007E28B8 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E722C922C06007E28B8 /* Preview Assets.xcassets */; };
 		9CD2F602E0C7313FD3967ACE /* WordProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B62098E04C3095B889397EC /* WordProvider.swift */; };
-		BB839A507E257E427EDF327E /* WordBank.json in Resources */ = {isa = PBXBuildFile; fileRef = CB90B347AD42770BB38CF941 /* WordBank.json */; };
 		C2FB34C4102FCBD97EADB91E /* CopySafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21DF9A95AEA44F66C376C83 /* CopySafety.swift */; };
 		C56399AF5A9FB677D166E85A /* WordEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1953888CF19BF643304ED9AC /* WordEntry.swift */; };
 		CEE0A8C8A89FF4365D45F346 /* PlantCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9331FDFC4EAE840666B50749 /* PlantCatalog.swift */; };
 		CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */; };
 		D61844C609FE7631DFFBF7CF /* Plants.json in Resources */ = {isa = PBXBuildFile; fileRef = 437318BFC10E7CDE04AF1603 /* Plants.json */; };
 		D6E3215F0B7EB9ED5C2DD218 /* WordDifficulty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909E3EE9D33E5BC4BBD0BBE2 /* WordDifficulty.swift */; };
-		DEE6BE19D0E9729C1907EB2C /* TriviaServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 916DCC6AD5F15EE8C53AB9F7 /* TriviaServiceTests.swift */; };
 		E7EE45CC3E1C7571FF926CB0 /* DailyBloom.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */; };
 		F71D413F98EA5AE19AADA1C0 /* Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045A383C28CF63B7AA1690E5 /* Economy.swift */; };
 /* End PBXBuildFile section */
@@ -63,12 +59,10 @@
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
 		507CD36D0F85A153026420C3 /* WordBankValidator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordBankValidator.swift; sourceTree = "<group>"; };
 		6406AFD4A968B89AEFEE8100 /* WordFloraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		71229EAE4924516E464A11B5 /* WordBankService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordBankService.swift; sourceTree = "<group>"; };
 		71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModelTests.swift; sourceTree = "<group>"; };
 		7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCatalogTests.swift; sourceTree = "<group>"; };
 		9075581718316A5EDE6C92FD /* GameViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
 		909E3EE9D33E5BC4BBD0BBE2 /* WordDifficulty.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordDifficulty.swift; sourceTree = "<group>"; };
-		916DCC6AD5F15EE8C53AB9F7 /* TriviaServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TriviaServiceTests.swift; sourceTree = "<group>"; };
 		9331FDFC4EAE840666B50749 /* PlantCatalog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCatalog.swift; sourceTree = "<group>"; };
 		99940443AEBC1F94C00E15D2 /* StreakEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StreakEngine.swift; sourceTree = "<group>"; };
 		9A467E682C922C05007E28B8 /* WordFlora.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WordFlora.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,10 +77,8 @@
 		B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerProfile.swift; sourceTree = "<group>"; };
 		B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SplitMix64.swift; sourceTree = "<group>"; };
 		BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyBloom.swift; sourceTree = "<group>"; };
-		CB90B347AD42770BB38CF941 /* WordBank.json */ = {isa = PBXFileReference; includeInIndex = 1; path = WordBank.json; sourceTree = "<group>"; };
 		D7C771AB1111BA1267E678AF /* PlantCollectible.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCollectible.swift; sourceTree = "<group>"; };
 		E6170EEBB1FE8D65905545EE /* HelpLadder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HelpLadder.swift; sourceTree = "<group>"; };
-		E78257300F1A3AAEFFF20767 /* TriviaService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TriviaService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -134,7 +126,6 @@
 		25D6FB48ABA4617FA21AE593 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				CB90B347AD42770BB38CF941 /* WordBank.json */,
 				437318BFC10E7CDE04AF1603 /* Plants.json */,
 				9D91134EF7A4DA4C11EB9E23 /* Words.json */,
 			);
@@ -157,7 +148,6 @@
 		7D0DBDDECE719C4DAFC3BF7C /* WordFloraTests */ = {
 			isa = PBXGroup;
 			children = (
-				916DCC6AD5F15EE8C53AB9F7 /* TriviaServiceTests.swift */,
 				71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */,
 				7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */,
 				07E6A1305C8A4BB87A255C2F /* WordProviderTests.swift */,
@@ -214,8 +204,6 @@
 		AA4845E06B8A3667C1CEFF57 /* Services */ = {
 			isa = PBXGroup;
 			children = (
-				71229EAE4924516E464A11B5 /* WordBankService.swift */,
-				E78257300F1A3AAEFFF20767 /* TriviaService.swift */,
 				9331FDFC4EAE840666B50749 /* PlantCatalog.swift */,
 				B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */,
 				507CD36D0F85A153026420C3 /* WordBankValidator.swift */,
@@ -329,7 +317,6 @@
 			files = (
 				9A467E732C922C06007E28B8 /* Preview Assets.xcassets in Resources */,
 				9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */,
-				BB839A507E257E427EDF327E /* WordBank.json in Resources */,
 				D61844C609FE7631DFFBF7CF /* Plants.json in Resources */,
 				59896F4A896FCF2AAA27E877 /* Words.json in Resources */,
 			);
@@ -342,7 +329,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DEE6BE19D0E9729C1907EB2C /* TriviaServiceTests.swift in Sources */,
 				05B7E3F9F4DC0094781F5022 /* GameViewModelTests.swift in Sources */,
 				CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */,
 				21F06B6221D6075031D257BC /* WordProviderTests.swift in Sources */,
@@ -359,8 +345,6 @@
 				68EF45C14F3CEC72F7042540 /* PlayerProfile.swift in Sources */,
 				2FAAC760A0B5D1B374DD5839 /* PlantCollectible.swift in Sources */,
 				8CDA4D0BA93F589962585DB8 /* GameRecord.swift in Sources */,
-				659ABF3B10DF2D1EE3B7B3F7 /* WordBankService.swift in Sources */,
-				878B847E459F79C19DF9C963 /* TriviaService.swift in Sources */,
 				9603333091B94F1CE68C0A45 /* GameViewModel.swift in Sources */,
 				CEE0A8C8A89FF4365D45F346 /* PlantCatalog.swift in Sources */,
 				C56399AF5A9FB677D166E85A /* WordEntry.swift in Sources */,
