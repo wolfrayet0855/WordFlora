@@ -24,6 +24,19 @@ struct HomeView: View {
                         .foregroundStyle(Color.secondaryText)
                 }
 
+                if app.showWelcomeBack {
+                    Card {
+                        HStack(spacing: 10) {
+                            Image(systemName: "cloud.sun.rain.fill").font(.title2).foregroundStyle(Color.accentText)
+                            Text(app.welcomeLine).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
+                            Spacer(minLength: 0)
+                            Button { app.dismissWelcomeBack() } label: { Image(systemName: "xmark").frame(width: Theme.minTap, height: Theme.minTap) }
+                                .accessibilityLabel("Dismiss")
+                        }
+                    }
+                    .transition(.opacity)
+                }
+
                 FlowerView(petals: 8)
                     .frame(height: 220)
                     .padding(.vertical, 4)

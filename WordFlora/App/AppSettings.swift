@@ -27,6 +27,7 @@ final class AppSettings {
     var ageBand: AgeBand? { didSet { defaults.set(ageBand?.rawValue, forKey: "ageBand") } }
     var onboardingComplete: Bool { didSet { defaults.set(onboardingComplete, forKey: "onboardingComplete") } }
     var completedSessions: Int { didSet { defaults.set(completedSessions, forKey: "completedSessions") } }
+    var lastOpenedAt: Date? { didSet { defaults.set(lastOpenedAt, forKey: "lastOpenedAt") } }
 
     var isUnderThirteen: Bool { ageBand == .under13 }
     var colorScheme: ColorScheme? {
@@ -56,6 +57,7 @@ final class AppSettings {
         ageBand = age
         onboardingComplete = bool("onboardingComplete", false)
         completedSessions = defaults.integer(forKey: "completedSessions")
+        lastOpenedAt = defaults.object(forKey: "lastOpenedAt") as? Date
     }
 
     /// Applies the defaults that depend on the age answer (called once, when the player answers).

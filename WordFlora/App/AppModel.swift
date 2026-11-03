@@ -20,6 +20,8 @@ final class AppModel {
     /// True when this launch opened the iCloud-synced store.
     let launchedWithCloud: Bool
     private(set) var syncNeedsRestart = false
+    private(set) var showWelcomeBack = false
+    private(set) var welcomeLine = WelcomeBack.lines[0]
     /// True when the saved garden could not be opened and this launch is running on a temporary store.
     let storeDegraded: Bool
     static let degradedStoreMessage = "We couldn't open your saved garden just now. Please close and reopen the app. Your saved garden is safe."
@@ -52,7 +54,15 @@ final class AppModel {
         let defs = (try? BadgeCatalog.load()) ?? []
         badges = BadgeState(json: game.playerProfile?.badgesJSON ?? "", defs: defs)
         refreshFreeDrops()
+        let lastOpen = settings.lastOpenedAt
+        if settings.onboardingComplete, WelcomeBack.shouldShow(lastOpened: lastOpen, now: now(), calendar: .current) {
+            showWelcomeBack = true
+            welcomeLine = WelcomeBack.lines[abs(Int(now().timeIntervalSince1970 / 86_400)) % WelcomeBack.lines.count]
+        }
+        if settings.onboardingComplete { settings.lastOpenedAt = now() }
     }
+
+    func dismissWelcomeBack() { showWelcomeBack = false }
 
     // MARK: Data
 
