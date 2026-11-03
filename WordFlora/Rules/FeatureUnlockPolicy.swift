@@ -6,8 +6,6 @@ enum Feature: CaseIterable, Hashable {
     var isBaseline: Bool { self == .play || self == .garden || self == .dailyBloom }
 }
 
-enum Tool: CaseIterable { case repot, prune, mist, lamp }
-
 struct UnlockStats: Equatable {
     var plantsEarned = 0
     var sawTwoPetalsLeft = false
@@ -32,9 +30,10 @@ enum FeatureUnlockPolicy {
         }
     }
 
-    /// One tool per garden-level milestone, in a fixed order.
-    static func unlockedTools(gardenMilestones n: Int) -> [Tool] {
-        Array(Tool.allCases.prefix(max(0, min(n, Tool.allCases.count))))
+    /// Tool unlock order (prototype round 8): the net arrives with the butterfly unlock; mister, shears and lamp come
+    /// with completed garden levels 1, 2 and 3. The can and trowel are owned from the start.
+    static func gardenTools(completedGardenLevels n: Int) -> [ToolID] {
+        Array([ToolID.mister, .shears, .lamp].prefix(max(0, min(n, 3))))
     }
 
     /// Features that unlocked since last asked; each is returned exactly once (for one TipKit tip each).

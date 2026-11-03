@@ -6,12 +6,18 @@
  <button id="tTheme">Light / Dark</button>
  <label><input type="checkbox" id="tRm"> Reduce Motion</label>
  <span class="seg"><button id="tFree">Free</button><button id="tPlus">Plus</button></span>
- <label><input type="checkbox" id="tEve"> Evening (17:30 to 21:30)</label>
- <button id="tReset">Reset</button>
+ <label><input type="checkbox" id="tEve"> Dusk (17:30 to 21:30)</label>
+ <label><input type="checkbox" id="tYoung"> Young player (under 13)</label>
+ <label>Season <select id="tSeason"><option value="spring">Spring</option><option value="summer">Summer</option><option value="autumn">Autumn</option><option value="winter">Winter</option></select></label>
+ <button id="tLogic">Ad logic</button>
  <button id="tReal">Real vs placeholder</button>
+ <br>
+ <button id="tDay">Next day</button><button id="tMin2">+2 min</button><button id="tMin20">+20 min</button><button id="tAway3">Away 3 days</button><button id="tAway30">Away 30 days</button><button id="tPrompts">Prompt map</button><button id="tFresh">Fresh install</button>
 </div>
 <div id="log">Haptic and sound cues appear here when you tap.</div>
 <div id="wrap"><div id="fit"><div id="phone"><svg width="0" height="0" style="position:absolute"><defs id="gdefs"></defs></svg>
- <div class="island"></div><div id="screen"></div><div id="ov"></div><canvas id="rainCv" width="780" height="1688"></canvas><div id="toast"></div><div class="hind"></div></div></div></div>
-<aside id="real"><h4>What is real vs placeholder</h4><b>Real (approved art and flows):</b><ul><li>All art: flower mascot, 50 plants, tools and tiers, 12 visitors, badges, flower rain, wordmark, icon.</li><li>Screens and copy: Home, round, plant earned, garden, shed, repot, prune, net game, album, badges, level map, settings, paywall, ad moment.</li><li>Rules: 8-petal round with Rose of Jericho revive, ad after every 3rd round (Free only), badge thresholds, tool unlock order and tier costs, evening visitors.</li></ul><b>Placeholder / not simulated:</b><ul><li>Economy numbers (drop, scoop and shed-point rewards, growth points, cooldowns) are simplified, not the tuned values. There is no daily cap on growth or trickle refill.</li><li>No real haptics or sounds: the line above the phone only names the cue that would play.</li><li>No purchases, no real ads, no iCloud, notifications, widgets, Game Center or parental gate/age screen.</li><li>The word list is 12 sample words. Net and Mister unlock together at Level 2 here.</li></ul>Progress is kept in this browser (localStorage); Reset clears it. Settings has Prototype helpers to jump ahead.</aside><script src="art.js"></script><script src="rain.js"></script><script src="app.js"></script>
+ <div class="island"></div><div id="screen"></div><div id="ov"></div><canvas id="rainCv" width="780" height="1688"></canvas><div id="skipRain" style="display:none;position:absolute;inset:0;z-index:56" aria-label="Tap to skip"></div><div id="toast"></div><div class="hind"></div></div></div></div>
+<aside id="logic"></aside>
+<aside id="real"><h4>What is real vs placeholder</h4><b>Real (approved art and flows):</b><ul><li>All art: flower mascot, 50 plants, tools and tiers, 12 visitors, badges, flower rain, wordmark, icon.</li><li>First session script (intro, age, tutorial word, first plant, water tip), help ladder, resting loss, progressive unlocks, two level tracks, resting card and ad rules, Rose seed meter, Garden Days, Quiet Garden, Calm, young-player mode, diary, naming, first-bloom ceremony, welcome back, seasons and dusk.</li></ul><b>Placeholder / not simulated:</b><ul><li>Economy numbers (drops, scoops, shed points, growth points, cooldowns) are simplified, not the tuned values. No daily growth cap or water trickle.</li><li>No real haptics or sounds: the line above the phone names the single cue that would play per action. "Say it" uses the browser voice if present.</li><li>No purchases, real ads, UMP/ATT or notification prompts (mock sheets show where they would appear), iCloud, widgets, Game Center. Age and parental gate are mocked.</li><li>12 sample words plus a 17-word bank; weather, real season and clock are simulated with the toolbar. Word difficulty bands are by length, not the computed score.</li></ul>Progress is kept in this browser (localStorage). Fresh install resets to the first-session script. Settings has Prototype helpers and Show everything.</aside>
+<script src="art.js"></script><script src="rain.js"></script><script src="app.js"></script>
 </body></html>

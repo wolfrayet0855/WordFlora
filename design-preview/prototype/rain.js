@@ -39,7 +39,7 @@ window.FlowerRain = (function () {
     function pick(a){return a[Math.floor(rnd()*a.length)]}
     function range(a){return lerp(a[0],a[1],rnd())}
     v.layers.forEach(function (L, li) {
-      for (i = 0; i < L.n; i++) {
+      for (i = 0; i < Math.round(L.n * (opts.calm ? .5 : 1)); i++) {
         var col = pick(PALETTE);
         parts.push({ li: li, kind: pick(L.kinds), color: col, x0: lerp(-10, W + 10, rnd()), size: range(L.size), delay: rnd() * L.delay,
           fall: range(L.fall), amp: range(L.amp), freq: range(L.freq), phase: rnd() * TAU, rot0: rnd() * 360, spin: (rnd() < .5 ? -1 : 1) * L.spin * (0.5 + rnd() * .5),

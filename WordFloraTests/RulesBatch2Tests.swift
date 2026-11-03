@@ -83,10 +83,10 @@ final class RulesBatch2Tests: XCTestCase {
         for f in Feature.allCases { XCTAssertTrue(FeatureUnlockPolicy.isUnlocked(f, stats: UnlockStats(), showEverything: true)) }
     }
 
-    func testGardenMilestonesUnlockOneToolEachInOrder() {
-        XCTAssertEqual(FeatureUnlockPolicy.unlockedTools(gardenMilestones: 0), [])
-        XCTAssertEqual(FeatureUnlockPolicy.unlockedTools(gardenMilestones: 2), [.repot, .prune])
-        XCTAssertEqual(FeatureUnlockPolicy.unlockedTools(gardenMilestones: 9), [.repot, .prune, .mist, .lamp])
+    func testGardenLevelsUnlockMisterThenShearsThenLamp() {
+        XCTAssertEqual(FeatureUnlockPolicy.gardenTools(completedGardenLevels: 0), [])
+        XCTAssertEqual(FeatureUnlockPolicy.gardenTools(completedGardenLevels: 2), [.mister, .shears])
+        XCTAssertEqual(FeatureUnlockPolicy.gardenTools(completedGardenLevels: 9), [.mister, .shears, .lamp])
     }
 
     func testEachUnlockAnnouncesExactlyOnce() {

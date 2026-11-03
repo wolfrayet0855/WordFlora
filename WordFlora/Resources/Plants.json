@@ -128,7 +128,7 @@
   {
     "name": "Hibiscus",
     "botanicalName": "Hibiscus rosa-sinensis",
-    "botanicalFact": "Each bloom typically lasts only a day.",
+    "botanicalFact": "Each bloom typically lasts about a day.",
     "level": 2,
     "imageName": "plant_hibiscus"
   },
@@ -163,7 +163,7 @@
   {
     "name": "Welwitschia",
     "botanicalName": "Welwitschia mirabilis",
-    "botanicalFact": "Grows only two leaves in its life, for 1,000+ years.",
+    "botanicalFact": "Grows just two leaves in its life, for 1,000+ years.",
     "level": 3,
     "imageName": "plant_welwitschia"
   },
@@ -282,7 +282,7 @@
   {
     "name": "Wollemi Pine",
     "botanicalName": "Wollemia nobilis",
-    "botanicalFact": "Known only from fossils until living trees were found in Australia in 1994.",
+    "botanicalFact": "Scientists knew it from fossils until living trees were found in Australia in 1994.",
     "level": 5,
     "imageName": "plant_wollemi_pine"
   },
@@ -331,7 +331,7 @@
   {
     "name": "Silversword",
     "botanicalName": "Argyroxiphium sandwicense",
-    "botanicalFact": "Found only in Hawaii, on high volcanic slopes.",
+    "botanicalFact": "Native to Hawaii, high on its volcanic slopes.",
     "level": 5,
     "imageName": "plant_silversword"
   },
@@ -345,7 +345,7 @@
   {
     "name": "Puya Raimondii",
     "botanicalName": "Puya raimondii",
-    "botanicalFact": "The largest bromeliad, it flowers once after many decades, then dies.",
+    "botanicalFact": "The largest bromeliad flowers once after many decades, then sets seed.",
     "level": 5,
     "imageName": "plant_puya_raimondii"
   }

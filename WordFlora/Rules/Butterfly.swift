@@ -22,7 +22,7 @@ enum VisitorCatalog {
         VisitorSpecies(id: "ladybug", name: "Ladybug", rarity: .common),
         VisitorSpecies(id: "dragonfly", name: "Dragonfly", rarity: .uncommon, fact: "Dragonfly ancestors zoomed through the sky about 300 million years ago, before dinosaurs."),
         VisitorSpecies(id: "morpho", name: "Blue Morpho", rarity: .rare),
-        VisitorSpecies(id: "hummingbird", name: "Hummingbird", rarity: .rare, fact: "A hummingbird's wings beat about 50 times a second."),
+        VisitorSpecies(id: "hummingbird", name: "Hummingbird", rarity: .rare, fact: "A hummingbird's wings flap about 50 times a second."),
         VisitorSpecies(id: "firefly", name: "Firefly", rarity: .uncommon, nightOnly: true),
         VisitorSpecies(id: "luna", name: "Luna Moth", rarity: .rare, nightOnly: true),
     ]

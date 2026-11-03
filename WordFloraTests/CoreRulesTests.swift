@@ -206,4 +206,22 @@ final class CoreRulesTests: XCTestCase {
             XCTAssertEqual(CopySafety.check(good), [], good)
         }
     }
+
+    // MARK: shipped content passes the copy linter
+    func testShippedPlantFactsPassCopySafety() throws {
+        for p in try PlantCatalog.load() { XCTAssertEqual(CopySafety.check(p.botanicalFact), [], "\(p.name): \(p.botanicalFact)") }
+    }
+
+    func testShippedWordBankTextPassesCopySafety() throws {
+        for e in try WordBank.load().entries {
+            for text in [e.hint, e.hint2, e.fact].compactMap({ $0 }) {
+                XCTAssertEqual(CopySafety.check(text), [], "\(e.id): \(text)")
+            }
+        }
+    }
+
+    func testVisitorFactsPassCopySafety() {
+        for v in VisitorCatalog.all { if let f = v.fact { XCTAssertEqual(CopySafety.check(f), [], "\(v.id): \(f)") } }
+    }
 }
+

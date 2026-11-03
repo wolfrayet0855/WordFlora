@@ -78,3 +78,20 @@ button{font-family:inherit;color:inherit;cursor:pointer}
 .flash{filter:brightness(1.18)}
 #real{display:none;position:fixed;right:12px;top:70px;width:290px;max-height:80vh;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:16px;padding:14px;font-size:12.5px;line-height:1.5;box-shadow:var(--shadow);z-index:99}#real h4{margin:0 0 6px}#real li{margin-bottom:4px}
 @media (min-width:1150px){#real{display:block}}
+.tb select{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:8px;padding:2px 4px}
+#screen .body{position:relative;z-index:1}
+.mood-strip{position:absolute;left:0;right:0;top:0;height:260px;z-index:0;pointer-events:none;overflow:hidden}.mood-strip svg{position:absolute;left:0;top:44px}
+.tipbub{background:color-mix(in srgb,var(--accent) 22%,var(--surface));border:1px solid color-mix(in srgb,var(--accent) 50%,transparent);border-radius:16px;padding:10px 14px;font-size:13.5px;line-height:1.4;margin:4px 0 8px;text-align:left}
+.pc.tipped{outline:3px solid var(--accent);outline-offset:2px;animation:ringK 2s ease-in-out infinite}.rm .pc.tipped{animation:none}
+.coach{font-size:13px;line-height:1.4;color:var(--muted);text-align:center;margin:0 6px}
+.pulse{animation:pulseB 1.2s ease-in-out 2;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 60%,transparent)}.rm .pulse{animation:none}
+@keyframes pulseB{0%,100%{transform:scale(1)}50%{transform:scale(1.04)}}
+.tiles{align-items:flex-end}.tile{box-sizing:border-box;height:38px}.tile.hit{animation:none}
+.st .pl.th{transform:rotate(7deg);transform-origin:50% 100%;filter:saturate(.8)}
+.dropb{position:absolute;right:42px;top:34px;width:34px;height:34px;border-radius:50%;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;font-size:18px;animation:bob 3s ease-in-out infinite}.rm .dropb{animation:none}
+.voice{font-size:13px;font-style:italic;color:var(--muted);min-height:18px;margin-top:4px}
+.cerwrap{text-align:center;padding:10px 0;cursor:pointer}.cerp{animation:cerK 2.4s ease-in-out both}.rm .cerp{animation:none}.cert{font-size:18px;font-weight:700;opacity:0;animation:cerT 2.4s ease-in-out both}
+@keyframes cerK{0%{transform:scale(.5);opacity:.2}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1)}}@keyframes cerT{0%,30%{opacity:0}70%,100%{opacity:1}}
+.kbn{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}.kbn button{height:50px;border-radius:14px;border:0;background:var(--surface);box-shadow:var(--shadow);font-size:22px;font-weight:700;color:var(--text)}
+#logic{display:none;position:fixed;left:12px;top:90px;width:260px;max-height:80vh;overflow:auto;background:var(--surface);color:var(--text);border:1px solid var(--line);border-radius:14px;padding:12px;font-size:12.5px;line-height:1.5;box-shadow:var(--shadow);z-index:99}#logic ul{margin:4px 0 4px 16px;padding:0}
+.dim.cer{background:rgba(0,0,0,.6)}
