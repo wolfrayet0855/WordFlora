@@ -58,4 +58,19 @@ enum WidgetActions {
         try? context.save()
         return result
     }
+
+    /// One calm sentence for Siri and Control Center: waters the garden's hero plant using the very same rules as the widget.
+    @MainActor
+    static func waterGarden(context: ModelContext, now: Date, calendar: Calendar, quiet: Bool) -> String {
+        guard let hero = snapshot(context: context, now: now, calm: true).hero else {
+            return "Play a word to find your first plant, then come back to water it."
+        }
+        let result = water(plantId: hero.plantId, context: context, now: now, calendar: calendar, quiet: quiet)
+        if result.applied { return "\(hero.name) had a drink and is growing nicely." }
+        switch result.reason {
+        case .noWater: return "No drops right now. Play a word to earn more."
+        case .fullForToday, .alreadyDoneToday: return "\(hero.name) has had plenty for today."
+        default: return "Your garden is ready when you are."
+        }
+    }
 }
