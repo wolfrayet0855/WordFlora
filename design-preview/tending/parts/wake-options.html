@@ -1,0 +1,105 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WordFlora wake options</title>
+<link rel="stylesheet" href="../../theme.css">
+<style>
+:root,[data-theme=light]{--leaf:#9BCB3C;--leaf-ink:#22331A;--water:#4C93D6;--sun:#F2B632;--heart:#E0627F;--soil:#7A5238;--card:#FFFFFF;--txt2:#4F5F4F;--petal:#F2788A;--petal-edge:#D9566C;--ghost:#7C867C;--glass:rgba(255,255,255,.95)}
+[data-theme=dark]{--leaf:#A8D84A;--leaf-ink:#1A2E1A;--water:#7DB6EE;--sun:#F6C85A;--heart:#F08AA3;--soil:#A47550;--card:#2C3E2C;--txt2:#B9D0B9;--petal:#F58A9B;--petal-edge:#E06B80;--ghost:#A9B8A9;--glass:rgba(44,62,44,.95)}
+body{line-height:1.45}.wrap{max-width:1700px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:30px;margin:0}.sub{color:var(--txt2);max-width:80ch}
+.bar{display:flex;gap:10px;margin:12px 0 22px}
+.btn{font:inherit;font-weight:800;border:0;border-radius:999px;min-height:44px;padding:10px 18px;background:var(--leaf);color:var(--leaf-ink);cursor:pointer}
+.btn:focus-visible,.opt:focus-visible,.go:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+.phones{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.phone{width:390px;height:844px;border:10px solid #22301f;border-radius:52px;box-sizing:content-box;overflow:hidden;position:relative;background:var(--bg);box-shadow:var(--shadow);flex:none}
+.cap{margin:10px 0 0;font-weight:700;max-width:390px}.cap small{display:block;font-weight:500;color:var(--txt2)}
+.sbar{height:44px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 4px;font-size:13px;font-weight:700}
+.title{font-size:28px;font-weight:800;text-align:center;padding-top:6px}
+.plant{position:absolute;left:50%;margin-left:-70px;width:140px;height:300px}.plant svg{width:100%;height:100%;overflow:visible}
+.dim{position:absolute;inset:0;background:rgba(20,30,20,.38);z-index:5}
+.sheet{position:absolute;left:0;right:0;bottom:0;height:520px;background:var(--surface);border-radius:28px 28px 0 0;z-index:6;padding:8px 16px 28px;box-shadow:0 -8px 30px rgba(0,0,0,.2)}
+.grab{width:38px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 10px}
+.sheet h2{margin:0;font-size:22px;text-align:center}.sheet p.s{margin:2px 0 12px;text-align:center;color:var(--txt2);font-weight:600;font-size:14px}
+.opt{display:flex;gap:12px;align-items:center;width:100%;min-height:104px;border:0;border-radius:22px;background:var(--card);box-shadow:var(--shadow),inset 0 0 0 2px var(--line);padding:12px;margin-bottom:10px;text-align:left;font:inherit;color:var(--text);cursor:pointer;position:relative}
+.opt.rec{box-shadow:0 0 0 3px var(--leaf),var(--shadow)}
+.opt .art{flex:none;width:76px;height:76px;border-radius:18px;display:grid;place-items:center;background:color-mix(in srgb,var(--leaf) 28%,transparent)}
+.opt .art svg{width:60px;height:60px}
+.opt b{display:block;font-size:17px}.opt span.d{display:block;color:var(--txt2);font-size:13px;font-weight:600;margin:1px 0 6px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}.chip{font-size:12px;font-weight:800;border-radius:999px;padding:4px 10px;background:color-mix(in srgb,var(--text) 10%,transparent)}
+.chip.g{background:color-mix(in srgb,var(--leaf) 40%,transparent)}
+.badge{position:absolute;top:-9px;right:14px;background:var(--leaf);color:var(--leaf-ink);font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px}
+.alt{display:block;margin:2px auto 0;min-height:44px;border:0;background:none;font:inherit;font-weight:800;color:var(--txt2);cursor:pointer}
+.go{display:block;border:0;border-radius:18px;min-height:56px;width:calc(100% - 32px);margin:0 auto;font:inherit;font-weight:800;font-size:17px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
+.card{position:absolute;left:16px;right:16px;border-radius:26px;background:var(--card);box-shadow:var(--shadow);padding:18px;text-align:center}
+.card h2{margin:0;font-size:24px}.card p{margin:6px 0 0;color:var(--txt2);font-weight:600}
+.pet{display:flex;justify-content:center;gap:10px;margin:14px 0}.pet svg{width:26px;height:36px;overflow:visible}
+.pet .on{fill:var(--petal);stroke:var(--petal-edge);stroke-width:3.5;stroke-linejoin:round;transform-box:fill-box;transform-origin:50% 100%;animation:grow .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * .3s + .4s)}
+.pet .off{fill:none;stroke:var(--ghost);stroke-width:3;stroke-dasharray:7 6}
+@keyframes grow{0%{transform:scale(.15);opacity:0}100%{transform:scale(1);opacity:1}}
+.key{display:flex;justify-content:center;align-items:center;gap:6px;margin:8px 0 0;font-size:14px;font-weight:700;color:var(--text)}.key svg{width:16px;height:16px}
+.hearts{display:flex;justify-content:center;gap:6px}.hearts svg{width:28px;height:28px}
+.glow{position:absolute;left:50%;margin-left:-130px;width:260px;height:260px;border-radius:50%;background:radial-gradient(color-mix(in srgb,var(--sun) 55%,transparent),transparent 70%);animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.12);opacity:.7}}
+.pop{transform-box:fill-box;transform-origin:center;animation:pop 2.4s ease-out infinite}
+@keyframes pop{0%{transform:scale(0);opacity:0}30%{opacity:1}100%{transform:scale(1)}}
+.zz{animation:pulse 3s ease-in-out infinite}
+.rm .glow,.rm .pop,.rm .zz,.rm .pet .on,.rm .seedg{animation:none}
+@media (prefers-reduced-motion:reduce){.glow,.pop,.zz,.pet .on,.seedg{animation:none}}
+.seedg{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04,1.06)}}
+.notes{margin-top:34px;max-width:95ch}.notes li{margin:6px 0}
+.x{position:absolute;top:10px;right:12px;width:44px;height:44px;border:0;border-radius:50%;background:color-mix(in srgb,var(--text) 10%,transparent);color:var(--text);font:inherit;font-size:20px;font-weight:800;cursor:pointer;display:grid;place-items:center}
+.x:focus-visible,.quiet:focus-visible,.alt:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+.quiet{display:inline-block;margin-top:12px;min-height:44px;padding:8px 20px;border:0;border-radius:999px;background:color-mix(in srgb,var(--leaf) 30%,transparent);color:var(--text);font:inherit;font-weight:800;cursor:pointer}
+.skip{margin:10px 0 0;font-size:13px;font-weight:700;color:var(--txt2)}
+.bar label{display:flex;align-items:center;gap:8px;font-weight:700}.bar select{font:inherit;min-height:44px;border-radius:12px;padding:0 10px}
+</style></head><body><div class="wrap">
+<h1>Wake Daisy: seed, choice, challenge, success, try again</h1>
+<p class="sub">Decisions in notes/decision.md. The seed card has a quiet "Wake Daisy" button. It opens a calm sheet with two big tiles in a stack (no carousel). The suggested tile is chosen by a simple rule, shown first, and focused first. A plain X closes the sheet. A try that does not work out is "Still dreaming", never a failure.</p>
+<div class="bar"><button class="btn" id="rm" aria-pressed="false">Preview Reduce Motion: off</button><button class="btn" id="th">Toggle dark</button>
+<label for="lw">Most recent wake try: <select id="lw"><option value="none">None yet</option><option value="word">Woke with word puzzle</option><option value="bf">Woke with butterflies</option><option value="dream">Ended in Still dreaming</option></select></label></div>
+<div class="phones" id="ph"></div>
+<ul class="notes">
+<li><b>0 Seed card</b>: "Daisy is resting in her seed. She is safe and cosy." One quiet tinted "Wake Daisy" button, no counters, no notifications.</li>
+<li><b>1 Choice sheet</b>: tiles in a stack, suggested first, with the badge "Good for today". <b>Adaptive rule</b>: suggest the game the player used to wake a seed most recently; if there is none, or the most recent try ended in "Still dreaming", suggest butterflies. Use the "Most recent wake try" menu above to preview it. Chips say "Quick" / "A little longer" (no minutes) and "Gentle" / "Tricky" as words. No text "not now" button: a plain 44 pt X in the corner (VoiceOver "Close") and swipe down both close it, with no change and no second ask this session.</li>
+<li><b>2 Challenge intro</b>: one short rule line, "Take your time.", one big Start button. Back returns to the sheet.</li>
+<li><b>3 Success</b>: sprout, glow, then her five pink petals one at a time, 0.3 s apart, 2.4 s at most. Same five petals as the crown on the Life page. "Tap to see them all." skips to all petals. Reduce Motion: all petals at once. Soft haptic on the first petal and on the hearts, and none when haptics are off. One VoiceOver announcement: "Daisy is awake."</li>
+<li><b>4 Still dreaming</b>: "Daisy is still dreaming. You can try again any time." Primary "Try again", secondary "Try the butterflies". After 2 in a row, the next try is easier and butterflies becomes the main button.</li>
+<li><b>VoiceOver order</b>: sheet title, suggested tile, other tile, Close. Tile label: "Catch butterflies, quick, gentle, good for today".</li>
+<li><b>Dynamic Type</b>: tiles grow, art shrinks to 56 pt, chips wrap. At 5+ challenges or accessibility sizes the sheet uses the .large detent and scrolls.</li>
+</ul></div>
+<script>
+const H=f=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21C4 15 3 11 3 8.5A4.5 4.5 0 0112 7a4.5 4.5 0 019 1.5C21 11 20 15 12 21z" fill="${f?'var(--heart)':'none'}" stroke="var(--heart)" stroke-width="2"/></svg>`;
+const PET='M100 74 C81 62 83 30 100 20 C117 30 119 62 100 74Z';
+const HEART='M12 21C4 15 3 11 3 8.5A4.5 4.5 0 0112 7a4.5 4.5 0 019 1.5C21 11 20 15 12 21z';
+// parts/seed-pot.svg, unchanged, placed at the bottom of a 140x300 box so the sprout has room above
+const pot=(extra='')=>`<svg viewBox="0 0 140 300" aria-hidden="true"><g transform="translate(0 150)"><ellipse cx="70" cy="136" rx="48" ry="7" fill="#2C3E2C" opacity=".16"/><path d="M28 78h84l-9 54a8 8 0 01-8 6H45a8 8 0 01-8-6z" fill="#C8734A"/><path d="M36 90h14l-3 40H42z" fill="#fff" opacity=".12"/><rect x="20" y="64" width="100" height="20" rx="9" fill="#DD8C63"/><ellipse cx="70" cy="66" rx="42" ry="7" fill="#7A5238"/>${extra}</g></svg>`;
+const seed='<g class="seedg"><ellipse cx="70" cy="55" rx="12" ry="16" fill="#C9A15F" stroke="#7A5238" stroke-width="2.5"/><path d="M70 41v26" stroke="#7A5238" stroke-width="2" stroke-linecap="round"/><path d="M63 52q3 3 6 0M71 52q3 3 6 0" stroke="#4A3220" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="62" cy="58" rx="2.6" ry="1.8" fill="#E0627F" opacity=".5"/><ellipse cx="78" cy="58" rx="2.6" ry="1.8" fill="#E0627F" opacity=".5"/></g><g font-family="-apple-system,system-ui,sans-serif" font-weight="800" fill="var(--text)"><text class="zz" x="92" y="42" font-size="16">z</text><text class="zz" x="105" y="26" font-size="12">z</text></g>';
+const sprout='<path d="M70 62C70 40 70 20 70 0" stroke="#5E8F1F" stroke-width="6" fill="none" stroke-linecap="round"/><path class="pop" d="M70 15C48 10 40 -5 38 -15C60 -15 70 -2 70 15z" fill="#7DB82E"/><path class="pop" d="M70 5C92 0 100 -15 102 -25C80 -25 70 -12 70 5z" fill="#7DB82E"/>';
+const book='<svg viewBox="0 0 60 60" aria-hidden="true"><rect x="8" y="10" width="44" height="40" rx="8" fill="#fff" stroke="#B9B3A0" stroke-width="2.5"/><text x="30" y="38" font-size="22" font-weight="800" text-anchor="middle" fill="#2C3E2C">Ab</text></svg>';
+const bf='<svg viewBox="0 0 60 60" aria-hidden="true"><path d="M30 30C14 10 6 22 12 34C16 42 26 38 30 30zM30 30C46 10 54 22 48 34C44 42 34 38 30 30z" fill="#E8A838" stroke="#C98D14" stroke-width="2"/><path d="M30 20v26" stroke="#2C3E2C" stroke-width="3" stroke-linecap="round"/></svg>';
+const opt=(art,t,d,c1,c2,rec)=>`<button class="opt ${rec?'rec':''}">${rec?'<span class="badge">Good for today</span>':''}<span class="art">${art}</span><span><b>${t}</b><span class="d">${d}</span><span class="chips"><span class="chip">${c1}</span><span class="chip ${c2==='Gentle'?'g':''}">${c2}</span></span></span></button>`;
+const topBar=()=>`<div class="sbar"><span>9:41</span><span>100%</span></div><div class="title">Daisy</div>`;
+const petals=(n)=>`<div class="pet" role="img" aria-label="${n} of 5 petals">${[...Array(5)].map((_,i)=>`<svg viewBox="78 16 44 62" aria-hidden="true"><path class="${i<n?'on':'off'}" style="--i:${i}" d="${PET}"/></svg>`).join('')}</div>`;
+const loveKey=`<p class="key"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${HEART}" fill="var(--heart)"/></svg>Love keeps her petals.</p>`;
+function ph(cap,sub,body){return `<div><div class="phone">${topBar()}${body}</div><p class="cap">${cap}<small>${sub}</small></p></div>`}
+// Adaptive rule: suggest the game from the most recent wake; none or "Still dreaming" -> butterflies.
+const suggest=last=>last==='word'?'word':'bf';
+const tiles={bf:s=>opt(bf,'Catch butterflies','Tap them as they float by','Quick','Gentle',s),word:s=>opt(book,'Word puzzle','Make one word from the letters','A little longer','Tricky',s)};
+function render(){const s=suggest(document.getElementById('lw').value),other=s==='bf'?'word':'bf';
+document.getElementById('ph').innerHTML=[
+ph('0. Seed card','Resting state. Quiet tinted button, no counters.',
+ `<div class="plant" style="top:110px">${pot(seed)}</div><div class="card" style="top:470px"><h2>Daisy is resting in her seed.</h2><p>She is safe and cosy.</p><button class="quiet">Wake Daisy</button></div>`),
+ph('1. Choice sheet','Suggested tile first, picked by the rule. Plain X closes.',
+ `<div class="plant" style="top:110px">${pot(seed)}</div><div class="dim"></div><div class="sheet" role="dialog" aria-label="Wake Daisy"><div class="grab"></div><button class="x" aria-label="Close">&#x2715;</button><h2>Wake Daisy</h2><p class="s">Pick one you like.</p>
+ ${tiles[s](true)}
+ ${tiles[other](false)}</div>`),
+ph('2. Challenge intro','Zooms out of the tapped tile (iOS 18); cross-fade fallback.',
+ `<div class="plant" style="top:110px">${pot(seed)}</div><div class="card" style="top:430px"><div class="chips" style="justify-content:center;margin-bottom:8px"><span class="chip">Quick</span><span class="chip g">Gentle</span></div><h2>Catch butterflies</h2><p>Tap 3 butterflies. Take your time.</p><div style="margin:14px 0" aria-hidden="true">${bf.replace('<svg','<svg width="64" height="64"')}</div></div><button class="go" style="position:absolute;bottom:60px;left:16px">Start</button>`),
+ph('3. Success','Five pink petals, one at a time (0.3 s apart, 2.4 s at most). A tap shows them all.',
+ `<div class="glow" style="top:130px"></div><div class="plant" style="top:110px">${pot(sprout)}</div><div class="card" style="top:450px"><h2>Daisy is awake!</h2><p>Here come her petals.</p>${petals(3)}<div class="hearts">${[1,1,1,0,0].map(H).join('')}</div>${loveKey}<p class="skip">Tap to see them all.</p></div>`),
+ph('4. Still dreaming','No fail state. Free to try again.',
+ `<div class="plant" style="top:110px">${pot(seed)}</div><div class="card" style="top:450px"><h2>Daisy is still dreaming.</h2><p>You can try again any time.</p></div><button class="go" style="position:absolute;bottom:130px;left:16px">Try again</button><button class="alt" style="position:absolute;bottom:60px;left:0;right:0;margin:auto">Try the butterflies</button>`)
+].join('');}
+document.getElementById('lw').onchange=render;render();
+const b=document.getElementById('rm');b.onclick=()=>{const on=!document.body.classList.contains('rm');document.body.classList.toggle('rm',on);b.textContent='Preview Reduce Motion: '+(on?'on':'off');b.setAttribute('aria-pressed',on)};
+document.getElementById('th').onclick=()=>{const r=document.documentElement;r.dataset.theme=r.dataset.theme==='dark'?'light':'dark'};
+</script></body></html>

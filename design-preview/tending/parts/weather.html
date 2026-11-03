@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordFlora weather: rain and thunder</title>
+<link rel="stylesheet" href="weather.css"></head>
+<body>
+<div class="controls">
+ <select id="day" aria-label="Day"><option>1</option><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option></select>
+ <button id="dark">Dark mode</button><button id="rm">Reduced motion</button><button id="now">Flash now</button>
+</div>
+<div id="lvl" class="spec"></div><div id="evt" class="spec"></div>
+<div class="phone">
+ <canvas id="rain" width="390" height="844" aria-hidden="true"></canvas>
+ <svg class="cloud" viewBox="0 0 340 170" aria-hidden="true">
+  <g class="shade"><ellipse cx="170" cy="120" rx="150" ry="36"/></g>
+  <g class="body"><ellipse cx="170" cy="105" rx="148" ry="38"/><circle cx="105" cy="82" r="48"/><circle cx="175" cy="62" r="58"/><circle cx="238" cy="88" r="42"/></g>
+  <path class="bolt" d="M176 70 L160 104 L172 104 L165 132 L192 96 L178 96 L188 70 Z"/>
+ </svg>
+ <div class="flash"></div>
+ <div class="badge" aria-hidden="true">Gentle rain</div>
+</div>
+<div class="spec">
+<b>Thunder sound spec.</b> Soft distant rumble, 2-3 s, low-pass ~400 Hz, slow 150 ms attack, long tail, no crack. -24 LUFS integrated, peak below -12 dBFS. Plays when Sound is on and Quiet Garden/Calm mode is off; from day 4; mixed under any music.<br>
+<b>Haptic.</b> One soft transient (intensity ~0.3, sharpness ~0.2), 0.3-0.5 s after the flash (sound-travel lag), same delay as the rumble start. Skipped in Calm mode.<br>
+<b>SwiftUI.</b> Drops: <code>TimelineView(.animation(minimumInterval: 1/30))</code> + <code>Canvas</code> (struct Drop with layer, x, y, ground y; draw lines and ellipse rings; cap 60). Flash: <code>Rectangle().fill(.white).opacity(flash ? 0.16 : 0)</code> with <code>.animation(.easeInOut(duration: 1.4), value: flash)</code> (0.10 in dark, peak at 25%), plus a small bolt shape in the cloud. Scheduler: <code>Task.sleep</code> 8-15 s. Haptic: <code>.sensoryFeedback(.impact(weight: .light, intensity: 0.3), trigger: thunderCount)</code> fired after a 0.3-0.5 s sleep. Gate everything on <code>@Environment(\.accessibilityReduceMotion)</code>: if true show a still cloud and a "Gentle rain" badge, no canvas, no flash.<br>
+<b>Safety.</b> Max 1 flash per 8 s (WCAG 2.3.1 allows 3/s); one slow-ramp flash, no double strobes; peak overlay 16% white (10% dark), bolt 28% opacity and small; no red flashes.
+</div>
+<script src="weather.js"></script>
+</body></html>

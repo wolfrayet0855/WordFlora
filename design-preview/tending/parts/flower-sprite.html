@@ -1,0 +1,18 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Flower parts</title>
+<style>body{font-family:-apple-system,system-ui,sans-serif;background:#F6F1E4;color:#2C3E2C;padding:20px}.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end}figure{margin:0;text-align:center}
+svg{overflow:visible}.petal{transform-box:view-box}
+.go #petal-1,.go #p5-1{animation:f 2.2s ease-in forwards}@keyframes f{to{transform:translate(40px,150px) rotate(95deg);opacity:0}}
+#crown .g{fill:none;stroke:#7C867C;stroke-opacity:.55;stroke-width:1.6;stroke-dasharray:4 3}</style></head><body>
+<p>Parts demo. <button onclick="document.body.classList.toggle('go')">Drop petal 1</button></p>
+<div class="row">
+<figure><img src="flower.svg" width="160" alt=""><figcaption>flower.svg, 8 petals</figcaption></figure>
+<figure id="five"></figure><figure><img src="seed-pot.svg" width="140" alt=""><figcaption>seed-pot.svg</figcaption></figure>
+<figure style="background:#dfe8ee;padding:20px"><img src="cloud.svg" width="160" alt=""><figcaption>cloud.svg</figcaption></figure></div>
+<script>
+const P='M100 74 C81 62 83 30 100 20 C117 30 119 62 100 74Z',order=[0,4,2,6,1,5,3,7];
+function ring(n,fill,stroke){let s='';for(let i=0;i<8;i++){const on=order.slice(8-n).includes(i);s+=`<g id="p5-${i+1}" class="petal" transform="rotate(${i*45} 100 88)"><path d="${P}" ${on?`fill="${fill}" stroke="${stroke}" stroke-width="2"`:'class="g" fill="none" stroke="#7C867C" stroke-opacity=".55" stroke-width="1.6" stroke-dasharray="4 3"'} stroke-linejoin="round"/></g>`}return s}
+// Crown: the real 5-petal ring (E9A36C/CF8247) shrunk over the real plant art
+fetch('../../plants/plant_daisy.svg').then(r=>r.text()).then(t=>{
+ const inner=t.replace(/^[\s\S]*?<svg[^>]*>/,'').replace(/<\/svg>\s*$/,'');
+ document.getElementById('five').innerHTML=`<svg viewBox="0 0 200 270" width="200"><g transform="translate(0 70)">${inner}</g><g id="crown" transform="translate(70 0) scale(.3) translate(-0 0)">${ring(5,'#E9A36C','#CF8247')}<circle cx="100" cy="88" r="20" fill="#E8A838"/><circle cx="100" cy="88" r="12" fill="#F5C858"/></g></svg><figcaption>real daisy art + 5-of-8 crown (ghosts dashed)</figcaption>`})
+</script></body></html>

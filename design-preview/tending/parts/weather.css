@@ -1,0 +1,30 @@
+/* WordFlora weather demo styles (standalone page for parts/weather.html) */
+:root,[data-theme=light]{--bg:#FAF7F0;--text:#2C3E2C;--txt2:#4F5F4F;--leaf:#9BCB3C;--leaf-ink:#22331A;--line:rgba(44,62,44,.12);--glass:rgba(255,255,255,.94);
+ --cloud:#B9C6CE;--cloud-edge:#9FB1BC;--shade:#9FB1BC;--drop:70,110,150;--flash:.16;--shadow:0 6px 18px rgba(44,62,44,.10)}
+[data-theme=dark]{--bg:#1A2E1A;--text:#D4EDD4;--txt2:#B9D0B9;--leaf:#A8D84A;--leaf-ink:#1A2E1A;--line:rgba(212,237,212,.14);--glass:rgba(44,62,44,.95);
+ --cloud:#71818B;--cloud-edge:#5A6972;--shade:#46535B;--drop:170,200,230;--flash:.10;--shadow:0 6px 18px rgba(0,0,0,.35)}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;padding:20px;background:var(--bg);color:var(--text);font-family:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,sans-serif;line-height:1.45}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.controls button,.controls select{font:inherit;font-weight:800;min-height:44px;border:0;border-radius:999px;padding:8px 16px;background:var(--leaf);color:var(--leaf-ink);cursor:pointer}
+.controls select{border-radius:12px;background:var(--glass);color:var(--text);box-shadow:inset 0 0 0 2px var(--line)}
+:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+.spec{max-width:80ch;color:var(--txt2);font-size:14px;margin:6px 0}
+.spec b{color:var(--text)}
+.phone{position:relative;width:390px;max-width:100%;height:844px;margin:14px 0;border:10px solid #22301f;border-radius:52px;box-sizing:content-box;overflow:hidden;background:var(--bg);box-shadow:var(--shadow)}
+#rain{position:absolute;inset:0;width:390px;height:844px;pointer-events:none;z-index:2}
+/* cloud: whole art inside its box (art spans x 20..320, y 4..156 of 340x170), so nothing is cropped */
+.cloud{position:absolute;left:25px;top:70px;width:340px;height:170px;overflow:visible;z-index:3;pointer-events:none}
+.cloud .shade{fill:var(--shade);opacity:.5}
+.cloud .body{fill:var(--cloud)}
+.bolt{fill:#FFF3C4;opacity:0}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:30}
+.flash.on{animation:fl 1.4s ease-in-out}.bolt.on{animation:bo 1.4s ease-in-out}
+@keyframes fl{0%{opacity:0}25%{opacity:var(--flash)}100%{opacity:0}}
+@keyframes bo{0%{opacity:0}25%{opacity:.28}100%{opacity:0}}
+.badge{display:none;position:absolute;top:260px;left:50%;transform:translateX(-50%);background:var(--glass);border-radius:999px;padding:6px 14px;font-size:14px;font-weight:800;z-index:9;box-shadow:0 0 0 1px var(--line),var(--shadow);pointer-events:none}
+/* Reduce Motion: still cloud plus words badge, no canvas, no flash */
+.reduced #rain,.reduced .flash,.reduced .bolt{display:none}
+.reduced .badge{display:block}
+@media (prefers-reduced-motion:reduce){#rain,.flash,.bolt{display:none}.badge{display:block}}

@@ -1,128 +1,298 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WordFlora life stats panel</title>
-<link rel="stylesheet" href="../theme.css">
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Life Stats Mockup</title>
+<link rel="stylesheet" href="../theme.css"><script src="../theme.js"></script>
 <style>
-:root,[data-theme=light]{--leaf:#9BCB3C;--leaf-ink:#22331A;--water:#4C93D6;--sun:#F2B632;--heart:#E0627F;--soil:#7A5238;--card:#FFFFFF;--txt2:#4F5F4F;--petal:#FFFFFF;--petal-edge:#B9B3A0;--glass:rgba(255,255,255,.92)}
-[data-theme=dark]{--leaf:#A8D84A;--leaf-ink:#1A2E1A;--water:#7DB6EE;--sun:#F6C85A;--heart:#F08AA3;--soil:#A47550;--card:#2C3E2C;--txt2:#B9D0B9;--petal:#F4F1E6;--petal-edge:#8A937F;--glass:rgba(44,62,44,.92)}
-body{line-height:1.45}
-.wrap{max-width:1500px;margin:0 auto;padding:28px 20px 80px}
-h1{font-size:30px;margin:0}.sub{color:var(--txt2);max-width:75ch}
+/* light: meter fills and icons are at least 3:1 on white (sun #B87F00 3.5, leaf fill #5E8F1F 3.9, water 3.8) */
+:root,[data-theme=light]{--leaf:#9BCB3C;--leaf-ink:#22331A;--leaf-fill:#5E8F1F;--water:#3F86C9;--sun:#B87F00;--heart:#D9506F;--soil:#7A5238;--clay:#C8734A;--clay-rim:#DD8C63;--card:#FFFFFF;--txt2:#4F5F4F;--glass:rgba(255,255,255,.94);
+ --cloud:#B9C6CE;--cloud-edge:#9FB1BC;--storm:#9AA9B3;--storm-edge:#7D8E99;--drop:70,110,150;--sheen:#9fb8c84d;--petal:#F2788A;--petal-edge:#D9566C;--ghost:#7C867C;--zz:#2C3E2C;--flash:.16}
+[data-theme=dark]{--leaf:#A8D84A;--leaf-ink:#1A2E1A;--leaf-fill:#A8D84A;--water:#7DB6EE;--sun:#F6C85A;--heart:#F08AA3;--soil:#A47550;--clay:#C8734A;--clay-rim:#DD8C63;--card:#2C3E2C;--txt2:#B9D0B9;--glass:rgba(44,62,44,.95);
+ --cloud:#71818B;--cloud-edge:#5A6972;--storm:#5B6A74;--storm-edge:#46535B;--drop:170,200,230;--sheen:#2a3d5566;--petal:#F58A9B;--petal-edge:#E06B80;--ghost:#A9B8A9;--zz:#D4EDD4;--flash:.10}
+body{line-height:1.45;background:var(--bg)}
+.wrap{max-width:1560px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:30px;margin:0}.sub{color:var(--txt2);max-width:80ch}
 .bar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 22px}
 .btn{font:inherit;font-weight:800;border:0;border-radius:999px;min-height:44px;padding:10px 18px;background:var(--leaf);color:var(--leaf-ink);cursor:pointer}
-.btn:focus-visible,.act:focus-visible,.tab:focus-visible,.min:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+:focus-visible{outline:3px solid var(--text);outline-offset:2px}
 .phones{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
-.phone{width:390px;height:844px;border:10px solid #22301f;border-radius:52px;box-sizing:content-box;overflow:hidden;position:relative;background:var(--bg);box-shadow:var(--shadow);flex:none}
+.phone{width:390px;height:844px;border:10px solid #22301f;border-radius:52px;box-sizing:content-box;overflow:hidden;position:relative;background:var(--bg);color:var(--text);box-shadow:var(--shadow);flex:none}
 .cap{margin:10px 0 0;font-weight:700;max-width:390px}.cap small{display:block;font-weight:500;color:var(--txt2)}
+.replay{font:inherit;font-size:14px;font-weight:800;min-height:44px;margin-top:6px;padding:8px 16px;border:0;border-radius:999px;background:color-mix(in srgb,var(--leaf) 35%,transparent);color:var(--text);cursor:pointer}
 .sbar{height:44px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 4px;font-size:13px;font-weight:700}
 .title{font-size:28px;font-weight:800;padding:6px 22px 0;text-align:center}
-.mood{text-align:center;color:var(--txt2);font-size:15px;font-weight:700;min-height:22px}
-.sky{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:4}
-.stage{position:absolute;left:0;right:0;top:130px;height:480px}
-.sheen{position:absolute;inset:0;background:linear-gradient(#cfe0ea00,#cfe0ea00)}
-.rainy .sheen{background:linear-gradient(#9fb8c855,#9fb8c800 70%)}
-.plant{position:absolute;left:50%;margin-left:-70px;top:90px;width:140px;height:300px}
-.plant svg{width:100%;height:100%;overflow:visible}
-.hint{position:absolute;left:0;right:0;top:418px;text-align:center;font-weight:700;font-size:14px;color:var(--txt2)}
-.hint i{display:inline-block;color:var(--heart);animation:beat 1.8s ease-in-out infinite;font-style:normal}
-@keyframes beat{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
-.ground{position:absolute;left:0;right:0;bottom:130px;height:70px;background:linear-gradient(transparent,color-mix(in srgb,var(--soil) 22%,transparent))}
-/* rain */
-.drop{position:absolute;top:-30px;width:3px;height:16px;border-radius:2px;background:var(--water);opacity:.55;animation:rain 1.9s linear infinite}
-@keyframes rain{to{transform:translateY(560px)}}
-.cloud{position:absolute;top:96px;left:50%;margin-left:-60px;width:120px;height:44px;opacity:.9}
-/* falling petals */
-.fall{transform-box:fill-box;transform-origin:center;animation:fall 5s ease-in infinite}
-@keyframes fall{0%{transform:translate(0,0) rotate(0);opacity:1}80%{opacity:1}100%{transform:translate(var(--dx,14px),240px) rotate(var(--r,160deg));opacity:0}}
-.sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 5s ease-in-out infinite}
-@keyframes sway{0%,100%{transform:rotate(-1.5deg)}50%{transform:rotate(1.5deg)}}
-.rn-note{display:none}
-/* Reduced motion: no movement, a still drop badge + faded petal on the ground */
-.rm .drop,.rm .fall,.rm .sway,.rm .hint i{animation:none}
-.rm .drop{display:none}.rm .fall{opacity:.35;transform:translate(10px,200px) rotate(60deg)}
-.rm .rn-note{display:flex}
-@media (prefers-reduced-motion:reduce){.drop,.fall,.sway,.hint i{animation:none}.drop{display:none}.fall{opacity:.35;transform:translate(10px,200px) rotate(60deg)}.rn-note{display:flex}}
-.rn-note{position:absolute;top:92px;right:14px;gap:6px;align-items:center;background:var(--glass);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;z-index:6;box-shadow:var(--shadow)}
+.mood{text-align:center;color:var(--txt2);font-size:15px;font-weight:700;min-height:22px;padding:0 20px}
+.sheen{position:absolute;inset:0;pointer-events:none}
+.rainy .sheen{background:linear-gradient(var(--sheen),transparent 62%)}
+/* rain: two canvases sized to the rain band only. Far layer behind Daisy, near layers in front of her (under the hint and panel) */
+canvas.rain{position:absolute;left:0;top:180px;width:390px;height:340px;pointer-events:none}
+canvas.back{z-index:2}canvas.front{z-index:5}
+/* cloud: full parts/cloud.svg art (padded 160x90 box, overflow visible) */
+.cloud{position:absolute;left:105px;top:112px;width:180px;height:101px;overflow:visible;z-index:3;pointer-events:none}
+.cloud .c1{fill:var(--cloud);stroke:var(--cloud-edge)}.cloud .c2{fill:var(--cloud)}
+.storm .cloud .c1{fill:var(--storm);stroke:var(--storm-edge)}.storm .cloud .c2{fill:var(--storm)}
+.bolt{fill:#FFF3C4;opacity:0}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:30}
+.flash.on{animation:fl 1.4s ease-in-out}.bolt.on{animation:bo 1.4s ease-in-out}
+@keyframes fl{0%{opacity:0}25%{opacity:var(--flash)}100%{opacity:0}}
+@keyframes bo{0%{opacity:0}25%{opacity:.28}100%{opacity:0}}
+/* plant: the app's own art, untouched (no filters). The crown lives inside the plant box so it sways with her */
+.plant{position:absolute;left:50%;margin-left:-110px;top:270px;width:220px;height:220px;z-index:4;transform-origin:50% 88%}
+.plant img{width:100%;height:100%;display:block}
+.sway{animation:sway 6s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+/* health crown: five pink petals round a small heart (love keeps the petals) */
+.crown{position:absolute;left:78px;top:-66px;width:64px;height:64px;overflow:visible;pointer-events:none}
+.ghost{fill:none;stroke:var(--ghost);stroke-width:3;stroke-dasharray:7 6}
+.pet{fill:var(--petal);stroke:var(--petal-edge);stroke-width:3.5;stroke-linejoin:round}
+.fall{transform-box:fill-box;transform-origin:50% 50%;animation:fall 7s cubic-bezier(.45,.05,.55,.95) infinite}
+@keyframes fall{0%{transform:translate(0,0) rotate(0);opacity:0}6%{opacity:1}25%{transform:translate(40px,140px) rotate(35deg)}50%{transform:translate(-25px,300px) rotate(-20deg)}75%{transform:translate(35px,460px) rotate(55deg)}90%{transform:translate(10px,560px) rotate(85deg);opacity:1}100%{transform:translate(10px,560px) rotate(85deg);opacity:0}}
+/* regrowth: one petal at a time, 0.3 s apart, small spring, plays once (Replay button re-runs it) */
+.pet.grow{transform-box:fill-box;transform-origin:50% 100%;animation:grow .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * .3s + .3s)}
+@keyframes grow{0%{transform:scale(.15);opacity:0}100%{transform:scale(1);opacity:1}}
+.rest{position:absolute;left:224px;top:458px;width:22px;height:22px;z-index:5;display:none;transform:rotate(70deg);pointer-events:none}
+.ground{position:absolute;left:0;right:0;top:440px;height:110px;background:linear-gradient(transparent,color-mix(in srgb,var(--soil) 18%,transparent) 45%,transparent);z-index:1}
+.hint{position:absolute;left:0;right:0;top:606px;text-align:center;font-weight:700;font-size:14px;color:var(--txt2);z-index:6;pointer-events:none}
+.hint i{display:inline-block;color:var(--heart);animation:pulse 1.8s ease-in-out infinite;font-style:normal}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+.lovefly{position:absolute;left:226px;top:250px;z-index:6;color:var(--heart);font-size:20px;animation:up 4s ease-out infinite;pointer-events:none}
+@keyframes up{0%{transform:translateY(40px);opacity:0}30%{opacity:1}100%{transform:translateY(-20px);opacity:0}}
+/* seed pot (parts/seed-pot.svg) */
+.pot{position:absolute;left:50%;margin-left:-85px;top:300px;width:170px;height:182px;overflow:visible;z-index:4}
+.pot #seed{transform-box:fill-box;transform-origin:50% 100%;animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1)}50%{transform:scale(1.04,1.06)}}
+.pot .z{animation:zz 3s ease-in-out infinite}.pot .z2{animation-delay:-1.5s}
+@keyframes zz{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-5px);opacity:.5}}
+.wake{position:absolute;left:40px;right:40px;top:640px;text-align:center;display:block;background:var(--card);border-radius:20px;padding:12px 14px;font-size:16px;font-weight:800;box-shadow:0 0 0 3px var(--leaf),var(--shadow);z-index:7;color:var(--text);text-decoration:none;min-height:44px}
+.wake span{display:block;color:var(--txt2);font-weight:600;font-size:13px}
+/* words badges: under Daisy, clear of the cloud and crown */
+.badge{display:none;position:absolute;top:524px;left:50%;transform:translateX(-50%);white-space:nowrap;gap:6px;align-items:center;background:var(--glass);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;z-index:9;box-shadow:0 0 0 1px var(--line),var(--shadow);pointer-events:none}
+.calmchip{position:absolute;top:124px;left:50%;transform:translateX(-50%);white-space:nowrap;display:flex;gap:6px;align-items:center;background:var(--glass);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;z-index:9;box-shadow:0 0 0 1px var(--line),var(--shadow);pointer-events:none}
+/* reduced motion: JS adds .still; the media query covers the time before JS runs */
+.still .sway,.still .hint i,.still #seed,.still .z,.still .pet.grow{animation:none}
+.still .fall,.still .lovefly,.still canvas.rain,.still .flash,.still .bolt{display:none}
+.still.rainy .rest{display:block}.still.rainy .badge{display:flex}
+@media (prefers-reduced-motion:reduce){.sway,.hint i,#seed,.z,.pet.grow{animation:none!important}
+ .fall,.lovefly,canvas.rain,.flash,.bolt{display:none!important}.rainy .rest{display:block}.rainy .badge{display:flex}}
 /* side panel */
-.panel{position:absolute;left:8px;top:150px;width:124px;background:var(--glass);border-radius:22px;box-shadow:var(--shadow);padding:8px 8px 10px;z-index:8;font-size:12.5px}
-.panel h4{margin:0;font-size:13px;display:flex;align-items:center;justify-content:space-between}
-.min{width:44px;height:44px;border:0;border-radius:14px;background:transparent;color:var(--text);font:inherit;font-size:20px;font-weight:900;margin:-8px -8px -4px 0;cursor:pointer}
-.m{margin:6px 0}.m b{display:flex;align-items:center;gap:5px;font-size:12.5px}.m svg{width:20px;height:20px;flex:none}
-.trk{height:9px;border-radius:5px;background:color-mix(in srgb,var(--text) 14%,transparent);margin-top:3px;overflow:hidden}
+.panel{position:absolute;left:12px;top:150px;width:110px;background:var(--glass);border-radius:22px;box-shadow:0 0 0 1px var(--line),var(--shadow);padding:8px 9px 10px;z-index:8;font-size:12.5px;transform-origin:0 50%;transition:transform .24s cubic-bezier(.34,1.3,.64,1),opacity .2s ease,visibility 0s}
+.panel h2{margin:0;font-size:15px;white-space:nowrap;font-weight:800;display:flex;align-items:center;justify-content:space-between}
+.min{width:44px;height:44px;flex:none;border:0;border-radius:14px;background:transparent;color:var(--text);cursor:pointer;display:grid;place-items:center;margin:-8px -9px -6px 0;padding:0}
+.min svg{width:20px;height:20px}
+.m{margin:7px 0}.m b{display:flex;align-items:center;gap:5px;font-size:12.5px}.m svg{width:20px;height:20px;flex:none}
+.trk{height:9px;border-radius:5px;background:color-mix(in srgb,var(--text) 12%,transparent);margin-top:3px;overflow:hidden}
 .trk i{display:block;height:100%;border-radius:5px;background:var(--c);width:var(--w)}
-.m small{display:block;color:var(--txt2);font-weight:600;font-size:11.5px}
-.path{display:flex;align-items:center;justify-content:space-between;margin:8px 0 2px;position:relative}
-.path:before{content:"";position:absolute;left:8px;right:8px;top:9px;height:3px;background:var(--line)}
-.st{position:relative;text-align:center;width:24px;font-size:9.5px;font-weight:700;color:var(--txt2)}
-.st u{display:grid;place-items:center;width:18px;height:18px;margin:0 auto 2px;border-radius:50%;background:var(--card);box-shadow:inset 0 0 0 2px var(--line);text-decoration:none;font-size:10px}
-.st.done u{background:var(--leaf);color:var(--leaf-ink);box-shadow:none}
-.st.now u{box-shadow:0 0 0 3px var(--leaf);background:var(--card)}
-.st.now{color:var(--text)}
-.love{margin-top:8px;border-top:1px solid var(--line);padding-top:6px}
-.hearts{display:flex;gap:1px;margin:2px 0}.hearts svg{width:20px;height:20px}
-.tab{position:absolute;left:0;top:190px;width:44px;height:84px;border:0;border-radius:0 22px 22px 0;background:var(--glass);box-shadow:var(--shadow);z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text);font:inherit;font-size:10px;font-weight:800;cursor:pointer}
+.m small,.love small,.grow-l small{display:block;color:var(--txt2);font-weight:600;font-size:12px;line-height:1.25}
+.grow-l{margin-top:9px;border-top:1px solid var(--line);padding-top:7px}
+.path{display:flex;align-items:center;justify-content:space-between;margin:5px 2px 3px;position:relative}
+.path:before{content:"";position:absolute;left:6px;right:6px;top:50%;height:3px;margin-top:-1.5px;background:var(--line)}
+.path u{position:relative;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--card);box-shadow:inset 0 0 0 2px var(--line);text-decoration:none}
+.path u svg{width:12px;height:12px}
+.path u.done{background:var(--leaf);color:var(--leaf-ink);box-shadow:none}
+.path u.now{box-shadow:0 0 0 3px var(--leaf);background:var(--card);color:var(--text)}
+.love{margin-top:8px;border-top:1px solid var(--line);padding-top:7px}
+.hearts{display:flex;gap:0;margin:3px 0}.hearts svg{width:18px;height:18px}
+.love small.key{display:flex;gap:4px;align-items:flex-start;margin-top:5px;color:var(--text)}
+.love small.key svg{width:14px;height:14px;flex:none;margin-top:1px}
+/* minimised: a plain button set in from the edge (clear of the system back swipe), fades in as the panel shrinks to it */
+.tab{position:absolute;left:12px;top:300px;width:48px;height:92px;border:0;border-radius:24px;background:var(--glass);box-shadow:0 0 0 1px var(--line),var(--shadow);z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text);font:inherit;font-size:12px;font-weight:800;cursor:pointer;opacity:0;visibility:hidden;transform:translateX(-6px);transition:opacity .2s ease .06s,transform .24s ease .06s,visibility 0s .3s}
 .tab svg{width:24px;height:24px}
+.tab .dot{position:absolute;top:8px;right:8px;width:12px;height:12px}
+.minimised .panel{transform:scale(.2);opacity:0;visibility:hidden;transition:transform .24s ease,opacity .16s ease,visibility 0s .24s}
+.minimised .tab{opacity:1;visibility:visible;transform:none;transition:opacity .2s ease .1s,transform .24s ease .1s,visibility 0s}
+.still .panel,.still.minimised .panel,.still .tab,.still.minimised .tab{transform:none}
 /* actions */
 .acts{position:absolute;left:14px;right:14px;bottom:30px;display:flex;gap:8px;z-index:9}
-.act{flex:1;min-height:64px;border:0;border-radius:20px;background:var(--card);box-shadow:var(--shadow);color:var(--text);font:inherit;font-weight:800;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
-.act svg{width:28px;height:28px}
-.act.glow{box-shadow:0 0 0 3px var(--leaf),var(--shadow)}
-.wake{position:absolute;left:150px;right:14px;top:640px;background:var(--glass);border-radius:18px;padding:10px 12px;font-size:13px;font-weight:700;box-shadow:var(--shadow);z-index:7}
-.wake span{display:block;color:var(--txt2);font-weight:600;font-size:12px}
-.notes{margin-top:34px;max-width:85ch}.notes li{margin:6px 0}
+.act{flex:1;min-height:64px;border:0;border-radius:20px;background:var(--card);box-shadow:0 0 0 1px var(--line),var(--shadow);color:var(--text);font:inherit;font-weight:800;font-size:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.act svg{width:28px;height:28px}.act.glow{box-shadow:0 0 0 3px var(--leaf),var(--shadow)}
+/* accessibility text size: Life sheet in the middle, actions pinned below as a 2x2 bar (safeAreaInset) */
+.ax .title{font-size:36px}.ax .mood{font-size:20px}
+.ax .plant{top:182px;width:132px;height:132px;margin-left:-66px}
+.ax .crown{top:-42px;left:46px;width:40px;height:40px}
+.ax .ground{top:270px;height:70px}
+.ax .hint{top:316px;font-size:18px}
+.sheet{position:absolute;left:0;right:0;top:354px;bottom:180px;background:var(--glass);border-radius:30px 30px 0 0;box-shadow:0 0 0 1px var(--line),0 -6px 18px rgba(44,62,44,.14);padding:8px 20px 16px;z-index:8;font-size:19px;overflow:auto;transition:transform .26s ease}
+.ax.minimised .sheet{transform:translateY(240px);overflow:hidden}
+.ax.minimised .sheet .min svg{transform:rotate(180deg)}
+.grab{width:44px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 6px}
+.sheet h2{margin:0;font-size:24px;display:flex;justify-content:space-between;align-items:center}
+.sheet .min{margin:0}.sheet .min svg{width:26px;height:26px}
+.sheet .m{margin:10px 0}.sheet .m b{font-size:21px;gap:10px}.sheet .m svg{width:32px;height:32px}
+.sheet .trk{height:14px;border-radius:7px}.sheet .m small,.sheet .love small,.sheet .grow-l small{font-size:18px}
+.sheet .path u{width:28px;height:28px}.sheet .path u svg{width:16px;height:16px}.sheet .hearts svg{width:32px;height:32px}
+.sheet .love small.key svg{width:22px;height:22px}
+.sheet .grow-l,.sheet .love{margin-top:10px;padding-top:10px}
+.ax .acts{left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px 34px;background:var(--glass);box-shadow:0 0 0 1px var(--line),0 -6px 18px rgba(44,62,44,.12);z-index:9}
+.ax .act{flex-direction:row;font-size:20px;gap:10px;min-height:64px}.ax .act svg{width:32px;height:32px}
+.notes{margin-top:34px;max-width:90ch}.notes li{margin:6px 0}.notes h2{font-size:20px;margin:24px 0 6px}
+.lnk{color:var(--text);font-weight:800}
 </style></head><body><div class="wrap">
-<h1>Life stats side panel and the no-love rule</h1>
-<p class="sub">Collapsible panel on the left edge of the plant screen. Open it to see three care meters, the growth path and love hearts; minimise it to a slim heart tab so the plant has the whole screen. No numbers, no red, every state has an icon and a words label. The plant stays centred in every state.</p>
-<div class="bar"><button class="btn" id="rm" aria-pressed="false">Preview Reduce Motion: off</button><button class="btn" id="th">Toggle dark</button></div>
+<h1>Life stats panel, rain and petals</h1>
+<p class="sub">The plant is Daisy's own art from the app, kept in the centre. The small crown of five pink petals above her is her health, with a heart in the middle: love keeps her petals. After a day with no love, one petal drifts down and a soft rain starts. Any love brings the petals back, one at a time. No numbers, no red, and every state has an icon and words.</p>
+<div class="bar"><button class="btn" id="rm" aria-pressed="false">Preview Reduce Motion: off</button><button class="btn" id="th">Toggle dark</button><button class="btn" id="snd" aria-pressed="false">Thunder sound: off</button><button class="btn" id="now">Flash thunder now</button></div>
 <div class="phones" id="ph"></div>
-<ul class="notes">
-<li><b>Rain</b> starts after one day with no love; a soft cloud and drops fall behind the plant. Reduce Motion: still cloud badge reading "Gentle rain", a petal resting on the ground, no movement.</li>
-<li><b>Petals</b>: one lost per extra day. When the last falls the plant becomes a seed in its pot. Progress, stage and plants are kept (hearts bar shows "resting", never empty-and-sad).</li>
-<li><b>Waking</b>: a word puzzle or butterfly catching; then any love brings petals back one at a time.</li>
-<li><b>VoiceOver</b>: panel is one container "Plant life, expanded". Each meter reads "Water, nourished". Path reads "Stage, bud, 3 of 4". Hearts read "Love, 3 of 5 filled" (counts only for VoiceOver, not shown). Minimise button: "Hide plant life panel"; tab: "Show plant life panel".</li>
-<li><b>Dynamic Type</b>: at large sizes the panel grows taller, and at accessibility sizes it becomes a bottom sheet instead of a side strip.</li>
-</ul></div>
+<div class="notes">
+<h2>The rule (every age)</h2>
+<ul>
+<li><b>24 hours with no love</b>: a soft drizzle starts and the first crown petal drifts down. One more petal each day; the rain gets steadier (drizzle, light rain, then rain with soft far thunder from day four). The same rule for every age.</li>
+<li><b>When the crown has no petals</b>: Daisy tucks herself into her pot as a sleeping seed. Stage, plants, words and streak history are all kept. The rain stops while she sleeps.</li>
+<li><b>Waking</b>: the "Wake Daisy" card opens a short wake-up game (<a class="lnk" href="parts/wake-options.html">wake options</a>). After that, any love (a tap, a word, a tending action) brings a petal back, one at a time.</li>
+<li><b>Calm mode and Quiet Garden</b>: no rain, no petal loss and no seed. The crown stays full (frame 11).</li>
+<li><b>Hearts and petals</b>: hearts are today's love; petals show that love keeps her well. The panel says it in one line, "Love keeps her petals", and the crown has a heart in the middle.</li>
+<li><b>VoiceOver</b>: the plant and mood come first, then (in the seed state) the Wake card, then the panel, one container "Life". Meters read "Water, full". Growth reads "Growing, bloom stage". Hearts read "Love, 2 of 5 hearts". The crown reads "Petals, 3 of 5". Minimise: "Hide Life panel" (aria-expanded true); tab: "Show Life panel" (aria-expanded false). The app remembers the choice. Weather is hidden from VoiceOver; when rain starts there is one announcement, "A rainy day for Daisy."</li>
+<li><b>Reduce Motion</b>: no canvas, no flash, no thunder haptic. A still cloud, a "Gentle rain" badge under Daisy and one petal resting on the ground. The panel fades instead of shrinking.</li>
+<li><b>Dynamic Type</b>: at accessibility sizes the panel becomes a Life sheet that scrolls, and Water, Feed, Sun and Repot stay pinned below it as a 2 by 2 bar (64 pt tall each). Daisy moves up, stays centred and stays tappable.</li>
+<li><b>Taps</b>: the crown, cloud, rain, badges and floating hearts never catch taps (allowsHitTesting(false)), so a tap anywhere on Daisy reaches her.</li>
+</ul>
+<h2>Thunder (from parts/weather.html)</h2>
+<ul>
+<li><b>Light</b>: one slow flash (1.4 s, soft rise), never more than once per 8 seconds (8 to 15 s apart), 16 percent white overlay (10 percent in dark), small pale bolt inside the cloud. No strobes, no red. None in Calm or Quiet Garden.</li>
+<li><b>Sound</b>: soft far rumble 2 to 3 s, low-pass about 400 Hz, 150 ms attack, no crack, quiet (about -24 LUFS). It plays when Sound is on and Calm is off. Try it with "Thunder sound".</li>
+<li><b>Haptic</b>: one soft light tap 0.3 to 0.5 s after the flash, none in Calm mode.</li>
+<li><b>Cost</b>: 30 fps cap, one path per rain layer, colours cached on theme change, canvases sized to the rain band and paused when off screen or when the app is in the background.</li>
+</ul>
+</div></div>
 <script>
 const ic={
 water:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C8 9 6 12 6 15a6 6 0 0012 0c0-3-2-6-6-12z" fill="var(--water)"/></svg>',
-feed:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19C5 9 11 4 20 4c0 9-5 15-15 15z" fill="var(--leaf)"/><path d="M5 19L14 10" stroke="var(--leaf-ink)" stroke-width="1.6" fill="none"/></svg>',
 sun:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="5" fill="var(--sun)"/><g stroke="var(--sun)" stroke-width="2" stroke-linecap="round"><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M5 19l2-2"/></g></svg>',
-repot:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-2 11H6z" fill="#C8734A"/><rect x="3" y="6" width="18" height="4" rx="2" fill="#DD8C63"/></svg>'};
-const H=(f)=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21C4 15 3 11 3 8.5A4.5 4.5 0 0112 7a4.5 4.5 0 019 1.5C21 11 20 15 12 21z" fill="${f?'var(--heart)':'none'}" stroke="var(--heart)" stroke-width="2"/></svg>`;
-function plant(n,rain){ // n petals 0..8; seed when 0
-  const cx=70,cy=80;let s='<svg viewBox="0 0 140 300" aria-hidden="true">';
-  s+='<g class="sway"><path d="M70 90 C68 160 72 210 70 250" stroke="#5E8F1F" stroke-width="7" fill="none" stroke-linecap="round"/><path d="M70 200 C45 190 35 170 30 160 C55 160 68 175 70 200z" fill="#7DB82E"/><path d="M70 220 C95 210 108 190 112 180 C88 180 72 195 70 220z" fill="#7DB82E"/>';
-  if(n>0){for(let i=0;i<8;i++){const a=i*45;const here=i<n;const falling=rain&&i===n; // the next petal is mid-fall
-    if(here||falling){const dx=(i%2?-1:1)*18;s+=`<g transform="rotate(${a} ${cx} ${cy})"><ellipse class="${falling?'fall':''}" style="--dx:${dx}px;--r:${dx*6}deg" cx="${cx}" cy="${cy-26}" rx="11" ry="25" fill="var(--petal)" stroke="var(--petal-edge)" stroke-width="2"/></g>`;}}
-    s+=`<circle cx="${cx}" cy="${cy}" r="14" fill="#F2B632" stroke="#C98D14" stroke-width="2"/></g>`;
-  }else s+='</g>';
-  s+='</svg>';return s;}
-function seedPot(){return '<svg viewBox="0 0 140 300" aria-hidden="true"><ellipse cx="70" cy="250" rx="46" ry="8" fill="#0002"/><path d="M26 226h88l-9 62H35z" fill="#C8734A"/><rect x="20" y="212" width="100" height="20" rx="8" fill="#DD8C63"/><ellipse cx="70" cy="214" rx="42" ry="7" fill="var(--soil)"/><ellipse cx="70" cy="204" rx="11" ry="15" fill="#B58A4E" stroke="#7A5238" stroke-width="2.5"/><path d="M70 192v22" stroke="#7A5238" stroke-width="2" /><text x="96" y="196" font-size="16" font-weight="800" fill="var(--text)">z</text><text x="108" y="182" font-size="12" font-weight="800" fill="var(--text)">z</text></svg>';}
-const meter=(n,icon,c,w,lab,vo)=>`<div class="m" role="img" aria-label="${n}, ${vo}"><b>${ic[icon]}${n}</b><div class="trk"><i style="--c:var(${c});--w:${w}%"></i></div><small>${lab}</small></div>`;
-const stages=['Seed','Sprout','Bud','Bloom'];
-const path=(i)=>`<div class="path" role="img" aria-label="Stage, ${stages[i].toLowerCase()}, ${i+1} of 4">`+stages.map((t,k)=>`<div class="st ${k<i?'done':''} ${k==i?'now':''}"><u>${k<i?'&#10003;':(k==i?'&#9679;':'')}</u>${t}</div>`).join('')+'</div>';
-function panel(o){return `<aside class="panel" aria-label="Plant life, expanded"><h4>Plant life<button class="min" aria-label="Hide plant life panel">&#8249;</button></h4>
-${meter('Water','water','--water',o.w,o.wl,o.wl.toLowerCase())}${meter('Food','feed','--leaf',o.f,o.fl,o.fl.toLowerCase())}${meter('Sun','sun','--sun',o.s,o.sl,o.sl.toLowerCase())}
-${path(o.st)}
-<div class="love" role="img" aria-label="Love, ${o.h} of 5 filled"><b style="font-size:12.5px">Love</b><div class="hearts">${[0,1,2,3,4].map(i=>H(i<o.h)).join('')}</div><small style="color:var(--txt2);font-weight:600;font-size:11.5px">${o.ll}</small></div></aside>`}
-const tab=`<button class="tab" aria-label="Show plant life panel">${H(true)}<span>Life</span></button>`;
-const acts=(g)=>`<div class="acts">${[['Water','water'],['Feed','feed'],['Sun','sun'],['Repot','repot']].map(([t,k])=>`<button class="act ${g===k?'glow':''}">${ic[k]}${t}</button>`).join('')}</div>`;
-function drops(){let s='';for(let i=0;i<22;i++)s+=`<i class="drop" style="left:${(i*37)%380}px;animation-delay:-${(i*.37).toFixed(2)}s;animation-duration:${1.6+(i%4)*.25}s"></i>`;return s}
-const cloud='<svg class="cloud" viewBox="0 0 120 44" aria-hidden="true"><path d="M20 40a16 16 0 010-32 22 22 0 0142-6 18 18 0 0138 14 12 12 0 010 24z" fill="#B9C6CE"/></svg>';
-const note='<div class="rn-note"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3C8 9 6 12 6 15a6 6 0 0012 0c0-3-2-6-6-12z" fill="var(--water)"/></svg>Gentle rain</div>';
+happy:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="var(--leaf-fill)"/><circle cx="9" cy="10" r="1.3" fill="var(--card)"/><circle cx="15" cy="10" r="1.3" fill="var(--card)"/><path d="M8 14q4 4 8 0" stroke="var(--card)" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>',
+feed:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19C5 9 11 4 20 4c0 9-5 15-15 15z" fill="var(--leaf-fill)"/><path d="M5 19L14 10" stroke="var(--card)" stroke-width="1.6" fill="none"/></svg>',
+repot:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16l-2 11H6z" fill="var(--clay)"/><rect x="3" y="6" width="18" height="4" rx="2" fill="var(--clay-rim)"/></svg>',
+chevL:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+chevD:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+tick:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+here:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6" fill="var(--leaf-fill)"/></svg>'};
+const HEART='M12 21C4 15 3 11 3 8.5A4.5 4.5 0 0112 7a4.5 4.5 0 019 1.5C21 11 20 15 12 21z';
+const H=f=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${HEART}" fill="${f?'var(--heart)':'none'}" stroke="var(--heart)" stroke-width="2"/></svg>`;
+// FlowerView petal (parts/flower.svg), five slots at 72 degrees round (100,88)
+const PET='M100 74 C81 62 83 30 100 20 C117 30 119 62 100 74Z';
+const petalIcon=`<svg viewBox="78 16 44 62" aria-hidden="true"><path class="pet" d="${PET}"/></svg>`;
+function crown(n,mode){ // n petals kept; 'fall' animates slot n dropping, 'grow' regrows slots 0..n-1 one by one
+ let s=`<svg class="crown${mode==='grow'?' regrow':''}" viewBox="28 16 144 144" role="img" aria-label="Petals, ${n} of 5">`;
+ for(let i=0;i<5;i++){const r=`rotate(${i*72} 100 88)`;
+  if(mode==='fall'&&i===n)s+=`<g transform="${r}"><path class="ghost" d="${PET}"/></g><g class="fall"><g transform="${r}"><path class="pet" d="${PET}"/></g></g>`;
+  else if(mode==='grow'&&i<n)s+=`<g transform="${r}"><path class="ghost" d="${PET}"/><path class="pet grow" style="--i:${i}" d="${PET}"/></g>`;
+  else s+=`<g transform="${r}"><path class="${i<n?'pet':'ghost'}" d="${PET}"/></g>`}
+ return s+`<path d="${HEART}" transform="translate(86 75) scale(1.17)" fill="var(--heart)"/></svg>`}
+const rest=`<svg class="rest" viewBox="78 16 44 62" aria-hidden="true"><path class="pet" d="${PET}"/></svg>`;
+const daisy=c=>`<div class="plant sway"><img src="../plants/plant_daisy.svg" alt="Daisy">${c}</div>`;
+const seedPot=`<svg class="pot" viewBox="0 0 140 150" role="img" aria-label="Daisy, resting as a seed in her pot">
+<ellipse cx="70" cy="136" rx="48" ry="7" fill="#2C3E2C" opacity=".16"/><path d="M28 78h84l-9 54a8 8 0 01-8 6H45a8 8 0 01-8-6z" fill="#C8734A"/><path d="M36 90h14l-3 40H42z" fill="#fff" opacity=".12"/><rect x="20" y="64" width="100" height="20" rx="9" fill="#DD8C63"/><ellipse cx="70" cy="66" rx="42" ry="7" fill="#7A5238"/>
+<g id="seed"><ellipse cx="70" cy="55" rx="12" ry="16" fill="#C9A15F" stroke="#7A5238" stroke-width="2.5"/><path d="M70 41v26" stroke="#7A5238" stroke-width="2" stroke-linecap="round"/><path d="M63 52q3 3 6 0M71 52q3 3 6 0" stroke="#4A3220" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="62" cy="58" rx="2.6" ry="1.8" fill="#E0627F" opacity=".5"/><ellipse cx="78" cy="58" rx="2.6" ry="1.8" fill="#E0627F" opacity=".5"/></g>
+<g font-family="-apple-system,system-ui,sans-serif" font-weight="800" fill="var(--zz)"><text class="z" x="92" y="42" font-size="16">z</text><text class="z z2" x="105" y="26" font-size="12">z</text></g></svg>`;
+// full cloud from parts/cloud.svg plus a small bolt (kept inside the cloud body) for thunder days
+const cloud=`<svg class="cloud" viewBox="0 0 160 90" aria-hidden="true"><g class="c1" stroke-width="2" stroke-linejoin="round"><circle cx="46" cy="52" r="20"/><circle cx="76" cy="38" r="26"/><circle cx="108" cy="46" r="22"/><circle cx="130" cy="54" r="14"/><rect x="40" y="46" width="90" height="22" rx="11"/></g><g class="c2"><circle cx="46" cy="52" r="18.5"/><circle cx="76" cy="38" r="24.5"/><circle cx="108" cy="46" r="20.5"/><circle cx="130" cy="54" r="12.5"/><rect x="42" y="48" width="86" height="19" rx="9.5"/></g><ellipse cx="70" cy="24" rx="12" ry="5" fill="#fff" opacity=".3"/><path class="bolt" d="M82 40 L75 53 L80 53 L77 66 L88 50 L82 50 L86 40 Z"/></svg>`;
+const meter=(n,icon,c,w,lab)=>`<div class="m" role="img" aria-label="${n}, ${lab.toLowerCase()}"><b>${ic[icon]}${n}</b><div class="trk"><i style="--c:var(${c});--w:${w}%"></i></div><small>${lab}</small></div>`;
+const stages=['Tiny','Sprout','Bud','Bloom'];
+const growth=(i,seed)=>`<div class="grow-l" role="img" aria-label="Growing, ${stages[i].toLowerCase()} stage${seed?', kept safe while she rests':''}"><b>Growing</b><div class="path">${stages.map((t,k)=>`<u class="${k<i?'done':''}${k==i?'now':''}">${k<i?ic.tick:(k==i?ic.here:'')}</u>`).join('')}</div><small>${seed?stages[i]+' kept safe':stages[i]+' stage'}</small></div>`;
+function inner(o,tag){const p=o.p;return `<h2>Life<button class="min" aria-label="Hide Life panel" aria-expanded="true">${tag==='sheet'?ic.chevD:ic.chevL}</button></h2>
+${meter('Water','water','--water',p.w,p.wl)}${meter('Sunshine','sun','--sun',p.s,p.sl)}${meter('Happiness','happy','--leaf-fill',p.h,p.hl)}
+${growth(p.st,o.seed)}<div class="love"><div role="img" aria-label="Love, ${p.love} of 5 hearts. ${p.ll}"><b>Love</b><div class="hearts">${[0,1,2,3,4].map(i=>H(i<p.love)).join('')}</div><small>${p.ll}</small></div><small class="key">${petalIcon}<span>Love keeps her petals.</span></small></div>`}
+const panel=o=>`<aside class="panel" aria-label="Life">${inner(o)}</aside>`;
+const sheet=o=>`<aside class="sheet" aria-label="Life"><div class="grab"></div>${inner(o,'sheet')}</aside>`;
+const tab=falling=>`<button class="tab" aria-label="Show Life panel${falling?', a petal is falling':''}" aria-expanded="false" inert>${H(true)}<span>Life</span>${falling?`<svg class="dot" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="var(--petal)" stroke="var(--petal-edge)" stroke-width="1.5"/></svg>`:''}</button>`;
+const acts=g=>`<div class="acts">${[['Water','water'],['Feed','feed'],['Sun','sun'],['Repot','repot']].map(([t,k])=>`<button class="act ${g===k?'glow':''}">${ic[k]}${t}</button>`).join('')}</div>`;
+const badge=d=>`<div class="badge" aria-hidden="true">${ic.water.replace('viewBox','width="18" height="18" viewBox')}${d>=4?'Rain and soft thunder':'Gentle rain'}</div>`;
+let fid=0;
 function phone(cap,sub,o){
- return `<div><div class="phone ${o.rain?'rainy':''}"><div class="sbar"><span>9:41</span><span>100%</span></div><div class="title">Daisy</div><div class="mood">${o.mood}</div>
- <div class="stage"><div class="sheen"></div>${o.rain?cloud:''}<div class="plant">${o.seed?seedPot():plant(o.n,o.rain)}</div><div class="hint" role="note"><i>&#9825;</i> ${o.hint}</div></div>
- ${o.rain?`<div class="sky" aria-hidden="true">${drops()}</div>${note}`:''}<div class="ground"></div>
- ${o.min?tab:panel(o.p)}${o.wake?`<div class="wake">${o.wake}</div>`:''}${acts(o.glow)}</div><p class="cap">${cap}<small>${sub}</small></p></div>`}
-const P=(h,ll,w,wl,f,fl,s,sl,st)=>({h,ll,w,wl,f,fl,s,sl,st});
-const hint='Tap Daisy to give love';
+ const rain=o.day>0&&!o.seed&&!o.calm, cls=['phone',rain?'rainy':'',o.day>=4&&rain?'storm':'',o.rm?'still force':'',o.ax?'ax':'',o.min?'minimised':''].join(' ');
+ const crownMode=o.grow?'grow':(rain?'fall':''), id='f'+(++fid);
+ const pnl=o.ax?sheet(o):panel(o)+tab(rain);
+ return `<div><div class="${cls}" id="${id}" data-day="${rain?o.day:0}" ${o.dark?'data-theme="dark"':''}><div class="sbar"><span>9:41</span><span>100%</span></div><div class="title">Daisy</div><div class="mood">${o.mood}</div>
+ <div class="sheen"></div><div class="ground"></div>${rain?'<canvas class="rain back" aria-hidden="true"></canvas><canvas class="rain front" aria-hidden="true"></canvas>'+cloud:''}
+ ${o.calm?`<div class="calmchip" aria-hidden="true">${ic.happy.replace('viewBox','width="18" height="18" viewBox')}Quiet Garden is on</div>`:''}
+ ${o.seed?seedPot:daisy(crown(o.n,crownMode))}${rain?rest:''}${o.grow?'<span class="lovefly" aria-hidden="true">&#9829;</span>':''}
+ <div class="hint" role="note"><i aria-hidden="true">&#9825;</i> ${o.hint}</div>
+ ${rain?badge(o.day):''}<div class="flash"></div>
+ ${o.wake?`<a class="wake" href="parts/wake-options.html">Wake Daisy<span>Pick one you like.</span></a>`:''}${pnl}${acts(o.glow)}</div><p class="cap">${cap}<small>${sub}</small>${o.grow?`<button class="replay" data-for="${id}">Replay petals</button>`:''}</p></div>`}
+const P=(w,wl,s,sl,h,hl,love,ll,st=3)=>({w,wl,s,sl,h,hl,love,ll,st});
+const T=P(90,'Full',85,'Bright',90,'Happy',5,'Loved');
+const D1=P(75,'Good',60,'Cloudy',60,'Cosy',2,'Hello soon?');
+const D3=P(55,'Sipping',45,'Cloudy',45,'Cosy',1,'Hellos help');
+const D4=P(45,'Sipping',35,'Sun is coming',35,'Cosy',0,'Ready for a hello');
 document.getElementById('ph').innerHTML=[
-phone('1. Thriving','All petals. Panel open.',{n:8,mood:'Daisy is glowing',hint,p:P(5,'Feeling cherished',90,'Quenched',80,'Nourished',85,'Glowing',3)}),
-phone('2. Day 1 without love','Gentle rain, first petal drifting down.',{n:7,rain:true,mood:'Daisy would love a hello',hint:'A tap brings the sunshine back',glow:'water',p:P(2,'Waiting for a hello',70,'Refreshed',60,'Content',60,'Soaking it in',3)}),
-phone('3. Day 3 without love','Half the petals remain; rain continues.',{n:4,rain:true,mood:'Daisy is resting and hopeful',hint:'Every hello brings a petal back',p:P(1,'A little love helps',55,'Sipping',50,'Content',45,'Dreaming of sun',3)}),
-phone('4. Seed in a pot','Dormant. Progress kept.',{seed:true,n:0,mood:'Daisy is napping safely',hint:'Tap to say hello',wake:'Wake Daisy<span>Solve a word puzzle or catch a butterfly</span>',p:P(0,'Resting, ready when you are',40,'Resting',40,'Resting',40,'Resting',3)}),
-phone('5. Panel minimised','Slim heart tab; plant gets the full width.',{n:8,min:true,mood:'Daisy is glowing',hint})
+phone('1. Thriving','Daisy\'s own art with her full crown of five petals. Panel open.',{n:5,mood:'Daisy is so happy',hint:'Tap Daisy to give love',p:T}),
+phone('2. Day 1 with no love','A soft drizzle falls from the bottom of the cloud. The first petal drifts down. Far drops pass behind Daisy, near drops in front.',{day:1,n:4,mood:'Daisy would love a hello',hint:'A tap brings the sun back',glow:'water',p:D1}),
+phone('3. Day 3 with no love','Light rain. Two petals stay, one more drifts down.',{day:3,n:2,mood:'Daisy is dreaming of sun',hint:'Every hello brings a petal back',p:D3}),
+phone('4. Day 4: soft thunder','Steadier rain and a gentle flash every 8 to 15 s (try Flash thunder now). One petal stays.',{day:4,n:1,mood:'Daisy is cosy under the clouds',hint:'One hello brightens the sky',p:D4}),
+phone('5. Day 5: seed in a pot','Daisy rests as a seed. Growth and progress are kept. The rain stops while she sleeps.',{seed:true,n:0,mood:'Daisy is resting in her seed',hint:'She is safe and cosy',wake:true,p:P(35,'Resting',35,'Resting',35,'Resting',0,'Ready for you',3)}),
+phone('6. Love comes back','After waking, love brings her petals back one by one, 0.3 s apart.',{n:3,grow:true,mood:'Her petals are coming back',hint:'Keep the love coming',p:P(80,'Good',70,'Warming up',75,'Happy',3,'Blooming')}),
+phone('7. Panel minimised','A small Life button, set in from the screen edge. The pink dot means a petal is falling. Daisy stays centred.',{day:1,n:4,min:true,mood:'Daisy would love a hello',hint:'A tap brings the sun back',p:D1}),
+phone('8. Dark mode','Day 4 in dark: lighter drops, a dimmer flash (10 percent).',{day:4,n:1,dark:true,mood:'Daisy is cosy under the clouds',hint:'One hello brightens the sky',p:D4}),
+phone('9. Reduce Motion','Day 3, still: the cloud, a words badge under Daisy and one petal resting on the ground. No flash.',{day:3,n:2,rm:true,mood:'Daisy is dreaming of sun',hint:'Every hello brings a petal back',p:D3}),
+phone('10. Accessibility text size','The Life sheet has big rows and scrolls. Water, Feed, Sun and Repot stay pinned below as a 2 by 2 bar.',{n:5,ax:true,mood:'Daisy is so happy',hint:'Tap Daisy to give love',p:T}),
+phone('11. Calm mode or Quiet Garden','Three days with no love, but Calm is on: no rain, no petal loss, no seed. All five petals stay.',{day:3,calm:true,n:5,mood:'Daisy is happy and calm',hint:'Tap Daisy to give love',p:P(75,'Good',60,'Warming up',70,'Happy',2,'Hello soon?')})
 ].join('');
-const root=document.documentElement,b=document.getElementById('rm');
-b.onclick=()=>{const on=!document.body.classList.contains('rm');document.body.classList.toggle('rm',on);b.textContent='Preview Reduce Motion: '+(on?'on':'off');b.setAttribute('aria-pressed',on)};
-document.getElementById('th').onclick=()=>{root.dataset.theme=root.dataset.theme==='dark'?'light':'dark'};
+
+/* Weather: adapted from parts/weather.js for many phones. Drops are born under the cloud's real bottom edge. */
+const LEVELS={1:{n:12,t:0},2:{n:20,t:0},3:{n:32,t:0},4:{n:42,t:1},5:{n:50,t:1},6:{n:56,t:1},7:{n:60,t:1}};
+// far -> near. len = speed/30 so streaks join up at 30 fps. Layer 0 draws behind Daisy, layers 1-2 in front.
+const LAYERS=[{sp:420,len:14,w:.9,a:.32,g:[452,470],share:.45},{sp:620,len:21,w:1.3,a:.5,g:[468,488],share:.35},{sp:860,len:28,w:1.9,a:.62,g:[486,506],share:.2}];
+const SLANT=.08, FPS=30, STEP=1000/FPS, TOP=180, BH=340;
+// cloud box: left 105, top 112, scale 180/160. Underside spans x 26..144 at y ~66 in cloud units.
+const CS=180/160, CX0=105+26*CS, CX1=105+144*CS, CY=112+66*CS;
+const media=matchMedia('(prefers-reduced-motion: reduce)');
+let forceRM=false, sound=false, actx=null, lastSound=-1e9, raf=0;
+const phones=[...document.querySelectorAll('.phone')];
+const wx=phones.filter(p=>+p.dataset.day>0).map(p=>({p,day:+p.dataset.day,cvs:[...p.querySelectorAll('canvas')],drops:[],spl:[],last:0,timer:0,lastFlash:-1e9,vis:true,col:'70,110,150'}));
+const rnd=(a,b)=>a+Math.random()*(b-a);
+const isStill=p=>p.classList.contains('force')||forceRM||media.matches;
+function mk(L,fresh){const l=LAYERS[L];return{L,x:rnd(CX0,CX1),y:fresh?CY-rnd(0,40):rnd(CY,l.g[0]),gy:rnd(l.g[0],l.g[1])}}
+function readColours(){wx.forEach(w=>{w.col=getComputedStyle(w.p).getPropertyValue('--drop').trim()||'70,110,150'})} // on theme change only
+function setup(w){const d=Math.min(devicePixelRatio||1,2);w.cx=w.cvs.map(c=>{c.width=390*d;c.height=BH*d;const x=c.getContext('2d');x.setTransform(d,0,0,d,0,-TOP*d);x.lineCap='round';return x});
+ w.drops=[];const n=LEVELS[w.day].n;let used=0;
+ LAYERS.forEach((l,i)=>{const c=i<LAYERS.length-1?Math.round(n*l.share):n-used;used+=c;for(let k=0;k<c;k++)w.drops.push(mk(i,false))});
+ w.splCap=Math.round(4+n*.5)}
+function draw(w,s){const c=w.col,paths=LAYERS.map(()=>new Path2D());
+ w.cx.forEach(x=>x.clearRect(0,TOP,390,BH));
+ for(let i=0;i<w.drops.length;i++){const d=w.drops[i],l=LAYERS[d.L];d.y+=l.sp*s;d.x+=l.sp*s*SLANT;
+  if(d.y>=d.gy){if(w.spl.length<w.splCap)w.spl.push({x:d.x,y:d.gy,a:0,L:d.L});w.drops[i]=mk(d.L,true);continue}
+  if(d.y<CY)continue; // still inside the cloud
+  const top=Math.max(CY,d.y-l.len);paths[d.L].moveTo(d.x,d.y);paths[d.L].lineTo(d.x-(d.y-top)*SLANT,top)}
+ LAYERS.forEach((l,i)=>{const x=w.cx[i===0?0:1];x.strokeStyle=`rgba(${c},${l.a})`;x.lineWidth=l.w;x.stroke(paths[i])});
+ for(let j=w.spl.length-1;j>=0;j--){const p=w.spl[j];p.a+=s/.4;if(p.a>=1){w.spl.splice(j,1);continue}
+  const x=w.cx[p.L===0?0:1],r=2+p.a*(4+p.L*3),al=(1-p.a)*(.22+p.L*.12);x.strokeStyle=`rgba(${c},${al})`;x.lineWidth=.8+p.L*.3;x.beginPath();x.ellipse(p.x,p.y,r,r*.35,0,0,6.283);x.stroke();
+  if(p.a<.5){x.fillStyle=`rgba(${c},${al})`;x.fillRect(p.x-r*.7,p.y-p.a*10,1.3,1.3);x.fillRect(p.x+r*.7,p.y-p.a*8,1.3,1.3)}}}
+const active=()=>!document.hidden&&wx.some(w=>w.vis&&!isStill(w.p));
+function frame(t){raf=0;
+ wx.forEach(w=>{if(!w.vis||isStill(w.p))return;if(!w.last){w.last=t;return}const dt=t-w.last;if(dt<STEP-1)return;w.last=t;draw(w,Math.min(dt,100)/1000)});
+ if(active())raf=requestAnimationFrame(frame)}
+function start(){if(!raf&&active())raf=requestAnimationFrame(frame)}
+function stop(){cancelAnimationFrame(raf);raf=0;wx.forEach(w=>w.last=0)}
+document.addEventListener('visibilitychange',()=>document.hidden?stop():start());
+const io=new IntersectionObserver(es=>{es.forEach(e=>{const w=wx.find(x=>x.p===e.target);if(!w)return;w.vis=e.isIntersecting;if(w.vis)w.last=0});start()});
+wx.forEach(w=>io.observe(w.p));
+new MutationObserver(readColours).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+function rumble(){ // soft far rumble: brown noise, low-pass, slow attack, long tail, no crack
+ if(!sound)return;const now=performance.now();if(now-lastSound<4000)return;lastSound=now;
+ actx=actx||new (window.AudioContext||window.webkitAudioContext)();const a=actx,len=3*a.sampleRate,b=a.createBuffer(1,len,a.sampleRate),d=b.getChannelData(0);let v=0;
+ for(let i=0;i<len;i++){v=(v+.02*(Math.random()*2-1))/1.02;d[i]=v*3.5}
+ const src=a.createBufferSource(),lp=a.createBiquadFilter(),g=a.createGain(),t0=a.currentTime;src.buffer=b;lp.type='lowpass';lp.frequency.value=400;
+ g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(.35,t0+.15);g.gain.setValueAtTime(.35,t0+.6);g.gain.exponentialRampToValueAtTime(.001,t0+2.8);
+ src.connect(lp).connect(g).connect(a.destination);src.start()}
+// 8 s gap for scheduled flashes; the manual button still waits at least 1.4 s so a flash is never cut off mid-way
+function flash(w,force){if(isStill(w.p)||!LEVELS[w.day].t||!w.vis)return;const now=performance.now(),gap=now-w.lastFlash;if(gap<(force?1400:8000))return;w.lastFlash=now;
+ [w.p.querySelector('.flash'),w.p.querySelector('.bolt')].forEach(e=>{e.classList.remove('on');void e.getBoundingClientRect();e.classList.add('on')});
+ setTimeout(rumble,rnd(300,500))}
+function schedule(w){clearTimeout(w.timer);if(!LEVELS[w.day].t||isStill(w.p))return;w.timer=setTimeout(()=>{flash(w);schedule(w)},rnd(8000,15000))}
+function apply(){phones.forEach(p=>p.classList.toggle('still',isStill(p)));
+ wx.forEach(w=>{if(isStill(w.p)){w.cx&&w.cx.forEach(x=>x.clearRect(0,TOP,390,BH));w.p.querySelectorAll('.flash,.bolt').forEach(e=>e.classList.remove('on'))}schedule(w)});stop();start()}
+readColours();wx.forEach(setup);apply();media.addEventListener('change',apply);
+setTimeout(()=>wx.forEach(w=>flash(w)),2500); // first gentle flash shortly after load on thunder days
+
+// panel minimise / restore: the panel shrinks into the Life button (fade only with Reduce Motion)
+document.getElementById('ph').addEventListener('click',e=>{const ph=e.target.closest('.phone');
+ const rp=e.target.closest('.replay');if(rp){const c=document.querySelector('#'+rp.dataset.for+' .crown');c.classList.remove('regrow');void c.getBoundingClientRect();c.classList.add('regrow');
+  c.querySelectorAll('.pet.grow').forEach(p=>{p.style.animation='none';void p.getBoundingClientRect();p.style.animation=''});return}
+ if(!ph)return;const mn=e.target.closest('.min'),tb=e.target.closest('.tab');if(!mn&&!tb)return;
+ const m=ph.querySelector('.min');
+ if(ph.classList.contains('ax')){const on=ph.classList.toggle('minimised');m.setAttribute('aria-expanded',!on);m.setAttribute('aria-label',on?'Show Life panel':'Hide Life panel');return}
+ const pn=ph.querySelector('.panel'),t=ph.querySelector('.tab');
+ if(mn){ph.classList.add('minimised');pn.inert=true;t.inert=false;t.focus()}
+ else{ph.classList.remove('minimised');t.inert=true;pn.inert=false;m.focus()}});
+// frame 7 starts minimised: make its panel inert and its button live
+phones.filter(p=>p.classList.contains('minimised')).forEach(p=>{const pn=p.querySelector('.panel'),t=p.querySelector('.tab');if(pn&&t){pn.inert=true;t.inert=false}});
+const b=document.getElementById('rm');
+b.onclick=()=>{forceRM=!forceRM;b.textContent='Preview Reduce Motion: '+(forceRM?'on':'off');b.setAttribute('aria-pressed',forceRM);apply()};
+document.getElementById('th').onclick=()=>window.wfToggle?wfToggle():(document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark');
+const sb=document.getElementById('snd');sb.onclick=()=>{sound=!sound;sb.textContent='Thunder sound: '+(sound?'on':'off');sb.setAttribute('aria-pressed',sound);if(sound){actx=actx||new (window.AudioContext||window.webkitAudioContext)();actx.resume()}};
+document.getElementById('now').onclick=()=>wx.forEach(w=>flash(w,true));
 </script></body></html>
