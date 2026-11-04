@@ -19,6 +19,7 @@
 		0EF248DB19561DBC0B3A3911 /* wf-sun.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 78262DDD42B5B0B95B53888A /* wf-sun.m4a */; };
 		1581D6A2E8210D4686510D56 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
 		170893E1A2616D1CEACC9A9D /* wf-earned.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5510B1B69285FC4D97F91D07 /* wf-earned.m4a */; };
+		19FC1E7D0E23F1EEAA3D062F /* wf-thunder.m4a in Resources */ = {isa = PBXBuildFile; fileRef = DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */; };
 		1A0DEDAC7F9EC16779453E20 /* WordFloraWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 99F163FA4DA73F8563DD08F0 /* WordFloraWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1A1EF2246D18FBC822B23F43 /* wf-butterfly.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B3C67B3F3D18A565BC91069D /* wf-butterfly.m4a */; };
 		1B1F6E25CDDEF290B4E2EDA4 /* VoicePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673807997651A94A74A50735 /* VoicePickerTests.swift */; };
@@ -366,6 +367,7 @@
 		D9550E7376E237963E1CA789 /* TapBurst.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TapBurst.swift; sourceTree = "<group>"; };
 		DA61364BB027900BC30E6C17 /* wf-badgeGold.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeGold.m4a"; sourceTree = "<group>"; };
 		DBDCE1A9248AD5C4EDCBE08A /* GardenBackupTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenBackupTests.swift; sourceTree = "<group>"; };
+		DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-thunder.m4a"; sourceTree = "<group>"; };
 		DE3B9B93CE1A034E8C165CB7 /* Badges.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Badges.json; sourceTree = "<group>"; };
 		DFF28D3D26629318AA9D49A4 /* GardenBackup.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenBackup.swift; sourceTree = "<group>"; };
 		E0F27137167AD56F3C378B56 /* PlantThinning.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantThinning.swift; sourceTree = "<group>"; };
@@ -771,6 +773,7 @@
 				8CDEF4F1B5B37025007C3FB4 /* wf-water.m4a */,
 				9BB89B0B7D5A508F1A4C13B4 /* wf-word.m4a */,
 				FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */,
+				DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */,
 			);
 			name = Sounds;
 			path = Sounds;
@@ -965,6 +968,7 @@
 				3FE4D4DD51111A1B37DC0A26 /* wf-water.m4a in Resources */,
 				EDB86ADCB596F2390F8642F7 /* wf-word.m4a in Resources */,
 				BA042FFFFC29EF40C286AF09 /* wf-wrong.m4a in Resources */,
+				19FC1E7D0E23F1EEAA3D062F /* wf-thunder.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
