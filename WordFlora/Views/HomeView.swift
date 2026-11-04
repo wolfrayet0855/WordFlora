@@ -250,8 +250,8 @@ struct HomeView: View {
                 .frame(width: sunDisc, height: sunDisc)
                 .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Daily Bloom").font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
-                        .measuresLines("Daily Bloom", font: Theme.font(.headline))
+                    Text("Daily Bloom").font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                        .measuresLines("Daily Bloom", font: Theme.font(.headline, weight: .bold))
                     Text(done ? "Done for today. See you tomorrow!" : "One word for everyone today")
                         .font(Theme.font(.footnote)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
