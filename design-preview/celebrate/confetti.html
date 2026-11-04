@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Petal Confetti</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  /* a stand-in game screen so the burst has context */
+  .bar { position: absolute; top: 56px; left: 16px; right: 16px; display: flex; justify-content: space-between; font-weight: 700; font-size: 17px; }
+  .flower { position: absolute; top: 104px; left: 50%; width: 120px; height: 140px; margin-left: -60px; }
+  .hint { position: absolute; top: 262px; left: 16px; right: 16px; height: 96px; border-radius: 16px; background: var(--surface); box-shadow: 0 6px 18px var(--shadow); padding: 14px 16px; font-size: 16px; line-height: 1.35; }
+  .tiles { position: absolute; top: 384px; left: 0; right: 0; display: flex; justify-content: center; gap: 6px; }
+  .tile { width: 36px; height: 44px; border-radius: 8px; background: var(--tile); display: grid; place-items: center; font-weight: 800; font-size: 22px; }
+  .tile.hot { will-change: transform; }
+  .keys { position: absolute; left: 8px; right: 8px; bottom: 48px; display: grid; grid-template-columns: repeat(10, 1fr); gap: 5px; }
+  .keys div { height: 46px; border-radius: 8px; background: var(--surface); box-shadow: 0 1px 0 var(--shadow); }
+  #dim { background: var(--dim); opacity: 0; }
+  #card { position: absolute; left: 24px; right: 24px; top: 250px; border-radius: 24px; background: var(--bg); padding: 22px 20px; text-align: center; opacity: 0; }
+  #card h2 { margin: 6px 0 10px; font-size: 22px; }
+  #card .kicker { font-size: 14px; font-weight: 700; color: var(--accent); }
+  #card .plant { width: 150px; height: 150px; margin: 6px auto 10px; border-radius: 16px; background: var(--surface); display: grid; place-items: center; }
+  #card .plant img { width: 120px; }
+  #card p { margin: 0 0 14px; font-size: 15px; color: var(--muted); }
+  #card .btn { height: 50px; border-radius: 18px; background: #E8A838; color: #2C3E2C; font-weight: 800; display: grid; place-items: center; }
+  #badge { position: absolute; left: 50%; top: 250px; width: 150px; height: 150px; margin-left: -75px; opacity: 0; }
+  #badge img { width: 100%; height: 100%; }
+  #halo { position: absolute; left: 50%; top: 325px; width: 260px; height: 260px; margin: -130px 0 0 -130px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,232,150,.55), rgba(255,232,150,0)); opacity: 0; }
+  #badgeText { position: absolute; left: 50%; width: 280px; margin-left: -140px; top: 424px; padding: 10px 0 12px; border-radius: 20px; background: rgba(20,32,20,.55); text-align: center; color: #fff; opacity: 0; }
+  #badgeText .t { font-size: 24px; font-weight: 800; }
+  #badgeText .s { font-size: 15px; font-weight: 600; opacity: .9; margin-top: 4px; }
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <div class="bar"><span>⌂</span><span id="title">Level 3</span><span>Help</span></div>
+  <img class="flower" src="../flowers/flower_8.svg" alt="">
+  <div class="hint">A tall flower that turns its face to follow the sun across the sky.</div>
+  <div class="tiles" id="tiles"></div>
+  <div class="keys">
+    <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+    <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
+  </div>
+  <div class="layer" id="dim"></div>
+  <div id="halo"></div>
+  <canvas class="layer" id="fx"></canvas>
+  <div id="badge"><img src="../../WordFlora/Assets.xcassets/BadgeArt/badge_daily_bloom_t3.imageset/badge_daily_bloom_t3.svg" alt=""></div>
+  <div id="badgeText"><div class="t">Gold Daily Bloomer</div><div class="s">Badge earned</div></div>
+  <div id="card">
+    <div class="kicker" id="kicker">Level up! New plants to find</div>
+    <h2 id="cardTitle">New plant found!</h2>
+    <div class="plant"><img src="../plant_sunflower.png" alt=""></div>
+    <p>Sunflowers track the sun while they are young.</p>
+    <div class="btn">Continue</div>
+  </div>
+  <canvas class="layer" id="fxFront"></canvas>
+</div>
+<script src="engine.js"></script>
+<script>
+const { P, PAL, rng, clamp, lerp, ease, seg, petal, blossom, setupCanvas, run } = WF;
+const W = 393, H = 852;
+const q = new URLSearchParams(location.search);
+const LEVEL = q.get('level') || 'medium';
+const fx = setupCanvas(document.getElementById('fx'), W, H);
+const fxFront = setupCanvas(document.getElementById('fxFront'), W, H);
+const $ = (id) => document.getElementById(id);
+
+// tiles: SUNFLOWER with the N just revealed
+const WORD = 'SUNFLOWER', SHOWN = new Set(['S', 'U', 'N', 'O']);
+$('tiles').innerHTML = [...WORD].map((c, i) => `<div class="tile${c === 'N' ? ' hot' : ''}">${SHOWN.has(c) ? c : ''}</div>`).join('');
+const HOT = { x: W / 2 + (2 - 4) * 42, y: 384 + 22 };     // centre of the N tile
+
+// ---- particle sets: every particle is a closed-form function of time (drag + gravity + flutter) ----
+const r = rng({ small: 3, medium: 5, large: 9, badge: 13 }[LEVEL] || 1);
+const parts = [];
+const pick = () => PAL[Math.floor(r() * PAL.length)];
+function burst(n, o) {
+  for (let i = 0; i < n; i++) {
+    const ang = o.dir + (r() - 0.5) * o.spread, v = lerp(o.v[0], o.v[1], r());
+    const isBloom = r() < o.bloomShare;
+    parts.push({
+      kind: isBloom ? 'bloom' : 'petal', col: pick(),
+      ox: o.x + (r() - 0.5) * (o.jitter || 0), oy: o.y, vx: Math.cos(ang) * v, vy: Math.sin(ang) * v,
+      k: o.k, g: o.g, t0: o.t0 + r() * (o.stagger || 0), life: lerp(o.life[0], o.life[1], r()),
+      len: isBloom ? lerp(o.bloomR[0], o.bloomR[1], r()) : lerp(o.len[0], o.len[1], r()),
+      a0: r() * 6.28, spin: (r() - 0.5) * 9, sway: 6 + r() * 14, sw: 3 + r() * 3, ph: r() * 6.28, fw: 5 + r() * 5,
+      front: o.front ? r() < o.front : false,
+    });
+  }
+}
+function drift(n, o) {        // gentle fall from above (Calm, and the top-up in "large")
+  for (let i = 0; i < n; i++) {
+    const isBloom = r() < (o.bloomShare || 0);
+    parts.push({ kind: isBloom ? 'bloom' : 'petal', col: pick(), drift: true,
+      ox: 10 + r() * (W - 20), oy: -20 - r() * 40, fall: lerp(o.speed[0], o.speed[1], r()),
+      t0: o.t0 + r() * o.stagger, life: lerp(o.life[0], o.life[1], r()),
+      len: isBloom ? lerp(6, 9, r()) : lerp(o.len[0], o.len[1], r()),
+      a0: r() * 6.28, spin: (r() - 0.5) * 3, sway: 12 + r() * 20, sw: 1.6 + r() * 1.4, ph: r() * 6.28, fw: 2.5 + r() * 2.5 });
+  }
+}
+
+const deg = Math.PI / 180;
+if (LEVEL === 'small') {
+  burst(14, { x: HOT.x, y: HOT.y - 10, dir: -90 * deg, spread: 130 * deg, v: [150, 250], k: 4.2, g: 300, t0: 0, life: [0.6, 0.8], len: [9, 12], bloomR: [6, 7], bloomShare: 0.3 });
+} else if (LEVEL === 'medium') {
+  burst(40, { x: W / 2, y: 262, dir: -90 * deg, spread: 150 * deg, v: [240, 470], k: 2.6, g: 230, t0: 0, stagger: 0.08, life: [1.5, 1.9], len: [10, 15], bloomR: [6, 9], bloomShare: 0.25, jitter: 30 });
+} else if (LEVEL === 'large' && P.calm) {
+  drift(24, { t0: 0, stagger: 1.0, speed: [110, 160], life: [2.2, 2.8], len: [11, 15], bloomShare: 0.15 });
+} else if (LEVEL === 'large' && !P.rm) {
+  for (const [n, t0] of [[26, 0], [14, 0.45]]) {   // two soft waves, 80 from the cannons
+    burst(n, { x: -6, y: H * 0.74, dir: -64 * deg, spread: 46 * deg, v: [650, 1000], k: 1.7, g: 210, t0, stagger: 0.15, life: [2.2, 2.8], len: [11, 16], bloomR: [7, 10], bloomShare: 0.22 });
+    burst(n, { x: W + 6, y: H * 0.74, dir: -116 * deg, spread: 46 * deg, v: [650, 1000], k: 1.7, g: 210, t0: t0 + 0.06, stagger: 0.15, life: [2.2, 2.8], len: [11, 16], bloomR: [7, 10], bloomShare: 0.22 });
+  }
+  drift(16, { t0: 0.5, stagger: 0.9, speed: [120, 170], life: [2.0, 2.4], len: [11, 14], bloomShare: 0.5 });
+} else if (LEVEL === 'badge' && !P.rm) {
+  for (let i = 0; i < 28; i++) parts.push({ kind: i % 4 === 0 ? 'bloom' : 'petal', col: PAL[i % PAL.length], swirl: true,
+    phi: i / 28 * 6.28 + r() * 0.2, d: 0.15 + r() * 0.2, R: 95 + r() * 45, len: i % 4 === 0 ? 7 + r() * 2 : 11 + r() * 4,
+    life: 2.3 + r() * 0.3, fw: 4 + r() * 4, ph: r() * 6.28, t0: 0 });
+}
+console.log('particles', parts.length);   // the caps: small 14, medium 40, large 96, badge 28 (all <= 120)
+
+function pose(p, t) {
+  const tt = t - p.t0;
+  if (tt < 0 || tt > p.life) return null;
+  const fade = 1 - ease.inOutCubic(seg(tt, p.life * 0.68, p.life));
+  if (p.swirl) {               // spiral out from the badge, then drift down
+    const u = seg(tt, 0, 1.5), e = ease.outCubic(u);
+    const rad = lerp(36, p.R, e), phi = p.phi + 2.4 * e;
+    const fall = Math.max(0, tt - 1.1);
+    return { x: W / 2 + Math.cos(phi) * rad, y: 325 + Math.sin(phi) * rad * 0.7 + 40 * fall * fall,
+             a: phi + Math.PI, flip: Math.cos(p.fw * tt + p.ph) * (fall > 0 ? 1 : 0.35) + (fall > 0 ? 0 : 0.65),
+             alpha: fade * ease.outCubic(seg(tt, 0, 0.2)) };
+  }
+  if (p.drift) {
+    return { x: p.ox + Math.sin(p.sw * tt + p.ph) * p.sway, y: p.oy + p.fall * tt, a: p.a0 + p.spin * tt + 0.5 * Math.sin(p.sw * tt),
+             flip: Math.cos(p.fw * tt + p.ph), alpha: fade * ease.outCubic(seg(tt, 0, 0.3)) };
+  }
+  const e = Math.exp(-p.k * tt), m = (1 - e) / p.k;
+  return {
+    x: p.ox + p.vx * m + Math.sin(p.sw * tt + p.ph) * p.sway * (1 - e),
+    y: p.oy + p.vy * m + (p.g / p.k) * (tt - m),
+    a: p.a0 + p.spin * m * 2 + 0.6 * Math.sin(p.sw * tt) * (1 - e),
+    flip: Math.cos(p.fw * tt + p.ph), alpha: fade,
+  };
+}
+
+function drawParts(t) {
+  fx.clearRect(0, 0, W, H); fxFront.clearRect(0, 0, W, H);
+  for (const p of parts) {
+    const s = pose(p, t);
+    if (!s) continue;
+    const ctx = p.front && t < 0.7 ? fxFront : fx;   // a few fly in front briefly, never linger over text
+    const a = p.front ? s.alpha * (ctx === fxFront ? 1 - seg(t, 0.5, 0.7) : seg(t, 0.5, 0.9)) : s.alpha;
+    if (p.kind === 'bloom') blossom(ctx, s.x, s.y, p.len, p.col, a, 1, s.a * 0.4, 1);
+    else petal(ctx, s.x, s.y, s.a, p.len, p.col, a, s.flip);
+  }
+}
+
+// Reduce Motion: a still ring of petals and blossoms fades in and out around the moment. Opacity only.
+function drawStill(t, cx, cy, R) {
+  fx.clearRect(0, 0, W, H);
+  const a = ease.outCubic(seg(t, 0, 0.3)) * (1 - ease.inOutCubic(seg(t, 0.9, 1.4)));
+  for (let i = 0; i < 12; i++) {
+    const phi = -Math.PI / 2 + (i - 5.5) * 0.24, x = cx + Math.cos(phi) * R, y = cy + Math.sin(phi) * R * 0.7;
+    if (i % 3 === 1) blossom(fx, x, y, 9, PAL[i % PAL.length], a, 1, 0, 1); else petal(fx, x, y, phi + Math.PI / 2, 13, PAL[i % PAL.length], a, 1);
+  }
+}
+
+function draw(t) {
+  const tile = document.querySelector('.tile.hot');
+  if (LEVEL === 'small') {
+    const pop = P.rm ? 0 : Math.sin(Math.PI * seg(t, 0, 0.28)) * 0.1;
+    tile.style.transform = `scale(${1 + pop})`;
+    tile.style.background = `color-mix(in srgb, #F5C858 ${Math.round(60 * (1 - seg(t, 0.2, 0.8)))}%, var(--tile))`;
+    tile.textContent = 'N';
+    if (P.rm) { drawStill(t, HOT.x, HOT.y, 34); return; }
+    drawParts(t); return;
+  }
+  if (LEVEL === 'badge') {
+    $('dim').style.background = 'rgba(0,0,0,.62)'; $('dim').style.opacity = ease.outCubic(seg(t, 0, 0.3));
+    const pop = P.rm ? ease.outCubic(seg(t, 0, 0.3)) : ease.outBack(seg(t, 0.05, 0.5));
+    $('badge').style.opacity = P.rm ? pop : clamp(pop * 3);
+    $('badge').style.transform = P.rm ? 'none' : `scale(${0.3 + 0.7 * pop}) rotate(${-12 * (1 - pop)}deg)`;
+    $('halo').style.opacity = ease.outCubic(seg(t, 0.2, 0.8)) * (0.7 + 0.3 * Math.sin(t * 2));
+    $('badgeText').style.opacity = ease.outCubic(seg(t, 0.4, 0.8));
+    if (P.rm) { drawStill(t, W / 2, 325, 110); return; }
+    drawParts(t); return;
+  }
+  // medium + large share the earned card. medium = level up; large = new plant / Daily Bloom.
+  $('kicker').style.display = LEVEL === 'medium' ? 'block' : 'none';
+  if (LEVEL === 'large' && q.get('daily') === '1') { $('title').textContent = 'Daily Bloom'; }
+  $('dim').style.opacity = ease.outCubic(seg(t, 0, P.rm ? 0.15 : 0.3));
+  const cIn = P.rm ? ease.outCubic(seg(t, 0.15, 0.4)) : ease.outCubic(seg(t, 0.7, 1.0));   // card at +0.7 s (Reduce Motion: dim, then card by 0.4 s)
+  $('card').style.opacity = cIn;
+  $('card').style.transform = `scale(${0.96 + 0.04 * cIn})`;
+  if (P.rm) { drawStill(t, W / 2, 262, 150); return; }
+  drawParts(t);
+}
+
+run(draw, { small: 1.1, medium: 2.0, large: 3.0, badge: 2.7 }[LEVEL], { skipTo: 99, hold: 1.0 });
+</script>
+</body>
+</html>

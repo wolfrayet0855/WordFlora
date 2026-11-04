@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Landing Intro</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  #mark { position: absolute; left: 0; right: 0; top: 0; display: flex; flex-direction: column; align-items: center; gap: 10px; will-change: transform, opacity; }
+  #mark .svg { width: 262px; }
+  #mark .svg svg { width: 100%; height: auto; display: block; overflow: visible; }
+  #tagline { font-size: 16px; font-weight: 600; color: var(--muted); }
+  #home { position: absolute; inset: 0; opacity: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; padding-top: 70px; gap: 16px; }
+  #home .card { width: 345px; height: 120px; border-radius: 18px; background: var(--surface); box-shadow: 0 6px 18px var(--shadow); display: grid; place-items: center; font-weight: 700; color: var(--muted); }
+  #skip { position: absolute; right: 16px; bottom: 40px; font-size: 13px; font-weight: 600; color: var(--muted); opacity: .0; }
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+  <canvas class="layer" id="back"></canvas>
+  <div id="mark"><div class="svg" id="svg"></div><div id="tagline">Guess words. Grow a garden.</div></div>
+  <canvas class="layer" id="front"></canvas>
+  <div id="home"><div class="svg" style="width:172px" id="homeMark"></div><div class="card">Home</div><div class="card">Daily Bloom</div></div>
+</div>
+<script src="wordmark-data.js"></script>
+<script src="engine.js"></script>
+<script>
+const { P, PAL, GREEN, rng, clamp, lerp, ease, seg, petal, blossom, leaf, setupCanvas, run } = WF;
+const W = 393, H = 852, G = H - 72;            // ground line sits above the home indicator
+const MARK_Y = H * 0.40, SETTLE = -18;          // wordmark centre, then it settles up as the row blooms
+const dark = P.theme === 'dark';
+
+// ---- wordmark (inline SVG so each O's five petals can open) ----
+document.getElementById('svg').innerHTML = WORDMARK[dark ? 'dark' : 'light'];
+document.getElementById('homeMark').innerHTML = WORDMARK[dark ? 'dark' : 'light'];
+const svg = document.querySelector('#svg svg');
+const oPetals = [...svg.querySelectorAll('path')].slice(0, 2).map((p, i) => {
+  const b = p.getBBox();                            // both O's share the ring centre y = 534 (viewBox units)
+  return { el: p, cx: b.x + b.width / 2, cy: 534, dir: i === 0 ? -1 : 1 };
+});
+const mark = document.getElementById('mark'), tag = document.getElementById('tagline'), home = document.getElementById('home');
+
+// ---- scene setup (deterministic) ----
+const r = rng(11);
+const N = 7, clusters = [];
+const cols = [0, 1, 3, 2, 4, 1, 0];               // neighbours never share a colour
+for (let c = 0; c < N; c++) {
+  const rank = Math.abs(c - 3);                      // the row blooms from the middle outwards
+  clusters.push({
+    x: 34 + c * (325 / (N - 1)) + (r() - 0.5) * 10,
+    h: [70, 50, 80, 58, 76, 48, 66][c],
+    rad: 16 + r() * 4,
+    col: PAL[cols[c]],
+    land: 1.15 + rank * 0.15 + r() * 0.06,          // when the cluster's last petal lands
+    lean: (r() - 0.5) * 0.12,
+  });
+}
+const petals = [];
+function addFaller(o) {
+  const D = 0.95 + r() * 0.35;
+  petals.push(Object.assign({
+    D, ts: o.land - D,
+    y0: -30 - r() * 60,
+    drift: (r() - 0.5) * 120,
+    swayA: 14 + r() * 18, swayW: 5 + r() * 4, ph: r() * 6.28,
+    spin0: r() * 6.28, spin: (r() - 0.5) * 7,
+    flipW: 7 + r() * 6, ph2: r() * 6.28,
+    back: r() < 0.4,                               // 40% drift behind the wordmark
+  }, o));
+}
+clusters.forEach((c, ci) => {
+  for (let k = 0; k < 5; k++) {
+    addFaller({
+      cluster: ci, k, col: c.col, len: 18 + r() * 3,
+      xL: c.x + (k - 2) * 5.5 + (r() - 0.5) * 3,
+      yL: G - [0, 2.5, 4.5, 2, 0][k] - r() * 1.5,      // a little heap
+      rest: (r() < 0.5 ? -1 : 1) * (1.25 + r() * 0.45),  // lying on its side, slight tilt
+      land: c.land - r() * 0.3,
+    });
+  }
+});
+for (let i = 0; i < 6; i++) {                      // loose petals that stay on the ground between flowers
+  const x = 16 + r() * 361;
+  addFaller({ cluster: -1, col: PAL[Math.floor(r() * 4)], len: 12 + r() * 4, xL: x, yL: G + 3 - (i % 4 === 0 ? 3 : 0),
+              rest: (r() < 0.5 ? -1 : 1) * (1.2 + r() * 0.6), land: 0.75 + r() * 1.2 });
+}
+clusters.forEach((c, ci) => { c.tb = Math.max(...petals.filter(p => p.cluster === ci).map(p => p.ts + p.D)) + 0.12; });
+
+// ---- per-petal pose ----
+function fallPose(p, t) {
+  const u = (t - p.ts) / p.D;
+  if (u < 0) return null;
+  if (u < 1) {
+    const f = 1 - Math.pow(1 - u, 1.35);
+    const end = ease.inOutCubic(seg(u, 0.72, 1));
+    return {
+      x: p.xL + p.drift * (1 - f) + p.swayA * Math.sin(p.swayW * u + p.ph) * Math.pow(1 - u, 0.8),
+      y: lerp(p.y0, p.yL, f),
+      a: lerp(p.spin0 + p.spin * u, p.rest, end),
+      flip: lerp(Math.cos(p.flipW * u + p.ph2), 1, end),
+      falling: true,
+    };
+  }
+  const tau = t - p.ts - p.D;                       // settle: tiny rock and bounce
+  return { x: p.xL, y: p.yL - 2.5 * Math.exp(-10 * tau) * Math.abs(Math.sin(14 * tau)),
+           a: p.rest + 0.22 * Math.exp(-7 * tau) * Math.sin(16 * tau), flip: 1, falling: false };
+}
+const baseOf = (q, len) => ({ x: q.x - Math.sin(q.a) * len / 2, y: q.y + Math.cos(q.a) * len / 2 });  // mid pivot -> base
+
+function stemTop(c, t) {
+  const g = ease.outCubic(seg(t, c.tb, c.tb + 0.5));
+  const sway = 0.035 * Math.sin(1.5 * (t - c.tb) + c.x) * seg(t, c.tb + 0.9, c.tb + 1.5);
+  const h = c.h * g;
+  return { x: c.x + Math.sin(c.lean + sway) * h, y: G - Math.cos(c.lean + sway) * h, g, h, rot: c.lean + sway };
+}
+
+function drawStem(ctx, c, t, alpha) {
+  const s = stemTop(c, t);
+  if (s.g <= 0) return s;
+  ctx.save(); ctx.globalAlpha = alpha;
+  ctx.fillStyle = dark ? 'rgba(0,0,0,.28)' : 'rgba(44,62,44,.12)';
+  ctx.beginPath(); ctx.ellipse(c.x, G + 4, 6 + 10 * s.g, 2.6, 0, 0, 7); ctx.fill();
+  ctx.strokeStyle = GREEN.stem; ctx.lineWidth = 3; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(c.x, G + 2); ctx.quadraticCurveTo(c.x - c.lean * 30, G - s.h * 0.5, s.x, s.y); ctx.stroke();
+  ctx.restore();
+  const lg = seg(t, c.tb + 0.22, c.tb + 0.6);
+  leaf(ctx, c.x + 1, G - s.h * 0.32, 11 * ease.outCubic(lg), -0.5, GREEN.leafA, alpha);
+  leaf(ctx, c.x - 1, G - s.h * 0.5, 9 * ease.outCubic(seg(t, c.tb + 0.3, c.tb + 0.68)), Math.PI + 0.55, GREEN.leafB, alpha);
+  return s;
+}
+
+const back = setupCanvas(document.getElementById('back'), W, H);
+const front = setupCanvas(document.getElementById('front'), W, H);
+
+function drawFinalRow(ctx, alpha) {          // Reduce Motion: the same row, already bloomed
+  const t = 99;
+  clusters.forEach(c => { const s = drawStem(ctx, c, t, alpha); blossom(ctx, s.x, s.y, c.rad, c.col, alpha, 1, s.rot, 1); });
+}
+
+function draw(t) {
+  back.clearRect(0, 0, W, H); front.clearRect(0, 0, W, H);
+
+  if (P.rm) {
+    const a = ease.outCubic(seg(t, 0, 0.6));
+    mark.style.opacity = a; tag.style.opacity = a;
+    mark.style.transform = `translateY(${MARK_Y + SETTLE - 30}px)`;
+    drawFinalRow(front, a);
+    const h = seg(t, 2.0, 2.4); home.style.opacity = h; document.getElementById('phone').dataset.t = t;
+    return;
+  }
+
+  // wordmark: rise + fade in, O flowers open, then settle upward while the row blooms
+  const mIn = ease.outCubic(seg(t, 0, 0.8));
+  const settle = ease.inOutCubic(seg(t, 1.8, 3.2));
+  mark.style.opacity = mIn;
+  mark.style.transform = `translateY(${MARK_Y - 30 + 14 * (1 - mIn) + SETTLE * settle}px) scale(${0.94 + 0.06 * mIn})`;
+  const open = ease.outBack(seg(t, 0.55, 1.2));          // O flowers: closed buds, then open
+  oPetals.forEach(o => o.el.setAttribute('transform',
+    `translate(${o.cx} ${o.cy}) rotate(${o.dir * 72 * (1 - open)}) scale(${0.15 + 0.85 * open}) translate(${-o.cx} ${-o.cy})`));
+  tag.style.opacity = ease.outCubic(seg(t, 0.6, 1.2));
+  tag.style.transform = `translateY(${6 * (1 - seg(t, 0.6, 1.2))}px)`;
+
+  // stems first (behind their petals)
+  const tops = clusters.map(c => drawStem(front, c, t, 1));
+
+  petals.forEach(p => {
+    const q = fallPose(p, t);
+    if (!q) return;
+    if (p.cluster < 0) {   // loose petals soak into the soil once the row has bloomed
+      petal(q.falling && p.back ? back : front, q.x, q.y, q.a, p.len, p.col, (q.falling && p.back ? 0.85 : 1) * (1 - ease.inOutCubic(seg(t, 2.6, 3.2))), q.flip); return;
+    }
+    const c = clusters[p.cluster], s = tops[p.cluster];
+    const gather = ease.inOutCubic(seg(t, c.tb + 0.05, c.tb + 0.5));
+    if (gather <= 0) { petal(q.falling && p.back ? back : front, q.x, q.y, q.a, p.len, p.col, q.falling && p.back ? 0.85 : 1, q.flip); return; }
+    if (t >= c.tb + 0.5) return;                         // the blossom takes over below
+    const b = baseOf(q, p.len), budA = s.rot + (p.k - 2) * 0.18, budLen = c.rad * 0.95 * 0.75;
+    let ra = q.a; while (ra - budA > Math.PI) ra -= 2 * Math.PI; while (budA - ra > Math.PI) ra += 2 * Math.PI;
+    petal(front, lerp(b.x, s.x, gather), lerp(b.y, s.y, gather), lerp(ra, budA, gather), lerp(p.len, budLen, gather), p.col, 1, 1, 'base');
+  });
+
+  clusters.forEach((c, i) => {
+    if (t < c.tb + 0.5) return;
+    const s = tops[i];
+    const op = ease.outBack(seg(t, c.tb + 0.5, c.tb + 0.95));
+    blossom(front, s.x, s.y, c.rad, c.col, 1, op, s.rot, ease.outBack(seg(t, c.tb + 0.62, c.tb + 0.85)));
+  });
+
+  // hand-off to Home
+  home.style.opacity = ease.inOutCubic(seg(t, 3.5, 3.9));
+}
+
+run(draw, P.rm ? 2.4 : 3.9, { skipTo: P.rm ? 2.0 : 3.5, hold: 1.5 });
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+:root, [data-theme=light] { --bg: #FAF7F0; --surface: #FFFFFF; --text: #2C3E2C; --muted: rgba(44,62,44,.88); --accent: #E8A838; --success: #2A7A38; --dim: rgba(0,0,0,.45); --shadow: rgba(44,62,44,.14); --tile: #EDE8DA; }
+[data-theme=dark] { --bg: #1A2E1A; --surface: #2C3E2C; --text: #D4EDD4; --muted: rgba(212,237,212,.88); --accent: #F0C060; --success: #66BB6A; --dim: rgba(0,0,0,.55); --shadow: rgba(0,0,0,.35); --tile: #24382A; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body { background: var(--bg); color: var(--text); font-family: ui-rounded, "SF Pro Rounded", "Nunito", system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+.phone { position: relative; width: 393px; height: 852px; overflow: hidden; background: var(--bg); margin: 0 auto; }
+.layer { position: absolute; inset: 0; pointer-events: none; }
+canvas.layer { width: 393px; height: 852px; }
