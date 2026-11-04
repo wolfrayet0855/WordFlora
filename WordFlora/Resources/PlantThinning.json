@@ -18623,29 +18623,30 @@
      "fall": {
       "1": [],
       "2": [],
-      "3": [],
-      "4": [
-       3,
+      "3": [
        1,
+       4
+      ],
+      "4": [
        0
       ],
       "5": [
-       4,
-       2
+       2,
+       3
       ]
      },
      "keepOrder": [
-      3,
       1,
-      0,
       4,
-      2
+      0,
+      2,
+      3
      ],
      "keptCounts": [
       0,
       0,
       0,
-      0,
+      2,
       3,
       5
      ],
@@ -18794,11 +18795,14 @@
       "0": [],
       "1": [],
       "2": [],
-      "3": [],
+      "3": [
+       1,
+       4
+      ],
       "4": [
        0,
        1,
-       3
+       4
       ],
       "5": [
        0,
@@ -18818,33 +18822,33 @@
        6
       ],
       "3": [
+       1,
+       4,
        5
       ],
       "4": [
-       3,
-       1,
        0
       ],
       "5": [
-       4,
-       2
+       2,
+       3
       ]
      },
      "keepOrder": [
       7,
       6,
-      5,
-      3,
       1,
-      0,
       4,
-      2
+      5,
+      0,
+      2,
+      3
      ],
      "keptCounts": [
       0,
       1,
       2,
-      3,
+      5,
       6,
       8
      ],
@@ -19062,6 +19066,8 @@
        7
       ],
       "3": [
+       1,
+       4,
        5,
        6,
        7
@@ -19069,7 +19075,7 @@
       "4": [
        0,
        1,
-       3,
+       4,
        5,
        6,
        7
@@ -19092,6 +19098,91 @@
      100,
      80
     ],
+    "curl": {
+     "pips": {
+      "3": [
+       {
+        "image": "plant_rose_curl_o72_2",
+        "petals": [
+         [
+          1,
+          1
+         ]
+        ],
+        "pivot": [
+         105.71,
+         78.15
+        ],
+        "rotate": 25
+       },
+       {
+        "image": "plant_rose_curl_o288_2",
+        "petals": [
+         [
+          1,
+          4
+         ]
+        ],
+        "pivot": [
+         94.29,
+         78.15
+        ],
+        "rotate": -25
+       }
+      ],
+      "4": [
+       {
+        "image": "plant_rose_curl_o0_1",
+        "petals": [
+         [
+          1,
+          0
+         ]
+        ],
+        "pivot": [
+         100,
+         74
+        ],
+        "rotate": 16
+       },
+       {
+        "image": "plant_rose_curl_o72_1",
+        "petals": [
+         [
+          1,
+          1
+         ]
+        ],
+        "pivot": [
+         105.71,
+         78.15
+        ],
+        "rotate": 17
+       },
+       {
+        "image": "plant_rose_curl_o288_1",
+        "petals": [
+         [
+          1,
+          4
+         ]
+        ],
+        "pivot": [
+         94.29,
+         78.15
+        ],
+        "rotate": -17
+       }
+      ]
+     },
+     "sprites": [
+      "plant_rose_curl_o0_1",
+      "plant_rose_curl_o72_1",
+      "plant_rose_curl_o288_1",
+      "plant_rose_curl_o72_2",
+      "plant_rose_curl_o288_2"
+     ]
+    },
     "fallSprites": {
      "heart": {
       "image": "plant_rose_fall_heart",
@@ -19202,7 +19293,7 @@
       ],
       "fallImage": "plant_rose_fall_outer",
       "id": "o72",
-      "lostAtPips": 3,
+      "lostAtPips": 2,
       "petals": [
        [
         0,
@@ -19246,7 +19337,7 @@
       ],
       "fallImage": "plant_rose_fall_outer",
       "id": "o216",
-      "lostAtPips": 3,
+      "lostAtPips": 4,
       "petals": [
        [
         0,
@@ -19268,7 +19359,7 @@
       ],
       "fallImage": "plant_rose_fall_outer",
       "id": "o288",
-      "lostAtPips": 4,
+      "lostAtPips": 2,
       "petals": [
        [
         0,

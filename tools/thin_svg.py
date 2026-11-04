@@ -25,6 +25,7 @@ Outputs (all regenerated on every run, nothing else is touched):
       r<i>_s<j>    petal sprite j of ring i, drawn at the first petal that uses it
       sepalN       a part that moves on its own (the rose's splaying sepals)
       fall_<kind>  dedicated falling-petal sprites from a peel rule (the rose's curled petals)
+      curl_<id>    a petal that stays but rolls back and droops at low counts (the rose's curl rule)
   WordFlora/Resources/PlantThinning.json   the manifest (see PlantThinning.swift for the schema)
 
 Element indices used in the overrides are 0-based pre-order indices of every element below the root
@@ -546,6 +547,7 @@ def peel_rings(nodes, refs, spec):
         r['keepOrder'] = [pos[u] for u, _ in entries]
         r['keptCounts'] = [sum(1 for u, _ in entries if by_pip[u] < k) for k in range(6)]
         r['type'] = 'peel'
+        r['part'] = key
         rings.append(r)
     return rings
 
@@ -553,8 +555,10 @@ def peel_rings(nodes, refs, spec):
 PEEL_SPRITE_BOX = '-14 -24 28 25'
 
 
-def peel_manifest(name, spec, rings, files, source):
-    """The parts of a peel rule the app needs beyond the rings: units, fall sprites, settle, splay, motion."""
+def peel_manifest(name, spec, rings, files, source, parts=None):
+    """The parts of a peel rule the app needs beyond the rings: units, fall sprites, settle, splay, curl, motion.
+    `parts` names each ring's role in the peel ('valleys' or 'layers'; None for extra rings)."""
+    parts = parts or [None] * len(rings)
     where = {}
     for ri, r in enumerate(rings):
         for pi, p in enumerate(r['petals']):
@@ -591,9 +595,51 @@ def peel_manifest(name, spec, rings, files, source):
                 if e in d['els'] and where.get(u):
                     refs += [x for x in where[u] if x not in refs]
         settle[str(k)] = {'petals': refs, 'dx': v.get('dx', 0), 'dy': v.get('dy', 0)}
-    return {'source': source, 'centre': spec.get('centre'), 'units': units, 'fallSprites': fall_images,
-            'settle': settle, 'splayAt': spec.get('splayAt'), 'seedAfterMs': spec.get('seedAfterMs'),
-            'motion': spec.get('motion', {})}
+    out = {'source': source, 'centre': spec.get('centre'), 'units': units, 'fallSprites': fall_images,
+           'settle': settle, 'splayAt': spec.get('splayAt'), 'seedAfterMs': spec.get('seedAfterMs'),
+           'motion': spec.get('motion', {})}
+    if spec.get('curl'):
+        out['curl'] = curl_manifest(name, spec['curl'], spec.get('centre', [100, 80]), rings, parts, files)
+    return out
+
+
+CURL_PARTS = ('face', 'tube', 'hi', 'fold')
+
+
+def curl_manifest(name, curl, centre, rings, parts, files):
+    """The rose's curled petals (notes/rose-curl.md): one sprite per curl stage, drawn in place in the 200 box at
+    translate(centre) rotate(angle) translate(0 -out) (+ scale(-1 1) when mirrored), and per pip count the petals
+    that swap to it and droop by `rotate` degrees about `pivot`. Units resolve to [ring, petal] in the petal ring
+    (the valley ring never curls), as settle does."""
+    cx, cy = curl.get('centre', centre)
+    fill = curl['fill']
+    images = []
+    for sid, s in curl['sprites'].items():
+        shape = curl['shapes'][s['shape']]
+        place = 'translate(%s %s) rotate(%s) translate(0 -%s)%s' % (
+            fmt(cx), fmt(cy), fmt(s['angle']), fmt(curl['out']), ' scale(-1 1)' if s.get('mirror') else '')
+        body = ''
+        for part in CURL_PARTS:
+            if part in ('hi', 'fold'):
+                body += '<path d="%s" fill="none" stroke="%s" stroke-width="%s" stroke-linecap="round"/>' % (
+                    shape[part], fill[part], fmt(shape[part + 'W']))
+            else:
+                body += '<path d="%s" fill="%s"/>' % (shape[part], fill[part])
+        img = '%s_curl_%s' % (name, sid)
+        files[img] = '<svg xmlns="%s" viewBox="0 0 200 200" width="200" height="200"><g transform="%s">%s</g></svg>' % (
+            SVG_NS, place, body)
+        images.append(img)
+    petal_ring = {}
+    for ri, r in enumerate(rings):
+        if parts[ri] == 'valleys':
+            continue
+        for pi, p in enumerate(r['petals']):
+            petal_ring.setdefault(p.get('unit'), [ri, pi])
+    pips = {}
+    for k, entries in curl.get('pips', {}).items():
+        pips[str(k)] = [{'petals': [petal_ring[e['unit']]], 'image': '%s_curl_%s' % (name, e['image']),
+                         'pivot': e['pivot'], 'rotate': e['rotate']} for e in entries]
+    return {'sprites': images, 'pips': pips}
 
 
 def build_plant(name, path, ov, rose_rule, rose_src=None):
@@ -759,7 +805,7 @@ def build_plant(name, path, ov, rose_rule, rose_src=None):
         h['rings'].append(ri)
 
     if peel:
-        rule.update(peel_manifest(name, peel, out_rings, files, rose_src))
+        rule.update(peel_manifest(name, peel, out_rings, files, rose_src, [r.get('part') for r in rings]))
 
     entry = {'kind': kind, 'viewBox': vb, 'layers': layers, 'rings': out_rings, 'heads': heads,
              'petalCount': sum(len(r['petals']) for r in out_rings), 'maxFallPerPip': MAX_FALL}

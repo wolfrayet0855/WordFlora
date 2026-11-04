@@ -34,12 +34,41 @@ Coordinates are in the plant's 200 box. Angles are 0 = up, clockwise. `i` is the
     swirl: { els: [14],     sprite: "swirl", drops: [[7, 300]] },
     heart: { els: [15, 16], sprite: "heart", drops: [[6, 60]] }
   },
-  lose: {                        // lost going from k+1 pips to k pips (outer to inner)
-    4: ["o288", "o144"],         // 3 outer petals left; gaps show the dark heart and sepals
-    3: ["o216", "o72", "o0"],    // closed bud (r15 wrap + swirl) in its sepals
-    2: ["wrap"],                 // small swirl bud
-    1: ["swirl"],                // last tight bud (r8 + heart)
-    0: ["heart"]                 // bare hip + splayed sepals on the stem
+  lose: {                        // lost going from k+1 pips to k pips; the outer petals now last to 3 pips so they can curl
+    4: ["o144", "o216"],         // 3 outer petals left (o0, o72, o288), curled (stage 1)
+    3: ["o0"],                   // the mirror pair o72 and o288 stays beside the closed bud, rolled further (stage 2)
+    2: ["o72", "o288", "wrap"],  // small swirl bud (5 petal refs fall: 2 outer, 2 valleys, the wrap)
+    1: ["swirl"],
+    0: ["heart"]
+  },
+  curl: {                        // the petals that stay get sleepy: a shorter, rolled-back sprite + a droop about the petal base
+    out: 19.5,                   // curled sprites sit at translate(100 80) rotate(angle) translate(0 -19.5) (fresh petals are at 17)
+    shapes: {                    // local: petal centre 0,0 (r12), pointing up/outward. Draw face, tube, hi (stroke), fold (stroke).
+      s1: { face: "M-11.97 .8A12 12 0 0 0 11.97 .8L10.4 .8Q1.2 -3.6 -10.4 .8Z",
+            tube: "M-10.4 -2.8Q1.2 -7.2 10.4 -2.8A1.8 1.8 0 0 1 10.4 .8Q1.2 -3.6 -10.4 .8A1.8 1.8 0 0 1 -10.4 -2.8Z",
+            hi: "M-8 -2.6Q1.2 -5.6 8 -2.6", fold: "M10.4 .8Q1.2 -3.6 -10.4 .8", hiW: .8, foldW: .9 },
+      s2: { face: "M-11.71 2.6A12 12 0 0 0 11.71 2.6L10.8 2.6Q1.2 -1.4 -10.8 2.6Z",
+            tube: "M-10.8 -1.4Q1.2 -5.4 10.8 -1.4A2 2 0 0 1 10.8 2.6Q1.2 -1.4 -10.8 2.6A2 2 0 0 1 -10.8 -1.4Z",
+            hi: "M-8.4 -1Q1.2 -4 8.4 -1", fold: "M10.8 2.6Q1.2 -1.4 -10.8 2.6", hiW: .8, foldW: .9 }
+    },
+    fill: { face: "#D94668", tube: "#B52C52", hi: "#E0587A", fold: "#8E1F3E" },   // all opaque; strokes are round-capped
+    sprites: {                   // imageset plant_rose_curl_<id>, drawn in place in the 200 box
+      o0_1:   { unit: "o0",   angle: 0,   shape: "s1" },
+      o72_1:  { unit: "o72",  angle: 72,  shape: "s1" },
+      o288_1: { unit: "o288", angle: 288, shape: "s1", mirror: true },   // mirror: append scale(-1 1) to the placement
+      o72_2:  { unit: "o72",  angle: 72,  shape: "s2" },
+      o288_2: { unit: "o288", angle: 288, shape: "s2", mirror: true }
+    },
+    pips: {                      // at this pip count and below; the smallest matching key wins (as settle). rotate: degrees clockwise about pivot
+      4: [ { unit: "o0",   image: "o0_1",   pivot: [100, 74],       rotate: 16 },
+           { unit: "o72",  image: "o72_1",  pivot: [105.71, 78.15], rotate: 17 },
+           { unit: "o288", image: "o288_1", pivot: [94.29, 78.15],  rotate: -17 } ],
+      3: [ { unit: "o72",  image: "o72_2",  pivot: [105.71, 78.15], rotate: 25 },
+           { unit: "o288", image: "o288_2", pivot: [94.29, 78.15],  rotate: -25 } ]
+    },
+    motion: "on a fall, after 0.9 s the fresh (or stage 1) petal cross-fades to the new sprite (0.6 s, the existing fading pattern) and "
+          + "rotationEffect eases to rotate (1.4 s, the settle curve). Regrow undoes both. A drooped petal's fall sprite starts at angle + rotate. "
+          + "Reduce Motion: the swap and the rotation go with the 0.3 s state animation."
   },
   settle: { 2: { els: [14, 15, 16], dx: 1, dy: 4 }, 1: { els: [15, 16], dx: -3, dy: 6 } },  // bud sinks into its sepals (1.4 s ease)
   splayAt: 0,                    // sepals rotate outward ±24° about their bases at 0 pips
@@ -64,6 +93,8 @@ Coordinates are in the plant's 200 box. Angles are 0 = up, clockwise. `i` is the
   }
 }
 ```
+
+The `lose` order and the `curl` key come from `notes/rose-curl.md` (T-E, approved after the critic review in `notes/rose-curl-review.md`): the outer petals o0, o72 and o288 stay to 3 pips so they can curl and droop, and `tools/thin_svg.py` writes the five `plant_rose_curl_*` sprites and `rule.curl` from it.
 
 ## Reuse on other plants
 
