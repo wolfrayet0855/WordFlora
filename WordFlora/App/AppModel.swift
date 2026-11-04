@@ -158,6 +158,12 @@ final class AppModel {
         plant.lastLovedAt = now(); try? context.save()
     }
 
+    /// The plant page records the love petal count it last animated, so a fall or regrowth plays once per change.
+    func markPetalsShown(_ plant: PlantCollectible, pips: Int) {
+        guard plant.lastShownPips != pips else { return }
+        plant.lastShownPips = pips; try? context.save()
+    }
+
     // MARK: Wake the seed
 
     /// The seed card (and its quiet "Wake" button) shows only for a seed; Quiet Garden and Calm mode never make one.

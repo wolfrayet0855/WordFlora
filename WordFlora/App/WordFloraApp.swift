@@ -55,6 +55,11 @@ struct WordFloraApp: App {
             if let p = model.plants().first { p.earnedCount = 1; p.lastLovedAt = Date.now.addingTimeInterval(-6 * 86_400) }
             try? model.context.save()
         }
+        if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-rain=") }).flatMap({ Double($0.dropFirst("-uitest-rain=".count)) }) {
+            // One found plant that has gone n days without love (rain, falling petals; 5 or more is a seed), for the plant page tests.
+            if let p = model.plants().first { p.earnedCount = 1; p.lastLovedAt = Date.now.addingTimeInterval(-(n * 86_400 + 3_600)) }
+            try? model.context.save()
+        }
         if uiTesting && args.contains("-uitest-plus") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
