@@ -31,6 +31,8 @@ struct GardenBackup: Codable, Equatable {
         var waterDay: Date?, lastFedAt: Date?, lastRepotGrowthAt: Date?
         // The chosen pot (added 2026-11-04 with the pot collection). Optional, so older backups still read.
         var potId: String?
+        // When that pot was chosen (added 2026-11-04). Optional, so older backups still read.
+        var potChosenAt: Date?
     }
 
     enum ImportError: Error, Equatable {
@@ -77,7 +79,7 @@ struct GardenBackup: Codable, Equatable {
                   soilRichness: $0.soilRichness, soilType: $0.soilType, nickname: $0.nickname, lastTendedAt: $0.lastTendedAt,
                   lastSunnyAt: $0.lastSunnyAt, lastPrunedAt: $0.lastPrunedAt, lastLovedAt: $0.lastLovedAt,
                   waterToday: $0.waterToday, waterDay: $0.waterDay, lastFedAt: $0.lastFedAt, lastRepotGrowthAt: $0.lastRepotGrowthAt,
-                  potId: $0.potId)
+                  potId: $0.potId, potChosenAt: $0.potChosenAt == .distantPast ? nil : $0.potChosenAt)
         }
         let games = (try? context.fetchCount(FetchDescriptor<GameRecord>())) ?? 0
         return GardenBackup(exportedAt: now, profile: snap, plants: plants, gamesRecorded: games)
@@ -146,7 +148,7 @@ struct GardenBackup: Codable, Equatable {
             c.hydration = s.hydration; c.soilRichness = s.soilRichness; c.soilType = s.soilType; c.nickname = s.nickname
             c.lastTendedAt = s.lastTendedAt; c.lastSunnyAt = s.lastSunnyAt; c.lastPrunedAt = s.lastPrunedAt; c.lastLovedAt = s.lastLovedAt
             c.waterToday = max(0, s.waterToday ?? 0); c.waterDay = s.waterDay; c.lastFedAt = s.lastFedAt; c.lastRepotGrowthAt = s.lastRepotGrowthAt
-            c.potId = s.potId ?? ""
+            c.potId = s.potId ?? ""; c.potChosenAt = s.potChosenAt ?? .distantPast
             DataReconciler.merge(c, into: k)
             report.plantsUpdated += 1
         }

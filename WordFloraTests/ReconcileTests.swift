@@ -89,6 +89,28 @@ final class ReconcileTests: XCTestCase {
         XCTAssertEqual(k.lastTendedAt, Date(timeIntervalSince1970: 5))
     }
 
+    func testPotMergeKeepsTheLaterPickEvenWhenTheOtherCopyWasTendedLater() {
+        func rose(_ pot: String, chosen: Double?, tended: Double?) -> PlantCollectible {
+            let p = PlantCollectible(name: "Rose", botanicalName: "r", botanicalFact: "f", level: 1, imageName: "plant_rose", plantId: "rose")
+            p.potId = pot; p.lastTendedAt = tended.map { Date(timeIntervalSince1970: $0) }
+            p.potChosenAt = chosen.map { Date(timeIntervalSince1970: $0) } ?? .distantPast
+            return p
+        }
+        XCTAssertEqual(rose("", chosen: nil, tended: nil).potChosenAt, .distantPast)
+        // the pick made later wins, whichever copy was watered later
+        var k = rose("mint", chosen: 100, tended: 900); DataReconciler.merge(rose("sunflower", chosen: 500, tended: 200), into: k)
+        XCTAssertEqual(k.potId, "sunflower"); XCTAssertEqual(k.potChosenAt, Date(timeIntervalSince1970: 500))
+        XCTAssertEqual(k.lastTendedAt, Date(timeIntervalSince1970: 900))
+        k = rose("sunflower", chosen: 500, tended: 200); DataReconciler.merge(rose("mint", chosen: 100, tended: 900), into: k)
+        XCTAssertEqual(k.potId, "sunflower"); XCTAssertEqual(k.potChosenAt, Date(timeIntervalSince1970: 500))
+        // a stamped pick beats an older unstamped one
+        k = rose("mint", chosen: nil, tended: 900); DataReconciler.merge(rose("sunflower", chosen: 50, tended: 10), into: k)
+        XCTAssertEqual(k.potId, "sunflower")
+        // a chosen pot still beats none, even with an older stamp
+        k = rose("", chosen: 900, tended: nil); DataReconciler.merge(rose("mint", chosen: 100, tended: nil), into: k)
+        XCTAssertEqual(k.potId, "mint")
+    }
+
     func testGardenLevelsCanCompleteAgainAfterDuplicatesAreMerged() {
         try! PlantCatalog.seedIfNeeded(context: ctx)
         for p in plants() where p.level == 1 { p.earnedCount = 1; p.stage = 4 }

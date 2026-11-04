@@ -39,6 +39,9 @@ final class PlantCollectible {
     /// The pot the plant sits in (`PotCatalog` id). Empty means never chosen, drawn as plain blue.
     /// Defaulted, so lightweight migration and CloudKit both accept it.
     var potId: String = ""
+    /// When the pot was last chosen, so iCloud keeps the latest pick. Kept apart from `lastTendedAt`, because picking
+    /// a pot is not tending (it must not reset the thirsty look or move the widget). Defaulted for migration and CloudKit.
+    var potChosenAt: Date = Date.distantPast
 
     init(name: String, botanicalName: String, botanicalFact: String,
          level: Int, imageName: String, plantId: String? = nil) {

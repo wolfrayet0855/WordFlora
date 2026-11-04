@@ -50,9 +50,17 @@ enum DataReconciler {
     }
 
     static func merge(_ o: PlantCollectible, into k: PlantCollectible) {
-        // The pot: a chosen pot beats none; when both chose one, the copy tended later wins (decided before the dates merge).
-        if !o.potId.isEmpty && (k.potId.isEmpty || (o.lastTendedAt ?? .distantPast) > (k.lastTendedAt ?? .distantPast)) {
-            k.potId = o.potId
+        // The pot: a chosen pot beats none; when both chose one, the later pick wins. Picks made before `potChosenAt`
+        // existed carry no stamp, so between two unstamped picks the copy tended later wins (decided before the dates merge).
+        // The stamp travels with the winning pot, so both devices settle on the same pot and stamp.
+        if !o.potId.isEmpty {
+            let oLater = o.potChosenAt != k.potChosenAt
+                ? o.potChosenAt > k.potChosenAt
+                : (o.lastTendedAt ?? .distantPast) > (k.lastTendedAt ?? .distantPast)
+            if k.potId.isEmpty || oLater {
+                k.potId = o.potId
+                k.potChosenAt = o.potChosenAt
+            }
         }
         k.earnedCount = max(k.earnedCount, o.earnedCount)
         k.growthPoints = max(k.growthPoints, o.growthPoints)

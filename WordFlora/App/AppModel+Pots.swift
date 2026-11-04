@@ -20,13 +20,14 @@ extension AppModel {
     }
 
     /// Puts the plant in `pot` (part of a repot; changing pots costs nothing). A Plus pot needs Plus to be chosen,
-    /// but the pot already on the plant always stays. A change counts as tending, so iCloud keeps the latest pick.
+    /// but the pot already on the plant always stays. The pick is stamped on `potChosenAt` so iCloud keeps the latest one;
+    /// it is not tending, so the plant's thirsty look and the widget's hero stay as they were.
     @discardableResult
     func choosePot(_ pot: Pot, for plant: PlantCollectible) -> Bool {
         guard canChoose(pot, for: plant) else { return false }
         guard plant.potId != pot.id else { return true }
         plant.potId = pot.id
-        plant.lastTendedAt = max(plant.lastTendedAt ?? .distantPast, Date.now)
+        plant.potChosenAt = max(plant.potChosenAt, Date.now)
         try? context.save()
         return true
     }

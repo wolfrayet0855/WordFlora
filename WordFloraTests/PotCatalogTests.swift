@@ -183,7 +183,6 @@ final class PotCatalogTests: XCTestCase {
         XCTAssertEqual(plant.potId, "")
         XCTAssertTrue(app.choosePot(PotCatalog.pot(id: "terracotta"), for: plant))
         XCTAssertEqual(plant.potId, "terracotta")
-        XCTAssertNotNil(plant.lastTendedAt)
         XCTAssertEqual(app.plantsUsing(PotCatalog.pot(id: "terracotta")).map(\.plantId), [plant.plantId])
 
         app.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
@@ -194,6 +193,26 @@ final class PotCatalogTests: XCTestCase {
         XCTAssertFalse(app.choosePot(PotCatalog.pot(id: "meadow"), for: plant))
         XCTAssertTrue(app.choosePot(PotCatalog.plainBlue, for: plant))
         XCTAssertEqual(plant.potId, "plainBlue")
+    }
+
+    @MainActor
+    func testChoosingAPotIsNotTendingSoTheThirstyLookAndWidgetStay() throws {
+        let container = try SharedContainer.make(inMemory: true)
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "wf-pots-\(UUID().uuidString)")!)
+        let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
+        let app = AppModel(container: container, settings: settings, bank: bank, notifications: ReminderTests.FakeCenter())
+        let plant = app.plants().first!; plant.earnedCount = 1
+        let tended = Date(timeIntervalSince1970: 1_000)
+        plant.lastTendedAt = tended
+        XCTAssertEqual(plant.potChosenAt, .distantPast, "a plant that never chose a pot")
+        let before = Date.now
+        XCTAssertTrue(app.choosePot(PotCatalog.pot(id: "terracotta"), for: plant))
+        XCTAssertEqual(plant.lastTendedAt, tended, "choosing a pot does not count as tending")
+        XCTAssertGreaterThanOrEqual(plant.potChosenAt, before, "the pick is stamped so iCloud keeps the latest one")
+
+        let untended = app.plants()[1]; untended.earnedCount = 1
+        XCTAssertTrue(app.choosePot(PotCatalog.pot(id: "terracotta"), for: untended))
+        XCTAssertNil(untended.lastTendedAt)
     }
 
     func testPlusHintPointsToSettings() {

@@ -137,6 +137,30 @@ final class GardenBackupTests: XCTestCase {
         XCTAssertEqual(plant("rose").potId, "sunflower")
     }
 
+    func testWhenThePotWasChosenRoundTripsAndOldBackupsStillRead() throws {
+        growSomething()
+        let rose = plant("rose"); rose.potId = "sunflower"; rose.potChosenAt = Date(timeIntervalSince1970: 3_000); try ctx.save()
+        let data = try GardenBackup.make(context: ctx, now: .now).encoded()
+        XCTAssertTrue(String(data: data, encoding: .utf8)!.contains("\"potChosenAt\""))
+
+        let fresh = try SharedContainer.make(inMemory: true)
+        try PlantCatalog.seedIfNeeded(context: fresh.mainContext)
+        let other = plant("rose", in: fresh.mainContext)
+        other.potId = "mint"; other.potChosenAt = Date(timeIntervalSince1970: 2_000); other.lastTendedAt = Date(timeIntervalSince1970: 9_000)
+        guard case .success = GardenBackup.restore(data, into: fresh.mainContext, badgeDefs: defs) else { return XCTFail("restore failed") }
+        XCTAssertEqual(plant("rose", in: fresh.mainContext).potId, "sunflower", "the later pick wins, not the later tend")
+        XCTAssertEqual(plant("rose", in: fresh.mainContext).potChosenAt, Date(timeIntervalSince1970: 3_000))
+
+        // A backup saved before the stamp existed has no potChosenAt key; it still reads and does not undo a stamped pick.
+        var json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        json["plants"] = (json["plants"] as! [[String: Any]]).map { var p = $0; p.removeValue(forKey: "potChosenAt"); p["potId"] = "mint"; return p }
+        let old = try JSONSerialization.data(withJSONObject: json)
+        guard case .success(let decoded) = GardenBackup.decode(old) else { return XCTFail("old backup should read") }
+        XCTAssertNil(decoded.plants.first { $0.plantId == "rose" }?.potChosenAt)
+        guard case .success = GardenBackup.restore(old, into: ctx, badgeDefs: defs) else { return XCTFail("old backup should restore") }
+        XCTAssertEqual(plant("rose").potId, "sunflower")
+    }
+
     func testFilenameAndCopy() {
         var cal = Calendar(identifier: .gregorian); cal.timeZone = TimeZone(identifier: "UTC")!
         let d = cal.date(from: DateComponents(year: 2026, month: 3, day: 7, hour: 12))!
