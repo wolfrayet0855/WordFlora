@@ -88,10 +88,14 @@ struct HomeView: View {
 
     var body: some View {
         let profile = app.profile
+        // One look at the unlock stats per render (each look fetches the garden), shared by every tile.
+        let stats = app.unlockStats, showAll = app.settings.showEverything
+        let unlocked = Set(Feature.allCases.filter { FeatureUnlockPolicy.isUnlocked($0, stats: stats, showEverything: showAll) })
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 topBar
-                hero(days: profile?.gardenDays ?? 0, roseStock: profile?.roseOfJerichoCount ?? 0, roseProgress: profile?.roseSeedProgress ?? 0)
+                hero(days: profile?.gardenDays ?? 0, roseStock: profile?.roseOfJerichoCount ?? 0, roseProgress: profile?.roseSeedProgress ?? 0,
+                     showRose: unlocked.contains(.rose))
 
                 if app.showWelcomeBack || app.plusOffer != nil {
                     VStack(spacing: 10) {
@@ -101,14 +105,14 @@ struct HomeView: View {
                 }
 
                 playButton
-                if app.isUnlocked(.dailyBloom) { dailyBloom.padding(.bottom, 4) }
+                if unlocked.contains(.dailyBloom) { dailyBloom.padding(.bottom, 4) }
 
                 Text("Explore")
                     .textCase(.uppercase).kerning(1.4)
                     .font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.secondaryText)
                     .padding(.horizontal, 4)
                     .accessibilityAddTraits(.isHeader)
-                exploreGrid
+                exploreGrid(unlocked)
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 24)
@@ -136,7 +140,7 @@ struct HomeView: View {
         }
     }
 
-    private func hero(days: Int, roseStock: Int, roseProgress: Int) -> some View {
+    private func hero(days: Int, roseStock: Int, roseProgress: Int, showRose: Bool) -> some View {
         HStack(alignment: singleColumn ? .top : .center, spacing: 14) {
             FlowerView(petals: 8, sway: false)
                 .frame(width: singleColumn ? 64 : 92, height: singleColumn ? 76 : 110)
@@ -152,7 +156,7 @@ struct HomeView: View {
                         .font(Theme.font(.body, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                if app.isUnlocked(.rose) {
+                if showRose {
                     let threshold = Economy.default.roseThreshold
                     let full = roseStock >= Economy.default.roseCap
                     Text("Rose of Jericho ×\(roseStock) · \(full ? "satchel full" : "\(roseProgress) of \(threshold)")")
@@ -275,27 +279,27 @@ struct HomeView: View {
 
     // MARK: explore
 
-    @ViewBuilder private var exploreGrid: some View {
+    @ViewBuilder private func exploreGrid(_ unlocked: Set<Feature>) -> some View {
         if singleColumn {
             VStack(spacing: 10) {
-                featureTile(nil, "Garden", "leaf.fill", .garden, .garden)
-                featureTile(.butterfly, "Levels", "map.fill", .levelMap, .levels)
-                featureTile(.shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
-                featureTile(.butterfly, "Visitors", "ladybug.fill", .butterfly, .visitors)
-                featureTile(.badges, "Badges", "rosette", .badges, .badges)
+                featureTile(unlocked, nil, "Garden", "leaf.fill", .garden, .garden)
+                featureTile(unlocked, .butterfly, "Levels", "map.fill", .levelMap, .levels)
+                featureTile(unlocked, .shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
+                featureTile(unlocked, .butterfly, "Visitors", "ladybug.fill", .butterfly, .visitors)
+                featureTile(unlocked, .badges, "Badges", "rosette", .badges, .badges)
             }
         } else {
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
                 GridRow {
-                    featureTile(nil, "Garden", "leaf.fill", .garden, .garden)
-                    featureTile(.butterfly, "Levels", "map.fill", .levelMap, .levels)
+                    featureTile(unlocked, nil, "Garden", "leaf.fill", .garden, .garden)
+                    featureTile(unlocked, .butterfly, "Levels", "map.fill", .levelMap, .levels)
                 }
                 GridRow {
-                    featureTile(.shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
-                    featureTile(.butterfly, "Visitors", "ladybug.fill", .butterfly, .visitors)
+                    featureTile(unlocked, .shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
+                    featureTile(unlocked, .butterfly, "Visitors", "ladybug.fill", .butterfly, .visitors)
                 }
                 GridRow {
-                    featureTile(.badges, "Badges", "rosette", .badges, .badges, wide: true)
+                    featureTile(unlocked, .badges, "Badges", "rosette", .badges, .badges, wide: true)
                         .gridCellColumns(2)
                 }
             }
@@ -303,9 +307,9 @@ struct HomeView: View {
     }
 
     /// Every destination is visible. Ones that are not open yet are dashed, dimmed and locked, with a kind line on how to reach them.
-    private func featureTile(_ feature: Feature?, _ title: String, _ icon: String, _ route: GameRoute,
+    private func featureTile(_ unlocked: Set<Feature>, _ feature: Feature?, _ title: String, _ icon: String, _ route: GameRoute,
                              _ tint: TileTint, wide: Bool = false) -> some View {
-        let open = feature.map { app.isUnlocked($0) } ?? true
+        let open = feature.map { unlocked.contains($0) } ?? true
         let hint = open ? nil : feature.flatMap { FeatureUnlockPolicy.hint(for: $0) }
         let row = singleColumn || wide
         let labelFont = Theme.font(.body, weight: .heavy)
