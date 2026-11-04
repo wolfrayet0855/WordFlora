@@ -1,0 +1,261 @@
+{
+  "version": 1,
+  "geometry": {
+    "viewBox": [
+      120,
+      100
+    ],
+    "note": "Same pot as TendAnimationView.drawPot: rim rounded rect (10,4,100,18,r9); body path M18 20 H102 L92 88 Q91 96 82 96 H38 Q29 96 28 88 Z; light strip M18 20 H34 L42 96 H38 Q29 96 28 88 Z white 14%; shade strip M102 20 H88 L82 96 Q91 96 92 88 Z in shade at 45%; rim shine (16,8,88,5,r2.5) white 35%. Decorations are drawn after the strips, clipped to the body path, before the rim.",
+    "decorations": {
+      "none": "Nothing extra.",
+      "rings": "Two bands across the body: rect (18,38,84,7) colors[0], rect (18,52,84,7) colors[0] at 70%.",
+      "drip": "Glaze band rect (18,20,84,10) colors[0], plus capsules (width 8, corner 4) hanging from top y 26, centre x and height: x 26 h 12, x 40 h 20, x 54 h 10, x 68 h 22, x 82 h 14, x 94 h 9, all colors[0].",
+      "flower": "One flower centred at (60,58): 8 petals, ellipse rx 4.5 ry 9 centred 10 above the flower centre, petal 0 points up, then every 45 degrees clockwise, colors[0]; centre circle r 7 colors[1].",
+      "stars": "Four-point sparkles (path M0 -7 Q1 -1.5 7 0 Q1 1.5 0 7 Q-1 1.5 -7 0 Q-1 -1.5 0 -7 Z, scaled): (38,46) x1.25 colors[0], (80,52) x1.0 colors[0], (60,74) x1.4 colors[0], (88,76) x0.7 colors[1], (34,72) x0.7 colors[1].",
+      "hearts": "Hearts (path M0 5 C-8 -1 -8 -8 -3 -8 C-1 -8 0 -6 0 -6 C0 -6 1 -8 3 -8 C8 -8 8 -1 0 5 Z, scaled): (40,46) x1.1, (80,46) x1.1, (60,70) x1.5, all colors[0].",
+      "dots": "Polka dots r 4.5 colors[0] at 85%: (34,36) (56,34) (78,36) (96,40) (44,52) (66,52) (86,56) (38,70) (58,72) (78,74) (50,88) (70,88).",
+      "stripes": "Vertical bars width 9 centred at x 22, 42, 62, 82, 102, full body height (y 20 to 100), colors[0], clipped to the body.",
+      "moon": "Crescent: the r 15 circle at (56,56) minus the r 13 circle at (63,51), as one closed path, filled colors[0]; nothing is overpainted in body colour. Path: M54.62 41.06 A15 15 0 1 0 69.68 62.15 A13 13 0 0 1 54.62 41.06 Z (the two circle intersections; outer arc on the big circle, inner arc on the small one). Same shape as an even-odd fill of both circles clipped to the r 15 circle, or circle15.subtracting(circle13) on iOS 17; the explicit two-arc path avoids a hairline at the clip edge. Small sparkles x0.55 at (84,42) and (82,78), dots r 2 at (36,40) and (40,80), colors[1].",
+      "flowerBand": "Grass band: rect (18,70,84,30) colors[0] with bumps (circles r 5 centred at x 26..98 step 9, y 70). Five tiny flowers centred at x 32,48,64,80,94, y 80: 5 petals, circle r 3 centred 3.5 from the flower centre, petal 0 up then every 72 degrees clockwise; flowers alternate colors[1], colors[2], colors[1]...; centre circle r 2 colors[3]."
+    },
+    "coordinates": "All x/y for capsules, bars, circles and petals are centres; petal 0 points up, then clockwise. (Capsules and bars give their centre x; capsules hang down from top y 26, bars run the full body height. Rects written (x,y,w,h) are top-left plus size.)",
+    "toEarn": {
+      "fill": {
+        "light": "#E4DFD2",
+        "dark": "#3A4C3A"
+      },
+      "ink": {
+        "light": "#746F5E",
+        "dark": "#8FA48F"
+      },
+      "strips": false,
+      "shine": false,
+      "stroke": {
+        "width": 2,
+        "dash": [
+          5,
+          4
+        ],
+        "color": "ink",
+        "on": [
+          "body",
+          "rim"
+        ]
+      },
+      "pattern": {
+        "color": "ink",
+        "opacity": 0.55
+      },
+      "note": "Pot not yet earned: body and rim filled with fill, no light/shade strips, no rim shine, dashed ink stroke on body and rim, the pot's own pattern drawn in ink at 55% (the moon crescent is cut the same way, so no body colour is needed)."
+    }
+  },
+  "pots": [
+    {
+      "id": "plainBlue",
+      "name": "Plain blue",
+      "body": "#5B8FD0",
+      "rim": "#7AA6DE",
+      "shade": "#4677B3",
+      "decoration": {
+        "kind": "none",
+        "colors": []
+      },
+      "unlock": {
+        "kind": "free",
+        "value": 0
+      },
+      "hint": "Every garden starts with this pot.",
+      "a11y": "Plain blue pot"
+    },
+    {
+      "id": "terracotta",
+      "name": "Terracotta",
+      "body": "#C8734A",
+      "rim": "#DD8C63",
+      "shade": "#A85A36",
+      "decoration": {
+        "kind": "rings",
+        "colors": [
+          "#7E3F22"
+        ]
+      },
+      "unlock": {
+        "kind": "plants",
+        "value": 1
+      },
+      "hint": "Grow your first plant to earn this pot.",
+      "a11y": "Terracotta pot with two rings"
+    },
+    {
+      "id": "sageGlaze",
+      "name": "Sage glaze",
+      "body": "#8FB08C",
+      "rim": "#B4CCB1",
+      "shade": "#76996F",
+      "decoration": {
+        "kind": "drip",
+        "colors": [
+          "#E2EFDE"
+        ]
+      },
+      "unlock": {
+        "kind": "plants",
+        "value": 10
+      },
+      "hint": "Grow 10 plants to earn this pot.",
+      "a11y": "Sage green pot with a drippy glaze"
+    },
+    {
+      "id": "sunflower",
+      "name": "Sunflower",
+      "body": "#F2C230",
+      "rim": "#F8D95F",
+      "shade": "#D9A514",
+      "decoration": {
+        "kind": "flower",
+        "colors": [
+          "#E07F2A",
+          "#6B4528"
+        ]
+      },
+      "unlock": {
+        "kind": "level",
+        "value": 3
+      },
+      "hint": "Finish level 3 to earn this pot.",
+      "a11y": "Yellow pot with a big flower"
+    },
+    {
+      "id": "starlight",
+      "name": "Starlight",
+      "body": "#2F6670",
+      "rim": "#5A98A2",
+      "shade": "#224C54",
+      "decoration": {
+        "kind": "stars",
+        "colors": [
+          "#FFE27A",
+          "#FFFFFF"
+        ]
+      },
+      "unlock": {
+        "kind": "level",
+        "value": 5
+      },
+      "hint": "Finish level 5 to earn this pot.",
+      "a11y": "Deep teal pot with twinkly stars"
+    },
+    {
+      "id": "rosePink",
+      "name": "Rose pink",
+      "body": "#E8869F",
+      "rim": "#F2A9BC",
+      "shade": "#CC6683",
+      "decoration": {
+        "kind": "hearts",
+        "colors": [
+          "#FFE9EF"
+        ]
+      },
+      "unlock": {
+        "kind": "plants",
+        "value": 25
+      },
+      "hint": "Grow 25 plants to earn this pot.",
+      "a11y": "Pink pot with hearts"
+    },
+    {
+      "id": "mint",
+      "name": "Mint",
+      "body": "#7CCFA8",
+      "rim": "#A8E5C8",
+      "shade": "#5BB38A",
+      "decoration": {
+        "kind": "dots",
+        "colors": [
+          "#FFFFFF"
+        ]
+      },
+      "unlock": {
+        "kind": "plants",
+        "value": 50
+      },
+      "hint": "Grow 50 plants to earn this pot.",
+      "a11y": "Mint green pot with white dots"
+    },
+    {
+      "id": "honeyStripe",
+      "name": "Honey stripe",
+      "body": "#E39B2E",
+      "rim": "#F2BC5E",
+      "shade": "#C47F18",
+      "decoration": {
+        "kind": "stripes",
+        "colors": [
+          "#FFF0C2"
+        ]
+      },
+      "unlock": {
+        "kind": "plus",
+        "value": 0
+      },
+      "hint": "Part of WordFlora Plus. A grown-up can find Plus in Settings.",
+      "a11y": "Honey pot with up and down stripes"
+    },
+    {
+      "id": "moonlit",
+      "name": "Moonlit",
+      "body": "#3B4A80",
+      "rim": "#7383C4",
+      "shade": "#2A3560",
+      "decoration": {
+        "kind": "moon",
+        "colors": [
+          "#F6E08A",
+          "#F6E08A"
+        ]
+      },
+      "unlock": {
+        "kind": "plus",
+        "value": 0
+      },
+      "hint": "Part of WordFlora Plus. A grown-up can find Plus in Settings.",
+      "a11y": "Night blue pot with a moon and tiny stars"
+    },
+    {
+      "id": "meadow",
+      "name": "Meadow",
+      "body": "#F3E6BF",
+      "rim": "#5E9E45",
+      "shade": "#D6C38E",
+      "decoration": {
+        "kind": "flowerBand",
+        "colors": [
+          "#6FA552",
+          "#FFFFFF",
+          "#F6A6BE",
+          "#F2B632"
+        ]
+      },
+      "unlock": {
+        "kind": "plus",
+        "value": 0
+      },
+      "hint": "Part of WordFlora Plus. A grown-up can find Plus in Settings.",
+      "a11y": "Cream pot with a band of grass and tiny flowers"
+    }
+  ],
+  "copy": {
+    "earned": "You earned this pot!",
+    "current": "In use",
+    "pickTitle": "Pick a pot",
+    "pickSub": "Changing pots is free.",
+    "plusTag": "Plus",
+    "plusKeep": "A pot already on a plant stays on it.",
+    "progressPlants": "{n} of {goal} plants grown",
+    "progressLevel": "{n} of {goal} levels finished",
+    "toGoOne": "One more level to go!",
+    "toGoMany": "{k} more levels to go!",
+    "progressFirst": "Grow one plant to earn this pot."
+  }
+}

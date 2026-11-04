@@ -1,0 +1,246 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WordFlora pot collection</title>
+<link rel="stylesheet" href="../theme.css">
+<script src="../theme.js"></script>
+<script>
+/* ?theme=dark|light for screenshots (does not touch the saved choice); ?only=s1..s4 shows one section */
+(function(){var q=new URLSearchParams(location.search);var t=q.get('theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t);
+ var w=q.get('w');if(w){document.documentElement.style.cssText='width:'+(+w)+'px;overflow-x:hidden';document.documentElement.setAttribute('data-narrow','')}
+ var o=q.get('only');if(o)document.documentElement.setAttribute('data-only',o)})();
+</script>
+<style>
+:root,[data-theme=light]{--leaf:#9BCB3C;--leaf-ink:#22331A;--ok:#3E7A22;--card:#FFFFFF;--txt2:#4F5F4F;--lock:#E4DFD2;--lockink:#746F5E;--plus:#E8A838;--plus-ink:#2C3E2C;--ring:#3E7A22;--tip:#2C3E2C;--tip-ink:#FAF7F0}
+[data-theme=dark]{--leaf:#A8D84A;--leaf-ink:#1A2E1A;--ok:#A8D84A;--card:#2C3E2C;--txt2:#B9D0B9;--lock:#3A4C3A;--lockink:#8FA48F;--plus:#F0C060;--plus-ink:#1A2E1A;--ring:#A8D84A;--tip:#D4EDD4;--tip-ink:#1A2E1A}
+body{line-height:1.45}
+.wrap{max-width:1400px;margin:0 auto;padding:20px 16px 80px}
+h1{font-size:28px;margin:0 0 4px}h2{font-size:22px;margin:40px 0 4px}h3{font-size:16px;margin:0 0 4px}
+.sub{color:var(--txt2);max-width:72ch;margin:4px 0 14px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 6px}
+.bar a{color:var(--text);font-weight:700}
+.btn{font:inherit;font-weight:800;border:0;border-radius:999px;min-height:44px;padding:8px 18px;background:var(--card);color:var(--text);box-shadow:inset 0 0 0 2px var(--line);cursor:pointer}
+:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+[data-only] section{display:none}
+[data-only=s1] #s1,[data-only=s1b] #s1b,[data-only=s2] #s2,[data-only=s3] #s3,[data-only=s4] #s4{display:block}
+[data-only] header{display:none}
+[data-only] h2{margin-top:0}
+.row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+svg.pot{display:block;overflow:visible}
+
+/* 1. catalog */
+.cat{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:14px}
+.pc{background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:12px 14px}
+.pc .sizes{display:flex;align-items:flex-end;gap:14px;margin:4px 0 8px}
+.pc .sizes figure{margin:0;text-align:center;font-size:11px;font-weight:700;color:var(--txt2)}
+.pc .meta{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.pc .meta b{font-size:16px}
+.pc .how{font-size:13px;font-weight:800;color:var(--txt2)}
+.pc .hint{font-size:14px;margin:2px 0 0}
+.pc code{font-size:11.5px;color:var(--txt2);display:block;overflow-wrap:anywhere}
+.sw{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;box-shadow:inset 0 0 0 1px var(--line)}
+.tagp{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:800;border-radius:999px;padding:1px 8px;background:var(--plus);color:var(--plus-ink);line-height:18px}
+.tagp svg{width:10px;height:10px}
+.cb{background:var(--card);border-radius:20px;padding:12px 14px;box-shadow:var(--shadow);margin-top:14px}
+.cb .lane{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-start;margin:4px 0 10px}
+.cb .lane figure{margin:0;width:56px;text-align:center;font-size:10.5px;font-weight:700;color:var(--txt2);line-height:1.2}
+.cb .lane svg{margin:0 auto 3px}
+.gray svg.pot{filter:grayscale(1)}
+.deut svg.pot{filter:url(#deut)}
+.prot svg.pot{filter:url(#prot)}
+.trit svg.pot{filter:url(#trit)}
+
+/* phone frame */
+.phone{width:min(390px,100%);background:var(--bg);border-radius:34px;box-shadow:var(--shadow),0 0 0 1px var(--line);padding:14px 16px 18px;position:relative;overflow:hidden;flex:none}
+/* at phone width the phone and stage go edge to edge, like the device */
+[data-narrow] .phone,[data-narrow] .stage{width:390px;margin:0 -16px;border-radius:0}
+@media (max-width:430px){.phone,.stage{width:100vw;margin:0 -16px;border-radius:0}}
+.cap{margin:8px 0 0;font-weight:700;max-width:390px;font-size:14px}.cap small{display:block;font-weight:500;color:var(--txt2)}
+
+/* 2. repot sheet */
+.sheet{background:var(--surface);border-radius:26px;box-shadow:var(--shadow);padding:14px 14px 16px}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 10px}
+.sheet h4{margin:0;font-size:18px}
+.sheet h5{margin:12px 0 2px;font-size:15px}
+.sheet .s{margin:0 0 6px;font-size:14px;color:var(--txt2)}
+.pick{display:grid;grid-template-columns:repeat(5,1fr);gap:8px 6px}
+.chip{position:relative;border:0;background:var(--bg);border-radius:16px;padding:7px 2px 6px;font:inherit;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:86px;cursor:pointer}
+.chip .nm{font-size:11.5px;font-weight:800;line-height:1.15;text-align:center}
+/* accessibility text sizes: 4 columns, 3 rows, names up to 2 lines */
+.ax .pick{grid-template-columns:repeat(4,1fr);gap:10px 8px}
+.ax .chip{min-height:112px;padding:8px 3px 7px}
+.ax .chip .nm.long{font-size:13px}
+.ax .chip .nm{font-size:16px;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.ax .sheet h4{font-size:23px}.ax .sheet h5{font-size:19px}.ax .sheet .s,.ax .tip{font-size:17px}.ax .tip small{font-size:15px}
+.chip.cur{box-shadow:inset 0 0 0 3px var(--ring)}
+.chip .ck{position:absolute;top:-5px;right:-3px;width:22px;height:22px;border-radius:50%;background:var(--ring);color:var(--surface);display:grid;place-items:center;box-shadow:0 0 0 2px var(--surface)}
+.chip .ck svg{width:13px;height:13px}
+.chip.lk .art{opacity:.9}
+.chip.lk .nm{color:var(--txt2)}
+.chip.tap{box-shadow:inset 0 0 0 2px var(--text)}
+.chip .tagp{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:10px;padding:0 6px;line-height:16px}
+.tip{grid-column:1/-1;position:relative;margin:4px 0 2px;background:var(--tip);color:var(--tip-ink);border-radius:14px;padding:10px 12px;font-size:14px;font-weight:700;display:flex;gap:10px;align-items:center}
+.tip::before{content:"";position:absolute;top:-7px;left:var(--ax,50%);width:14px;height:14px;background:var(--tip);transform:translateX(-50%) rotate(45deg);border-radius:2px}
+.tip svg{flex:none}
+.tip small{display:block;font-weight:600;opacity:.9}
+.soils{display:flex;gap:8px}
+.soil{flex:1;border-radius:14px;background:var(--bg);padding:8px;font-size:13px;font-weight:800;text-align:center}
+.soil.sel{box-shadow:inset 0 0 0 3px var(--ring)}
+.soil i{display:block;width:34px;height:14px;border-radius:50%;margin:2px auto 4px;background:#6B4528}
+.pill{width:100%;margin-top:12px;padding:14px;border-radius:999px;border:0;background:var(--leaf);color:var(--leaf-ink);font:inherit;font-weight:800;font-size:16px;min-height:50px}
+
+/* 3. shed */
+.shed h4{margin:4px 0 2px;font-size:22px}
+.shed h5{margin:14px 0 6px;font-size:17px;display:flex;justify-content:space-between;align-items:baseline}
+.shed h5 span{font-size:13px;color:var(--txt2);font-weight:700}
+.tools{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tool{background:var(--surface);border-radius:16px;padding:8px;text-align:center;font-size:12.5px;font-weight:800;box-shadow:var(--shadow)}
+.tool svg{width:40px;height:40px;display:block;margin:0 auto 2px}
+.tool small{display:block;color:var(--txt2);font-weight:700}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pcard{position:relative;background:var(--surface);border-radius:16px;padding:10px 6px 9px;text-align:center;box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:150px}
+.pcard .nm{font-size:13.5px;font-weight:800;line-height:1.15}
+.pcard .st{font-size:12px;font-weight:700;color:var(--txt2);line-height:1.25}
+.pcard .st.ok{color:var(--ok)}
+.pcard .bar2{width:78%;height:7px;border-radius:4px;background:var(--line);overflow:hidden;margin-top:2px}
+.pcard .bar2 b{display:block;height:100%;border-radius:4px;background:var(--ok);width:var(--f)}
+.pcard .tagp{position:absolute;top:7px;right:7px}
+.pcard .ck{position:absolute;top:7px;right:7px;width:20px;height:20px;border-radius:50%;background:var(--ring);color:var(--surface);display:grid;place-items:center}
+.pcard .ck svg{width:12px;height:12px}
+.pcard.lk{background:color-mix(in srgb,var(--surface) 55%,var(--bg))}
+.pcard.lk{box-shadow:inset 0 0 0 1.5px var(--line)}
+
+/* 4. stage */
+.stage{position:relative;width:390px;height:420px;overflow:hidden;border-radius:26px;background:linear-gradient(#DCEFFB,#F4F1DF 66%,#CFE2B4 66.2%);box-shadow:var(--shadow);flex:none}
+[data-theme=dark] .stage{background:linear-gradient(#1F3A4D,#233A2A 66%,#2A4426 66.2%)}
+.stage .grd{position:absolute;left:0;right:0;top:387px;bottom:0;background:#B7CC93}
+[data-theme=dark] .stage .grd{background:#1E3320}
+.stage .shadow{position:absolute;left:130px;top:376px;width:130px;height:16px;border-radius:50%;background:rgba(44,62,44,.18)}
+.stage .pt{position:absolute;left:125px;top:270px;width:140px;height:117px}
+.stage .pt svg{position:absolute;left:0;top:0;width:140px;height:117px}
+.stage .pt .soilt{position:absolute;left:30px;top:6px;width:80px;height:20px;border-radius:50%;background:#6B4528;box-shadow:inset 0 3px 0 #85583A}
+.stage .pl{position:absolute;left:85px;top:91px;width:220px;height:220px}
+.stage .pl img{width:100%;height:100%;display:block}
+/* plant art's own ground shadow is kept only inside the soil-top ellipse (80 x 20, centre 110,195 in the 220 plant box) */
+.stage .pl{-webkit-mask:linear-gradient(#000 0 0) 0 0/100% 186px no-repeat,radial-gradient(40px 10px at 110px 195px,#000 98%,transparent 100%);mask:linear-gradient(#000 0 0) 0 0/100% 186px no-repeat,radial-gradient(40px 10px at 110px 195px,#000 98%,transparent 100%)}
+[data-theme=dark] .stage .shadow{background:rgba(0,0,0,.35)}
+.stage .name{position:absolute;left:14px;top:14px;background:var(--surface);border-radius:14px;padding:6px 12px;font-weight:800;font-size:14px;box-shadow:var(--shadow)}
+.stage .name small{display:block;font-weight:700;font-size:12px;color:var(--txt2)}
+table{border-collapse:collapse;width:100%;max-width:1100px;background:var(--card);border-radius:14px;overflow:hidden}
+td,th{padding:7px 10px;text-align:left;font-size:13.5px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:color-mix(in srgb,var(--leaf) 30%,transparent)}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<filter id="deut"><feColorMatrix type="matrix" values="0.367 0.861 -0.228 0 0  0.280 0.673 0.047 0 0  -0.012 0.043 0.969 0 0  0 0 0 1 0"/></filter>
+<filter id="prot"><feColorMatrix type="matrix" values="0.152 1.053 -0.205 0 0  0.115 0.786 0.099 0 0  -0.004 -0.048 1.052 0 0  0 0 0 1 0"/></filter>
+<filter id="trit"><feColorMatrix type="matrix" values="1.256 -0.077 -0.179 0 0  -0.078 0.931 0.148 0 0  0.005 0.691 0.304 0 0  0 0 0 1 0"/></filter>
+</defs></svg>
+<div class="wrap">
+<header><h1>Pot collection</h1>
+<p class="sub">Ten cosmetic pots. Plain blue to start, six earned by play and kept for good, three with WordFlora Plus. Each pot has its own pattern, so it reads by shape as well as colour. Design review only, not built yet. Catalog data: <a href="pots.json" style="color:var(--text)">pots.json</a>.</p>
+<div class="bar"><button class="btn" id="thT">Dark mode</button>
+<a href="#s1">1 Pots</a><a href="#s2">2 Pick a pot</a><a href="#s3">3 Shed</a><a href="#s4">4 Plant page</a><a href="#s5">5 Table</a></div></header>
+
+<section id="s1"><h2>1. The ten pots at 44, 88 and 120 pt</h2>
+<p class="sub">Same pot shape as the repot effect today (rim, body, light and shade strips). The pattern sits on the body, clipped to it.</p>
+<div class="cat" id="cat"></div></section>
+
+<section id="s1b"><h2>1b. Colour-blind check at 44 pt</h2>
+<p class="sub">The same ten pots through grey and three colour vision filters. Every pot keeps its own pattern, so no two look alike even without hue.</p>
+<div class="cb" id="cb"></div></section>
+
+<section id="s2"><h2>2. Pick a pot (repot sheet)</h2>
+<p class="sub">Example player: 12 plants grown, level 3 finished, no Plus. The row sits above the soil choices. All ten pots show in a 5 by 2 grid, so nothing hides off screen. Owned pots are full colour. Pots still to earn show as a soft outline with their pattern. Plus pots are full colour with a Plus tag.</p>
+<div class="row" id="sheets"></div></section>
+
+<section id="s3"><h2>3. Garden Shed: Pots (below Tools)</h2>
+<p class="sub">Same player. Earned pots say so with a check. Pots to earn show the hint and a gentle progress bar. Plus pots show the tag and a calm line, no lock.</p>
+<div class="row" id="shed"></div></section>
+
+<section id="s4"><h2>4. Plant page stage</h2>
+<p class="sub">The chosen pot replaces the plain blue one on the stage. The plant art sits on the soil exactly as today.</p>
+<div class="row" id="stages"></div></section>
+
+<section id="s5"><h2>5. Catalog</h2><table id="tbl"></table></section>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const STAR='M0 -7 Q1 -1.5 7 0 Q1 1.5 0 7 Q-1 1.5 -7 0 Q-1 -1.5 0 -7Z';
+const HEART='M0 5 C-8 -1 -8 -8 -3 -8 C-1 -8 0 -6 0 -6 C0 -6 1 -8 3 -8 C8 -8 8 -1 0 5Z';
+const BODY='M18 20 H102 L92 88 Q91 96 82 96 H38 Q29 96 28 88Z';
+const IC={
+ ck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+ sprout:'<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><path d="M12 21v-8"/><path d="M12 13C12 8 8 6 4 6c0 4 3 7 8 7Z"/><path d="M12 11c0-4 3-6 8-6 0 4-3 6-8 6Z"/><rect x="11" y="10" width="2" height="11" rx="1"/></svg>',
+ star:'<svg viewBox="-8 -8 16 16"><path fill="currentColor" d="'+STAR+'"/></svg>'};
+let uid=0;
+/* draw one pot. mode: 'full' | 'ghost' (to earn: soft fill, dashed outline, pattern in ink) */
+function potSVG(p,size,mode='full'){
+ const id='c'+(uid++);const g=mode==='ghost';
+ const B=g?'var(--lock)':p.body,R=g?'var(--lock)':p.rim,S=g?'var(--lockink)':p.shade;
+ const C=(i)=>g?'var(--lockink)':p.decoration.colors[i];
+ const h=size*100/120;
+ let d='';const k=p.decoration.kind;
+ if(k==='rings')d=`<rect x="18" y="38" width="84" height="7" fill="${C(0)}"/><rect x="18" y="52" width="84" height="7" fill="${C(0)}" opacity=".7"/>`;
+ if(k==='drip')d=`<rect x="18" y="20" width="84" height="10" fill="${C(0)}"/>`+[[26,12],[40,20],[54,10],[68,22],[82,14],[94,9]].map(([x,hh])=>`<rect x="${x-4}" y="26" width="8" height="${hh}" rx="4" fill="${C(0)}"/>`).join('');
+ if(k==='flower')d=`<g transform="translate(60 58)" fill="${C(0)}">${[0,45,90,135,180,225,270,315].map(a=>`<ellipse cx="0" cy="-10" rx="4.5" ry="9" transform="rotate(${a})"/>`).join('')}<circle r="7" fill="${C(1)}"/></g>`;
+ if(k==='stars')d=[[38,46,1.25,0],[80,52,1,0],[60,74,1.4,0],[88,76,.7,1],[34,72,.7,1]].map(([x,y,s,c])=>`<path d="${STAR}" transform="translate(${x} ${y}) scale(${s})" fill="${C(c)}"/>`).join('');
+ if(k==='hearts')d=[[40,46,1.1],[80,46,1.1],[60,70,1.5]].map(([x,y,s])=>`<path d="${HEART}" transform="translate(${x} ${y}) scale(${s})" fill="${C(0)}"/>`).join('');
+ if(k==='dots')d=`<g fill="${C(0)}" opacity=".85">`+[[34,36],[56,34],[78,36],[96,40],[44,52],[66,52],[86,56],[38,70],[58,72],[78,74],[50,88],[70,88]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.5"/>`).join('')+'</g>';
+ if(k==='stripes')d=[22,42,62,82,102].map(x=>`<rect x="${x-4.5}" y="20" width="9" height="80" fill="${C(0)}"/>`).join('');
+ if(k==='moon')d=`<path fill="${C(0)}" d="M54.62 41.06A15 15 0 1 0 69.68 62.15A13 13 0 0 1 54.62 41.06Z"/>`+[[84,42],[82,78]].map(([x,y])=>`<path d="${STAR}" transform="translate(${x} ${y}) scale(.55)" fill="${C(1)}"/>`).join('')+`<circle cx="36" cy="40" r="2" fill="${C(1)}"/><circle cx="40" cy="80" r="2" fill="${C(1)}"/>`;
+ if(k==='flowerBand'){d=`<g fill="${C(0)}"><rect x="18" y="70" width="84" height="30"/>${[26,35,44,53,62,71,80,89,98].map(x=>`<circle cx="${x}" cy="70" r="5"/>`).join('')}</g>`+[32,48,64,80,94].map((x,i)=>`<g transform="translate(${x} 80)" fill="${g?'var(--lock)':p.decoration.colors[i%2?2:1]}">${[0,72,144,216,288].map(a=>`<circle cx="0" cy="-3.5" r="3" transform="rotate(${a})"/>`).join('')}<circle r="2" fill="${g?'var(--lockink)':p.decoration.colors[3]}"/></g>`).join('')}
+ const strips=g?'':`<path d="M18 20 H34 L42 96 H38 Q29 96 28 88Z" fill="#fff" opacity=".14"/><path d="M102 20 H88 L82 96 Q91 96 92 88Z" fill="${S}" opacity=".45"/>`;
+ const deco=g?`<g opacity=".55">${d}</g>`:d;
+ const outline=g?`<path d="${BODY}" fill="none" stroke="var(--lockink)" stroke-width="2" stroke-dasharray="5 4"/>`:'';
+ const rim=`<rect x="10" y="4" width="100" height="18" rx="9" fill="${R}" ${g?'stroke="var(--lockink)" stroke-width="2" stroke-dasharray="5 4"':''}/>`+(g?'':'<rect x="16" y="8" width="88" height="5" rx="2.5" fill="#fff" opacity=".35"/>');
+ return `<svg class="pot" width="${size}" height="${h.toFixed(1)}" viewBox="0 0 120 100" role="img" aria-label="${p.a11y}${g?', not earned yet':''}"><defs><clipPath id="${id}"><path d="${BODY}"/></clipPath></defs><path d="${BODY}" fill="${B}"/><g clip-path="url(#${id})">${strips}${deco}</g>${outline}${rim}</svg>`;
+}
+const how=p=>({free:'Start',plants:p.unlock.value===1?'First plant':p.unlock.value+' plants',level:'Finish level '+p.unlock.value,plus:'Plus'})[p.unlock.kind];
+const plusTag='<span class="tagp">'+IC.star+'Plus</span>';
+/* example player */
+const ME={plants:12,levelDone:3,plus:false,current:'sageGlaze'};
+const owns=p=>p.unlock.kind==='free'||(p.unlock.kind==='plants'&&ME.plants>=p.unlock.value)||(p.unlock.kind==='level'&&ME.levelDone>=p.unlock.value)||(p.unlock.kind==='plus'&&ME.plus);
+
+fetch('pots.json').then(r=>r.json()).then(J=>{const P=J.pots;
+ /* 1 */
+ $('#cat').innerHTML=P.map(p=>`<article class="pc"><div class="meta"><b>${p.name}</b>${p.unlock.kind==='plus'?plusTag:`<span class="how">${how(p)}</span>`}</div>
+ <div class="sizes">${[44,88,120].map(s=>`<figure>${potSVG(p,s)}${s}</figure>`).join('')}${p.unlock.kind==='free'||p.unlock.kind==='plus'?'':`<figure>${potSVG(p,44,'ghost')}to earn</figure>`}</div>
+ <p class="hint">${p.hint}</p><code>${p.id} · <span class="sw" style="background:${p.body}"></span> ${p.body} <span class="sw" style="background:${p.rim}"></span> ${p.rim} <span class="sw" style="background:${p.shade}"></span> ${p.shade} · ${p.decoration.kind}</code></article>`).join('');
+ $('#cb').innerHTML=[['','As seen'],['gray','Grey'],['deut','Deuteranopia (red-green)'],['prot','Protanopia (red-green)'],['trit','Tritanopia (blue-yellow)']].map(([c,t])=>`<h3>${t}</h3><div class="lane ${c}">${P.map(p=>`<figure>${potSVG(p,44)}${p.name}</figure>`).join('')}</div>`).join('');
+ /* 2 */
+ function chip(p,state,curId){const o=owns(p),cur=p.id===(curId||ME.current),plus=p.unlock.kind==='plus';
+  const lab=`${p.name} pot`+(cur?', in use':o?'':plus?', Plus':', not earned yet');
+  return `<button class="chip${cur?' cur':''}${!o&&!plus?' lk':''}${state===p.id?' tap':''}" aria-label="${lab}" aria-pressed="${cur}">${cur?`<span class="ck">${IC.ck}</span>`:''}${plus&&!o?plusTag:''}<span class="art">${potSVG(p,50,(!o&&!plus)?'ghost':'full')}</span><span class="nm${!p.name.includes(' ')&&p.name.length>=9?' long':''}">${p.name}</span></button>`}
+ function sheet(state,tipHTML,ax,btn,curId,big){const N=big?4:5;return `<div class="phone${big?' ax':''}"><div class="sheet"><div class="grab"></div><h4>Repot Daisy</h4>
+ <h5>Pick a pot</h5><p class="s">${J.copy.pickSub}</p><div class="pick">${(()=>{const ti=P.findIndex(p=>p.id===state);const after=ti<0?-1:Math.min(P.length-1,Math.floor(ti/N)*N+N-1);const ax=((ti%N)+.5)*(100/N)+'%';
+  return P.map((p,i)=>chip(p,state,curId)+(i===after&&tipHTML?`<div class="tip" style="--ax:${ax}" role="status">${tipHTML}</div>`:'')).join('')})()}</div>
+ <h5>Soil</h5><div class="soils"><div class="soil sel"><i></i>Garden soil<br><small style="color:var(--txt2)">1 scoop</small></div><div class="soil"><i style="background:#3E2A1A"></i>Rich soil<br><small style="color:var(--txt2)">2 scoops</small></div></div>
+ <button class="pill">${btn}</button></div></div>`}
+ const byId=Object.fromEntries(P.map(p=>[p.id,p]));
+ const fill=(s,o)=>s.replace(/\{(\w+)\}/g,(_,k)=>o[k]);
+ const toGo=p=>{const k=p.unlock.value-ME.levelDone;return k===1?J.copy.toGoOne:fill(J.copy.toGoMany,{k})};
+ $('#sheets').innerHTML=
+  `<div>${sheet('', '', '', 'Repot with fresh soil')}<p class="cap">A. Opened<small>Current pot has a ring and a check badge (shape, not just colour). VoiceOver: "Sage glaze pot, in use".</small></p></div>`+
+  `<div>${sheet('starlight',`<span style="color:var(--tip-ink)">${IC.sprout}</span><span>${byId.starlight.hint}<small>You finished level 3. ${toGo(byId.starlight)}</small></span>`,'90%','Repot with fresh soil')}<p class="cap">B. Tapped a pot to earn (Starlight)<small>The hint shows under the grid, pointing at the pot. Nothing else changes; the button keeps the pot that is in use.</small></p></div>`+
+  `<div>${sheet('moonlit',`<span style="color:var(--tip-ink)">${potSVG(byId.moonlit,30)}</span><span>Moonlit is part of WordFlora Plus.<small>A grown-up can find Plus in Settings.</small></span>`,'50%','Repot with fresh soil')}<p class="cap">C. Tapped a Plus pot (Moonlit)<small>Calm line, no lock, no price, no button to buy here. Plus opens only from Settings behind the grown-up gate.</small></p></div>`+
+  `<div>${sheet('', '', '', 'Repot into Sunflower','sunflower')}<p class="cap">D. Picked an owned pot (Sunflower)<small>The check moves to the pick and the button names it. Repot plays the effect with the new pot.</small></p></div>`+
+  `<div>${sheet('starlight',`<span style="color:var(--tip-ink)">${IC.sprout}</span><span>${byId.starlight.hint}<small>You finished level 3. ${toGo(byId.starlight)}</small></span>`,'','Repot with fresh soil','',true)}<p class="cap">E. Accessibility text size (AX1 and up), Starlight tapped<small>The grid switches to 4 columns and 3 rows; chip names grow and wrap to 2 lines at the space; a one-word name that still does not fit (Terracotta, Sunflower, Starlight) scales down to 80% (SwiftUI lineLimit(2) plus minimumScaleFactor(0.8)), never breaking inside a word; pots keep their 50 pt size. The hint opens under Starlight's row.</small></p></div>`;
+ /* 3 */
+ const TOOLS=[['Watering can','Copper',`<svg viewBox="0 0 110 90"><path d="M82 34C104 30 104 68 80 66" fill="none" stroke="#3B3B3B" stroke-width="9" stroke-linecap="round"/><path d="M82 34C104 30 104 68 80 66" fill="none" stroke="#3F7A45" stroke-width="5" stroke-linecap="round"/><path d="M30 60L8 22" stroke="#3B3B3B" stroke-width="12" stroke-linecap="round"/><path d="M30 60L8 22" stroke="#3F7A45" stroke-width="7.5" stroke-linecap="round"/><rect x="26" y="30" width="56" height="50" rx="11" fill="#5FA05A" stroke="#3B3B3B" stroke-width="2.4"/><rect x="26" y="30" width="56" height="11" rx="5.5" fill="#C5CED6" stroke="#3B3B3B" stroke-width="2.2"/></svg>`],['Trowel','Steel',`<svg viewBox="0 0 140 50"><path d="M60 25C66 6 100 4 138 25C100 46 66 44 60 25Z" fill="#C5CED6" stroke="#3B3B3B" stroke-width="2.4"/><rect x="40" y="13" width="11" height="24" rx="3" fill="#D5DCE2" stroke="#3B3B3B" stroke-width="2.2"/><rect x="2" y="16" width="40" height="18" rx="9" fill="#B07A4B" stroke="#3B3B3B" stroke-width="2.4"/></svg>`],['Sun lamp','Brass',`<svg viewBox="-60 -60 120 120"><g stroke="#E8A21A" stroke-width="7" stroke-linecap="round">${[...Array(12)].map((_,i)=>`<path d="M0 -40V-52" transform="rotate(${i*30})"/>`).join('')}</g><circle r="32" fill="#F6C85A" stroke="#E8A21A" stroke-width="3"/></svg>`]];
+ function pcard(p){const o=owns(p),plus=p.unlock.kind==='plus';let st='',extra='';
+  if(o){st=`<span class="st ok">${p.id===ME.current?'In use by Daisy':'Yours to use'}</span>`;extra=`<span class="ck">${IC.ck}</span>`}
+  else if(plus){st=`<span class="st">Part of WordFlora Plus</span>`;extra=plusTag}
+  else{const goal=p.unlock.value;const now=p.unlock.kind==='plants'?ME.plants:ME.levelDone;const line=p.unlock.kind==='plants'?`Grow ${goal} plants`:`Finish level ${goal}`;
+   st=`<span class="st">${line}</span><span class="bar2" role="progressbar" aria-valuenow="${now}" aria-valuemax="${goal}" aria-label="${p.unlock.kind==='plants'?now+' of '+goal+' plants grown':fill(J.copy.progressLevel,{n:now,goal})}"><b style="--f:${Math.min(100,now/goal*100)}%"></b></span><span class="st" style="font-size:11.5px">${p.unlock.kind==='plants'?now+' of '+goal+' plants':fill(J.copy.progressLevel,{n:now,goal})}</span>`}
+  return `<div class="pcard${!o&&!plus?' lk':''}">${extra}${potSVG(p,76,(!o&&!plus)?'ghost':'full')}<span class="nm">${p.name}</span>${st}</div>`}
+ $('#shed').innerHTML=`<div><div class="phone shed"><h4>Garden Shed</h4><h5>Tools</h5><div class="tools">${TOOLS.map(([n,t,s])=>`<div class="tool">${s}${n}<small>${t}</small></div>`).join('')}</div>
+ <h5>Pots <span>Tap a pot to see how to earn it</span></h5><div class="pgrid">${P.map(pcard).join('')}</div>
+ <p class="s" style="margin:12px 2px 0;font-size:13px;color:var(--txt2)">Pots you earn stay yours. A pot already on a plant stays on it.</p></div><p class="cap">Shed, Pots section<small>3 columns at 390 pt. To-earn cards use a softer card and the outline pot; text stays full contrast.</small></p></div>`;
+ /* 4 */
+ const st=(plant,label,pid)=>`<div><div class="stage"><div class="grd"></div><div class="shadow"></div><div class="pt">${potSVG(byId[pid],140)}<div class="soilt"></div></div><div class="pl"><img src="../plants/plant_${plant}.svg" alt="${label}"></div><div class="name">${label}<small>${byId[pid].name} pot</small></div></div><p class="cap">${label} in ${byId[pid].name}</p></div>`;
+ $('#stages').innerHTML=st('daisy','Daisy','sageGlaze')+st('sunflower','Sunny','sunflower')+st('rose','Rosie','rosePink')+st('lavender','Lavender','moonlit')+st('marigold','Goldie','meadow');
+ /* 5 */
+ $('#tbl').innerHTML='<tr><th>id</th><th>Name</th><th>Body / rim / shade</th><th>Pattern</th><th>Unlock</th><th>Hint</th></tr>'+P.map(p=>`<tr><td><code>${p.id}</code></td><td>${p.name}</td><td>${p.body} / ${p.rim} / ${p.shade}</td><td>${p.decoration.kind}</td><td>${p.unlock.kind}${p.unlock.value?' '+p.unlock.value:''}</td><td>${p.hint}</td></tr>`).join('');
+ document.body.dataset.ready='1';
+ if(new URLSearchParams(location.search).has('debug')){const W=innerWidth;const bad=[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>W+1&&e.offsetParent).slice(0,8).map(e=>e.tagName+'.'+e.className.baseVal+e.className+':'+Math.round(e.getBoundingClientRect().right));document.body.dataset.debug=W+' '+document.documentElement.scrollWidth+' '+bad.join(' | ')}
+});
+const thb=$('#thT');function syncTh(){thb.textContent=document.documentElement.dataset.theme==='dark'?'Light mode':'Dark mode'}syncTh();
+thb.onclick=()=>{const d=document.documentElement.dataset.theme!=='dark';document.documentElement.dataset.theme=d?'dark':'light';syncTh()};
+</script></body></html>
