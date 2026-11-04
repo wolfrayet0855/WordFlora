@@ -86,6 +86,19 @@ final class WordProviderTests: XCTestCase {
         }
     }
 
+    func testShippedBankDailyWordsComeFromLevelsOneToThree() throws {
+        let daily = try WordBank.load().entries.filter(\.dailyEligible)
+        XCTAssertGreaterThanOrEqual(daily.count, 150)
+        for e in daily { XCTAssertLessThanOrEqual(e.level, 3, "\(e.id) is daily at level \(e.level)") }
+    }
+
+    func testShippedBankHeroLevelsMatchTheirPlants() throws {
+        let levels = Dictionary(try PlantCatalog.load().map { ($0.plantId, $0.level) }, uniquingKeysWith: { a, _ in a })
+        for e in try WordBank.load().entries where e.kind == .hero {
+            XCTAssertEqual(e.level, e.plantId.flatMap { levels[$0] }, "\(e.id)")
+        }
+    }
+
     func testShippedBankDailySelectionIsDeterministicAndCoversEveryEntry() throws {
         let b = try WordBank.load()
         XCTAssertEqual(b.daily, DailyConfig(epoch: "2026-01-01", seed: 20260101))
