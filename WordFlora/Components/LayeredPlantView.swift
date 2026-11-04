@@ -105,10 +105,10 @@ struct LayeredPlantView: View {
             .animation(.easeInOut(duration: reduceMotion ? 0.3 : 1.4), value: shown)
 
             ForEach(falling) { f in
-                // a drooped petal starts its fall at its angle + droop
+                // a drooped petal starts its fall at its angle + droop and rests as any other petal
                 petal(t, f.ref, pips: f.look)
                     .modifier(FallEffect(t: localT(f.index), reduceMotion: reduceMotion, start: centre(t, f.ref), rest: f.rest,
-                                         angle: angle(t, f.ref) + (t.curl(for: f.ref, pips: f.look)?.rotate ?? 0), k: k))
+                                         angle: angle(t, f.ref), droop: t.curl(for: f.ref, pips: f.look)?.rotate ?? 0, k: k))
             }
         }
         .frame(width: size, height: size, alignment: .topLeading)
@@ -123,7 +123,7 @@ struct LayeredPlantView: View {
 
     /// A petal as it looks at `pips`. With a curl rule (the rose) a petal that stays swaps to its curled sprite and
     /// droops about its base; when the count changed from `from`, the two sprites cross-fade with `fadeOut` and the
-    /// droop eases with the head's state animation (0.3 s under Reduce Motion).
+    /// droop eases on the same schedule (`droopAnimation`; the short fades under Reduce Motion).
     @ViewBuilder private func petal(_ t: PlantThinning, _ ref: PetalRef, pips: Int, from: Int? = nil) -> some View {
         let ring = t.rings[ref.ring], p = ring.petals[ref.petal]
         let fresh = ring.sprites[min(p.sprite, ring.sprites.count - 1)].image
@@ -142,8 +142,20 @@ struct LayeredPlantView: View {
                         .opacity(images.count == 1 || (name == now) == fadeOut ? 1 : 0)
                 }
             }
-            .rotationEffect(.degrees(entry?.rotate ?? 0), anchor: UnitPoint(x: pivot[0] / 200, y: pivot[1] / 200))
+            .animation(droopAnimation(from: from, to: pips)) {
+                $0.rotationEffect(.degrees(entry?.rotate ?? 0), anchor: UnitPoint(x: pivot[0] / 200, y: pivot[1] / 200))
+            }
         }
+    }
+
+    /// The cross-fade of leaving petals and of curled sprites on a fall, and back on a regrow.
+    private var fallFade: Animation { reduceMotion ? .easeOut(duration: 0.5) : .easeOut(duration: 0.8).delay(Self.fallDelay + 0.4) }
+    private var regrowFade: Animation { reduceMotion ? .easeIn(duration: 0.25) : .easeInOut(duration: 0.6) }
+
+    /// A curled petal droops on the same schedule as its sprite cross-fade, so the rolled sprite and the droop arrive together.
+    private func droopAnimation(from: Int?, to: Int) -> Animation? {
+        guard let from, from != to else { return nil }
+        return from > to ? fallFade : regrowFade
     }
 
     /// A ring sprite moved onto its petal, or (no petal) a curled sprite already drawn in place.
@@ -204,16 +216,17 @@ struct LayeredPlantView: View {
                 guard gen == generation else { return }
                 if reduceMotion {
                     withAnimation(.easeIn(duration: 0.6)) { fallT = 1 }
-                    withAnimation(.easeOut(duration: 0.5)) { fadeOut = true }
+                    withAnimation(fallFade) { fadeOut = true }
                 } else {
                     withAnimation(.linear(duration: total).delay(Self.fallDelay)) { fallT = 1 }
-                    withAnimation(.easeOut(duration: 0.8).delay(Self.fallDelay + 0.4)) { fadeOut = true }
+                    withAnimation(fallFade) { fadeOut = true }
                 }
             }
             let settleAfter = (reduceMotion ? 0.7 : Self.fallDelay + total) + (to == 0 ? Double(t.rule?.seedAfterMs ?? 1200) / 1000 : 0)
             DispatchQueue.main.asyncAfter(deadline: .now() + settleAfter) {
                 guard gen == generation else { return }
                 fading = []
+                changedFrom = nil               // the cross-fade is long done: drop the hidden earlier sprite
                 onShown(to)
             }
         case let .regrow(from, to):
@@ -229,7 +242,11 @@ struct LayeredPlantView: View {
                 changedFrom = from; fadeOut = false
                 DispatchQueue.main.async {
                     guard gen == generation else { return }
-                    withAnimation(reduceMotion ? .easeIn(duration: 0.25) : .easeInOut(duration: 0.6)) { fadeOut = true }
+                    withAnimation(regrowFade) { fadeOut = true }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + (reduceMotion ? 0.4 : 0.9)) {
+                    guard gen == generation else { return }
+                    changedFrom = nil
                 }
             }
             for (i, g) in groups.enumerated() {
@@ -258,13 +275,16 @@ private struct FallEffect: ViewModifier, Animatable {
     let start: CGPoint
     let rest: CGPoint
     let angle: Double
+    /// Degrees the (curled) petal already droops by when it lets go: it lifts off along angle + droop, and the rest
+    /// rotation takes the droop back out, so it lies on the ground exactly as an undrooped petal would.
+    var droop: Double = 0
     let k: CGFloat
 
     var animatableData: Double { get { t } set { t = newValue } }
 
     func body(content: Content) -> some View {
         let dx = (rest.x - start.x), dy = (rest.y - start.y)
-        let a = angle * .pi / 180, r = 90 - angle.truncatingRemainder(dividingBy: 180)
+        let a = (angle + droop) * .pi / 180, r = 90 - angle.truncatingRemainder(dividingBy: 180) - droop
         let ox = 4 * sin(a), oy = -4 * cos(a)
         // keyframes from lifestats.html: lift, drift right, drift left, rest
         let keys: [(Double, Double, Double, Double, Double)] = [   // time, x, y, rotation, scale
