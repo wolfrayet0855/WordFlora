@@ -15,6 +15,7 @@
 		0BA1F76FAE344B07CA9FD2C0 /* DataReconciler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 266B16D2FBF38C233CD39A05 /* DataReconciler.swift */; };
 		0D10710960161587F17B49FA /* wf-soil.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 46F554723E29D7207609F7A7 /* wf-soil.m4a */; };
 		0D40FB8B459939AEF138E877 /* LifePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DACB1B15E0B500548ECCC8E /* LifePanel.swift */; };
+		6A3637FF809AEE76F03A30E6 /* NameStoryCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D9DBF6CF922185F20488618 /* NameStoryCard.swift */; };
 		0ED6F1FF31FA92710DC232E9 /* PlantThinning.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F27137167AD56F3C378B56 /* PlantThinning.swift */; };
 		0EF248DB19561DBC0B3A3911 /* wf-sun.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 78262DDD42B5B0B95B53888A /* wf-sun.m4a */; };
 		1581D6A2E8210D4686510D56 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
@@ -271,6 +272,7 @@
 		5B58C1C833EE44A8A7BE2B94 /* ShareCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShareCard.swift; sourceTree = "<group>"; };
 		5CB68790025C9135B9C9E7DA /* OnboardingFlow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OnboardingFlow.swift; sourceTree = "<group>"; };
 		5DACB1B15E0B500548ECCC8E /* LifePanel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifePanel.swift; sourceTree = "<group>"; };
+		9D9DBF6CF922185F20488618 /* NameStoryCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NameStoryCard.swift; sourceTree = "<group>"; };
 		616F9C7CA1B8EB8C04DD8F97 /* Theme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
 		6406AFD4A968B89AEFEE8100 /* WordFloraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6624B0783F70383BBF4A343C /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -558,6 +560,7 @@
 				81A738D4825EDE5CDE9AA4F4 /* LifePalette.swift */,
 				B67E4139D96BE75310B27031 /* PetalPipRow.swift */,
 				5DACB1B15E0B500548ECCC8E /* LifePanel.swift */,
+				9D9DBF6CF922185F20488618 /* NameStoryCard.swift */,
 				52107D98E6FA3FE503D0BDC7 /* LayeredPlantView.swift */,
 				AF243532D79B05FABE12F6B1 /* RainOverlay.swift */,
 				C95EE8F83CC87F157461F447 /* SeedPotView.swift */,
@@ -1125,6 +1128,7 @@
 				89D5ED23DA9588AA0C10C640 /* LifePalette.swift in Sources */,
 				54ACC3979C866A48FFB28F86 /* PetalPipRow.swift in Sources */,
 				0D40FB8B459939AEF138E877 /* LifePanel.swift in Sources */,
+				6A3637FF809AEE76F03A30E6 /* NameStoryCard.swift in Sources */,
 				80C6C5F5EDC6DB0C83563F51 /* LayeredPlantView.swift in Sources */,
 				C0301098F862C6C9DF220D24 /* RainOverlay.swift in Sources */,
 				99A763B192E74385836B56C6 /* SeedPotView.swift in Sources */,

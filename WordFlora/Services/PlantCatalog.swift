@@ -7,6 +7,8 @@ struct PlantInfo: Decodable, Equatable {
     let botanicalFact: String
     let level: Int
     let imageName: String
+    /// How the plant got its name (fact card V2). Missing for plants whose story is not verified yet.
+    var nameStory: NameStory? = nil
 
     /// Stable identity derived from the asset name ("plant_rose" -> "rose").
     var plantId: String {
@@ -14,8 +16,32 @@ struct PlantInfo: Decodable, Equatable {
     }
 }
 
+/// A verified word-origin story: every story is checked against two sources before it ships.
+struct NameStory: Decodable, Equatable {
+    /// The old word the name grew from, as written in that language ("dæges ēage").
+    let origin: String
+    /// The language of `origin` ("Old English").
+    let language: String
+    /// What `origin` means in plain words ("day's eye").
+    let meaning: String
+    /// The short first line on the card.
+    let line: String
+    /// One fun fact, under 40 words, at a grade 2-3 reading level.
+    let funFact: String
+    /// SF Symbol for the origin chip.
+    var symbol: String? = nil
+}
+
 enum PlantCatalog {
     enum CatalogError: Error { case fileNotFound }
+
+    private static let storiesById: [String: NameStory] = {
+        let plants = (try? load()) ?? []
+        return Dictionary(plants.compactMap { p in p.nameStory.map { (p.plantId, $0) } }, uniquingKeysWith: { a, _ in a })
+    }()
+
+    /// The name story for a plant, or nil when it has none (the card then shows "Did you know?").
+    static func nameStory(for plantId: String) -> NameStory? { storiesById[plantId] }
 
     static func load(bundle: Bundle = .main) throws -> [PlantInfo] {
         guard let url = bundle.url(forResource: "Plants", withExtension: "json") else {

@@ -4,14 +4,30 @@
     "botanicalName": "Taraxacum officinale",
     "botanicalFact": "Dandelion seeds can drift for miles on the wind, and bees love the flowers.",
     "level": 1,
-    "imageName": "plant_dandelion"
+    "imageName": "plant_dandelion",
+    "nameStory": {
+      "origin": "dent de lion",
+      "language": "French",
+      "meaning": "lion's tooth",
+      "line": "Dandelion comes from “lion's tooth.”",
+      "funFact": "Look at a leaf. Its sharp, pointy edges look like a row of lion teeth.",
+      "symbol": "pawprint.fill"
+    }
   },
   {
     "name": "Daisy",
     "botanicalName": "Bellis perennis",
     "botanicalFact": "Its name comes from 'day's eye': petals close at night.",
     "level": 1,
-    "imageName": "plant_daisy"
+    "imageName": "plant_daisy",
+    "nameStory": {
+      "origin": "dæges ēage",
+      "language": "Old English",
+      "meaning": "day's eye",
+      "line": "Daisy comes from “day's eye.”",
+      "funFact": "Its petals close at night and open with the morning sun, like an eye waking up.",
+      "symbol": "sun.max.fill"
+    }
   },
   {
     "name": "Clover",
@@ -32,14 +48,30 @@
     "botanicalName": "Helianthus annuus",
     "botanicalFact": "Young blooms track the sun: heliotropism.",
     "level": 1,
-    "imageName": "plant_sunflower"
+    "imageName": "plant_sunflower",
+    "nameStory": {
+      "origin": "hēlios + anthos",
+      "language": "Greek",
+      "meaning": "sun flower",
+      "line": "Its plant name, Helianthus, means “sun flower.”",
+      "funFact": "Its big round head with gold petals looks like a bright sun.",
+      "symbol": "sun.max.fill"
+    }
   },
   {
     "name": "Tulip",
     "botanicalName": "Tulipa gesneriana",
     "botanicalFact": "Tulip bulbs fueled a speculative price bubble in the Netherlands in the 1630s.",
     "level": 1,
-    "imageName": "plant_tulip"
+    "imageName": "plant_tulip",
+    "nameStory": {
+      "origin": "dulband",
+      "language": "Persian",
+      "meaning": "turban",
+      "line": "Tulip comes from an old word for “turban.”",
+      "funFact": "A turban is a long cloth that is wrapped around the head. People thought an open tulip looked like one.",
+      "symbol": "crown.fill"
+    }
   },
   {
     "name": "Rose",
@@ -116,7 +148,15 @@
     "botanicalName": "Aloe vera",
     "botanicalFact": "Its thick leaves store a water-rich gel inside.",
     "level": 2,
-    "imageName": "plant_aloe_vera"
+    "imageName": "plant_aloe_vera",
+    "nameStory": {
+      "origin": "vera",
+      "language": "Latin",
+      "meaning": "true",
+      "line": "Vera means “true.”",
+      "funFact": "There are many kinds of aloe. This one got the name true aloe.",
+      "symbol": "checkmark.seal.fill"
+    }
   },
   {
     "name": "Bamboo",
@@ -144,7 +184,15 @@
     "botanicalName": "Dionaea muscipula",
     "botanicalFact": "Traps shut in about 0.1s when two hairs are touched.",
     "level": 3,
-    "imageName": "plant_venus_flytrap"
+    "imageName": "plant_venus_flytrap",
+    "nameStory": {
+      "origin": "muscipula",
+      "language": "Latin",
+      "meaning": "mousetrap",
+      "line": "Its plant name, muscipula, means “mousetrap.”",
+      "funFact": "Its leaves snap shut like a tiny trap. They catch bugs, not mice!",
+      "symbol": "ant.fill"
+    }
   },
   {
     "name": "Baobab",
@@ -186,7 +234,15 @@
     "botanicalName": "Mimosa pudica",
     "botanicalFact": "Its leaflets fold shut within seconds of being touched.",
     "level": 3,
-    "imageName": "plant_sensitive_plant"
+    "imageName": "plant_sensitive_plant",
+    "nameStory": {
+      "origin": "pudica",
+      "language": "Latin",
+      "meaning": "shy",
+      "line": "Its plant name, pudica, means “shy.”",
+      "funFact": "Touch a leaf and it folds up fast, as if it is shy. Soon it opens up again.",
+      "symbol": "hand.raised.fill"
+    }
   },
   {
     "name": "Bird of Paradise",
@@ -207,7 +263,15 @@
     "botanicalName": "Lithops pseudotruncatella",
     "botanicalFact": "These 'living stones' from southern Africa are camouflaged to look like pebbles.",
     "level": 3,
-    "imageName": "plant_lithops"
+    "imageName": "plant_lithops",
+    "nameStory": {
+      "origin": "lithos + ops",
+      "language": "Greek",
+      "meaning": "stone face",
+      "line": "Lithops means “stone face.”",
+      "funFact": "These small plants look like rocks. Hungry animals walk past and do not see them.",
+      "symbol": "circle.hexagongrid.fill"
+    }
   },
   {
     "name": "Rafflesia",
@@ -270,7 +334,15 @@
     "botanicalName": "Drosera rotundifolia",
     "botanicalFact": "Sticky tentacles on its leaves trap and digest small insects.",
     "level": 4,
-    "imageName": "plant_sundew"
+    "imageName": "plant_sundew",
+    "nameStory": {
+      "origin": "ros solis",
+      "language": "Latin",
+      "meaning": "dew of the sun",
+      "line": "Sundew comes from “dew of the sun.”",
+      "funFact": "Its leaves shine with sticky drops that look like dew in the sun. Small bugs stick to them.",
+      "symbol": "drop.fill"
+    }
   },
   {
     "name": "Lady's Slipper Orchid",
@@ -312,7 +384,15 @@
     "botanicalName": "Franklinia alatamaha",
     "botanicalFact": "It has not been seen in the wild since the early 1800s; all living trees descend from cultivated ones.",
     "level": 5,
-    "imageName": "plant_franklin_tree"
+    "imageName": "plant_franklin_tree",
+    "nameStory": {
+      "origin": "Franklinia",
+      "language": "Latin",
+      "meaning": "Franklin's tree",
+      "line": "It is named for Benjamin Franklin.",
+      "funFact": "A dad and his son found it by a river in 1765. They named it for a friend, Ben Franklin.",
+      "symbol": "person.fill"
+    }
   },
   {
     "name": "Chocolate Cosmos",
