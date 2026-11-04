@@ -33,21 +33,31 @@ canvas.back{z-index:2}canvas.front{z-index:5}
 .flash.on{animation:fl 1.4s ease-in-out}.bolt.on{animation:bo 1.4s ease-in-out}
 @keyframes fl{0%{opacity:0}25%{opacity:var(--flash)}100%{opacity:0}}
 @keyframes bo{0%{opacity:0}25%{opacity:.28}100%{opacity:0}}
-/* plant: the app's own art, untouched (no filters). The crown lives inside the plant box so it sways with her */
+/* plant: the app's own art, untouched (no filters). The falling petal lives inside the plant box so it leaves her head as she sways */
 .plant{position:absolute;left:50%;margin-left:-110px;top:270px;width:220px;height:220px;z-index:4;transform-origin:50% 88%}
 .plant img{width:100%;height:100%;display:block}
+.plant{--rest:color-mix(in srgb,var(--petal) 78%,#fff)}
+.plant>svg.lp{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .sway{animation:sway 6s ease-in-out infinite}
 @keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
-/* health crown: five pink petals round a small heart (love keeps the petals) */
-.crown{position:absolute;left:78px;top:-66px;width:64px;height:64px;overflow:visible;pointer-events:none}
-.ghost{fill:none;stroke:var(--ghost);stroke-width:3;stroke-dasharray:7 6}
-.pet{fill:var(--petal);stroke:var(--petal-edge);stroke-width:3.5;stroke-linejoin:round}
-.fall{transform-box:fill-box;transform-origin:50% 50%;animation:fall 7s cubic-bezier(.45,.05,.55,.95) infinite}
-@keyframes fall{0%{transform:translate(0,0) rotate(0);opacity:0}6%{opacity:1}25%{transform:translate(40px,140px) rotate(35deg)}50%{transform:translate(-25px,300px) rotate(-20deg)}75%{transform:translate(35px,460px) rotate(55deg)}90%{transform:translate(10px,560px) rotate(85deg);opacity:1}100%{transform:translate(10px,560px) rotate(85deg);opacity:0}}
-/* regrowth: one petal at a time, 0.3 s apart, small spring, plays once (Replay button re-runs it) */
-.pet.grow{transform-box:fill-box;transform-origin:50% 100%;animation:grow .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * .3s + .3s)}
+/* love petals row under Daisy: a small flower, then five pips (one pip = one day of love). Filled pink = love, dashed with a faint fill = gone for now */
+.lovebar{position:absolute;left:50%;top:518px;transform:translateX(-50%);z-index:6;display:flex;align-items:center;padding:5px 11px 5px 8px;background:var(--glass);border-radius:999px;box-shadow:0 0 0 1px var(--line),var(--shadow);pointer-events:none}
+.pips{display:inline-flex;align-items:center;gap:4px}
+.pips .lf{width:18px;height:18px;margin-right:3px;flex:none}
+.pip{width:13px;height:18px;overflow:visible;flex:none}
+.pg{fill:color-mix(in srgb,var(--ghost) 16%,transparent);stroke:var(--ghost);stroke-width:1.4;stroke-dasharray:2.6 2.1;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.pf{fill:var(--petal);stroke:var(--petal-edge);stroke-width:1.5;vector-effect:non-scaling-stroke;stroke-linejoin:round;transform-box:fill-box;transform-origin:50% 100%}
+/* the pip for today softly empties as her petal lets go (in step with the fall) */
+.pf.out{animation:pout .6s ease .7s both}
+@keyframes pout{to{opacity:0;transform:scale(.55)}}
+/* regrowth: one pip at a time, 0.3 s apart, small spring, plays once (Replay button re-runs it) */
+.pf.in{animation:grow .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * .3s + .3s)}
 @keyframes grow{0%{transform:scale(.15);opacity:0}100%{transform:scale(1);opacity:1}}
-.rest{position:absolute;left:224px;top:458px;width:22px;height:22px;z-index:5;display:none;transform:rotate(70deg);pointer-events:none}
+/* one of Daisy's own petals lets go: lifts, drifts down once through the rain (3.4 s), blushes love pink, and rests on the ground. Never loops. */
+.fall{transform-box:fill-box;transform-origin:50% 50%;animation:fall 3.4s cubic-bezier(.45,.05,.55,.95) .6s both}
+@keyframes fall{0%{transform:translate(0,0) rotate(0)}10%{transform:translate(calc(var(--ox)*1px),calc(var(--oy)*1px)) rotate(6deg)}38%{transform:translate(calc(var(--dx)*.45px + 14px),calc(var(--dy)*.32px)) rotate(calc(var(--r)*.6deg + 20deg))}68%{transform:translate(calc(var(--dx)*.5px - 8px),calc(var(--dy)*.7px)) rotate(calc(var(--r)*.3deg - 10deg))}100%{transform:translate(calc(var(--dx)*1px),calc(var(--dy)*1px)) rotate(calc(var(--r)*1deg)) scale(.78)}}
+.fall ellipse{stroke-width:1.5;animation:blush 3.4s ease .6s both}
+@keyframes blush{0%,12%{fill:#FFFFFF;stroke:#E3DAC4}70%,100%{fill:var(--rest);stroke:var(--petal-edge)}}
 .ground{position:absolute;left:0;right:0;top:440px;height:110px;background:linear-gradient(transparent,color-mix(in srgb,var(--soil) 18%,transparent) 45%,transparent);z-index:1}
 .hint{position:absolute;left:0;right:0;top:606px;text-align:center;font-weight:700;font-size:14px;color:var(--txt2);z-index:6;pointer-events:none}
 .hint i{display:inline-block;color:var(--heart);animation:pulse 1.8s ease-in-out infinite;font-style:normal}
@@ -62,15 +72,21 @@ canvas.back{z-index:2}canvas.front{z-index:5}
 @keyframes zz{0%,100%{transform:translateY(0);opacity:.9}50%{transform:translateY(-5px);opacity:.5}}
 .wake{position:absolute;left:40px;right:40px;top:640px;text-align:center;display:block;background:var(--card);border-radius:20px;padding:12px 14px;font-size:16px;font-weight:800;box-shadow:0 0 0 3px var(--leaf),var(--shadow);z-index:7;color:var(--text);text-decoration:none;min-height:44px}
 .wake span{display:block;color:var(--txt2);font-weight:600;font-size:13px}
-/* words badges: under Daisy, clear of the cloud and crown */
-.badge{display:none;position:absolute;top:524px;left:50%;transform:translateX(-50%);white-space:nowrap;gap:6px;align-items:center;background:var(--glass);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;z-index:9;box-shadow:0 0 0 1px var(--line),var(--shadow);pointer-events:none}
+/* words badges: under the love petals row, above the hint */
+.badge{display:none;position:absolute;top:558px;left:50%;transform:translateX(-50%);white-space:nowrap;gap:6px;align-items:center;background:var(--glass);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;z-index:9;box-shadow:0 0 0 1px var(--line),var(--shadow);pointer-events:none}
 .calmchip{position:absolute;top:124px;left:50%;transform:translateX(-50%);white-space:nowrap;display:flex;gap:6px;align-items:center;background:var(--glass);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:800;z-index:9;box-shadow:0 0 0 1px var(--line),var(--shadow);pointer-events:none}
 /* reduced motion: JS adds .still; the media query covers the time before JS runs */
-.still .sway,.still .hint i,.still #seed,.still .z,.still .pet.grow{animation:none}
-.still .fall,.still .lovefly,.still canvas.rain,.still .flash,.still .bolt{display:none}
-.still.rainy .rest{display:block}.still.rainy .badge{display:flex}
-@media (prefers-reduced-motion:reduce){.sway,.hint i,#seed,.z,.pet.grow{animation:none!important}
- .fall,.lovefly,canvas.rain,.flash,.bolt{display:none!important}.rainy .rest{display:block}.rainy .badge{display:flex}}
+/* Reduce Motion: no drift. The petal just fades in where it rests on the ground, the pip fades, regrown pips simply appear */
+.still .sway,.still .hint i,.still #seed,.still .z,.still .pf.in{animation:none}
+.still .fall{animation:restin .6s ease both}.still .fall ellipse{animation:none;fill:var(--rest);stroke:var(--petal-edge)}
+.still .pf.out{animation:fade .6s ease both}
+@keyframes restin{0%{opacity:0;transform:translate(calc(var(--dx)*1px),calc(var(--dy)*1px)) rotate(calc(var(--r)*1deg)) scale(.78)}100%{opacity:1;transform:translate(calc(var(--dx)*1px),calc(var(--dy)*1px)) rotate(calc(var(--r)*1deg)) scale(.78)}}
+@keyframes fade{to{opacity:0}}
+.still .lovefly,.still canvas.rain,.still .flash,.still .bolt{display:none}
+.still.rainy .badge{display:flex}
+@media (prefers-reduced-motion:reduce){.sway,.hint i,#seed,.z,.pf.in{animation:none!important}
+ .fall{animation:restin .6s ease both!important}.fall ellipse{animation:none!important;fill:var(--rest);stroke:var(--petal-edge)}.pf.out{animation:fade .6s ease both!important}
+ .lovefly,canvas.rain,.flash,.bolt{display:none!important}.rainy .badge{display:flex}}
 /* side panel */
 .panel{position:absolute;left:12px;top:150px;width:110px;background:var(--glass);border-radius:22px;box-shadow:0 0 0 1px var(--line),var(--shadow);padding:8px 9px 10px;z-index:8;font-size:12.5px;transform-origin:0 50%;transition:transform .24s cubic-bezier(.34,1.3,.64,1),opacity .2s ease,visibility 0s}
 .panel h2{margin:0;font-size:15px;white-space:nowrap;font-weight:800;display:flex;align-items:center;justify-content:space-between}
@@ -89,8 +105,8 @@ canvas.back{z-index:2}canvas.front{z-index:5}
 .path u.now{box-shadow:0 0 0 3px var(--leaf);background:var(--card);color:var(--text)}
 .love{margin-top:8px;border-top:1px solid var(--line);padding-top:7px}
 .hearts{display:flex;gap:0;margin:3px 0}.hearts svg{width:18px;height:18px}
-.love small.key{display:flex;gap:4px;align-items:flex-start;margin-top:5px;color:var(--text)}
-.love small.key svg{width:14px;height:14px;flex:none;margin-top:1px}
+.love .key{margin-top:6px}.love .key small{color:var(--text)}
+.love .key .pips{gap:3px;margin-bottom:2px}.love .key .lf{width:14px;height:14px;margin-right:2px}.love .key .pip{width:10px;height:14px}
 /* minimised: a plain button set in from the edge (clear of the system back swipe), fades in as the panel shrinks to it */
 .tab{position:absolute;left:12px;top:300px;width:48px;height:92px;border:0;border-radius:24px;background:var(--glass);box-shadow:0 0 0 1px var(--line),var(--shadow);z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text);font:inherit;font-size:12px;font-weight:800;cursor:pointer;opacity:0;visibility:hidden;transform:translateX(-6px);transition:opacity .2s ease .06s,transform .24s ease .06s,visibility 0s .3s}
 .tab svg{width:24px;height:24px}
@@ -104,9 +120,9 @@ canvas.back{z-index:2}canvas.front{z-index:5}
 .act svg{width:28px;height:28px}.act.glow{box-shadow:0 0 0 3px var(--leaf),var(--shadow)}
 /* accessibility text size: Life sheet in the middle, actions pinned below as a 2x2 bar (safeAreaInset) */
 .ax .title{font-size:36px}.ax .mood{font-size:20px}
-.ax .plant{top:182px;width:132px;height:132px;margin-left:-66px}
-.ax .crown{top:-42px;left:46px;width:40px;height:40px}
-.ax .ground{top:270px;height:70px}
+.ax .plant{top:146px;width:132px;height:132px;margin-left:-66px}
+.ax .lovebar{top:270px;padding:5px 13px 5px 10px}.ax .lovebar .pips{gap:5px}.ax .lovebar .lf{width:24px;height:24px}.ax .lovebar .pip{width:17px;height:24px}
+.ax .ground{top:234px;height:70px}
 .ax .hint{top:316px;font-size:18px}
 .sheet{position:absolute;left:0;right:0;top:354px;bottom:180px;background:var(--glass);border-radius:30px 30px 0 0;box-shadow:0 0 0 1px var(--line),0 -6px 18px rgba(44,62,44,.14);padding:8px 20px 16px;z-index:8;font-size:19px;overflow:auto;transition:transform .26s ease}
 .ax.minimised .sheet{transform:translateY(240px);overflow:hidden}
@@ -117,7 +133,7 @@ canvas.back{z-index:2}canvas.front{z-index:5}
 .sheet .m{margin:10px 0}.sheet .m b{font-size:21px;gap:10px}.sheet .m svg{width:32px;height:32px}
 .sheet .trk{height:14px;border-radius:7px}.sheet .m small,.sheet .love small,.sheet .grow-l small{font-size:18px}
 .sheet .path u{width:28px;height:28px}.sheet .path u svg{width:16px;height:16px}.sheet .hearts svg{width:32px;height:32px}
-.sheet .love small.key svg{width:22px;height:22px}
+.sheet .love .key .pips{gap:5px}.sheet .love .key .lf{width:26px;height:26px}.sheet .love .key .pip{width:19px;height:26px}
 .sheet .grow-l,.sheet .love{margin-top:10px;padding-top:10px}
 .ax .acts{left:0;right:0;bottom:0;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 14px 34px;background:var(--glass);box-shadow:0 0 0 1px var(--line),0 -6px 18px rgba(44,62,44,.12);z-index:9}
 .ax .act{flex-direction:row;font-size:20px;gap:10px;min-height:64px}.ax .act svg{width:32px;height:32px}
@@ -125,21 +141,22 @@ canvas.back{z-index:2}canvas.front{z-index:5}
 .lnk{color:var(--text);font-weight:800}
 </style></head><body><div class="wrap">
 <h1>Life stats panel, rain and petals</h1>
-<p class="sub">The plant is Daisy's own art from the app, kept in the centre. The small crown of five pink petals above her is her health, with a heart in the middle: love keeps her petals. After a day with no love, one petal drifts down and a soft rain starts. Any love brings the petals back, one at a time. No numbers, no red, and every state has an icon and words.</p>
+<p class="sub">The plant is Daisy's own art from the app, kept in the centre. Under her sits a small row: a love flower, then five pink petal pips, one for each day of love she has in store. After a day with no love, a soft rain starts, one of her own petals lets go and drifts down to the ground, and one pip turns to a dashed outline. Any love brings the pips back, one at a time. No numbers, no red, and every state has an icon and words.</p>
 <div class="bar"><button class="btn" id="rm" aria-pressed="false">Preview Reduce Motion: off</button><button class="btn" id="th">Toggle dark</button><button class="btn" id="snd" aria-pressed="false">Thunder sound: off</button><button class="btn" id="now">Flash thunder now</button></div>
 <div class="phones" id="ph"></div>
 <div class="notes">
 <h2>The rule (every age)</h2>
 <ul>
-<li><b>24 hours with no love</b>: a soft drizzle starts and the first crown petal drifts down. One more petal each day; the rain gets steadier (drizzle, light rain, then rain with soft far thunder from day four). The same rule for every age.</li>
-<li><b>When the crown has no petals</b>: Daisy tucks herself into her pot as a sleeping seed. Stage, plants, words and streak history are all kept. The rain stops while she sleeps.</li>
-<li><b>Waking</b>: the "Wake Daisy" card opens a short wake-up game (<a class="lnk" href="parts/wake-options.html">wake options</a>). After that, any love (a tap, a word, a tending action) brings a petal back, one at a time.</li>
-<li><b>Calm mode and Quiet Garden</b>: no rain, no petal loss and no seed. The crown stays full (frame 11).</li>
-<li><b>Hearts and petals</b>: hearts are today's love; petals show that love keeps her well. The panel says it in one line, "Love keeps her petals", and the crown has a heart in the middle.</li>
-<li><b>VoiceOver</b>: the plant and mood come first, then (in the seed state) the Wake card, then the panel, one container "Life". Meters read "Water, full". Growth reads "Growing, bloom stage". Hearts read "Love, 2 of 5 hearts". The crown reads "Petals, 3 of 5". Minimise: "Hide Life panel" (aria-expanded true); tab: "Show Life panel" (aria-expanded false). The app remembers the choice. Weather is hidden from VoiceOver; when rain starts there is one announcement, "A rainy day for Daisy."</li>
-<li><b>Reduce Motion</b>: no canvas, no flash, no thunder haptic. A still cloud, a "Gentle rain" badge under Daisy and one petal resting on the ground. The panel fades instead of shrinking.</li>
+<li><b>24 hours with no love</b>: a soft drizzle starts, one of Daisy's own petals lets go and drifts down once (3.4 s) through the rain, blushing love pink, and rests on the ground by her stem. At the same moment one pip in the row fades to a dashed outline. One pip a day; the rain gets steadier (drizzle, light rain, then rain with soft far thunder from day four). The fall plays once a day, never on a loop. The same rule for every age.</li>
+<li><b>When no pink pips stay</b>: Daisy tucks herself into her pot as a sleeping seed. The row under her is hidden; the panel shows five dashed pips. Stage, plants, words and streak history are all kept. The rain stops while she sleeps.</li>
+<li><b>Waking</b>: the "Wake Daisy" card opens a short wake-up game (<a class="lnk" href="parts/wake-options.html">wake options</a>). After that, any love (a tap, a word, a tending action) brings the pips back, one at a time, 0.3 s apart.</li>
+<li><b>Calm mode and Quiet Garden</b>: no rain, no falling petals and no seed. All five pips stay pink (frame 11).</li>
+<li><b>Hearts and petals</b>: hearts are today's love; the pips show how many days of love she has in store. The panel's Love key shows the same five pips with one line, "Love keeps her petals."</li>
+<li><b>The love row</b>: a glass pill under Daisy, clear of the cloud, the rain band (drops land above it), the Life panel and the action buttons. Filled pip: love pink with a deeper pink edge. Pip gone for now: a dashed outline with a faint fill, so it shows in dark mode too. Never red, no numbers.</li>
+<li><b>VoiceOver</b>: the plant and mood come first, then (in the seed state) the Wake card, then the panel, one container "Life". Meters read "Water, full". Growth reads "Growing, bloom stage". Hearts read "Love, 2 of 5 hearts". Daisy reads "Daisy, 3 of 5 love petals" (the row under her is part of that one element). The panel key reads "3 of 5 love petals. Love keeps her petals." Minimise: "Hide Life panel" (aria-expanded true); tab: "Show Life panel" (aria-expanded false). The app remembers the choice. Weather is hidden from VoiceOver; when rain starts there is one announcement, "A rainy day for Daisy."</li>
+<li><b>Reduce Motion</b>: no canvas, no flash, no thunder haptic. A still cloud and a "Gentle rain" badge under the love row. Today's petal does not drift: it fades in where it rests on the ground, and its pip fades. Regrown pips simply appear. The panel fades instead of shrinking.</li>
 <li><b>Dynamic Type</b>: at accessibility sizes the panel becomes a Life sheet that scrolls, and Water, Feed, Sun and Repot stay pinned below it as a 2 by 2 bar (64 pt tall each). Daisy moves up, stays centred and stays tappable.</li>
-<li><b>Taps</b>: the crown, cloud, rain, badges and floating hearts never catch taps (allowsHitTesting(false)), so a tap anywhere on Daisy reaches her.</li>
+<li><b>Taps</b>: the love row, the falling petal, cloud, rain, badges and floating hearts never catch taps (allowsHitTesting(false)), so a tap anywhere on Daisy reaches her.</li>
 </ul>
 <h2>Thunder (from parts/weather.html)</h2>
 <ul>
@@ -164,16 +181,19 @@ const HEART='M12 21C4 15 3 11 3 8.5A4.5 4.5 0 0112 7a4.5 4.5 0 019 1.5C21 11 20 
 const H=f=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${HEART}" fill="${f?'var(--heart)':'none'}" stroke="var(--heart)" stroke-width="2"/></svg>`;
 // FlowerView petal (parts/flower.svg), five slots at 72 degrees round (100,88)
 const PET='M100 74 C81 62 83 30 100 20 C117 30 119 62 100 74Z';
-const petalIcon=`<svg viewBox="78 16 44 62" aria-hidden="true"><path class="pet" d="${PET}"/></svg>`;
-function crown(n,mode){ // n petals kept; 'fall' animates slot n dropping, 'grow' regrows slots 0..n-1 one by one
- let s=`<svg class="crown${mode==='grow'?' regrow':''}" viewBox="28 16 144 144" role="img" aria-label="Petals, ${n} of 5">`;
- for(let i=0;i<5;i++){const r=`rotate(${i*72} 100 88)`;
-  if(mode==='fall'&&i===n)s+=`<g transform="${r}"><path class="ghost" d="${PET}"/></g><g class="fall"><g transform="${r}"><path class="pet" d="${PET}"/></g></g>`;
-  else if(mode==='grow'&&i<n)s+=`<g transform="${r}"><path class="ghost" d="${PET}"/><path class="pet grow" style="--i:${i}" d="${PET}"/></g>`;
-  else s+=`<g transform="${r}"><path class="${i<n?'pet':'ghost'}" d="${PET}"/></g>`}
- return s+`<path d="${HEART}" transform="translate(86 75) scale(1.17)" fill="var(--heart)"/></svg>`}
-const rest=`<svg class="rest" viewBox="78 16 44 62" aria-hidden="true"><path class="pet" d="${PET}"/></svg>`;
-const daisy=c=>`<div class="plant sway"><img src="../plants/plant_daisy.svg" alt="Daisy">${c}</div>`;
+// small love flower that starts every pip row, so the row reads as "Love"
+const FLOWER=`<svg class="lf" viewBox="30 18 140 140" aria-hidden="true">${[0,1,2,3,4].map(i=>`<path d="${PET}" transform="rotate(${i*72} 100 88)" fill="var(--petal)" stroke="var(--petal-edge)" stroke-width="7" stroke-linejoin="round"/>`).join('')}<circle cx="100" cy="88" r="18" fill="#F2B632" stroke="#D48E1B" stroke-width="5"/></svg>`;
+// five pips, one per day of love. n = pips kept. 'fall': pip n empties today. 'grow': pips 0..n-1 come back one by one
+function pips(n,mode){let s=`<span class="pips" aria-hidden="true">${FLOWER}`;
+ for(let i=0;i<5;i++){const f=mode==='fall'&&i===n,on=i<n;
+  s+=`<svg class="pip" viewBox="78 16 44 62"><path class="pg" d="${PET}"/>${on||f?`<path class="pf${f?' out':''}${mode==='grow'&&on?' in':''}" style="--i:${i}" d="${PET}"/>`:''}</svg>`}
+ return s+'</span>'}
+const loveBar=(n,mode)=>`<div class="lovebar">${pips(n,mode)}</div>`;
+// one of Daisy's own 16 white petals (same ellipse as plant_daisy.svg) lets go and drifts to the ground beside her stem.
+// a = the petal's angle on her head; the drift ends lying flat at (136,171) in her 200 box, on the ground shadow
+function fallingPetal(a){const t=a*Math.PI/180,cx=100+23*Math.sin(t),cy=76-23*Math.cos(t),dx=(136-cx).toFixed(1),dy=(171-cy).toFixed(1);
+ return `<g class="fall" style="--dx:${dx};--dy:${dy};--r:${90-a};--ox:${(4*Math.sin(t)).toFixed(1)};--oy:${(-4*Math.cos(t)).toFixed(1)}"><ellipse cx="100" cy="53" rx="5.8" ry="21" fill="#FFFFFF" stroke="#E3DAC4" transform="rotate(${a} 100 76)"/></g>`}
+const daisy=(n,mode,a)=>`<div class="plant sway" role="img" aria-label="Daisy, ${n} of 5 love petals"><img src="../plants/plant_daisy.svg" alt=""><svg class="lp" viewBox="0 0 200 200" aria-hidden="true">${mode==='fall'?fallingPetal(a):''}</svg></div>`;
 const seedPot=`<svg class="pot" viewBox="0 0 140 150" role="img" aria-label="Daisy, resting as a seed in her pot">
 <ellipse cx="70" cy="136" rx="48" ry="7" fill="#2C3E2C" opacity=".16"/><path d="M28 78h84l-9 54a8 8 0 01-8 6H45a8 8 0 01-8-6z" fill="#C8734A"/><path d="M36 90h14l-3 40H42z" fill="#fff" opacity=".12"/><rect x="20" y="64" width="100" height="20" rx="9" fill="#DD8C63"/><ellipse cx="70" cy="66" rx="42" ry="7" fill="#7A5238"/>
 <g id="seed"><ellipse cx="70" cy="55" rx="12" ry="16" fill="#C9A15F" stroke="#7A5238" stroke-width="2.5"/><path d="M70 41v26" stroke="#7A5238" stroke-width="2" stroke-linecap="round"/><path d="M63 52q3 3 6 0M71 52q3 3 6 0" stroke="#4A3220" stroke-width="1.8" fill="none" stroke-linecap="round"/><ellipse cx="62" cy="58" rx="2.6" ry="1.8" fill="#E0627F" opacity=".5"/><ellipse cx="78" cy="58" rx="2.6" ry="1.8" fill="#E0627F" opacity=".5"/></g>
@@ -185,7 +205,7 @@ const stages=['Tiny','Sprout','Bud','Bloom'];
 const growth=(i,seed)=>`<div class="grow-l" role="img" aria-label="Growing, ${stages[i].toLowerCase()} stage${seed?', kept safe while she rests':''}"><b>Growing</b><div class="path">${stages.map((t,k)=>`<u class="${k<i?'done':''}${k==i?'now':''}">${k<i?ic.tick:(k==i?ic.here:'')}</u>`).join('')}</div><small>${seed?stages[i]+' kept safe':stages[i]+' stage'}</small></div>`;
 function inner(o,tag){const p=o.p;return `<h2>Life<button class="min" aria-label="Hide Life panel" aria-expanded="true">${tag==='sheet'?ic.chevD:ic.chevL}</button></h2>
 ${meter('Water','water','--water',p.w,p.wl)}${meter('Sunshine','sun','--sun',p.s,p.sl)}${meter('Happiness','happy','--leaf-fill',p.h,p.hl)}
-${growth(p.st,o.seed)}<div class="love"><div role="img" aria-label="Love, ${p.love} of 5 hearts. ${p.ll}"><b>Love</b><div class="hearts">${[0,1,2,3,4].map(i=>H(i<p.love)).join('')}</div><small>${p.ll}</small></div><small class="key">${petalIcon}<span>Love keeps her petals.</span></small></div>`}
+${growth(p.st,o.seed)}<div class="love"><div role="img" aria-label="Love, ${p.love} of 5 hearts. ${p.ll}"><b>Love</b><div class="hearts">${[0,1,2,3,4].map(i=>H(i<p.love)).join('')}</div><small>${p.ll}</small></div><div class="key" role="img" aria-label="${o.n} of 5 love petals. Love keeps her petals.">${pips(o.n,o.mode)}<small>Love keeps her petals.</small></div></div>`}
 const panel=o=>`<aside class="panel" aria-label="Life">${inner(o)}</aside>`;
 const sheet=o=>`<aside class="sheet" aria-label="Life"><div class="grab"></div>${inner(o,'sheet')}</aside>`;
 const tab=falling=>`<button class="tab" aria-label="Show Life panel${falling?', a petal is falling':''}" aria-expanded="false" inert>${H(true)}<span>Life</span>${falling?`<svg class="dot" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="var(--petal)" stroke="var(--petal-edge)" stroke-width="1.5"/></svg>`:''}</button>`;
@@ -194,32 +214,32 @@ const badge=d=>`<div class="badge" aria-hidden="true">${ic.water.replace('viewBo
 let fid=0;
 function phone(cap,sub,o){
  const rain=o.day>0&&!o.seed&&!o.calm, cls=['phone',rain?'rainy':'',o.day>=4&&rain?'storm':'',o.rm?'still force':'',o.ax?'ax':'',o.min?'minimised':''].join(' ');
- const crownMode=o.grow?'grow':(rain?'fall':''), id='f'+(++fid);
+ o.mode=o.grow?'grow':(rain?'fall':''); const id='f'+(++fid);
  const pnl=o.ax?sheet(o):panel(o)+tab(rain);
  return `<div><div class="${cls}" id="${id}" data-day="${rain?o.day:0}" ${o.dark?'data-theme="dark"':''}><div class="sbar"><span>9:41</span><span>100%</span></div><div class="title">Daisy</div><div class="mood">${o.mood}</div>
  <div class="sheen"></div><div class="ground"></div>${rain?'<canvas class="rain back" aria-hidden="true"></canvas><canvas class="rain front" aria-hidden="true"></canvas>'+cloud:''}
  ${o.calm?`<div class="calmchip" aria-hidden="true">${ic.happy.replace('viewBox','width="18" height="18" viewBox')}Quiet Garden is on</div>`:''}
- ${o.seed?seedPot:daisy(crown(o.n,crownMode))}${rain?rest:''}${o.grow?'<span class="lovefly" aria-hidden="true">&#9829;</span>':''}
+ ${o.seed?seedPot:daisy(o.n,o.mode,o.a||67.5)+loveBar(o.n,o.mode)}${o.grow?'<span class="lovefly" aria-hidden="true">&#9829;</span>':''}
  <div class="hint" role="note"><i aria-hidden="true">&#9825;</i> ${o.hint}</div>
  ${rain?badge(o.day):''}<div class="flash"></div>
- ${o.wake?`<a class="wake" href="parts/wake-options.html">Wake Daisy<span>Pick one you like.</span></a>`:''}${pnl}${acts(o.glow)}</div><p class="cap">${cap}<small>${sub}</small>${o.grow?`<button class="replay" data-for="${id}">Replay petals</button>`:''}</p></div>`}
+ ${o.wake?`<a class="wake" href="parts/wake-options.html">Wake Daisy<span>Pick one you like.</span></a>`:''}${pnl}${acts(o.glow)}</div><p class="cap">${cap}<small>${sub}</small>${o.mode?`<button class="replay" data-for="${id}">${o.grow?'Replay petals':'Replay the petal'}</button>`:''}</p></div>`}
 const P=(w,wl,s,sl,h,hl,love,ll,st=3)=>({w,wl,s,sl,h,hl,love,ll,st});
 const T=P(90,'Full',85,'Bright',90,'Happy',5,'Loved');
 const D1=P(75,'Good',60,'Cloudy',60,'Cosy',2,'Hello soon?');
 const D3=P(55,'Sipping',45,'Cloudy',45,'Cosy',1,'Hellos help');
 const D4=P(45,'Sipping',35,'Sun is coming',35,'Cosy',0,'Ready for a hello');
 document.getElementById('ph').innerHTML=[
-phone('1. Thriving','Daisy\'s own art with her full crown of five petals. Panel open.',{n:5,mood:'Daisy is so happy',hint:'Tap Daisy to give love',p:T}),
-phone('2. Day 1 with no love','A soft drizzle falls from the bottom of the cloud. The first petal drifts down. Far drops pass behind Daisy, near drops in front.',{day:1,n:4,mood:'Daisy would love a hello',hint:'A tap brings the sun back',glow:'water',p:D1}),
-phone('3. Day 3 with no love','Light rain. Two petals stay, one more drifts down.',{day:3,n:2,mood:'Daisy is dreaming of sun',hint:'Every hello brings a petal back',p:D3}),
-phone('4. Day 4: soft thunder','Steadier rain and a gentle flash every 8 to 15 s (try Flash thunder now). One petal stays.',{day:4,n:1,mood:'Daisy is cosy under the clouds',hint:'One hello brightens the sky',p:D4}),
+phone('1. Thriving','Daisy\'s own art. Under her, the love row: a small flower and five pink petals. Panel open.',{n:5,mood:'Daisy is so happy',hint:'Tap Daisy to give love',p:T}),
+phone('2. Day 1 with no love','A soft drizzle falls from the bottom of the cloud. One of Daisy\'s own petals lets go, drifts down once through the rain and rests on the ground. The fifth pip fades to a dashed outline.',{day:1,n:4,a:67.5,mood:'Daisy would love a hello',hint:'A tap brings the sun back',glow:'water',p:D1}),
+phone('3. Day 3 with no love','Light rain. Two pink pips stay; today\'s petal drifts down from her head.',{day:3,n:2,a:90,mood:'Daisy is dreaming of sun',hint:'Every hello brings a petal back',p:D3}),
+phone('4. Day 4: soft thunder','Steadier rain and a gentle flash every 8 to 15 s (try Flash thunder now). One pink pip stays.',{day:4,n:1,a:112.5,mood:'Daisy is cosy under the clouds',hint:'One hello brightens the sky',p:D4}),
 phone('5. Day 5: seed in a pot','Daisy rests as a seed. Growth and progress are kept. The rain stops while she sleeps.',{seed:true,n:0,mood:'Daisy is resting in her seed',hint:'She is safe and cosy',wake:true,p:P(35,'Resting',35,'Resting',35,'Resting',0,'Ready for you',3)}),
-phone('6. Love comes back','After waking, love brings her petals back one by one, 0.3 s apart.',{n:3,grow:true,mood:'Her petals are coming back',hint:'Keep the love coming',p:P(80,'Good',70,'Warming up',75,'Happy',3,'Blooming')}),
+phone('6. Love comes back','After waking, love brings her pink pips back one by one, 0.3 s apart, in the row and in the panel.',{n:3,grow:true,mood:'Her petals are coming back',hint:'Keep the love coming',p:P(80,'Good',70,'Warming up',75,'Happy',3,'Blooming')}),
 phone('7. Panel minimised','A small Life button, set in from the screen edge. The pink dot means a petal is falling. Daisy stays centred.',{day:1,n:4,min:true,mood:'Daisy would love a hello',hint:'A tap brings the sun back',p:D1}),
 phone('8. Dark mode','Day 4 in dark: lighter drops, a dimmer flash (10 percent).',{day:4,n:1,dark:true,mood:'Daisy is cosy under the clouds',hint:'One hello brightens the sky',p:D4}),
-phone('9. Reduce Motion','Day 3, still: the cloud, a words badge under Daisy and one petal resting on the ground. No flash.',{day:3,n:2,rm:true,mood:'Daisy is dreaming of sun',hint:'Every hello brings a petal back',p:D3}),
-phone('10. Accessibility text size','The Life sheet has big rows and scrolls. Water, Feed, Sun and Repot stay pinned below as a 2 by 2 bar.',{n:5,ax:true,mood:'Daisy is so happy',hint:'Tap Daisy to give love',p:T}),
-phone('11. Calm mode or Quiet Garden','Three days with no love, but Calm is on: no rain, no petal loss, no seed. All five petals stay.',{day:3,calm:true,n:5,mood:'Daisy is happy and calm',hint:'Tap Daisy to give love',p:P(75,'Good',60,'Warming up',70,'Happy',2,'Hello soon?')})
+phone('9. Reduce Motion','Day 3, still: the cloud, a words badge, and today\'s petal fades in where it rests on the ground. No drift, no flash.',{day:3,n:2,a:90,rm:true,mood:'Daisy is dreaming of sun',hint:'Every hello brings a petal back',p:D3}),
+phone('10. Accessibility text size','Daisy moves up so the bigger love row fits under her, above the hint. The Life sheet has big rows and scrolls. Water, Feed, Sun and Repot stay pinned below as a 2 by 2 bar.',{n:5,ax:true,mood:'Daisy is so happy',hint:'Tap Daisy to give love',p:T}),
+phone('11. Calm mode or Quiet Garden','Three days with no love, but Calm is on: no rain, no falling petals, no seed. All five pink pips stay.',{day:3,calm:true,n:5,mood:'Daisy is happy and calm',hint:'Tap Daisy to give love',p:P(75,'Good',60,'Warming up',70,'Happy',2,'Hello soon?')})
 ].join('');
 
 /* Weather: adapted from parts/weather.js for many phones. Drops are born under the cloud's real bottom edge. */
@@ -280,8 +300,7 @@ setTimeout(()=>wx.forEach(w=>flash(w)),2500); // first gentle flash shortly afte
 
 // panel minimise / restore: the panel shrinks into the Life button (fade only with Reduce Motion)
 document.getElementById('ph').addEventListener('click',e=>{const ph=e.target.closest('.phone');
- const rp=e.target.closest('.replay');if(rp){const c=document.querySelector('#'+rp.dataset.for+' .crown');c.classList.remove('regrow');void c.getBoundingClientRect();c.classList.add('regrow');
-  c.querySelectorAll('.pet.grow').forEach(p=>{p.style.animation='none';void p.getBoundingClientRect();p.style.animation=''});return}
+ const rp=e.target.closest('.replay');if(rp){document.querySelectorAll('#'+rp.dataset.for+' .pf.in,#'+rp.dataset.for+' .pf.out,#'+rp.dataset.for+' .fall,#'+rp.dataset.for+' .fall ellipse').forEach(p=>{p.style.animation='none';void p.getBoundingClientRect();p.style.animation=''});return}
  if(!ph)return;const mn=e.target.closest('.min'),tb=e.target.closest('.tab');if(!mn&&!tb)return;
  const m=ph.querySelector('.min');
  if(ph.classList.contains('ax')){const on=ph.classList.toggle('minimised');m.setAttribute('aria-expanded',!on);m.setAttribute('aria-label',on?'Show Life panel':'Hide Life panel');return}

@@ -1,0 +1,141 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Crown Options</title>
+<link rel="stylesheet" href="../../theme.css"><script src="../../theme.js"></script>
+<style>
+/* tokens copied from lifestats.html so the options sit in the same world */
+:root,[data-theme=light]{--leaf:#9BCB3C;--leaf-ink:#22331A;--leaf-fill:#5E8F1F;--water:#3F86C9;--sun:#B87F00;--heart:#D9506F;--soil:#7A5238;--card:#FFFFFF;--txt2:#4F5F4F;--glass:rgba(255,255,255,.94);
+ --cloud:#B9C6CE;--cloud-edge:#9FB1BC;--drop:70,110,150;--sheen:#9fb8c84d;--petal:#F2788A;--petal-edge:#D9566C;--ghost:#7C867C;--zz:#2C3E2C}
+[data-theme=dark]{--leaf:#A8D84A;--leaf-ink:#1A2E1A;--leaf-fill:#A8D84A;--water:#7DB6EE;--sun:#F6C85A;--heart:#F08AA3;--soil:#A47550;--card:#2C3E2C;--txt2:#B9D0B9;--glass:rgba(44,62,44,.95);
+ --cloud:#71818B;--cloud-edge:#5A6972;--drop:170,200,230;--sheen:#2a3d5566;--petal:#F58A9B;--petal-edge:#E06B80;--ghost:#A9B8A9;--zz:#D4EDD4}
+body{line-height:1.45;background:var(--bg)}
+.wrap{max-width:1560px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:30px;margin:0}h2.opt{font-size:22px;margin:34px 0 4px}.sub{color:var(--txt2);max-width:85ch;margin:4px 0 14px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 10px}
+.btn,.replay{font:inherit;font-weight:800;border:0;border-radius:999px;min-height:44px;padding:10px 18px;background:var(--leaf);color:var(--leaf-ink);cursor:pointer}
+.replay{font-size:14px;padding:8px 16px;margin-top:6px;background:color-mix(in srgb,var(--leaf) 35%,transparent);color:var(--text)}
+.phones{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.phone{width:390px;height:844px;border:10px solid #22301f;border-radius:52px;box-sizing:content-box;overflow:hidden;position:relative;background:var(--bg);color:var(--text);box-shadow:var(--shadow);flex:none}
+.cap{margin:10px 0 0;font-weight:700;max-width:390px}.cap small{display:block;font-weight:500;color:var(--txt2)}
+.sbar{height:44px;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 4px;font-size:13px;font-weight:700}
+.title{font-size:28px;font-weight:800;padding:6px 22px 0;text-align:center}
+.mood{text-align:center;color:var(--txt2);font-size:15px;font-weight:700;min-height:22px;padding:0 20px}
+.sheen{position:absolute;inset:0;pointer-events:none}.rainy .sheen{background:linear-gradient(var(--sheen),transparent 62%)}
+.ground{position:absolute;left:0;right:0;top:440px;height:110px;background:linear-gradient(transparent,color-mix(in srgb,var(--soil) 18%,transparent) 45%,transparent);z-index:1}
+.cloud{position:absolute;left:105px;top:112px;width:180px;height:101px;overflow:visible;z-index:3;pointer-events:none}
+.cloud .c1{fill:var(--cloud);stroke:var(--cloud-edge)}.cloud .c2{fill:var(--cloud)}
+svg.rain{position:absolute;left:0;top:0;width:390px;height:844px;pointer-events:none}
+svg.rain line{stroke:rgb(var(--drop));stroke-linecap:round}
+svg.rain.back{z-index:2;opacity:.35}svg.rain.front{z-index:5;opacity:.6}
+.plant{position:absolute;left:50%;margin-left:-110px;top:270px;width:220px;height:220px;z-index:4;transform-origin:50% 88%}
+.plant img{width:100%;height:100%;display:block}
+.plant>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
+.sway{animation:sway 6s ease-in-out infinite}@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+.hint{position:absolute;left:0;right:0;top:606px;text-align:center;font-weight:700;font-size:14px;color:var(--txt2);z-index:6;pointer-events:none}
+.hint i{color:var(--heart);font-style:normal}
+.pot{position:absolute;left:50%;margin-left:-85px;top:300px;width:170px;height:182px;overflow:visible;z-index:4}
+.wake{position:absolute;left:40px;right:40px;top:640px;text-align:center;display:block;background:var(--card);border-radius:20px;padding:12px 14px;font-size:16px;font-weight:800;box-shadow:0 0 0 3px var(--leaf),var(--shadow);z-index:7;color:var(--text);text-decoration:none}
+.wake span{display:block;color:var(--txt2);font-weight:600;font-size:13px}
+/* simplified Life panel (same size and place as lifestats.html) */
+.panel{position:absolute;left:12px;top:150px;width:110px;background:var(--glass);border-radius:22px;box-shadow:0 0 0 1px var(--line),var(--shadow);padding:8px 9px 10px;z-index:8;font-size:12.5px}
+.panel h3{margin:0 0 4px;font-size:15px}
+.m{margin:7px 0}.m b{font-size:12.5px}.trk{height:9px;border-radius:5px;background:color-mix(in srgb,var(--text) 12%,transparent);margin-top:3px;overflow:hidden}
+.trk i{display:block;height:100%;border-radius:5px;background:var(--c);width:var(--w)}
+.panel small{display:block;color:var(--txt2);font-weight:600;font-size:12px;line-height:1.25}
+.love{margin-top:8px;border-top:1px solid var(--line);padding-top:7px}.hearts svg{width:18px;height:18px}
+.acts{position:absolute;left:14px;right:14px;bottom:30px;display:flex;gap:8px;z-index:9}
+.act{flex:1;min-height:64px;border-radius:20px;background:var(--card);box-shadow:0 0 0 1px var(--line),var(--shadow);display:grid;place-items:center;font-weight:800;font-size:13px}
+
+/* shared petal styles */
+.pet{fill:var(--petal);stroke:var(--petal-edge);stroke-width:2;stroke-linejoin:round}
+.ghost{fill:color-mix(in srgb,var(--ghost) 10%,transparent);stroke:var(--ghost);stroke-width:1.6;stroke-dasharray:3.2 2.6;stroke-linejoin:round}
+/* fall: plays ONCE (one petal per day, not a loop), pivot at the petal's centre, drifts to the ground and stays there */
+.drop{transform-box:fill-box;transform-origin:50% 50%;animation:drop 3.4s cubic-bezier(.45,.05,.55,.95) .6s both}
+@keyframes drop{0%{transform:translate(0,0) rotate(0)}30%{transform:translate(14px,40px) rotate(40deg)}60%{transform:translate(-10px,86px) rotate(-15deg)}100%{transform:translate(6px,var(--fy,120px)) rotate(80deg)}}
+/* regrow: from the hub outwards, 0.3 s apart, small spring */
+.grow{transform-box:fill-box;animation:grow .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * .3s + .4s)}
+@keyframes grow{0%{transform:scale(.15);opacity:0}100%{transform:scale(1);opacity:1}}
+@media (prefers-reduced-motion:reduce){.sway,.drop,.grow{animation:none!important}.drop{display:none}}
+
+/* option B: petal chip under Daisy */
+.chip{position:absolute;left:50%;transform:translateX(-50%);top:496px;z-index:6;display:flex;align-items:center;gap:8px;background:var(--glass);border-radius:999px;padding:6px 12px 6px 10px;box-shadow:0 0 0 1px var(--line),var(--shadow);font-size:13px;font-weight:800;white-space:nowrap;pointer-events:none}
+.chip svg{width:96px;height:22px;overflow:visible}
+.chip .hrt,.chip .hrt svg{width:16px;height:16px;display:block}
+</style></head><body><div class="wrap">
+<h1>Crown options</h1>
+<p class="sub">Three ways to show Daisy's five love petals without a second flower floating over her head. Each row: thriving (5), day 3 in rain (3, one drifting down once), and resting seed. Light and dark. Same rain, panel and copy rules as lifestats.html. Tap Replay to see the fall or the regrowth again.</p>
+<p class="sub"><b>Owner's choice: B, refined</b>, and it is now built in <a href="../lifestats.html" style="color:var(--text);font-weight:800">lifestats.html</a> and wake-options.html: a love row under Daisy (small flower plus five pips, no words), and one of Daisy's own petals drifting down once a day from A. C (blush) was turned down. Notes in notes/option-b.md.</p>
+<div class="bar"><button class="btn" id="th">Toggle dark</button></div>
+<div id="out"></div>
+</div>
+<script>
+const q=new URLSearchParams(location.search);
+const PET='M100 74 C81 62 83 30 100 20 C117 30 119 62 100 74Z'; // FlowerView petal, hub (100,88), length 54
+const HEART='M12 21C4 15 3 11 3 8.5A4.5 4.5 0 0112 7a4.5 4.5 0 019 1.5C21 11 20 15 12 21z';
+const H=f=>`<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${HEART}" fill="${f?'var(--heart)':'none'}" stroke="var(--heart)" stroke-width="2"/></svg>`;
+// symmetric keep order: centre stays longest, outer ends go first (right then left), so 3 and 1 stay balanced
+const KEEP=[2,1,3,0,4]; const kept=n=>new Set(KEEP.slice(0,n));
+const fallingSlot=n=>KEEP[n]; // the slot that drops on the day n is reached
+
+/* Option A: halo arc. Five petals fanned over Daisy's head, pointing out from HER centre (100,76 in her 200 box), so they read as part of her */
+function halo(n,mode){const k=kept(n),ang=[-56,-28,0,28,56];let s=`<svg viewBox="0 0 200 200" role="img" aria-label="Love petals, ${n} of 5">`;
+ // a petal path scaled to 0.42, placed with its base 52 units out from her centre
+ ang.forEach((a,i)=>{const g=`transform="rotate(${a} 100 76) translate(100 24) scale(.42) translate(-100 -74)"`;
+  const on=k.has(i);
+  if(mode==='fall'&&i===fallingSlot(n))s+=`<g ${g}><path class="ghost" d="${PET}"/></g><g class="drop" style="--fy:150px"><g ${g}><path class="pet" d="${PET}"/></g></g>`;
+  else if(mode==='grow'&&on)s+=`<g ${g}><path class="ghost" d="${PET}"/><path class="pet grow" style="--i:${KEEP.indexOf(i)};transform-origin:50% 100%" d="${PET}"/></g>`;
+  else s+=`<g ${g}><path class="${on?'pet':'ghost'}" d="${PET}"/></g>`});
+ return s+'</svg>'}
+
+/* Option B: a petal chip on the ground under Daisy: five petals in a row plus a heart, out of the rain column */
+function chip(n,mode,seed){const k=kept(n);let s=`<div class="chip" role="img" aria-label="Love petals, ${n} of 5${seed?', they grow back with love':''}"><span class="hrt">${H(true)}</span><svg viewBox="0 0 96 22" aria-hidden="true">`;
+ for(let i=0;i<5;i++){const g=`transform="translate(${i*20+8} 1) scale(.37) translate(-100 -20)"`; const on=seed?false:i<n; // in the chip they fill left to right like the hearts
+  if(mode==='fall'&&i===n)s+=`<g ${g}><path class="ghost" d="${PET}"/></g><g class="drop" style="--fy:40px"><g ${g}><path class="pet" d="${PET}"/></g></g>`;
+  else if(mode==='grow'&&on)s+=`<g ${g}><path class="ghost" d="${PET}"/><path class="pet grow" style="--i:${i};transform-origin:50% 100%" d="${PET}"/></g>`;
+  else s+=`<g ${g}><path class="${on?'pet':'ghost'}" d="${PET}"/></g>`}
+ return s+`</svg><span>${seed?'Grow with love':'Love petals'}</span></div>`}
+
+/* Option C: blush ring on Daisy's own head. Five small pink petals between her yellow centre and her white petals.
+   Her centre is redrawn on top (same colours as plant_daisy.svg) so the pink sits UNDER the disc. */
+function blush(n,mode){const k=kept(n);let s=`<svg viewBox="0 0 200 200" role="img" aria-label="Love petals, ${n} of 5">`;
+ for(let i=0;i<5;i++){const g=`transform="rotate(${(i-2)*72} 100 76) translate(100 55) scale(.44) translate(-100 -74)"`;const on=k.has(i);
+  if(mode==='fall'&&i===fallingSlot(n))s+=`<g class="drop" style="--fy:96px"><g ${g}><path class="pet" d="${PET}"/></g></g>`;
+  else if(mode==='grow'&&on)s+=`<g ${g}><path class="pet grow" style="--i:${KEEP.indexOf(i)};transform-origin:50% 100%" d="${PET}"/></g>`;
+  else if(on)s+=`<g ${g}><path class="pet" d="${PET}"/></g>`}
+ s+=`<circle cx="100" cy="76" r="14" fill="#F2B632"/>`+[[107,76],[101.9,82.7],[94,79.6],[94.9,71.2],[103.3,69.8],[100,76]].map(([x,y],j)=>`<circle cx="${x}" cy="${y}" r="${j==5?2:1.8}" fill="#D48E1B"/>`).join('');
+ return s+'</svg>'}
+
+const cloud=`<svg class="cloud" viewBox="0 0 160 90" aria-hidden="true"><g class="c1" stroke-width="2" stroke-linejoin="round"><circle cx="46" cy="52" r="20"/><circle cx="76" cy="38" r="26"/><circle cx="108" cy="46" r="22"/><circle cx="130" cy="54" r="14"/><rect x="40" y="46" width="90" height="22" rx="11"/></g><g class="c2"><circle cx="46" cy="52" r="18.5"/><circle cx="76" cy="38" r="24.5"/><circle cx="108" cy="46" r="20.5"/><circle cx="130" cy="54" r="12.5"/><rect x="42" y="48" width="86" height="19" rx="9.5"/></g><ellipse cx="70" cy="24" rx="12" ry="5" fill="#fff" opacity=".3"/></svg>`;
+// static seeded rain (screenshots stay the same each run); drops born under the cloud's bottom edge (y 186)
+function rain(cls,count,seed,w){let r=seed,s=`<svg class="rain ${cls}" viewBox="0 0 390 844" aria-hidden="true">`;const R=()=>(r=(r*9301+49297)%233280)/233280;
+ for(let i=0;i<count;i++){const x=134+R()*134,y=192+R()*270,l=10+R()*16;s+=`<line x1="${x}" y1="${y}" x2="${x-l*.08}" y2="${y-l}" stroke-width="${w}"/>`}return s+'</svg>'}
+const seedPot=`<svg class="pot" viewBox="0 0 140 150" role="img" aria-label="Daisy, resting as a seed in her pot"><ellipse cx="70" cy="136" rx="48" ry="7" fill="#2C3E2C" opacity=".16"/><path d="M28 78h84l-9 54a8 8 0 01-8 6H45a8 8 0 01-8-6z" fill="#C8734A"/><rect x="20" y="64" width="100" height="20" rx="9" fill="#DD8C63"/><ellipse cx="70" cy="66" rx="42" ry="7" fill="#7A5238"/><g><ellipse cx="70" cy="55" rx="12" ry="16" fill="#C9A15F" stroke="#7A5238" stroke-width="2.5"/><path d="M70 41v26" stroke="#7A5238" stroke-width="2" stroke-linecap="round"/><path d="M63 52q3 3 6 0M71 52q3 3 6 0" stroke="#4A3220" stroke-width="1.8" fill="none" stroke-linecap="round"/></g><g font-family="-apple-system,system-ui,sans-serif" font-weight="800" fill="var(--zz)"><text x="92" y="42" font-size="16">z</text><text x="105" y="26" font-size="12">z</text></g></svg>`;
+const meter=(n,c,w,l)=>`<div class="m"><b>${n}</b><div class="trk"><i style="--c:var(${c});--w:${w}%"></i></div><small>${l}</small></div>`;
+const panel=(p,love,ll)=>`<aside class="panel" aria-label="Life"><h3>Life</h3>${meter('Water','--water',p[0],p[1])}${meter('Sunshine','--sun',p[2],p[3])}${meter('Happiness','--leaf-fill',p[4],p[5])}<div class="love"><b>Love</b><div class="hearts">${[0,1,2,3,4].map(i=>H(i<love)).join('')}</div><small>${ll}</small></div></aside>`;
+const acts=`<div class="acts" aria-hidden="true"><div class="act">Water</div><div class="act">Feed</div><div class="act">Sun</div><div class="act">Repot</div></div>`;
+
+const STATES={
+ thrive:{n:5,mood:'Daisy is so happy',hint:'Tap Daisy to give love',p:[90,'Full',85,'Bright',90,'Happy'],love:5,ll:'Loved',cap:'Thriving'},
+ day3:{n:2,day:3,mood:'Daisy is dreaming of sun',hint:'Every hello brings a petal back',p:[55,'Sipping',45,'Cloudy',45,'Cosy'],love:1,ll:'Hellos help',cap:'Day 3: rain, 3 petals stay, one drifts down'},
+ grow:{n:3,grow:true,mood:'Her petals are coming back',hint:'Keep the love coming',p:[80,'Good',70,'Warming up',75,'Happy'],love:3,ll:'Blooming',cap:'Love comes back: petals regrow'},
+ seed:{n:0,seed:true,mood:'Daisy is resting in her seed',hint:'She is safe and cosy',p:[35,'Resting',35,'Resting',35,'Resting'],love:0,ll:'Ready for you',cap:'Resting seed'}};
+// day 3 shows 3 petals with the 3rd drifting: n=2 kept + the falling one (3 visible at the start of the frame)
+let fid=0;
+function phone(opt,key,dark){const st=STATES[key],rainy=!!st.day,mode=st.grow?'grow':(rainy?'fall':''),id='p'+(++fid);
+ let deco='',plantExtra='';
+ if(!st.seed){if(opt==='A')plantExtra=halo(st.n,mode);if(opt==='C')plantExtra=blush(st.n,mode)}
+ if(opt==='B')deco=chip(st.n,mode,st.seed);
+ const plant=st.seed?seedPot:`<div class="plant sway"><img src="../../plants/plant_daisy.svg" alt="Daisy">${plantExtra}</div>`;
+ return `<div><div class="phone ${rainy?'rainy':''}" id="${id}" data-theme="${dark?'dark':'light'}"><div class="sbar"><span>9:41</span><span>100%</span></div><div class="title">Daisy</div><div class="mood">${st.mood}</div>
+ <div class="sheen"></div><div class="ground"></div>${rainy?rain('back',14,7,.9)+cloud+rain('front',18,31,1.4):''}
+ ${plant}${deco}<div class="hint"><i aria-hidden="true">&#9825;</i> ${st.hint}</div>
+ ${st.seed?'<a class="wake" href="wake-options.html">Wake Daisy<span>Pick one you like.</span></a>':''}${panel(st.p,st.love,st.ll)}${acts}</div>
+ <p class="cap">${opt}. ${st.cap}${dark?' (dark)':''}${mode?`<button class="replay" data-for="${id}">Replay</button>`:''}</p></div>`}
+const OPTS={A:['Halo arc','Five small pink petals fanned over her head, pointing out from her own centre, 8 pt above her white petals. No heart, no hub, so it cannot read as a second flower. The centre petal stays longest, the outer ends go first, so the arc stays balanced.'],
+ B:['Petal chip','A small glass pill on the ground under Daisy: a heart, five petals and the words "Love petals". Petals fill left to right like the hearts. It sits out of the cloud and rain column and next to the words, so the count is read, not guessed.'],
+ C:['Blush on her own head','Five small pink petals tucked under Daisy\'s yellow centre, over her white petals. Love literally colours her. With fewer petals she turns back to a plain white daisy. An overlay on top of the app art, not a change to the art file.']};
+const only=q.get('o'),theme=q.get('t'),states=(q.get('s')||'thrive,day3,seed').split(',');
+document.getElementById('out').innerHTML=Object.entries(OPTS).filter(([k])=>!only||only===k).map(([k,[t,d]])=>
+ `<h2 class="opt">${k}. ${t}</h2><p class="sub">${d}</p><div class="phones">${[false,true].filter(dk=>!theme||(theme==='dark')===dk).map(dk=>states.map(s=>phone(k,s,dk)).join('')).join('')}</div>`).join('');
+document.getElementById('out').addEventListener('click',e=>{const b=e.target.closest('.replay');if(!b)return;
+ document.querySelectorAll('#'+b.dataset.for+' .drop,#'+b.dataset.for+' .grow').forEach(p=>{p.style.animation='none';void p.getBoundingClientRect();p.style.animation=''})});
+document.getElementById('th').onclick=()=>window.wfToggle?wfToggle():(document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark');
+</script></body></html>

@@ -30,9 +30,10 @@ h1{font-size:30px;margin:0}.sub{color:var(--txt2);max-width:80ch}
 .go{display:block;border:0;border-radius:18px;min-height:56px;width:calc(100% - 32px);margin:0 auto;font:inherit;font-weight:800;font-size:17px;background:var(--accent);color:var(--accent-ink);cursor:pointer}
 .card{position:absolute;left:16px;right:16px;border-radius:26px;background:var(--card);box-shadow:var(--shadow);padding:18px;text-align:center}
 .card h2{margin:0;font-size:24px}.card p{margin:6px 0 0;color:var(--txt2);font-weight:600}
-.pet{display:flex;justify-content:center;gap:10px;margin:14px 0}.pet svg{width:26px;height:36px;overflow:visible}
-.pet .on{fill:var(--petal);stroke:var(--petal-edge);stroke-width:3.5;stroke-linejoin:round;transform-box:fill-box;transform-origin:50% 100%;animation:grow .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * .3s + .4s)}
-.pet .off{fill:none;stroke:var(--ghost);stroke-width:3;stroke-dasharray:7 6}
+/* same love row as lifestats.html: a small flower, then five pips (filled pink, or dashed with a faint fill) */
+.pet{display:flex;justify-content:center;align-items:center;gap:8px;margin:14px 0}.pet svg{width:24px;height:33px;overflow:visible}.pet svg.lf{width:30px;height:30px;margin-right:2px}
+.pet .pg{fill:color-mix(in srgb,var(--ghost) 16%,transparent);stroke:var(--ghost);stroke-width:1.6;stroke-dasharray:3 2.4;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.pet .on{fill:var(--petal);stroke:var(--petal-edge);stroke-width:1.8;vector-effect:non-scaling-stroke;stroke-linejoin:round;transform-box:fill-box;transform-origin:50% 100%;animation:grow .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * .3s + .4s)}
 @keyframes grow{0%{transform:scale(.15);opacity:0}100%{transform:scale(1);opacity:1}}
 .key{display:flex;justify-content:center;align-items:center;gap:6px;margin:8px 0 0;font-size:14px;font-weight:700;color:var(--text)}.key svg{width:16px;height:16px}
 .hearts{display:flex;justify-content:center;gap:6px}.hearts svg{width:28px;height:28px}
@@ -61,7 +62,7 @@ h1{font-size:30px;margin:0}.sub{color:var(--txt2);max-width:80ch}
 <li><b>0 Seed card</b>: "Daisy is resting in her seed. She is safe and cosy." One quiet tinted "Wake Daisy" button, no counters, no notifications.</li>
 <li><b>1 Choice sheet</b>: tiles in a stack, suggested first, with the badge "Good for today". <b>Adaptive rule</b>: suggest the game the player used to wake a seed most recently; if there is none, or the most recent try ended in "Still dreaming", suggest butterflies. Use the "Most recent wake try" menu above to preview it. Chips say "Quick" / "A little longer" (no minutes) and "Gentle" / "Tricky" as words. No text "not now" button: a plain 44 pt X in the corner (VoiceOver "Close") and swipe down both close it, with no change and no second ask this session.</li>
 <li><b>2 Challenge intro</b>: one short rule line, "Take your time.", one big Start button. Back returns to the sheet.</li>
-<li><b>3 Success</b>: sprout, glow, then her five pink petals one at a time, 0.3 s apart, 2.4 s at most. Same five petals as the crown on the Life page. "Tap to see them all." skips to all petals. Reduce Motion: all petals at once. Soft haptic on the first petal and on the hearts, and none when haptics are off. One VoiceOver announcement: "Daisy is awake."</li>
+<li><b>3 Success</b>: sprout, glow, then her pink love pips one at a time, 0.3 s apart, 2.4 s at most. The same row as under Daisy on the Life page: a small love flower, then five pips, pink for love and a dashed outline with a faint fill for the rest. "Tap to see them all." skips to all petals. Reduce Motion: all petals at once. Soft haptic on the first petal and on the hearts, and none when haptics are off. One VoiceOver announcement: "Daisy is awake."</li>
 <li><b>4 Still dreaming</b>: "Daisy is still dreaming. You can try again any time." Primary "Try again", secondary "Try the butterflies". After 2 in a row, the next try is easier and butterflies becomes the main button.</li>
 <li><b>VoiceOver order</b>: sheet title, suggested tile, other tile, Close. Tile label: "Catch butterflies, quick, gentle, good for today".</li>
 <li><b>Dynamic Type</b>: tiles grow, art shrinks to 56 pt, chips wrap. At 5+ challenges or accessibility sizes the sheet uses the .large detent and scrolls.</li>
@@ -78,7 +79,8 @@ const book='<svg viewBox="0 0 60 60" aria-hidden="true"><rect x="8" y="10" width
 const bf='<svg viewBox="0 0 60 60" aria-hidden="true"><path d="M30 30C14 10 6 22 12 34C16 42 26 38 30 30zM30 30C46 10 54 22 48 34C44 42 34 38 30 30z" fill="#E8A838" stroke="#C98D14" stroke-width="2"/><path d="M30 20v26" stroke="#2C3E2C" stroke-width="3" stroke-linecap="round"/></svg>';
 const opt=(art,t,d,c1,c2,rec)=>`<button class="opt ${rec?'rec':''}">${rec?'<span class="badge">Good for today</span>':''}<span class="art">${art}</span><span><b>${t}</b><span class="d">${d}</span><span class="chips"><span class="chip">${c1}</span><span class="chip ${c2==='Gentle'?'g':''}">${c2}</span></span></span></button>`;
 const topBar=()=>`<div class="sbar"><span>9:41</span><span>100%</span></div><div class="title">Daisy</div>`;
-const petals=(n)=>`<div class="pet" role="img" aria-label="${n} of 5 petals">${[...Array(5)].map((_,i)=>`<svg viewBox="78 16 44 62" aria-hidden="true"><path class="${i<n?'on':'off'}" style="--i:${i}" d="${PET}"/></svg>`).join('')}</div>`;
+const FLOWER=`<svg class="lf" viewBox="30 18 140 140" aria-hidden="true">${[0,1,2,3,4].map(i=>`<path d="${PET}" transform="rotate(${i*72} 100 88)" fill="var(--petal)" stroke="var(--petal-edge)" stroke-width="7" stroke-linejoin="round"/>`).join('')}<circle cx="100" cy="88" r="18" fill="#F2B632" stroke="#D48E1B" stroke-width="5"/></svg>`;
+const petals=(n)=>`<div class="pet" role="img" aria-label="Daisy, ${n} of 5 love petals">${FLOWER}${[...Array(5)].map((_,i)=>`<svg viewBox="78 16 44 62" aria-hidden="true"><path class="pg" d="${PET}"/>${i<n?`<path class="on" style="--i:${i}" d="${PET}"/>`:''}</svg>`).join('')}</div>`;
 const loveKey=`<p class="key"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="${HEART}" fill="var(--heart)"/></svg>Love keeps her petals.</p>`;
 function ph(cap,sub,body){return `<div><div class="phone">${topBar()}${body}</div><p class="cap">${cap}<small>${sub}</small></p></div>`}
 // Adaptive rule: suggest the game from the most recent wake; none or "Still dreaming" -> butterflies.
