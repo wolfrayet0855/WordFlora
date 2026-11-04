@@ -1,0 +1,123 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordFlora Home v2</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+/* Params: ?state=unlocked|early|large  &theme=light|dark  &cards=1 (welcome-back + Plus offer)  &daily=done */
+:root{--scale:1;--ink:var(--accent-ink);--tx:color-mix(in srgb,var(--text) 82%,transparent);--card-line:color-mix(in srgb,var(--text) 16%,transparent)}
+[data-theme=light]{--accent-text:#7A4A00;--ok:#2E6B30}
+[data-theme=dark]{--accent-text:#F0C060;--ok:#8FD492}
+html{font-size:calc(16px*var(--scale))}
+body{min-height:100vh;width:390px;margin:0;font-size:1rem;line-height:1.25}
+.page{width:390px;min-height:844px;display:flex;flex-direction:column;padding:0 16px;position:relative}
+.status{height:47px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 8px 4px;font-size:15px;font-weight:600}
+.top{display:flex;align-items:center;justify-content:space-between;min-height:44px}
+.word{font-size:1.5rem;font-weight:900;letter-spacing:-.02em}.word b{color:var(--accent-text)}
+.icon-btn{width:44px;height:44px;display:grid;place-items:center;border:0;background:none;color:var(--text);border-radius:12px;flex:none}
+.icon-btn svg{width:22px;height:22px}
+.hero{display:flex;align-items:center;gap:14px;margin:4px 0 10px}
+.hero img{width:92px;flex:none}
+.hero p{margin:0;font-size:.9375rem;color:var(--tx)}
+.hero .gd{display:flex;align-items:center;gap:6px;margin-top:6px;font-weight:700;font-size:1rem;color:var(--text)}
+.hero .gd svg{width:18px;height:18px;color:var(--accent-text);flex:none}
+.card{background:var(--surface);border:1px solid var(--card-line);border-radius:16px;box-shadow:var(--shadow)}
+.slot{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.note{display:flex;gap:10px;align-items:flex-start;padding:10px 2px 10px 14px}
+.note svg.lead{width:22px;height:22px;color:var(--accent-text);flex:none;margin-top:10px}
+.note .t{flex:1;min-width:0;font-size:.9375rem;padding-top:8px}.note .t strong{display:block;font-size:1rem;margin-bottom:2px}
+.note .t span{color:var(--tx);font-size:.875rem;display:block}
+.note .learn{display:inline-flex;align-items:center;min-height:44px;font-weight:700;color:var(--accent-text);text-decoration:underline}
+.play{display:flex;align-items:center;justify-content:center;gap:10px;height:64px;border-radius:18px;background:var(--accent);color:var(--ink);font-weight:800;font-size:1.375rem;border:0;width:100%;box-shadow:var(--shadow)}
+.play svg{width:22px;height:22px}
+.daily{display:flex;align-items:center;gap:12px;padding:12px 14px;margin:10px 0 16px;min-height:60px;width:100%;text-align:left;color:var(--text);font:inherit}
+.daily .sun{width:36px;height:36px;border-radius:50%;background:color-mix(in srgb,var(--accent) 28%,var(--surface));display:grid;place-items:center;color:var(--accent-text);flex:none}
+.daily .sun svg{width:20px;height:20px}
+.daily .t{flex:1;min-width:0}.daily strong{display:block;font-size:1.0625rem;white-space:nowrap}
+.daily span.s{display:block;font-size:.8125rem;color:var(--tx)}
+.daily .chev{width:18px;height:18px;color:var(--tx);flex:none}
+.daily.done .sun{background:color-mix(in srgb,var(--ok) 22%,var(--surface));color:var(--ok)}
+.eyebrow{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--tx);margin:0 4px 8px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:6px;padding:14px 8px 12px;min-height:96px;text-align:center;color:var(--text);font:inherit}
+.tile.wide{grid-column:1/-1;flex-direction:row;justify-content:center;gap:12px;min-height:64px;padding:10px 12px}
+.tile svg.ic{width:28px;height:28px;color:var(--text);flex:none}
+.tile .col{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:0}
+.tile .lb{font-weight:800;font-size:1rem;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.tile .hint{font-size:.75rem;color:var(--tx);line-height:1.3;font-weight:500}
+.tile.locked{background:transparent;border:1.5px dashed color-mix(in srgb,var(--text) 40%,transparent);box-shadow:none}
+.tile.locked svg.ic{color:var(--tx)}
+.tile .lock{width:13px;height:13px;flex:none}
+.spacer{flex:1;min-height:12px}
+.banner{height:50px;margin:12px 0 0;border:1px dashed var(--card-line);border-radius:8px;display:grid;place-items:center;font-size:.6875rem;color:var(--tx);letter-spacing:.08em;text-transform:uppercase}
+.homebar{height:34px;display:grid;place-items:center}.homebar i{width:134px;height:5px;border-radius:3px;background:var(--text)}
+/* Large text: single column list rows, icon left, label then hint, wraps by design */
+.ax .grid{grid-template-columns:1fr}
+.ax .tile,.ax .tile.wide{flex-direction:row;justify-content:flex-start;text-align:left;gap:14px;padding:14px;min-height:72px;align-items:center}
+.ax .tile svg.ic{width:2rem;height:2rem}
+.ax .tile .col{align-items:flex-start;gap:3px}
+.ax .tile .lb{font-size:1rem}
+.ax .hint{font-size:.8125rem}
+.ax .hero img{width:64px}.ax .hero{align-items:flex-start}
+.ax .daily strong{white-space:normal}
+.ax .play{height:auto;min-height:64px;padding:12px}
+</style>
+<style>/* ?shot=1 centres the 390 pt phone in headless Chromium's 500 px minimum window */html.shot body{margin-left:55px}</style>
+<script>
+const q=new URLSearchParams(location.search);const st=q.get('state')||'unlocked',th=q.get('theme')||'light';
+document.documentElement.dataset.theme=th;if(q.get('shot'))document.documentElement.classList.add('shot');if(q.get('shot'))document.documentElement.style.cssText+='background:var(--bg)';
+if(st==='large')document.documentElement.style.setProperty('--scale','1.9');
+</script></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="leaf" viewBox="0 0 24 24"><path fill="currentColor" d="M20 3C9 3 4 8 4 15c0 1.5.3 2.7.8 3.7C3.7 19.8 3 21 3 21h2c.4-.6 1-1.3 1.7-1.8 1 .5 2.2.8 3.3.8 8 0 11-6 10-16zM8 15c1-3 4-5.5 8-7-3 3-5 5.5-6 9-1 0-1.800-.9-2-2z"/></symbol>
+<symbol id="map" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6l6-2.500 6 2.500 6-2.500v14.500L15 20.500 9 18l-6 2.500V6zm7 .2v10.500l4 1.600V7.800l-4-1.600z"/></symbol>
+<symbol id="tools" viewBox="0 0 24 24"><path fill="currentColor" d="M22 6.500a5 5 0 0 1-6.700 4.700L8.500 18a2.100 2.100 0 0 1-3-3l6.800-6.800A5 5 0 0 1 17.500 2l-3 3 .5 2.500L17.500 8l3-3c.9.4 1.500 1 1.500 1.500z"/></symbol>
+<symbol id="bug" viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="5" ry="7" fill="currentColor"/><circle cx="12" cy="6" r="3" fill="currentColor"/><path stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M10 4L8 1.500M14 4l2-2.500M7 11l-4-1.500M17 11l4-1.500M7 15H3M17 15h4M7.500 19l-3 2M16.500 19l3 2"/><path stroke="var(--surface)" stroke-width="1.5" d="M12 9v11"/></symbol>
+<symbol id="badge" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a6.500 6.500 0 0 0-3.500 12L7 22l5-2.500 5 2.500-1.500-8A6.500 6.500 0 0 0 12 2zm0 3l1.200 2.600 2.800.4-2 2 .5 2.800L12 11.400 9.500 12.800 10 10l-2-2 2.800-.4z"/></symbol>
+<symbol id="lock" viewBox="0 0 24 24"><path fill="currentColor" d="M7 10V8a5 5 0 0 1 10 0v2h1.500A1.500 1.500 0 0 1 20 11.500v9a1.500 1.500 0 0 1-1.500 1.500h-13A1.500 1.500 0 0 1 4 20.500v-9A1.500 1.500 0 0 1 5.500 10H7zm2 0h6V8a3 3 0 0 0-6 0v2z"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path fill="currentColor" d="M6 3.500v17l15-8.500z"/></symbol>
+<symbol id="sun" viewBox="0 0 24 24"><path fill="currentColor" d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM11 1h2v3h-2zm0 19h2v3h-2zM1 11h3v2H1zm19 0h3v2h-3zM4.200 5.600l1.400-1.400 2.100 2.100-1.400 1.400zm12.100 12.100l1.400-1.400 2.100 2.100-1.400 1.400zM5.600 19.800l-1.400-1.400 2.100-2.100 1.400 1.400zM17.700 7.700l-1.400-1.400 2.100-2.100 1.400 1.400z"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.500 14.500L6 12l1.400-1.400 3.100 3.100 6.100-6.100L18 9z"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.500" stroke-linecap="round" d="M9 5l7 7-7 7"/></symbol>
+<symbol id="gear" viewBox="0 0 24 24"><path fill="currentColor" d="M19.400 13a7.500 7.500 0 0 0 0-2l2.100-1.600-2-3.500-2.500 1a7.500 7.500 0 0 0-1.700-1L14.900 3h-4l-.4 2.900a7.500 7.500 0 0 0-1.700 1l-2.500-1-2 3.500L6.600 11a7.500 7.500 0 0 0 0 2l-2.100 1.600 2 3.500 2.500-1a7.500 7.500 0 0 0 1.700 1l.4 2.900h4l.4-2.900a7.500 7.500 0 0 0 1.700-1l2.500 1 2-3.500zM12.900 15.500a3.500 3.500 0 1 1 0-7 3.500 3.500 0 0 1 0 7z"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.500" stroke-linecap="round" d="M7 7l10 10M17 7L7 17"/></symbol>
+<symbol id="cloud" viewBox="0 0 24 24"><path fill="currentColor" d="M7 18a5 5 0 0 1-.6-10A6 6 0 0 1 18 9a4.500 4.500 0 0 1-.5 9z"/></symbol>
+<symbol id="rain" viewBox="0 0 24 24"><path fill="currentColor" d="M7 14a5 5 0 0 1-.6-10A6 6 0 0 1 18 5a4.500 4.500 0 0 1-.5 9zM8 16l-1 3h1.600l1-3zm5 0l-1 3h1.600l1-3z"/></symbol>
+</defs></svg>
+<div class="page" id="p"></div>
+<script>
+const I=(n,c='ic')=>`<svg class="${c}" aria-hidden="true"><use href="#${n}"/></svg>`;
+const cards=q.get('cards')==='1', early=st==='early';
+const hints={Levels:'Opens after 3 garden days or your first level up.',Shed:'Opens at your second level up.',Visitors:'Opens after 3 garden days or your first level up.',Badges:'Opens with your first badge.'};
+const lockedSet=early?['Levels','Shed','Visitors','Badges']:[];
+function tile(label,icon,wide){const lk=lockedSet.includes(label);
+ const inner=`${I(icon)}<div class="col"><span class="lb">${lk?I('lock','lock'):''}${label}</span>${lk?`<span class="hint">${hints[label]}</span>`:''}</div>`;
+ return lk?`<div class="card tile locked${wide?' wide':''}" role="button" aria-disabled="true" data-label="${label}">${inner}</div>`
+ :`<button class="card tile${wide?' wide':''}" data-label="${label}">${inner}</button>`;}
+const days=early?0:12, dailyDone=q.get('daily')==='done';
+document.getElementById('p').innerHTML=`
+<div class="status"><span>9:41</span><span>100%</span></div>
+<!-- VoiceOver: wordmark "WordFlora"; gear: "Settings", button -->
+<div class="top"><div class="word" aria-label="WordFlora">Word<b>Flora</b></div><button class="icon-btn" aria-label="Settings">${I('gear','')}</button></div>
+<!-- VoiceOver: "Garden Days. 12" or "Your garden is new" (one static text element); flower image is decorative -->
+<div class="hero"><img src="../flowers/flower_8.svg" alt=""><div><p>Guess words. Grow a garden.</p>
+ <div class="gd">${I('leaf','')}<span>${days===0?'Your garden is new':days+' Garden Days'}</span></div></div></div>
+${cards?`<div class="slot">
+ <!-- VoiceOver: "Welcome back. Your garden kept growing while you were away." then "Dismiss welcome, button" -->
+ <div class="card note" data-card="welcome">${I('rain','lead')}<div class="t"><strong>Welcome back</strong><span>Your garden kept growing while you were away.</span></div><button class="icon-btn" aria-label="Dismiss welcome">${I('x','')}</button></div>
+ <!-- VoiceOver: "Keep your garden safe. iCloud sync across your devices, with no ads." "Learn more, link" "Dismiss Plus offer, button" -->
+ <div class="card note" data-card="plus">${I('cloud','lead')}<div class="t"><strong>Keep your garden safe</strong><span>iCloud sync across your devices, with no ads.</span><a class="learn" href="#">Learn more</a></div><button class="icon-btn" aria-label="Dismiss Plus offer">${I('x','')}</button></div>
+</div>`:''}
+<!-- VoiceOver: "Play, button" -->
+<button class="play" data-label="Play">${I('play','')}<span>Play</span></button>
+<!-- VoiceOver: "Daily Bloom. One word for everyone today, button" / done: "Daily Bloom. Done for today. See you tomorrow!" -->
+<button class="card daily${dailyDone?' done':''}" data-label="Daily Bloom"><span class="sun">${I(dailyDone?'check':'sun','')}</span><span class="t"><strong>Daily Bloom</strong><span class="s">${dailyDone?'Done for today. See you tomorrow!':'One word for everyone today'}</span></span>${dailyDone?'':I('chev','chev')}</button>
+<!-- VoiceOver per tile: "Garden, button". Locked: "Shed, dimmed. Opens at your second level up." Lock icon plus dashed outline plus hint text, so state is never colour-only -->
+<div class="eyebrow" role="heading" aria-level="2">Explore</div>
+<div class="grid">${tile('Garden','leaf')}${tile('Levels','map')}${tile('Shed','tools')}${tile('Visitors','bug')}${tile('Badges','badge',true)}</div>
+<div class="spacer"></div>
+<!-- Reserved banner slot: fixed 50 pt so layout never jumps when an ad loads -->
+<div class="banner" aria-hidden="true">Banner space</div>
+<div class="homebar"><i></i></div>`;
+if(st==='large')document.getElementById('p').classList.add('ax');
+/* ?measure=1 : writes one-line check of every label into <pre id=m> (read with --dump-dom) */
+if(q.get('measure')){addEventListener('load',()=>{const out=[];document.querySelectorAll('.lb,.daily strong,.play span,.hero .gd span,.hero p,.note strong').forEach(e=>{const r=document.createRange();const tn=[...e.childNodes].filter(n=>n.nodeType===3).pop();r.selectNodeContents(tn||e);const lh=parseFloat(getComputedStyle(e).lineHeight)||e.getBoundingClientRect().height;const rects=[...r.getClientRects()].map(x=>Math.round(x.top));const lines=new Set(rects).size;out.push(e.textContent.trim()+' => lines:'+lines+(e.scrollWidth>e.clientWidth+1?' OVERFLOW':''))});const pre=document.createElement('pre');pre.id='m';pre.textContent=out.join('\n');document.body.appendChild(pre)})}
+</script></body></html>
