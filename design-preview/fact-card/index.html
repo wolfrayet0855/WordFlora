@@ -1,0 +1,139 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordFlora fact card and first win</title>
+<style>
+:root{--bg:#FAF7F0;--surface:#fff;--text:#2C3E2C;--accent:#E8A838;--ink:#2C3E2C;--muted:#5d6e5d;--line:rgba(44,62,44,.14);--tint:#FFF3D6;--chip:#EAF3E3;--shadow:0 6px 18px rgba(44,62,44,.10);--s:1}
+[data-theme=dark]{--bg:#1A2E1A;--surface:#2C3E2C;--text:#D4EDD4;--accent:#F0C060;--ink:#1A2E1A;--muted:#A9C7A9;--line:rgba(212,237,212,.16);--tint:#3a4a2a;--chip:#1F3320;--shadow:0 6px 18px rgba(0,0,0,.35)}
+*{box-sizing:border-box}body{margin:0;background:#ddd;font-family:ui-rounded,"SF Pro Rounded",Nunito,system-ui,sans-serif}
+.all{display:flex;flex-wrap:wrap;gap:24px;padding:24px}
+.phone{width:390px;height:844px;background:var(--bg);color:var(--text);position:relative;overflow:hidden;display:flex;flex-direction:column;font-size:calc(16px*var(--s))}
+.phone.tall{height:auto;min-height:844px}
+.status{height:47px;flex:none;display:flex;justify-content:space-between;align-items:flex-end;padding:0 28px 6px;font-weight:700;font-size:15px}
+.home-ind{position:absolute;bottom:8px;left:50%;width:134px;height:5px;margin-left:-67px;border-radius:3px;background:var(--text);opacity:.85}
+.serif{font-family:"New York",ui-serif,"Iowan Old Style",Georgia,serif}
+button{font:inherit;color:inherit;border:0;cursor:pointer}
+.btn{min-height:56px;border-radius:18px;font-weight:800;font-size:calc(19px*var(--s));width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 16px}
+.primary{background:var(--accent);color:#2C3E2C}.quiet{background:none;color:var(--muted);min-height:48px;font-size:calc(16px*var(--s))}
+.eyebrow{font-size:calc(13px*var(--s));font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+[data-theme=light] .eyebrow{color:#9a6200}
+/* A flow */
+.flow{flex:1;display:flex;flex-direction:column;align-items:center;text-align:center;padding:8px 24px 40px;gap:14px}
+.flow h1{font-size:calc(32px*var(--s));margin:0;line-height:1.1;font-weight:900}
+.flow p{margin:0;font-size:calc(18px*var(--s));line-height:1.35;color:var(--muted);max-width:320px}
+.dots{display:flex;gap:8px}.dots i{width:8px;height:8px;border-radius:4px;background:var(--line)}.dots i.on{background:var(--accent);width:22px}
+.pcard{background:var(--surface);border:2px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:28px;width:260px;padding:18px 12px 16px;box-shadow:var(--shadow);position:relative}
+.pcard img{width:170px;height:170px;display:block;margin:0 auto}
+.pcard b{display:block;font-size:calc(24px*var(--s))}.pcard i{font-size:calc(14px*var(--s));color:var(--muted)}
+.how{display:flex;gap:12px;align-items:center;background:var(--surface);border-radius:20px;padding:12px 16px;text-align:left;box-shadow:var(--shadow);max-width:340px}
+.how .ic{flex:none;width:44px;height:44px;border-radius:14px;background:var(--accent);display:grid;place-items:center}
+.how span{font-size:calc(16px*var(--s));line-height:1.3}
+.spacer{flex:1}
+.drop{position:absolute;width:10px;height:16px;background:#4FA8E8;border-radius:50% 50% 50% 50%/65% 65% 35% 35%;opacity:.9}
+.can{position:absolute;left:12px;top:-34px;transform:rotate(-28deg)}
+.meter{width:240px;height:14px;border-radius:7px;background:var(--line);overflow:hidden}.meter div{height:100%;background:#4FA8E8;border-radius:7px}
+.ok{display:inline-flex;gap:8px;align-items:center;background:var(--chip);border-radius:999px;padding:8px 16px;font-weight:800;font-size:calc(16px*var(--s))}
+/* B plant page */
+.top{display:flex;align-items:center;justify-content:space-between;padding:0 16px;height:44px;flex:none}
+.top .rb{width:44px;height:44px;border-radius:22px;background:var(--surface);display:grid;place-items:center;box-shadow:var(--shadow)}
+.top h2{margin:0;font-size:calc(18px*var(--s))}
+.stage{position:relative;height:196px;flex:none;display:flex;align-items:flex-end;justify-content:center}
+.stage img{height:190px}
+.life{position:absolute;left:0;top:44px;background:var(--surface);border-radius:0 16px 16px 0;width:44px;height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;box-shadow:var(--shadow);font-size:11px;font-weight:800}
+.petals{display:flex;justify-content:center;gap:8px;height:30px;align-items:center;flex:none;font-size:calc(13px*var(--s));color:var(--muted);font-weight:700}
+.petal{width:14px;height:14px;border-radius:50% 0 50% 50%;transform:rotate(45deg);background:#F2788A}.petal.off{background:var(--line)}
+.body{flex:1;padding:6px 16px 0;display:flex;flex-direction:column;gap:12px;min-height:0}
+.actions{flex:none;display:flex;gap:10px;padding:10px 16px 28px;background:linear-gradient(transparent,var(--bg) 16%)}
+.act{flex:1;min-height:64px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;font-size:calc(13px*var(--s))}
+.act.main{background:var(--accent);color:#2C3E2C}
+/* story card */
+.story{background:var(--surface);border-radius:24px;padding:16px 18px 14px;box-shadow:var(--shadow);border:1.5px solid var(--line);position:relative;overflow:hidden}
+.story:before{content:"";position:absolute;right:-30px;top:-30px;width:120px;height:120px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 38%,transparent),transparent)}
+.story .hd{display:flex;justify-content:space-between;align-items:center;position:relative}
+.story .kicker{font-size:calc(12px*var(--s));font-weight:800;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.spk{width:44px;height:44px;border-radius:22px;background:var(--chip);display:grid;place-items:center;flex:none}
+.story h3{margin:2px 0 0;font-size:calc(38px*var(--s));line-height:1.02;font-weight:700;position:relative}
+.story .bot{font-size:calc(14px*var(--s));font-style:italic;color:var(--muted);margin:2px 0 10px;position:relative}
+.origin{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;position:relative}
+.chip{background:var(--tint);border-radius:999px;padding:6px 12px;font-weight:800;font-size:calc(15px*var(--s));display:inline-flex;gap:6px;align-items:center}
+.chip.name{background:var(--accent);color:#2C3E2C}.arrow{color:var(--muted);font-weight:800}
+.fact{margin:0;font-size:calc(17px*var(--s));line-height:1.35;position:relative}
+.fact span{display:block}
+.more{margin-top:8px;font-size:calc(15px*var(--s));line-height:1.4;color:var(--muted);border-top:1.5px dashed var(--line);padding-top:8px;position:relative}
+.tell{margin-top:8px;display:flex;justify-content:space-between;align-items:center;position:relative}
+.tell button{background:none;font-weight:800;color:var(--text);min-height:44px;padding:0 4px;font-size:calc(15px*var(--s));display:flex;gap:6px;align-items:center;text-decoration:underline;text-decoration-color:var(--accent);text-underline-offset:4px;text-decoration-thickness:2px}
+.tell .sh{text-decoration:none}
+/* compact variant (earned / garden) */
+.story.mini{padding:12px 14px;border-radius:20px;text-align:left;width:100%}
+.story.mini h3{font-size:calc(26px*var(--s))}
+.story.mini .fact{font-size:calc(15px*var(--s))}
+.share{width:340px;margin:0 auto;border-radius:30px;padding:24px 22px 18px;background:linear-gradient(160deg,#FFF3D6,#F7D9A0);color:#2C3E2C;text-align:center;box-shadow:var(--shadow)}
+[data-theme=dark] .share{background:linear-gradient(160deg,#335033,#1F3820);color:#D4EDD4}
+.share img{height:140px}.share h3{font-size:44px;margin:4px 0 0;font-weight:700}.share .bot{font-style:italic;opacity:.75;margin:0 0 12px}
+.share .fact{font-size:19px;margin-top:12px}.share .brand{margin-top:14px;font-size:13px;font-weight:800;letter-spacing:.1em;opacity:.7}
+.label{font:600 13px system-ui;color:#333;margin:0 0 6px}
+@keyframes fall{0%{transform:translateY(-6px);opacity:0}30%{opacity:1}100%{transform:translateY(60px);opacity:0}}
+</style></head><body>
+<div class="all" id="all"></div>
+<script>
+const P={
+ daisy:{n:'Daisy',b:'Bellis perennis',img:'daisy',chip:['day’s eye','Daisy'],icon:'☀️',
+  lines:['Daisy comes from “day’s eye.”','Its petals close at night and open with the morning sun.'],
+  more:'Long ago, people in England called it “daes eage,” which means day’s eye. Over many years the words slid together and became “daisy.” Look closely and the golden middle really does look like a little eye.'},
+ lotus:{n:'Lotus',b:'Nelumbo nucifera',img:'lotus',chip:['the lotus effect'],icon:'💧',
+  lines:['Water rolls off a lotus leaf in shiny beads.','The beads pick up dust, so the leaf cleans itself.'],
+  more:'The leaf is covered in tiny bumps. Water cannot spread out between them, so it rolls into round drops. People study this trick to design paint and glass that stay clean.'},
+ strawberry:{n:'Strawberry',b:'Fragaria x ananassa',img:'strawberry',chip:['tiny fruits outside'],icon:'🍓',
+  lines:['The little dots on a strawberry are the real fruits.','The red, juicy part is a puffed-up flower base.'],
+  more:'Each dot is a tiny fruit called an achene, with one seed inside. A single strawberry can have about two hundred of them. The sweet red part is just the flower base that grew soft and round.'}
+};
+const spk='<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/></svg>';
+const shr='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7 8l5-5 5 5M5 12v8h14v-8"/></svg>';
+const can='<svg width="44" height="44" viewBox="0 0 48 48"><path d="M10 20h22v16a4 4 0 01-4 4H14a4 4 0 01-4-4z" fill="#4FA8E8"/><path d="M32 24l12-8v6l-12 8z" fill="#3B8BC7"/><path d="M10 24c-5 0-6 8 0 8" fill="none" stroke="#3B8BC7" stroke-width="3"/></svg>';
+const drp='<svg width="22" height="22" viewBox="0 0 24 24"><path d="M12 2C12 2 5 10.5 5 15a7 7 0 0014 0C19 10.5 12 2 12 2z" fill="#2C3E2C"/></svg>';
+const status='<div class="status"><span>9:41</span><span>100%</span></div><div class="home-ind"></div>';
+const img=(k,h)=>`<img src="../plants/plant_${k==='daisy'?'daisy':k}.svg" ${h?`style="height:${h}px"`:''} alt="">`;
+function story(k,o={}){const p=P[k];const open=o.open;
+ const chip=p.chip.length>1?`<span class="chip">${p.icon} ${p.chip[0]}</span><span class="arrow">→</span><span class="chip name">${p.chip[1]}</span>`:`<span class="chip">${p.icon} ${p.chip[0]}</span>`;
+ const lines=o.mini?p.lines.slice(0,1):p.lines;
+ return `<section class="story ${o.mini?'mini':''}" aria-label="How it got its name"><div class="hd"><div><div class="kicker">${p.chip.length>1?'How it got its name':'Fun plant fact'}</div></div><button class="spk" aria-label="Read aloud">${spk}</button></div>
+ <h3 class="serif">${p.n}</h3><div class="bot serif">${p.b}</div>
+ <div class="origin">${chip}</div>
+ <p class="fact">${lines.map(l=>`<span>${l}</span>`).join('')}</p>
+ ${open&&!o.mini?`<div class="more">${p.more}</div>`:''}
+ ${o.mini?'':`<div class="tell"><button>${open?'Show less ▴':'Tell me more ▾'}</button><button class="sh" aria-label="Share this fact">${shr} Share</button></div>`}</section>`}
+function plantPage(k,o={}){return `<div class="phone ${o.tall?'tall':''}" data-theme="${o.t||'light'}" style="--s:${o.s||1}">${status}
+ <div class="top"><div class="rb">‹</div><h2>${P[k].n}</h2><div class="rb">⋯</div></div>
+ <div class="stage"><div class="life" aria-label="Life panel"><span style="font-size:20px">♥</span>Life</div>${img(k)}</div>
+ <div class="petals"><i class="petal"></i><i class="petal"></i><i class="petal"></i><i class="petal off"></i><i class="petal off"></i>&nbsp;3 love petals</div>
+ <div class="body">${story(k,o)}</div>
+ <div class="actions"><div class="act main">${drp}Water</div><div class="act">☀️ Sun</div><div class="act">👋 Hello</div></div></div>`}
+function earned(k,t){return `<div class="phone" data-theme="${t||'light'}">${status}<div class="flow" style="padding-top:20px;gap:10px"><div class="eyebrow">New plant found!</div><h1 style="font-size:30px">You found a ${P[k].n}!</h1>
+ <div class="pcard" style="width:200px;padding:10px">${img(k,130)}</div><div style="width:100%">${story(k,{mini:true})}</div><div class="spacer"></div><button class="btn primary">Next</button></div></div>`}
+function share(k,t){return `<div class="phone" data-theme="${t||'light'}">${status}<div class="top"><div class="rb">✕</div><h2>Share</h2><div class="rb" style="visibility:hidden"></div></div><div style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px">
+ <div class="share">${img(k)}<h3 class="serif">${P[k].n}</h3><p class="bot serif">${P[k].b}</p><span class="chip name" style="background:rgba(232,168,56,.9);color:#2C3E2C">${P[k].icon} ${P[k].chip[0]}${P[k].chip[1]?' → '+P[k].chip[1]:''}</span><p class="fact">${P[k].lines[0]}</p><div class="brand">WORDFLORA</div></div>
+ <div style="padding:0 24px"><button class="btn primary">${shr} Share this card</button></div></div></div>`}
+/* A flow */
+const A={
+ a1:`<div class="phone">${status}<div class="flow" style="padding-top:36px"><div class="eyebrow">Word found</div><h1>New plant found!</h1><div class="pcard" style="margin-top:6px">${img('daisy')}<b>Daisy</b><i class="serif">Bellis perennis</i></div><p>Your Daisy is now in your garden.</p><div class="spacer"></div><div class="dots"><i class="on"></i><i></i><i></i></div><button class="btn primary">Next</button></div></div>`,
+ a2:`<div class="phone">${status}<div class="flow" style="padding-top:36px"><div class="eyebrow">Plant tip</div><h1>Plants love water</h1><div class="pcard" style="width:220px">${img('daisy',140)}</div><div class="how"><div class="ic">${drp.replace('#2C3E2C','#2C3E2C')}</div><span><b>The water button</b> gives your plant a drink. Your first drink is free!</span></div><div class="spacer"></div><div class="dots"><i></i><i class="on"></i><i></i></div><button class="btn primary">${drp} Water my plant</button><button class="quiet">Not now</button></div></div>`,
+ a3:`<div class="phone">${status}<div class="flow" style="padding-top:36px"><div class="eyebrow">Plant tip</div><h1>Here comes the water</h1><div class="pcard" style="width:220px;margin-top:36px"><div class="can">${can}</div>${[0,1,2,3,4].map(i=>`<i class="drop" style="left:${58+i*9}px;top:${-4+i*14}px;animation:fall 1.2s ${i*.15}s infinite"></i>`).join('')}${img('daisy',140)}</div><div class="meter" style="margin-top:10px"><div style="width:62%"></div></div><p>Glug, glug, glug...</p><div class="spacer"></div><div class="dots"><i></i><i class="on"></i><i></i></div><button class="btn primary" style="opacity:.45">${drp} Watering...</button></div></div>`,
+ a4:`<div class="phone">${status}<div class="flow" style="padding-top:36px"><div class="eyebrow">Yum!</div><h1>Your Daisy loves it</h1><div class="pcard" style="width:220px;background:var(--tint)">${img('daisy',140)}</div><div class="ok">✔ Watered. It will grow a little every day.</div><p>Water it whenever you like. You can find it in your garden.</p><div class="spacer"></div><div class="dots"><i></i><i></i><i class="on"></i></div><button class="btn primary">Go to my garden</button></div></div>`
+};
+const F={
+ a1:A.a1,a2:A.a2,a3:A.a3,a4:A.a4,
+ 'b-daisy-light':plantPage('daisy',{}),
+ 'b-daisy-dark':plantPage('daisy',{t:'dark'}),
+ 'b-daisy-open':plantPage('daisy',{open:1,tall:1}),
+ 'b-lotus-light':plantPage('lotus',{}),
+ 'b-lotus-dark':plantPage('lotus',{t:'dark',open:1,tall:1}),
+ 'b-strawberry-light':plantPage('strawberry',{open:1,tall:1}),
+ 'b-strawberry-dark':plantPage('strawberry',{t:'dark'}),
+ 'b-daisy-large':plantPage('daisy',{s:1.6,tall:1}),
+ 'b-lotus-large-dark':plantPage('lotus',{s:1.6,tall:1,t:'dark',open:1}),
+ 'b-earned-light':earned('daisy'),'b-earned-dark':earned('lotus','dark'),
+ 'b-share-light':share('daisy'),'b-share-dark':share('strawberry','dark')
+};
+const q=new URLSearchParams(location.search).get('f');
+const root=document.getElementById('all');
+if(q){document.body.style.background='transparent';root.style.padding=0;root.innerHTML=F[q]}
+else root.innerHTML=Object.entries(F).map(([k,v])=>`<div><p class="label">${k}</p>${v}</div>`).join('');
+</script></body></html>

@@ -1,0 +1,370 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WordFlora tend actions</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+:root,[data-theme=light]{--leaf:#9BCB3C;--leaf-ink:#22331A;--water:#3F86C9;--waterf:#4C93D6;--sun:#B87F00;--sunf:#F2B632;--soilc:#7A5238;--card:#FFFFFF;--txt2:#4F5F4F;--rest:#6B6A5E}
+[data-theme=dark]{--leaf:#A8D84A;--leaf-ink:#1A2E1A;--water:#7DB6EE;--waterf:#7DB6EE;--sun:#F6C85A;--sunf:#F6C85A;--soilc:#A47550;--card:#2C3E2C;--txt2:#B9D0B9;--rest:#B9C9B9}
+body{line-height:1.45}
+.wrap{max-width:1800px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:30px;margin:0 0 4px}h2{font-size:24px;margin:48px 0 4px}h3{font-size:17px;margin:0 0 6px}
+.sub{color:var(--txt2);max-width:72ch;margin:4px 0 16px}
+.bar a{color:var(--text)}nav a{color:var(--text)}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 6px}
+.btn{font:inherit;font-weight:800;border:0;border-radius:999px;min-height:44px;padding:8px 18px;background:var(--leaf);color:var(--leaf-ink);cursor:pointer}
+.btn.ghost{background:var(--card);color:var(--text);box-shadow:inset 0 0 0 2px var(--line)}
+:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+.row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.cap{margin:8px 0 0;font-weight:700;max-width:390px}.cap small{display:block;font-weight:500;color:var(--txt2)}
+/* ===== Life card ===== */
+.life{width:390px;background:var(--surface);border-radius:26px;box-shadow:var(--shadow);padding:16px 16px 14px;position:relative;overflow:hidden}
+.life h4{margin:0 0 8px;font-size:16px}
+.m{display:grid;grid-template-columns:36px 1fr;gap:2px 10px;padding:8px 0;border-top:1px solid var(--line)}
+.m:first-of-type{border-top:0}
+.mi{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}
+.mi svg{width:22px;height:22px}
+.mt{display:flex;justify-content:space-between;font-weight:800;font-size:14px}
+.mt span{font-weight:700;font-size:12.5px;color:var(--txt2)}
+.track{height:12px;border-radius:7px;background:color-mix(in srgb,var(--c) 16%,transparent);overflow:hidden;margin-top:4px;position:relative}
+.fill{height:100%;border-radius:7px;background:var(--c);width:var(--f);position:relative;overflow:hidden}
+.full .fill,.rest .fill{background:var(--c)}
+.rest .fill{background:repeating-linear-gradient(135deg,var(--c) 0 8px,color-mix(in srgb,var(--c) 70%,#fff) 8px 16px)}
+.line{grid-column:2;font-size:14px;color:var(--text);margin-top:3px;font-weight:600;line-height:1.35}
+.m.w{--c:var(--water)}.m.s{--c:var(--sun)}.m.o{--c:var(--soilc)}
+.acts{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:10px}
+.ab{border:0;font:inherit;background:transparent;color:var(--text);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:12px;font-weight:800;padding:2px 0;cursor:pointer;min-height:64px;position:relative}
+.ab .dot{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;background:var(--c);color:#fff;position:relative;transition:transform .15s}
+.ab .dot svg{width:24px;height:24px}
+.ab.w{--c:var(--water)}.ab.s{--c:#C48A00}.ab.o{--c:var(--soilc)}.ab.p{--c:#6E8F3A}.ab.r{--c:#C8734A}
+[data-theme=dark] .ab.s{--c:#F6C85A}[data-theme=dark] .ab .dot{color:#1A2E1A}
+.ab.ready .dot{box-shadow:0 0 0 3px var(--surface),0 0 0 6px color-mix(in srgb,var(--c) 45%,transparent)}
+.ab.done .dot,.ab.rest .dot{background:color-mix(in srgb,var(--c) 20%,var(--surface));color:var(--c)}
+.ab.rest .dot{background:color-mix(in srgb,var(--rest) 14%,var(--surface));color:var(--rest)}
+.ab .bdg{position:absolute;right:-3px;top:-3px;width:20px;height:20px;border-radius:50%;background:var(--surface);color:var(--c);display:none;place-items:center;box-shadow:0 0 0 2px var(--c)}
+.ab.rest .bdg{color:var(--rest);box-shadow:0 0 0 2px var(--rest)}
+.ab.done .bdg,.ab.rest .bdg{display:grid}.bdg svg{width:12px;height:12px}
+.ab:active .dot,.ab.press .dot{transform:scale(.9)}
+.tag{display:inline-block;font-size:12px;font-weight:800;border-radius:999px;padding:3px 10px;margin:0 0 8px;background:color-mix(in srgb,var(--leaf) 40%,transparent)}
+.toast{position:absolute;left:16px;right:16px;bottom:12px;background:var(--text);color:var(--bg);border-radius:16px;padding:12px 14px;font-weight:700;font-size:14px;display:flex;gap:10px;align-items:center;opacity:0;transform:translateY(12px);pointer-events:none}
+.toast.show{opacity:1;transform:none;transition:all .25s}
+.toast svg{width:22px;height:22px;flex:none}
+/* tap animation (seekable): press, fill, toast */
+@keyframes press{0%{transform:scale(1)}40%{transform:scale(.88)}100%{transform:scale(1)}}
+@keyframes tapw{0%{width:var(--f)}100%{width:100%}}
+@keyframes wave{0%{background-position:0 0}100%{background-position:-60px 0}}
+@keyframes glow{0%{filter:brightness(1)}50%{filter:brightness(1.35) saturate(1.2)}100%{filter:none}}
+@keyframes heap{0%{transform:scaleY(.4)}100%{transform:none}}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--c) 55%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+@keyframes toastin{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:none}}
+@keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.25)}100%{transform:scale(1);opacity:1}}
+.tap .ab.hit .dot{animation:press .25s ease-out both}
+.tap .m.hit .fill{animation:tapw 1s .2s cubic-bezier(.3,.7,.2,1) both}
+.tap .m.hit.w .fill{background-image:repeating-linear-gradient(100deg,transparent 0 14px,rgba(255,255,255,.35) 14px 20px);background-size:60px 100%;background-color:var(--c);animation:tapw 1s .2s cubic-bezier(.3,.7,.2,1) both,wave .5s linear 2}
+.tap .m.hit.s .fill{animation:tapw 1s .2s cubic-bezier(.3,.7,.2,1) both,glow 1s .2s both}
+.tap .m.hit.o .fill{animation:tapw 1s .2s steps(5,jump-end) both}
+.tap .m.hit .mi{animation:pop .5s .9s both}
+.tap .m.hit{--f0:0}
+.tap .ab.hit .bdg{display:grid;animation:pop .35s 1.1s both}
+.tap .toast.hit{animation:toastin .3s 1.1s both;opacity:0}
+.tzl{width:190px;padding:8px;border-radius:14px;box-shadow:none;border:1px solid var(--line);text-align:left}.tzl .ab{min-height:0;font-size:0;gap:0;width:50px}.tzl .ab .dot{width:38px;height:38px}
+/* ===== stage ===== */
+.stage{position:relative;width:390px;height:420px;overflow:hidden;border-radius:26px;background:linear-gradient(#DCEFFB,#F4F1DF 66%,#CFE2B4 66.2%);box-shadow:var(--shadow);flex:none}
+[data-theme=dark] .stage{background:linear-gradient(#1F3A4D,#233A2A 66%,#2A4426 66.2%)}
+.stage .grd{position:absolute;left:0;right:0;top:387px;bottom:0;background:#B7CC93}
+[data-theme=dark] .stage .grd{background:#1E3320}
+.stage *{position:absolute}
+.stage svg{display:block;overflow:visible}
+.stage .pt{left:125px;top:270px;width:140px;height:117px}
+.stage .pt>svg{position:absolute;left:0;top:0;width:100%;height:100%}
+.stage .pt .soil{left:30px;top:6px;width:80px;height:20px;border-radius:50%;background:#6B4528;box-shadow:inset 0 3px 0 #85583A}
+.stage .pt .mound{left:42px;top:1px;width:56px;height:16px;border-radius:50% 50% 30% 30%;background:#7A5238;transform-origin:50% 100%}
+.stage .pl{left:85px;top:91px;width:220px;height:220px;transform-origin:50% 88%}
+.stage .pl img{position:static;width:100%;height:100%;display:block}
+.stage .wet{left:150px;top:276px;width:90px;height:24px;border-radius:50%;background:rgba(40,60,110,.35);opacity:0}
+.stage .chip{left:12px;top:12px;width:150px;padding:7px 10px 8px;border-radius:14px;background:var(--surface);box-shadow:var(--shadow);font-size:12px;font-weight:800;z-index:30}
+.stage .chip i{position:static;display:block;height:9px;border-radius:5px;background:color-mix(in srgb,var(--c) 18%,transparent);margin-top:4px;overflow:hidden}
+.stage .chip b{position:static;display:block;height:100%;border-radius:5px;background:var(--c);width:var(--f)}
+.stage .chip span{position:static}
+.stage .mv,.stage .rmx{opacity:0}
+.stage .rmx{display:none}
+.stage.rm .mv{display:none}.stage.rm .rmx{display:block}
+/* actors */
+.can{left:225px;top:80px;width:110px;height:90px;transform-origin:50% 50%;z-index:20}
+.drop{width:9px;height:13px;border-radius:50% 50% 50% 50%/65% 65% 40% 40%;background:var(--waterf);box-shadow:inset -2px -2px 0 rgba(255,255,255,.45);z-index:19;left:var(--x);top:122px}
+.rip{left:calc(var(--x) - 17px);top:278px;width:34px;height:12px;border-radius:50%;border:2px solid rgba(255,255,255,.9);box-shadow:0 0 0 1.5px rgba(63,134,201,.55);z-index:6}
+.trowel{left:-138px;top:-25px;width:140px;height:50px;transform-origin:138px 25px;z-index:25}
+.pile{left:20px;top:352px;width:100px;height:36px;z-index:5}
+.heapfall{width:11px;height:10px;border-radius:45%;background:#6B4528;box-shadow:inset 0 2px 0 #85583A;z-index:24;left:var(--x);top:250px}
+.sunb{left:14px;top:30px;width:130px;height:130px;z-index:4;transform-origin:50% 50%}
+.glow{inset:0;background:radial-gradient(circle at 20% 22%,rgba(255,226,120,.6),rgba(255,226,120,0) 62%);z-index:3}
+.spk{left:var(--x);top:var(--y);width:36px;height:36px;margin:-18px 0 0 -18px;z-index:21}
+.fall{width:14px;height:12px;border-radius:45%;background:#6B4528;box-shadow:inset 0 2px 0 #85583A;left:var(--x);top:210px;z-index:22}
+.ghost{z-index:30;font-weight:800;font-size:13px;left:0;right:0;bottom:12px;text-align:center}
+/* water */
+.go.k-water .can{animation:cin .35s ease-out both,ctilt .3s .35s ease-in-out forwards,cout .3s 1.45s ease-in forwards}
+@keyframes cin{0%{transform:translate(70px,-20px) rotate(0);opacity:0}100%{transform:none;opacity:1}}
+@keyframes ctilt{0%{transform:rotate(0);opacity:1}100%{transform:rotate(-30deg);opacity:1}}
+@keyframes cout{0%{transform:rotate(-30deg);opacity:1}100%{transform:translate(70px,-20px) rotate(-8deg);opacity:0}}
+.go.k-water .drop{animation:dfall .46s var(--d) cubic-bezier(.55,0,1,.5) both,dfade .46s var(--d) linear both}
+@keyframes dfall{0%{transform:translateY(0) scaleY(.7)}100%{transform:translateY(158px) scaleY(1.25)}}
+@keyframes dfade{0%{opacity:0}12%{opacity:1}90%{opacity:1}100%{opacity:0}}
+.go.k-water .rip{animation:ripple .55s var(--d) ease-out both}
+@keyframes ripple{0%{transform:scale(.2);opacity:.95}100%{transform:scale(1.7);opacity:0}}
+.go.k-water .pl{animation:drink .5s 1.05s ease-in-out both}
+@keyframes drink{0%{transform:none}35%{transform:scale(1.045,.97)}70%{transform:scale(.99,1.035)}100%{transform:none}}
+.go.k-water .wet{animation:wet 1.1s 1s ease-out both}
+@keyframes wet{0%{opacity:0}30%{opacity:1}100%{opacity:.7}}
+/* soil */
+.go.k-soil .trowel{animation:tr 1.9s linear both}
+@keyframes tr{
+ 0%{transform:translate(30px,300px) rotate(95deg) scale(.7);opacity:0;animation-timing-function:ease-out}
+ 8%{opacity:1}
+ 16%{transform:translate(72px,368px) rotate(128deg) scale(.7);animation-timing-function:ease-in-out}
+ 26%{transform:translate(84px,380px) rotate(140deg) scale(.7);animation-timing-function:ease-in-out}
+ 37%{transform:translate(82px,346px) rotate(-6deg) scale(.7);animation-timing-function:ease-in-out}
+ 53%{transform:translate(160px,246px) rotate(-26deg) scale(.7);animation-timing-function:ease-in-out}
+ 63%{transform:translate(232px,252px) rotate(-8deg) scale(.7);animation-timing-function:ease-in}
+ 74%{transform:translate(240px,262px) rotate(62deg) scale(.7);animation-timing-function:ease-out}
+ 87%{transform:translate(250px,246px) rotate(58deg) scale(.7);opacity:1}
+ 100%{transform:translate(330px,170px) rotate(20deg) scale(.7);opacity:0}}
+.trowel .hp{transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:hp 1.9s linear both}
+@keyframes hp{0%,24%{opacity:0;transform:scale(.3)}30%{opacity:1;transform:scale(1)}72%{opacity:1;transform:translateX(0)}79%{opacity:1;transform:translateX(26px) scale(.9)}84%,100%{opacity:0;transform:translateX(34px) scale(.5)}}
+.go.k-soil .pileb{animation:pileb 1.9s linear both}
+@keyframes pileb{0%,22%{transform:none}30%,100%{transform:scale(.88,.72)}}
+.pileb{transform-origin:50% 100%}
+.go.k-soil .fall{animation:cfall .34s var(--d) cubic-bezier(.5,0,1,.6) both}
+@keyframes cfall{0%{opacity:0;transform:translateY(0)}12%{opacity:1}85%{opacity:1}100%{opacity:0;transform:translateY(60px)}}
+.go.k-soil .pt .mound{animation:rise .5s 1.5s ease-out both}
+@keyframes rise{0%{transform:scale(.4,.1)}100%{transform:scale(1,1)}}
+.go.k-soil .pt .soil{animation:lvl .5s 1.5s ease-out both}
+@keyframes lvl{0%{transform:none}100%{transform:translateY(-3px) scaleX(1.04)}}
+.go.k-soil .pl{animation:drink .45s 1.65s ease-in-out both}
+/* sun */
+.go.k-sun .sunb{animation:sunin .55s cubic-bezier(.3,1.5,.5,1) both,sunout .4s 1.4s ease-in forwards}
+@keyframes sunin{0%{transform:scale(0) rotate(-40deg);opacity:0}100%{transform:scale(1) rotate(0);opacity:1}}
+@keyframes sunout{0%{opacity:1;transform:none}100%{opacity:0;transform:scale(.9)}}
+.go.k-sun .glow{animation:gl 1.8s ease-in-out both}
+@keyframes gl{0%{opacity:0}25%{opacity:1}70%{opacity:.8}100%{opacity:0}}
+.go.k-sun .spk{animation:spk .5s var(--d) ease-out both}
+@keyframes spk{0%{opacity:0;transform:scale(.2) rotate(0)}40%{opacity:1;transform:scale(1.2) rotate(40deg)}100%{opacity:0;transform:scale(.5) rotate(90deg)}}
+.go.k-sun .pl{animation:flutter 1.35s .28s ease-in-out both}
+@keyframes flutter{0%{transform:rotate(0)}14%{transform:rotate(3.2deg) scale(1.01)}30%{transform:rotate(-2.8deg)}46%{transform:rotate(2.2deg)}62%{transform:rotate(-1.5deg)}78%{transform:rotate(.8deg)}100%{transform:none}}
+/* repot */
+.go.k-repot .pl{animation:rpl 1.9s linear both}
+@keyframes rpl{0%{transform:none;animation-timing-function:ease-out}18%{transform:translateY(-56px);animation-timing-function:linear}48%{transform:translateY(-56px);animation-timing-function:cubic-bezier(.3,0,.3,1.3)}62%{transform:translateY(0);animation-timing-function:ease-in-out}74%{transform:none}84%{transform:scale(1.03,.97);animation-timing-function:ease-in-out}100%{transform:none}}
+.go.k-repot .ball{animation:ball 1.9s linear both}
+@keyframes ball{0%{opacity:0}9%{opacity:0}16%{opacity:1}48%{opacity:1}56%,100%{opacity:0}}
+.ball{left:140px;top:251px;width:110px;height:56px;z-index:2;transform:translateY(-56px)}
+.potA,.potB{z-index:1}
+.potB{transform:translateX(360px)}
+.go.k-repot .potA{animation:pa .5s .3s cubic-bezier(.5,0,.8,.4) both}
+@keyframes pa{0%{transform:none;opacity:1}100%{transform:translate(-300px,24px) rotate(-12deg);opacity:0}}
+.go.k-repot .potB{animation:pb .45s .6s cubic-bezier(.2,.8,.3,1) both}
+@keyframes pb{0%{transform:translateX(360px);opacity:1}100%{transform:none;opacity:1}}
+.potB{opacity:0}
+.go.k-repot .potB .mound{animation:rise .4s 1.2s ease-out both}
+.go.k-repot .potB svg{animation:settle .35s 1.55s ease-in-out both;transform-origin:50% 100%}
+@keyframes settle{0%{transform:none}40%{transform:scale(1.03,.96)}100%{transform:none}}
+.go.k-repot .fall{animation:cfall .34s var(--d) cubic-bezier(.5,0,1,.6) both}
+.potB .mound{transform:scale(.4,.1)}
+.go.k-repot .potB .spkl{animation:twk .5s var(--d) ease-in-out both}
+.spkl{opacity:0;z-index:5}
+@keyframes twk{0%{opacity:0;transform:scale(.3)}50%{opacity:1;transform:scale(1.2)}100%{opacity:0;transform:scale(.5)}}
+/* chip fill */
+.go .chip b{animation:chf var(--cd) var(--cdl) ease-out both}
+@keyframes chf{0%{width:var(--f)}100%{width:100%}}
+/* reduced motion */
+.stage.rm.go .rmx{animation:fadein .4s both}
+@keyframes fadein{0%{opacity:0}100%{opacity:1}}
+@keyframes fadeout{0%{opacity:1}100%{opacity:0}}
+.stage.rm.go .pl{animation:none}
+.stage.rm.go .chip b{animation:chf .4s 0s both}
+.stage.rm.go.k-repot .potA{animation:fadeout .4s both}
+.stage.rm.go.k-repot .potB{animation:fadein .4s both;transform:none}
+.stage.rm.go.k-repot .potB .mound{animation:none;transform:none}
+.stage.rm.go.k-repot .potB svg{animation:none}
+.stage.rm.go.k-soil .pt .mound{animation:rise .4s both}
+.stage.rm.go.k-soil .pt .soil{animation:lvl .4s both}
+.stage.rm.go.k-water .wet{animation:wet .4s both}
+.stage.rm.go.k-sun .glow{animation:fadein .4s both}
+.rmx.badge{left:14px;top:46px;z-index:30;width:56px;height:56px}
+.rmx.badge svg{position:static;width:56px;height:56px}
+.sw{left:320px;top:14px;width:50px;height:50px;z-index:30}
+/* strips */
+.strip{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 10px}
+.strip .fr{flex:none;width:195px;text-align:center;font-size:12px;font-weight:800;color:var(--txt2)}
+.strip .fr .z{width:195px;height:210px;overflow:hidden;border-radius:14px;position:relative}
+.strip .fr .z .stage{transform:scale(.5);transform-origin:0 0;border-radius:0;box-shadow:none}
+.pot-row{display:flex;gap:8px;overflow:hidden;padding:4px 2px 8px}
+.pr{flex:none;width:78px;text-align:center;font-size:12px;font-weight:700;border-radius:16px;padding:6px 2px;background:var(--card);position:relative}
+.pr svg{width:62px;display:block;margin:0 auto}
+.pr.sel{box-shadow:0 0 0 3px var(--leaf)}
+.pr .sp{position:absolute;top:2px;right:6px;color:#C48A00;font-size:13px}
+.sheet{width:390px;background:var(--surface);border-radius:26px;box-shadow:var(--shadow);padding:14px 16px 16px}
+.sheet h4{margin:0 0 4px;font-size:17px}
+.pill{width:100%;margin-top:8px;padding:14px;border-radius:999px;border:0;background:var(--leaf);color:var(--leaf-ink);font:inherit;font-weight:800;font-size:16px}
+table{border-collapse:collapse;width:100%;max-width:1000px;background:var(--card);border-radius:14px;overflow:hidden}
+td,th{padding:8px 10px;text-align:left;font-size:14px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:color-mix(in srgb,var(--leaf) 30%,transparent)}
+ul.rules{max-width:78ch;padding-left:20px}ul.rules li{margin:5px 0}
+.live{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.live .col{width:390px;display:flex;flex-direction:column;gap:12px}
+</style></head><body><div class="wrap">
+<header><h1>Tend actions: meters, buttons and effects</h1>
+<p class="sub">Fix for "Daisy has had enough sun" when Sunshine is low. Rule: a meter shows how much its own action can do today. Low means the button works. Full means it rests, and the tap says why in kind words. Design review only, not built yet.</p>
+<div class="bar"><button class="btn ghost" id="rmT" aria-pressed="false">Reduce Motion: off</button><button class="btn ghost" id="thT">Dark: off</button>
+<nav style="display:flex;gap:14px;align-items:center;font-weight:700"><a href="#st">1 States</a><a href="#try">2 Try it</a><a href="#fx">3 Effects</a><a href="#rp">4 Repot</a><a href="#cp">5 Copy</a></nav></div></header>
+
+<h2 id="st">1. Meter and button states</h2>
+<p class="sub">Rule from the project plan: each action has its own daily allowance (Water 2 a day, Feed once, Sun once) and its meter shows only that. Not full means the button works. Ready: meter low, button lit with a ring. Water after one drink reads Good and still works. Done for today: meter full, button checked. Full: the button rests (moon badge, striped meter); tapping it says why and what comes next.</p>
+<div class="row" id="states"></div>
+
+<h2 id="try">2. Tap response (live)</h2>
+<p class="sub">Tap Water, Sun or Soil. The button presses in, the meter fills in a way that matches the action (water ripples, sun glows, soil rises in steps), the scene plays once, and a toast says what happened. A full action shows its reason as the toast and shakes nothing.</p>
+<div class="live"><div class="col"><div id="liveStage"></div></div><div class="col"><div id="liveLife"></div><button class="btn" id="liveReset">Start the day again</button><div id="tapStrip"></div></div></div>
+
+<h2 id="fx">3. Tend effects (each under 2 seconds, plays once)</h2>
+<p class="sub">Press Play on each. Frames show the exact moments. Reduce Motion swaps all travel for a 0.4 second fade to the end look.</p>
+<div id="fxs"></div>
+
+<h2 id="rp">4. Repot flow with the pot shed</h2>
+<div class="row" id="rpflow"></div>
+<div id="rpstrip"></div>
+
+<h2 id="cp">5. Rules and copy</h2>
+<ul class="rules">
+<li>Meter = that action's own allowance today: Water is waterings divided by 2 (0, 50, 100), Sun and Feed are 0 or 100. Not full means the button works. Time since the last action must not drive the bar. No action blocks another.</li>
+<li>A resting button stays tappable. The tap shows the reason as a toast and a VoiceOver announcement, never a silent refusal.</li>
+<li>Button stays Feed. Owner decision 3 in the plan: default is to show soil only through Feed's done state. This page also shows an optional Soil meter row; delete it if the default stays.</li>
+<li>Large text: the same states appear in the pinned 2 by 2 bar. Check and moon badges keep their shape, so colour is never the only signal.</li>
+</ul>
+<table id="copyT"></table>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+const STAR='<path d="M0 -7 Q1 -1.5 7 0 Q1 1.5 0 7 Q-1 1.5 -7 0 Q-1 -1.5 0 -7Z"/>';
+const HEART='<path d="M0 5 C-8 -1 -8 -8 -3 -8 C-1 -8 0 -6 0 -6 C0 -6 1 -8 3 -8 C8 -8 8 -1 0 5Z"/>';
+function star(x,y,s,f,cls,d){return `<g transform="translate(${x} ${y}) scale(${s})" fill="${f}"><g class="${cls||''}" style="animation-delay:${d||0}s">${STAR}</g></g>`}
+const POTS={
+ blue:{n:'Plain blue',u:'Start',b:'#5B8FD0',r:'#7AA6DE',d:'#4677B3',deco:()=>'<rect x="24" y="44" width="72" height="6" rx="3" fill="#fff" opacity=".35"/>',pl:'daisy'},
+ terra:{n:'Terracotta',u:'First plant',b:'#C8734A',r:'#DD8C63',d:'#A85A36',deco:()=>'<rect x="24" y="42" width="72" height="5" rx="2.5" fill="#A85A36"/><rect x="26" y="52" width="68" height="5" rx="2.5" fill="#A85A36" opacity=".6"/>',pl:'marigold'},
+ sage:{n:'Sage glaze',u:'10 plants',b:'#8FB08C',r:'#B4CCB1',d:'#76996F',deco:()=>'<path d="M18 22 H102 L101 30 Q98 36 94 30 Q90 52 85 30 Q80 40 76 30 Q71 62 66 30 Q60 44 55 30 Q50 56 44 30 Q38 42 33 30 Q28 50 23 30 Q20 34 18 28Z" fill="#DCEBD8"/>',pl:'lavender'},
+ shell:{n:'Seashell',u:'Finish level 1',b:'#F1CFC4',r:'#F8E4DC',d:'#DDB1A3',deco:()=>'<g stroke="#DDB1A3" stroke-width="3" stroke-linecap="round" fill="none"><path d="M60 92 L36 32"/><path d="M60 92 L48 32"/><path d="M60 92 L60 32"/><path d="M60 92 L72 32"/><path d="M60 92 L84 32"/></g>',pl:'tulip'},
+ moon:{n:'Moonlight',u:'Finish level 2',b:'#3E4D84',r:'#5A6BA6',d:'#2E3B68',deco:()=>'<circle cx="56" cy="56" r="17" fill="#F6E08A"/><circle cx="65" cy="51" r="15" fill="#3E4D84"/>'+star(86,44,.8,'#F6E08A')+star(84,74,.6,'#F6E08A')+star(34,40,.5,'#F6E08A'),pl:'jasmine'},
+ sun:{n:'Sunflower',u:'Finish level 3',b:'#F2C230',r:'#F8D95F',d:'#D9A514',deco:()=>'<g transform="translate(60 58)"><g fill="#E8913A">'+[0,45,90,135].map(a=>`<ellipse rx="5" ry="15" transform="rotate(${a})"/>`).join('')+'</g><circle r="8" fill="#6B4528"/></g>',pl:'sunflower'},
+ rose:{n:'Rose pink',u:'25 plants',b:'#E8869F',r:'#F2A9BC',d:'#CC6683',deco:()=>[[38,46,1],[82,46,1],[60,68,1.3]].map(([x,y,s])=>`<g transform="translate(${x} ${y}) scale(${s})" fill="#FFE9EF">${HEART}</g>`).join(''),pl:'rose'},
+ mint:{n:'Mint',u:'50 plants',b:'#86D6B0',r:'#ABE7CC',d:'#63B88F',deco:()=>'<g fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" opacity=".8"><path d="M24 44 q9 -8 18 0 t18 0 t18 0 t18 0"/><path d="M26 62 q9 -8 17 0 t17 0 t17 0 t17 0"/></g>',pl:'clover'},
+ gem:{n:'Crystal',u:'150 shed points',b:'#A98BE2',r:'#C9B3F0',d:'#8869C7',deco:()=>'<path d="M60 38 L74 52 L60 70 L46 52Z" fill="#E9DDFF"/><path d="M46 52 H74" stroke="#A98BE2" stroke-width="2"/>'+star(32,48,.8,'#fff')+star(90,64,.7,'#fff')+star(86,38,.5,'#fff'),pl:'poppy',spark:1},
+ star:{n:'Starlight',u:'Finish level 5',b:'#2F6670',r:'#47838D',d:'#224C54',deco:()=>star(36,44,1,'#FFE27A','tw',0)+star(82,50,.8,'#FFE27A','tw',.7)+star(60,70,1.2,'#FFE27A','tw',1.3)+star(92,76,.6,'#fff','tw',.3)+star(28,72,.6,'#fff','tw',1.0),pl:'hibiscus',spark:1,anim:1}
+};
+function pot(k,locked){
+ const p=POTS[k];
+ if(locked) return `<svg viewBox="0 0 120 100" aria-hidden="true"><rect x="10" y="4" width="100" height="18" rx="9" fill="var(--lock)" stroke="var(--lockink)" stroke-width="2" stroke-dasharray="5 4"/><path d="M18 22 H102 L92 88 Q91 96 82 96 H38 Q29 96 28 88Z" fill="var(--lock)" stroke="var(--lockink)" stroke-width="2" stroke-dasharray="5 4"/><g transform="translate(60 60)" fill="none" stroke="var(--lockink)" stroke-width="4" stroke-linecap="round"><rect x="-11" y="-3" width="22" height="17" rx="4" fill="var(--lockink)"/><path d="M-6 -3 V-9 a6 6 0 0 1 12 0 V-3"/></g></svg>`;
+ return `<svg viewBox="0 0 120 100" role="img" aria-label="${p.n} pot"><path d="M18 20 H102 L92 88 Q91 96 82 96 H38 Q29 96 28 88Z" fill="${p.b}"/><path d="M18 20 H34 L42 96 H38 Q29 96 28 88Z" fill="#fff" opacity=".14"/><path d="M102 20 H88 L82 96 Q91 96 92 88Z" fill="${p.d}" opacity=".45"/>${p.deco()}<rect x="10" y="4" width="100" height="18" rx="9" fill="${p.r}"/><rect x="16" y="8" width="88" height="5" rx="2.5" fill="#fff" opacity=".35"/></svg>`;
+}
+
+const SP='<path d="M0 -7 Q1 -1.5 7 0 Q1 1.5 0 7 Q-1 1.5 -7 0 Q-1 -1.5 0 -7Z"/>';
+const IC={
+ w:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.5C8 8 5.5 11 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 11 16 8 12 2.5Z"/></svg>',
+ s:'<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4.6"/><g stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></g></svg>',
+ o:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 17c1-5 5-8 9-8s8 3 9 8Z"/><rect x="3" y="18.5" width="18" height="2.5" rx="1.2"/></svg>',
+ p:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><circle cx="6.5" cy="17.5" r="3"/><circle cx="17.5" cy="17.5" r="3"/><path d="M8.5 15.5L18 4M15.5 15.5L6 4"/></svg>',
+ r:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 8h16l-1.6 11a2 2 0 0 1-2 1.7H7.6a2 2 0 0 1-2-1.7Z"/><rect x="3" y="4" width="18" height="5" rx="2.5"/></svg>',
+ ck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7"/></svg>',
+ mn:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5Z"/></svg>'};
+const TEXT={
+ w:{name:'Water',lab:'Water',
+  ready:['Ready for a drink',0,'Daisy can have 2 drinks a day. Tap Water to pour.'],
+  half:['Good',50,'Daisy had 1 drink. She can have 1 more today.'],
+  done:['Full',100,'Daisy had both drinks. Water again tomorrow.'],
+  full:['Full',100,'Daisy has had all the water she needs today. Sun or a hello would be nice.'],
+  toast:'Splash! Daisy had a drink.'},
+ s:{name:'Sunshine',lab:'Sun',
+  ready:['Ready for sun',0,'Daisy would love some sun. Tap Sun to let it shine.'],
+  done:['Bright',100,'Sun is out for today. Daisy is glowing. Try again tomorrow.'],
+  full:['Bright',100,'Daisy soaked up the sun today. More sun tomorrow!'],
+  toast:'Sun is out. Daisy is glowing!'},
+ o:{name:'Soil',lab:'Feed',
+  ready:['Ready for soil',0,'Daisy is ready for fresh soil. Tap Feed to add a scoop.'],
+  done:['Fed today',100,'Fresh soil is in. Daisy feels cozy. More tomorrow.'],
+  full:['Fed today',100,'Daisy is well fed today. More soil tomorrow.'],
+  toast:'Fresh soil is in. Daisy feels cozy.'}};
+function meter(k,st,cls=''){const t=TEXT[k][st];return `<div class="m ${k} ${st==='full'?'rest':''} ${cls}" data-k="${k}"><div class="mi">${IC[k]}</div><div><div class="mt">${TEXT[k].name}<span>${t[0]}</span></div><div class="track" role="progressbar" aria-valuenow="${t[1]}" aria-label="${TEXT[k].name}"><div class="fill" style="--f:${t[1]}%"></div></div></div><div class="line">${t[2]}</div></div>`}
+function btn(k,st,cls=''){const l=k==='p'?'Prune':k==='r'?'Repot':TEXT[k].lab;const s=(k==='p'||k==='r')?'ready':(st==='full'?'rest':st==='half'?'ready':st);
+ const aria=s==='ready'?'':s==='done'?'. Done for today':'. Resting, tap to hear why';
+ return `<button class="ab ${k} ${s==='ready'&&(k==='p'||k==='r')?'':s} ${cls}" data-k="${k}" aria-label="${l}${aria}"><span class="dot">${IC[k]}<span class="bdg">${s==='done'?IC.ck:IC.mn}</span></span>${l}</button>`}
+function life(sts,tag,cls=''){return `<div class="life ${cls}">${tag?`<span class="tag">${tag}</span>`:''}<h4>Daisy's Life</h4>${['w','s','o'].map((k,i)=>meter(k,sts[i])).join('')}<div class="acts">${['w','o','s'].map(k=>btn(k,sts[['w','s','o'].indexOf(k)])).join('')}${btn('p','ready')}${btn('r','ready')}</div><div class="toast"><span style="color:#9BCB3C">${IC.ck}</span><span class="tt"></span></div></div>`}
+$('#states').innerHTML=[
+ [['ready','ready','ready'],'Ready: a fresh morning'],
+ [['half','done','ready'],'Mid day: second drink still works'],
+ [['done','done','done'],'Done for today'],
+ [['full','full','full'],'Full: tapping a resting button']
+].map(([s,t],i)=>`<div>${life(s,t)}</div>`).join('');
+(()=>{const l=document.querySelectorAll('#states .life')[3];const tt=l.querySelector('.toast');tt.classList.add('show');tt.querySelector('.tt').textContent=TEXT.w.full[2];tt.querySelector('span').innerHTML=IC.mn;tt.firstChild.style.color='#B9C9B9';l.style.paddingBottom='76px'})();
+/* ---- scene builder ---- */
+const plantImg='../plants/plant_daisy.svg';
+function potBlock(k,cls,extra=''){return `<div class="pt ${cls}">${pot(k)}<div class="soil"></div><div class="mound"></div>${extra}</div>`}
+const sparkAt=[[150,205,'.30s'],[238,200,'.38s'],[197,122,'.46s'],[165,160,'.54s'],[230,155,'.62s'],[120,250,'.7s']];
+const TROWEL=`<svg viewBox="0 0 140 50" width="140" height="50"><path d="M60 25C66 6 100 4 138 25C100 46 66 44 60 25Z" fill="#C5CED6" stroke="#3B3B3B" stroke-width="2.4" stroke-linejoin="round"/><path d="M66 25H128" stroke="#8D9AA6" stroke-width="2" stroke-linecap="round"/><path d="M72 17C86 12 104 15 118 22" stroke="#fff" stroke-opacity=".7" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M48 21H62V29H48Z" fill="#AEB9C3" stroke="#3B3B3B" stroke-width="2.2" stroke-linejoin="round"/><rect x="40" y="13" width="11" height="24" rx="3" fill="#D5DCE2" stroke="#3B3B3B" stroke-width="2.2"/><rect x="2" y="16" width="40" height="18" rx="9" fill="#B07A4B" stroke="#3B3B3B" stroke-width="2.4"/><path d="M12 20V30M18 20V30M24 20V30" stroke="#8A5A32" stroke-width="2" stroke-linecap="round"/><g class="hp"><path d="M66 24C68 8 84 2 98 6C112 9 118 18 118 24Z" fill="#6B4528" stroke="#3B3B3B" stroke-width="1.6" stroke-linejoin="round"/><path d="M76 14C84 9 96 9 106 13" stroke="#85583A" stroke-width="2.5" fill="none" stroke-linecap="round"/></g></svg>`;
+const CAN=`<svg viewBox="0 0 110 90" width="110" height="90"><path d="M82 34C104 30 104 68 80 66" fill="none" stroke="#3B3B3B" stroke-width="9" stroke-linecap="round"/><path d="M82 34C104 30 104 68 80 66" fill="none" stroke="#3F7A45" stroke-width="5" stroke-linecap="round"/><path d="M30 60L8 22" stroke="#3B3B3B" stroke-width="12" stroke-linecap="round"/><path d="M30 60L8 22" stroke="#3F7A45" stroke-width="7.5" stroke-linecap="round"/><ellipse cx="6" cy="19" rx="9" ry="5.5" transform="rotate(-62 6 19)" fill="#C5CED6" stroke="#3B3B3B" stroke-width="2.2"/><rect x="26" y="30" width="56" height="50" rx="11" fill="#5FA05A" stroke="#3B3B3B" stroke-width="2.4"/><rect x="26" y="30" width="56" height="11" rx="5.5" fill="#C5CED6" stroke="#3B3B3B" stroke-width="2.2"/><path d="M36 50V70" stroke="#fff" stroke-opacity=".35" stroke-width="4" stroke-linecap="round"/></svg>`;
+const SUN=`<svg viewBox="-60 -60 120 120" width="130" height="130"><g stroke="#E8A21A" stroke-width="7" stroke-linecap="round">${[...Array(12)].map((_,i)=>`<path d="M0 -40V-52" transform="rotate(${i*30})"/>`).join('')}</g><circle r="32" fill="#F6C85A" stroke="#E8A21A" stroke-width="3"/><circle r="22" cx="-5" cy="-6" fill="#FFE9A0" opacity=".7"/><circle cx="-10" cy="-2" r="2.6" fill="#7A5238"/><circle cx="10" cy="-2" r="2.6" fill="#7A5238"/><path d="M-9 8Q0 15 9 8" stroke="#7A5238" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>`;
+function chip(k,pctStart,label,cd,cdl){const c={water:'var(--water)',sun:'#C48A00',soil:'var(--soilc)',repot:'var(--leaf)'}[k];return `<div class="chip" style="--c:${c};--f:${pctStart}%;--cd:${cd}s;--cdl:${cdl}s"><span>${label}</span><i><b></b></i></div>`}
+function dropsHTML(){return [0,1,2,3,4,5].map(i=>`<div class="drop mv" style="--x:${206+(i%3)*10+(i>2?6:0)}px;--d:${(.62+i*.09).toFixed(2)}s"></div><div class="rip mv" style="--x:${211+(i%3)*10+(i>2?6:0)}px;--d:${(1.07+i*.09).toFixed(2)}s"></div>`).join('')}
+function fallHTML(t0,xs){return xs.map((x,i)=>`<div class="fall mv" style="--x:${x}px;--d:${(t0+i*.07).toFixed(2)}s;top:${230}px"></div>`).join('')}
+function rmBadge(svg){return `<div class="rmx badge">${svg}</div>`}
+function scene(kind,opts={}){
+ let inner='';
+ const pl=`<div class="pl"><img src="${plantImg}" alt="Daisy"></div>`;
+ if(kind==='water') inner=chip('water',22,'Water',.55,1.1)+potBlock('blue','potA')+'<div class="wet"></div>'+pl+dropsHTML()+`<div class="can mv">${CAN}</div>`+rmBadge(`<svg viewBox="0 0 24 24" fill="#4C93D6" stroke="#3B3B3B" stroke-width="1"><path d="M12 2.5C8 8 5.5 11 5.5 14.5a6.5 6.5 0 0 0 13 0C18.5 11 16 8 12 2.5Z"/></svg>`);
+ if(kind==='soil') inner=chip('soil',30,'Soil',.5,1.5)+`<div class="pile"><svg class="pileb" viewBox="0 0 100 36" width="100" height="36" style="position:absolute;left:0;top:0"><path d="M2 36C8 14 26 4 50 4C74 4 92 14 98 36Z" fill="#6B4528" stroke="#3B3B3B" stroke-width="2" stroke-linejoin="round"/><path d="M24 22C34 12 54 10 70 16" stroke="#85583A" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>`+potBlock('blue','potA')+pl+fallHTML(1.42,[186,196,206,214,200]).replace(/top:230px/g,'top:236px')+`<div class="trowel mv">${TROWEL}</div>`+rmBadge(TROWEL.replace('width="140" height="50"','width="56" height="20"'));
+ if(kind==='sun') inner=chip('sun',18,'Sunshine',.7,.5)+'<div class="glow mv"></div>'+potBlock('blue','potA')+pl+sparkAt.map(([x,y,d])=>`<div class="spk mv" style="--x:${x}px;--y:${y}px;--d:${d}"><svg viewBox="-9 -9 18 18" width="36" height="36"><g fill="#FFF6C8" stroke="#E8A21A" stroke-width="1">${SP}</g></svg></div>`).join('')+`<div class="sunb mv">${SUN}</div><div class="glow rmx"></div>`+rmBadge(SUN.replace('width="130" height="130"','width="56" height="56"'));
+ if(kind==='repot'){const nk=opts.pot||'gem';inner=chip('repot',0,'New pot',.5,1.2).replace('--f:0%','--f:0%')+`<div class="ball mv"><svg viewBox="0 0 110 56" width="110" height="56"><path d="M8 6C8 40 30 54 55 54C80 54 102 40 102 6Z" fill="#6B4528" stroke="#3B3B3B" stroke-width="2.4" stroke-linejoin="round"/><path d="M26 18C36 28 46 30 58 28" stroke="#85583A" stroke-width="3" fill="none" stroke-linecap="round"/></svg></div>`+potBlock('blue','potA')+potBlock(nk,'potB',POTS[nk].spark?[0,1,2,3].map(i=>`<div class="spkl" style="left:${[14,100,52,86][i]}px;top:${[40,50,64,28][i]}px;--d:${(1.5+i*.1).toFixed(1)}s"><svg viewBox="-9 -9 18 18" width="20" height="20" style="position:static"><g fill="#fff" stroke="#E8A21A" stroke-width="1">${SP}</g></svg></div>`).join(''):'')+pl+fallHTML(1.12,[168,182,196,210,224]).replace(/top:230px/g,'top:205px')}
+ return `<div class="stage k-${kind}${opts.rm?' rm':''}" data-kind="${kind}"><div class="grd"></div>${inner}</div>`;
+}
+function seek(el,t){el.classList.add('go');el.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=t})}
+const DUR={water:1.8,soil:1.9,sun:1.8,repot:1.9};
+const FX={
+ water:['Water pour','Can slides in (0.35 s), tilts (0.3 s), six drops fall with real speed-up, a ripple opens where each lands, Daisy takes a little drink, soil darkens. Meter fills from 0.55 s.',[0,.35,.7,.95,1.15,1.35,1.55,1.8]],
+ soil:['Soil scoop','Trowel dips into the mound, pushes in, lifts with a heap, arcs over, tips into the pot, soil level rises in the pot. Meter rises in steps.',[0,.3,.6,.9,1.2,1.4,1.65,1.9]],
+ sun:['Sun glisten','Sun pops in with overshoot, sparkles start on the leaves at 0.3 s, and Daisy flutters from the very first glint. Sun fades out gently.',[0,.15,.3,.5,.8,1.1,1.4,1.8]],
+ repot:['Repot','Daisy lifts first, the old pot slides out, the pot picked in the shed slides in, Daisy lowers, fresh soil falls, tiny settle.',[0,.25,.5,.75,1,1.25,1.55,1.9]]};
+function fxCard(kind,opts={}){const [t,d,fr]=FX[kind];
+ return `<section style="margin:18px 0 28px"><h3>${t} (${DUR[kind]} s)</h3><p class="sub" style="margin:0 0 10px">${d}</p><div class="row"><div><div class="stage-wrap" data-kind="${kind}">${scene(kind,opts)}</div><div class="bar"><button class="btn play" data-kind="${kind}">Play once</button></div></div></div>
+ <div class="strip">${fr.map(f=>`<div class="fr"><div class="z" data-t="${f}" data-kind="${kind}"></div>${f.toFixed(2)} s</div>`).join('')}</div>
+ <div class="strip"><div class="fr"><div class="z" data-t="0" data-kind="${kind}" data-rm="1" data-rest="0"></div>Reduce Motion: before</div><div class="fr"><div class="z" data-t="0.45" data-kind="${kind}" data-rm="1"></div>Reduce Motion: after (0.4 s fade)</div></div></section>`}
+$('#fxs').innerHTML=['water','soil','sun'].map(k=>fxCard(k)).join('');
+/* repot flow */
+const choose='gem';
+const shedRow=['blue','terra','sage','gem','star','moon'].map(k=>`<div class="pr${k===choose?' sel':''}">${POTS[k].spark?'<span class="sp">&#10022;</span>':''}${pot(k)}${POTS[k].n.split(' ')[0]}${k===choose?'<br>&#10003; Picked':''}</div>`).join('');
+$('#rpflow').innerHTML=`<div><div class="sheet"><h4>Repot Daisy</h4><p class="sub" style="margin:0 0 6px;font-size:14px">Pick a pot from your shed. Changing pots is free.</p><div class="pot-row">${shedRow}</div><div style="display:flex;gap:6px;font-size:13px;color:var(--txt2);font-weight:700">Plain blue is always here. Sparkly pots twinkle when Daisy settles in. <span style="color:#C48A00">&#10022;</span></div><button class="pill">Repot into Crystal</button></div><p class="cap">Step 1: pick a pot<small>Shed row shows plain blue plus unlocked pots. Sparkly ones carry a small star.</small></p></div>
+<div><div class="stage-wrap" data-kind="repot">${scene('repot',{pot:choose})}</div><div class="bar"><button class="btn play" data-kind="repot">Play once</button></div><p class="cap">Step 2: it plays once (1.9 s)<small>Lift, old pot out, chosen pot in, soil falls, settle. A toast follows.</small></p></div>
+<div><div class="life" style="padding-bottom:70px"><h4>Daisy's Life</h4>${meter('w','done')}<div class="toast show"><span style="color:#9BCB3C">${IC.ck}</span><span>Daisy is cozy in her Crystal pot!</span></div></div><p class="cap">Step 3: toast<small>Positive line, then the garden is calm again.</small></p></div>`;
+$('#rpstrip').innerHTML=`<p class="sub">${FX.repot[1]}</p><div class="strip">${FX.repot[2].map(f=>`<div class="fr"><div class="z" data-t="${f}" data-kind="repot" data-pot="${choose}"></div>${f.toFixed(2)} s</div>`).join('')}</div><div class="strip"><div class="fr"><div class="z" data-t="0" data-kind="repot" data-pot="${choose}" data-rm="1"></div>Reduce Motion: before</div><div class="fr"><div class="z" data-t="0.45" data-kind="repot" data-pot="${choose}" data-rm="1"></div>Reduce Motion: after</div></div>`;
+/* strips */
+function fillStrips(){document.querySelectorAll('.z[data-kind]').forEach(z=>{const k=z.dataset.kind;z.innerHTML=scene(k,{pot:z.dataset.pot||'gem',rm:!!z.dataset.rm});if(z.dataset.t!==undefined&&z.dataset.rest!=='0')seek(z.firstChild,parseFloat(z.dataset.t)*1000)})}
+/* play buttons */
+let RM=false;
+function play(kind){document.querySelectorAll(`.stage-wrap[data-kind="${kind}"]`).forEach(w=>{w.innerHTML=scene(kind,{pot:choose,rm:RM});const s=w.firstChild;void s.offsetWidth;s.classList.add('go')})}
+document.addEventListener('click',e=>{const b=e.target.closest('.play');if(b)play(b.dataset.kind)});
+$('#rmT').onclick=e=>{RM=!RM;e.target.textContent='Reduce Motion: '+(RM?'on':'off');e.target.setAttribute('aria-pressed',RM)};
+$('#thT').onclick=e=>{const d=document.documentElement.dataset.theme==='dark';document.documentElement.dataset.theme=d?'light':'dark';e.target.textContent='Dark: '+(d?'off':'on')};
+/* live try-it */
+let st;const LIVEKIND={w:'water',o:'soil',s:'sun'};
+function resetLive(){st={w:'ready',s:'ready',o:'ready'};$('#liveStage').innerHTML=scene('water');$('#liveLife').innerHTML=life([st.w,st.s,st.o],'Tap Water, Soil or Sun','tap');wireLive()}
+function toast(l,msg,ok=true){const t=l.querySelector('.toast');t.querySelector('.tt').textContent=msg;t.classList.remove('show');void t.offsetWidth;t.classList.add('show');clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove('show'),2600)}
+function wireLive(){const l=$('#liveLife .life');l.querySelectorAll('.ab').forEach(b=>b.onclick=()=>{const k=b.dataset.k;if(!LIVEKIND[k])return;
+ if(st[k]==='done'){toast(l,TEXT[k].full[2]);return}
+ const was=st[k];st[k]=(k==='w'&&was==='ready')?'half':'done';const kind=LIVEKIND[k];$('#liveStage').innerHTML=scene(kind,{rm:RM});const s=$('#liveStage').firstChild;void s.offsetWidth;s.classList.add('go');
+ const m=l.querySelector(`.m[data-k="${k}"]`);m.classList.add('hit');b.classList.add('hit');
+ if(st[k]==='done')b.classList.remove('ready');
+ setTimeout(()=>{const s2=st[k];const T=TEXT[k][s2];m.querySelector('.mt span').textContent=T[0];m.querySelector('.line').textContent=T[2];m.querySelector('.fill').style.setProperty('--f',T[1]+'%');m.classList.remove('hit');b.classList.remove('hit');if(s2==='done'){b.classList.add('done');b.setAttribute('aria-label',TEXT[k].lab+'. Done for today')}else b.classList.add('ready')},1300);
+ toast(l,TEXT[k].toast);l.querySelector('.toast').style.animationDelay='0s'})}
+$('#liveReset').onclick=resetLive;resetLive();
+/* tap strip: three frames of the button/meter/toast */
+(function(){const fr=[0.1,0.5,1.0,1.6];
+ $('#tapStrip').innerHTML=`<div class="cap">Tap response frames (Water): press, fill, check, toast</div><div class="strip" style="flex-wrap:wrap">${fr.map(f=>`<div class="fr" style="width:190px"><div class="tz" data-t="${f}"></div>${f.toFixed(1)} s</div>`).join('')}</div>`;
+ document.querySelectorAll('.tz').forEach(z=>{const t=parseFloat(z.dataset.t);z.innerHTML=`<div class="life tap tzl"><div style="display:flex;gap:6px;align-items:center">${btn('w','ready','hit')}<div class="m w hit" style="grid-template-columns:1fr;flex:1;padding:0;border:0"><div class="mt">Water<span>${t>=1?'Good':'Ready'}</span></div><div class="track"><div class="fill" style="--f:22%"></div></div></div></div><div class="toast hit" style="position:relative;left:0;right:0;bottom:0;margin-top:6px;font-size:11px;padding:6px 8px;text-align:left"><span class="tt">${TEXT.w.toast}</span></div></div>`;
+  const L=z.firstChild;if(t>=1)L.querySelector('.ab').classList.add('done');L.getAnimations({subtree:true}).forEach(a=>{a.pause();a.currentTime=t*1000});});})();
+fillStrips();
+/* copy table */
+$('#copyT').innerHTML='<tr><th>Action</th><th>Ready</th><th>Done for today</th><th>Full (reason, next step)</th></tr>'+['w','s','o'].map(k=>`<tr><td><b>${TEXT[k].name}</b></td><td>${TEXT[k].ready[2]}</td><td>${TEXT[k].done[2]}</td><td>${TEXT[k].full[2]}</td></tr>`).join('')+'<tr><td><b>Toasts</b></td><td colspan="3">'+['w','s','o'].map(k=>TEXT[k].toast).join(' &nbsp;|&nbsp; ')+' &nbsp;|&nbsp; Daisy is cozy in her new pot!</td></tr>';
+if(location.hash==='#dark')document.documentElement.dataset.theme='dark';
+</script></body></html>
