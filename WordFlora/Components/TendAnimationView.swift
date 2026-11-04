@@ -58,22 +58,30 @@ enum TendEffect: String, CaseIterable, Equatable {
     }
 }
 
-/// The pots a repot can play with.
-/// HOOK (pot collection): the shed's pot row is not built yet, so plain blue is the one pot. When the collection lands,
-/// add its pots here (colours from design-preview/tending/actions.html, POTS) and pass the picked one into `TendPlay`.
-enum TendPot: String, CaseIterable, Equatable {
-    case plainBlue
+/// The pot a repot plays with, drawn from `PotCatalog` (design-preview/pots/pots.json).
+struct TendPot: Equatable, Hashable {
+    let pot: Pot
 
-    var name: String { "Plain blue" }
-    var body: Color { Color(UIColor(hex: 0x5B8FD0)) }
-    var rim: Color { Color(UIColor(hex: 0x7AA6DE)) }
-    var shade: Color { Color(UIColor(hex: 0x4677B3)) }
+    init(_ pot: Pot) { self.pot = pot }
+    /// Empty and unknown ids are plain blue.
+    init(id: String) { pot = PotCatalog.pot(id: id) }
+
+    static let plainBlue = TendPot(PotCatalog.plainBlue)
+    static var allCases: [TendPot] { PotCatalog.all.map(TendPot.init) }
+
+    var id: String { pot.id }
+    var name: String { pot.name }
+    var body: Color { PotPainter.color(pot.body) }
+    var rim: Color { PotPainter.color(pot.rim) }
+    var shade: Color { PotPainter.color(pot.shade) }
 }
 
 /// One play of one effect.
 struct TendPlay: Equatable {
     let effect: TendEffect
+    /// The pot the plant moves into, and the one it leaves (a repot slides one out and the other in).
     var pot: TendPot = .plainBlue
+    var from: TendPot = .plainBlue
     let startedAt: Date
     let id: Int
 }
@@ -84,9 +92,9 @@ struct TendSequencer: Equatable {
     private var count = 0
 
     @discardableResult
-    mutating func start(_ effect: TendEffect, pot: TendPot = .plainBlue, at date: Date) -> TendPlay {
+    mutating func start(_ effect: TendEffect, pot: TendPot = .plainBlue, from: TendPot = .plainBlue, at date: Date) -> TendPlay {
         count += 1
-        let play = TendPlay(effect: effect, pot: pot, startedAt: date, id: count)
+        let play = TendPlay(effect: effect, pot: pot, from: from, startedAt: date, id: count)
         current = play
         return play
     }
@@ -255,6 +263,14 @@ struct TendAnimationView: View {
 
     /// The canvas reaches this far past the plant box on every side (the can and sun start outside it).
     static let margin: CGFloat = 0.45
+
+    /// The stage pot in 220 pt plant box points (actions.html and pots/index.html: 140 pt wide, its top 179 points
+    /// down the plant box). The plant page draws the plant's pot here and the repot effect slides pots in and out of it.
+    static let potRect = CGRect(x: 40, y: 179, width: 140, height: 140 * 100 / 120)
+    /// The soil top inside that pot, where the plant's ground shadow is kept.
+    static let soilRect = CGRect(x: 70, y: 185, width: 80, height: 20)
+    /// The floor shadow under the pot.
+    static let floorShadowRect = CGRect(x: 45, y: 285, width: 130, height: 16)
 }
 
 // MARK: Drawing
@@ -505,7 +521,7 @@ private struct TendScene {
 
     // MARK: Repot: the plant lifts first, the old pot slides out, the new pot slides in, soil falls, a tiny settle.
 
-    private static let potRect = CGRect(x: 70, y: 152, width: 80, height: 56)
+    private static let potRect = TendAnimationView.potRect
 
     private func repot(_ g: GraphicsContext) {
         let d = play.effect.duration
@@ -531,7 +547,7 @@ private struct TendScene {
         if oldIn > 0 && out < 1 {
             var og = g; og.opacity = oldIn * (1 - out)
             og.translateBy(x: Self.potRect.midX - 300 * out, y: Self.potRect.minY + 24 * out); og.rotate(by: .degrees(-12 * out))
-            Self.drawPot(og, body: LifePalette.clay, rim: LifePalette.clayRim, shade: Color(UIColor(hex: 0xA85A36)), rise: 1)
+            Self.drawPot(og, pot: play.from, width: Self.potRect.width, rise: 1)
         }
 
         // the picked pot slides in from the right, its soil rises, it settles, then the scene fades
@@ -543,7 +559,7 @@ private struct TendScene {
             ng.translateBy(x: Self.potRect.midX + 360 * (1 - inF), y: Self.potRect.maxY)
             ng.scaleBy(x: settle[0], y: settle[1])
             ng.translateBy(x: 0, y: -Self.potRect.height)
-            Self.drawPot(ng, body: play.pot.body, rim: play.pot.rim, shade: play.pot.shade, rise: M.easeOut(M.window(t, 1.2, 0.4)))
+            Self.drawPot(ng, pot: play.pot, width: Self.potRect.width, rise: M.easeOut(M.window(t, 1.2, 0.4)))
         }
 
         for (i, x) in [83.0, 97, 111, 125, 139].enumerated() {
@@ -555,27 +571,12 @@ private struct TendScene {
         }
     }
 
-    /// A pot drawn from its top centre, 80 wide (mockup pot(), 120 by 100 view box). `rise` grows its soil mound.
-    static func drawPot(_ g: GraphicsContext, body: Color, rim: Color, shade: Color, rise: Double) {
+    /// A catalog pot drawn from its top centre, `width` wide (the shared 120 by 100 pot box). `rise` grows its soil mound.
+    static func drawPot(_ g: GraphicsContext, pot: TendPot, width: CGFloat = 80, rise: Double) {
         var p = g
-        p.scaleBy(x: 80 / 120, y: 56 / 100)
+        p.scaleBy(x: width / 120, y: width / 120)
         p.translateBy(x: -60, y: 0)
-        let shape = Path { q in
-            q.move(to: CGPoint(x: 18, y: 20)); q.addLine(to: CGPoint(x: 102, y: 20)); q.addLine(to: CGPoint(x: 92, y: 88))
-            q.addQuadCurve(to: CGPoint(x: 82, y: 96), control: CGPoint(x: 91, y: 96)); q.addLine(to: CGPoint(x: 38, y: 96))
-            q.addQuadCurve(to: CGPoint(x: 28, y: 88), control: CGPoint(x: 29, y: 96)); q.closeSubpath()
-        }
-        p.fill(shape, with: .color(body))
-        p.fill(Path { q in q.move(to: CGPoint(x: 102, y: 20)); q.addLine(to: CGPoint(x: 88, y: 20)); q.addLine(to: CGPoint(x: 82, y: 96))
-            q.addQuadCurve(to: CGPoint(x: 92, y: 88), control: CGPoint(x: 91, y: 96)); q.closeSubpath() }, with: .color(shade.opacity(0.45)))
-        p.fill(Path(roundedRect: CGRect(x: 24, y: 44, width: 72, height: 6), cornerRadius: 3), with: .color(.white.opacity(0.35)))
-        p.fill(Path(roundedRect: CGRect(x: 10, y: 4, width: 100, height: 18), cornerRadius: 9), with: .color(rim))
-        p.fill(Path(ellipseIn: CGRect(x: 26, y: 6, width: 68, height: 12)), with: .color(Color(UIColor(hex: 0x6B4528))))
-        if rise > 0 {
-            var m = p
-            m.translateBy(x: 60, y: 12); m.scaleBy(x: 0.4 + 0.6 * rise, y: 0.1 + 0.9 * rise)
-            m.fill(Path(roundedRect: CGRect(x: -26, y: -10, width: 52, height: 12), cornerSize: CGSize(width: 22, height: 8)), with: .color(Color(UIColor(hex: 0x7A5238))))
-        }
+        PotPainter.draw(p, pot: pot.pot, soil: true, rise: rise)
     }
 
     // MARK: Reduce Motion: no travel, a 0.4 s fade to the end look (a badge and a soft glow), then a fade out.
@@ -601,7 +602,7 @@ private struct TendScene {
             Self.drawSun(s)
         case .repot:
             var p = c; p.translateBy(x: badge.x, y: badge.y - 22); p.scaleBy(x: 0.45, y: 0.45)
-            Self.drawPot(p, body: play.pot.body, rim: play.pot.rim, shade: play.pot.shade, rise: 1)
+            Self.drawPot(p, pot: play.pot, rise: 1)
         }
     }
 }

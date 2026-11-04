@@ -19,6 +19,9 @@ struct LayeredPlantView: View {
     let size: CGFloat
     /// Called when the shown count settles, to persist it.
     var onShown: (Int) -> Void = { _ in }
+    /// When the plant stands in a pot, its ground shadow is kept inside this soil-top ellipse (points in the plant
+    /// box), so it never spills over the rim (design-preview/pots/review.md, change 2).
+    var groundClip: CGRect? = nil
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var display: Int?
@@ -68,7 +71,15 @@ struct LayeredPlantView: View {
         let pivot = t.droop.map { UnitPoint(x: $0.pivot[0] / 200, y: $0.pivot[1] / 200) } ?? .bottom
         ZStack(alignment: .topLeading) {
             ForEach(Array(t.layers.enumerated()), id: \.offset) { _, layer in
-                if layer.kind == .ground { layerImage(layer) }
+                if layer.kind == .ground {
+                    if let groundClip {
+                        layerImage(layer).mask(alignment: .topLeading) {
+                            Ellipse().frame(width: groundClip.width, height: groundClip.height).offset(x: groundClip.minX, y: groundClip.minY)
+                        }
+                    } else {
+                        layerImage(layer)
+                    }
+                }
             }
             ZStack(alignment: .topLeading) {
                 ForEach(Array(t.layers.enumerated()), id: \.offset) { _, layer in

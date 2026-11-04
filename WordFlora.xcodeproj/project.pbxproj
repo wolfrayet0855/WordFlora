@@ -23,6 +23,7 @@
 		1A0DEDAC7F9EC16779453E20 /* WordFloraWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 99F163FA4DA73F8563DD08F0 /* WordFloraWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1A1EF2246D18FBC822B23F43 /* wf-butterfly.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B3C67B3F3D18A565BC91069D /* wf-butterfly.m4a */; };
 		1B1F6E25CDDEF290B4E2EDA4 /* VoicePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673807997651A94A74A50735 /* VoicePickerTests.swift */; };
+		1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */; };
 		1CE9AE24116B633B3AF3403A /* WakePuzzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60BDD5B19B690060D44B813 /* WakePuzzle.swift */; };
 		1CEC41D7155EFBA55139F8BF /* ButterflyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F887962950E79A156ED26A3F /* ButterflyView.swift */; };
 		1D3676A7C18FACB6F1FC68CD /* RoseMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */; };
@@ -41,6 +42,7 @@
 		32B0BDF2B9904F58C4465D04 /* WidgetActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF5CF61BBF7BC272D7B55BB /* WidgetActions.swift */; };
 		3387AF69843656FF4847F8E8 /* wf-badgeGold.m4a in Resources */ = {isa = PBXBuildFile; fileRef = DA61364BB027900BC30E6C17 /* wf-badgeGold.m4a */; };
 		33BA691BF1E87DE5BB43E0B0 /* TendingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F787992B59617103496CEE38 /* TendingUITests.swift */; };
+		347A410A75615F9238BE8729 /* PotArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5937A430C3FA390AF941B091 /* PotArtView.swift */; };
 		35E6F9E2E0FBEFA232A6E0B1 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25BA2007B9E2490E80F9FDF0 /* OnboardingView.swift */; };
 		3A604584883B42745568A096 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9888DEE09FE8404AD2E6B806 /* SharedContainer.swift */; };
 		3B0ACB4FD72E0B1901B947AA /* BadgesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DA8F2D5FF4FD7D8DEFF8E5 /* BadgesView.swift */; };
@@ -81,8 +83,10 @@
 		72563F46E520B7D22ECEAB04 /* WordTilesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C19C4668A7EFD195748409A0 /* WordTilesView.swift */; };
 		73A960D878B4124A30601B58 /* CapacityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB0A3A61951013C0E5506F /* CapacityTests.swift */; };
 		73D43C070CF83BBA5CF8A575 /* PlantThinningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50EBB1E418EE1EB9BB4CA6 /* PlantThinningTests.swift */; };
+		73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */; };
 		7414B32D8EE9EB1450BE77C1 /* wf-badgeSilver.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ACF0034A28D0F546B9B9DB9 /* wf-badgeSilver.m4a */; };
 		77DC9100629457266EDDA0DB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1AAA9FCAE4CF29BBA16A8 /* SettingsView.swift */; };
+		7DD477E02162F248269BFF98 /* PotCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E72C046D44E8C67ECE69705 /* PotCatalog.swift */; };
 		802F6E198FE55EE761BBF216 /* Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045A383C28CF63B7AA1690E5 /* Economy.swift */; };
 		80C6C5F5EDC6DB0C83563F51 /* LayeredPlantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52107D98E6FA3FE503D0BDC7 /* LayeredPlantView.swift */; };
 		812CC68498F635B4E42F0D32 /* FeatureUnlockPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */; };
@@ -171,6 +175,7 @@
 		E7EE45CC3E1C7571FF926CB0 /* DailyBloom.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */; };
 		EC4500E6CD3A54445703ACAF /* ReconcileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5603BA4007B124D652F8467 /* ReconcileTests.swift */; };
 		EDB86ADCB596F2390F8642F7 /* wf-word.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9BB89B0B7D5A508F1A4C13B4 /* wf-word.m4a */; };
+		EDC9869F995C67A16F2AB495 /* PotPickerViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A7721B11B88B81E56630C05 /* PotPickerViews.swift */; };
 		EF9467241BBA43B535D516F9 /* WidgetActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF5CF61BBF7BC272D7B55BB /* WidgetActions.swift */; };
 		F1EC73BEF7CC700E3392A9D0 /* Paywall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235887FB6ABDC2ED7F728A3C /* Paywall.swift */; };
 		F4C0D43C87AF2524BB79A1A1 /* TendAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F738E93544B38467408EB43 /* TendAnimationView.swift */; };
@@ -236,6 +241,7 @@
 		1953888CF19BF643304ED9AC /* WordEntry.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordEntry.swift; sourceTree = "<group>"; };
 		1C993C4217CD453C7424D842 /* GardenIntentTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenIntentTests.swift; sourceTree = "<group>"; };
 		1D7290C3761A8148AC6E5A94 /* ButterflyGameModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyGameModelTests.swift; sourceTree = "<group>"; };
+		1E72C046D44E8C67ECE69705 /* PotCatalog.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PotCatalog.swift; sourceTree = "<group>"; };
 		1F9C82D7DFDE6E520A95AC7E /* WakeSheet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WakeSheet.swift; sourceTree = "<group>"; };
 		2209A1734F0A48837A37BC23 /* RootView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		235887FB6ABDC2ED7F728A3C /* Paywall.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Paywall.swift; sourceTree = "<group>"; };
@@ -243,6 +249,7 @@
 		266B16D2FBF38C233CD39A05 /* DataReconciler.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DataReconciler.swift; sourceTree = "<group>"; };
 		2732222DBF50FDA29A7C62BE /* PlantVoice.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantVoice.swift; sourceTree = "<group>"; };
 		273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FeatureUnlockPolicy.swift; sourceTree = "<group>"; };
+		2A7721B11B88B81E56630C05 /* PotPickerViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PotPickerViews.swift; sourceTree = "<group>"; };
 		2BEEF2341BC08BF94A6BDA7B /* TendAnimationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendAnimationTests.swift; sourceTree = "<group>"; };
 		2EA96D7DD8E3103D3D959B4A /* ShedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShedView.swift; sourceTree = "<group>"; };
 		2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoseMeter.swift; sourceTree = "<group>"; };
@@ -265,6 +272,7 @@
 		494B19877C303C1C4B6F6D08 /* AppModelTendingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppModelTendingTests.swift; sourceTree = "<group>"; };
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
 		4DA662141FB5A76A22AE6D6E /* PlusOfferPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlusOfferPolicy.swift; sourceTree = "<group>"; };
+		4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PotCatalogTests.swift; sourceTree = "<group>"; };
 		500B058D92EC73FD924DC8CE /* Reminders.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Reminders.swift; sourceTree = "<group>"; };
 		507CD36D0F85A153026420C3 /* WordBankValidator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordBankValidator.swift; sourceTree = "<group>"; };
 		50C9D359377B349CAE2D2189 /* StoreKitConfigTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StoreKitConfigTests.swift; sourceTree = "<group>"; };
@@ -273,6 +281,7 @@
 		52200CB2DFCDDA761EAF9AE0 /* Ads.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Ads.xcconfig; path = Config/Ads.xcconfig; sourceTree = "<group>"; };
 		545F60B78CCEA135D7B2E627 /* TendingEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendingEngine.swift; sourceTree = "<group>"; };
 		5510B1B69285FC4D97F91D07 /* wf-earned.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-earned.m4a"; sourceTree = "<group>"; };
+		5937A430C3FA390AF941B091 /* PotArtView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PotArtView.swift; sourceTree = "<group>"; };
 		5A4C64F5ADBB45D602E50A5F /* PlusView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlusView.swift; sourceTree = "<group>"; };
 		5A6D285E428AC50ED352DE5C /* wf-snip.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-snip.m4a"; sourceTree = "<group>"; };
 		5A7C1E2F9B3D4A6E8C0F1A02 /* StatsActionRuleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StatsActionRuleTests.swift; sourceTree = "<group>"; };
@@ -380,6 +389,7 @@
 		EF01514127063E580BD3F0E2 /* WakePuzzleView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WakePuzzleView.swift; sourceTree = "<group>"; };
 		EF908A564AC2DBFD8ADCFBBA /* LoveEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoveEngineTests.swift; sourceTree = "<group>"; };
 		F53AF4373CF0983348711216 /* Badges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
+		F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+Pots.swift"; sourceTree = "<group>"; };
 		F787992B59617103496CEE38 /* TendingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendingUITests.swift; sourceTree = "<group>"; };
 		F887962950E79A156ED26A3F /* ButterflyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyView.swift; sourceTree = "<group>"; };
 		F9B200507C4629386A0C486C /* GardenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidget.swift; sourceTree = "<group>"; };
@@ -475,6 +485,7 @@
 				A60BDD5B19B690060D44B813 /* WakePuzzle.swift */,
 				E0F27137167AD56F3C378B56 /* PlantThinning.swift */,
 				3E9482B7E7B497DE1F68D020 /* LifeStats.swift */,
+				1E72C046D44E8C67ECE69705 /* PotCatalog.swift */,
 			);
 			name = Rules;
 			path = Rules;
@@ -573,6 +584,7 @@
 				AF243532D79B05FABE12F6B1 /* RainOverlay.swift */,
 				C95EE8F83CC87F157461F447 /* SeedPotView.swift */,
 				2F738E93544B38467408EB43 /* TendAnimationView.swift */,
+				5937A430C3FA390AF941B091 /* PotArtView.swift */,
 			);
 			name = Components;
 			path = Components;
@@ -616,6 +628,7 @@
 				0B50EBB1E418EE1EB9BB4CA6 /* PlantThinningTests.swift */,
 				0A17B66E1750BA0EC6874EED /* LifeStatsTests.swift */,
 				2BEEF2341BC08BF94A6BDA7B /* TendAnimationTests.swift */,
+				4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -700,6 +713,7 @@
 				439E45E6B9B1F70CB95378CC /* AppModel.swift */,
 				3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */,
 				C8CFA5BED25190317B98E622 /* GardenShortcuts.swift */,
+				F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */,
 			);
 			name = App;
 			path = App;
@@ -722,6 +736,7 @@
 				F887962950E79A156ED26A3F /* ButterflyView.swift */,
 				1F9C82D7DFDE6E520A95AC7E /* WakeSheet.swift */,
 				EF01514127063E580BD3F0E2 /* WakePuzzleView.swift */,
+				2A7721B11B88B81E56630C05 /* PotPickerViews.swift */,
 			);
 			name = Views;
 			path = Views;
@@ -1032,6 +1047,7 @@
 				73D43C070CF83BBA5CF8A575 /* PlantThinningTests.swift in Sources */,
 				C0A400B31989FDA16B29412C /* LifeStatsTests.swift in Sources */,
 				C84708A999B2ED2665D94F0A /* TendAnimationTests.swift in Sources */,
+				73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1148,6 +1164,10 @@
 				C0301098F862C6C9DF220D24 /* RainOverlay.swift in Sources */,
 				99A763B192E74385836B56C6 /* SeedPotView.swift in Sources */,
 				F4C0D43C87AF2524BB79A1A1 /* TendAnimationView.swift in Sources */,
+				7DD477E02162F248269BFF98 /* PotCatalog.swift in Sources */,
+				1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */,
+				347A410A75615F9238BE8729 /* PotArtView.swift in Sources */,
+				EDC9869F995C67A16F2AB495 /* PotPickerViews.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

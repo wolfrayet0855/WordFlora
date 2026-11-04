@@ -72,10 +72,51 @@ final class TendingUITests: XCTestCase {
         shot("tend-sun-mid")
         app.buttons["tend-repot"].tap()
         XCTAssertTrue(app.staticTexts["Choose a soil"].waitForExistence(timeout: 3))
-        XCTAssertTrue(app.buttons["Plain blue"].exists)
+        XCTAssertTrue(app.buttons["pot-tile-plainBlue"].exists)
         shot("tend-repot-sheet")
         app.buttons["Loam"].tap()
+        app.buttons["repot-go"].tap()
         XCTAssertTrue(element("tend-anim-repot").waitForExistence(timeout: 3)); shot("tend-repot-mid")
+    }
+
+    // MARK: Pot collection (T-D)
+
+    func testTheRepotSheetPicksAPotAndNamesItOnTheButton() {
+        open("Daisy", plantId: "daisy")
+        app.buttons["tend-repot"].tap()
+        XCTAssertTrue(app.staticTexts["Pick a pot"].waitForExistence(timeout: 3))
+        let blue = app.buttons["pot-tile-plainBlue"]
+        XCTAssertTrue(blue.exists)
+        XCTAssertEqual(blue.label, "Plain blue pot, in use")
+        XCTAssertTrue(blue.isSelected)
+        XCTAssertEqual(app.buttons["repot-go"].label, "Repot with fresh soil")
+        XCTAssertGreaterThanOrEqual(blue.frame.width, 44); XCTAssertGreaterThanOrEqual(blue.frame.height, 44)
+
+        // A pot to earn says how, and the button keeps the pot in use.
+        let starlight = app.buttons["pot-tile-starlight"]
+        XCTAssertEqual(starlight.label, "Starlight pot, not earned yet")
+        starlight.tap()
+        XCTAssertTrue(element("pot-hint").waitForExistence(timeout: 2))
+        XCTAssertTrue(element("pot-hint").label.contains("Finish level 5"), element("pot-hint").label)
+        XCTAssertEqual(app.buttons["repot-go"].label, "Repot with fresh soil")
+        // A Plus pot says where Plus lives, with no price.
+        app.buttons["pot-tile-moonlit"].tap()
+        XCTAssertTrue(element("pot-hint").label.contains("Settings"), element("pot-hint").label)
+        shot("pot-pick-plus-hint")
+
+        // One plant found earns Terracotta; picking it names it on the button and the repot plays.
+        app.buttons["pot-tile-terracotta"].tap()
+        XCTAssertEqual(app.buttons["repot-go"].label, "Repot into Terracotta")
+        XCTAssertTrue(app.buttons["pot-tile-terracotta"].isSelected)
+        shot("pot-pick-terracotta")
+        app.buttons["repot-go"].tap()
+        XCTAssertTrue(toast.waitForExistence(timeout: 5), "the repot went through")
+        let gone = NSPredicate(format: "exists == false")
+        expectation(for: gone, evaluatedWith: element("tend-anim-repot")); waitForExpectations(timeout: 15)
+        shot("pot-stage-terracotta")
+        app.buttons["tend-repot"].tap()
+        XCTAssertTrue(app.buttons["pot-tile-terracotta"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.buttons["pot-tile-terracotta"].label, "Terracotta pot, in use", "the pick was saved")
     }
 
     func testABlockedTapSaysWhyWithoutAnEffect() {

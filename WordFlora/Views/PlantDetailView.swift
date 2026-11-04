@@ -35,7 +35,8 @@ struct PlantDetailView: View {
     @State private var tends = TendSequencer()
     @State private var tendTaps = 0
     @State private var nudges: [TendKind: Int] = [:]
-    @State private var pot: TendPot = .plainBlue
+    @State private var pickedPot = ""        // the pot picked in the repot sheet (PotCatalog id)
+    @State private var pickedSoil: SoilType = .loam
 
     private enum PanelFocus: Hashable { case show, hide }
 
@@ -87,7 +88,7 @@ struct PlantDetailView: View {
                     .accessibilityHint(PlantDetailCopy.renameHint)
             }
         }
-        .sheet(isPresented: $showRepot) { repotSheet(plant).presentationDetents([.medium, .large]) }
+        .sheet(isPresented: $showRepot) { repotSheet(plant).presentationDetents([.large]).presentationDragIndicator(.visible) }
         .sheet(isPresented: $showWake) { WakeSheet(plant: plant).environment(app) }   // Wake the seed
         .alert("Name your plant", isPresented: $renaming) {
             TextField("Name", text: $draftName)
@@ -139,8 +140,10 @@ struct PlantDetailView: View {
     private func stage(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot, plantSize s: CGFloat, plantTop: CGFloat, cloudTop: CGFloat) -> some View {
         let raining = snap.rainDay > 0
         let weather = LifeStats.weather(day: snap.rainDay)
-        let groundY = plantTop + s * 171 / 200
-        let rowTop = plantTop + s + (large ? 6 : 8)
+        let k = s / 220
+        let potBottom = plantTop + TendAnimationView.potRect.maxY * k     // the plant's pot stands on the floor here
+        let groundY = potBottom - 6 * k
+        let rowTop = potBottom + (large ? 6 : 8)
         let rowHeight: CGFloat = large ? 40 : 30
         let geo = RainGeometry(cloudTop: cloudTop, groundY: groundY)
         let paused = !stageVisible || scenePhase != .active || lowPower.isOn
@@ -157,10 +160,17 @@ struct PlantDetailView: View {
             }
             LinearGradient(stops: [.init(color: .clear, location: 0), .init(color: LifePalette.soil.opacity(0.18), location: 0.45), .init(color: .clear, location: 1)],
                            startPoint: .top, endPoint: .bottom)
-                .frame(height: s * 0.5).padding(.top, plantTop + s * 0.77).allowsHitTesting(false).accessibilityHidden(true)
+                .frame(height: s * 0.5).padding(.top, potBottom - s * 0.25).allowsHitTesting(false).accessibilityHidden(true)
 
             if raining && !reduceMotion {
                 RainCanvas(drops: weather.drops, layers: [0], geometry: geo, paused: paused).frame(height: rowTop)
+            }
+
+            // The plant's pot stands behind it (the seed pot draws its own). The repot effect brings its own pots.
+            if !showPot {
+                stagePot(plant, size: s)
+                    .opacity(tends.current?.effect == .repot && !calm ? 0 : 1)
+                    .padding(.top, plantTop)
             }
 
             plantView(plant, snap, size: s, showPot: showPot, thirsty: thirsty, name: name)
@@ -202,15 +212,36 @@ struct PlantDetailView: View {
         }
     }
 
+    /// The plant's chosen pot at the stage spot (design-preview/pots, section 4), with its floor shadow.
+    private func stagePot(_ plant: PlantCollectible, size s: CGFloat) -> some View {
+        let k = s / 220
+        let r = TendAnimationView.potRect, f = TendAnimationView.floorShadowRect
+        return ZStack(alignment: .topLeading) {
+            Ellipse().fill(colorScheme == .dark ? Color.black.opacity(0.35) : Color(UIColor(hex: 0x2C3E2C)).opacity(0.18))
+                .frame(width: f.width * k, height: f.height * k)
+                .offset(x: f.minX * k, y: f.minY * k)
+            PotArtView(pot: PotCatalog.pot(id: plant.potId), width: r.width * k, soil: true)
+                .offset(x: r.minX * k, y: r.minY * k)
+        }
+        .frame(width: s, height: f.maxY * k, alignment: .topLeading)
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
+    }
+
     @ViewBuilder
     private func plantView(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot, size s: CGFloat, showPot: Bool, thirsty: Bool, name: String) -> some View {
         ZStack {
             if showPot {
-                SeedPotView(width: s * 0.78).frame(width: s, height: s, alignment: .bottom).transition(.opacity)
+                // The seed pot's pot box lines up with the stage pot, so the seed rests in the plant's own pot.
+                let k = s / 220, r = TendAnimationView.potRect, u = r.width * k / 120
+                SeedPotView(pot: PotCatalog.pot(id: plant.potId), width: 140 * u)
+                    .offset(x: r.minX * k - SeedPotView.potOrigin.x * u, y: r.minY * k - SeedPotView.potOrigin.y * u)
+                    .frame(width: s, height: s, alignment: .topLeading).transition(.opacity)
             } else {
-                LayeredPlantView(imageName: plant.imageName, pips: snap.pips, shownPips: plant.lastShownPips, size: s) { n in
-                    app.markPetalsShown(plant, pips: n)
-                }
+                let k = s / 220, soil = TendAnimationView.soilRect
+                LayeredPlantView(imageName: plant.imageName, pips: snap.pips, shownPips: plant.lastShownPips, size: s,
+                                 onShown: { n in app.markPetalsShown(plant, pips: n) },
+                                 groundClip: CGRect(x: soil.minX * k, y: soil.minY * k, width: soil.width * k, height: soil.height * k))
                 .rotationEffect(.degrees(thirsty ? 5 : sway), anchor: .bottom)
                 .transition(.opacity)
             }
@@ -408,52 +439,56 @@ struct PlantDetailView: View {
     private func tap(_ kind: TendKind, _ plant: PlantCollectible) {
         if kind == .repot {
             let state = app.actionState(.repot(.loam), plant: plant)
-            if state.isReady { showRepot = true } else { refuse(kind, state.line ?? TendKind.repot.supplyCaption) }
+            if state.isReady {
+                pickedPot = PotCatalog.pot(id: plant.potId).id
+                pickedSoil = SoilType(rawValue: plant.soilType) ?? .loam
+                showRepot = true
+            } else { refuse(kind, state.line ?? TendKind.repot.supplyCaption) }
             return
         }
         run(action(for: kind), kind: kind, plant)
     }
 
+    /// The repot sheet (design-preview/pots, section 2): pick a pot (free to change), pick a soil (a scoop, as
+    /// before), then one button that names the new pot. Only pots the player has (or the pot already on the plant)
+    /// can be picked; the others say how to earn them.
     private func repotSheet(_ plant: PlantCollectible) -> some View {
-        ScrollView {
-            VStack(spacing: 14) {
-                Text("Choose a soil").font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                Text("Plants have favorite soils. Try one and see how it reacts.").font(Theme.font(.callout)).foregroundStyle(Color.secondaryText)
-                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+        let picked = PotCatalog.pot(id: pickedPot)
+        return ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Repot \(displayName(plant))").font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                    .accessibilityAddTraits(.isHeader)
+                PotPickGrid(currentId: plant.potId, picked: $pickedPot, stats: app.potStats, hasPlus: app.hasPlusForPots)
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("Choose a soil").font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                        .accessibilityAddTraits(.isHeader)
+                    Text("Plants have favorite soils. Try one and see how it reacts.").font(Theme.font(.callout)).foregroundStyle(Color.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
                     ForEach(SoilType.allCases, id: \.self) { soil in
-                        Button { showRepot = false; run(.repot(soil), kind: .repot, plant) } label: { Text(soil.rawValue.capitalized) }
+                        Button { pickedSoil = soil } label: { Text(soil.rawValue.capitalized) }
                             .buttonStyle(SecondaryButtonStyle())
+                            .overlay {
+                                if pickedSoil == soil { RoundedRectangle(cornerRadius: Theme.cornerRadius).strokeBorder(PotPalette.ring, lineWidth: 3) }
+                            }
+                            .accessibilityAddTraits(pickedSoil == soil ? .isSelected : [])
                     }
                 }
-                potRow
             }
             .padding(24)
         }
-    }
-
-    /// The pot the repot plays with.
-    /// HOOK (pot collection): the shed's pot row is not built yet, so plain blue is the one pot here. When it lands,
-    /// list the player's pots from the shed in this row and keep the picked one in `pot`.
-    private var potRow: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text(PlantDetailCopy.potTitle).font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-            HStack(spacing: 10) {
-                ForEach(TendPot.allCases, id: \.self) { p in
-                    Button { pot = p } label: {
-                        Label(p.name, systemImage: pot == p ? "checkmark.circle.fill" : "circle")
-                            .font(Theme.font(.subheadline, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
-                            .padding(.horizontal, 14).frame(minHeight: Theme.minTap)
-                            .background(p.rim.opacity(0.35), in: Capsule())
-                            .overlay(Capsule().stroke(pot == p ? p.shade : LifePalette.line, lineWidth: 2))
-                    }
-                    .accessibilityAddTraits(pot == p ? .isSelected : [])
-                }
-            }
-            Text(PlantDetailCopy.potNote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
+        .safeAreaInset(edge: .bottom) {
+            Button {
+                showRepot = false
+                run(.repot(pickedSoil), kind: .repot, plant, pot: picked)
+            } label: { Text(PotCatalog.repotTitle(picked: picked, currentId: plant.potId)) }
+                .buttonStyle(PrimaryButtonStyle())
+                .accessibilityIdentifier("repot-go")
+                .padding(.horizontal, 24).padding(.top, 10).padding(.bottom, 8)
+                .background(Color.appBackground)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.appBackground)
     }
 
     @ViewBuilder private var toastView: some View {
@@ -489,13 +524,16 @@ struct PlantDetailView: View {
 
     /// A tap: on success the effect plays once (replacing any effect still playing), with its sound and one soft
     /// haptic, and the toast follows the pour; a refused tap gets a soft nudge and the kind reason at once.
-    private func run(_ action: AppModel.TendAction, kind: TendKind, _ plant: PlantCollectible) {
+    /// A repot carries the picked pot, which is saved once the repot goes through (changing pots is free).
+    private func run(_ action: AppModel.TendAction, kind: TendKind, _ plant: PlantCollectible, pot: Pot? = nil) {
+        let from = TendPot(id: plant.potId)
         let outcome = app.tend(action, plant: plant)
         guard outcome.applied else { refuse(kind, outcome.message); return }
+        if let pot { app.choosePot(pot, for: plant) }
         tendTaps += 1
         if let effect = TendEffect(action) {
             app.play(effect.sound)
-            let play = tends.start(effect, pot: pot, at: .now)
+            let play = tends.start(effect, pot: TendPot(id: plant.potId), from: from, at: .now)
             let life = TendMotion.lifetime(effect, calm: calm, hold: TendMotion.uiTestHold)
             DispatchQueue.main.asyncAfter(deadline: .now() + life) { tends.finish(id: play.id) }
         } else {
@@ -530,9 +568,7 @@ enum PlantDetailCopy {
     static let quiet = "Take your time. Plants grow at their own pace."
     static let thirsty = "Thirsty. A drink will perk it right up."
     static let askAI = "Ask for a fun fact"
-    static let potTitle = "Pot"
-    static let potNote = "Plain blue is always here. More pots will come from the shed."
-    static var all: [String] { [rename, renameHint, quiet, thirsty, askAI, potTitle, potNote] }
+    static var all: [String] { [rename, renameHint, quiet, thirsty, askAI] }
 }
 
 /// The "tap your plant" hint is hidden while VoiceOver runs, since VoiceOver users get the plant's own hint.

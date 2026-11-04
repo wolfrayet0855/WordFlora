@@ -25,6 +25,9 @@ struct ShedView: View {
                 }
                 ForEach(Self.info, id: \.0) { tool, name, blurb in card(tool, name, blurb, tier: inv.tier(of: tool), points: points) }
                 if let message { Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText) }
+                ShedPotsSection(stats: app.potStats, hasPlus: app.hasPlusForPots) { pot in
+                    app.plantsUsing(pot).map { $0.nickname.isEmpty ? $0.name : $0.nickname }
+                }
             }
             .padding(20)
         }
