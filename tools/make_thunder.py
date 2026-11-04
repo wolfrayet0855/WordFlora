@@ -6,12 +6,12 @@ Original and procedural: nothing is sampled, so the sound is licence clean. Pure
 
 Recipe (see docs/research/audio-feedback.md, "Thunder"):
   1. Brown noise (leaky integrated white noise, fixed seed) with a pinch of white for air.
-  2. Two hand-coded one-pole low-pass stages whose cutoff sweeps from 220 Hz down to 80 Hz, so the roll
-     darkens as it moves away; two one-pole high-pass stages at 45 Hz keep the
+  2. Two hand-coded one-pole low-pass stages whose cutoff sweeps from 450 Hz down to 180 Hz, so the roll
+     darkens as it moves away; two one-pole high-pass stages at 70 Hz keep the
      energy where speakers can play it.
   3. A slow amplitude envelope made of three gentle sub-rolls (raised-cosine rises of 0.5 to 0.7 s, so there
      is never a crack), a little slow random flutter for texture, and a long tail fade to silence.
-  4. Peak normalised to about -12 dBFS, written as 16-bit 44.1 kHz mono WAV, encoded to AAC at 64 kb/s.
+  4. Peak normalised to about -9 dBFS, written as 16-bit 44.1 kHz mono WAV, encoded to AAC at 64 kb/s.
 
 Run from the repo root:  python3 tools/make_thunder.py
 """
@@ -29,10 +29,10 @@ import wave
 SEED = 20261104
 RATE = 44100
 DURATION = 4.6            # seconds
-PEAK_DBFS = -12.0
-CUTOFF_START = 220.0      # Hz
-CUTOFF_END = 80.0         # Hz
-HIGHPASS = 45.0           # Hz (two one-pole stages)
+PEAK_DBFS = -9.0
+CUTOFF_START = 450.0      # Hz
+CUTOFF_END = 180.0        # Hz
+HIGHPASS = 70.0           # Hz (two one-pole stages)
 # Sub-rolls: (start s, rise s, peak level, decay time constant s)
 ROLLS = [
     (0.00, 0.70, 0.70, 0.55),
