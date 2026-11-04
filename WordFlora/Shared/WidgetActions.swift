@@ -68,8 +68,8 @@ enum WidgetActions {
         let result = water(plantId: hero.plantId, context: context, now: now, calendar: calendar, quiet: quiet)
         if result.applied { return "\(hero.name) had a drink and is growing nicely." }
         switch result.reason {
-        case .noWater: return "No drops right now. Play a word to earn more."
-        case .fullForToday, .alreadyDoneToday: return "\(hero.name) has had plenty for today."
+        case .noWater: return TendCopy.canDry
+        case .doneForToday: return TendCopy.done(.water, name: hero.name)
         default: return "Your garden is ready when you are."
         }
     }

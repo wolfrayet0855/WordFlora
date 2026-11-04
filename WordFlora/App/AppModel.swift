@@ -209,7 +209,7 @@ final class AppModel {
             repotOutcome = r.outcome
         }
 
-        guard result.applied else { return TendOutcome(applied: false, message: Self.message(for: result.reason, plant: plant)) }
+        guard result.applied else { return TendOutcome(applied: false, message: Self.message(for: result.reason, action: action, plant: plant)) }
 
         plant.lastLovedAt = date
         let counter: BadgeCounter? = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return nil } }()
@@ -231,16 +231,86 @@ final class AppModel {
         var i = inv; i.unlock(.lamp); return i
     }
 
-    private static func message(for reason: TendResult.Reason?, plant: PlantCollectible) -> String {
+    // MARK: Action states (THE RULE: each action has its own done state, and a blocked tap says why and what next)
+
+    struct ActionState: Equatable {
+        enum Status: Equatable {
+            /// The button works and visibly does something.
+            case ready
+            /// Today's allowance for this action is used up; its meter is full. More tomorrow.
+            case done
+            /// Today's allowance is there, but the can is dry or the scoops are out.
+            case needsSupply
+        }
+        var status: Status
+        /// The button's words: the action name, or its done label ("Fed today").
+        var label: String
+        /// When not ready: the kind reason and next step a tap shows.
+        var line: String?
+        var isReady: Bool { status == .ready }
+    }
+
+    static let doneLabels = (water: "Had a drink", feed: "Fed today", sun: "Sunny today")
+
+    /// What the plant page's buttons show before a tap, using the very same rules `tend` applies.
+    func actionState(_ action: TendAction, plant: PlantCollectible) -> ActionState {
+        let quiet = settings.quietGarden
+        let date = now(), cal = Calendar.current, eco = Economy.default
+        let name = Self.displayName(plant)
+        let p = profile
+        func state(_ care: TendingEngine.Care, label: String, done: String, supply: Bool, noSupply: TendResult.Reason) -> ActionState {
+            if TendingEngine.isDone(care, plant: plant, now: date, calendar: cal, economy: eco) {
+                return ActionState(status: .done, label: done, line: Self.message(for: .doneForToday, action: action, name: name))
+            }
+            if !quiet && !supply { return ActionState(status: .needsSupply, label: label, line: Self.message(for: noSupply, action: action, name: name)) }
+            return ActionState(status: .ready, label: label, line: nil)
+        }
+        switch action {
+        case .water: return state(.water, label: "Water", done: Self.doneLabels.water, supply: (p?.water ?? 0) > 0, noSupply: .noWater)
+        case .feed: return state(.feed, label: "Feed", done: Self.doneLabels.feed, supply: (p?.soil ?? 0) > 0, noSupply: .noSoil)
+        case .sun: return state(.sun, label: "Sun", done: Self.doneLabels.sun, supply: true, noSupply: .noWater)
+        case .prune:
+            if !quiet && inventory.tier(of: .shears) == 0 { return ActionState(status: .needsSupply, label: "Prune", line: Self.message(for: .notOwned, action: action, name: name)) }
+            if let last = plant.lastPrunedAt, date.timeIntervalSince(last) < ToolEngine.pruneCooldownDays * 86_400 {
+                return ActionState(status: .done, label: "Prune", line: Self.message(for: .cooldown, action: action, name: name))
+            }
+            return ActionState(status: .ready, label: "Prune", line: nil)
+        case .repot:
+            if !quiet && (p?.soil ?? 0) == 0 { return ActionState(status: .needsSupply, label: "Repot", line: Self.message(for: .noSoil, action: action, name: name)) }
+            return ActionState(status: .ready, label: "Repot", line: nil)
+        }
+    }
+
+    private static func displayName(_ plant: PlantCollectible) -> String { plant.nickname.isEmpty ? plant.name : plant.nickname }
+
+    private static func message(for reason: TendResult.Reason?, action: TendAction, plant: PlantCollectible) -> String {
+        message(for: reason, action: action, name: displayName(plant))
+    }
+
+    /// Grade-2 words, no banned words (CopySafety), and the plant's nickname when it has one.
+    static func message(for reason: TendResult.Reason?, action: TendAction, name: String) -> String {
         switch reason {
-        case .noWater: return "No drops left. Win a word to earn more."
-        case .noSoil: return "No soil scoops left. Finding new plants earns more."
-        case .fullForToday: return TendingEngine.capacityLine(.plenty, name: plant.name)
-        case .alreadyDoneToday: return "\(plant.name) already soaked up the sun today."
-        case .notOwned: return "You need the shears first."
-        case .cooldown: return "Pruned recently. Give it a couple of days."
+        case .noWater: return TendCopy.canDry
+        case .noSoil: return TendCopy.noScoops
+        case .doneForToday:
+            switch action {
+            case .water: return TendCopy.done(.water, name: name)
+            case .sun: return TendCopy.done(.sun, name: name)
+            case .feed, .repot: return TendCopy.done(.feed, name: name)
+            case .prune: return TendCopy.trimmed(name: name)
+            }
+        case .notOwned: return TendCopy.needShears
+        case .cooldown: return TendCopy.trimmed(name: name)
         case nil: return "Not right now."
         }
+    }
+
+    /// Every blocked line and done label, for the copy tests.
+    static func ruleLines(name: String) -> [String] {
+        let reasons: [TendResult.Reason?] = [.noWater, .noSoil, .doneForToday, .notOwned, .cooldown, nil]
+        let actions: [TendAction] = [.water, .feed, .sun, .prune]
+        return reasons.flatMap { r in actions.map { message(for: r, action: $0, name: name) } }
+            + [doneLabels.water, doneLabels.feed, doneLabels.sun]
     }
 
     // MARK: Ads (spec sections 12, 16, 18, 19; ruling in section 20)

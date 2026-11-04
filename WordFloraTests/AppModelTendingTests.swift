@@ -21,14 +21,14 @@ final class AppModelTendingTests: XCTestCase {
         let app = try makeApp(); let plant = try firstPlant(app); app.profile?.water = 3
         let r = app.tend(.water, plant: plant)
         XCTAssertTrue(r.applied)
-        XCTAssertEqual(app.profile?.water, 2); XCTAssertEqual(plant.growthPoints, 4)
+        XCTAssertEqual(app.profile?.water, 2); XCTAssertEqual(plant.growthPoints, 3)
     }
 
     func testWaterWithNoDropsIsDeclinedWithAFriendlyReason() throws {
         let app = try makeApp(); let plant = try firstPlant(app); app.profile?.water = 0
         let r = app.tend(.water, plant: plant)
         XCTAssertFalse(r.applied)
-        XCTAssertEqual(r.message, "No drops left. Win a word to earn more.")
+        XCTAssertEqual(r.message, "Your can is dry. Win a word to fill it.")
     }
 
     func testPruneNeedsShearsAndFeedSpendsAScoop() throws {
@@ -36,9 +36,9 @@ final class AppModelTendingTests: XCTestCase {
         XCTAssertFalse(app.tend(.prune, plant: plant).applied)                 // no shears yet
         var inv = app.inventory; inv.unlock(.shears); app.inventory = inv
         XCTAssertTrue(app.tend(.prune, plant: plant).applied)                  // 4 growth
-        XCTAssertTrue(app.tend(.feed, plant: plant).applied)                   // fills the rest of today's 10
+        XCTAssertTrue(app.tend(.feed, plant: plant).applied)                   // 4 more; pruning never blocks feeding
         XCTAssertEqual(app.profile?.soil, 1)
-        XCTAssertEqual(plant.growthPoints, 10)
+        XCTAssertEqual(plant.growthPoints, 8)
     }
 
     func testRepotMatchIsHappy() throws {
@@ -59,18 +59,19 @@ final class AppModelTendingTests: XCTestCase {
     func testQuietGardenSpendsNothingButPlantsStillGrow() throws {
         let app = try makeApp(quiet: true); let plant = try firstPlant(app); app.profile?.water = 0; app.profile?.soil = 0
         XCTAssertTrue(app.tend(.water, plant: plant).applied)
-        XCTAssertEqual(plant.growthPoints, 4)
+        XCTAssertEqual(plant.growthPoints, 3)
         XCTAssertEqual(app.profile?.water, 0)
     }
 
-    func testQuietGardenStillRespectsTheDailyGrowthCap() throws {
-        let app = try makeApp(quiet: true); let plant = try firstPlant(app)
+    func testQuietGardenStillRespectsTheTwoDrinksADay() throws {
+        let t = Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: .now)!
+        let app = try makeApp(quiet: true, now: { t }); let plant = try firstPlant(app)
         for _ in 0..<10 { _ = app.tend(.water, plant: plant) }
-        XCTAssertEqual(plant.growthPoints, 10)
+        XCTAssertEqual(plant.growthPoints, 6)
     }
 
     func testStageUpIsReportedGently() throws {
-        let app = try makeApp(); let plant = try firstPlant(app); app.profile?.water = 3; plant.growthPoints = 8
+        let app = try makeApp(); let plant = try firstPlant(app); app.profile?.water = 3; plant.growthPoints = 9
         let r = app.tend(.water, plant: plant)
         XCTAssertTrue(r.stageUp); XCTAssertTrue(r.message.hasPrefix("\(plant.name) grew a little!"))
     }

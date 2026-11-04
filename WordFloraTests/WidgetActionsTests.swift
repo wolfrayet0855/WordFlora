@@ -55,7 +55,7 @@ final class WidgetActionsTests: XCTestCase {
         let ps = plants(["rose"])
         let r = WidgetActions.water(plantId: "rose", context: ctx, now: t0, calendar: cal, quiet: false)
         XCTAssertTrue(r.applied)
-        XCTAssertEqual(profile.water, 2); XCTAssertEqual(ps[0].growthPoints, 4)
+        XCTAssertEqual(profile.water, 2); XCTAssertEqual(ps[0].growthPoints, 3)
     }
 
     func testWaterButtonIsGentleWhenOutOfDropsOrUnknown() {
@@ -75,7 +75,7 @@ final class WidgetActionsTests: XCTestCase {
     func testQuietGardenWateringSpendsNothingAndStillGrowsThePlant() {
         let ps = plants(["rose"]); profile.water = 0
         let r = WidgetActions.water(plantId: "rose", context: ctx, now: t0, calendar: cal, quiet: true)
-        XCTAssertTrue(r.applied); XCTAssertEqual(ps[0].growthPoints, 4); XCTAssertEqual(profile.water, 0)
+        XCTAssertTrue(r.applied); XCTAssertEqual(ps[0].growthPoints, 3); XCTAssertEqual(profile.water, 0)
     }
 
     func testWidgetNeverShowsTheThirstyLook() {
@@ -84,11 +84,11 @@ final class WidgetActionsTests: XCTestCase {
         XCTAssertTrue(WidgetActions.widgetShowsThirstyLook == false)
     }
 
-    func testWateringTwiceInARowIsSafeAndRespectsTheDailyCap() {
+    func testWateringManyTimesIsSafeAndRespectsTheTwoDrinksADay() {
         let ps = plants(["rose"]); profile.water = 9
         for _ in 0..<5 { _ = WidgetActions.water(plantId: "rose", context: ctx, now: t0, calendar: cal, quiet: false) }
-        XCTAssertEqual(ps[0].growthPoints, 10)
-        XCTAssertEqual(profile.water, 6)                              // only three drops were actually spent
+        XCTAssertEqual(ps[0].growthPoints, 6)
+        XCTAssertEqual(profile.water, 7)                              // only two drops were actually spent
     }
 
     // MARK: deep links
