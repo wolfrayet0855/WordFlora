@@ -107,7 +107,7 @@
   {
     "name": "Poppy",
     "botanicalName": "Papaver rhoeas",
-    "botanicalFact": "Its seeds can lie dormant in soil for decades, sprouting when the ground is disturbed.",
+    "botanicalFact": "Poppy seeds can sleep in the soil for many years. They wake and grow when the soil is dug up.",
     "level": 1,
     "imageName": "plant_poppy"
   },
@@ -122,7 +122,7 @@
       "language": "Greek",
       "meaning": "kidney scale",
       "line": "Its plant name, Nephrolepis, means “kidney scale.”",
-      "funFact": "Look under a leaf for tiny dots shaped like kidney beans. Each one keeps its spores safe.",
+      "funFact": "Look under a leaf for tiny dots shaped like kidney beans. They hold specks that grow new ferns.",
       "symbol": "leaf.fill"
     }
   },
@@ -161,15 +161,7 @@
     "botanicalName": "Lavandula angustifolia",
     "botanicalFact": "People have used lavender for scent and bathing for thousands of years.",
     "level": 2,
-    "imageName": "plant_lavender",
-    "nameStory": {
-      "origin": "lavare",
-      "language": "Latin",
-      "meaning": "to wash",
-      "line": "Its name may come from Latin “lavare,” to wash.",
-      "funFact": "Long ago, people put its sweet flowers in baths. They put them with clean clothes, too.",
-      "symbol": "drop.fill"
-    }
+    "imageName": "plant_lavender"
   },
   {
     "name": "Lotus",
@@ -234,7 +226,7 @@
       "language": "Latin",
       "meaning": "true",
       "line": "Vera means “true.”",
-      "funFact": "There are many kinds of aloe. This one got the name true aloe.",
+      "funFact": "Many kinds of aloe look alike. This one was called the true aloe. Its leaves hold a cool, clear gel.",
       "symbol": "checkmark.seal.fill"
     }
   },
@@ -308,8 +300,8 @@
       "origin": "Adansonia",
       "language": "Latin",
       "meaning": "Adanson's tree",
-      "line": "It is named for Michel Adanson.",
-      "funFact": "He was a plant scientist from France. He saw the big baobab trees in Senegal in 1749.",
+      "line": "Its plant name, Adansonia, is for Michel Adanson.",
+      "funFact": "He was from France. In 1749 he went to Senegal and saw the big baobab trees there.",
       "symbol": "person.fill"
     }
   },
@@ -354,7 +346,7 @@
       "language": "Greek",
       "meaning": "she-dragon",
       "line": "Its plant name, Dracaena, means “she-dragon.”",
-      "funFact": "Its sap is a deep red. Long ago, people called the red sap dragon's blood.",
+      "funFact": "Its sap is deep red. Long ago, people called it “dragon's blood.”",
       "symbol": "flame.fill"
     }
   },
@@ -474,7 +466,7 @@
       "language": "Latin",
       "meaning": "curled back",
       "line": "Its plant name, revoluta, means “curled back.”",
-      "funFact": "Look at the edge of a leaflet. It curls back under, like a tiny rolled hem.",
+      "funFact": "Look at the edge of a leaflet. It curls back under, like a rolled-up sleeve.",
       "symbol": "leaf.fill"
     }
   },
@@ -489,7 +481,7 @@
       "language": "Greek",
       "meaning": "one turn",
       "line": "Its plant name, Monotropa, means “one turn.”",
-      "funFact": "Each stem bends in one turn and holds one flower. It is pale white, like a ghost.",
+      "funFact": "Each stem bends over at the top and holds one flower. It is pale white, like candle wax.",
       "symbol": "moon.stars.fill"
     }
   },
@@ -517,7 +509,7 @@
     "nameStory": {
       "origin": "Proteus",
       "language": "Greek",
-      "meaning": "who could change shape",
+      "meaning": "the shape-changer",
       "line": "Protea is named for Proteus, who could change shape.",
       "funFact": "Proteus was a sea god in old Greek tales. Protea flowers come in many shapes, just like him.",
       "symbol": "crown.fill"
@@ -579,7 +571,7 @@
       "language": "Greek",
       "meaning": "Aphrodite's slipper",
       "line": "Its plant name means “slipper of Aphrodite.”",
-      "funFact": "Aphrodite was a queen of old Greek stories. The flower has a puffy pouch shaped like a slipper.",
+      "funFact": "Aphrodite was a goddess in old Greek tales. The flower has a puffy pouch shaped like a slipper.",
       "symbol": "shoe.fill"
     }
   },
@@ -654,7 +646,7 @@
       "language": "Latin",
       "meaning": "Franklin's tree",
       "line": "It is named for Benjamin Franklin.",
-      "funFact": "A dad and his son found it by a river in 1765. They named it for a friend, Ben Franklin.",
+      "funFact": "A dad and son found it by a river in 1765. The son named it for a friend, Ben Franklin.",
       "symbol": "person.fill"
     }
   },
@@ -684,7 +676,7 @@
       "language": "English",
       "meaning": "floating white flower",
       "line": "It is called “ghost” because its flower seems to float.",
-      "funFact": "Its roots look like tree bark, so the white flower seems to hang in the air.",
+      "funFact": "It has no leaves. Its roots blend in with the tree bark, so the white flower seems to float.",
       "symbol": "cloud.fill"
     }
   },
@@ -699,7 +691,7 @@
       "language": "Greek",
       "meaning": "silver sword",
       "line": "Its plant name, Argyroxiphium, means “silver sword.”",
-      "funFact": "Fine silver hairs cover its long, thin leaves. They shine in the sun and keep off the frost.",
+      "funFact": "Fine silver hairs cover its long, thin leaves. They reflect the strong sun and help it hold water.",
       "symbol": "star.fill"
     }
   },

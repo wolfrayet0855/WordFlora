@@ -13,7 +13,7 @@ W = en.wikipedia.org/wiki/, Wt = en.wiktionary.org/wiki/. Sources for Rose, Fern
 Cherry Blossom, Corpse Flower (*titanum*), Dragon Blood Tree (*Dracaena*), Bird of Paradise, Passionflower and
 Bleeding Heart were added by the integrator from standard botanical Latin; they are the pages to check in review.
 
-## Stories (48)
+## Stories (47)
 
 | Plant | Conf. | Angle (origin, meaning) | Sources |
 |---|---|---|---|
@@ -27,7 +27,7 @@ Bleeding Heart were added by the integrator from standard botanical Latin; they 
 | Fern | verified | *Nephrolepis*, "kidney scale": the bean-shaped spore covers | W/Nephrolepis, sweetgum.nybg.org/science/vh/monographs-details/?irn=26477 |
 | Strawberry | safe | Old English *strēaw + berġe*; reason hedged (runners) | Wt/strawberry |
 | Orchid | verified | *Phalaenopsis*, "like a moth"; the moth orchid | W/Phalaenopsis |
-| Lavender | safe | Latin *lavare*, "to wash" (line says "may"); baths | W/Lavandula |
+| Lavender | - | fallback | W/Lavandula |
 | Lotus | verified | *nucifera*, "nut bearing": seeds in the pod | W/Nelumbo_nucifera |
 | Jasmine | - | fallback | W/Jasmine |
 | Snapdragon | verified | "snapping dragon": squeeze the mouth | W/Antirrhinum |
@@ -67,11 +67,12 @@ Bleeding Heart were added by the integrator from standard botanical Latin; they 
 | Rainbow Eucalyptus | verified | *deglupta*, "peeled": the peeling coloured bark | W/Eucalyptus_deglupta, australiangeographic.com.au/?p=341247 |
 | Puya raimondii | safe | for Antonio Raimondi, who studied plants in Peru | W/Puya_raimondii |
 
-## Plain fallback (2)
+## Plain fallback (3)
 
 | Plant | Why |
 |---|---|
-| Poppy | *poppy* and *papaver* only mean "poppy"; the root of *rhoeas* is disputed. Nothing true to show a child. |
+| Poppy | *poppy* and *papaver* only mean "poppy"; the root of *rhoeas* is disputed. Nothing true to show a child. The fallback fact was rewritten for kids (seeds sleep in the soil). |
+| Lavender | *lavare* "to wash" is the usual story but *livere* "bluish" is also cited; the card's "That means ..." sentence cannot carry a hedge. |
 | Jasmine | Persian *yāsaman* has no settled meaning; "gift from God" is a popular claim without a solid source. |
 
 ## Changes from the research drafts
@@ -92,3 +93,11 @@ Bleeding Heart were added by the integrator from standard botanical Latin; they 
 - Baobab, Welwitschia, Rafflesia, Giant Water Lily, Wollemi Pine, Puya: `language` "named after" changed to "Latin".
 - Marigold: `language` "English" changed to "Middle English", origin "Mary + gold".
 - Several lines shortened to pass the grade 3.9 reading check.
+
+## Review fixes
+
+- Lady's Slipper: Aphrodite is a goddess, not a queen. Silversword: the hairs reflect sun and help hold water
+  (NPS), frost claim dropped. Ghost Orchid: says it has no leaves. King Protea chip: "the shape-changer".
+- Baobab: line says the plant name *Adansonia* (not "baobab") is for Adanson.
+- Fun facts reworded for Aloe Vera, Fern, Ghost Pipe, Sago Palm, Dragon Blood Tree, Franklin Tree, Baobab.
+- Lavender moved to the fallback list.

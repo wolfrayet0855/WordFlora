@@ -71,7 +71,7 @@ final class PlantCatalogTests: XCTestCase {
 final class NameStoryCatalogTests: XCTestCase {
     /// Plants reviewed for T-B whose name origin teaches nothing a child can see or is not settled
     /// (see docs/research/name-stories.md). They show the plain "Did you know?" card.
-    private let reviewedFallback: Set<String> = ["poppy", "jasmine"]
+    private let reviewedFallback: Set<String> = ["poppy", "jasmine", "lavender"]
 
     func testLoaderReadsTheDaisyStory() throws {
         let daisy = try XCTUnwrap(try PlantCatalog.load().first { $0.plantId == "daisy" })
