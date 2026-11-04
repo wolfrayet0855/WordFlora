@@ -142,6 +142,73 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(wake.waitForExistence(timeout: 3))          // closing changes nothing: still a seed
     }
 
+    // MARK: Plant page: Life panel, love petals, rain, seed pot
+
+    private func openClover(_ extra: [String]) {
+        app.launchArguments = ["-uitest", "-uitest-onboarded"] + extra
+        app.launch()
+        app.buttons["Garden"].tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
+    }
+
+    func testLifePanelMinimisesToATabAndComesBack() {
+        openClover(["-uitest-gardened"])
+        let plant = app.buttons["plant-love"]
+        XCTAssertTrue(plant.waitForExistence(timeout: 5))
+        XCTAssertEqual(plant.label, "Clover, 5 of 5 love petals")
+        let hide = app.buttons["Hide Life panel"]
+        XCTAssertTrue(hide.waitForExistence(timeout: 3))
+        XCTAssertTrue(app.otherElements["Life"].exists || app.staticTexts["Life"].exists)
+        shot("plant-life")
+        hide.tap()
+        let show = app.buttons["Show Life panel"]
+        XCTAssertTrue(show.waitForExistence(timeout: 3))
+        XCTAssertFalse(hide.exists)
+        XCTAssertGreaterThanOrEqual(show.frame.width, 44); XCTAssertGreaterThanOrEqual(show.frame.height, 44)
+        shot("plant-life-minimised")
+        show.tap()
+        XCTAssertTrue(app.buttons["Hide Life panel"].waitForExistence(timeout: 3))
+    }
+
+    func testARainyDayReadsFewerLovePetalsAndAHelloBringsThemBack() {
+        openClover(["-uitest-rain=2"])
+        let plant = app.buttons["plant-love"]
+        XCTAssertTrue(plant.waitForExistence(timeout: 5))
+        XCTAssertEqual(plant.label, "Clover, 3 of 5 love petals")
+        sleep(5)                                   // the petals drift down and rest
+        shot("plant-rain-2")
+        plant.tap()
+        XCTAssertTrue(app.buttons["Clover, 5 of 5 love petals"].waitForExistence(timeout: 3))
+        sleep(2)
+        shot("plant-regrown")
+    }
+
+    func testPlantPageScreens() {
+        openClover(["-uitest-rain=4"])
+        XCTAssertTrue(app.buttons["Clover, 1 of 5 love petals"].waitForExistence(timeout: 5))
+        sleep(6); shot("plant-rain-4")
+        app.terminate()
+        XCUIDevice.shared.appearance = .dark
+        openClover(["-uitest-rain=1"])
+        XCTAssertTrue(app.buttons["Clover, 4 of 5 love petals"].waitForExistence(timeout: 5))
+        sleep(5); shot("plant-rain-1-dark")
+        app.terminate()
+        XCUIDevice.shared.appearance = .light
+        openClover(["-uitest-seed"])
+        XCTAssertTrue(app.buttons["Wake Clover"].waitForExistence(timeout: 5))
+        sleep(7)
+        XCTAssertTrue(app.buttons["Clover, resting as a seed in its pot"].exists)
+        shot("plant-seed")
+        app.terminate()
+        openClover(["-uitest-rain=2", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
+        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5))
+        XCTAssertGreaterThanOrEqual(app.buttons["Water"].frame.height, 64)
+        sleep(4); shot("plant-large")
+        app.buttons["Hide Life panel"].tap()
+        XCTAssertTrue(app.buttons["Show Life panel"].waitForExistence(timeout: 3))
+        shot("plant-large-collapsed")
+    }
+
     func testPaywallShowsBothPlansHonestlyAndSubscriberStateHidesThem() {
         launch()
         app.buttons["Settings"].tap()
@@ -201,7 +268,7 @@ final class WordFloraUITests: XCTestCase {
         var findings = [String]()
         do {
             try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
-                findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | \(issue.element?.elementType.rawValue ?? 0) '\(issue.element?.label ?? "")'")
+                findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | \(issue.element?.elementType.rawValue ?? 0) '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
                 return true            // collect everything instead of stopping at the first issue
             }
         } catch { findings.append("\(name): audit failed to run: \(error)") }
@@ -223,6 +290,11 @@ final class WordFloraUITests: XCTestCase {
         app.buttons["Garden"].tap(); XCTAssertTrue(app.staticTexts["Level 1 · Seedling"].waitForExistence(timeout: 5)); audit("garden")
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
         XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5)); audit("plant")
+    }
+
+    func testAuditRainyPlant() {
+        openClover(["-uitest-rain=3"])
+        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5)); audit("plant-rain")
     }
 
     func testAuditMoreScreens() {
