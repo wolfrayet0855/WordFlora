@@ -11,12 +11,12 @@ extension AppModel {
 
     func potState(_ pot: Pot, stats: PotCatalog.Stats? = nil) -> PotState {
         let s = stats ?? potStats
-        return PotCatalog.state(of: pot, plantsGrown: s.plantsGrown, levelsFinished: s.levelsFinished, hasPlus: hasPlusForPots)
+        return PotCatalog.state(of: pot, plantsGrown: s.plantsGrown, finishedLevels: s.finishedLevels, hasPlus: hasPlusForPots)
     }
 
     func canChoose(_ pot: Pot, for plant: PlantCollectible, stats: PotCatalog.Stats? = nil) -> Bool {
         let s = stats ?? potStats
-        return PotCatalog.canChoose(pot, currentId: plant.potId, plantsGrown: s.plantsGrown, levelsFinished: s.levelsFinished, hasPlus: hasPlusForPots)
+        return PotCatalog.canChoose(pot, currentId: plant.potId, plantsGrown: s.plantsGrown, finishedLevels: s.finishedLevels, hasPlus: hasPlusForPots)
     }
 
     /// Puts the plant in `pot` (part of a repot; changing pots costs nothing). A Plus pot needs Plus to be chosen,

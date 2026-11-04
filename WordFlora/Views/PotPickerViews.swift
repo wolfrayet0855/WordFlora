@@ -54,7 +54,7 @@ struct PotPickGrid: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     private func state(_ pot: Pot) -> PotState {
-        PotCatalog.state(of: pot, plantsGrown: stats.plantsGrown, levelsFinished: stats.levelsFinished, hasPlus: hasPlus)
+        PotCatalog.state(of: pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels, hasPlus: hasPlus)
     }
 
     var body: some View {
@@ -77,7 +77,7 @@ struct PotPickGrid: View {
         let isCurrent = pot.id == PotCatalog.pot(id: currentId).id
         let isPicked = pot.id == PotCatalog.pot(id: picked).id
         let choosable = PotCatalog.canChoose(pot, currentId: currentId, plantsGrown: stats.plantsGrown,
-                                             levelsFinished: stats.levelsFinished, hasPlus: hasPlus)
+                                             finishedLevels: stats.finishedLevels, hasPlus: hasPlus)
         let toEarn: Bool = { if case .toEarn = s { return !isCurrent }; return false }()
         let plusTag: Bool = { if case .plus = s { return !isCurrent }; return false }()
         return Button {
@@ -116,7 +116,7 @@ struct PotPickGrid: View {
         let lines: (String, String) = {
             switch s {
             case .plus: return (PotCatalog.plusLine(pot), PotCatalog.Copy.plusSettings)
-            case .toEarn(let h): return (h, PotCatalog.tipLine(pot, plantsGrown: stats.plantsGrown, levelsFinished: stats.levelsFinished))
+            case .toEarn(let h): return (h, PotCatalog.tipLine(pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels))
             case .owned: return (PotCatalog.Copy.earned, "")
             }
         }()
@@ -198,9 +198,9 @@ struct ShedPotsSection: View {
     }
 
     private func card(_ pot: Pot) -> some View {
-        let s = PotCatalog.state(of: pot, plantsGrown: stats.plantsGrown, levelsFinished: stats.levelsFinished, hasPlus: hasPlus)
-        let progress = PotCatalog.progress(pot, plantsGrown: stats.plantsGrown, levelsFinished: stats.levelsFinished)
-        let progressText = PotCatalog.progressLine(pot, plantsGrown: stats.plantsGrown, levelsFinished: stats.levelsFinished)
+        let s = PotCatalog.state(of: pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels, hasPlus: hasPlus)
+        let progress = PotCatalog.progress(pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels)
+        let progressText = PotCatalog.progressLine(pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels)
         let toEarn: Bool = { if case .toEarn = s { return true }; return false }()
         let names = users(pot)
         let label: String = {
@@ -254,7 +254,7 @@ struct ShedPotsSection: View {
         switch s {
         case .owned: return pot.unlock == .free ? pot.hint : PotCatalog.Copy.earned
         case .plus: return "\(PotCatalog.plusLine(pot)) \(PotCatalog.Copy.plusSettings)"
-        case .toEarn(let h): return "\(h) \(PotCatalog.tipLine(pot, plantsGrown: stats.plantsGrown, levelsFinished: stats.levelsFinished))"
+        case .toEarn(let h): return "\(h) \(PotCatalog.tipLine(pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels))"
         }
     }
 }

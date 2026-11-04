@@ -7,7 +7,7 @@ struct Pot: Equatable, Hashable, Identifiable {
         case free
         /// Plants grown (found plants in the collection) at least this many.
         case plants(Int)
-        /// This many levels finished (all ten plants of a level found).
+        /// This level finished (all ten of its plants found). The level itself, not a count of levels.
         case level(Int)
         case plus
     }
@@ -103,30 +103,35 @@ enum PotCatalog {
 
     // MARK: Unlocks (computed from play, never stored)
 
-    struct Stats: Equatable { var plantsGrown = 0; var levelsFinished = 0 }
+    struct Stats: Equatable {
+        var plantsGrown = 0
+        /// Which levels are finished, so a level pot asks for its own level.
+        var finishedLevels: Set<Int> = []
+        var levelsFinished: Int { finishedLevels.count }
+    }
 
     /// Plants grown = found plants; a level is finished when all ten of its plants are found (as the level badge counts).
     static func stats(plants: [PlantProgress]) -> Stats {
         let finished = (1...5).filter { lvl in
             let inLevel = plants.filter { $0.level == lvl }
             return inLevel.count == 10 && inLevel.allSatisfy(\.earned)
-        }.count
-        return Stats(plantsGrown: plants.filter(\.earned).count, levelsFinished: finished)
+        }
+        return Stats(plantsGrown: plants.filter(\.earned).count, finishedLevels: Set(finished))
     }
 
-    static func state(of pot: Pot, plantsGrown: Int, levelsFinished: Int, hasPlus: Bool) -> PotState {
+    static func state(of pot: Pot, plantsGrown: Int, finishedLevels: Set<Int>, hasPlus: Bool) -> PotState {
         switch pot.unlock {
         case .free: return .owned
         case .plants(let n): return plantsGrown >= n ? .owned : .toEarn(hint: pot.hint)
-        case .level(let n): return levelsFinished >= n ? .owned : .toEarn(hint: pot.hint)
+        case .level(let n): return finishedLevels.contains(n) ? .owned : .toEarn(hint: pot.hint)
         case .plus: return hasPlus ? .owned : .plus(hint: pot.hint)
         }
     }
 
     /// The pot already on the plant can always stay; any other pot must be owned now.
-    static func canChoose(_ pot: Pot, currentId: String, plantsGrown: Int, levelsFinished: Int, hasPlus: Bool) -> Bool {
+    static func canChoose(_ pot: Pot, currentId: String, plantsGrown: Int, finishedLevels: Set<Int>, hasPlus: Bool) -> Bool {
         if pot.id == self.pot(id: currentId).id { return true }
-        return state(of: pot, plantsGrown: plantsGrown, levelsFinished: levelsFinished, hasPlus: hasPlus) == .owned
+        return state(of: pot, plantsGrown: plantsGrown, finishedLevels: finishedLevels, hasPlus: hasPlus) == .owned
     }
 
     struct Progress: Equatable {
@@ -135,11 +140,17 @@ enum PotCatalog {
         var fraction: Double { goal > 0 ? min(1, Double(now) / Double(goal)) : 1 }
     }
 
+    /// Toward "finish level n": n once level n is finished, otherwise the highest finished level below it
+    /// (with levels played in order, that is how many of the n are done). The bar is full only when level n is.
+    private static func levelProgress(_ n: Int, finishedLevels: Set<Int>) -> Int {
+        finishedLevels.contains(n) ? n : (finishedLevels.filter { $0 < n }.max() ?? 0)
+    }
+
     /// How far along a pot to earn is; nil for plain blue and Plus pots.
-    static func progress(_ pot: Pot, plantsGrown: Int, levelsFinished: Int) -> Progress? {
+    static func progress(_ pot: Pot, plantsGrown: Int, finishedLevels: Set<Int>) -> Progress? {
         switch pot.unlock {
         case .plants(let n): return Progress(now: min(plantsGrown, n), goal: n)
-        case .level(let n): return Progress(now: min(levelsFinished, n), goal: n)
+        case .level(let n): return Progress(now: levelProgress(n, finishedLevels: finishedLevels), goal: n)
         case .free, .plus: return nil
         }
     }
@@ -180,22 +191,22 @@ enum PotCatalog {
     }
 
     /// The progress under a shed card's bar ("12 of 25 plants grown", "3 of 5 levels finished").
-    static func progressLine(_ pot: Pot, plantsGrown: Int, levelsFinished: Int) -> String {
-        guard let p = progress(pot, plantsGrown: plantsGrown, levelsFinished: levelsFinished) else { return "" }
+    static func progressLine(_ pot: Pot, plantsGrown: Int, finishedLevels: Set<Int>) -> String {
+        guard let p = progress(pot, plantsGrown: plantsGrown, finishedLevels: finishedLevels) else { return "" }
         if case .level = pot.unlock { return "\(p.now) of \(p.goal) levels finished" }
         return "\(p.now) of \(p.goal) plants grown"
     }
 
     /// The second line of the hint under the pick grid ("You finished level 3. Two more levels to go!").
-    static func tipLine(_ pot: Pot, plantsGrown: Int, levelsFinished: Int) -> String {
-        guard let p = progress(pot, plantsGrown: plantsGrown, levelsFinished: levelsFinished) else { return "" }
+    static func tipLine(_ pot: Pot, plantsGrown: Int, finishedLevels: Set<Int>) -> String {
+        guard let p = progress(pot, plantsGrown: plantsGrown, finishedLevels: finishedLevels) else { return "" }
         switch pot.unlock {
         case .level:
             let k = p.goal - p.now
             let toGo = k == 1 ? "One more level to go!" : "\(word(k)) more levels to go!"
             return p.now > 0 ? "You finished level \(p.now). \(toGo)" : toGo
         default:
-            return p.goal == 1 && p.now == 0 ? Copy.progressFirst : progressLine(pot, plantsGrown: plantsGrown, levelsFinished: levelsFinished)
+            return p.goal == 1 && p.now == 0 ? Copy.progressFirst : progressLine(pot, plantsGrown: plantsGrown, finishedLevels: finishedLevels)
         }
     }
 

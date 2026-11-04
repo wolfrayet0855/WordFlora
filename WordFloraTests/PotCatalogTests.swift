@@ -1,11 +1,14 @@
 import XCTest
 @testable import WordFlora
 
+/// Levels 1 through n finished, the usual order of play.
+private func upTo(_ n: Int) -> Set<Int> { n < 1 ? [] : Set(1...n) }
+
 /// The pot collection (T-D, design-preview/pots): ten pots, unlocks computed from play, Plus gating, copy.
 final class PotCatalogTests: XCTestCase {
 
-    private func state(_ id: String, plants: Int = 0, levels: Int = 0, plus: Bool = false) -> PotState {
-        PotCatalog.state(of: PotCatalog.pot(id: id), plantsGrown: plants, levelsFinished: levels, hasPlus: plus)
+    private func state(_ id: String, plants: Int = 0, levels: Int = 0, finished: Set<Int>? = nil, plus: Bool = false) -> PotState {
+        PotCatalog.state(of: PotCatalog.pot(id: id), plantsGrown: plants, finishedLevels: finished ?? upTo(levels), hasPlus: plus)
     }
 
     // MARK: Catalog
@@ -87,14 +90,31 @@ final class PotCatalogTests: XCTestCase {
         }
     }
 
+    func testALevelPotNeedsThatLevelFinishedNotJustThatManyLevels() {
+        let sunflower = PotCatalog.pot(id: "sunflower"), starlight = PotCatalog.pot(id: "starlight")
+        // Three levels finished, but not level 3: Sunflower (finish level 3) is still to earn.
+        XCTAssertEqual(state("sunflower", finished: [1, 2, 4]), .toEarn(hint: sunflower.hint))
+        XCTAssertFalse(PotCatalog.canChoose(sunflower, currentId: "", plantsGrown: 30, finishedLevels: [1, 2, 4], hasPlus: true))
+        // Level 3 alone earns Sunflower, and not Starlight (finish level 5).
+        XCTAssertEqual(state("sunflower", finished: [3]), .owned)
+        XCTAssertEqual(state("starlight", finished: [3]), .toEarn(hint: starlight.hint))
+        XCTAssertTrue(PotCatalog.canChoose(sunflower, currentId: "", plantsGrown: 10, finishedLevels: [3], hasPlus: false))
+        XCTAssertEqual(state("starlight", finished: [1, 2, 3, 4]), .toEarn(hint: starlight.hint))
+        XCTAssertEqual(state("starlight", finished: [5]), .owned)
+        // The bar fills only when the level itself is finished.
+        XCTAssertEqual(PotCatalog.progress(sunflower, plantsGrown: 0, finishedLevels: [1, 2, 4]), PotCatalog.Progress(now: 2, goal: 3))
+        XCTAssertEqual(PotCatalog.progress(sunflower, plantsGrown: 0, finishedLevels: [3]), PotCatalog.Progress(now: 3, goal: 3))
+        XCTAssertEqual(PotCatalog.tipLine(sunflower, plantsGrown: 0, finishedLevels: [1, 2, 4]), "You finished level 2. One more level to go!")
+    }
+
     func testChoosingNeedsTheStateButThePotInUseAlwaysStays() {
         let moonlit = PotCatalog.pot(id: "moonlit"), mint = PotCatalog.pot(id: "mint")
-        XCTAssertFalse(PotCatalog.canChoose(moonlit, currentId: "", plantsGrown: 50, levelsFinished: 5, hasPlus: false))
-        XCTAssertTrue(PotCatalog.canChoose(moonlit, currentId: "", plantsGrown: 0, levelsFinished: 0, hasPlus: true))
+        XCTAssertFalse(PotCatalog.canChoose(moonlit, currentId: "", plantsGrown: 50, finishedLevels: upTo(5), hasPlus: false))
+        XCTAssertTrue(PotCatalog.canChoose(moonlit, currentId: "", plantsGrown: 0, finishedLevels: upTo(0), hasPlus: true))
         // Plus ended: the pot already on the plant stays and can be kept.
-        XCTAssertTrue(PotCatalog.canChoose(moonlit, currentId: "moonlit", plantsGrown: 0, levelsFinished: 0, hasPlus: false))
-        XCTAssertFalse(PotCatalog.canChoose(mint, currentId: "", plantsGrown: 49, levelsFinished: 5, hasPlus: true))
-        XCTAssertTrue(PotCatalog.canChoose(PotCatalog.plainBlue, currentId: "mint", plantsGrown: 0, levelsFinished: 0, hasPlus: false))
+        XCTAssertTrue(PotCatalog.canChoose(moonlit, currentId: "moonlit", plantsGrown: 0, finishedLevels: upTo(0), hasPlus: false))
+        XCTAssertFalse(PotCatalog.canChoose(mint, currentId: "", plantsGrown: 49, finishedLevels: upTo(5), hasPlus: true))
+        XCTAssertTrue(PotCatalog.canChoose(PotCatalog.plainBlue, currentId: "mint", plantsGrown: 0, finishedLevels: upTo(0), hasPlus: false))
     }
 
     func testStatsComeFromFoundPlantsAndFullLevels() {
@@ -106,6 +126,11 @@ final class PotCatalogTests: XCTestCase {
         let s = PotCatalog.stats(plants: plants)
         XCTAssertEqual(s.plantsGrown, 19)
         XCTAssertEqual(s.levelsFinished, 1)
+        XCTAssertEqual(s.finishedLevels, [1])
+        for i in 0..<10 { plants[i].earned = false }          // only level 3 done
+        for i in 20..<30 { plants[i].earned = true }
+        XCTAssertEqual(PotCatalog.stats(plants: plants).finishedLevels, [3])
+        XCTAssertEqual(PotCatalog.stats(plants: plants).levelsFinished, 1)
     }
 
     // MARK: Progress lines
@@ -113,17 +138,17 @@ final class PotCatalogTests: XCTestCase {
     func testProgressLines() {
         let starlight = PotCatalog.pot(id: "starlight"), sunflower = PotCatalog.pot(id: "sunflower")
         let rose = PotCatalog.pot(id: "rosePink"), terracotta = PotCatalog.pot(id: "terracotta")
-        XCTAssertEqual(PotCatalog.tipLine(starlight, plantsGrown: 12, levelsFinished: 3), "You finished level 3. Two more levels to go!")
-        XCTAssertEqual(PotCatalog.tipLine(sunflower, plantsGrown: 12, levelsFinished: 2), "You finished level 2. One more level to go!")
-        XCTAssertEqual(PotCatalog.tipLine(sunflower, plantsGrown: 0, levelsFinished: 0), "Three more levels to go!")
-        XCTAssertEqual(PotCatalog.tipLine(rose, plantsGrown: 12, levelsFinished: 0), "12 of 25 plants grown")
-        XCTAssertEqual(PotCatalog.tipLine(terracotta, plantsGrown: 0, levelsFinished: 0), "Grow one plant to earn this pot.")
-        XCTAssertEqual(PotCatalog.progressLine(starlight, plantsGrown: 0, levelsFinished: 3), "3 of 5 levels finished")
-        XCTAssertEqual(PotCatalog.progressLine(rose, plantsGrown: 12, levelsFinished: 0), "12 of 25 plants grown")
-        XCTAssertEqual(PotCatalog.progress(rose, plantsGrown: 30, levelsFinished: 0)?.fraction, 1)
-        XCTAssertEqual(PotCatalog.progress(rose, plantsGrown: 5, levelsFinished: 0)?.fraction ?? 0, 0.2, accuracy: 0.0001)
-        XCTAssertNil(PotCatalog.progress(PotCatalog.plainBlue, plantsGrown: 0, levelsFinished: 0))
-        XCTAssertNil(PotCatalog.progress(PotCatalog.pot(id: "moonlit"), plantsGrown: 0, levelsFinished: 0))
+        XCTAssertEqual(PotCatalog.tipLine(starlight, plantsGrown: 12, finishedLevels: upTo(3)), "You finished level 3. Two more levels to go!")
+        XCTAssertEqual(PotCatalog.tipLine(sunflower, plantsGrown: 12, finishedLevels: upTo(2)), "You finished level 2. One more level to go!")
+        XCTAssertEqual(PotCatalog.tipLine(sunflower, plantsGrown: 0, finishedLevels: upTo(0)), "Three more levels to go!")
+        XCTAssertEqual(PotCatalog.tipLine(rose, plantsGrown: 12, finishedLevels: upTo(0)), "12 of 25 plants grown")
+        XCTAssertEqual(PotCatalog.tipLine(terracotta, plantsGrown: 0, finishedLevels: upTo(0)), "Grow one plant to earn this pot.")
+        XCTAssertEqual(PotCatalog.progressLine(starlight, plantsGrown: 0, finishedLevels: upTo(3)), "3 of 5 levels finished")
+        XCTAssertEqual(PotCatalog.progressLine(rose, plantsGrown: 12, finishedLevels: upTo(0)), "12 of 25 plants grown")
+        XCTAssertEqual(PotCatalog.progress(rose, plantsGrown: 30, finishedLevels: upTo(0))?.fraction, 1)
+        XCTAssertEqual(PotCatalog.progress(rose, plantsGrown: 5, finishedLevels: upTo(0))?.fraction ?? 0, 0.2, accuracy: 0.0001)
+        XCTAssertNil(PotCatalog.progress(PotCatalog.plainBlue, plantsGrown: 0, finishedLevels: upTo(0)))
+        XCTAssertNil(PotCatalog.progress(PotCatalog.pot(id: "moonlit"), plantsGrown: 0, finishedLevels: upTo(0)))
         XCTAssertEqual(PotCatalog.goalLine(rose), "Grow 25 plants")
         XCTAssertEqual(PotCatalog.goalLine(terracotta), "Grow one plant")
         XCTAssertEqual(PotCatalog.goalLine(starlight), "Finish level 5")
@@ -153,8 +178,8 @@ final class PotCatalogTests: XCTestCase {
             lines += [pot.name, pot.hint, pot.a11y, PotCatalog.goalLine(pot), PotCatalog.plusLine(pot)]
             lines += [PotCatalog.repotTitle(picked: pot, currentId: "")]
             for (plants, levels) in [(0, 0), (1, 1), (12, 3), (49, 4)] {
-                lines += [PotCatalog.tipLine(pot, plantsGrown: plants, levelsFinished: levels),
-                          PotCatalog.progressLine(pot, plantsGrown: plants, levelsFinished: levels)]
+                lines += [PotCatalog.tipLine(pot, plantsGrown: plants, finishedLevels: upTo(levels)),
+                          PotCatalog.progressLine(pot, plantsGrown: plants, finishedLevels: upTo(levels))]
             }
         }
         let extra = ["only", "last", "left", "waiting", "lost", "empty", "locked", "buy", "price"]
