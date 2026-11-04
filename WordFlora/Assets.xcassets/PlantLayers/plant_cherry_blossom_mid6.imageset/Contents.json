@@ -1,0 +1,15 @@
+{
+  "images": [
+    {
+      "filename": "plant_cherry_blossom_mid6.svg",
+      "idiom": "universal"
+    }
+  ],
+  "info": {
+    "author": "xcode",
+    "version": 1
+  },
+  "properties": {
+    "preserves-vector-representation": true
+  }
+}
