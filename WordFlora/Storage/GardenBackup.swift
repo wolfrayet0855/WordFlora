@@ -29,6 +29,8 @@ struct GardenBackup: Codable, Equatable {
         // Today's allowances (added 2026-11-04). All optional, so backups saved before then still read.
         var waterToday: Int?
         var waterDay: Date?, lastFedAt: Date?, lastRepotGrowthAt: Date?
+        // The chosen pot (added 2026-11-04 with the pot collection). Optional, so older backups still read.
+        var potId: String?
     }
 
     enum ImportError: Error, Equatable {
@@ -74,7 +76,8 @@ struct GardenBackup: Codable, Equatable {
             Plant(plantId: $0.plantId, earnedCount: $0.earnedCount, growthPoints: $0.growthPoints, stage: $0.stage, hydration: $0.hydration,
                   soilRichness: $0.soilRichness, soilType: $0.soilType, nickname: $0.nickname, lastTendedAt: $0.lastTendedAt,
                   lastSunnyAt: $0.lastSunnyAt, lastPrunedAt: $0.lastPrunedAt, lastLovedAt: $0.lastLovedAt,
-                  waterToday: $0.waterToday, waterDay: $0.waterDay, lastFedAt: $0.lastFedAt, lastRepotGrowthAt: $0.lastRepotGrowthAt)
+                  waterToday: $0.waterToday, waterDay: $0.waterDay, lastFedAt: $0.lastFedAt, lastRepotGrowthAt: $0.lastRepotGrowthAt,
+                  potId: $0.potId)
         }
         let games = (try? context.fetchCount(FetchDescriptor<GameRecord>())) ?? 0
         return GardenBackup(exportedAt: now, profile: snap, plants: plants, gamesRecorded: games)
@@ -111,7 +114,7 @@ struct GardenBackup: Codable, Equatable {
                       p.bestStreak, p.streakFreezes, p.roseSeedProgress, p.gardenDays, p.shedPoints, p.glowLanterns, gamesRecorded]
         guard counts.allSatisfy({ $0 >= 0 }), (1...100).contains(p.currentLevel) else { return false }
         return plants.allSatisfy { !$0.plantId.isEmpty && $0.earnedCount >= 0 && $0.growthPoints >= 0 && (0...4).contains($0.stage)
-            && $0.hydration.isFinite && $0.soilRichness.isFinite && $0.nickname.count <= 60 }
+            && $0.hydration.isFinite && $0.soilRichness.isFinite && $0.nickname.count <= 60 && ($0.potId ?? "").count <= 40 }
     }
 
     static func restore(_ data: Data, into context: ModelContext, badgeDefs: [BadgeDef]) -> Result<RestoreReport, ImportError> {
@@ -143,6 +146,7 @@ struct GardenBackup: Codable, Equatable {
             c.hydration = s.hydration; c.soilRichness = s.soilRichness; c.soilType = s.soilType; c.nickname = s.nickname
             c.lastTendedAt = s.lastTendedAt; c.lastSunnyAt = s.lastSunnyAt; c.lastPrunedAt = s.lastPrunedAt; c.lastLovedAt = s.lastLovedAt
             c.waterToday = max(0, s.waterToday ?? 0); c.waterDay = s.waterDay; c.lastFedAt = s.lastFedAt; c.lastRepotGrowthAt = s.lastRepotGrowthAt
+            c.potId = s.potId ?? ""
             DataReconciler.merge(c, into: k)
             report.plantsUpdated += 1
         }

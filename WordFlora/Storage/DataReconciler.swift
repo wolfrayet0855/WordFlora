@@ -50,6 +50,10 @@ enum DataReconciler {
     }
 
     static func merge(_ o: PlantCollectible, into k: PlantCollectible) {
+        // The pot: a chosen pot beats none; when both chose one, the copy tended later wins (decided before the dates merge).
+        if !o.potId.isEmpty && (k.potId.isEmpty || (o.lastTendedAt ?? .distantPast) > (k.lastTendedAt ?? .distantPast)) {
+            k.potId = o.potId
+        }
         k.earnedCount = max(k.earnedCount, o.earnedCount)
         k.growthPoints = max(k.growthPoints, o.growthPoints)
         k.stage = max(k.stage, o.stage)

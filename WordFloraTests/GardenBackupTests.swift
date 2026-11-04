@@ -117,6 +117,26 @@ final class GardenBackupTests: XCTestCase {
         }
     }
 
+    func testThePotRoundTripsAndOldBackupsReadAsPlainBlue() throws {
+        growSomething()
+        plant("rose").potId = "sunflower"; try ctx.save()
+        let data = try GardenBackup.make(context: ctx, now: .now).encoded()
+        XCTAssertTrue(String(data: data, encoding: .utf8)!.contains("\"potId\" : \"sunflower\""))
+
+        let fresh = try SharedContainer.make(inMemory: true)
+        try PlantCatalog.seedIfNeeded(context: fresh.mainContext)
+        guard case .success = GardenBackup.restore(data, into: fresh.mainContext, badgeDefs: defs) else { return XCTFail("restore failed") }
+        XCTAssertEqual(plant("rose", in: fresh.mainContext).potId, "sunflower")
+        XCTAssertEqual(plant("daisy", in: fresh.mainContext).potId, "")
+
+        // A backup saved before pots existed has no potId key; it still reads and changes no pot.
+        var json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        json["plants"] = (json["plants"] as! [[String: Any]]).map { var p = $0; p.removeValue(forKey: "potId"); return p }
+        let old = try JSONSerialization.data(withJSONObject: json)
+        guard case .success = GardenBackup.restore(old, into: ctx, badgeDefs: defs) else { return XCTFail("old backup should read") }
+        XCTAssertEqual(plant("rose").potId, "sunflower")
+    }
+
     func testFilenameAndCopy() {
         var cal = Calendar(identifier: .gregorian); cal.timeZone = TimeZone(identifier: "UTC")!
         let d = cal.date(from: DateComponents(year: 2026, month: 3, day: 7, hour: 12))!

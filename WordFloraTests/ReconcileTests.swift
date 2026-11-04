@@ -71,6 +71,24 @@ final class ReconcileTests: XCTestCase {
         XCTAssertEqual(a.lastShownPips, 4)      // at worst a fall plays once more; never a stale regrow
     }
 
+    func testPotMergeKeepsAChosenPotAndTheNewerTendWinsATie() {
+        func rose(_ pot: String, tended: Double?) -> PlantCollectible {
+            let p = PlantCollectible(name: "Rose", botanicalName: "r", botanicalFact: "f", level: 1, imageName: "plant_rose", plantId: "rose")
+            p.potId = pot; p.lastTendedAt = tended.map { Date(timeIntervalSince1970: $0) }
+            return p
+        }
+        XCTAssertEqual(rose("", tended: nil).potId, "", "a new plant has no pot chosen, which means plain blue")
+        // non-empty wins, in both directions
+        var k = rose("", tended: 900); DataReconciler.merge(rose("mint", tended: 100), into: k); XCTAssertEqual(k.potId, "mint")
+        k = rose("mint", tended: 100); DataReconciler.merge(rose("", tended: 900), into: k); XCTAssertEqual(k.potId, "mint")
+        // both chosen: the copy tended later wins, in both directions
+        k = rose("mint", tended: 100); DataReconciler.merge(rose("sunflower", tended: 900), into: k); XCTAssertEqual(k.potId, "sunflower")
+        k = rose("sunflower", tended: 900); DataReconciler.merge(rose("mint", tended: 100), into: k); XCTAssertEqual(k.potId, "sunflower")
+        k = rose("mint", tended: nil); DataReconciler.merge(rose("sunflower", tended: 5), into: k); XCTAssertEqual(k.potId, "sunflower")
+        k = rose("mint", tended: 5); DataReconciler.merge(rose("sunflower", tended: nil), into: k); XCTAssertEqual(k.potId, "mint")
+        XCTAssertEqual(k.lastTendedAt, Date(timeIntervalSince1970: 5))
+    }
+
     func testGardenLevelsCanCompleteAgainAfterDuplicatesAreMerged() {
         try! PlantCatalog.seedIfNeeded(context: ctx)
         for p in plants() where p.level == 1 { p.earnedCount = 1; p.stage = 4 }

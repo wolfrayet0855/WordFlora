@@ -36,6 +36,9 @@ final class PlantCollectible {
     var lastLovedAt: Date?
     /// The love petal count the plant page last animated to, so a petal fall or regrowth plays once per change.
     var lastShownPips: Int = 5
+    /// The pot the plant sits in (`PotCatalog` id). Empty means never chosen, drawn as plain blue.
+    /// Defaulted, so lightweight migration and CloudKit both accept it.
+    var potId: String = ""
 
     init(name: String, botanicalName: String, botanicalFact: String,
          level: Int, imageName: String, plantId: String? = nil) {
