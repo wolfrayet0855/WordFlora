@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Logo A: Two blooms</title>
+<link rel="stylesheet" href="../../theme.css">
+<script src="../../theme.js"></script>
+<style>
+  body{padding:0 16px 64px}
+  .wrap{max-width:1080px;margin:0 auto}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0 8px}
+  header.top h1{font-size:15px;font-weight:800;letter-spacing:.02em;margin:0;color:var(--muted);text-transform:uppercase}
+  .tog{font:inherit;font-weight:700;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:8px 14px;cursor:pointer}
+  h2{font-size:20px;margin:40px 0 6px}
+  p.lead{margin:0 0 16px;color:var(--muted);max-width:62ch;line-height:1.45}
+  .hero{background:var(--surface);border-radius:24px;box-shadow:var(--shadow);padding:48px 24px;text-align:center}
+  .hero img{width:min(560px,100%);height:auto}
+  .hero p{margin:14px 0 0;color:var(--muted);font-weight:600}
+  .wm-d{display:none}
+  [data-theme=dark] .hero .wm-l{display:none}[data-theme=dark] .hero .wm-d{display:inline}
+
+  /* phone mocks */
+  .phones{display:flex;flex-wrap:wrap;gap:20px}
+  .phone{width:390px;max-width:100%;border-radius:36px;overflow:hidden;border:1px solid var(--line);background:var(--bg);color:var(--text);box-shadow:var(--shadow)}
+  .status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:14px;font-weight:700}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 8px 20px}
+  .topbar img{height:22px;width:auto;display:block}       /* .title = 28 pt -> mark is 22 pt tall */
+  .gear{width:44px;height:44px;display:grid;place-items:center}
+  .card{margin:8px 16px;background:var(--surface);border-radius:20px;padding:16px;display:flex;gap:14px;align-items:center}
+  .card .dot{width:56px;height:56px;border-radius:50%;background:color-mix(in srgb,var(--accent) 35%,transparent)}
+  .card b{display:block;font-size:17px}.card span{color:var(--muted);font-size:14px}
+  .btn{margin:14px 16px 24px;height:56px;border-radius:16px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;font-size:19px}
+  .onb{height:330px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}
+  .onb img{height:34px;width:auto}                      /* largeTitle 34 pt x 1.25 */
+  .onb span{color:var(--muted);font-weight:600;font-size:16px}
+  .lab{font-size:12px;font-weight:700;color:var(--muted);margin:8px 4px 0}
+
+  /* home screen rows */
+  .screens{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+  .hs{border-radius:24px;padding:22px 18px;display:flex;align-items:flex-end;gap:22px;flex-wrap:wrap}
+  .hs.l{background:linear-gradient(160deg,#cfe3f2,#f4e7d3)}
+  .hs.d{background:linear-gradient(160deg,#0d1420,#24301f)}
+  .hs figure{margin:0;text-align:center}
+  .hs img{display:block;border-radius:22.37%;margin:0 auto}
+  .hs figcaption{font-size:11px;margin-top:5px;font-family:-apple-system,system-ui,sans-serif}
+  .hs.l figcaption{color:#1d2a1d}.hs.d figcaption{color:#e8efe8}
+  .big{display:flex;flex-wrap:wrap;gap:20px}
+  .big figure{margin:0}
+  .big img{width:220px;height:220px;border-radius:22.37%;display:block;box-shadow:var(--shadow)}
+  .big figcaption{font-size:13px;font-weight:700;color:var(--muted);margin-top:8px}
+  .tint{width:220px;height:220px;border-radius:22.37%;background:#000;position:relative;overflow:hidden;box-shadow:var(--shadow)}
+  .tint img{position:absolute;inset:0;border-radius:0;box-shadow:none;mix-blend-mode:multiply}
+  .tint::before{content:"";position:absolute;inset:0;background:#8FB8FF}
+
+  .mono{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  .mono div{border-radius:20px;padding:32px 24px;display:grid;place-items:center}
+  .mono img{width:100%;max-width:320px;height:auto}
+
+  .px{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;background:var(--surface);border-radius:20px;padding:20px}
+  .px img{image-rendering:auto;display:block}
+  .px .z{image-rendering:pixelated}
+  .px small{display:block;font-size:11px;color:var(--muted);margin-top:4px}
+
+  .rat{background:var(--surface);border-radius:20px;padding:20px 24px;line-height:1.55;max-width:760px}
+  .rat li{margin:6px 0}
+  table{border-collapse:collapse;font-size:14px}td,th{padding:6px 10px;border-bottom:1px solid var(--line);text-align:left}
+  .sw{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid var(--line)}
+  @media (max-width:480px){.hero{padding:32px 16px}.big img,.tint{width:150px;height:150px}}
+</style></head>
+<body><div class="wrap">
+<header class="top"><h1>T-F logo · Direction A · Two blooms</h1><button class="tog" onclick="wfToggle()">Light / dark</button></header>
+
+<section class="hero">
+  <img class="wm-l" src="wordmark.svg" alt="WordFlora">
+  <img class="wm-d" src="wordmark-dark.svg" alt="WordFlora">
+  <p>Both O's bloom: an amber flower in “Word”, a rose flower in “Flora”.</p>
+</section>
+
+<h2>In the app</h2>
+<p class="lead">Sized as the app uses <code>WordmarkView</code>: Home top bar (.title, about 22 pt tall) and the onboarding title (.largeTitle ×1.25, about 34 pt tall). Light and dark side by side.</p>
+<div class="phones">
+  <div>
+  <div class="phone" data-theme="light">
+    <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="topbar"><img src="wordmark.svg" alt="WordFlora"><div class="gear"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.6 4.9-1.9-.4a7 7 0 0 1-.6 1.5l1.1 1.6-1.7 1.7-1.6-1.1c-.5.3-1 .5-1.5.6l-.4 1.9h-2.4l-.4-1.9a7 7 0 0 1-1.5-.6l-1.6 1.1-1.7-1.7 1.1-1.6a7 7 0 0 1-.6-1.5l-1.9-.4v-2.4l1.9-.4c.1-.5.3-1 .6-1.5L4.4 7.2l1.7-1.7 1.6 1.1c.5-.3 1-.5 1.5-.6l.4-1.9h2.4l.4 1.9c.5.1 1 .3 1.5.6l1.6-1.1 1.7 1.7-1.1 1.6c.3.5.5 1 .6 1.5l1.9.4Z"/></svg></div></div>
+    <div class="card"><div class="dot"></div><div><b>Day 4 streak</b><span>Your garden is growing</span></div></div>
+    <div class="btn">Play today's word</div>
+  </div><div class="lab">Home · light</div></div>
+  <div>
+  <div class="phone" data-theme="dark">
+    <div class="status"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="topbar"><img src="wordmark-dark.svg" alt="WordFlora"><div class="gear"><svg width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Zm8.6 4.9-1.9-.4a7 7 0 0 1-.6 1.5l1.1 1.6-1.7 1.7-1.6-1.1c-.5.3-1 .5-1.5.6l-.4 1.9h-2.4l-.4-1.9a7 7 0 0 1-1.5-.6l-1.6 1.1-1.7-1.7 1.1-1.6a7 7 0 0 1-.6-1.5l-1.9-.4v-2.4l1.9-.4c.1-.5.3-1 .6-1.5L4.4 7.2l1.7-1.7 1.6 1.1c.5-.3 1-.5 1.5-.6l.4-1.9h2.4l.4 1.9c.5.1 1 .3 1.5.6l1.6-1.1 1.7 1.7-1.1 1.6c.3.5.5 1 .6 1.5l1.9.4Z"/></svg></div></div>
+    <div class="card"><div class="dot"></div><div><b>Day 4 streak</b><span>Your garden is growing</span></div></div>
+    <div class="btn">Play today's word</div>
+  </div><div class="lab">Home · dark</div></div>
+  <div>
+  <div class="phone" data-theme="light"><div class="onb"><img src="wordmark.svg" alt="WordFlora"><span>Guess words. Grow a garden.</span></div></div>
+  <div class="lab">Onboarding · light</div></div>
+  <div>
+  <div class="phone" data-theme="dark"><div class="onb"><img src="wordmark-dark.svg" alt="WordFlora"><span>Guess words. Grow a garden.</span></div></div>
+  <div class="lab">Onboarding · dark</div></div>
+</div>
+
+<h2>App icon</h2>
+<p class="lead">The two O's, lifted out of the wordmark: the big rose bloom and the small amber bloom sit on one diagonal and never touch, so they stay two shapes at 29 px. Full-bleed square (iOS applies the corner mask); shown masked here.</p>
+<div class="big">
+  <figure><img src="icon-1024.png" alt="Icon, light"><figcaption>Default (light)</figcaption></figure>
+  <figure><img src="icon-dark-1024.png" alt="Icon, dark"><figcaption>iOS 18 dark</figcaption></figure>
+  <figure><img src="icon-tinted-1024.png" alt="Icon, tinted source" style="background:#000"><figcaption>Tinted source (greyscale)</figcaption></figure>
+  <figure><div class="tint"><img src="icon-tinted-1024.png" alt="Icon, tinted simulation"></div><figcaption>Tinted, simulated blue tint</figcaption></figure>
+</div>
+
+<h3 style="margin:28px 0 8px">Home screen row, real pixel sizes (1024 is shown at 120)</h3>
+<div class="screens">
+  <div class="hs l">
+    <figure><img src="icon-1024.png" width="120" height="120" alt=""><figcaption>1024</figcaption></figure>
+    <figure><img src="icon-180.png" width="90" height="90" alt=""><figcaption>180 @2x</figcaption></figure>
+    <figure><img src="icon-60.png" width="60" height="60" alt=""><figcaption>60</figcaption></figure>
+    <figure><img src="icon-29.png" width="29" height="29" alt=""><figcaption>29</figcaption></figure>
+  </div>
+  <div class="hs d">
+    <figure><img src="icon-dark-1024.png" width="120" height="120" alt=""><figcaption>1024</figcaption></figure>
+    <figure><img src="icon-dark-180.png" width="90" height="90" alt=""><figcaption>180 @2x</figcaption></figure>
+    <figure><img src="icon-dark-60.png" width="60" height="60" alt=""><figcaption>60</figcaption></figure>
+    <figure><img src="icon-dark-29.png" width="29" height="29" alt=""><figcaption>29</figcaption></figure>
+  </div>
+</div>
+
+<h2>Monochrome</h2>
+<p class="lead">One colour. Each bloom becomes a five-lobed ring with the centre knocked out, which is literally an “o” with a petalled edge. Use for embossing, single-ink print, watermarks.</p>
+<div class="mono">
+  <div style="background:#fff"><img src="wordmark-mono.svg" alt="WordFlora, one colour"></div>
+  <div style="background:#2A7A38"><img src="wordmark-mono-white.svg" alt="WordFlora, one colour reversed"></div>
+</div>
+
+<h2>Small-size check</h2>
+<p class="lead">Rendered PNGs at 1×, then the same pixels enlarged 4× (no smoothing) so you can see what the screen actually draws.</p>
+<div class="px">
+  <div><img src="wordmark-120.png" width="120" alt=""><small>wordmark 120 px wide (19 px tall)</small></div>
+  <div><img src="wordmark-191.png" width="191" alt=""><small>wordmark 29 px tall</small></div>
+  <div><img src="wordmark-dark-120.png" width="120" alt=""><small>dark, 120</small></div>
+  <div><img src="icon-29.png" width="29" alt=""><small>icon 29</small></div>
+  <div><img src="icon-dark-29.png" width="29" alt=""><small>dark 29</small></div>
+  <div><img class="z" src="wordmark-120.png" width="480" alt=""><small>120 px wordmark ×4</small></div>
+  <div><img class="z" src="icon-29.png" width="116" alt=""><small>29 px icon ×4</small></div>
+  <div><img class="z" src="icon-dark-29.png" width="116" alt=""><small>dark ×4</small></div>
+  <div><img class="z" src="icon-tinted-29.png" width="116" alt=""><small>tinted ×4</small></div>
+</div>
+
+<h2>Why this works</h2>
+<div class="rat"><ul>
+  <li><b>The flower is the letter, not a decoration on it.</b> Five rounded petals form the o's outer edge; the centre disc sits exactly where the counter (the hole) of Nunito Black's o would be. In one colour the centre is cut out, so it is still an o.</li>
+  <li><b>Counter stays the lightest part in light mode, the darkest in dark mode.</b> Pale butter / gold centres on light, deep brown / plum centres on dark. That keeps the ring-with-a-hole silhouette, which is what makes the eye read “o” at 19 px.</li>
+  <li><b>Two blooms, two colours, one per word.</b> Amber in “Word”, rose in “Flora”: the two words keep their existing colours (#2C3E2C and #2A7A38 light; #D4EDD4 and #F0C060 dark), and each bloom adds the other warm colour from the app palette.</li>
+  <li><b>Same letters as today.</b> Heavy rounded sans (Nunito Black, a close stand-in for SF Rounded Heavy) converted to paths, so the SVGs need no font. Kerning tightened around the blooms.</li>
+  <li><b>Five petals, not six.</b> Six evenly spaced lobes read as a cog at small sizes, and Home puts the mark right next to the settings gear. Five petals read as a flower.</li>
+  <li><b>The icon is the two O's.</b> Same bloom geometry, rose big and amber small, on the Flora green. No face: the icon stays calm for adults and the shapes stay crisp at 29 px.</li>
+</ul>
+<p>Colours, contrast ratios and colour-blind notes: <a href="notes.md">notes.md</a>.</p></div>
+</div></body></html>

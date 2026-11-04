@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordFlora Logo Review</title>
+<link rel="stylesheet" href="../theme.css">
+<script src="../theme.js"></script>
+<style>
+  body{padding:0 16px 64px;background:var(--bg);color:var(--text)}
+  .wrap{max-width:1120px;margin:0 auto}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0 8px}
+  header.top h1{font-size:22px;margin:0}
+  .tog{font:inherit;font-weight:700;padding:8px 14px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer}
+  .lead{color:var(--muted);max-width:70ch;line-height:1.5}
+  h2{margin:36px 0 12px;font-size:19px}
+  .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+  @media (max-width:860px){.grid{grid-template-columns:1fr}}
+  .card{background:var(--surface);border-radius:20px;padding:16px;box-shadow:var(--shadow);min-width:0}
+  .card h3{margin:0 0 4px;font-size:17px}
+  .card .sub{color:var(--muted);font-size:13px;margin:0 0 12px}
+  .win{outline:3px solid var(--accent);outline-offset:-3px}
+  .badge{display:inline-block;background:var(--accent);color:var(--accent-ink);font-size:12px;font-weight:800;padding:2px 9px;border-radius:999px;margin-left:6px;vertical-align:2px}
+  .tile{border-radius:12px;padding:10px;margin:0 0 8px;display:flex;justify-content:center}
+  .tile.l{background:#FAF7F0}.tile.d{background:#1A2E1A}
+  .tile img{max-width:100%;height:auto;display:block}
+  .lab{font-size:11px;color:var(--muted);margin:-4px 0 10px;text-align:center}
+  .icons{display:flex;gap:12px;align-items:flex-end;justify-content:center;flex-wrap:wrap;padding:14px;border-radius:12px;margin-bottom:8px}
+  .icons.l{background:linear-gradient(#cfe3c4,#e9e4d6)}.icons.d{background:linear-gradient(#0f1b0f,#1a2e1a)}
+  .icons figure{margin:0;text-align:center;font-size:10px;color:#555}
+  .icons.d figure{color:#9ab59a}
+  .icons img{display:block;border-radius:22.37%;margin:0 auto 3px}
+  a.more{font-weight:700;color:var(--text)}
+  table{border-collapse:collapse;width:100%;background:var(--surface);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);font-size:14px}
+  th,td{padding:9px 12px;text-align:left;border-bottom:1px solid var(--line)}
+  td.n,th.n{text-align:center;width:16%}
+  tr.tot td{font-weight:800}
+  .scroll{overflow-x:auto}
+  .rec{background:var(--surface);border-radius:20px;padding:4px 20px 12px;box-shadow:var(--shadow);line-height:1.55}
+  .rec li{margin:4px 0}
+  code{font-size:.9em}
+  .sw{display:inline-block;width:.9em;height:.9em;border-radius:3px;vertical-align:-1px;margin-right:3px;border:1px solid var(--line)}
+  .placeholder{border:2px dashed var(--line);border-radius:20px;padding:28px;text-align:center;color:var(--muted)}
+</style>
+</head><body><div class="wrap">
+<header class="top"><h1>T-F logo: three directions and the critic's review</h1><button class="tog" onclick="wfToggle()">Light / dark</button></header>
+<p class="lead">The brief asks for the O's to be flowers, legible at small sizes, robust in light, dark and mono, colour-blind safe, calm, and appealing to both kids and adults. The renders are the designers' own PNGs at real size. Full review: <a class="more" href="critic.md">critic.md</a>.</p>
+
+<h2>Wordmark at 320 px and 120 px</h2>
+<div class="grid">
+  <div class="card"><h3>A · Two blooms</h3><p class="sub">Both O's replaced by five-petal blooms (amber, rose)</p>
+    <div class="tile l"><img src="a/wordmark-320.png" width="320" alt="Direction A wordmark, light"></div>
+    <div class="tile d"><img src="a/wordmark-dark-320.png" width="320" alt="Direction A wordmark, dark"></div>
+    <div class="tile l"><img src="a/wordmark-120.png" width="120" alt=""><span style="width:12px"></span><img src="a/wordmark-mono-120.png" width="120" alt=""></div>
+    <div class="lab">120 px light · mono</div>
+    <a class="more" href="a/index.html">Open direction A →</a></div>
+  <div class="card win"><h3>B · Ring blooms <span class="badge">Winner</span></h3><p class="sub">A real Nunito "o" ring with petals masked behind it (twin)</p>
+    <div class="tile l"><img src="b/png/wordmark-twin-320.png" width="320" alt="Direction B wordmark, light"></div>
+    <div class="tile d"><img src="b/png/wordmark-twin-dark-320.png" width="320" alt="Direction B wordmark, dark"></div>
+    <div class="tile l"><img src="b/png/wordmark-twin-120.png" width="120" alt=""><span style="width:12px"></span><img src="b/png/wordmark-twin-mono-120.png" width="120" alt=""></div>
+    <div class="lab">120 px light · mono</div>
+    <a class="more" href="b/index.html">Open direction B →</a></div>
+  <div class="card"><h3>C · Word tiles + bloom</h3><p class="sub">Hand-built rounded letters, six-petal two-tone blooms</p>
+    <div class="tile l"><img src="c/png/wordmark-light-320.png" width="320" alt="Direction C wordmark, light"></div>
+    <div class="tile d"><img src="c/png/wordmark-dark-320.png" width="320" alt="Direction C wordmark, dark"></div>
+    <div class="tile l"><img src="c/png/wordmark-light-120.png" width="120" alt=""><span style="width:12px"></span><img src="c/png/wordmark-mono-120.png" width="120" alt=""></div>
+    <div class="lab">120 px light · mono</div>
+    <a class="more" href="c/index.html">Open direction C →</a></div>
+</div>
+
+<h2>App icon at 60 px and 29 px</h2>
+<div class="grid">
+  <div class="card"><h3>A</h3>
+    <div class="icons l"><figure><img src="a/icon-60.png" width="60" alt="">60</figure><figure><img src="a/icon-29.png" width="29" alt="">29</figure><figure><img src="a/icon-tinted-29.png" width="29" alt="">tinted</figure></div>
+    <div class="icons d"><figure><img src="a/icon-dark-60.png" width="60" alt="">60</figure><figure><img src="a/icon-dark-29.png" width="29" alt="">29</figure></div></div>
+  <div class="card win"><h3>B</h3>
+    <div class="icons l"><figure><img src="b/png/icon-60.png" width="60" alt="">60</figure><figure><img src="b/png/icon-29.png" width="29" alt="">29</figure><figure><img src="b/png/icon-tinted-29.png" width="29" alt="">tinted</figure></div>
+    <div class="icons d"><figure><img src="b/png/icon-dark-60.png" width="60" alt="">60</figure><figure><img src="b/png/icon-dark-29.png" width="29" alt="">29</figure></div></div>
+  <div class="card"><h3>C</h3>
+    <div class="icons l"><figure><img src="c/png/icon-light-60.png" width="60" alt="">60</figure><figure><img src="c/png/icon-light-29.png" width="29" alt="">29</figure><figure><img src="c/png/icon-tinted-29.png" width="29" alt="">tinted</figure></div>
+    <div class="icons d"><figure><img src="c/png/icon-dark-60.png" width="60" alt="">60</figure><figure><img src="c/png/icon-dark-29.png" width="29" alt="">29</figure></div></div>
+</div>
+<div class="card" style="margin-top:16px;display:flex;gap:14px;align-items:center">
+  <img src="current-icon-120.png" width="60" height="60" style="border-radius:22.37%" alt="Current app icon">
+  <p class="sub" style="margin:0">For comparison, the current icon: a white daisy with a smiling face. A and C sit close to it, and only B adds a word-game cue (the letter o).</p>
+</div>
+
+<h2>Scores</h2>
+<div class="scroll"><table>
+  <thead><tr><th>Criterion (1 to 5; for integration, 5 = cheapest)</th><th class="n">A</th><th class="n">B</th><th class="n">C</th></tr></thead>
+  <tbody>
+    <tr><td>Legibility: wordmark at 120 px, icon at 29 px</td><td class="n">4</td><td class="n">4</td><td class="n">3</td></tr>
+    <tr><td>The O's still read as O's</td><td class="n">3</td><td class="n">5</td><td class="n">3</td></tr>
+    <tr><td>Distinctiveness (vs current icon and generic flower apps)</td><td class="n">2</td><td class="n">5</td><td class="n">2</td></tr>
+    <tr><td>Kid appeal and adult calm</td><td class="n">4</td><td class="n">4</td><td class="n">3</td></tr>
+    <tr><td>Light, dark and mono robustness</td><td class="n">4</td><td class="n">4</td><td class="n">3</td></tr>
+    <tr><td>Colour-blind safety (lightness steps)</td><td class="n">3</td><td class="n">4</td><td class="n">3</td></tr>
+    <tr><td>Fit with the palette and SF Rounded headings</td><td class="n">4</td><td class="n">4</td><td class="n">3</td></tr>
+    <tr><td>Integration cost</td><td class="n">4</td><td class="n">3</td><td class="n">2</td></tr>
+    <tr class="tot"><td>Total (out of 40)</td><td class="n">28</td><td class="n">33</td><td class="n">22</td></tr>
+  </tbody>
+</table></div>
+
+<h2>Recommendation</h2>
+<div class="rec">
+<p><b>Winner: B's ring-O and icon, refined with A's bloom shape, colour logic and kerning.</b> B is the only direction where the word still reads "WordFlora" with the petals removed, and its icon is the only one that links the garden to the word game. A's wordmark is more polished, so the refinement borrows that polish.</p>
+<ul>
+  <li><b>Petals:</b> five rounded petals on both O's (drop the six-petal daisy, which becomes a starburst at 120 px). Petal tips no more than 1.18× the ring radius. The Word O has a petal pointing up, the Flora O is rotated 36°.</li>
+  <li><b>Gap:</b> 36 u (up from 30), cut against <i>all</i> glyphs dilated by 36 u, so the petals tuck behind the W and the r.</li>
+  <li><b>W–o fix:</b> Nunito's native W–o advance minus 40 u. The optical W–o gap should be within ±10% of the r–d gap. The d|F breath is 20 u at most.</li>
+  <li><b>Petal colours:</b> light <span class="sw" style="background:#E0962A"></span>#E0962A (4.67:1 against the ink ring) and <span class="sw" style="background:#EE8C9E"></span>#EE8C9E (2.25:1 against the green ring, up from 1.68). Dark <span class="sw" style="background:#E0962A"></span>#E0962A (5.91:1 against the background) and <span class="sw" style="background:#E25D78"></span>#E25D78 (2.04:1 against the gold ring). Letters are unchanged and all at least 4.5:1.</li>
+  <li><b>Sizes:</b> twin from 130 pt wide upwards (Home 172 pt, Onboarding 262 pt). Solo (only the Flora O blooms) below 130 pt.</li>
+  <li><b>Build:</b> bake the gap into plain filled paths (no <code>&lt;mask&gt;</code>, stroke or filter). Ship an SVG image set "Wordmark" (Any and Dark appearances, Preserve Vector Data) plus "WordmarkSolo". <code>WordmarkView</code> becomes an <code>Image</code> with a <code>@ScaledMetric</code> width and keeps <code>.accessibilityLabel("WordFlora")</code>.</li>
+  <li><b>Icon:</b> a candidate only, placed under <code>design-preview/logo/icon/</code>. B's composition with the gradient changed to #3E7A2A → #2E6B22, the ring enlarged 6%, full-bleed with no baked corners. <b>No AppIcon swap this round.</b> I would not be unanimous yet: it loses the current icon's smiling face and has not been checked on a real home screen.</li>
+</ul>
+</div>
+
+<h2>Refined</h2>
+<div class="card" style="display:flex;flex-direction:column;gap:14px">
+  <p style="margin:0"><b>Shipped: "B uncut".</b> This is the review team's verdict (<code>review-opus.md</code> and <code>review-sonnet.md</code>). The ring is Nunito Black's own "o" with five of A's ellipse petals. Only the 36-unit gap around each o's own ring is cut, and no neighbouring letter cuts a petal. Each flower O gets extra side bearing so its petals stay clear of the next letter. Twin is used from 130 pt wide up, solo below that.</p>
+  <div style="display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end">
+    <figure style="margin:0"><div style="background:#FAF7F0;border-radius:12px;padding:12px"><img src="final/png/wordmark-320.png" width="320" alt="WordFlora final wordmark, 320 px" style="display:block"></div><figcaption style="font-size:12px;opacity:.7">final, 320 px</figcaption></figure>
+    <figure style="margin:0"><div style="background:#FAF7F0;border-radius:12px;padding:12px"><img src="final/png/wordmark-120.png" width="120" alt="WordFlora final wordmark, 120 px" style="display:block;image-rendering:pixelated"></div><figcaption style="font-size:12px;opacity:.7">final, 120 px</figcaption></figure>
+  </div>
+  <a class="more" href="final/index.html">Open /logo/final/index.html →</a>
+  <a class="more" href="icon/index.html">Icon candidate (no swap this round) →</a>
+</div>
+</div></body></html>

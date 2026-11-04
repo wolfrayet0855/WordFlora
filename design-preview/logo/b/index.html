@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logo B: Ring Blooms</title>
+<link rel="stylesheet" href="../../theme.css">
+<script src="../../theme.js"></script>
+<style>
+  body{padding:0 16px 64px}
+  .wrap{max-width:1120px;margin:0 auto}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0 8px}
+  header.top h1{font-size:20px;margin:0}
+  .toggle{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:40px 0 12px}
+  p,li{line-height:1.5}
+  .muted{color:var(--muted)}
+  .card{background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:20px}
+  .hero{display:flex;flex-direction:column;align-items:center;gap:14px;padding:44px 16px}
+  .hero img{width:min(560px,100%)}
+  /* theme-aware image pairs */
+  .on-dark{display:none}
+  [data-theme=dark] .on-light{display:none}
+  [data-theme=dark] .on-dark{display:block}
+  [data-theme=dark] img.on-dark{display:block}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+  .phones{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
+  .phone{width:390px;max-width:100%;height:600px;border-radius:44px;background:var(--bg);border:10px solid #111;overflow:hidden;position:relative;box-shadow:var(--shadow)}
+  .status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:14px;font-weight:700}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 0 16px;height:52px}
+  .topbar img{width:172px}
+  .gear{width:44px;height:44px;display:grid;place-items:center}
+  .hcard{margin:12px 16px;background:var(--surface);border-radius:20px;padding:12px 14px;display:flex;gap:14px;align-items:center;box-shadow:var(--shadow)}
+  .hcard .fl{width:56px;height:64px;flex:none}
+  .hcard b{display:block;margin-top:4px}
+  .sect{margin:20px 20px 8px;font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 16px}
+  .tile{height:96px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
+  .onb{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100% - 44px);gap:8px;padding-bottom:60px}
+  .onb img{width:262px}
+  .onb span{color:var(--muted);font-weight:600;font-size:16px}
+  .variants .card{display:flex;flex-direction:column;gap:14px}
+  .swatch{border-radius:14px;padding:22px 18px;display:flex;justify-content:center}
+  .swatch img{width:100%;max-width:420px}
+  .sw-light{background:#FAF7F0}.sw-dark{background:#1A2E1A}.sw-mono{background:#fff;border:1px solid var(--line)}
+  .badge{display:inline-block;font-size:12px;font-weight:800;padding:3px 9px;border-radius:999px;background:var(--accent);color:var(--accent-ink)}
+  .sizes{display:flex;flex-wrap:wrap;align-items:flex-end;gap:22px}
+  .sizes figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .ios{border-radius:22.37%;display:block}
+  .big{width:180px;height:180px}
+  .springboard{border-radius:24px;padding:22px 18px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px 10px;max-width:390px}
+  .sb-light{background:linear-gradient(160deg,#cfe3f2,#f3e6d4)}
+  .sb-dark{background:linear-gradient(160deg,#10161f,#232a1f)}
+  .app{display:flex;flex-direction:column;align-items:center;gap:5px;font-size:11px;font-family:-apple-system,system-ui,sans-serif}
+  .sb-light .app{color:#1c1c1e}.sb-dark .app{color:#f2f2f7}
+  .app .ph{width:60px;height:60px;border-radius:22.37%}
+  .small-row{display:flex;gap:12px;align-items:center;padding:10px 14px;border-radius:14px;margin-top:12px}
+  .small-row span{font-size:13px;font-family:-apple-system,system-ui,sans-serif}
+  .pix img{image-rendering:pixelated}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+  .chip{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid var(--line)}
+  @media (max-width:430px){.phone{border-width:6px;border-radius:36px}.springboard{gap:14px 4px;padding:16px 10px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>Logo direction B: ring blooms</h1>
+    <button class="toggle" onclick="wfToggle()">Light / dark</button>
+  </header>
+  <p class="muted">Each O stays a heavy Nunito Black ring, the same weight as the other letters, with its counter left open. Petals grow from under the ring, and a clear gap separates them from it. "Word" gets a six-petal amber daisy. "Flora" gets a five-petal coral blossom. Letters are converted to paths, so no web font is needed.</p>
+
+  <section class="card hero">
+    <img class="on-light" src="wordmark.svg" alt="WordFlora">
+    <img class="on-dark" src="wordmark-dark.svg" alt="WordFlora">
+    <span class="badge">Recommended: twin blooms</span>
+  </section>
+
+  <h2>In the app (390 pt)</h2>
+  <div class="phones">
+    <div class="phone" aria-label="Home mock">
+      <div class="status"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="topbar">
+        <img class="on-light" src="wordmark.svg" alt="WordFlora">
+        <img class="on-dark" src="wordmark-dark.svg" alt="WordFlora">
+        <div class="gear"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7 7 0 0 0-1.7-1L15 3.2h-4l-.4 2.7a7 7 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7 7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7 7 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></div>
+      </div>
+      <div class="hcard">
+        <svg class="fl" viewBox="0 0 56 64"><g fill="var(--accent)"><circle cx="28" cy="10" r="8"/><circle cx="42" cy="20" r="8"/><circle cx="37" cy="36" r="8"/><circle cx="19" cy="36" r="8"/><circle cx="14" cy="20" r="8"/></g><circle cx="28" cy="24" r="8" fill="#fff8e6"/><path d="M28 34v28" stroke="var(--success)" stroke-width="3"/></svg>
+        <div><span style="font-size:15px;font-weight:600">Guess words. Grow a garden.</span><b>3 Garden Days</b></div>
+      </div>
+      <div class="sect">Explore</div>
+      <div class="tiles"><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
+    </div>
+    <div class="phone" aria-label="Onboarding mock">
+      <div class="status"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="onb">
+        <img class="on-light" src="wordmark.svg" alt="WordFlora">
+        <img class="on-dark" src="wordmark-dark.svg" alt="WordFlora">
+        <span>Guess words. Grow a garden.</span>
+      </div>
+    </div>
+  </div>
+  <p class="muted" style="text-align:center">Home title: the mark is 172 pt wide, so its cap height matches the current 28 pt heavy title. Onboarding: 262 pt wide, matching largeTitle &times; 1.25.</p>
+
+  <h2>Both variants</h2>
+  <div class="grid variants">
+    <div class="card">
+      <div><b>Twin blooms</b> <span class="badge">recommended</span><br><span class="muted">Both O's flower: a daisy in Word and a blossom in Flora.</span></div>
+      <div class="swatch sw-light"><img src="wordmark-twin.svg" alt="WordFlora, twin blooms, light"></div>
+      <div class="swatch sw-dark"><img src="wordmark-twin-dark.svg" alt="WordFlora, twin blooms, dark"></div>
+      <div class="swatch sw-mono"><img src="wordmark-twin-mono.svg" alt="WordFlora, twin blooms, one colour"></div>
+    </div>
+    <div class="card">
+      <div><b>Solo bloom</b><br><span class="muted">Only the Flora O flowers, and "Word" stays plain type.</span></div>
+      <div class="swatch sw-light"><img src="wordmark-solo.svg" alt="WordFlora, solo bloom, light"></div>
+      <div class="swatch sw-dark"><img src="wordmark-solo-dark.svg" alt="WordFlora, solo bloom, dark"></div>
+      <div class="swatch sw-mono"><img src="wordmark-solo-mono.svg" alt="WordFlora, solo bloom, one colour"></div>
+    </div>
+  </div>
+
+  <h2>Wordmark at small widths (actual pixels)</h2>
+  <div class="card pix">
+    <div class="sizes">
+      <figure><img src="png/wordmark-twin-320.png" width="320" alt=""><figcaption>twin, 320 px</figcaption></figure>
+      <figure><img src="png/wordmark-twin-120.png" width="120" alt=""><figcaption>twin, 120 px</figcaption></figure>
+      <figure><img src="png/wordmark-solo-320.png" width="320" alt=""><figcaption>solo, 320 px</figcaption></figure>
+      <figure><img src="png/wordmark-solo-120.png" width="120" alt=""><figcaption>solo, 120 px</figcaption></figure>
+      <figure><img src="png/wordmark-twin-dark-120.png" width="120" alt=""><figcaption>twin dark, 120 px</figcaption></figure>
+      <figure><img src="png/wordmark-twin-mono-120.png" width="120" alt=""><figcaption>twin mono, 120 px</figcaption></figure>
+    </div>
+  </div>
+
+  <h2>App icon</h2>
+  <p class="muted">The icon is the Flora blossom O on its own. The SVGs and PNGs are full-bleed squares, because iOS applies the corner mask itself. This page adds the mask for preview.</p>
+  <div class="grid">
+    <div class="card">
+      <b>Default (light)</b>
+      <div class="sizes" style="margin-top:12px">
+        <figure><img class="ios big" src="png/icon-1024.png" alt="icon 1024 shown at 180"><figcaption>1024 (shown at 180)</figcaption></figure>
+        <figure><img class="ios" src="png/icon-180.png" width="180" height="180" alt=""><figcaption>180</figcaption></figure>
+        <figure class="pix"><img class="ios" src="png/icon-60.png" width="60" height="60" alt=""><figcaption>60</figcaption></figure>
+        <figure class="pix"><img class="ios" src="png/icon-29.png" width="29" height="29" alt=""><figcaption>29</figcaption></figure>
+      </div>
+    </div>
+    <div class="card">
+      <b>Dark and tinted (iOS 18)</b>
+      <div class="sizes" style="margin-top:12px">
+        <figure><img class="ios" src="png/icon-dark-180.png" width="180" height="180" alt=""><figcaption>dark 180</figcaption></figure>
+        <figure class="pix"><img class="ios" src="png/icon-dark-60.png" width="60" height="60" alt=""><figcaption>60</figcaption></figure>
+        <figure class="pix"><img class="ios" src="png/icon-dark-29.png" width="29" height="29" alt=""><figcaption>29</figcaption></figure>
+        <figure><img class="ios" src="png/icon-tinted-180.png" width="180" height="180" alt=""><figcaption>tinted 180</figcaption></figure>
+        <figure class="pix"><img class="ios" src="png/icon-tinted-60.png" width="60" height="60" alt=""><figcaption>60</figcaption></figure>
+        <figure class="pix"><img class="ios" src="png/icon-tinted-29.png" width="29" height="29" alt=""><figcaption>29</figcaption></figure>
+      </div>
+    </div>
+  </div>
+
+  <h2>Home screen</h2>
+  <div class="grid">
+    <div>
+      <div class="springboard sb-light">
+        <div class="app"><div class="ph" style="background:#4a90e2"></div>Mail</div>
+        <div class="app"><img class="ios" src="png/icon-180.png" width="60" height="60" alt="">WordFlora</div>
+        <div class="app"><div class="ph" style="background:#f5f5f5"></div>Photos</div>
+        <div class="app"><div class="ph" style="background:#ff9f0a"></div>Books</div>
+      </div>
+      <div class="small-row sb-light pix"><img class="ios" src="png/icon-29.png" width="29" height="29" alt=""><span>WordFlora: 29 pt (Settings row)</span></div>
+    </div>
+    <div>
+      <div class="springboard sb-dark">
+        <div class="app"><div class="ph" style="background:#1c3a5e"></div>Mail</div>
+        <div class="app"><img class="ios" src="png/icon-dark-180.png" width="60" height="60" alt="">WordFlora</div>
+        <div class="app"><div class="ph" style="background:#2c2c2e"></div>Photos</div>
+        <div class="app"><div class="ph" style="background:#5a3a10"></div>Books</div>
+      </div>
+      <div class="small-row sb-dark pix"><img class="ios" src="png/icon-dark-29.png" width="29" height="29" alt=""><span>WordFlora: 29 pt (Settings row)</span></div>
+    </div>
+  </div>
+
+  <h2>Monochrome</h2>
+  <div class="card">
+    <div class="swatch sw-mono"><img src="wordmark-mono.svg" alt="WordFlora one colour"></div>
+    <p class="muted">The mark uses one ink, #2C3E2C. The petals still read because a gap the colour of the background separates them from each ring. That gap is a mask, so the mark also works on photos and on any background colour.</p>
+  </div>
+
+  <h2>Rationale</h2>
+  <div class="card">
+    <ul>
+      <li><b>The O stays an O.</b> The ring is the real Nunito Black "o", so it has the same weight and shape as the other letters. The petals are extra shapes behind it and never replace the letter, which keeps the word readable to early readers.</li>
+      <li><b>Two different flowers make a small garden.</b> The Word O is a six-petal amber daisy, the app accent. The Flora O is a five-petal coral blossom. Neither has petals pointing straight sideways, so the letters can stay close together.</li>
+      <li><b>Colour is never the only cue.</b> A clear gap around each ring outlines the petals in every colour mode, and the petals are lighter (light mode) or darker (dark mode) than the ring.</li>
+      <li><b>The icon is the Flora O.</b> It is a cream ring with amber petals on the app's green. It keeps the cream, amber and green of the current smiling daisy, but now it is a letter as well as a flower. The five broad petals survive at 29 px, where the slimmer daisy breaks up into dots.</li>
+      <li><b>Recommendation: twin blooms.</b> It is what the owner described and it is friendlier for kids. "Solo" is the fallback for widths of 120 px or less (see notes.md).</li>
+    </ul>
+    <table>
+      <tr><th>Role</th><th>Light</th><th>Dark</th></tr>
+      <tr><td>"Word" letters</td><td><span class="chip" style="background:#2C3E2C"></span>#2C3E2C, 10.7:1</td><td><span class="chip" style="background:#D4EDD4"></span>#D4EDD4, 11.6:1</td></tr>
+      <tr><td>"Flora" letters</td><td><span class="chip" style="background:#2A7A38"></span>#2A7A38, 5.0:1</td><td><span class="chip" style="background:#F0C060"></span>#F0C060, 8.6:1</td></tr>
+      <tr><td>Word O petals</td><td colspan="2"><span class="chip" style="background:#E8A838"></span>#E8A838 (appAccent)</td></tr>
+      <tr><td>Flora O petals</td><td colspan="2"><span class="chip" style="background:#E0705A"></span>#E0705A (coral)</td></tr>
+    </table>
+  </div>
+</div>
+</body>
+</html>

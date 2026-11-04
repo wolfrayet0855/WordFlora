@@ -1,0 +1,12 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Render</title>
+<style>html,body{margin:0;padding:0;overflow:hidden}body{background:var(--b,#FAF7F0)}img{display:block}</style></head>
+<body><img id="i" alt="">
+<script>
+// render.html?v=icon&size=1024            -> square icon, size x size
+// render.html?v=wordmark&size=320&bg=FAF7F0 -> wordmark, size px wide
+var q=new URLSearchParams(location.search),v=q.get('v')||'icon',s=+q.get('size')||1024,bg=q.get('bg');
+if(bg)document.body.style.background='#'+bg;
+var i=document.getElementById('i');i.src=v+'.svg?'+Date.now();i.style.width=s+'px';
+if(v.indexOf('icon')===0)i.style.height=s+'px';
+</script></body></html>

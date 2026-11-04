@@ -1,0 +1,12 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>Render</title>
+<style>html,body{margin:0;padding:0;overflow:hidden}#box{display:flex;align-items:center;justify-content:center;overflow:hidden}img{display:block}</style>
+</head><body><div id="box"><img id="i" alt=""></div>
+<script>
+// ?v=<svg basename>&size=<px width>&h=<px height, default = size>&bg=<hex without #>
+// The box is drawn at the top-left at exactly size x h; render.sh crops the screenshot to it.
+var q=new URLSearchParams(location.search), s=+(q.get('size')||1024), h=+(q.get('h')||s), v=q.get('v')||'icon';
+var b=document.getElementById('box'); b.style.width=s+'px'; b.style.height=h+'px';
+b.style.background=q.get('bg')?'#'+q.get('bg'):'transparent';
+var i=document.getElementById('i'); i.src=v+'.svg'; i.style.width=s+'px';
+</script></body></html>

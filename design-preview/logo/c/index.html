@@ -1,0 +1,53 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Logo C: Word tiles + bloom</title>
+<link rel="stylesheet" href="../../theme.css"><script src="../../theme.js"></script><style>
+body{padding:24px 20px 80px;max-width:1100px;margin:0 auto}
+h1{margin:0 0 4px;font-size:28px}h2{margin:40px 0 8px;font-size:20px}p{line-height:1.5;max-width:70ch}.s{color:var(--muted)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+button.t{font:inherit;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:8px 14px;cursor:pointer}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.phone{width:390px;max-width:100%;background:var(--bg);border:1px solid var(--line);border-radius:28px;padding:20px 20px 28px;box-shadow:var(--shadow)}
+.top{display:flex;justify-content:space-between;align-items:center}.top img{height:auto;width:190px}
+.gear{width:44px;height:44px;border-radius:50%;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;margin-top:18px}
+.onb{height:300px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px}.onb img{width:300px}
+.homes{display:flex;gap:22px;padding:22px;border-radius:22px;align-items:flex-end;flex-wrap:wrap}
+.homes.l{background:linear-gradient(#cfe3c4,#e9e4d6)}.homes.d{background:linear-gradient(#0f1b0f,#1a2e1a)}
+.ic{text-align:center;font-size:11px;color:#555}.d .ic{color:#9ab}.ic img{display:block;margin:0 auto 4px}
+.ic img{border-radius:22.5%}
+.sw{display:flex;gap:16px;flex-wrap:wrap}.sw div{padding:16px;border-radius:14px}
+ul{line-height:1.55;max-width:70ch}
+</style></head><body>
+<div class="bar"><div><h1>Logo C: Word tiles + bloom</h1><div class="s">Ticket T-F, visual designer C. Lettering is drawn from rounded strokes (no font dependency).</div></div><button class="t" onclick="wfToggle()">Toggle light / dark</button></div>
+
+<h2>Wordmark</h2>
+<div class="card"><img src="wordmark.svg" id="wm" alt="WordFlora" style="width:100%;max-width:640px;display:block"></div>
+<script>function sw(){var d=document.documentElement.getAttribute('data-theme')==='dark';document.querySelectorAll('img[data-wm]').forEach(function(i){i.src=d?'wordmark-dark.svg':'wordmark.svg'});document.getElementById('wm').src=d?'wordmark-dark.svg':'wordmark.svg'}new MutationObserver(sw).observe(document.documentElement,{attributes:true});addEventListener('load',sw)</script>
+
+<h2>In context (390 pt phone)</h2>
+<div class="row">
+ <div class="phone"><div class="top"><img data-wm src="wordmark.svg" alt="WordFlora"><div class="gear" aria-hidden="true">&#9881;</div></div>
+  <div class="card"><b>Today's garden</b><p class="s" style="margin:6px 0 0">Home header: same size as WordmarkView(.title).</p></div></div>
+ <div class="phone"><div class="onb"><img data-wm src="wordmark.svg" alt="WordFlora"><div class="s">Guess words. Grow a garden.</div></div></div>
+</div>
+
+<h2>App icon at 1024, 180, 60, 29</h2>
+<div class="homes l"><div class="ic"><img src="png/icon-light-1024.png" width="180" alt="">1024 (shown 180)</div><div class="ic"><img src="png/icon-light-180.png" width="180" alt="">180</div><div class="ic"><img src="png/icon-light-60.png" width="60" alt="">60</div><div class="ic"><img src="png/icon-light-29.png" width="29" alt="">29</div><div class="ic"><img src="png/icon-tinted-60.png" width="60" alt="">tinted 60</div></div>
+<div class="homes d" style="margin-top:14px"><div class="ic"><img src="png/icon-dark-1024.png" width="180" alt="">1024 (shown 180)</div><div class="ic"><img src="png/icon-dark-180.png" width="180" alt="">180</div><div class="ic"><img src="png/icon-dark-60.png" width="60" alt="">60</div><div class="ic"><img src="png/icon-dark-29.png" width="29" alt="">29</div><div class="ic"><img src="png/icon-tinted-29.png" width="29" alt="">tinted 29</div></div>
+<p class="s">The tinted icon is greyscale on black; iOS applies the user's tint to its luminance. The PNGs include the rounded corners drawn in the SVG; the shipping asset would be a full-bleed square.</p>
+
+<h2>Wordmark renders and mono</h2>
+<div class="sw">
+ <div style="background:#FAF7F0"><img src="png/wordmark-light-320.png" alt=""><br><img src="png/wordmark-light-120.png" alt=""></div>
+ <div style="background:#1A2E1A"><img src="png/wordmark-dark-320.png" alt=""><br><img src="png/wordmark-dark-120.png" alt=""></div>
+ <div style="background:#FAF7F0"><img src="png/wordmark-mono-320.png" alt=""><br><img src="png/wordmark-mono-120.png" alt=""></div>
+</div>
+
+<h2>Rationale</h2>
+<ul>
+<li>WordFlora is a word game, so the letters are chunky and evenly weighted like tiles on a shelf, sitting on one soft baseline bar.</li>
+<li>Both O's become blooms: six round petals in two alternating tones around a green centre, separated by a thin gap so the bloom reads as a ring (an O) rather than a blob.</li>
+<li>"Word" is primary ink, "Flora" is the wordmarkFlora green, matching WordmarkView. In dark mode Flora is the app's gold (the actual colorset value).</li>
+<li>The same bloom, enlarged, is the app icon: one big readable shape at 29 pt.</li>
+<li>Mono keeps petals as one colour and knocks out a ring around a solid centre, so it still reads as a flower.</li>
+</ul>
+</body></html>

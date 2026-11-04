@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>WordFlora Final Wordmark</title>
+<link rel="stylesheet" href="../../theme.css">
+<script src="../../theme.js"></script>
+<style>
+  body{padding:0 16px 64px}
+  .wrap{max-width:1160px;margin:0 auto}
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:20px 0 8px}
+  header.top h1{font-size:20px;margin:0}
+  .toggle{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:8px 14px;font:inherit;font-weight:700;cursor:pointer;white-space:nowrap}
+  h2{font-size:15px;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin:40px 0 12px}
+  p,li{line-height:1.5}
+  .muted{color:var(--muted)}
+  .card{background:var(--surface);border-radius:20px;box-shadow:var(--shadow);padding:20px;color:var(--text)}
+  .hero{display:flex;justify-content:center;padding:44px 16px}
+  .hero img{width:min(600px,100%)}
+  .on-dark{display:none}
+  :root[data-theme=dark] .on-light{display:none}
+  :root[data-theme=dark] .on-dark{display:block}
+  .phones{display:flex;flex-wrap:wrap;gap:24px;justify-content:center}
+  .phone{width:390px;max-width:100%;height:560px;border-radius:44px;background:var(--bg);color:var(--text);border:10px solid #111;overflow:hidden;box-shadow:var(--shadow)}
+  .status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 26px;font-size:14px;font-weight:700}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:4px 16px 0 16px;height:52px}
+  .topbar img{width:172px;display:block}
+  .gear{width:44px;height:44px;display:grid;place-items:center}
+  .hcard{margin:12px 16px;background:var(--surface);border-radius:20px;padding:14px;box-shadow:var(--shadow)}
+  .hcard b{display:block;margin-top:4px}
+  .sect{margin:20px 20px 8px;font-size:12px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted)}
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 16px}
+  .tile{height:90px;border-radius:18px;background:var(--surface);box-shadow:var(--shadow)}
+  .onb{display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100% - 44px);gap:8px;padding-bottom:60px}
+  .onb img{width:262px;display:block}
+  .onb span{color:var(--muted);font-weight:600;font-size:16px}
+  .navbar{display:flex;align-items:center;justify-content:center;height:44px;border-bottom:1px solid var(--line);position:relative}
+  .navbar img{width:110px;display:block}
+  .navbar .back{position:absolute;left:14px;font-weight:700;color:var(--muted)}
+  .sizes{display:flex;flex-wrap:wrap;align-items:flex-end;gap:22px}
+  .sizes figure{margin:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px;font-size:12px;color:var(--muted)}
+  .pix img{image-rendering:pixelated;display:block}
+  .sw{border-radius:12px;padding:12px}
+  .sw-l{background:#FAF7F0}.sw-d{background:#1A2E1A}.sw-m{background:#fff;border:1px solid var(--line)}
+  .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+  .swatch{border-radius:14px;padding:22px 18px;display:flex;justify-content:center}
+  .swatch img{width:100%;max-width:440px}
+  table{border-collapse:collapse;width:100%;font-size:14px}
+  td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+  .chip{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:6px;border:1px solid var(--line)}
+  .tablewrap{overflow-x:auto}
+  code{font-size:13px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <h1>WordFlora wordmark: final</h1>
+    <button class="toggle" onclick="wfToggle()">Light / dark</button>
+  </header>
+  <p class="muted">"B uncut", the review team's verdict. Each O is Nunito Black's own "o" with five of A's ellipse petals around it. Only the 36-unit gap around each o's own ring is cut. No neighbouring letter cuts a petal, because each flower O gets extra side bearing until its petals stay clear of the next letter. Everything is plain filled paths, with no mask, stroke or filter.</p>
+
+  <section class="card hero">
+    <img class="on-light" src="wordmark.svg" alt="WordFlora">
+    <img class="on-dark" src="wordmark-dark.svg" alt="WordFlora">
+  </section>
+
+  <h2>Home header and onboarding (390 pt), light and dark</h2>
+  <div class="phones">
+    <div class="phone" data-theme="light">
+      <div class="status"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="topbar"><img src="wordmark.svg" alt="WordFlora">
+        <div class="gear"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7 7 0 0 0-1.7-1L15 3.2h-4l-.4 2.7a7 7 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7 7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7 7 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></div></div>
+      <div class="hcard"><span style="font-size:15px;font-weight:600">Guess words. Grow a garden.</span><b>3 Garden Days</b></div>
+      <div class="sect">Explore</div>
+      <div class="tiles"><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
+    </div>
+    <div class="phone" data-theme="dark">
+      <div class="status"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="topbar"><img src="wordmark-dark.svg" alt="WordFlora">
+        <div class="gear"><svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M19.4 13a7.5 7.5 0 0 0 0-2l2.1-1.6-2-3.5-2.5 1a7 7 0 0 0-1.7-1L15 3.2h-4l-.4 2.7a7 7 0 0 0-1.7 1l-2.5-1-2 3.5L6.6 11a7.5 7.5 0 0 0 0 2l-2.1 1.6 2 3.5 2.5-1a7 7 0 0 0 1.7 1l.4 2.7h4l.4-2.7a7 7 0 0 0 1.7-1l2.5 1 2-3.5zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg></div></div>
+      <div class="hcard"><span style="font-size:15px;font-weight:600">Guess words. Grow a garden.</span><b>3 Garden Days</b></div>
+      <div class="sect">Explore</div>
+      <div class="tiles"><div class="tile"></div><div class="tile"></div><div class="tile"></div><div class="tile"></div></div>
+    </div>
+    <div class="phone" data-theme="light">
+      <div class="status"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="onb"><img src="wordmark.svg" alt="WordFlora"><span>Guess words. Grow a garden.</span></div>
+    </div>
+    <div class="phone" data-theme="dark">
+      <div class="status"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>
+      <div class="onb"><img src="wordmark-dark.svg" alt="WordFlora"><span>Guess words. Grow a garden.</span></div>
+    </div>
+  </div>
+  <p class="muted" style="text-align:center">Home: twin blooms at 172 pt (.title). Onboarding: twin at 262 pt (largeTitle &times; 1.25).</p>
+
+  <h2>Below 130 pt: solo bloom</h2>
+  <div class="grid">
+    <div class="phone" data-theme="light" style="height:auto;border-width:6px;border-radius:24px">
+      <div class="navbar"><span class="back">&lsaquo; Back</span><img src="wordmark-solo.svg" alt="WordFlora"></div>
+    </div>
+    <div class="phone" data-theme="dark" style="height:auto;border-width:6px;border-radius:24px">
+      <div class="navbar"><span class="back">&lsaquo; Back</span><img src="wordmark-solo-dark.svg" alt="WordFlora"></div>
+    </div>
+  </div>
+  <p class="muted">Nav bars, widgets, share cards and anything under about 20 pt tall use the solo mark at 110 pt. Only the Flora O blooms.</p>
+
+  <h2>Real-size renders (actual pixels)</h2>
+  <div class="card pix">
+    <div class="sizes">
+      <figure><div class="sw sw-l"><img src="png/wordmark-320.png" width="320" alt=""></div>twin, 320 px</figure>
+      <figure><div class="sw sw-l"><img src="png/wordmark-120.png" width="120" alt=""></div>twin, 120 px</figure>
+      <figure><div class="sw sw-d"><img src="png/wordmark-dark-320.png" width="320" alt=""></div>twin dark, 320 px</figure>
+      <figure><div class="sw sw-d"><img src="png/wordmark-dark-120.png" width="120" alt=""></div>twin dark, 120 px</figure>
+      <figure><div class="sw sw-l"><img src="png/wordmark-solo-320.png" width="320" alt=""></div>solo, 320 px</figure>
+      <figure><div class="sw sw-l"><img src="png/wordmark-solo-120.png" width="120" alt=""></div>solo, 120 px</figure>
+      <figure><div class="sw sw-d"><img src="png/wordmark-solo-dark-320.png" width="320" alt=""></div>solo dark, 320 px</figure>
+      <figure><div class="sw sw-d"><img src="png/wordmark-solo-dark-120.png" width="120" alt=""></div>solo dark, 120 px</figure>
+      <figure><div class="sw sw-m"><img src="png/wordmark-mono-320.png" width="320" alt=""></div>mono, 320 px</figure>
+      <figure><div class="sw sw-m"><img src="png/wordmark-mono-120.png" width="120" alt=""></div>mono, 120 px</figure>
+      <figure><div class="sw sw-m"><img src="png/wordmark-mono-solid-320.png" width="320" alt=""></div>mono-solid (petals 0.6, Increase Contrast), 320 px</figure>
+      <figure><div class="sw sw-m"><img src="png/wordmark-mono-solid-120.png" width="120" alt=""></div>mono-solid, 120 px</figure>
+    </div>
+  </div>
+
+  <h2>Why the reach is 1.75&times;, not 1.40&times;</h2>
+  <div class="card pix">
+    <div class="sizes">
+      <figure><div class="sw sw-l"><img src="png/spec-k140-320.png" width="320" alt=""></div>1.40&times; (spec), 320 px</figure>
+      <figure><div class="sw sw-l"><img src="png/spec-k140-120.png" width="120" alt=""></div>1.40&times;, 120 px</figure>
+      <figure><div class="sw sw-l"><img src="png/wordmark-320.png" width="320" alt=""></div>1.75&times; (final), 320 px</figure>
+      <figure><div class="sw sw-l"><img src="png/wordmark-120.png" width="120" alt=""></div>1.75&times;, 120 px</figure>
+    </div>
+    <p class="muted">At 1.40&times; only about 70 units of each petal show outside the gap. That is about 1.5 px at 120 px wide, so the Flora petals cannot be counted and the acceptance check fails. At 1.75&times; all five can be counted.</p>
+  </div>
+
+  <h2>All files</h2>
+  <div class="grid">
+    <div class="swatch sw-l"><img src="wordmark.svg" alt="twin light"></div>
+    <div class="swatch sw-d"><img src="wordmark-dark.svg" alt="twin dark"></div>
+    <div class="swatch sw-l"><img src="wordmark-solo.svg" alt="solo light"></div>
+    <div class="swatch sw-d"><img src="wordmark-solo-dark.svg" alt="solo dark"></div>
+    <div class="swatch sw-m"><img src="wordmark-mono.svg" alt="mono"></div>
+    <div class="swatch sw-m"><img src="wordmark-solo-mono.svg" alt="solo mono"></div>
+    <div class="swatch sw-m"><img src="wordmark-mono-solid.svg" alt="mono solid"></div>
+  </div>
+
+  <h2>Contrast (WCAG)</h2>
+  <div class="card tablewrap">
+    <table>
+      <tr><th>Pair</th><th>Colours</th><th>Ratio</th></tr>
+      <tr><td>"Word" letters and ring, light</td><td><span class="chip" style="background:#2C3E2C"></span>#2C3E2C on #FAF7F0</td><td><b>10.71</b></td></tr>
+      <tr><td>"Flora" letters and ring, light</td><td><span class="chip" style="background:#2A7A38"></span>#2A7A38 on #FAF7F0</td><td><b>4.98</b></td></tr>
+      <tr><td>"Word" letters and ring, dark</td><td><span class="chip" style="background:#D4EDD4"></span>#D4EDD4 on #1A2E1A</td><td><b>11.63</b></td></tr>
+      <tr><td>"Flora" letters and ring, dark</td><td><span class="chip" style="background:#F0C060"></span>#F0C060 on #1A2E1A</td><td><b>8.56</b></td></tr>
+      <tr><td>Word petals, light</td><td><span class="chip" style="background:#E0962A"></span>#E0962A on bg / on ring</td><td>2.29 / 4.67</td></tr>
+      <tr><td>Flora petals, light</td><td><span class="chip" style="background:#E27D8A"></span>#E27D8A on bg / on ring</td><td>2.61 / 1.91</td></tr>
+      <tr><td>Word petals, dark</td><td><span class="chip" style="background:#E0962A"></span>#E0962A on bg / on ring</td><td>5.91 / 1.97</td></tr>
+      <tr><td>Flora petals, dark</td><td><span class="chip" style="background:#E25D78"></span>#E25D78 on bg / on ring</td><td>4.19 / 2.04</td></tr>
+      <tr><td>Mono ink / petals at 45% (&asymp;#A0A8A0)</td><td>on #FFFFFF</td><td>11.46 / 2.44</td></tr>
+      <tr><td>Mono-solid petals at 60% (&asymp;#808B80)</td><td>on #FFFFFF / on ink</td><td>3.55 / 3.23</td></tr>
+    </table>
+    <p class="muted">Every letter and ring is at least 4.5:1. The petals are decoration: the 36-unit gap always separates them from the letters, so the word reads in full without them.</p>
+  </div>
+</div>
+</body>
+</html>

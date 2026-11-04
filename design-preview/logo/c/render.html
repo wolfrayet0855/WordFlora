@@ -1,0 +1,6 @@
+<!doctype html><meta charset=utf-8><style>html,body{margin:0;overflow:hidden}</style>
+<body><script>
+var q=new URLSearchParams(location.search),s=q.get('size'),v=q.get('v');
+document.body.style.background='#'+(q.get('bg')||'fff');
+var i=new Image();i.style.display='block';i.style.width=s+'px';i.src=v+'.svg';document.body.appendChild(i);
+</script>
