@@ -7,7 +7,7 @@ import AVFoundation
 /// one-line change below plus the file in Resources/Sounds.
 enum SoundEvent: CaseIterable {
     case key, correct, wrong, word, earned, levelUp, rest, wake, water, soil, sun, snip, butterfly
-    case badgeBronze, badgeSilver, badgeGold, button, ambient
+    case badgeBronze, badgeSilver, badgeGold, button, ambient, thunder
 
     static func badge(tier: Int) -> SoundEvent {
         switch tier { case 2: return .badgeSilver; case 3...: return .badgeGold; default: return .badgeBronze }
@@ -19,6 +19,8 @@ struct SoundSpec {
     var ext: String
     /// Correction toward about -20 LUFS, measured by the audio designer. Players can only attenuate, so boosts are capped.
     var gainDb: Float
+    /// Lowers the ambient bed while this sound plays (the long, low thunder roll would muddy it).
+    var ducksAmbient = false
 }
 
 enum SoundCatalog {
@@ -41,6 +43,8 @@ enum SoundCatalog {
         .badgeGold: SoundSpec(file: "wf-badgeGold", ext: "m4a", gainDb: -3.8),
         .button: SoundSpec(file: "wf-button", ext: "m4a", gainDb: -5.9),
         .ambient: SoundSpec(file: "wf-ambient", ext: "caf", gainDb: -0.6),
+        // Procedural (tools/make_thunder.py), about -31 LUFS: kept well under the action sounds on purpose, never boosted.
+        .thunder: SoundSpec(file: "wf-thunder", ext: "m4a", gainDb: 0, ducksAmbient: true),
     ]
 
     static let ambientVolume: Float = 0.25
@@ -59,7 +63,12 @@ enum SoundCatalog {
 @MainActor
 protocol SoundPlaying: AnyObject {
     var enabled: Bool { get set }
-    func play(_ event: SoundEvent)
+    /// `volume` (0...1) scales the event's catalog level, for sounds meant to sit lower than usual.
+    func play(_ event: SoundEvent, volume: Float)
+}
+
+extension SoundPlaying {
+    func play(_ event: SoundEvent) { play(event, volume: 1) }
 }
 
 @MainActor
@@ -71,6 +80,7 @@ final class SoundPlayer: SoundPlaying {
     private(set) var playCount = 0
     private var players: [SoundEvent: AVAudioPlayer] = [:]
     private var ambient: AVAudioPlayer?
+    private var unduck: DispatchWorkItem?
 
     struct Jitter { var volumeScale: Float; var rate: Float }
 
@@ -87,7 +97,7 @@ final class SoundPlayer: SoundPlaying {
         try? AVAudioSession.sharedInstance().setActive(true)
     }
 
-    func play(_ event: SoundEvent) {
+    func play(_ event: SoundEvent, volume: Float) {
         guard enabled else { return }
         playCount += 1
         guard event != .ambient, let url = SoundCatalog.url(for: event) else { return }
@@ -97,10 +107,17 @@ final class SoundPlayer: SoundPlaying {
             p.enableRate = true; p.prepareToPlay(); players[event] = p; player = p
         }
         let j = Self.jitter(seed: UInt64(truncatingIfNeeded: playCount))
-        player.volume = min(1, SoundCatalog.volume(for: event, master: master) * j.volumeScale)
+        player.volume = min(1, SoundCatalog.volume(for: event, master: master) * j.volumeScale * min(max(volume, 0), 1))
         player.rate = j.rate
         player.currentTime = 0
         player.play()
+        if SoundCatalog.specs[event]?.ducksAmbient == true, ambient != nil {
+            duckAmbient(true)
+            unduck?.cancel()
+            let item = DispatchWorkItem { [weak self] in self?.duckAmbient(false) }
+            unduck = item
+            DispatchQueue.main.asyncAfter(deadline: .now() + player.duration / Double(max(player.rate, 0.5)), execute: item)
+        }
     }
 
     func startAmbient() {

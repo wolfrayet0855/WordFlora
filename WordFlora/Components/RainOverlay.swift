@@ -127,23 +127,35 @@ struct RainCanvas: View {
 }
 
 /// Drives the gentle thunder: a slow 1.4 s flash every 8 to 15 s (never closer than 8 s), then a soft haptic
-/// 0.3 to 0.5 s later. It only runs while `active` (thunder days, on screen, app active, not Reduce Motion,
+/// 0.3 to 0.5 s later. The first flash of a visit also calls `roll` 0.6 to 1.2 s after it (the soft thunder sound);
+/// later flashes stay silent. It only runs while `active` (thunder days, on screen, app active, not Reduce Motion,
 /// Calm or Quiet Garden). `flash` is the white overlay's opacity.
 struct ThunderDriver: View {
     let active: Bool
     let dark: Bool
     let haptics: Bool
     @Binding var flash: Double
+    /// Plays the thunder sound; called at most once per visit.
+    var roll: () -> Void = {}
     @State private var lastFlash: Date?
+    @State private var visit = ThunderGate.Visit()
 
     var body: some View {
         Color.clear.frame(width: 0, height: 0)
             .accessibilityHidden(true)
+            .onAppear { visit = ThunderGate.Visit() }       // each appearance of the plant page is a new visit
             .task(id: active) {
                 guard active else { flash = 0; return }
                 try? await Task.sleep(for: .seconds(2.5))      // the first flash comes soon after the page opens
                 while !Task.isCancelled && active {
-                    if ThunderGate.canFlash(lastFlash: lastFlash, now: .now) { strike() }
+                    if ThunderGate.canFlash(lastFlash: lastFlash, now: .now) {
+                        strike()
+                        if visit.flash() {                            // sound follows light, once per visit
+                            try? await Task.sleep(for: .seconds(ThunderGate.soundDelay(unit: .random(in: 0...1))))
+                            guard !Task.isCancelled && active else { break }
+                            roll()
+                        }
+                    }
                     try? await Task.sleep(for: .seconds(ThunderGate.nextDelay(unit: .random(in: 0...1))))
                 }
                 flash = 0

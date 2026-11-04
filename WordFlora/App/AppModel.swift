@@ -572,9 +572,9 @@ final class AppModel {
     // MARK: Sound
 
     /// One place that honours the Sound setting for every non-round sound.
-    func play(_ event: SoundEvent) {
+    func play(_ event: SoundEvent, volume: Float = 1) {
         SoundPlayer.shared.enabled = settings.soundOn
-        SoundPlayer.shared.play(event)
+        SoundPlayer.shared.play(event, volume: volume)
     }
 
     func updateAmbience() {

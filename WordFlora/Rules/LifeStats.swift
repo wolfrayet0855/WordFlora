@@ -165,6 +165,24 @@ enum ThunderGate {
     /// `unit` is a random number in 0...1.
     static func nextDelay(unit: Double) -> TimeInterval { 8 + 7 * min(max(unit, 0), 1) }
     static func hapticDelay(unit: Double) -> TimeInterval { 0.3 + 0.2 * min(max(unit, 0), 1) }
+
+    /// The soft thunder roll plays at this share of the player's level.
+    static let soundVolume: Float = 0.35
+    /// Sound follows light: the roll starts 0.6 to 1.2 s after the flash begins.
+    static func soundDelay(unit: Double) -> TimeInterval { 0.6 + 0.6 * min(max(unit, 0), 1) }
+    /// Only the first flash of a plant-page visit rolls; later flashes stay silent.
+    static func shouldSound(playedThisVisit: Bool) -> Bool { !playedThisVisit }
+
+    /// One plant-page visit (from the page appearing until it goes away).
+    struct Visit {
+        private(set) var playedThisVisit = false
+        /// Call on every flash; true when this flash should bring the thunder roll.
+        mutating func flash() -> Bool {
+            guard ThunderGate.shouldSound(playedThisVisit: playedThisVisit) else { return false }
+            playedThisVisit = true
+            return true
+        }
+    }
 }
 
 /// The petal fall or regrowth to play when the plant page opens or its love changes, so each change plays once.

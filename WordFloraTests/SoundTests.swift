@@ -9,7 +9,8 @@ final class SoundTests: XCTestCase {
     final class RecordingSound: SoundPlaying {
         var enabled = true
         var played: [SoundEvent] = []
-        func play(_ event: SoundEvent) { if enabled { played.append(event) } }
+        var volumes: [Float] = []
+        func play(_ event: SoundEvent, volume: Float) { if enabled { played.append(event); volumes.append(volume) } }
     }
 
     // MARK: catalog
@@ -37,6 +38,50 @@ final class SoundTests: XCTestCase {
         XCTAssertEqual(SoundEvent.badge(tier: 3), .badgeGold)
         XCTAssertEqual(SoundEvent.badge(tier: 9), .badgeGold)
         XCTAssertEqual(SoundEvent.badge(tier: 0), .badgeBronze)
+    }
+
+    // MARK: thunder
+    func testThunderAssetIsBundledSmallAndAboutFourSecondsLong() throws {
+        let url = try XCTUnwrap(SoundCatalog.url(for: .thunder))
+        XCTAssertEqual(url.lastPathComponent, "wf-thunder.m4a")
+        let size = try XCTUnwrap(try url.resourceValues(forKeys: [.fileSizeKey]).fileSize)
+        XCTAssertLessThan(size, 300 * 1024)
+        let player = try AVAudioPlayer(contentsOf: url)
+        XCTAssertTrue((2.5...6.0).contains(player.duration), "duration \(player.duration)")
+    }
+
+    func testThunderPlaysSoftlyAndDucksTheAmbientBed() {
+        XCTAssertEqual(ThunderGate.soundVolume, 0.35, accuracy: 0.001)
+        XCTAssertLessThan(SoundCatalog.volume(for: .thunder, master: 0.8) * ThunderGate.soundVolume, SoundCatalog.volume(for: .water, master: 0.8))
+        XCTAssertTrue(SoundCatalog.specs[.thunder]?.ducksAmbient == true)
+        XCTAssertFalse(SoundCatalog.specs[.water]?.ducksAmbient == true)
+    }
+
+    func testThunderRollsAfterTheFirstFlashOnlyOncePerVisit() {
+        for r in [-1.0, 0.0, 0.5, 1.0, 2.0] { XCTAssertTrue((0.6...1.2).contains(ThunderGate.soundDelay(unit: r)), "\(r)") }
+        XCTAssertLessThan(ThunderGate.soundDelay(unit: 0), ThunderGate.soundDelay(unit: 1))   // sound follows light, never with it
+        XCTAssertTrue(ThunderGate.shouldSound(playedThisVisit: false))
+        XCTAssertFalse(ThunderGate.shouldSound(playedThisVisit: true))
+        var visit = ThunderGate.Visit()
+        XCTAssertTrue(visit.flash())                    // first flash of the visit rolls
+        XCTAssertFalse(visit.flash())                   // later flashes stay silent
+        XCTAssertFalse(visit.flash())
+        visit = ThunderGate.Visit()                     // a new visit (the page appears again) may roll once more
+        XCTAssertTrue(visit.flash())
+    }
+
+    func testPlayingAtAVolumePassesItThroughAndThePlainCallIsFullVolume() {
+        let s = RecordingSound()
+        s.play(.correct); s.play(.thunder, volume: 0.35)
+        XCTAssertEqual(s.played, [.correct, .thunder]); XCTAssertEqual(s.volumes, [1, 0.35])
+        s.enabled = false; s.play(.thunder, volume: 0.35)
+        XCTAssertEqual(s.played.count, 2)               // sound off: no thunder
+    }
+
+    func testDisabledPlayerPlaysNoThunder() {
+        let p = SoundPlayer(); p.enabled = false
+        p.play(.thunder, volume: ThunderGate.soundVolume)
+        XCTAssertEqual(p.playCount, 0)
     }
 
     // MARK: jitter (fatigue control)

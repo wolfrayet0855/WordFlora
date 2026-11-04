@@ -76,7 +76,8 @@ struct PlantDetailView: View {
         .background {
             ThunderDriver(active: LifeStats.weather(day: snap.rainDay).thunder && !reduceMotion && stageVisible
                                   && scenePhase == .active && !lowPower.isOn,
-                          dark: colorScheme == .dark, haptics: app.settings.hapticsOn, flash: $flash)
+                          dark: colorScheme == .dark, haptics: app.settings.hapticsOn, flash: $flash,
+                          roll: { app.play(.thunder, volume: ThunderGate.soundVolume) })
         }
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: tendTaps) { _, _ in app.settings.hapticsOn }
         .toolbar {
