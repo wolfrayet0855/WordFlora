@@ -26,6 +26,8 @@ final class PlantCollectible {
     var nickname: String = ""
     var createdAt: Date = Date.now
     var lastLovedAt: Date?
+    /// The love petal count the plant page last animated to, so a petal fall or regrowth plays once per change.
+    var lastShownPips: Int = 5
 
     init(name: String, botanicalName: String, botanicalFact: String,
          level: Int, imageName: String, plantId: String? = nil) {

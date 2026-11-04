@@ -62,6 +62,15 @@ final class ReconcileTests: XCTestCase {
         XCTAssertEqual(rose.earnedCount, 3); XCTAssertEqual(rose.growthPoints, 90); XCTAssertEqual(rose.stage, 3); XCTAssertEqual(rose.nickname, "Rosie")
     }
 
+    func testShownLovePetalsMergeToTheHigherCountAndDefaultToFive() {
+        let a = PlantCollectible(name: "Rose", botanicalName: "r", botanicalFact: "f", level: 1, imageName: "plant_rose", plantId: "rose")
+        XCTAssertEqual(a.lastShownPips, 5)
+        let b = PlantCollectible(name: "Rose", botanicalName: "r", botanicalFact: "f", level: 1, imageName: "plant_rose", plantId: "rose")
+        a.lastShownPips = 2; b.lastShownPips = 4
+        DataReconciler.merge(b, into: a)
+        XCTAssertEqual(a.lastShownPips, 4)      // at worst a fall plays once more; never a stale regrow
+    }
+
     func testGardenLevelsCanCompleteAgainAfterDuplicatesAreMerged() {
         try! PlantCatalog.seedIfNeeded(context: ctx)
         for p in plants() where p.level == 1 { p.earnedCount = 1; p.stage = 4 }

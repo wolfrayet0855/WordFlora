@@ -58,6 +58,7 @@ enum DataReconciler {
         k.lastSunnyAt = [k.lastSunnyAt, o.lastSunnyAt].compactMap { $0 }.max()
         k.lastPrunedAt = [k.lastPrunedAt, o.lastPrunedAt].compactMap { $0 }.max()
         k.lastLovedAt = [k.lastLovedAt, o.lastLovedAt].compactMap { $0 }.max()
+        k.lastShownPips = max(k.lastShownPips, o.lastShownPips)
         if k.nickname.isEmpty { k.nickname = o.nickname }
         if k.soilType.isEmpty { k.soilType = o.soilType }
     }
