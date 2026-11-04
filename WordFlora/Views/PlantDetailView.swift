@@ -47,10 +47,7 @@ struct PlantDetailView: View {
     private func displayName(_ plant: PlantCollectible) -> String { plant.nickname.isEmpty ? plant.name : plant.nickname }
 
     private func snapshot(_ plant: PlantCollectible) -> LifeStats.Snapshot {
-        LifeStats.snapshot(.init(lastTendedAt: plant.lastTendedAt, lastSunnyAt: plant.lastSunnyAt, lastLovedAt: plant.lastLovedAt,
-                                 soilRichness: plant.soilRichness, stage: plant.stage, absorbedToday: plant.absorbedToday,
-                                 absorbDay: plant.absorbDay, now: .now, calendar: .current,
-                                 exempt: app.settings.quietGarden || app.settings.calmMode))
+        LifeStats.snapshot(.init(plant: plant, now: .now, calendar: .current, exempt: app.settings.quietGarden || app.settings.calmMode))
     }
 
     @ViewBuilder private func content(_ plant: PlantCollectible) -> some View {

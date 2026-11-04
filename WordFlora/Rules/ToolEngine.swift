@@ -67,7 +67,7 @@ enum ToolEngine {
     static let pruneCooldownDays = 2.0
     static let repotMatchGrowth = 4
 
-    /// A better can waters more plants per use, one drop each.
+    /// A better can waters more plants per use, one drop each. A plant that has had its drinks today is skipped for free.
     static func waterWithCan(_ plants: [PlantCollectible], profile: PlayerProfile, inventory: ToolInventory,
                              now: Date, calendar: Calendar, economy: Economy, quiet: Bool = false) -> [TendResult] {
         var results = [TendResult]()
@@ -97,16 +97,16 @@ enum ToolEngine {
     static func prune(_ plant: PlantCollectible, inventory: ToolInventory, now: Date, calendar: Calendar,
                       economy: Economy, quiet: Bool = false) -> TendResult {
         let tier = max(1, inventory.tier(of: .shears))
-        if !quiet {
-            guard inventory.tier(of: .shears) > 0 else { return .blocked(.notOwned) }
-            if let last = plant.lastPrunedAt, now.timeIntervalSince(last) < pruneCooldownDays * 86_400 { return .blocked(.cooldown) }
-        }
+        if !quiet { guard inventory.tier(of: .shears) > 0 else { return .blocked(.notOwned) } }
+        // Pruning rests in Quiet Garden too: with no shared daily cap, the rest is what keeps its growth paced.
+        if let last = plant.lastPrunedAt, now.timeIntervalSince(last) < pruneCooldownDays * 86_400 { return .blocked(.cooldown) }
         let r = TendingEngine.applyGrowth(plant, desired: pruneGrowth[tier - 1], now: now, calendar: calendar, economy: economy)
         if r.applied { plant.lastPrunedAt = now }
         return r
     }
 
     /// Costs one scoop. A preferred soil is "happy" (growth boost); anything else is simply neutral, never harmful.
+    /// The happy growth comes once a day; another happy repot the same day still refreshes the soil.
     static func repot(_ plant: PlantCollectible, to soil: SoilType, profile: PlayerProfile, now: Date,
                       calendar: Calendar, economy: Economy, quiet: Bool = false) -> RepotResult {
         let happy = soil == SoilType.preferred(forPlantId: plant.plantId)
@@ -117,7 +117,12 @@ enum ToolEngine {
         var tend = TendResult()
         if happy {
             plant.soilBoostUntil = now.addingTimeInterval(Double(economy.soilBoostDays) * 86_400)
-            tend = TendingEngine.applyGrowth(plant, desired: repotMatchGrowth, now: now, calendar: calendar, economy: economy)
+            if !TendingEngine.isToday(plant.lastRepotGrowthAt, now: now, calendar: calendar) {
+                plant.lastRepotGrowthAt = now
+                tend = TendingEngine.applyGrowth(plant, desired: repotMatchGrowth, now: now, calendar: calendar, economy: economy)
+            } else {
+                tend = TendResult(applied: true, gpGained: 0, stageUp: false, reason: nil)
+            }
         }
         return RepotResult(applied: true, outcome: happy ? .happy : .neutral, tend: tend)
     }

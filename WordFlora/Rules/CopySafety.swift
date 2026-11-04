@@ -6,7 +6,7 @@ enum CopySafety {
         // guilt / absence
         "miss", "lonely", "alone", "waiting", "abandon", "neglect", "forgot", "forget",
         // loss / death
-        "die", "dies", "died", "dying", "dead", "lost", "broken", "lose streak", "broken streak", "last chance",
+        "die", "dies", "died", "dying", "dead", "lost", "empty", "left", "broken", "lose streak", "broken streak", "last chance",
         // urgency
         "hurry", "now or never", "expires", "only", "last",
         // trait praise / comparison

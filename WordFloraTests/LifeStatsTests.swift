@@ -6,12 +6,14 @@ final class LifeStatsTests: XCTestCase {
     let cal: Calendar = { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "UTC")!; return c }()
     func hours(_ h: Double) -> Date { t0.addingTimeInterval(h * 3600) }
 
-    private func inputs(tended: Double? = 1, sunny: Double? = 1, loved: Double? = 1, soil: Double = 0.5, stage: Int = 3,
-                        absorbed: Int = 10, absorbDay: Date? = nil, exempt: Bool = false, now: Date? = nil) -> LifeStats.Inputs {
+    /// `waters` drinks today, sun and soil `sunny` / `fed` hours ago (nil = never).
+    private func inputs(waters: Int = 2, sunny: Double? = 1, fed: Double? = nil, pruned: Double? = nil, loved: Double? = 1, soil: Double = 0.5,
+                        stage: Int = 3, waterDay: Date? = nil, exempt: Bool = false, now: Date? = nil) -> LifeStats.Inputs {
         let n = now ?? hours(30)
         func ago(_ h: Double?) -> Date? { h.map { n.addingTimeInterval(-$0 * 3600) } }
-        return LifeStats.Inputs(lastTendedAt: ago(tended), lastSunnyAt: ago(sunny), lastLovedAt: ago(loved), soilRichness: soil,
-                                stage: stage, absorbedToday: absorbed, absorbDay: absorbDay ?? n, now: n, calendar: cal, exempt: exempt)
+        return LifeStats.Inputs(lastSunnyAt: ago(sunny), lastLovedAt: ago(loved), lastFedAt: ago(fed), lastPrunedAt: ago(pruned),
+                                soilRichness: soil, stage: stage, waterToday: waters, waterDay: waterDay ?? cal.startOfDay(for: n),
+                                now: n, calendar: cal, exempt: exempt)
     }
 
     // MARK: Meters
@@ -20,23 +22,25 @@ final class LifeStatsTests: XCTestCase {
         let s = LifeStats.snapshot(inputs())
         XCTAssertEqual(s.water.word, "Full"); XCTAssertEqual(s.sunshine.word, "Bright"); XCTAssertEqual(s.happiness.word, "Happy")
         XCTAssertEqual(s.water.accessibilityLabel, "Water, full")
+        XCTAssertTrue(s.water.done); XCTAssertTrue(s.sunshine.done)
     }
 
-    func testWaterSoftensWithTimeButNeverEmpties() {
-        let fills = [1.0, 30, 60, 200, 2000].map { LifeStats.snapshot(inputs(tended: $0)).water.fill }
-        XCTAssertEqual(fills, fills.sorted(by: >), "water only ever eases down as time passes")
+    func testWaterShowsTodaysDrinksAndNeverEmpties() {
+        let fills = [0, 1, 2, 5].map { LifeStats.snapshot(inputs(waters: $0)).water.fill }
+        XCTAssertEqual(fills, fills.sorted(), "each drink today fills it a little more")
         XCTAssertGreaterThanOrEqual(fills.min()!, 0.3, "a meter never shows as empty")
-        XCTAssertEqual(LifeStats.snapshot(inputs(tended: 30)).water.word, "Good")
-        XCTAssertEqual(LifeStats.snapshot(inputs(tended: 60)).water.word, "Sipping")
-        XCTAssertEqual(LifeStats.snapshot(inputs(tended: nil)).water.word, "Sipping")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0)).water.word, "Ready for a drink")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 1)).water.word, "Good")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2)).water.word, "Full")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, waterDay: hours(-200))).water.word, "Ready for a drink")   // yesterday's drinks
     }
 
-    func testSunshineEasesAndRainMakesItCloudy() {
-        XCTAssertEqual(LifeStats.snapshot(inputs(sunny: 30)).sunshine.word, "Warming up")
-        XCTAssertEqual(LifeStats.snapshot(inputs(sunny: 100)).sunshine.word, "Sun is coming")
-        XCTAssertEqual(LifeStats.snapshot(inputs(sunny: 1, loved: 30)).sunshine.word, "Cloudy")   // a rainy day
-        let fills = [1.0, 30, 100].map { LifeStats.snapshot(inputs(sunny: $0)).sunshine.fill }
-        XCTAssertEqual(fills, fills.sorted(by: >))
+    func testSunshineIsBrightOnlyWhenSunnedTodayAndRainNeverChangesIt() {
+        XCTAssertEqual(LifeStats.snapshot(inputs(sunny: 1)).sunshine.word, "Bright")
+        XCTAssertEqual(LifeStats.snapshot(inputs(sunny: 30)).sunshine.word, "Ready for sun")
+        XCTAssertEqual(LifeStats.snapshot(inputs(sunny: nil)).sunshine.word, "Ready for sun")
+        XCTAssertEqual(LifeStats.snapshot(inputs(sunny: 1, loved: 30)).sunshine.word, "Bright")    // a rainy day
+        XCTAssertGreaterThan(LifeStats.snapshot(inputs(sunny: 1)).sunshine.fill, LifeStats.snapshot(inputs(sunny: 30)).sunshine.fill)
     }
 
     func testHappinessFollowsLoveAndSoil() {
@@ -67,13 +71,14 @@ final class LifeStatsTests: XCTestCase {
     }
 
     func testHeartsShowTodaysLove() {
-        XCTAssertEqual(LifeStats.snapshot(inputs(loved: 1, absorbed: 10)).hearts, 5)
-        XCTAssertEqual(LifeStats.snapshot(inputs(loved: 1, absorbed: 0)).hearts, 1)       // a hello today is one heart
-        XCTAssertEqual(LifeStats.snapshot(inputs(loved: 30, absorbed: 0)).hearts, 0)
-        XCTAssertEqual(LifeStats.snapshot(inputs(loved: 1, absorbed: 10, absorbDay: hours(-200))).hearts, 1)   // yesterday's growth does not count
-        XCTAssertEqual(LifeStats.snapshot(inputs(loved: 1, absorbed: 10)).loveLine, "Loved")
-        XCTAssertEqual(LifeStats.snapshot(inputs(loved: 30, absorbed: 0)).loveLine, "Ready for a hello")
-        XCTAssertEqual(LifeStats.snapshot(inputs(loved: 1, absorbed: 0)).heartsLabel, "Love, 1 of 5 hearts. Hellos help")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, pruned: 1, loved: 1)).hearts, 5)
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 1)).hearts, 1)       // a hello today is one heart
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 30)).hearts, 0)
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, loved: 1)).hearts, 3)
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: nil, loved: 1, waterDay: hours(-200))).hearts, 1)   // yesterday's care does not count
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, pruned: 1, loved: 1)).loveLine, "Loved")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 30)).loveLine, "Ready for a hello")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 1)).heartsLabel, "Love, 1 of 5 hearts. Hellos help")
     }
 
     // MARK: Pips and labels

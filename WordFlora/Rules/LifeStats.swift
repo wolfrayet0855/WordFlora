@@ -1,17 +1,19 @@
 import Foundation
 
-/// The plant page's Life panel: three soft meters, a stage path, today's hearts and the love petals, all read from
-/// data the plant already keeps (lastTendedAt, lastSunnyAt, lastLovedAt, soilRichness, stage, absorbedToday).
-/// Meters use "has had" words, ease down slowly with time, never reach empty, never use red and never show numbers.
+/// The plant page's Life panel: soft meters, a stage path, today's hearts and the love petals, all read from data the
+/// plant already keeps. THE RULE (2026-11-04): each meter shows only its own action's allowance for today, read through
+/// the same `TendingEngine` helpers the actions use, so a meter that is not full always means its button works, and a
+/// full meter means that action is done for today. Meters never reach empty, never use red and never show numbers.
 enum LifeStats {
     struct Inputs {
-        var lastTendedAt: Date?
         var lastSunnyAt: Date?
         var lastLovedAt: Date?
+        var lastFedAt: Date?
+        var lastPrunedAt: Date?
         var soilRichness: Double
         var stage: Int
-        var absorbedToday: Int
-        var absorbDay: Date?
+        var waterToday: Int
+        var waterDay: Date?
         var now: Date
         var calendar: Calendar
         /// Quiet Garden or Calm mode: no rain, no falling petals, no seed.
@@ -24,6 +26,8 @@ enum LifeStats {
         var word: String
         /// 0...1, never below `floor`.
         var fill: Double
+        /// This meter's action is done for today (its button shows the done state).
+        var done = false
         var accessibilityLabel: String { "\(name), \(word.lowercased())" }
     }
 
@@ -46,6 +50,9 @@ enum LifeStats {
     }
 
     static let floor = 0.3
+    /// The fill a meter shows when its action is ready and not yet done today. Today's share of the allowance fills the
+    /// rest, so water reads 0.5 / 0.75 / 1.0 for 0 / 1 / 2 drinks. Shorter bars fail the accessibility contrast audit.
+    static let readyFill = 0.5
     static let stageNames = ["Tiny", "Sprout", "Bud", "Bloom", "Full bloom"]
 
     // MARK: Copy (every visible or spoken line on the panel lives here so the copy test can read it all)
@@ -57,8 +64,8 @@ enum LifeStats {
     static let growingTitle = "Growing"
     static let loveTitle = "Love"
     static let meterNames = (water: "Water", sunshine: "Sunshine", happiness: "Happiness")
-    static let waterWords = ["Full", "Good", "Sipping"]
-    static let sunWords = ["Bright", "Warming up", "Cloudy", "Sun is coming"]
+    static let waterWords = ["Full", "Good", "Ready for a drink"]
+    static let sunWords = ["Bright", "Ready for sun"]
     static let happyWords = ["Happy", "Cosy"]
     static let restWord = "Resting"
     static let loveLines = ["Loved", "Feeling loved", "Hellos help", "Ready for a hello", "Ready for you"]
@@ -96,30 +103,29 @@ enum LifeStats {
                             stage: stage, hearts: 0, loveLine: loveLines[4], pips: 0, isSeed: true, rainDay: 0)
         }
 
+        let drinks = TendingEngine.todayCount(i.waterToday, day: i.waterDay, now: i.now, calendar: i.calendar)
+        let perDay = max(1, i.economy.waterPerDay)
         let water: Meter = {
-            let h = hours(since: i.lastTendedAt, now: i.now)
-            if h < 24 { return Meter(name: meterNames.water, word: waterWords[0], fill: 0.9) }
-            if h < 48 { return Meter(name: meterNames.water, word: waterWords[1], fill: 0.72) }
-            return Meter(name: meterNames.water, word: waterWords[2], fill: 0.5)
+            let fraction = min(1, Double(drinks) / Double(perDay))
+            let word = drinks >= perDay ? waterWords[0] : (drinks > 0 ? waterWords[1] : waterWords[2])
+            return Meter(name: meterNames.water, word: word, fill: readyFill + (1 - readyFill) * fraction, done: drinks >= perDay)
         }()
 
-        let sunshine: Meter = {
-            let h = hours(since: i.lastSunnyAt, now: i.now)
-            var level = h < 24 ? 0 : (h < 72 ? 1 : 3)
-            if rainDay > 0 { level = max(level, 2) }      // a rainy day is cloudy, never brighter
-            let fills = [0.85, 0.65, 0.5, 0.38]
-            return Meter(name: meterNames.sunshine, word: sunWords[level], fill: fills[level])
-        }()
+        // Bright only when sunned today. Rain does not change this.
+        let sunnedToday = TendingEngine.isToday(i.lastSunnyAt, now: i.now, calendar: i.calendar)
+        let sunshine = Meter(name: meterNames.sunshine, word: sunnedToday ? sunWords[0] : sunWords[1],
+                             fill: sunnedToday ? 1 : readyFill, done: sunnedToday)
 
         let happiness: Meter = {
             let score = Double(love.petalsLeft) / 5 * 0.7 + min(max(i.soilRichness, 0), 1) * 0.3
             return Meter(name: meterNames.happiness, word: score >= 0.65 ? happyWords[0] : happyWords[1], fill: 0.35 + 0.55 * score)
         }()
 
+        // One heart for a hello, plus one for each kind of care today, up to five.
         let lovedToday = i.lastLovedAt.map { i.calendar.isDate($0, inSameDayAs: i.now) && $0 <= i.now } ?? false
-        let absorbed = (i.absorbDay.map { i.calendar.isDate($0, inSameDayAs: i.now) } ?? false) ? i.absorbedToday : 0
-        let cap = max(1, i.economy.dailyAbsorbCap)
-        let hearts = lovedToday ? min(5, max(1, 1 + Int((Double(absorbed) * 4 / Double(cap)).rounded()))) : 0
+        let kinds = [drinks > 0, sunnedToday, TendingEngine.isToday(i.lastFedAt, now: i.now, calendar: i.calendar),
+                     TendingEngine.isToday(i.lastPrunedAt, now: i.now, calendar: i.calendar)].filter { $0 }.count
+        let hearts = lovedToday ? min(5, 1 + kinds) : 0
         let line: String = {
             switch hearts {
             case 5: return loveLines[0]
@@ -138,11 +144,6 @@ enum LifeStats {
         guard day > 0 else { return Weather(drops: 0, thunder: false) }
         let drops = [12, 20, 32, 42, 50, 56, 60]
         return Weather(drops: drops[min(day, 7) - 1], thunder: day >= 4)
-    }
-
-    private static func hours(since d: Date?, now: Date) -> Double {
-        guard let d else { return .infinity }
-        return max(0, now.timeIntervalSince(d) / 3600)
     }
 
     private static func days(since d: Date?, now: Date) -> Int {
@@ -177,5 +178,14 @@ enum PetalMotion: Equatable {
         if n < s { return .fall(from: s, to: n) }
         if n > s { return .regrow(from: s, to: n) }
         return .still
+    }
+}
+
+extension LifeStats.Inputs {
+    /// Reads every field the Life panel needs straight from the plant.
+    init(plant: PlantCollectible, now: Date, calendar: Calendar, exempt: Bool, economy: Economy = .default) {
+        self.init(lastSunnyAt: plant.lastSunnyAt, lastLovedAt: plant.lastLovedAt, lastFedAt: plant.lastFedAt, lastPrunedAt: plant.lastPrunedAt,
+                  soilRichness: plant.soilRichness, stage: plant.stage, waterToday: plant.waterToday, waterDay: plant.waterDay,
+                  now: now, calendar: calendar, exempt: exempt, economy: economy)
     }
 }

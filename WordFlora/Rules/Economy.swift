@@ -13,11 +13,13 @@ struct Economy: Codable, Equatable {
     var roseMilestones = [7, 30, 100]
     var maxPetals = 8
 
-    // Tending (spec section 16)
-    var waterGrowth = 4
-    var soilGrowth = 12
-    var sunGrowth = 2
-    var dailyAbsorbCap = 10
+    // Tending (spec section 16; owner decisions 2026-11-04). Each action has its own daily allowance per plant:
+    // two drinks, one scoop of soil and one sunny spell a day. No action blocks another, and the allowances keep
+    // a day's growth bounded (there is no shared daily cap any more).
+    var waterGrowth = 3            // 5 with a soil boost (3 x 1.5, rounded)
+    var waterPerDay = 2            // playtest knob: 3 is the other option the owner weighed
+    var soilGrowth = 4             // soil is once a day
+    var sunGrowth = 2              // sun is once a day
     var soilBoostMultiplier = 1.5
     var soilBoostDays = 3
     var soilRichnessStep = 0.34
@@ -26,7 +28,7 @@ struct Economy: Codable, Equatable {
     var trickleCap = 5
     var waterBankCap = 40
     var stageThresholds = [0.06, 0.22, 0.50, 1.0]
-    var levelBaseCost = 180.0
+    var levelBaseCost = 200.0
     var levelCostMultipliers = [1.0, 1.1, 1.2, 1.3, 1.4]
 
     static let `default` = Economy()

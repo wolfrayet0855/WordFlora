@@ -73,7 +73,7 @@ enum WakeCopy {
 
     static func butterflyIntro(goal: Int) -> String { "Tap \(goal) butterflies. Take your time." }
     static let puzzleIntroAnagram = "Make a word from the letters. Take your time."
-    static let puzzleIntroVowels = "Fill in the empty spots to make a word. Take your time."
+    static let puzzleIntroVowels = "Fill in the blank spots to make a word. Take your time."
     static let start = "Start"
     static func caughtSoFar(_ n: Int, goal: Int) -> String { "\(n) of \(goal) butterflies" }
 

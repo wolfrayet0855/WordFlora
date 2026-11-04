@@ -69,11 +69,11 @@ final class ToolEngineTests: XCTestCase {
     }
 
     // MARK: trowel and lamp
-    func testTrowelTierScalesSoilGrowthButStillCapped() {
+    func testTrowelTierScalesSoilGrowth() {
         let p = plant(), pr = profile(soil: 3)
         var inv = ToolInventory(); var pts = 500; _ = inv.upgrade(.trowel, shedPoints: &pts)
         let r = ToolEngine.addSoil(p, profile: pr, inventory: inv, now: t0, calendar: cal, economy: eco)
-        XCTAssertEqual(r.gpGained, 10)                 // 12 x 1.25 = 15, capped by the 10/day absorb limit
+        XCTAssertEqual(r.gpGained, 5)                  // 4 x 1.25 = 5
     }
 
     func testLampTierRaisesSunGrowth() {
@@ -128,13 +128,22 @@ final class ToolEngineTests: XCTestCase {
     }
 
     // MARK: quiet garden
-    func testQuietGardenIgnoresCostsOwnershipAndCooldownsButGrowthStaysCapped() {
+    func testQuietGardenIgnoresCostsAndOwnershipButGrowthStaysPaced() {
         let p = plant(), pr = profile(water: 0, soil: 0)
         XCTAssertTrue(ToolEngine.prune(p, inventory: ToolInventory(), now: t0, calendar: cal, economy: eco, quiet: true).applied)   // no shears needed
-        XCTAssertTrue(ToolEngine.prune(p, inventory: ToolInventory(), now: t0, calendar: cal, economy: eco, quiet: true).applied)   // no cooldown
+        XCTAssertEqual(ToolEngine.prune(p, inventory: ToolInventory(), now: t0, calendar: cal, economy: eco, quiet: true).reason, .cooldown)   // pruning still rests
         XCTAssertTrue(ToolEngine.repot(p, to: .peaty, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).applied)
         XCTAssertEqual(pr.soil, 0)
-        XCTAssertLessThanOrEqual(p.growthPoints, eco.dailyAbsorbCap)
-        XCTAssertGreaterThan(p.growthPoints, 0)
+        XCTAssertEqual(p.growthPoints, 4)
+    }
+
+    func testHappyRepotGrowsOnceADay() {
+        let p = plant("rose"); let pr = profile(soil: 5)
+        let good = SoilType.preferred(forPlantId: "rose")
+        XCTAssertEqual(ToolEngine.repot(p, to: good, profile: pr, now: t0, calendar: cal, economy: eco).tend.gpGained, 4)
+        let again = ToolEngine.repot(p, to: good, profile: pr, now: t0, calendar: cal, economy: eco)
+        XCTAssertTrue(again.applied); XCTAssertEqual(again.outcome, .happy); XCTAssertEqual(again.tend.gpGained, 0)
+        XCTAssertEqual(p.growthPoints, 4)
+        XCTAssertEqual(ToolEngine.repot(p, to: good, profile: pr, now: t0.addingTimeInterval(86_400), calendar: cal, economy: eco).tend.gpGained, 4)
     }
 }

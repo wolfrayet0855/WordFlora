@@ -59,6 +59,15 @@ enum DataReconciler {
         k.lastPrunedAt = [k.lastPrunedAt, o.lastPrunedAt].compactMap { $0 }.max()
         k.lastLovedAt = [k.lastLovedAt, o.lastLovedAt].compactMap { $0 }.max()
         k.lastShownPips = max(k.lastShownPips, o.lastShownPips)
+        k.lastFedAt = [k.lastFedAt, o.lastFedAt].compactMap { $0 }.max()
+        k.lastRepotGrowthAt = [k.lastRepotGrowthAt, o.lastRepotGrowthAt].compactMap { $0 }.max()
+        // Drinks belong to a day: the later day's count wins, and on the same day the larger count wins.
+        switch (k.waterDay, o.waterDay) {
+        case (nil, _?): k.waterDay = o.waterDay; k.waterToday = o.waterToday
+        case let (kd?, od?) where od > kd: k.waterDay = od; k.waterToday = o.waterToday
+        case let (kd?, od?) where od == kd: k.waterToday = max(k.waterToday, o.waterToday)
+        default: break
+        }
         if k.nickname.isEmpty { k.nickname = o.nickname }
         if k.soilType.isEmpty { k.soilType = o.soilType }
     }

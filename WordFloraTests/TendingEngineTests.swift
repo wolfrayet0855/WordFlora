@@ -19,7 +19,7 @@ final class TendingEngineTests: XCTestCase {
         let p = plant(), pr = profile(water: 3)
         let r = TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco)
         XCTAssertTrue(r.applied)
-        XCTAssertEqual(pr.water, 2); XCTAssertEqual(p.growthPoints, 4)
+        XCTAssertEqual(pr.water, 2); XCTAssertEqual(p.growthPoints, 3)
         XCTAssertEqual(p.hydration, 1.0); XCTAssertEqual(p.lastTendedAt, t0)
     }
 
@@ -29,21 +29,21 @@ final class TendingEngineTests: XCTestCase {
         XCTAssertFalse(r.applied); XCTAssertEqual(r.reason, .noWater); XCTAssertEqual(p.growthPoints, 0)
     }
 
-    func testDailyAbsorbCapPerPlantAndNoDropSpentWhenFull() {
+    func testTwoDrinksADayPerPlantAndNoDropSpentWhenDone() {
         let p = plant(), pr = profile(water: 5)
         for _ in 0..<5 { _ = TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco) }
-        XCTAssertEqual(p.growthPoints, 10)          // 4 + 4 + 2 (capped)
-        XCTAssertEqual(pr.water, 2)                 // only 3 drops were spent
+        XCTAssertEqual(p.growthPoints, 6)           // 3 + 3, then done for today
+        XCTAssertEqual(pr.water, 3)                 // only 2 drops were spent
         let r = TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco)
-        XCTAssertEqual(r.reason, .fullForToday)
+        XCTAssertEqual(r.reason, .doneForToday)
     }
 
-    func testAbsorbCapResetsNextDay() {
+    func testWaterAllowanceResetsNextDay() {
         let p = plant(), pr = profile(water: 5)
         for _ in 0..<3 { _ = TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco) }
         let next = later(24)
         let r = TendingEngine.water(p, profile: pr, now: next, calendar: cal, economy: eco)
-        XCTAssertTrue(r.applied); XCTAssertEqual(p.growthPoints, 14)
+        XCTAssertTrue(r.applied); XCTAssertEqual(p.growthPoints, 9)
     }
 
     // MARK: soil
@@ -52,7 +52,7 @@ final class TendingEngineTests: XCTestCase {
         let r = TendingEngine.addSoil(p, profile: pr, now: t0, calendar: cal, economy: eco)
         XCTAssertTrue(r.applied)
         XCTAssertEqual(pr.soil, 1)
-        XCTAssertEqual(p.growthPoints, 10)          // 12 capped by the daily absorb limit
+        XCTAssertEqual(p.growthPoints, 4)
         XCTAssertGreaterThan(p.soilRichness, 0)
         XCTAssertNotNil(p.soilBoostUntil)
     }
@@ -62,11 +62,11 @@ final class TendingEngineTests: XCTestCase {
         _ = TendingEngine.addSoil(p, profile: pr, now: t0, calendar: cal, economy: eco)
         let day2 = later(24)
         _ = TendingEngine.water(p, profile: pr, now: day2, calendar: cal, economy: eco)
-        XCTAssertEqual(p.growthPoints, 10 + 6)       // 4 x 1.5
+        XCTAssertEqual(p.growthPoints, 4 + 5)        // 3 x 1.5 rounds to 5
         let day5 = later(24 * 4)
         let before = p.growthPoints
         _ = TendingEngine.water(p, profile: pr, now: day5, calendar: cal, economy: eco)
-        XCTAssertEqual(p.growthPoints, before + 4)   // boost expired
+        XCTAssertEqual(p.growthPoints, before + 3)   // boost expired
     }
 
     func testSoilWithNoScoopsDoesNothing() {
@@ -79,28 +79,28 @@ final class TendingEngineTests: XCTestCase {
         let p = plant(), pr = profile()
         XCTAssertTrue(TendingEngine.sun(p, profile: pr, now: t0, calendar: cal, economy: eco).applied)
         XCTAssertEqual(p.growthPoints, 2)
-        XCTAssertEqual(TendingEngine.sun(p, profile: pr, now: later(1), calendar: cal, economy: eco).reason, .alreadyDoneToday)
+        XCTAssertEqual(TendingEngine.sun(p, profile: pr, now: later(1), calendar: cal, economy: eco).reason, .doneForToday)
         XCTAssertTrue(TendingEngine.sun(p, profile: pr, now: later(25), calendar: cal, economy: eco).applied)
     }
 
     // MARK: stages
     func testStageThresholdsLevelOne() {
         XCTAssertEqual(TendingEngine.stage(forGrowth: 0, level: 1), 0)
-        XCTAssertEqual(TendingEngine.stage(forGrowth: 10, level: 1), 0)   // 6% of 180 = 10.8
-        XCTAssertEqual(TendingEngine.stage(forGrowth: 11, level: 1), 1)
-        XCTAssertEqual(TendingEngine.stage(forGrowth: 40, level: 1), 2)   // 22% = 39.6
-        XCTAssertEqual(TendingEngine.stage(forGrowth: 90, level: 1), 3)
-        XCTAssertEqual(TendingEngine.stage(forGrowth: 180, level: 1), 4)
+        XCTAssertEqual(TendingEngine.stage(forGrowth: 11, level: 1), 0)   // 6% of 200 = 12
+        XCTAssertEqual(TendingEngine.stage(forGrowth: 12, level: 1), 1)
+        XCTAssertEqual(TendingEngine.stage(forGrowth: 44, level: 1), 2)   // 22% = 44
+        XCTAssertEqual(TendingEngine.stage(forGrowth: 100, level: 1), 3)
+        XCTAssertEqual(TendingEngine.stage(forGrowth: 200, level: 1), 4)
     }
 
     func testHigherLevelsCostMore() {
-        XCTAssertEqual(TendingEngine.stage(forGrowth: 180, level: 5), 3)  // level 5 needs 252
-        XCTAssertEqual(TendingEngine.stage(forGrowth: 252, level: 5), 4)
+        XCTAssertEqual(TendingEngine.stage(forGrowth: 200, level: 5), 3)  // level 5 needs 280
+        XCTAssertEqual(TendingEngine.stage(forGrowth: 280, level: 5), 4)
     }
 
     func testStageUpIsReportedAndNeverRegresses() {
         let p = plant(), pr = profile()
-        p.growthPoints = 8
+        p.growthPoints = 9
         let r = TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco)
         XCTAssertTrue(r.stageUp); XCTAssertEqual(p.stage, 1)
         p.stage = 3; p.growthPoints = 0
@@ -150,13 +150,16 @@ final class TendingEngineTests: XCTestCase {
     }
 
     // MARK: quiet garden
-    func testQuietGardenSpendsNothingButGrowsAtTheNormalCappedPace() {
+    func testQuietGardenSpendsNothingButGrowsAtTheNormalPace() {
         let p = plant(), pr = profile(water: 0, soil: 0)
         let r = TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true)
         XCTAssertTrue(r.applied)
-        XCTAssertEqual(pr.water, 0); XCTAssertEqual(p.growthPoints, 4)
+        XCTAssertEqual(pr.water, 0); XCTAssertEqual(p.growthPoints, 3)
         XCTAssertTrue(TendingEngine.addSoil(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).applied)
-        XCTAssertEqual(pr.soil, 0); XCTAssertEqual(p.growthPoints, 10)                 // capped at the daily absorb limit
-        XCTAssertEqual(TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).reason, .fullForToday)
+        XCTAssertEqual(pr.soil, 0); XCTAssertEqual(p.growthPoints, 7)
+        XCTAssertTrue(TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).applied)    // boosted: 5
+        XCTAssertEqual(TendingEngine.water(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).reason, .doneForToday)
+        XCTAssertEqual(TendingEngine.addSoil(p, profile: pr, now: t0, calendar: cal, economy: eco, quiet: true).reason, .doneForToday)
+        XCTAssertEqual(p.growthPoints, 12)
     }
 }

@@ -26,6 +26,9 @@ struct GardenBackup: Codable, Equatable {
         var hydration = 1.0, soilRichness = 0.0
         var soilType = "", nickname = ""
         var lastTendedAt: Date?, lastSunnyAt: Date?, lastPrunedAt: Date?, lastLovedAt: Date?
+        // Today's allowances (added 2026-11-04). All optional, so backups saved before then still read.
+        var waterToday: Int?
+        var waterDay: Date?, lastFedAt: Date?, lastRepotGrowthAt: Date?
     }
 
     enum ImportError: Error, Equatable {
@@ -70,7 +73,8 @@ struct GardenBackup: Codable, Equatable {
         let plants = ((try? context.fetch(FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.plantId)]))) ?? []).map {
             Plant(plantId: $0.plantId, earnedCount: $0.earnedCount, growthPoints: $0.growthPoints, stage: $0.stage, hydration: $0.hydration,
                   soilRichness: $0.soilRichness, soilType: $0.soilType, nickname: $0.nickname, lastTendedAt: $0.lastTendedAt,
-                  lastSunnyAt: $0.lastSunnyAt, lastPrunedAt: $0.lastPrunedAt, lastLovedAt: $0.lastLovedAt)
+                  lastSunnyAt: $0.lastSunnyAt, lastPrunedAt: $0.lastPrunedAt, lastLovedAt: $0.lastLovedAt,
+                  waterToday: $0.waterToday, waterDay: $0.waterDay, lastFedAt: $0.lastFedAt, lastRepotGrowthAt: $0.lastRepotGrowthAt)
         }
         let games = (try? context.fetchCount(FetchDescriptor<GameRecord>())) ?? 0
         return GardenBackup(exportedAt: now, profile: snap, plants: plants, gamesRecorded: games)
@@ -138,6 +142,7 @@ struct GardenBackup: Codable, Equatable {
             c.earnedCount = s.earnedCount; c.growthPoints = s.growthPoints; c.stage = s.stage
             c.hydration = s.hydration; c.soilRichness = s.soilRichness; c.soilType = s.soilType; c.nickname = s.nickname
             c.lastTendedAt = s.lastTendedAt; c.lastSunnyAt = s.lastSunnyAt; c.lastPrunedAt = s.lastPrunedAt; c.lastLovedAt = s.lastLovedAt
+            c.waterToday = max(0, s.waterToday ?? 0); c.waterDay = s.waterDay; c.lastFedAt = s.lastFedAt; c.lastRepotGrowthAt = s.lastRepotGrowthAt
             DataReconciler.merge(c, into: k)
             report.plantsUpdated += 1
         }

@@ -1,7 +1,8 @@
 import Foundation
 
 struct TendResult: Equatable {
-    enum Reason: Equatable { case noWater, noSoil, fullForToday, alreadyDoneToday, notOwned, cooldown }
+    /// `doneForToday`: this action's own daily allowance for this plant is used up (never because of another action).
+    enum Reason: Equatable { case noWater, noSoil, doneForToday, notOwned, cooldown }
     var applied = false
     var gpGained = 0
     var stageUp = false
@@ -10,48 +11,73 @@ struct TendResult: Equatable {
     static func blocked(_ r: Reason) -> TendResult { TendResult(applied: false, gpGained: 0, stageUp: false, reason: r) }
 }
 
-/// Gentle tending rules (spec sections 4, 16). Plants never die and stages only move forward;
-/// pacing comes from a per-plant daily absorb cap, never from punishment.
+/// Gentle tending rules (spec sections 4, 16). Plants never die and stages only move forward.
+/// THE RULE (2026-11-04): each action has its own daily allowance per plant, so no action ever blocks another,
+/// and the Life meters read these same allowances, so a meter that is not full always means its button works.
 enum TendingEngine {
+
+    /// The three daily cares that each have a done state.
+    enum Care: CaseIterable { case water, feed, sun }
+
+    // MARK: Today's allowances (shared by the actions, the meters and the buttons)
+
+    /// A per-day count: `count` if `day` is today in `calendar`, else 0.
+    static func todayCount(_ count: Int, day: Date?, now: Date, calendar: Calendar) -> Int {
+        guard let day, calendar.isDate(day, inSameDayAs: now) else { return 0 }
+        return max(0, count)
+    }
+
+    static func isToday(_ date: Date?, now: Date, calendar: Calendar) -> Bool {
+        guard let date else { return false }
+        return calendar.isDate(date, inSameDayAs: now)
+    }
+
+    static func waterings(_ plant: PlantCollectible, now: Date, calendar: Calendar) -> Int {
+        todayCount(plant.waterToday, day: plant.waterDay, now: now, calendar: calendar)
+    }
+
+    static func isDone(_ care: Care, plant: PlantCollectible, now: Date, calendar: Calendar, economy: Economy) -> Bool {
+        switch care {
+        case .water: return waterings(plant, now: now, calendar: calendar) >= max(1, economy.waterPerDay)
+        case .feed: return isToday(plant.lastFedAt, now: now, calendar: calendar)
+        case .sun: return isToday(plant.lastSunnyAt, now: now, calendar: calendar)
+        }
+    }
 
     // MARK: Actions
 
     static func water(_ plant: PlantCollectible, profile: PlayerProfile, now: Date, calendar: Calendar,
                       economy: Economy, quiet: Bool = false) -> TendResult {
+        guard !isDone(.water, plant: plant, now: now, calendar: calendar, economy: economy) else { return .blocked(.doneForToday) }
         guard quiet || profile.water > 0 else { return .blocked(.noWater) }
-        resetDay(plant, now: now, calendar: calendar)
-        let remaining = economy.dailyAbsorbCap - plant.absorbedToday
-        guard remaining > 0 else { return .blocked(.fullForToday) }
 
         var desired = Double(economy.waterGrowth)
         if let until = plant.soilBoostUntil, until > now { desired *= economy.soilBoostMultiplier }
-        let gain = min(Int(desired.rounded()), remaining)
         if !quiet { profile.water -= 1 }
+        plant.waterToday = waterings(plant, now: now, calendar: calendar) + 1
+        plant.waterDay = calendar.startOfDay(for: now)
         refresh(plant, now: now)
-        return grow(plant, by: gain)
+        return grow(plant, by: Int(desired.rounded()), now: now, calendar: calendar)
     }
 
     static func addSoil(_ plant: PlantCollectible, profile: PlayerProfile, now: Date, calendar: Calendar,
                         economy: Economy, quiet: Bool = false, multiplier: Double = 1.0) -> TendResult {
+        guard !isDone(.feed, plant: plant, now: now, calendar: calendar, economy: economy) else { return .blocked(.doneForToday) }
         guard quiet || profile.soil > 0 else { return .blocked(.noSoil) }
-        resetDay(plant, now: now, calendar: calendar)
-        let remaining = economy.dailyAbsorbCap - plant.absorbedToday
-        guard remaining > 0 else { return .blocked(.fullForToday) }
 
         if !quiet { profile.soil -= 1 }
+        plant.lastFedAt = now
         plant.soilRichness = min(1.0, plant.soilRichness + economy.soilRichnessStep)
         plant.soilBoostUntil = now.addingTimeInterval(Double(economy.soilBoostDays) * 86_400)
-        return grow(plant, by: min(Int((Double(economy.soilGrowth) * multiplier).rounded()), remaining))
+        return grow(plant, by: Int((Double(economy.soilGrowth) * multiplier).rounded()), now: now, calendar: calendar)
     }
 
+    /// Sun is free and once a day, in Quiet Garden too.
     static func sun(_ plant: PlantCollectible, profile: PlayerProfile, now: Date, calendar: Calendar,
                     economy: Economy, quiet: Bool = false, growth: Int? = nil) -> TendResult {
-        if !quiet, let last = plant.lastSunnyAt, calendar.isDate(last, inSameDayAs: now) { return .blocked(.alreadyDoneToday) }
-        resetDay(plant, now: now, calendar: calendar)
-        let remaining = economy.dailyAbsorbCap - plant.absorbedToday
-        guard remaining > 0 else { return .blocked(.fullForToday) }
+        guard !isDone(.sun, plant: plant, now: now, calendar: calendar, economy: economy) else { return .blocked(.doneForToday) }
         plant.lastSunnyAt = now
-        return grow(plant, by: min(growth ?? economy.sunGrowth, remaining))
+        return grow(plant, by: growth ?? economy.sunGrowth, now: now, calendar: calendar)
     }
 
     // MARK: Stages
@@ -79,12 +105,9 @@ enum TendingEngine {
         profile.lastTrickleAt = profile.water >= economy.trickleCap ? now : profile.lastTrickleAt.addingTimeInterval(Double(n) * interval)
     }
 
-    /// Shared by tools: grow within the per-plant daily absorb cap (no cost handling here).
+    /// Shared by tools (prune, happy repot), which pace themselves; no cost handling here.
     static func applyGrowth(_ plant: PlantCollectible, desired: Int, now: Date, calendar: Calendar, economy: Economy) -> TendResult {
-        resetDay(plant, now: now, calendar: calendar)
-        let remaining = economy.dailyAbsorbCap - plant.absorbedToday
-        guard remaining > 0 else { return .blocked(.fullForToday) }
-        return grow(plant, by: min(desired, remaining))
+        grow(plant, by: desired, now: now, calendar: calendar)
     }
 
     // MARK: Helpers
@@ -94,40 +117,41 @@ enum TendingEngine {
         plant.lastTendedAt = now
     }
 
-    // MARK: Daily capacity (shown as a soft fill, never as a count)
+    // MARK: Today's summary (shown as a soft fill, never as a count)
 
-    enum Capacity: Equatable { case room, nearly, plenty }
+    /// How much of today's care is done: two drinks, soil and sun. "Plenty" means every care is done for today.
+    enum Capacity: Equatable, CaseIterable { case room, nearly, plenty }
 
-    private static func absorbedNow(_ plant: PlantCollectible, now: Date, calendar: Calendar) -> Int {
-        guard let d = plant.absorbDay, calendar.isDate(d, inSameDayAs: now) else { return 0 }
-        return plant.absorbedToday
+    static func capacityFill(_ plant: PlantCollectible, now: Date, calendar: Calendar, economy: Economy) -> Double {
+        let water = min(1, Double(waterings(plant, now: now, calendar: calendar)) / Double(max(1, economy.waterPerDay)))
+        let fed: Double = isDone(.feed, plant: plant, now: now, calendar: calendar, economy: economy) ? 1 : 0
+        let sunny: Double = isDone(.sun, plant: plant, now: now, calendar: calendar, economy: economy) ? 1 : 0
+        return (water + fed + sunny) / 3
     }
 
     static func capacityState(_ plant: PlantCollectible, now: Date, calendar: Calendar, economy: Economy) -> Capacity {
-        let a = absorbedNow(plant, now: now, calendar: calendar)
-        if a >= economy.dailyAbsorbCap { return .plenty }
-        return a >= 6 ? .nearly : .room
-    }
-
-    static func capacityFill(_ plant: PlantCollectible, now: Date, calendar: Calendar, economy: Economy) -> Double {
-        min(1, Double(absorbedNow(plant, now: now, calendar: calendar)) / Double(max(1, economy.dailyAbsorbCap)))
+        let done = Care.allCases.filter { isDone($0, plant: plant, now: now, calendar: calendar, economy: economy) }.count
+        switch done {
+        case 3: return .plenty
+        case 2: return .nearly
+        default: return .room
+        }
     }
 
     static func capacityLine(_ c: Capacity, name: String) -> String {
         switch c {
         case .room: return "Room for a little more."
-        case .nearly: return "Almost full of sunshine today."
-        case .plenty: return "\(name) has had plenty for today. Fresh start tomorrow."
+        case .nearly: return "\(name) is well cared for today."
+        case .plenty: return "\(name) has had all its care today. More tomorrow!"
         }
     }
 
-    private static func resetDay(_ plant: PlantCollectible, now: Date, calendar: Calendar) {
-        if let d = plant.absorbDay, calendar.isDate(d, inSameDayAs: now) { return }
-        plant.absorbDay = calendar.startOfDay(for: now)
-        plant.absorbedToday = 0
-    }
-
-    private static func grow(_ plant: PlantCollectible, by gain: Int) -> TendResult {
+    /// Keeps the all-actions record of growth taken in today.
+    private static func grow(_ plant: PlantCollectible, by gain: Int, now: Date, calendar: Calendar) -> TendResult {
+        if !isToday(plant.absorbDay, now: now, calendar: calendar) {
+            plant.absorbDay = calendar.startOfDay(for: now)
+            plant.absorbedToday = 0
+        }
         plant.growthPoints += gain
         plant.absorbedToday += gain
         let newStage = max(plant.stage, stage(forGrowth: plant.growthPoints, level: plant.level))
@@ -135,4 +159,22 @@ enum TendingEngine {
         plant.stage = newStage
         return TendResult(applied: true, gpGained: gain, stageUp: up, reason: nil)
     }
+}
+
+/// Every blocked-tap line (THE RULE, plan section b): a kind reason and a next step, at a grade-2 reading level, with no
+/// banned words. Shared by the app, the widget, Siri and Control Center. `name` is the nickname when the plant has one.
+enum TendCopy {
+    static let canDry = "Your can is dry. Win a word to fill it."
+    static let noScoops = "Out of soil scoops. Find a new plant to get more."
+    static let needShears = "You need the shears first."
+
+    static func done(_ care: TendingEngine.Care, name: String) -> String {
+        switch care {
+        case .water: return "\(name) has had all the water it needs today. Sun or a hello would be nice."
+        case .sun: return "\(name) soaked up the sun today. More sun tomorrow!"
+        case .feed: return "\(name) is well fed today. More soil tomorrow."
+        }
+    }
+
+    static func trimmed(name: String) -> String { "\(name) had a trim. Trim again in two days." }
 }

@@ -18,8 +18,16 @@ final class PlantCollectible {
     var soilRichness: Double = 0.0
     var lastTendedAt: Date?
     var lastSunnyAt: Date?
+    /// Growth taken in today, all actions together (a record only; it no longer gates anything).
     var absorbedToday: Int = 0
     var absorbDay: Date?
+    /// Drinks today, counted against `Economy.waterPerDay`. `waterDay` is the local start of the day they belong to.
+    var waterToday: Int = 0
+    var waterDay: Date?
+    /// The last time soil was added; soil is once a day.
+    var lastFedAt: Date?
+    /// The last time a happy repot gave growth; that growth is once a day.
+    var lastRepotGrowthAt: Date?
     var soilBoostUntil: Date?
     var lastPrunedAt: Date?
     var soilType: String = ""
