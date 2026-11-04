@@ -34,14 +34,30 @@
     "botanicalName": "Trifolium repens",
     "botanicalFact": "Clover's root bacteria turn nitrogen from the air into plant food for the soil.",
     "level": 1,
-    "imageName": "plant_clover"
+    "imageName": "plant_clover",
+    "nameStory": {
+      "origin": "tri + folium",
+      "language": "Latin",
+      "meaning": "three leaves",
+      "line": "Its plant name, Trifolium, means “three leaves.”",
+      "funFact": "Look for leaves made of three round parts. A rare clover has four!",
+      "symbol": "leaf.fill"
+    }
   },
   {
     "name": "Marigold",
     "botanicalName": "Tagetes erecta",
     "botanicalFact": "Roots release compounds that deter harmful nematodes.",
     "level": 1,
-    "imageName": "plant_marigold"
+    "imageName": "plant_marigold",
+    "nameStory": {
+      "origin": "Mary + gold",
+      "language": "Middle English",
+      "meaning": "Mary's gold",
+      "line": "Marigold comes from “Mary's gold.”",
+      "funFact": "Its petals glow gold and orange. They look like small gold coins.",
+      "symbol": "sparkles"
+    }
   },
   {
     "name": "Sunflower",
@@ -78,7 +94,15 @@
     "botanicalName": "Rosa gallica",
     "botanicalFact": "Its fruits, called rose hips, are rich in vitamin C.",
     "level": 1,
-    "imageName": "plant_rose"
+    "imageName": "plant_rose",
+    "nameStory": {
+      "origin": "Rosa gallica",
+      "language": "Latin",
+      "meaning": "rose of Gaul",
+      "line": "Its plant name, Rosa gallica, means “rose of Gaul.”",
+      "funFact": "Gaul is an old name for the land of France. So people also call it the French rose.",
+      "symbol": "heart.fill"
+    }
   },
   {
     "name": "Poppy",
@@ -92,35 +116,75 @@
     "botanicalName": "Nephrolepis exaltata",
     "botanicalFact": "Ferns reproduce with spores rather than seeds or flowers.",
     "level": 1,
-    "imageName": "plant_fern"
+    "imageName": "plant_fern",
+    "nameStory": {
+      "origin": "nephros + lepis",
+      "language": "Greek",
+      "meaning": "kidney scale",
+      "line": "Its plant name, Nephrolepis, means “kidney scale.”",
+      "funFact": "Look under a leaf for tiny dots shaped like kidney beans. Each one keeps its spores safe.",
+      "symbol": "leaf.fill"
+    }
   },
   {
     "name": "Strawberry",
     "botanicalName": "Fragaria x ananassa",
     "botanicalFact": "The tiny 'seeds' on its surface are actually separate fruits; the red flesh is an enlarged flower base.",
     "level": 1,
-    "imageName": "plant_strawberry"
+    "imageName": "plant_strawberry",
+    "nameStory": {
+      "origin": "strēaw + berġe",
+      "language": "Old English",
+      "meaning": "straw berry",
+      "line": "Strawberry is “straw” plus “berry.”",
+      "funFact": "No one knows for sure why. It may be for its thin runners, which look like bits of straw.",
+      "symbol": "leaf.fill"
+    }
   },
   {
     "name": "Orchid",
     "botanicalName": "Phalaenopsis",
     "botanicalFact": "One of the two largest flowering plant families.",
     "level": 2,
-    "imageName": "plant_orchid"
+    "imageName": "plant_orchid",
+    "nameStory": {
+      "origin": "phalaina + opsis",
+      "language": "Greek",
+      "meaning": "like a moth",
+      "line": "Its plant name, Phalaenopsis, means “like a moth.”",
+      "funFact": "Its wide, flat flowers look like moths in flight. That is why it is called the moth orchid.",
+      "symbol": "sparkles"
+    }
   },
   {
     "name": "Lavender",
     "botanicalName": "Lavandula angustifolia",
     "botanicalFact": "People have used lavender for scent and bathing for thousands of years.",
     "level": 2,
-    "imageName": "plant_lavender"
+    "imageName": "plant_lavender",
+    "nameStory": {
+      "origin": "lavare",
+      "language": "Latin",
+      "meaning": "to wash",
+      "line": "Its name may come from Latin “lavare,” to wash.",
+      "funFact": "Long ago, people put its sweet flowers in baths. They put them with clean clothes, too.",
+      "symbol": "drop.fill"
+    }
   },
   {
     "name": "Lotus",
     "botanicalName": "Nelumbo nucifera",
     "botanicalFact": "Leaves repel water: the 'lotus effect'.",
     "level": 2,
-    "imageName": "plant_lotus"
+    "imageName": "plant_lotus",
+    "nameStory": {
+      "origin": "nucifera",
+      "language": "Latin",
+      "meaning": "nut bearing",
+      "line": "Its plant name, nucifera, means “nut bearing.”",
+      "funFact": "Its seed pod looks like a round cup full of holes. Each hole holds a seed like a little nut.",
+      "symbol": "leaf.fill"
+    }
   },
   {
     "name": "Jasmine",
@@ -134,14 +198,30 @@
     "botanicalName": "Antirrhinum majus",
     "botanicalFact": "Squeeze a bloom's sides and the 'dragon' opens its mouth.",
     "level": 2,
-    "imageName": "plant_snapdragon"
+    "imageName": "plant_snapdragon",
+    "nameStory": {
+      "origin": "snap + dragon",
+      "language": "English",
+      "meaning": "snapping dragon",
+      "line": "Snapdragon means a “snapping dragon.”",
+      "funFact": "Gently squeeze the sides of a flower. Its “mouth” opens and shuts like a dragon's.",
+      "symbol": "flame.fill"
+    }
   },
   {
     "name": "Saguaro Cactus",
     "botanicalName": "Carnegiea gigantea",
     "botanicalFact": "A saguaro often waits 50 to 70 years before it grows its first arm.",
     "level": 2,
-    "imageName": "plant_saguaro_cactus"
+    "imageName": "plant_saguaro_cactus",
+    "nameStory": {
+      "origin": "gigantea",
+      "language": "Latin",
+      "meaning": "giant",
+      "line": "Its plant name, gigantea, means “giant.”",
+      "funFact": "It can grow taller than a house, with arms that reach up to the sky.",
+      "symbol": "arrow.up"
+    }
   },
   {
     "name": "Aloe Vera",
@@ -163,21 +243,45 @@
     "botanicalName": "Phyllostachys edulis",
     "botanicalFact": "Giant moso bamboo can grow about a meter in one day.",
     "level": 2,
-    "imageName": "plant_bamboo"
+    "imageName": "plant_bamboo",
+    "nameStory": {
+      "origin": "edulis",
+      "language": "Latin",
+      "meaning": "good to eat",
+      "line": "Its plant name, edulis, means “good to eat.”",
+      "funFact": "People cook its young shoots. You may have had bamboo shoots in a meal!",
+      "symbol": "fork.knife"
+    }
   },
   {
     "name": "Hibiscus",
     "botanicalName": "Hibiscus rosa-sinensis",
     "botanicalFact": "Each bloom typically lasts about a day.",
     "level": 2,
-    "imageName": "plant_hibiscus"
+    "imageName": "plant_hibiscus",
+    "nameStory": {
+      "origin": "hibiskos",
+      "language": "Greek",
+      "meaning": "marsh mallow plant",
+      "line": "Hibiscus comes from the Greek word “hibiskos.”",
+      "funFact": "The Greeks gave that name to the marsh mallow plant. Its root was once used to make marshmallows!",
+      "symbol": "sparkles"
+    }
   },
   {
     "name": "Cherry Blossom",
     "botanicalName": "Prunus serrulata",
     "botanicalFact": "Japan's hanami custom of viewing the blossoms is centuries old.",
     "level": 2,
-    "imageName": "plant_cherry_blossom"
+    "imageName": "plant_cherry_blossom",
+    "nameStory": {
+      "origin": "serrulata",
+      "language": "Latin",
+      "meaning": "little saw teeth",
+      "line": "Its plant name, serrulata, means “little saw teeth.”",
+      "funFact": "Look at the edge of a leaf. It has tiny points, like the teeth on a saw.",
+      "symbol": "leaf.fill"
+    }
   },
   {
     "name": "Venus Flytrap",
@@ -199,35 +303,75 @@
     "botanicalName": "Adansonia digitata",
     "botanicalFact": "Big baobab trunks can store over 100,000 liters of water.",
     "level": 3,
-    "imageName": "plant_baobab"
+    "imageName": "plant_baobab",
+    "nameStory": {
+      "origin": "Adansonia",
+      "language": "Latin",
+      "meaning": "Adanson's tree",
+      "line": "It is named for Michel Adanson.",
+      "funFact": "He was a plant scientist from France. He saw the big baobab trees in Senegal in 1749.",
+      "symbol": "person.fill"
+    }
   },
   {
     "name": "Corpse Flower",
     "botanicalName": "Amorphophallus titanum",
     "botanicalFact": "Smells like rotting flesh to attract pollinators.",
     "level": 3,
-    "imageName": "plant_corpse_flower"
+    "imageName": "plant_corpse_flower",
+    "nameStory": {
+      "origin": "titanum",
+      "language": "Latin",
+      "meaning": "giant",
+      "line": "Its plant name, titanum, means “giant.”",
+      "funFact": "Its flower spike can grow taller than a grown-up. It has a strong, stinky smell that flies love!",
+      "symbol": "arrow.up"
+    }
   },
   {
     "name": "Welwitschia",
     "botanicalName": "Welwitschia mirabilis",
     "botanicalFact": "Grows just two leaves in its life, for 1,000+ years.",
     "level": 3,
-    "imageName": "plant_welwitschia"
+    "imageName": "plant_welwitschia",
+    "nameStory": {
+      "origin": "Welwitschia",
+      "language": "Latin",
+      "meaning": "Welwitsch's plant",
+      "line": "It is named for Friedrich Welwitsch.",
+      "funFact": "He found it in Angola in 1859. He was so amazed that he knelt down to look at it.",
+      "symbol": "person.fill"
+    }
   },
   {
     "name": "Dragon Blood Tree",
     "botanicalName": "Dracaena cinnabari",
     "botanicalFact": "Its bark bleeds a deep red resin.",
     "level": 3,
-    "imageName": "plant_dragon_blood_tree"
+    "imageName": "plant_dragon_blood_tree",
+    "nameStory": {
+      "origin": "drakaina",
+      "language": "Greek",
+      "meaning": "she-dragon",
+      "line": "Its plant name, Dracaena, means “she-dragon.”",
+      "funFact": "Its sap is a deep red. Long ago, people called the red sap dragon's blood.",
+      "symbol": "flame.fill"
+    }
   },
   {
     "name": "Pitcher Plant",
     "botanicalName": "Nepenthes alata",
     "botanicalFact": "Its pitcher-shaped leaves hold digestive fluid that drowns insects.",
     "level": 3,
-    "imageName": "plant_pitcher_plant"
+    "imageName": "plant_pitcher_plant",
+    "nameStory": {
+      "origin": "pitcher",
+      "language": "English",
+      "meaning": "water jug",
+      "line": "A pitcher is a jug, and its leaves look like one.",
+      "funFact": "Each leaf makes a deep cup with a lid. Small bugs slip in and get trapped.",
+      "symbol": "cup.and.saucer.fill"
+    }
   },
   {
     "name": "Sensitive Plant",
@@ -249,14 +393,30 @@
     "botanicalName": "Strelitzia reginae",
     "botanicalFact": "Native to South Africa, its bloom resembles a colorful bird's head.",
     "level": 3,
-    "imageName": "plant_bird_of_paradise"
+    "imageName": "plant_bird_of_paradise",
+    "nameStory": {
+      "origin": "reginae",
+      "language": "Latin",
+      "meaning": "of the queen",
+      "line": "Its plant name, reginae, means “of the queen.”",
+      "funFact": "It was named for Queen Charlotte of Britain. Its flower looks like a bright bird with a crest.",
+      "symbol": "crown.fill"
+    }
   },
   {
     "name": "Joshua Tree",
     "botanicalName": "Yucca brevifolia",
     "botanicalFact": "It depends on yucca moths for pollination.",
     "level": 3,
-    "imageName": "plant_joshua_tree"
+    "imageName": "plant_joshua_tree",
+    "nameStory": {
+      "origin": "brevifolia",
+      "language": "Latin",
+      "meaning": "short leaves",
+      "line": "Its plant name, brevifolia, means “short leaves.”",
+      "funFact": "Its leaves are short and spiky. They grow in bunches at the tips of the branches.",
+      "symbol": "leaf.fill"
+    }
   },
   {
     "name": "Lithops",
@@ -278,56 +438,120 @@
     "botanicalName": "Rafflesia arnoldii",
     "botanicalFact": "Produces the world's largest single flower, about a meter across.",
     "level": 4,
-    "imageName": "plant_rafflesia"
+    "imageName": "plant_rafflesia",
+    "nameStory": {
+      "origin": "Rafflesia",
+      "language": "Latin",
+      "meaning": "Raffles's flower",
+      "line": "It is named for Sir Stamford Raffles.",
+      "funFact": "He and his friend Joseph Arnold saw it in Sumatra in 1818. Its flower can be as wide as a hula hoop!",
+      "symbol": "person.fill"
+    }
   },
   {
     "name": "Monkey Puzzle Tree",
     "botanicalName": "Araucaria araucana",
     "botanicalFact": "Native to Chile and Argentina, it is the national tree of Chile.",
     "level": 4,
-    "imageName": "plant_monkey_puzzle_tree"
+    "imageName": "plant_monkey_puzzle_tree",
+    "nameStory": {
+      "origin": "monkey puzzle",
+      "language": "English",
+      "meaning": "puzzle for a monkey",
+      "line": "A man joked it would puzzle a monkey to climb it.",
+      "funFact": "Its branches are covered in sharp, stiff leaves. A monkey would find it hard to climb.",
+      "symbol": "pawprint.fill"
+    }
   },
   {
     "name": "Sago Palm",
     "botanicalName": "Cycas revoluta",
     "botanicalFact": "Despite the name it is not a palm but a cycad, an ancient seed-plant lineage. Every part is poisonous, so never eat it.",
     "level": 4,
-    "imageName": "plant_sago_palm"
+    "imageName": "plant_sago_palm",
+    "nameStory": {
+      "origin": "revoluta",
+      "language": "Latin",
+      "meaning": "curled back",
+      "line": "Its plant name, revoluta, means “curled back.”",
+      "funFact": "Look at the edge of a leaflet. It curls back under, like a tiny rolled hem.",
+      "symbol": "leaf.fill"
+    }
   },
   {
     "name": "Ghost Pipe",
     "botanicalName": "Monotropa uniflora",
     "botanicalFact": "It has no chlorophyll and draws nutrients through fungi linked to tree roots.",
     "level": 4,
-    "imageName": "plant_ghost_pipe"
+    "imageName": "plant_ghost_pipe",
+    "nameStory": {
+      "origin": "monos + tropos",
+      "language": "Greek",
+      "meaning": "one turn",
+      "line": "Its plant name, Monotropa, means “one turn.”",
+      "funFact": "Each stem bends in one turn and holds one flower. It is pale white, like a ghost.",
+      "symbol": "moon.stars.fill"
+    }
   },
   {
     "name": "Passionflower",
     "botanicalName": "Passiflora caerulea",
     "botanicalFact": "Its name comes from Spanish missionaries who saw symbols of the Passion in the bloom.",
     "level": 4,
-    "imageName": "plant_passionflower"
+    "imageName": "plant_passionflower",
+    "nameStory": {
+      "origin": "caerulea",
+      "language": "Latin",
+      "meaning": "sky blue",
+      "line": "Its plant name, caerulea, means “sky blue.”",
+      "funFact": "Look for the ring of thin threads in the flower. They are blue, white and purple.",
+      "symbol": "paintpalette.fill"
+    }
   },
   {
     "name": "King Protea",
     "botanicalName": "Protea cynaroides",
     "botanicalFact": "It is the national flower of South Africa.",
     "level": 4,
-    "imageName": "plant_king_protea"
+    "imageName": "plant_king_protea",
+    "nameStory": {
+      "origin": "Proteus",
+      "language": "Greek",
+      "meaning": "who could change shape",
+      "line": "Protea is named for Proteus, who could change shape.",
+      "funFact": "Proteus was a sea god in old Greek tales. Protea flowers come in many shapes, just like him.",
+      "symbol": "crown.fill"
+    }
   },
   {
     "name": "Bleeding Heart",
     "botanicalName": "Lamprocapnos spectabilis",
     "botanicalFact": "Native to Siberia, northern China, Korea and Japan.",
     "level": 4,
-    "imageName": "plant_bleeding_heart"
+    "imageName": "plant_bleeding_heart",
+    "nameStory": {
+      "origin": "spectabilis",
+      "language": "Latin",
+      "meaning": "worth seeing",
+      "line": "Its plant name, spectabilis, means “worth seeing.”",
+      "funFact": "Each pink flower looks like a little heart with a white drop below it. Look for a row on one stem.",
+      "symbol": "heart.fill"
+    }
   },
   {
     "name": "Giant Water Lily",
     "botanicalName": "Victoria amazonica",
     "botanicalFact": "Its floating leaves can exceed 2 m across.",
     "level": 4,
-    "imageName": "plant_giant_water_lily"
+    "imageName": "plant_giant_water_lily",
+    "nameStory": {
+      "origin": "Victoria",
+      "language": "Latin",
+      "meaning": "Queen Victoria's lily",
+      "line": "It is named for Queen Victoria of Britain.",
+      "funFact": "Its round leaves float on the water. They can be wider than a bed.",
+      "symbol": "crown.fill"
+    }
   },
   {
     "name": "Sundew",
@@ -349,35 +573,75 @@
     "botanicalName": "Paphiopedilum",
     "botanicalFact": "Its slipper-shaped pouch acts as a trap that guides insects past the pollen.",
     "level": 4,
-    "imageName": "plant_ladys_slipper_orchid"
+    "imageName": "plant_ladys_slipper_orchid",
+    "nameStory": {
+      "origin": "Paphos + pedilon",
+      "language": "Greek",
+      "meaning": "Aphrodite's slipper",
+      "line": "Its plant name means “slipper of Aphrodite.”",
+      "funFact": "Aphrodite was a queen of old Greek stories. The flower has a puffy pouch shaped like a slipper.",
+      "symbol": "shoe.fill"
+    }
   },
   {
     "name": "Wollemi Pine",
     "botanicalName": "Wollemia nobilis",
     "botanicalFact": "Scientists knew it from fossils until living trees were found in Australia in 1994.",
     "level": 5,
-    "imageName": "plant_wollemi_pine"
+    "imageName": "plant_wollemi_pine",
+    "nameStory": {
+      "origin": "Wollemia nobilis",
+      "language": "Latin",
+      "meaning": "Noble's Wollemi tree",
+      "line": "It is named for a park called Wollemi.",
+      "funFact": "The park is in Australia. A man named David Noble found it there in 1994. Its second name is for him.",
+      "symbol": "map.fill"
+    }
   },
   {
     "name": "Jade Vine",
     "botanicalName": "Strongylodon macrobotrys",
     "botanicalFact": "Its turquoise, claw-shaped flowers are pollinated by bats.",
     "level": 5,
-    "imageName": "plant_jade_vine"
+    "imageName": "plant_jade_vine",
+    "nameStory": {
+      "origin": "makros + botrys",
+      "language": "Greek",
+      "meaning": "long grape bunch",
+      "line": "Its plant name, macrobotrys, means “long grape bunch.”",
+      "funFact": "Its flowers hang in long bunches like grapes. They are the blue-green of jade.",
+      "symbol": "leaf.fill"
+    }
   },
   {
     "name": "Coco de Mer",
     "botanicalName": "Lodoicea maldivica",
     "botanicalFact": "It produces the heaviest seed of any plant.",
     "level": 5,
-    "imageName": "plant_coco_de_mer"
+    "imageName": "plant_coco_de_mer",
+    "nameStory": {
+      "origin": "coco de mer",
+      "language": "French",
+      "meaning": "coconut of the sea",
+      "line": "Coco de mer means “coconut of the sea.”",
+      "funFact": "Long ago, big nuts washed up on beaches. People thought the tree grew under the sea.",
+      "symbol": "water.waves"
+    }
   },
   {
     "name": "Black Bat Flower",
     "botanicalName": "Tacca chantrieri",
     "botanicalFact": "Long whisker-like bracts dangle from its near-black blooms.",
     "level": 5,
-    "imageName": "plant_black_bat_flower"
+    "imageName": "plant_black_bat_flower",
+    "nameStory": {
+      "origin": "bat flower",
+      "language": "English",
+      "meaning": "flower like a bat",
+      "line": "Its dark flower looks like a bat with open wings.",
+      "funFact": "Long thin threads hang from it like whiskers. Count the wings and the whiskers.",
+      "symbol": "moon.stars.fill"
+    }
   },
   {
     "name": "Franklin Tree",
@@ -399,34 +663,74 @@
     "botanicalName": "Cosmos atrosanguineus",
     "botanicalFact": "Extinct in the wild, its blooms smell of chocolate.",
     "level": 5,
-    "imageName": "plant_chocolate_cosmos"
+    "imageName": "plant_chocolate_cosmos",
+    "nameStory": {
+      "origin": "kosmos",
+      "language": "Greek",
+      "meaning": "neat and orderly",
+      "line": "Cosmos comes from a Greek word for “orderly.”",
+      "funFact": "Its petals sit in a neat ring. This one is dark red-brown and smells like chocolate.",
+      "symbol": "sparkles"
+    }
   },
   {
     "name": "Ghost Orchid",
     "botanicalName": "Dendrophylax lindenii",
     "botanicalFact": "It has no leaves and photosynthesizes through its roots.",
     "level": 5,
-    "imageName": "plant_ghost_orchid"
+    "imageName": "plant_ghost_orchid",
+    "nameStory": {
+      "origin": "ghost orchid",
+      "language": "English",
+      "meaning": "floating white flower",
+      "line": "It is called “ghost” because its flower seems to float.",
+      "funFact": "Its roots look like tree bark, so the white flower seems to hang in the air.",
+      "symbol": "cloud.fill"
+    }
   },
   {
     "name": "Silversword",
     "botanicalName": "Argyroxiphium sandwicense",
     "botanicalFact": "Native to Hawaii, high on its volcanic slopes.",
     "level": 5,
-    "imageName": "plant_silversword"
+    "imageName": "plant_silversword",
+    "nameStory": {
+      "origin": "argyros + xiphos",
+      "language": "Greek",
+      "meaning": "silver sword",
+      "line": "Its plant name, Argyroxiphium, means “silver sword.”",
+      "funFact": "Fine silver hairs cover its long, thin leaves. They shine in the sun and keep off the frost.",
+      "symbol": "star.fill"
+    }
   },
   {
     "name": "Rainbow Eucalyptus",
     "botanicalName": "Eucalyptus deglupta",
     "botanicalFact": "Bark peels in strips at different times, revealing multicolored layers.",
     "level": 5,
-    "imageName": "plant_rainbow_eucalyptus"
+    "imageName": "plant_rainbow_eucalyptus",
+    "nameStory": {
+      "origin": "deglupta",
+      "language": "Latin",
+      "meaning": "peeled",
+      "line": "Its plant name, deglupta, means “peeled.”",
+      "funFact": "Its bark peels off in strips. Under it are bright stripes of green, blue, orange and red.",
+      "symbol": "paintpalette.fill"
+    }
   },
   {
     "name": "Puya raimondii",
     "botanicalName": "Puya raimondii",
     "botanicalFact": "The largest bromeliad flowers once after many decades, then sets seed.",
     "level": 5,
-    "imageName": "plant_puya_raimondii"
+    "imageName": "plant_puya_raimondii",
+    "nameStory": {
+      "origin": "raimondii",
+      "language": "Latin",
+      "meaning": "Raimondi's puya",
+      "line": "It is named for Antonio Raimondi.",
+      "funFact": "He studied plants in Peru. This puya grows a flower spike as tall as a house.",
+      "symbol": "person.fill"
+    }
   }
 ]

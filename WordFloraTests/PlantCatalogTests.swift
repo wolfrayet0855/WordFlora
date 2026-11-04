@@ -1,4 +1,5 @@
 import XCTest
+import UIKit
 import SwiftData
 @testable import WordFlora
 
@@ -68,8 +69,9 @@ final class PlantCatalogTests: XCTestCase {
 // MARK: name stories (fact card V2)
 @MainActor
 final class NameStoryCatalogTests: XCTestCase {
-    private let pilot = ["daisy", "dandelion", "sunflower", "tulip", "aloe_vera", "sensitive_plant",
-                         "lithops", "venus_flytrap", "sundew", "franklin_tree"]
+    /// Plants reviewed for T-B whose name origin teaches nothing a child can see or is not settled
+    /// (see docs/research/name-stories.md). They show the plain "Did you know?" card.
+    private let reviewedFallback: Set<String> = ["poppy", "jasmine"]
 
     func testLoaderReadsTheDaisyStory() throws {
         let daisy = try XCTUnwrap(try PlantCatalog.load().first { $0.plantId == "daisy" })
@@ -80,17 +82,64 @@ final class NameStoryCatalogTests: XCTestCase {
         XCTAssertEqual(NameStoryCard.Content(plant: daisy).title, "How Daisy got its name")
     }
 
-    func testPilotHasExactlyTheVerifiedTenStories() throws {
-        let withStory = try PlantCatalog.load().filter { $0.nameStory != nil }.map(\.plantId)
-        XCTAssertEqual(Set(withStory), Set(pilot))
+    func testEveryPlantHasAStoryOrIsAReviewedFallback() throws {
+        let plants = try PlantCatalog.load()
+        let ids = Set(plants.map(\.plantId))
+        XCTAssertTrue(reviewedFallback.isSubset(of: ids), "unknown fallback ids: \(reviewedFallback.subtracting(ids))")
+        XCTAssertLessThanOrEqual(reviewedFallback.count, 5, "the fallback list should stay a handful")
+        for plant in plants {
+            if reviewedFallback.contains(plant.plantId) {
+                XCTAssertNil(plant.nameStory, "\(plant.name) is a reviewed fallback but has a story")
+            } else {
+                XCTAssertNotNil(plant.nameStory, "\(plant.name) has no name story and is not a reviewed fallback")
+            }
+        }
+    }
+
+    func testEveryStoryFitsTheCard() throws {
+        for plant in try PlantCatalog.load() {
+            guard let story = plant.nameStory else { continue }
+            XCTAssertLessThanOrEqual(story.line.count, 70, "\(plant.name) line")
+            XCTAssertLessThanOrEqual(story.funFact.count, 140, "\(plant.name) funFact")
+            XCTAssertLessThanOrEqual(story.meaning.count, 24, "\(plant.name) meaning")
+            XCTAssertFalse(story.origin.trimmingCharacters(in: .whitespaces).isEmpty, "\(plant.name) origin")
+            XCTAssertFalse(story.language.trimmingCharacters(in: .whitespaces).isEmpty, "\(plant.name) language")
+            XCTAssertNotEqual(story.language.lowercased(), "named after", "\(plant.name) language must be a real language")
+            let symbol = try XCTUnwrap(story.symbol, "\(plant.name) symbol")
+            XCTAssertFalse(symbol.isEmpty, "\(plant.name) symbol")
+            XCTAssertNotNil(UIImage(systemName: symbol), "\(plant.name) symbol \(symbol) is not an SF Symbol")
+        }
+    }
+
+    func testEveryStoryStringAndFactIsCopySafe() throws {
+        for plant in try PlantCatalog.load() {
+            XCTAssertEqual(CopySafety.check(plant.botanicalFact), [], "\(plant.name) botanicalFact")
+            guard let s = plant.nameStory else { continue }
+            for text in [s.origin, s.language, s.meaning, s.line, s.funFact] {
+                XCTAssertEqual(CopySafety.check(text), [], "\(plant.name): \(text)")
+            }
+        }
+    }
+
+    func testEveryCardHasSafeLinesAndAHowTitle() throws {
+        for plant in try PlantCatalog.load() {
+            let content = NameStoryCard.Content(plant: plant)
+            for line in content.lines + [content.more].compactMap({ $0 }) {
+                XCTAssertEqual(CopySafety.check(line), [], "\(plant.name): \(line)")
+            }
+            if plant.nameStory != nil {
+                XCTAssertTrue(content.title.hasPrefix("How "), "\(plant.name): \(content.title)")
+                XCTAssertNotNil(content.more)
+            }
+        }
     }
 
     func testAPlantWithoutAStoryFallsBackToDidYouKnow() throws {
-        let rose = try XCTUnwrap(try PlantCatalog.load().first { $0.plantId == "rose" })
-        XCTAssertNil(rose.nameStory)
-        let content = NameStoryCard.Content(plant: rose)
+        let poppy = try XCTUnwrap(try PlantCatalog.load().first { $0.plantId == "poppy" })
+        XCTAssertNil(poppy.nameStory)
+        let content = NameStoryCard.Content(plant: poppy)
         XCTAssertEqual(content.title, "Did you know?")
-        XCTAssertEqual(content.lines, [rose.botanicalFact])
+        XCTAssertEqual(content.lines, [poppy.botanicalFact])
         XCTAssertNil(content.more)
         XCTAssertNil(content.chip)
     }
@@ -103,7 +152,7 @@ final class NameStoryCatalogTests: XCTestCase {
 
     func testStoryLookupByPlantId() {
         XCTAssertEqual(PlantCatalog.nameStory(for: "daisy")?.meaning, "day's eye")
-        XCTAssertNil(PlantCatalog.nameStory(for: "rose"))
+        XCTAssertNil(PlantCatalog.nameStory(for: "poppy"))
         XCTAssertNil(PlantCatalog.nameStory(for: "no_such_plant"))
     }
 
