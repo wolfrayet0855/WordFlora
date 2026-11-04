@@ -53,3 +53,5 @@ Device-only unverified: Siri phrases, Control Center control, speech voice/silen
 - **Visibility:** every Home destination is shown; locked ones are dimmed with an unlock hint.
 
 - **Ruling (owner, same day, later):** petal loss, rain and the seed state apply at every age with the same 24 h rule. The researchers' under-13 72 h delay and default Gentle mode are NOT adopted. Safeguards that remain: nothing earned is ever removed, Quiet Garden and Calm mode turn it off, copy stays gentle and positive-only.
+
+- 2026-11-03: Wake the seed flow built (WakeChallenge/WakePuzzle rules, WakeSheet, WakePuzzleView, butterfly wake at a goal of 3, or 2 after two "still dreaming" tries). Plant page shows the seed card in one marked block; a tap on a seed opens the sheet. Not built yet: rain visuals, Life panel, petal thinning. UI flag: -uitest-seed.

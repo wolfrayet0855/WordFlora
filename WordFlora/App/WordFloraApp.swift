@@ -50,6 +50,11 @@ struct WordFloraApp: App {
             model.profile?.water = 5; model.profile?.soil = 3
             try? model.context.save()
         }
+        if uiTesting && args.contains("-uitest-seed") {
+            // One found plant that has rested long enough to be a seed, for the wake flow UI test.
+            if let p = model.plants().first { p.earnedCount = 1; p.lastLovedAt = Date.now.addingTimeInterval(-6 * 86_400) }
+            try? model.context.save()
+        }
         if uiTesting && args.contains("-uitest-plus") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }

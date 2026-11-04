@@ -15,6 +15,7 @@ struct PlantDetailView: View {
     @State private var bump = false
     @State private var aiText: String?
     @State private var aiBusy = false
+    @State private var showWake = false      // Wake the seed (see the marked block below)
 
     private var plant: PlantCollectible? { app.plants().first { $0.plantId == plantId } }
     private static let stageNames = ["Seed", "Sprout", "Bud", "Bloom", "Flourishing"]
@@ -45,6 +46,7 @@ struct PlantDetailView: View {
                     Image(plant.imageName).resizable().scaledToFit().frame(height: 156)
                         .rotationEffect(.degrees(thirsty ? 5 : sway), anchor: .bottom)
                         .onTapGesture {            // a small hello: the plant sways back and settles
+                            if app.showsWakeCard(plant) { showWake = true; return }   // Wake the seed: a tap on a seed offers the wake sheet
                             hellos += 1
                             guard !UIAccessibility.isReduceMotionEnabled else { return }
                             withAnimation(.interpolatingSpring(stiffness: 90, damping: 5)) { sway = 7 }
@@ -79,6 +81,10 @@ struct PlantDetailView: View {
                 }
 
                 if !quiet { growthBar(plant); resources }
+
+                // MARK: Wake the seed (begin). Kept to this one block for the planned redesign of this screen.
+                if app.showsWakeCard(plant) { WakeSeedCard(plant: plant, isPresented: $showWake) }
+                // MARK: Wake the seed (end)
 
                 actions(plant)
 
@@ -117,6 +123,7 @@ struct PlantDetailView: View {
         }
         .overlay(alignment: .bottom) { toastView }
         .sheet(isPresented: $showRepot) { repotSheet(plant).presentationDetents([.medium]) }
+        .sheet(isPresented: $showWake) { WakeSheet(plant: plant).environment(app) }   // Wake the seed
         .alert("Name your plant", isPresented: $renaming) {
             TextField("Name", text: $draftName)
             Button("Save") { plant.nickname = String(draftName.prefix(16)); try? app.context.save() }

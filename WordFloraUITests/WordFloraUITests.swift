@@ -119,6 +119,29 @@ final class WordFloraUITests: XCTestCase {
         shot("repot")
     }
 
+    func testASeedOffersTheWakeSheetWithTwoChallengesAndAPlainClose() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-seed"]
+        app.launch()
+        app.buttons["Garden"].tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
+        let wake = app.buttons["Wake Clover"]
+        XCTAssertTrue(wake.waitForExistence(timeout: 5))
+        scrollTo(wake)
+        wake.tap()
+        XCTAssertTrue(app.buttons["wake-butterflies"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["wake-wordPuzzle"].exists)
+        XCTAssertEqual(app.buttons["wake-butterflies"].label, "Catch butterflies, quick, gentle, good for today")
+        XCTAssertFalse(app.buttons["Maybe later"].exists)
+        shot("wake-sheet")
+        app.buttons["wake-wordPuzzle"].tap()
+        XCTAssertTrue(app.buttons["Start"].waitForExistence(timeout: 3))
+        app.buttons["Start"].tap()
+        XCTAssertTrue(app.buttons["Clear"].waitForExistence(timeout: 3))
+        shot("wake-puzzle")
+        app.buttons["Close"].tap()
+        XCTAssertTrue(wake.waitForExistence(timeout: 3))          // closing changes nothing: still a seed
+    }
+
     func testPaywallShowsBothPlansHonestlyAndSubscriberStateHidesThem() {
         launch()
         app.buttons["Settings"].tap()
