@@ -80,38 +80,91 @@ private struct AgeQuestionView: View {
     }
 }
 
+/// The first win, after "New plant found!" (design-preview/fact-card frames 2-4): one tip, one free drink, then home.
 private struct FirstGardenTipView: View {
     @Environment(AppModel.self) private var app
     @State private var watered = false
+    @State private var toast: String?
+    @ScaledMetric(relativeTo: .title2) private var tipIcon: CGFloat = 44
 
     private var plant: PlantCollectible? { app.plants().first { $0.earnedCount > 0 } }
+    private var plantName: String {
+        guard let plant else { return "plant" }
+        return plant.nickname.isEmpty ? plant.name : plant.nickname
+    }
 
     var body: some View {
-        VStack(spacing: 18) {
-            Spacer()
-            Text(watered ? "Lovely. It will grow a little every day." : "Your first plant!").font(Theme.font(.title, weight: .bold)).multilineTextAlignment(.center)
-            if let plant {
-                PlantCard(plant: plant).frame(maxWidth: 240)
-                    .scaleEffect(watered ? 1.04 : 1).animation(.spring(response: 0.4, dampingFraction: 0.5), value: watered)
+        ScrollView {
+            VStack(spacing: 14) {
+                Text(watered ? "Yum!" : "Plant tip")
+                    .textCase(.uppercase).kerning(1)
+                    .font(Theme.font(.footnote, weight: .heavy)).foregroundStyle(Color.accentText)
+                Text(watered ? "Your \(plantName) loves it" : "Plants love water")
+                    .font(Theme.font(.largeTitle, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+                if let plant {
+                    // HOOK (T5): the water pour storyboard plays here once, over the plant, when `watered` turns true.
+                    PlantCard(plant: plant).frame(maxWidth: 220)
+                        .scaleEffect(watered ? 1.04 : 1).animation(.spring(response: 0.4, dampingFraction: 0.5), value: watered)
+                }
+                if watered {
+                    Label("Watered. It will grow a little every day.", systemImage: "checkmark.circle.fill")
+                        .font(Theme.font(.callout, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                        .padding(.horizontal, 16).padding(.vertical, 8)
+                        .background(Color.successText.opacity(0.14), in: Capsule())
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text("Water it whenever you like. You can find it in your garden.")
+                        .font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
+                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                } else {
+                    HStack(spacing: 12) {
+                        Image(systemName: "drop.fill").font(.title3).foregroundStyle(Color.ink)
+                            .frame(width: tipIcon, height: tipIcon)
+                            .background(Color.appAccent, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+                            .accessibilityHidden(true)
+                        (Text("The water button").bold() + Text(" gives your plant a drink. Your first drink is free!"))
+                            .font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    .padding(.horizontal, 16).padding(.vertical, 12)
+                    .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .accessibilityElement(children: .combine)
+                }
+                Spacer(minLength: 16)
+                if watered {
+                    Button("Go home") { app.finishOnboarding() }.buttonStyle(PrimaryButtonStyle())
+                } else {
+                    Button { water() } label: { Label("Water my plant", systemImage: "drop.fill") }.buttonStyle(PrimaryButtonStyle())
+                    Button("Not now") { app.finishOnboarding() }
+                        .font(Theme.font(.body, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                        .frame(minHeight: Theme.minTap)
+                }
             }
-            Text(watered ? "Plants need water, sun and soil. You will find them all in your garden." : "Plants like a drink. Tap the button to water it.")
-                .font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText)
-            if watered {
-                Button("Play another word") { app.finishOnboarding() }.buttonStyle(PrimaryButtonStyle())
-            } else {
-                Button { water() } label: { Label("Water your plant", systemImage: "drop.fill") }.buttonStyle(PrimaryButtonStyle())
-                Button("Skip") { app.finishOnboarding() }.font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText).frame(minHeight: Theme.minTap)
-            }
-            Spacer()
+            .padding(24)
+            .frame(maxWidth: .infinity)
         }
-        .padding(24)
+        .scrollBounceBehavior(.basedOnSize)
+        .overlay(alignment: .bottom) { toastView }
+    }
+
+    @ViewBuilder private var toastView: some View {
+        if let toast {
+            Text(toast).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                .padding(.horizontal, 16).padding(.vertical, 12)
+                .background(Color.appSurface, in: Capsule()).shadow(radius: 6, y: 2).padding(.bottom, 96)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
     }
 
     private func water() {
-        guard let plant, let profile = app.profile else { watered = true; return }
+        guard let plant, let profile = app.profile else { withAnimation { watered = true }; return }
         profile.water += 1                       // the free first drop
-        _ = TendingEngine.water(plant, profile: profile, now: .now, calendar: .current, economy: .default)
-        try? app.context.save()
+        let outcome = app.tend(.water, plant: plant)
+        if outcome.applied { app.play(.water) }
         withAnimation { watered = true }
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { toast = outcome.message }
+        AccessibilityNotification.Announcement(outcome.message).post()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { withAnimation { toast = nil } }
     }
 }

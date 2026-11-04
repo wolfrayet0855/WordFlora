@@ -89,10 +89,13 @@ final class WordFloraUITests: XCTestCase {
         for ch in "SED" { app.buttons[String(ch)].tap() }
         XCTAssertTrue(app.staticTexts["New plant found!"].waitForExistence(timeout: 6))
         app.buttons["Continue"].tap()
-        XCTAssertTrue(app.buttons["Water your plant"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Water my plant"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Not now"].exists)
         shot("first-tip")
-        app.buttons["Water your plant"].tap()
-        app.buttons["Play another word"].tap()
+        app.buttons["Water my plant"].tap()
+        XCTAssertTrue(app.staticTexts["Watered. It will grow a little every day."].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.buttons["Play another word"].exists)
+        app.buttons["Go home"].tap()
         XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Levels"].isEnabled)                         // later features are visible but not open yet
     }
