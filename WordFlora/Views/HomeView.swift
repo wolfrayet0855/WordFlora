@@ -1,191 +1,414 @@
 import SwiftUI
 
+/// Colour pair for one Explore tile (design-preview/home-v2/notes-color.md).
+enum TileTint {
+    case garden, levels, shed, visitors, badges
+
+    var fill: Color {
+        switch self {
+        case .garden: .tileGardenFill
+        case .levels: .tileLevelsFill
+        case .shed: .tileShedFill
+        case .visitors: .tileVisitorsFill
+        case .badges: .tileBadgesFill
+        }
+    }
+    var icon: Color {
+        switch self {
+        case .garden: .successText
+        case .levels: .tileLevelsIcon
+        case .shed: .tileShedIcon
+        case .visitors: .tileVisitorsIcon
+        case .badges: .accentText
+        }
+    }
+}
+
+/// Reports how many lines each Home label uses (read by HomeLayoutUITests via `-uitest-layout`).
+private struct LabelLinesKey: PreferenceKey {
+    static let defaultValue: [String: Int] = [:]
+    static func reduce(value: inout [String: Int], nextValue: () -> [String: Int]) { value.merge(nextValue()) { $1 } }
+}
+
+/// Compares the label's rendered height with the height of the same text forced onto one line (only under `-uitest-layout`).
+private struct LineProbe: ViewModifier {
+    let key: String
+    let font: Font
+    static let enabled = ProcessInfo.processInfo.arguments.contains("-uitest-layout")
+
+    func body(content: Content) -> some View {
+        if Self.enabled {
+            content
+                .background(alignment: .topLeading) {
+                    Text(key).font(font).lineLimit(1).fixedSize().hidden()
+                        .background(GeometryReader { one in
+                            Color.clear.preference(key: OneLineKey.self, value: one.size.height)
+                        })
+                }
+                .overlayPreferenceValue(OneLineKey.self) { oneLine in
+                    GeometryReader { g in
+                        Color.clear.preference(key: LabelLinesKey.self,
+                                               value: [key: oneLine > 0 ? max(1, Int((g.size.height / oneLine).rounded())) : 0])
+                    }
+                }
+        } else {
+            content
+        }
+    }
+}
+
+private extension View {
+    func measuresLines(_ key: String, font: Font) -> some View { modifier(LineProbe(key: key, font: font)) }
+}
+
+private struct OneLineKey: PreferenceKey {
+    static let defaultValue: CGFloat = 0
+    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) { value = max(value, nextValue()) }
+}
+
 struct HomeView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
+    @Environment(\.dynamicTypeSize) private var typeSize
 
-    /// Every destination is visible. Ones that are not open yet are dimmed with a kind line on how to reach them.
-    @ViewBuilder private func featureTile(_ feature: Feature?, _ title: String, _ icon: String, _ route: GameRoute) -> some View {
-        let open = feature.map { app.isUnlocked($0) } ?? true
-        VStack(spacing: 4) {
-            Button { router.go(route) } label: { Label(title, systemImage: icon) }
-                .buttonStyle(SecondaryButtonStyle()).disabled(!open)
-            if !open, let f = feature, let hint = FeatureUnlockPolicy.hint(for: f) {
-                Text(hint).font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .frame(maxWidth: .infinity)
-    }
+    @ScaledMetric(relativeTo: .title3) private var gearSize: CGFloat = 22
+    @ScaledMetric(relativeTo: .title2) private var playIcon: CGFloat = 22
+    @ScaledMetric(relativeTo: .body) private var leafIcon: CGFloat = 18
+    @ScaledMetric(relativeTo: .headline) private var sunDisc: CGFloat = 36
+    @ScaledMetric(relativeTo: .body) private var tileIcon: CGFloat = 28
+    @ScaledMetric(relativeTo: .caption) private var lockIcon: CGFloat = 13
+
+    @State private var labelLines: [String: Int] = [:]
+    private let reportsLayout = LineProbe.enabled
+
+    /// Accessibility text sizes switch the Explore grid to one column of list rows.
+    private var singleColumn: Bool { typeSize.isAccessibilitySize }
+    private static let radius: CGFloat = 20
+    private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: Self.radius, style: .continuous) }
 
     var body: some View {
         let profile = app.profile
         ScrollView {
-            VStack(spacing: 20) {
-                HStack {
-                    Spacer()
-                    Button { router.go(.settings) } label: {
-                        Image(systemName: "gearshape.fill").font(.title3).frame(width: Theme.minTap, height: Theme.minTap)
+            VStack(alignment: .leading, spacing: 12) {
+                topBar
+                hero(days: profile?.gardenDays ?? 0, roseStock: profile?.roseOfJerichoCount ?? 0, roseProgress: profile?.roseSeedProgress ?? 0)
+
+                if app.showWelcomeBack || app.plusOffer != nil {
+                    VStack(spacing: 10) {
+                        if app.showWelcomeBack { welcomeCard.transition(.opacity) }
+                        if app.plusOffer != nil { plusOfferCard.transition(.opacity) }
                     }
-                    .foregroundStyle(Color.secondaryText)
-                    .accessibilityLabel("Settings")
                 }
 
-                VStack(spacing: 4) {
-                    WordmarkView()
-                    Text("Guess words. Grow a garden.")
-                        .font(Theme.font(.callout, weight: .medium))
-                        .foregroundStyle(Color.secondaryText)
-                }
+                playButton
+                if app.isUnlocked(.dailyBloom) { dailyBloom.padding(.bottom, 4) }
 
-                if app.showWelcomeBack {
-                    Card {
-                        HStack(spacing: 10) {
-                            Image(systemName: "cloud.sun.rain.fill").font(.title2).foregroundStyle(Color.accentText)
-                            Text(app.welcomeLine).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
-                            Spacer(minLength: 0)
-                            Button { app.dismissWelcomeBack() } label: { Image(systemName: "xmark").frame(width: Theme.minTap, height: Theme.minTap) }
-                                .accessibilityLabel("Dismiss")
-                        }
-                    }
-                    .transition(.opacity)
-                }
-
-                if app.plusOffer != nil { plusOfferCard.transition(.opacity) }
-
-                FlowerView(petals: 8)
-                    .frame(height: 220)
-                    .padding(.vertical, 4)
-
-                HStack(alignment: .top, spacing: 12) {
-                    RoseSeedChip(progress: profile?.roseSeedProgress ?? 0, stock: profile?.roseOfJerichoCount ?? 0)
-                    GardenDaysChip(days: profile?.gardenDays ?? 0,
-                                   streak: app.settings.showStreak ? (profile?.streak ?? 0) : nil,
-                                   best: profile?.bestStreak ?? 0)
-                }
-
-                Button { router.go(.game(daily: false, level: nil)) } label: {
-                    Label("Play", systemImage: "play.fill")
-                }
-                .buttonStyle(PrimaryButtonStyle())
-
-                if app.isUnlocked(.dailyBloom) {
-                    let done = app.dailyBloomDoneToday
-                    Button { router.go(.game(daily: true, level: nil)) } label: {
-                        HStack {
-                            Image(systemName: done ? "checkmark.circle.fill" : "sun.max.fill").foregroundStyle(done ? Color.successText : Color.accentText)
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Daily Bloom").font(Theme.font(.headline))
-                                Text(done ? "Done for today. See you tomorrow!" : "One word for everyone today").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
-                            }
-                            Spacer()
-                            if !done { Image(systemName: "chevron.right").font(.footnote.weight(.semibold)).foregroundStyle(Color.appPrimaryText.opacity(0.4)) }
-                        }
-                    }
-                    .buttonStyle(SecondaryButtonStyle()).disabled(done)
-                }
-
-                HStack(alignment: .top, spacing: 12) {
-                    featureTile(nil, "Garden", "leaf.fill", .garden)
-                    featureTile(.butterfly, "Levels", "map.fill", .levelMap)
-                }
-                HStack(alignment: .top, spacing: 12) {
-                    featureTile(.shed, "Shed", "wrench.and.screwdriver.fill", .shed)
-                    featureTile(.butterfly, "Visitors", "ladybug.fill", .butterfly)
-                    featureTile(.badges, "Badges", "rosette", .badges)
-                }
+                Text("Explore")
+                    .textCase(.uppercase).kerning(1.4)
+                    .font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.secondaryText)
+                    .padding(.horizontal, 4)
+                    .accessibilityAddTraits(.isHeader)
+                exploreGrid
             }
-            .padding(.horizontal, 20)
-            .padding(.bottom, 32)
+            .padding(.horizontal, 16)
+            .padding(.bottom, 24)
+            .onPreferenceChange(LabelLinesKey.self) { if reportsLayout { labelLines = $0 } }
         }
         .background(Color.appBackground.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) { bannerArea }
         .task { await app.prepareBannerIfAllowed() }
         .onAppear { app.checkPlusOffer() }
         .navigationBarHidden(true)
+        .overlay(alignment: .bottomLeading) { layoutReport }
+    }
+
+    // MARK: header
+
+    private var topBar: some View {
+        HStack {
+            WordmarkView(style: .title)
+            Spacer()
+            Button { router.go(.settings) } label: {
+                Image(systemName: "gearshape.fill").font(.system(size: gearSize)).frame(minWidth: Theme.minTap, minHeight: Theme.minTap)
+            }
+            .foregroundStyle(Color.appPrimaryText)
+            .accessibilityLabel("Settings")
+        }
+    }
+
+    private func hero(days: Int, roseStock: Int, roseProgress: Int) -> some View {
+        HStack(alignment: singleColumn ? .top : .center, spacing: 14) {
+            FlowerView(petals: 8, sway: false)
+                .frame(width: singleColumn ? 64 : 92, height: singleColumn ? 76 : 110)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 6) {
+                Text("Guess words. Grow a garden.")
+                    .font(Theme.font(.subheadline, weight: .medium)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 6) {
+                    Image(systemName: "leaf.fill").font(.system(size: leafIcon)).foregroundStyle(Color.successText)
+                        .accessibilityHidden(true)
+                    Text(days == 0 ? "Your garden is new" : "\(days) Garden \(days == 1 ? "Day" : "Days")")
+                        .font(Theme.font(.body, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                if app.isUnlocked(.rose) {
+                    let threshold = Economy.default.roseThreshold
+                    let full = roseStock >= Economy.default.roseCap
+                    Text("Rose of Jericho ×\(roseStock) · \(full ? "satchel full" : "\(roseProgress) of \(threshold)")")
+                        .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 14).padding(.vertical, 12)
+        .background(
+            LinearGradient(colors: [.tileLevelsFill, .tileGardenFill, .appBackground],
+                           startPoint: UnitPoint(x: 0.2, y: 0), endPoint: UnitPoint(x: 0.9, y: 1.4)),
+            in: shape)
+        .overlay(shape.stroke(Color.appPrimaryText.opacity(0.08)))
+        .accessibilityElement(children: .combine)
+    }
+
+    // MARK: cards above Play
+
+    private func noteCard<Extra: View>(icon: String, title: String, detail: String, dismissLabel: String,
+                                       dismiss: @escaping () -> Void, @ViewBuilder extra: () -> Extra) -> some View {
+        HStack(alignment: .top, spacing: 10) {
+            Image(systemName: icon).font(.system(size: gearSize)).foregroundStyle(Color.accentText)
+                .padding(.top, 10).accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                Text(detail).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                extra()
+            }
+            .padding(.top, 8)
+            Spacer(minLength: 0)
+            Button { withAnimation { dismiss() } } label: {
+                Image(systemName: "xmark").font(.body.weight(.semibold)).frame(width: Theme.minTap, height: Theme.minTap)
+            }
+            .foregroundStyle(Color.appPrimaryText)
+            .accessibilityLabel(dismissLabel)
+        }
+        .padding(.leading, 14).padding(.trailing, 2).padding(.vertical, 6)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.appSurface, in: shape)
+        .overlay(shape.stroke(Color.appPrimaryText.opacity(0.12)))
+    }
+
+    private var welcomeCard: some View {
+        noteCard(icon: "cloud.rain.fill", title: "Welcome back", detail: app.welcomeLine,
+                 dismissLabel: "Dismiss welcome", dismiss: { app.dismissWelcomeBack() }) { EmptyView() }
+            .accessibilityIdentifier("welcome-card")
     }
 
     /// One gentle, dismissible card after a milestone (PlusOfferPolicy decides when).
     private var plusOfferCard: some View {
-        Card {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack(alignment: .top, spacing: 10) {
-                    Image(systemName: "icloud.fill").font(.title2).foregroundStyle(Color.accentText)
-                    Text(PlusOfferPolicy.Copy.headline).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
-                        .fixedSize(horizontal: false, vertical: true)
-                    Spacer(minLength: 0)
-                    Button { withAnimation { app.dismissPlusOffer() } } label: { Image(systemName: "xmark").frame(width: Theme.minTap, height: Theme.minTap) }
-                        .accessibilityLabel("Dismiss")
-                }
-                Text(PlusOfferPolicy.Copy.detail).font(Theme.font(.callout)).foregroundStyle(Color.secondaryText)
-                    .fixedSize(horizontal: false, vertical: true)
-                Button(PlusOfferPolicy.Copy.button) { app.dismissPlusOffer(); router.go(.plus) }
-                    .font(Theme.font(.callout, weight: .semibold))
+        noteCard(icon: "icloud.fill", title: PlusOfferPolicy.Copy.headline, detail: PlusOfferPolicy.Copy.detail,
+                 dismissLabel: "Dismiss Plus offer", dismiss: { app.dismissPlusOffer() }) {
+            Button { app.dismissPlusOffer(); router.go(.plus) } label: {
+                Text(PlusOfferPolicy.Copy.button).underline()
+                    .font(Theme.font(.callout, weight: .bold)).foregroundStyle(Color.accentText)
+                    .frame(minHeight: Theme.minTap)
             }
         }
         .accessibilityIdentifier("plus-offer-card")
     }
 
+    // MARK: play
+
+    private var playButton: some View {
+        Button { router.go(.game(daily: false, level: nil)) } label: {
+            HStack(spacing: 10) {
+                Image(systemName: "play.fill").font(.system(size: playIcon)).accessibilityHidden(true)
+                Text("Play").measuresLines("Play", font: Theme.font(.title2, weight: .heavy))
+            }
+            .font(Theme.font(.title2, weight: .heavy))
+            .foregroundStyle(Color.ink)
+            .frame(maxWidth: .infinity, minHeight: 64)
+            .padding(.vertical, singleColumn ? 8 : 0)
+            .background(Color.appAccent, in: shape)       // flat accent: the audit reads gradients and glows as low contrast
+            .contentShape(shape)
+        }
+        .buttonStyle(PressScaleStyle())
+        .accessibilityLabel("Play")
+    }
+
+    private var dailyBloom: some View {
+        let done = app.dailyBloomDoneToday
+        return Button { router.go(.game(daily: true, level: nil)) } label: {
+            HStack(spacing: 12) {
+                ZStack {
+                    Circle().fill(done ? Color.successText.opacity(0.22) : Color.petalRose.opacity(0.3))
+                    Image(systemName: done ? "checkmark.circle.fill" : "sun.max.fill")
+                        .font(.system(size: sunDisc * 0.55))
+                        .foregroundStyle(done ? Color.successText : Color.bloomIcon)
+                }
+                .frame(width: sunDisc, height: sunDisc)
+                .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Daily Bloom").font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                        .measuresLines("Daily Bloom", font: Theme.font(.headline))
+                    Text(done ? "Done for today. See you tomorrow!" : "One word for everyone today")
+                        .font(Theme.font(.footnote)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                Spacer(minLength: 0)
+                if !done {
+                    Image(systemName: "chevron.right").font(.footnote.weight(.bold)).foregroundStyle(Color.bloomIcon)
+                        .accessibilityHidden(true)
+                }
+            }
+            .padding(.horizontal, 14).padding(.vertical, 12)
+            .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
+            .background(Color.bloomFill, in: shape)
+            .overlay(shape.stroke(Color.petalRose.opacity(0.4)))
+            .shadow(color: .black.opacity(0.06), radius: 2, y: 1)
+            .contentShape(shape)
+        }
+        .buttonStyle(PressScaleStyle())
+        .disabled(done)
+    }
+
+    // MARK: explore
+
+    @ViewBuilder private var exploreGrid: some View {
+        if singleColumn {
+            VStack(spacing: 10) {
+                featureTile(nil, "Garden", "leaf.fill", .garden, .garden)
+                featureTile(.butterfly, "Levels", "map.fill", .levelMap, .levels)
+                featureTile(.shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
+                featureTile(.butterfly, "Visitors", "ladybug.fill", .butterfly, .visitors)
+                featureTile(.badges, "Badges", "rosette", .badges, .badges)
+            }
+        } else {
+            Grid(horizontalSpacing: 10, verticalSpacing: 10) {
+                GridRow {
+                    featureTile(nil, "Garden", "leaf.fill", .garden, .garden)
+                    featureTile(.butterfly, "Levels", "map.fill", .levelMap, .levels)
+                }
+                GridRow {
+                    featureTile(.shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
+                    featureTile(.butterfly, "Visitors", "ladybug.fill", .butterfly, .visitors)
+                }
+                GridRow {
+                    featureTile(.badges, "Badges", "rosette", .badges, .badges, wide: true)
+                        .gridCellColumns(2)
+                }
+            }
+        }
+    }
+
+    /// Every destination is visible. Ones that are not open yet are dashed, dimmed and locked, with a kind line on how to reach them.
+    private func featureTile(_ feature: Feature?, _ title: String, _ icon: String, _ route: GameRoute,
+                             _ tint: TileTint, wide: Bool = false) -> some View {
+        let open = feature.map { app.isUnlocked($0) } ?? true
+        let hint = open ? nil : feature.flatMap { FeatureUnlockPolicy.hint(for: $0) }
+        let row = singleColumn || wide
+        let labelFont = Theme.font(.body, weight: .heavy)
+
+        let label = HStack(spacing: 5) {
+            if !open {
+                Image(systemName: "lock.fill").font(.system(size: lockIcon)).foregroundStyle(Color.appPrimaryText)
+            }
+            Text(title).font(labelFont).foregroundStyle(Color.appPrimaryText)
+                .measuresLines(title, font: labelFont)
+        }
+
+        let text = VStack(alignment: row ? .leading : .center, spacing: 2) {
+            label
+            if let hint {
+                Text(hint).font(Theme.font(.caption, weight: .medium)).foregroundStyle(Color.secondaryText)
+                    .multilineTextAlignment(row ? .leading : .center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+
+        let iconView = Image(systemName: icon)
+            .font(.system(size: singleColumn ? tileIcon * 1.15 : tileIcon))
+            .foregroundStyle(open ? tint.icon : Color.secondaryText)
+            .frame(width: tileIcon * (singleColumn ? 1.4 : 1.2), height: tileIcon * (singleColumn ? 1.4 : 1.2))
+
+        return Button { router.go(route) } label: {
+            Group {
+                if row {
+                    HStack(spacing: singleColumn ? 14 : 12) {
+                        iconView
+                        text
+                        if singleColumn { Spacer(minLength: 0) }
+                    }
+                    .frame(maxWidth: .infinity, minHeight: singleColumn ? 72 : 64, alignment: singleColumn ? .leading : .center)
+                } else {
+                    VStack(spacing: 6) {
+                        iconView
+                        text
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+                    .frame(minHeight: 96)
+                }
+            }
+            .padding(.horizontal, row ? 14 : 8)
+            .padding(.top, row ? 10 : 14).padding(.bottom, row ? 10 : 12)
+            .background(open ? tint.fill : Color.appPrimaryText.opacity(0.06), in: shape)
+            .background(Color.appBackground, in: shape)
+            .overlay {
+                if open {
+                    shape.stroke(tint.icon.opacity(0.3), lineWidth: 1)
+                } else {
+                    shape.strokeBorder(Color.appPrimaryText.opacity(0.6), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4]))
+                }
+            }
+            .saturation(open ? 1 : 0.35)
+            .shadow(color: open ? .black.opacity(0.06) : .clear, radius: 1, y: 1)
+            .contentShape(shape)
+        }
+        .buttonStyle(PressScaleStyle())
+        .disabled(!open)
+        .accessibilityLabel(title)
+        .accessibilityHint(hint ?? "")
+        .accessibilityIdentifier("tile-\(title)")
+        .accessibilityValue(reportsLayout ? "lines:\(labelLines[title] ?? 0)" : "")
+    }
+
+    /// Under `-uitest-layout`, one invisible-to-players element carries the line count of the Play and Daily Bloom labels.
+    @ViewBuilder private var layoutReport: some View {
+        if reportsLayout {
+            Text(["Play", "Daily Bloom"].map { "\($0)=\(labelLines[$0] ?? 0)" }.joined(separator: ";"))
+                .font(.system(size: 1)).foregroundStyle(Color.clear)
+                .accessibilityIdentifier("home-layout-report")
+        }
+    }
+
+    // MARK: banner
+
+    /// Reserved, fixed-height slot so the page never jumps when an ad loads.
     @ViewBuilder private var bannerArea: some View {
-        if app.showBanner && app.ads.started {
+        if app.showBanner {
             VStack(spacing: 2) {
-                AdBannerView().frame(height: 60)
+                Group {
+                    if app.ads.started { AdBannerView() } else { Color.clear }
+                }
+                .frame(height: 50)
                 HStack(spacing: 16) {
                     Button("Go ad-free") { router.go(.plus) }
                     Link("Report an ad", destination: Links.reportAd)
-                }.font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
+                }
+                .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
+                .opacity(app.ads.started ? 1 : 0)
             }
             .padding(.vertical, 4).frame(maxWidth: .infinity).background(Color.appBackground)
         }
     }
 }
 
-struct RoseSeedChip: View {
-    let progress: Int
-    let stock: Int
-    private let threshold = Economy.default.roseThreshold
-    private var full: Bool { stock >= Economy.default.roseCap }
-
-    var body: some View {
-        HStack(spacing: 10) {
-            ZStack {
-                Circle().stroke(Color.appPrimaryText.opacity(0.12), lineWidth: 5)
-                Circle().trim(from: 0, to: full ? 1 : CGFloat(progress) / CGFloat(threshold))
-                    .stroke(Color.successText, style: StrokeStyle(lineWidth: 5, lineCap: .round)).rotationEffect(.degrees(-90))
-                Image("rose_of_jericho").resizable().scaledToFit().padding(8)
-            }
-            .frame(width: 44, height: 44)
-            VStack(alignment: .leading, spacing: 1) {
-                Text("×\(stock)").font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
-                Text(full ? "Your satchel is full" : "\(progress) of \(threshold)").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).fixedSize(horizontal: false, vertical: true)
-            }
-        }
-        .padding(10).frame(maxWidth: .infinity, minHeight: 76, alignment: .leading)
-        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Rose of Jericho: \(stock) in your satchel, \(full ? "satchel full" : "\(progress) of \(threshold) rounds toward the next")")
-    }
-}
-
-struct GardenDaysChip: View {
-    let days: Int
-    let streak: Int?
-    let best: Int
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Image(systemName: "calendar").font(.title3).foregroundStyle(Color.appAccent).frame(width: 44, height: 44)
-            VStack(alignment: .leading, spacing: 1) {
-                Text(days == 0 ? "Your garden is new" : "\(days) Garden \(days == 1 ? "Day" : "Days")")
-                    .font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
-                if let streak, days > 0 {
-                    Text(streak > 1 ? "Streak \(streak)" : "Best streak: \(max(best, streak))")
-                        .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).lineLimit(2)
-                }
-            }
-        }
-        .padding(10).frame(maxWidth: .infinity, minHeight: 76, alignment: .leading)
-        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
-        .accessibilityElement(children: .combine)
+/// A gentle press for custom-drawn Home buttons.
+private struct PressScaleStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed ? 0.97 : 1)
+            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }
