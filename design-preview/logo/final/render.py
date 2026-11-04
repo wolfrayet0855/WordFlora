@@ -1,5 +1,5 @@
 """Render PNGs for final/ (wordmarks) and ../icon/ (icon candidate) with headless Chromium.
-Needs the static server on http://localhost:8765/ (serving design-preview/) and Pillow.
+Loads render.html over file:// (no server needed); needs Pillow.
     python render.py [wordmark|icon|all]
 """
 import os, re, subprocess, sys
@@ -11,8 +11,8 @@ CH = '/Users/computer/Library/Caches/ms-playwright/chromium-1140/chrome-mac/Chro
 
 def shot(out, svg, w, h, bg=''):
     tmp = out + '.tmp.png'
-    url = 'http://localhost:8765/logo/final/render.html?v=%s&size=%d&h=%d&bg=%s' % (svg, w, h, bg)
-    subprocess.run([CH, '--headless=new', '--disable-gpu', '--hide-scrollbars', '--force-device-scale-factor=1',
+    url = 'file://%s/render.html?v=%s&size=%d&h=%d&bg=%s' % (HERE, svg, w, h, bg)
+    subprocess.run([CH, '--headless=new', '--disable-gpu', '--hide-scrollbars', '--allow-file-access-from-files', '--force-device-scale-factor=1',
                     '--window-size=%d,%d' % (max(w, 200), h + 200), '--screenshot=' + tmp, url],
                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
     Image.open(tmp).crop((0, 0, w, h)).save(out); os.remove(tmp)

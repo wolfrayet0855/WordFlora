@@ -6,7 +6,21 @@ Everything is plain filled paths: the 36-unit gap is baked in with boolean ops
 (petals minus every glyph dilated by GAP), so there is no mask, stroke or filter
 and the SVGs import cleanly into an Xcode asset catalog.
 Writes final/*.svg and ../icon/*.svg.
-Env: K = petal tip / ring radius (default 1.18 per spec; see notes.md).
+Env: K = petal tip / ring radius (default 1.72; v1 used 1.75, see notes.md).
+     V1=1 rebuilds the original v1 files byte for byte (kept in v1/ for revert).
+
+v2 touch-up (notes.md, "v2 touch-up"):
+  - every petal keeps a real NB_CLEAR (32 u) of air to the neighbouring letters; v1 only forbade
+    overlap, so petals came within 4-8 u of W, r, l and read as touching at every app size;
+  - petal corners where they meet the ring gap are rounded (opening, ROUND = 18 u), matching
+    Nunito's round terminals and removing the spikes that sparkle at small sizes;
+  - reach 1.75 -> 1.72 to pay back most of the width the extra clearance costs;
+  - light amber deepened (#E0962A -> #DA8B22, 2.29 -> 2.55:1 on cream), light rose cooled
+    a touch (#E27D8A -> #E07A8E, 2.61 -> 2.67:1; stays close to the app's coral pinks),
+    dark rose cooled to match (#E25D78 -> #E0607F);
+  - solo ring gap 36 -> 46 u (solo only shows below 130 pt, where 36 u is under 1 px);
+  - mono / solo-mono petal opacity 0.45 -> 0.55 (mono-solid stays 0.6);
+  - SVG width/height written equal to the viewBox (as the asset catalog copies have).
 """
 import math, os, sys
 import pathops
@@ -64,12 +78,17 @@ GAP = 36
 # Spec asked for 1.40; at 1.40 the visible petal is ~70 u (about 1.5 px at 120 px wide) and the five petals
 # cannot be counted, failing the acceptance check. 1.60 / 1.75 / 1.90 were compared; 1.75 is the
 # smallest reach where all five Flora petals are countable at 120 px (notes.md).
-K = float(os.environ.get('K', '1.75'))
+V1 = bool(os.environ.get('V1'))
+K = float(os.environ.get('K', '1.75' if V1 else '1.72'))
 MIN_CLEAR = 0.90   # each petal keeps >= 90% of its (post-gap) area clear of neighbours dilated by GAP
+NB_CLEAR = 0 if V1 else float(os.environ.get('NB_CLEAR', '32'))   # hard air between any petal and a neighbour
+ROUND = 0 if V1 else float(os.environ.get('ROUND', '10'))         # radius for rounding petal corners at the gap
+# solo is only used below 130 pt wide, where 36 u is under 1 px: give its ring gap more room (optical size)
+GAPS = {'twin': GAP, 'solo': GAP if V1 else float(os.environ.get('SOLO_GAP', '46'))}
 
-def petals_of(cx, cy, rot, sc=1.0, k=K):
+def petals_of(cx, cy, rot, sc=1.0, k=None):
     """five ellipse petals (A's proportions): tip at k * ring radius; rot 0 = one petal straight up"""
-    T = k * O_R
+    T = (K if k is None else k) * O_R
     PR, PW = 0.45 * T, 0.387 * T          # half-length, half-width (A: 128/284, 110/284)
     PD = T - PR
     out = []
@@ -81,8 +100,8 @@ def petals_of(cx, cy, rot, sc=1.0, k=K):
     return out
 
 PAL = {
-  'light': dict(ink='#2C3E2C', flora='#2A7A38', p1='#E0962A', p2='#E27D8A', bg='#FAF7F0'),
-  'dark':  dict(ink='#D4EDD4', flora='#F0C060', p1='#E0962A', p2='#E25D78', bg='#1A2E1A'),
+  'light': dict(ink='#2C3E2C', flora='#2A7A38', p1='#E0962A' if V1 else '#DA8B22', p2='#E27D8A' if V1 else '#E07A8E', bg='#FAF7F0'),
+  'dark':  dict(ink='#D4EDD4', flora='#F0C060', p1='#E0962A', p2='#E25D78' if V1 else '#E0607F', bg='#1A2E1A'),
   'mono':  dict(ink='#2C3E2C', flora='#2C3E2C', p1='#2C3E2C', p2='#2C3E2C', bg='#FFFFFF'),
 }
 BLOOMS = ((1, 0, 'p1'), (6, 36, 'p2'))     # (letter index, rotation, colour key)
@@ -99,15 +118,37 @@ def layout(extra):
         x += extra.get(i, (0, 0))[1]
     return xs, x
 
+def erode(path, r):
+    s = pathops.Path(); s.addPath(path)
+    s.stroke(r * 2, pathops.LineCap.ROUND_CAP, pathops.LineJoin.ROUND_JOIN, 4)
+    s.convertConicsToQuads()
+    return pathops.op(path, s, pathops.PathOp.DIFFERENCE)
+
+FUSE = os.environ.get('FUSE', '1') == '1'
+
+def rounded(path, r):
+    """FUSE: closing then opening, so petals that only touch at a point join with a soft web and
+    every corner gets radius ~r; otherwise opening only (rounds convex corners, petals split apart)"""
+    if not r: return path
+    if FUSE: path = erode(dilate(path, r), r)
+    return dilate(erode(path, r), r)
+
 def visible_petals(xs, idx, rot):
     cx, cy = xs[idx] + O_CX, BASE - O_CY
     ring = glyph('o', xs[idx], BASE)
     cut = pathops.op(dilate(ring, GAP), ellipse(cx, cy, O_R - 20, O_R - 30, 0), pathops.PathOp.UNION)
     return [pathops.op(p, cut, pathops.PathOp.DIFFERENCE) for p in petals_of(cx, cy, rot)]
 
+def petals_clear(xs, idx, rot, nb):
+    """the fit rule: no petal overlaps the neighbour (dilated by NB_CLEAR) and >= MIN_CLEAR of each
+    petal stays clear of the neighbour dilated by GAP"""
+    r = clear_ratios(xs, idx, rot, nb)
+    return min(c for c, _ in r) >= MIN_CLEAR and max(h for _, h in r) == 0
+
 def clear_ratios(xs, idx, rot, nb):
     """per petal: share of visible area clear of neighbour glyph nb (dilated by GAP); also raw overlap"""
     nbg = glyph('WordFlora'[nb], xs[nb], BASE); nbd = dilate(nbg, GAP)
+    if NB_CLEAR: nbg = dilate(nbg, NB_CLEAR)
     out = []
     for p in visible_petals(xs, idx, rot):
         A = abs(p.area)
@@ -124,13 +165,11 @@ def fit_bearings(variant, step=5):
         before = after = 0
         while True:
             extra[idx] = (before, after); xs, _ = layout(extra)
-            r = clear_ratios(xs, idx, rot, idx - 1)
-            if min(c for c, _ in r) >= MIN_CLEAR and max(h for _, h in r) == 0: break
+            if petals_clear(xs, idx, rot, idx - 1): break
             before += step
         while True:
             extra[idx] = (before, after); xs, _ = layout(extra)
-            r = clear_ratios(xs, idx, rot, idx + 1)
-            if min(c for c, _ in r) >= MIN_CLEAR and max(h for _, h in r) == 0: break
+            if petals_clear(xs, idx, rot, idx + 1): break
             after += step
     return extra
 
@@ -152,8 +191,7 @@ def balance(extra, variant, step=5):
                 elif ratio > 1 + TOL:
                     trial = dict(extra); trial[idx] = (b - step, a) if side == 0 else (b, a - step)
                     txs, _w = layout(trial)
-                    r = clear_ratios(txs, idx, rot, idx - 1 if side == 0 else idx + 1)
-                    if min(c for c, _ in r) >= MIN_CLEAR and max(h for _, h in r) == 0: extra = trial
+                    if petals_clear(txs, idx, rot, idx - 1 if side == 0 else idx + 1): extra = trial
                     else: break
                 else: break
     return extra
@@ -164,7 +202,9 @@ def wordmark(variant, pal, extra, petal_opacity=0.45):
     blooms = []
     for idx, rot, key in BLOOMS:
         if idx == 1 and variant == 'solo': continue
-        blooms.append((key, union(visible_petals(xs, idx, rot))))
+        # round the fused bloom (not each petal, which would split the silhouette); opening only
+        # removes area, so the clearance checks made on the unrounded petals still hold
+        blooms.append((key, rounded(union(visible_petals(xs, idx, rot)), ROUND)))
     body = []
     op = (' fill-opacity="%s"' % petal_opacity) if pal == 'mono' else ''
     for key, b in blooms:
@@ -180,8 +220,9 @@ def wordmark(variant, pal, extra, petal_opacity=0.45):
     return vb, '\n  '.join(body), (glyphs, xs)
 
 def svg(vb, body, title):
-    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="%s" role="img" aria-label="WordFlora">\n'
-            '  <title>%s</title>\n  %s\n</svg>\n') % (' '.join(str(v) for v in vb), title, body)
+    wh = '' if V1 else 'width="%s" height="%s" ' % (vb[2], vb[3])
+    return ('<svg xmlns="http://www.w3.org/2000/svg" %sviewBox="%s" role="img" aria-label="WordFlora">\n'
+            '  <title>%s</title>\n  %s\n</svg>\n') % (wh, ' '.join(str(v) for v in vb), title, body)
 
 # ---------- icon candidate ----------
 ICON = {
@@ -236,16 +277,21 @@ def gaps(glyphs):
     return res
 
 if __name__ == '__main__':
-    report = []
+    out_dir = os.environ.get('OUT', HERE)
+    MO = 0.45 if V1 else 0.55   # v2: mono petals at 0.45 read as smudges at 29 px
     files = (('wordmark', 'twin', 'light', 0.45), ('wordmark-dark', 'twin', 'dark', 0.45),
              ('wordmark-solo', 'solo', 'light', 0.45), ('wordmark-solo-dark', 'solo', 'dark', 0.45),
-             ('wordmark-mono', 'twin', 'mono', 0.45), ('wordmark-mono-solid', 'twin', 'mono', 0.6),
-             ('wordmark-solo-mono', 'solo', 'mono', 0.45))
-    fits = {v: balance(fit_bearings(v), v) for v in ('twin', 'solo')}
-    for name, v, p, o in files:
-        vb, body, (glyphs, xs) = wordmark(v, p, fits[v], o)
-        open(os.path.join(HERE, name + '.svg'), 'w').write(svg(vb, body, 'WordFlora'))
+             ('wordmark-mono', 'twin', 'mono', MO), ('wordmark-mono-solid', 'twin', 'mono', 0.6),
+             ('wordmark-solo-mono', 'solo', 'mono', MO))
+    fits = {}
     for v in ('twin', 'solo'):
+        GAP = GAPS[v]; fits[v] = balance(fit_bearings(v), v)
+    for name, v, p, o in files:
+        GAP = GAPS[v]
+        vb, body, (glyphs, xs) = wordmark(v, p, fits[v], o)
+        open(os.path.join(out_dir, name + '.svg'), 'w').write(svg(vb, body, 'WordFlora'))
+    for v in ('twin', 'solo'):
+        GAP = GAPS[v]; print('[%s] ring gap %s' % (v, GAP))
         xs, w = layout(fits[v]); glyphs = [glyph(ch, x, BASE) for ch, x in zip('WordFlora', xs)]
         print('[%s] extra side bearing (before, after):' % v, fits[v], ' total width', w)
         g = gaps(glyphs); rd = g['r-d'][1]
@@ -254,8 +300,8 @@ if __name__ == '__main__':
             if idx == 1 and v == 'solo': continue
             for nb in (idx - 1, idx + 1):
                 r = clear_ratios(xs, idx, rot, nb)
-                print('  o%d vs %s: min clear %.3f, overlap %d' % (idx, 'WordFlora'[nb], min(c for c, _ in r), max(h for _, h in r)))
+                print('  o%d vs %s: min clear %.3f, overlap with neighbour+%d: %d' % (idx, 'WordFlora'[nb], min(c for c, _ in r), NB_CLEAR, max(h for _, h in r)))
     if os.environ.get('ICON'):
         for st in ('light', 'dark', 'tinted'):
             open(os.path.join(ICON_DIR, 'icon%s.svg' % ('' if st == 'light' else '-' + st)), 'w').write(icon(st))
-    print('ok K=%s' % K)
+    print('ok K=%s NB_CLEAR=%s ROUND=%s%s' % (K, NB_CLEAR, ROUND, ' (V1)' if V1 else ''))

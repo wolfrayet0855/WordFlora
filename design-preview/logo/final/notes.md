@@ -115,3 +115,22 @@ The rose #E27D8A has luminance 0.33, against 0.15 for the green ring and 0.93 fo
 - **Reach.** The reach is 1.75×, not the specified 1.40×. This needs the review team's sign-off.
 - **Pale petals.** The light-mode petals are still pale at 120 px: the amber is 2.29:1, and the rose is 2.61:1 on cream.
 - **Mono.** Mono relies on `fill-opacity`.
+
+## v2 touch-up
+The originals are kept in `v1/` (`V1=1 python build.py <font>` rebuilds them byte for byte). Build: `python build.py Nunito-900.ttf`. Comparison sheets: `python sheet.py` writes `compare/sheet-{light,dark,mono}.png` and `compare/tiny-zoom.png` (file://, no server needed). `render.py` now also works over file://.
+
+| Change | v1 | v2 | Why |
+|---|---|---|---|
+| Real air between petals and neighbouring letters | none (petals came within 4–8 u of W, r, l) | 32 u, hard rule | at every app size the petals read as touching W, r and l |
+| Petal corners at the ring gap | sharp | rounded, r = 10 u (closing + opening of the fused bloom) | removes spikes that sparkle at small sizes; matches Nunito's round terminals |
+| Reach | 1.75× | 1.72× | pays back most of the extra width |
+| Solo ring gap | 36 u | 46 u | solo only shows below 130 pt, where 36 u is under 1 px |
+| Light amber | #E0962A (2.29:1 on cream) | #DA8B22 (2.55:1) | pale at 120 px |
+| Light rose | #E27D8A (2.61:1) | #E07A8E (2.67:1) | slightly deeper, still close to the app's coral pinks |
+| Dark rose | #E25D78 | #E0607F | matches the light shift |
+| Mono / solo-mono petal opacity | 0.45 | 0.55 | read as smudges at 29 px (mono-solid stays 0.6) |
+| SVG size | viewBox only | width/height equal to the viewBox | as the asset-catalog copies have |
+
+Width: twin 5695 → 5780 u (+1.5%), solo 5535 → 5580 u. The aspect ratio goes from 5.70 to 5.83, so at 172 pt wide the mark is about 29.5 pt tall instead of 30.2 pt. The solo switch is width-based, so it is unaffected.
+There is no centre dot: the counter has to stay an empty letter, and the two flowers are already told apart by colour, rotation and the word they sit in.
+The critic scored v1 vs v2 as APPROVE WITH CHANGES (legibility 6 → 7.5, rhythm 5.5 → 7.5, edges 6.5 → 8). Its changes were applied: the rose was pulled back toward the app pinks, mono opacity was raised, and clearance went from 28 to 32 u.
