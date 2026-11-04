@@ -166,13 +166,16 @@ final class TendingUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Share this fact"].firstMatch.exists)
     }
 
+    /// Poppy is one of the plants with no verified name story (Plants.json has no `nameStory` for it).
     func testAPlantWithNoStoryShowsDidYouKnowInTheSameCard() {
-        open("Sago Palm", plantId: "sago_palm")
+        open("Poppy", plantId: "poppy")
         XCTAssertTrue(element("name-story-card").waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "got its name")).firstMatch.exists,
+                       "Poppy now has a name story; pick a plant without one for this test")
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] %@", "Did you know?")).firstMatch.exists)
         XCTAssertFalse(app.buttons["Tell me more"].firstMatch.exists)
-        shot("card-sago-light")
-        app.swipeUp(); sleep(1); shot("card-sago-light-scrolled")
+        shot("card-poppy-light")
+        app.swipeUp(); sleep(1); shot("card-poppy-light-scrolled")
     }
 
     func testCardScreensInDarkAndLargeText() {
@@ -180,8 +183,8 @@ final class TendingUITests: XCTestCase {
         open("Daisy", plantId: "daisy")
         sleep(1); shot("card-daisy-dark")
         app.terminate()
-        open("Sago Palm", plantId: "sago_palm")
-        sleep(1); shot("card-sago-dark")
+        open("Poppy", plantId: "poppy")
+        sleep(1); shot("card-poppy-dark")
         app.terminate()
         XCUIDevice.shared.appearance = .light
         open("Daisy", plantId: "daisy", extra: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
@@ -191,8 +194,8 @@ final class TendingUITests: XCTestCase {
         for _ in 0..<4 where !card.isHittable { app.swipeUp() }
         shot("card-daisy-large-scrolled")
         app.terminate()
-        open("Sago Palm", plantId: "sago_palm", extra: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
-        app.swipeUp(); sleep(1); shot("card-sago-large-scrolled")
+        open("Poppy", plantId: "poppy", extra: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
+        app.swipeUp(); sleep(1); shot("card-poppy-large-scrolled")
         app.terminate()
         open("Daisy", plantId: "daisy", extra: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryExtraExtraExtraLarge"])
         sleep(1); shot("card-daisy-xxxl")
