@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "bankVersion": "2026.11.0-starter",
+  "bankVersion": "2026.11.1",
   "entries": [
     {
       "id": "l1-rose",
@@ -523,6 +523,5132 @@
         "science"
       ],
       "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-ant",
+      "word": "ANT",
+      "display": "Ant",
+      "hint": "A tiny insect that works with its big family.",
+      "hint2": "It marches in a line to find crumbs.",
+      "fact": "An ant can carry something much bigger than itself.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-bark",
+      "word": "BARK",
+      "display": "Bark",
+      "hint": "The rough skin that covers a tree trunk.",
+      "hint2": "Hug a tree and you will feel this.",
+      "fact": "Bark protects a tree like a coat.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-bean",
+      "word": "BEAN",
+      "display": "Bean",
+      "hint": "A seed that grows in a pod and climbs a pole.",
+      "hint2": "Jack grew a giant stalk from one.",
+      "fact": "A bean seed sprouts quickly when it is warm and damp.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-bee",
+      "word": "BEE",
+      "display": "Bee",
+      "hint": "A buzzing insect that visits flowers.",
+      "hint2": "It makes honey and says buzz.",
+      "fact": "A bee carries pollen from flower to flower.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-bench",
+      "word": "BENCH",
+      "display": "Bench",
+      "hint": "A long seat in a park or garden.",
+      "hint2": "Sit here to watch the butterflies.",
+      "fact": "A bench is a nice place to rest and watch the garden.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-bird",
+      "word": "BIRD",
+      "display": "Bird",
+      "hint": "An animal with feathers and wings that can sing.",
+      "hint2": "It tweets from a branch.",
+      "fact": "A bird has feathers that help it fly and stay warm.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-bud",
+      "word": "BUD",
+      "display": "Bud",
+      "hint": "A tiny flower package that is not open yet.",
+      "hint2": "It opens into a flower.",
+      "fact": "A bud can open into a flower or a leaf.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-bug",
+      "word": "BUG",
+      "display": "Bug",
+      "hint": "A small crawling creature with many legs.",
+      "hint2": "You may find one under a rock.",
+      "fact": "Many bugs help the garden by moving soil and pollen.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-cloud",
+      "word": "CLOUD",
+      "display": "Cloud",
+      "hint": "A fluffy white shape floating high up.",
+      "hint2": "Rain falls from a gray one.",
+      "fact": "A cloud is made of many tiny water drops.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-clover",
+      "word": "CLOVER",
+      "display": "Clover",
+      "hint": "A small green plant with three round leaves.",
+      "hint2": "Finding one with four leaves is a lucky day.",
+      "fact": "Bees love the tiny flowers that grow on clover.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "clover",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-corn",
+      "word": "CORN",
+      "display": "Corn",
+      "hint": "A tall plant with golden kernels on a cob.",
+      "hint2": "It pops into a snack at the movies.",
+      "fact": "Each corn plant can grow taller than a grown-up.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-daisy",
+      "word": "DAISY",
+      "display": "Daisy",
+      "hint": "A white flower with a sunny yellow middle.",
+      "hint2": "You can weave a chain from these flowers.",
+      "fact": "A daisy closes its petals at night and opens in the morning.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "daisy",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-dandelion",
+      "word": "DANDELION",
+      "display": "Dandelion",
+      "hint": "A yellow flower that turns into a puffy ball of wishes.",
+      "hint2": "Blow on it and the fluffy parts fly away.",
+      "fact": "Each fluffy part carries a seed on the wind.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "dandelion",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-dew",
+      "word": "DEW",
+      "display": "Dew",
+      "hint": "Tiny water drops on grass in the morning.",
+      "hint2": "Look for sparkly drops on the grass at sunrise.",
+      "fact": "Dew forms when the air cools down at night.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-duck",
+      "word": "DUCK",
+      "display": "Duck",
+      "hint": "A bird that paddles on a pond and quacks.",
+      "hint2": "It says quack and has webbed feet.",
+      "fact": "A duck has oily feathers that keep water off.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-fence",
+      "word": "FENCE",
+      "display": "Fence",
+      "hint": "A wall of wood or wire around a yard.",
+      "hint2": "Beans can climb up one.",
+      "fact": "Some plants like to climb a fence to reach the sun.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-fly",
+      "word": "FLY",
+      "display": "Fly",
+      "hint": "To move through the air with wings.",
+      "hint2": "Birds do this high in the sky.",
+      "fact": "A tiny fly can flap its wings hundreds of times each second.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-frog",
+      "word": "FROG",
+      "display": "Frog",
+      "hint": "A green jumper that says ribbit.",
+      "hint2": "It hops and likes ponds.",
+      "fact": "A frog can leap far with its strong back legs.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-gate",
+      "word": "GATE",
+      "display": "Gate",
+      "hint": "A door in a fence that swings open.",
+      "hint2": "Open it to walk into the garden.",
+      "fact": "A gate lets people in while the fence keeps its shape.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-grass",
+      "word": "GRASS",
+      "display": "Grass",
+      "hint": "Green blades that cover a lawn.",
+      "hint2": "You can roll on it at the park.",
+      "fact": "Grass keeps growing even after it is mowed.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-hill",
+      "word": "HILL",
+      "display": "Hill",
+      "hint": "A round bump of land, smaller than a mountain.",
+      "hint2": "You can roll down a grassy one.",
+      "fact": "A hill is a great spot for flying a kite.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-hose",
+      "word": "HOSE",
+      "display": "Hose",
+      "hint": "A long tube for watering the garden.",
+      "hint2": "Turn the tap and water flows through it.",
+      "fact": "A hose can reach plants far from the tap.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-lake",
+      "word": "LAKE",
+      "display": "Lake",
+      "hint": "A large body of calm water with land around it.",
+      "hint2": "Bigger than a pond, you can swim or boat here.",
+      "fact": "A lake can be so big you cannot see the other side.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-lily",
+      "word": "LILY",
+      "display": "Lily",
+      "hint": "A tall garden flower shaped like a trumpet.",
+      "hint2": "Its big trumpet flowers are often white.",
+      "fact": "A lily grows from a bulb under the ground.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-log",
+      "word": "LOG",
+      "display": "Log",
+      "hint": "A thick piece of a fallen tree.",
+      "hint2": "Beetles and moss like to live on one.",
+      "fact": "A log on the ground can be a home for many small animals.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-marigold",
+      "word": "MARIGOLD",
+      "display": "Marigold",
+      "hint": "An orange or yellow bloom that looks like a fluffy pom-pom.",
+      "hint2": "Gardeners plant this flower in their vegetable beds.",
+      "fact": "Marigolds have a strong smell that many bugs dislike.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "marigold",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-mint",
+      "word": "MINT",
+      "display": "Mint",
+      "hint": "A leafy herb with a cool fresh smell.",
+      "hint2": "It is used in tea and toothpaste.",
+      "fact": "Mint spreads quickly, so many gardeners grow it in a pot.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-moss",
+      "word": "MOSS",
+      "display": "Moss",
+      "hint": "Soft green carpet that grows on rocks and logs.",
+      "hint2": "It feels like a tiny green pillow.",
+      "fact": "Moss grows in damp, shady places.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-moth",
+      "word": "MOTH",
+      "display": "Moth",
+      "hint": "A night flyer with dusty wings that likes lights.",
+      "hint2": "It looks like a butterfly but comes out at night.",
+      "fact": "A moth often rests with its wings spread flat.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-mud",
+      "word": "MUD",
+      "display": "Mud",
+      "hint": "Wet soft dirt that squishes under your boots.",
+      "hint2": "Rain plus dirt makes this.",
+      "fact": "Mud is made when soil gets very wet.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-nest",
+      "word": "NEST",
+      "display": "Nest",
+      "hint": "A cozy home that a bird makes for its eggs.",
+      "hint2": "Birds build it from twigs and grass.",
+      "fact": "Many birds weave a new nest each spring.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-oak",
+      "word": "OAK",
+      "display": "Oak",
+      "hint": "A big strong tree that grows acorns.",
+      "hint2": "Squirrels love the nuts from this tree.",
+      "fact": "An oak can live for hundreds of years.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-path",
+      "word": "PATH",
+      "display": "Path",
+      "hint": "A narrow way for walking through a garden.",
+      "hint2": "Follow it to get from the gate to the door.",
+      "fact": "Many paths are made of stones, wood chips or gravel.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-pear",
+      "word": "PEAR",
+      "display": "Pear",
+      "hint": "A sweet juicy fruit shaped a bit like a bell.",
+      "hint2": "It is green or yellow and grows on a tree.",
+      "fact": "A pear tree has white flowers in spring.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-pine",
+      "word": "PINE",
+      "display": "Pine",
+      "hint": "A tree with needles and cones that stays green.",
+      "hint2": "This tree smells fresh and is often a Christmas tree.",
+      "fact": "A pine tree has green needles all year long.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-plant",
+      "word": "PLANT",
+      "display": "Plant",
+      "hint": "A living thing with roots that grows in soil.",
+      "hint2": "Flowers, trees and grass are all this.",
+      "fact": "A plant makes its own food from sunlight.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-plum",
+      "word": "PLUM",
+      "display": "Plum",
+      "hint": "A purple fruit with a pit in the middle.",
+      "hint2": "Soft, round and sweet, it grows on a tree.",
+      "fact": "A plum has one hard stone inside with a seed.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-pond",
+      "word": "POND",
+      "display": "Pond",
+      "hint": "A small pool of water in a garden or park.",
+      "hint2": "Frogs and ducks like to splash here.",
+      "fact": "A pond can be home to frogs, fish and lily pads.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-poppy",
+      "word": "POPPY",
+      "display": "Poppy",
+      "hint": "A bright red flower with thin paper-like petals.",
+      "hint2": "Its petals look like crinkly red silk.",
+      "fact": "A poppy makes lots of tiny seeds in a round pod.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "poppy",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-pot",
+      "word": "POT",
+      "display": "Pot",
+      "hint": "A container that holds a plant and soil.",
+      "hint2": "A flower can live in this on a windowsill.",
+      "fact": "A pot with holes lets extra water drain out.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-rain",
+      "word": "RAIN",
+      "display": "Rain",
+      "hint": "Drops that fall from clouds and give plants a drink.",
+      "hint2": "You need an umbrella when this falls.",
+      "fact": "Rain gives plants the water they need to grow.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-rake",
+      "word": "RAKE",
+      "display": "Rake",
+      "hint": "A garden tool with long teeth for gathering leaves.",
+      "hint2": "It makes a pile of leaves in autumn.",
+      "fact": "A rake can also smooth the soil flat.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-shed",
+      "word": "SHED",
+      "display": "Shed",
+      "hint": "A small building where garden tools are kept.",
+      "hint2": "Spades and rakes stay in here.",
+      "fact": "A shed keeps tools dry and safe.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-sky",
+      "word": "SKY",
+      "display": "Sky",
+      "hint": "The big blue space above us.",
+      "hint2": "Birds and clouds are up here.",
+      "fact": "The sky looks blue because of how sunlight spreads.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-snail",
+      "word": "SNAIL",
+      "display": "Snail",
+      "hint": "A slow animal that carries a shell on its back.",
+      "hint2": "It moves slowly and leaves a shiny trail.",
+      "fact": "A snail has a shell that grows as it grows.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-soil",
+      "word": "SOIL",
+      "display": "Soil",
+      "hint": "The brown stuff plants grow in.",
+      "hint2": "Dig a hole in the garden and you find this.",
+      "fact": "Soil is full of tiny helpers that feed plants.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-spade",
+      "word": "SPADE",
+      "display": "Spade",
+      "hint": "A tool with a flat blade for digging.",
+      "hint2": "You push it into the ground with your foot.",
+      "fact": "A spade helps gardeners dig holes for plants.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-stem",
+      "word": "STEM",
+      "display": "Stem",
+      "hint": "The part that holds a flower up high.",
+      "hint2": "A flower sits on top of this green stick.",
+      "fact": "A stem carries water from the soil up to the leaves.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-strawberry",
+      "word": "STRAWBERRY",
+      "display": "Strawberry",
+      "hint": "A sweet red fruit with tiny seeds on the outside.",
+      "hint2": "You can pick it from a low plant in summer.",
+      "fact": "The seeds on a strawberry are on the outside of the fruit.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "strawberry",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-sun",
+      "word": "SUN",
+      "display": "Sun",
+      "hint": "The bright star that warms our days.",
+      "hint2": "It shines in the sky when it is day.",
+      "fact": "Plants use light from the sun to make food.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-sunflower",
+      "word": "SUNFLOWER",
+      "display": "Sunflower",
+      "hint": "A very tall yellow bloom that turns its face toward the light.",
+      "hint2": "Young ones follow the sun across the sky.",
+      "fact": "A sunflower head holds hundreds of seeds that birds enjoy.",
+      "level": 1,
+      "kind": "hero",
+      "plantId": "sunflower",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-twig",
+      "word": "TWIG",
+      "display": "Twig",
+      "hint": "A little thin branch from a tree.",
+      "hint2": "Small enough to hold in one hand.",
+      "fact": "Birds use twigs to build their nests.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-vine",
+      "word": "VINE",
+      "display": "Vine",
+      "hint": "A plant with long stems that climb and curl.",
+      "hint2": "Grapes and beans grow on this kind of plant.",
+      "fact": "A vine wraps around things to climb toward the light.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-wind",
+      "word": "WIND",
+      "display": "Wind",
+      "hint": "Moving air that makes leaves dance.",
+      "hint2": "You feel it when a kite flies.",
+      "fact": "Wind can carry seeds far away to new places.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l1-worm",
+      "word": "WORM",
+      "display": "Worm",
+      "hint": "A long wiggly animal that lives in the soil.",
+      "hint2": "It wiggles and has no legs.",
+      "fact": "Worms help make the soil soft and healthy.",
+      "level": 1,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-apple",
+      "word": "APPLE",
+      "display": "Apple",
+      "hint": "A crunchy red or green fruit that grows on trees.",
+      "hint2": "A teacher might get one as a gift.",
+      "fact": "Apple trees can grow for many years.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-basket",
+      "word": "BASKET",
+      "display": "Basket",
+      "hint": "A woven container for carrying fruit or flowers.",
+      "hint2": "You can pick berries and put them in it.",
+      "fact": "Baskets can be woven from reeds, grass, or twigs.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-beetle",
+      "word": "BEETLE",
+      "display": "Beetle",
+      "hint": "A small insect with hard shiny wing covers.",
+      "hint2": "Some are red with black spots.",
+      "fact": "Beetles are the biggest group of insects in the world.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-berry",
+      "word": "BERRY",
+      "display": "Berry",
+      "hint": "A small, round, juicy fruit that grows on a bush.",
+      "hint2": "Blue and red ones are great for picking.",
+      "fact": "Birds love to eat ripe berries.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-bloom",
+      "word": "BLOOM",
+      "display": "Bloom",
+      "hint": "A flower does this when it opens up.",
+      "hint2": "A bud opens into a pretty flower.",
+      "fact": "Many flowers open in the morning light.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-branch",
+      "word": "BRANCH",
+      "display": "Branch",
+      "hint": "A woody arm that grows out from a tree.",
+      "hint2": "Birds like to sit on one of these.",
+      "fact": "Leaves and fruit grow on tree branches.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-breeze",
+      "word": "BREEZE",
+      "display": "Breeze",
+      "hint": "A soft, gentle wind.",
+      "hint2": "It makes the leaves wiggle on a warm day.",
+      "fact": "A breeze can carry seeds far away.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-bucket",
+      "word": "BUCKET",
+      "display": "Bucket",
+      "hint": "A round container with a handle for carrying water.",
+      "hint2": "You fill it at the tap to water plants.",
+      "fact": "A bucket of water can help a whole row of seedlings.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-carrot",
+      "word": "CARROT",
+      "display": "Carrot",
+      "hint": "An orange root you can crunch.",
+      "hint2": "Rabbits love this long orange veggie.",
+      "fact": "A carrot grows under the ground.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-cedar",
+      "word": "CEDAR",
+      "display": "Cedar",
+      "hint": "A tall evergreen tree with a fresh, woody smell.",
+      "hint2": "It keeps its green needles all year.",
+      "fact": "Cedar trees stay green all through winter.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-creek",
+      "word": "CREEK",
+      "display": "Creek",
+      "hint": "A small stream of flowing water.",
+      "hint2": "It is smaller than a river.",
+      "fact": "Little fish and frogs live in a creek.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-cricket",
+      "word": "CRICKET",
+      "display": "Cricket",
+      "hint": "An insect that chirps on summer nights.",
+      "hint2": "It rubs its wings to make a song.",
+      "fact": "A cricket sings by rubbing its wings together.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-feather",
+      "word": "FEATHER",
+      "display": "Feather",
+      "hint": "A light, soft thing that covers a bird.",
+      "hint2": "Birds use these to fly.",
+      "fact": "A bird's feathers keep it warm and help it fly.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-flower",
+      "word": "FLOWER",
+      "display": "Flower",
+      "hint": "The colorful part of a plant that smells sweet.",
+      "hint2": "Bees visit it for nectar.",
+      "fact": "Bees help flowers make seeds as they visit.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-forest",
+      "word": "FOREST",
+      "display": "Forest",
+      "hint": "A big place full of many trees.",
+      "hint2": "Deer and owls live among the trees here.",
+      "fact": "A forest is home to thousands of plants and animals.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-garden",
+      "word": "GARDEN",
+      "display": "Garden",
+      "hint": "A place where people grow flowers and food.",
+      "hint2": "You plant seeds here and water them.",
+      "fact": "Gardens grow best with sun, water, and care.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-hedge",
+      "word": "HEDGE",
+      "display": "Hedge",
+      "hint": "A neat wall of bushes along a garden border.",
+      "hint2": "Bushes grow in a row to make a green fence.",
+      "fact": "A hedge gives birds a safe place to nest.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-hibiscus",
+      "word": "HIBISCUS",
+      "display": "Hibiscus",
+      "hint": "A big, bright flower from warm places.",
+      "hint2": "Its large flowers come in red, pink, and yellow.",
+      "fact": "Some hibiscus flowers can be as wide as a dinner plate.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "hibiscus",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-honey",
+      "word": "HONEY",
+      "display": "Honey",
+      "hint": "A sweet golden food made by bees.",
+      "hint2": "It is sticky and tastes sweet on toast.",
+      "fact": "Bees visit many flowers to make a little honey.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-insect",
+      "word": "INSECT",
+      "display": "Insect",
+      "hint": "A small animal with six legs.",
+      "hint2": "Ants and bees are this kind of creature.",
+      "fact": "Insects have three body parts and six legs.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-jasmine",
+      "word": "JASMINE",
+      "display": "Jasmine",
+      "hint": "A climbing plant with small white flowers that smell sweet.",
+      "hint2": "Its sweet flowers are often used in tea.",
+      "fact": "Many jasmine flowers smell strongest in the evening.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "jasmine",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-ladybug",
+      "word": "LADYBUG",
+      "display": "Ladybug",
+      "hint": "A small red beetle with black spots.",
+      "hint2": "It is red with dots and eats tiny bugs on plants.",
+      "fact": "A ladybug helps gardeners by eating tiny pests.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-lavender",
+      "word": "LAVENDER",
+      "display": "Lavender",
+      "hint": "A purple plant with a soothing smell.",
+      "hint2": "Its purple spikes are loved by bees.",
+      "fact": "Bees love lavender flowers.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "lavender",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-lemon",
+      "word": "LEMON",
+      "display": "Lemon",
+      "hint": "A sour yellow fruit.",
+      "hint2": "Mixed with sugar and water, it makes a tasty drink.",
+      "fact": "A lemon tree can have flowers and fruit at the same time.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-lotus",
+      "word": "LOTUS",
+      "display": "Lotus",
+      "hint": "A pretty flower that floats on still water.",
+      "hint2": "Its big round leaves float on ponds.",
+      "fact": "Lotus leaves let water roll right off.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "lotus",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-maple",
+      "word": "MAPLE",
+      "display": "Maple",
+      "hint": "A tree whose leaves turn red in autumn.",
+      "hint2": "Its leaf is on the flag of Canada.",
+      "fact": "Maple syrup is made by boiling down the sap of maple trees.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-orchard",
+      "word": "ORCHARD",
+      "display": "Orchard",
+      "hint": "A place where many fruit trees grow together.",
+      "hint2": "Apple trees grow in rows here.",
+      "fact": "Orchard trees are covered in blossoms each spring.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-orchid",
+      "word": "ORCHID",
+      "display": "Orchid",
+      "hint": "A fancy flower with unusual, delicate petals.",
+      "hint2": "It comes in many colors and grows on trees in warm places.",
+      "fact": "Some orchids grow high on tree branches, not in soil.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "orchid",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-peach",
+      "word": "PEACH",
+      "display": "Peach",
+      "hint": "A soft, fuzzy fruit that is orange and pink.",
+      "hint2": "It grows on a tree and has a big pit.",
+      "fact": "Peach trees grow pink flowers in spring.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-pebble",
+      "word": "PEBBLE",
+      "display": "Pebble",
+      "hint": "A small, smooth stone.",
+      "hint2": "You might skip one across a pond.",
+      "fact": "Water rolls stones until they become smooth pebbles.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-picnic",
+      "word": "PICNIC",
+      "display": "Picnic",
+      "hint": "A meal you eat outside on a blanket.",
+      "hint2": "You pack a basket and eat on the grass.",
+      "fact": "People have enjoyed picnics in parks for hundreds of years.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-puddle",
+      "word": "PUDDLE",
+      "display": "Puddle",
+      "hint": "A small pool of rain on the ground.",
+      "hint2": "You can splash in it with your boots.",
+      "fact": "Puddles dry up when the sun warms them.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-pumpkin",
+      "word": "PUMPKIN",
+      "display": "Pumpkin",
+      "hint": "A big round orange vegetable that grows on a vine.",
+      "hint2": "People carve faces in it in autumn.",
+      "fact": "A pumpkin is really a fruit, because it holds seeds.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-rabbit",
+      "word": "RABBIT",
+      "display": "Rabbit",
+      "hint": "A furry animal with long ears that hops.",
+      "hint2": "It loves to nibble carrots.",
+      "fact": "Rabbits can hop high and run fast.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-rainbow",
+      "word": "RAINBOW",
+      "display": "Rainbow",
+      "hint": "A colorful arc in the sky after a shower and sun.",
+      "hint2": "It shows red, orange, yellow, green, blue and violet.",
+      "fact": "A rainbow forms when sunlight shines through raindrops.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-river",
+      "word": "RIVER",
+      "display": "River",
+      "hint": "Water that flows in a long path to the sea.",
+      "hint2": "Boats can float down it.",
+      "fact": "Rivers carry water from the hills to the sea.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-robin",
+      "word": "ROBIN",
+      "display": "Robin",
+      "hint": "A bird with a bright orange-red chest.",
+      "hint2": "It hops on the lawn looking for worms.",
+      "fact": "Robins sing early in the morning.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-saguaro",
+      "word": "SAGUARO",
+      "display": "Saguaro",
+      "hint": "A tall desert cactus with arms that reach up.",
+      "hint2": "It lives in the hot desert and has big arms.",
+      "fact": "A saguaro can grow taller than a house.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "saguaro_cactus",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-shade",
+      "word": "SHADE",
+      "display": "Shade",
+      "hint": "A cool spot made when a tree blocks the sun.",
+      "hint2": "You sit here under a tree on a hot day.",
+      "fact": "Big trees give cool shade on sunny days.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-shovel",
+      "word": "SHOVEL",
+      "display": "Shovel",
+      "hint": "A tool with a flat blade for digging.",
+      "hint2": "You use it to dig a hole for a plant.",
+      "fact": "A shovel helps gardeners move soil.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-snapdragon",
+      "word": "SNAPDRAGON",
+      "display": "Snapdragon",
+      "hint": "A tall flower that opens like a tiny mouth when squeezed.",
+      "hint2": "Squeeze its sides and its mouth pops open.",
+      "fact": "Snapdragon flowers come in many bright colors.",
+      "level": 2,
+      "kind": "hero",
+      "plantId": "snapdragon",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-spider",
+      "word": "SPIDER",
+      "display": "Spider",
+      "hint": "A small animal with eight legs that spins a web.",
+      "hint2": "It makes a silky web in the garden.",
+      "fact": "A spider spins silk from its own body.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-sprout",
+      "word": "SPROUT",
+      "display": "Sprout",
+      "hint": "A tiny new plant pushing out of a seed.",
+      "hint2": "A baby plant that just poked up from the soil.",
+      "fact": "A seed can send up a green shoot in just a few days.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-stone",
+      "word": "STONE",
+      "display": "Stone",
+      "hint": "A hard piece of rock.",
+      "hint2": "It is found on the ground and in streams.",
+      "fact": "Some plants grow in the cracks between stones.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-storm",
+      "word": "STORM",
+      "display": "Storm",
+      "hint": "Dark clouds with rain, wind, and thunder.",
+      "hint2": "You hear thunder when this passes by.",
+      "fact": "After a storm, the garden gets a big drink.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-sunset",
+      "word": "SUNSET",
+      "display": "Sunset",
+      "hint": "The sky glows orange and pink at the end of the day.",
+      "hint2": "You see it when the sun goes down.",
+      "fact": "At the end of the day, sunlight passes through more air, so the sky glows red and orange.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-thorn",
+      "word": "THORN",
+      "display": "Thorn",
+      "hint": "A sharp point on a rose stem.",
+      "hint2": "Rose stems have these, so touch gently.",
+      "fact": "Thorns help some plants keep hungry animals away.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-tomato",
+      "word": "TOMATO",
+      "display": "Tomato",
+      "hint": "A round red fruit that people often call a vegetable.",
+      "hint2": "It is squished to make ketchup.",
+      "fact": "Tomato plants need lots of sun to grow ripe fruit.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-trunk",
+      "word": "TRUNK",
+      "display": "Trunk",
+      "hint": "The thick main part of a tree.",
+      "hint2": "It holds up the branches and the leaves.",
+      "fact": "A tree trunk usually adds one new ring each year.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l2-willow",
+      "word": "WILLOW",
+      "display": "Willow",
+      "hint": "A tree with long, drooping branches near water.",
+      "hint2": "Its thin branches sway by the pond.",
+      "fact": "Willow trees love to grow near water.",
+      "level": 2,
+      "kind": "vocab",
+      "tags": [
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-bird-of-paradise",
+      "word": "BIRD OF PARADISE",
+      "display": "Bird of Paradise",
+      "hint": "A bright bloom shaped like a colorful flying creature.",
+      "hint2": "It is orange and blue with a pointed beak shape.",
+      "fact": "Its bloom looks like a bird with a crest, and it grows in warm places.",
+      "level": 3,
+      "kind": "hero",
+      "plantId": "bird_of_paradise",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-blossom",
+      "word": "BLOSSOM",
+      "display": "Blossom",
+      "hint": "A flower on a fruit tree in spring.",
+      "hint2": "Apple trees get pink and white ones.",
+      "fact": "Bees visit them to find sweet nectar.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-burrow",
+      "word": "BURROW",
+      "display": "Burrow",
+      "hint": "An underground home dug by a rabbit.",
+      "hint2": "Moles and foxes dig these too.",
+      "fact": "Rabbits dig tunnels and rooms below the ground.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-butterfly",
+      "word": "BUTTERFLY",
+      "display": "Butterfly",
+      "hint": "An insect with colorful wings that sips nectar.",
+      "hint2": "It starts life as a caterpillar.",
+      "fact": "A butterfly tastes with its feet.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-canopy",
+      "word": "CANOPY",
+      "display": "Canopy",
+      "hint": "The leafy roof high up in a forest.",
+      "hint2": "Treetops spread out to form it.",
+      "fact": "Many rainforest birds and monkeys live high up in the treetops.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-catkin",
+      "word": "CATKIN",
+      "display": "Catkin",
+      "hint": "A soft, fuzzy dangling flower on a hazel tree.",
+      "hint2": "It hangs like a little fuzzy tail.",
+      "fact": "Willow and hazel trees grow these in early spring.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-chrysalis",
+      "word": "CHRYSALIS",
+      "display": "Chrysalis",
+      "hint": "The hard case where a caterpillar changes into a butterfly.",
+      "hint2": "A caterpillar rests inside it.",
+      "fact": "A caterpillar becomes a butterfly inside this case.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-compost",
+      "word": "COMPOST",
+      "display": "Compost",
+      "hint": "Garden food made from old leaves and peels.",
+      "hint2": "You make it in a bin from kitchen scraps.",
+      "fact": "Worms help turn scraps into rich soil.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-corpse-flower",
+      "word": "CORPSE FLOWER",
+      "display": "Corpse Flower",
+      "hint": "A giant bloom with a very stinky smell.",
+      "hint2": "Its huge bloom spike can grow taller than a grown-up.",
+      "fact": "Its strong stink draws in flies and beetles that carry its pollen.",
+      "level": 3,
+      "kind": "hero",
+      "plantId": "corpse_flower",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-daffodil",
+      "word": "DAFFODIL",
+      "display": "Daffodil",
+      "hint": "A yellow spring flower shaped like a trumpet.",
+      "hint2": "It grows from a bulb.",
+      "fact": "It is one of the first to bloom in spring.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-desert",
+      "word": "DESERT",
+      "display": "Desert",
+      "hint": "A very dry place with little rain.",
+      "hint2": "Cacti grow here.",
+      "fact": "Camels travel across sand dunes in one.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-dragon-blood-tree",
+      "word": "DRAGON BLOOD TREE",
+      "display": "Dragon Blood Tree",
+      "hint": "A plant shaped like an upside-down umbrella with red sap.",
+      "hint2": "Its red sap gave it a fiery name.",
+      "fact": "It grows wild on Socotra, an island in the Arabian Sea.",
+      "level": 3,
+      "kind": "hero",
+      "plantId": "dragon_blood_tree",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-dragonfly",
+      "word": "DRAGONFLY",
+      "display": "Dragonfly",
+      "hint": "An insect with shiny wings that zooms over ponds.",
+      "hint2": "It has four wings and big round eyes.",
+      "fact": "Young ones live underwater before they grow wings.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-evaporate",
+      "word": "EVAPORATE",
+      "display": "Evaporate",
+      "hint": "To turn from a liquid into a gas in the warm air.",
+      "hint2": "Puddles do this on a hot day.",
+      "fact": "The sun warms water until it floats up as vapor.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-foliage",
+      "word": "FOLIAGE",
+      "display": "Foliage",
+      "hint": "All the leaves on a plant.",
+      "hint2": "Trees show lots of it in summer.",
+      "fact": "Leaves turn red and gold in autumn.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-fossil",
+      "word": "FOSSIL",
+      "display": "Fossil",
+      "hint": "A very old shell or bone turned to stone.",
+      "hint2": "Found by digging in rocks.",
+      "fact": "Some show plants from millions of years ago.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-gardener",
+      "word": "GARDENER",
+      "display": "Gardener",
+      "hint": "A person who grows plants.",
+      "hint2": "This person waters and weeds.",
+      "fact": "Gardeners know that plants grow best with sun and water.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-glacier",
+      "word": "GLACIER",
+      "display": "Glacier",
+      "hint": "A huge, slow river of ice.",
+      "hint2": "It creeps down a mountain.",
+      "fact": "It is made from snow packed down over many years.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-gravity",
+      "word": "GRAVITY",
+      "display": "Gravity",
+      "hint": "The pull that keeps your feet on the ground.",
+      "hint2": "It makes apples fall from a tree.",
+      "fact": "Earth pulls everything toward its center.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-habitat",
+      "word": "HABITAT",
+      "display": "Habitat",
+      "hint": "The natural home where an animal lives.",
+      "hint2": "A pond is one for frogs.",
+      "fact": "It gives animals food, water and shelter.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-harvest",
+      "word": "HARVEST",
+      "display": "Harvest",
+      "hint": "Picking ripe fruit and vegetables from the garden.",
+      "hint2": "Farmers do this when crops are ready.",
+      "fact": "Many gardens are ready for this in autumn.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-hedgehog",
+      "word": "HEDGEHOG",
+      "display": "Hedgehog",
+      "hint": "A small spiky animal that visits gardens.",
+      "hint2": "It curls into a ball.",
+      "fact": "It snuffles for beetles and worms at night.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-hibernate",
+      "word": "HIBERNATE",
+      "display": "Hibernate",
+      "hint": "To sleep through the cold winter months.",
+      "hint2": "Bears do this in a cozy den.",
+      "fact": "Some animals rest all winter and wake in spring.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-joshua-tree",
+      "word": "JOSHUA TREE",
+      "display": "Joshua Tree",
+      "hint": "A spiky desert giant with bendy arms.",
+      "hint2": "It grows in the Mojave Desert in the USA.",
+      "fact": "It is a kind of yucca that grows in dry, sunny deserts.",
+      "level": 3,
+      "kind": "hero",
+      "plantId": "joshua_tree",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-migrate",
+      "word": "MIGRATE",
+      "display": "Migrate",
+      "hint": "To travel far to find a better place for the season.",
+      "hint2": "Geese do this each autumn.",
+      "fact": "Many birds fly south when winter comes.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-mineral",
+      "word": "MINERAL",
+      "display": "Mineral",
+      "hint": "A natural solid found in rocks, like quartz.",
+      "hint2": "Salt and gold are examples.",
+      "fact": "Plants take small amounts from the soil.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-moisture",
+      "word": "MOISTURE",
+      "display": "Moisture",
+      "hint": "A little bit of wetness in soil or air.",
+      "hint2": "Damp soil has plenty of it.",
+      "fact": "Plants drink it up through their roots.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-pinecone",
+      "word": "PINECONE",
+      "display": "Pinecone",
+      "hint": "A woody, scaly holder of seeds from an evergreen tree.",
+      "hint2": "Squirrels nibble the seeds tucked between its scales.",
+      "fact": "Many open their scales in dry weather and close them when it is damp.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "seed"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-pitcher-plant",
+      "word": "PITCHER PLANT",
+      "display": "Pitcher Plant",
+      "hint": "A jug-shaped green cup that traps bugs.",
+      "hint2": "Its slippery cup holds a sweet liquid.",
+      "fact": "Its cup-shaped leaves catch bugs for a meal.",
+      "level": 3,
+      "kind": "hero",
+      "plantId": "pitcher_plant",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-planet",
+      "word": "PLANET",
+      "display": "Planet",
+      "hint": "A big round world that travels around a star.",
+      "hint2": "Earth is ours.",
+      "fact": "Our sun has eight of these circling it.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-prairie",
+      "word": "PRAIRIE",
+      "display": "Prairie",
+      "hint": "A wide, flat grassland.",
+      "hint2": "Bison roam these plains.",
+      "fact": "Tall grasses and wildflowers wave in the wind.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-predator",
+      "word": "PREDATOR",
+      "display": "Predator",
+      "hint": "An animal that hunts other animals for food.",
+      "hint2": "A hawk is one.",
+      "fact": "Ladybugs hunt tiny aphids, which helps garden plants.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-raccoon",
+      "word": "RACCOON",
+      "display": "Raccoon",
+      "hint": "A masked animal with a ringed tail.",
+      "hint2": "It has a black mask across its eyes and comes out at night.",
+      "fact": "Raccoons have very sensitive front paws that help them feel for food.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-rainfall",
+      "word": "RAINFALL",
+      "display": "Rainfall",
+      "hint": "The amount of water that drops from the clouds.",
+      "hint2": "A gauge in the garden measures it.",
+      "fact": "Plants need it to grow.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-sapling",
+      "word": "SAPLING",
+      "display": "Sapling",
+      "hint": "A young tree that is still thin and small.",
+      "hint2": "An oak starts as one.",
+      "fact": "A tiny tree can grow into a giant over many years.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-scarecrow",
+      "word": "SCARECROW",
+      "display": "Scarecrow",
+      "hint": "A straw figure that stands in a field.",
+      "hint2": "It wears old clothes and a hat.",
+      "fact": "Farmers put one up to keep birds away from seeds.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-seasons",
+      "word": "SEASONS",
+      "display": "Seasons",
+      "hint": "Spring, summer, autumn and winter.",
+      "hint2": "There are four of these in a year.",
+      "fact": "Earth tilts as it travels around the sun, which brings four of these.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-sensitive-plant",
+      "word": "SENSITIVE PLANT",
+      "display": "Sensitive Plant",
+      "hint": "Touch its leaves and they fold up like tiny hands.",
+      "hint2": "It is also called the touch-me-not.",
+      "fact": "Its leaves fold shut when touched, then open again soon.",
+      "level": 3,
+      "kind": "hero",
+      "plantId": "sensitive_plant",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-snowflake",
+      "word": "SNOWFLAKE",
+      "display": "Snowflake",
+      "hint": "A tiny, six-sided crystal of ice.",
+      "hint2": "It drifts down in winter.",
+      "fact": "Most snowflakes have six sides or six points.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-sparrow",
+      "word": "SPARROW",
+      "display": "Sparrow",
+      "hint": "A small brown bird that hops in gardens.",
+      "hint2": "It chirps from the hedge.",
+      "fact": "It likes to eat seeds and crumbs.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-squirrel",
+      "word": "SQUIRREL",
+      "display": "Squirrel",
+      "hint": "A bushy-tailed animal that buries nuts.",
+      "hint2": "It leaps from branch to branch in the park.",
+      "fact": "Some buried nuts are never dug up and grow into new trees.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-sunlight",
+      "word": "SUNLIGHT",
+      "display": "Sunlight",
+      "hint": "Golden rays from the sky that help leaves make food.",
+      "hint2": "Leaves turn toward it all day.",
+      "fact": "Plants soak it up to grow.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-sunrise",
+      "word": "SUNRISE",
+      "display": "Sunrise",
+      "hint": "When the sun first appears in the morning.",
+      "hint2": "Roosters crow at this time.",
+      "fact": "The sky glows pink and orange at dawn.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-tadpole",
+      "word": "TADPOLE",
+      "display": "Tadpole",
+      "hint": "A baby frog with a tail that swims.",
+      "hint2": "It lives in a pond.",
+      "fact": "It grows legs and becomes a frog.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-tendril",
+      "word": "TENDRIL",
+      "display": "Tendril",
+      "hint": "A curly little thread that helps a vine climb.",
+      "hint2": "Pea plants use it to grab a fence.",
+      "fact": "Peas, grapes and cucumbers all climb with these.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-thunder",
+      "word": "THUNDER",
+      "display": "Thunder",
+      "hint": "The loud rumble you hear after lightning.",
+      "hint2": "Clouds make this big sound.",
+      "fact": "Lightning heats the air and the air booms.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-tornado",
+      "word": "TORNADO",
+      "display": "Tornado",
+      "hint": "A spinning funnel of wind.",
+      "hint2": "It twirls down from a storm cloud.",
+      "fact": "Weather scientists watch the sky for these swirling winds.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-trellis",
+      "word": "TRELLIS",
+      "display": "Trellis",
+      "hint": "A frame that helps climbing plants grow tall.",
+      "hint2": "Roses and beans can climb it.",
+      "fact": "It is made of wood or wire with crisscross bars.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-volcano",
+      "word": "VOLCANO",
+      "display": "Volcano",
+      "hint": "A mountain that can bubble up hot melted rock.",
+      "hint2": "Some have a crater at the top.",
+      "fact": "Hot rock from inside Earth is called lava.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l3-wetland",
+      "word": "WETLAND",
+      "display": "Wetland",
+      "hint": "A soggy place beside a pond or stream.",
+      "hint2": "Frogs and herons love it.",
+      "fact": "Marshes and swamps are this kind of place.",
+      "level": 3,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-avalanche",
+      "word": "AVALANCHE",
+      "display": "Avalanche",
+      "hint": "A huge slide of snow rushing down a mountain.",
+      "hint2": "Skiers watch out for this on steep snowy slopes.",
+      "fact": "Deep snow on a steep slope can suddenly slide all at once.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-beehive",
+      "word": "BEEHIVE",
+      "display": "Beehive",
+      "hint": "The home where honey bees live and store honey.",
+      "hint2": "Thousands of bees buzz in this box.",
+      "fact": "One hive can hold tens of thousands of bees working together.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-birdsong",
+      "word": "BIRDSONG",
+      "display": "Birdsong",
+      "hint": "The tweets and trills heard at dawn.",
+      "hint2": "Robins and wrens fill the morning with it.",
+      "fact": "Many birds sing most at dawn, in what is called the dawn chorus.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-bleeding-heart",
+      "word": "BLEEDING HEART",
+      "display": "Bleeding Heart",
+      "hint": "A garden plant with pink flowers shaped like valentines that dangle like lockets.",
+      "hint2": "Its pink flowers hang in a row like tiny lockets.",
+      "fact": "It blooms in spring, with each flower dangling from an arching stem.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "bleeding_heart",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-blueberry",
+      "word": "BLUEBERRY",
+      "display": "Blueberry",
+      "hint": "A small, dark round fruit that grows on a bush.",
+      "hint2": "It can turn your tongue purple if you eat lots.",
+      "fact": "Its fruit starts out green and turns deep blue as it ripens.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-buttercup",
+      "word": "BUTTERCUP",
+      "display": "Buttercup",
+      "hint": "A small, shiny yellow wildflower in grassy fields.",
+      "hint2": "Hold it under your chin to see a yellow glow.",
+      "fact": "Its petals are so shiny that they bounce yellow light back.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-caterpillar",
+      "word": "CATERPILLAR",
+      "display": "Caterpillar",
+      "hint": "A fuzzy, crawling bug that will grow into a butterfly or moth.",
+      "hint2": "It munches leaves all day.",
+      "fact": "A caterpillar grows so fast that it must shed its skin several times.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-chamomile",
+      "word": "CHAMOMILE",
+      "display": "Chamomile",
+      "hint": "A small daisy-like flower used to make a calming tea.",
+      "hint2": "Its tea is often sipped before bedtime.",
+      "fact": "Its flowers smell a little like apples.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-chipmunk",
+      "word": "CHIPMUNK",
+      "display": "Chipmunk",
+      "hint": "A small striped animal that stuffs seeds into its cheeks.",
+      "hint2": "It is like a tiny squirrel with stripes on its back.",
+      "fact": "It carries food in stretchy cheek pouches to its burrow.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-coastline",
+      "word": "COASTLINE",
+      "display": "Coastline",
+      "hint": "The edge where land meets the sea.",
+      "hint2": "Cliffs, coves and beaches run along it.",
+      "fact": "Waves slowly reshape the land along the sea, grain by grain.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "water"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-driftwood",
+      "word": "DRIFTWOOD",
+      "display": "Driftwood",
+      "hint": "A smooth old log that floats in and washes up on shore.",
+      "hint2": "Waves roll it along the beach.",
+      "fact": "Water and sand polish driftwood until it feels smooth.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-estuary",
+      "word": "ESTUARY",
+      "display": "Estuary",
+      "hint": "A place where a river meets the sea.",
+      "hint2": "Fresh water and salty water mix here.",
+      "fact": "Many baby fish grow up in the calm waters of an estuary.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-evergreen",
+      "word": "EVERGREEN",
+      "display": "Evergreen",
+      "hint": "A tree that keeps its needles or leaves all year.",
+      "hint2": "Fir and pine trees look fresh all winter long.",
+      "fact": "Many pine and fir trees keep their needles through the cold months.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-fertile",
+      "word": "FERTILE",
+      "display": "Fertile",
+      "hint": "Soil that is rich and full of what plants need.",
+      "hint2": "Good garden dirt is this, so seeds grow well.",
+      "fact": "Soil gets richer when old leaves and bits of plants mix into it.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-firefly",
+      "word": "FIREFLY",
+      "display": "Firefly",
+      "hint": "A beetle that glows in the dark on summer nights.",
+      "hint2": "Its tail lights up like a tiny lantern.",
+      "fact": "Fireflies flash their glow to talk to each other.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-fragrant",
+      "word": "FRAGRANT",
+      "display": "Fragrant",
+      "hint": "Having a sweet smell.",
+      "hint2": "Lavender and roses are like this.",
+      "fact": "Flowers make sweet smells to invite bees and butterflies.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-giant-water-lily",
+      "word": "GIANT WATER LILY",
+      "display": "Giant Water Lily",
+      "hint": "A huge round leaf that floats on a river and can hold a small child.",
+      "hint2": "Its flat leaves are like green rafts.",
+      "fact": "Its round leaves can grow wider than a grown-up is tall.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "giant_water_lily",
+      "tags": [
+        "plant",
+        "water"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-grasshopper",
+      "word": "GRASSHOPPER",
+      "display": "Grasshopper",
+      "hint": "A green insect with long back legs that jumps.",
+      "hint2": "It chirps in tall meadows in summer.",
+      "fact": "It can leap many times its own body length.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-greenhouse",
+      "word": "GREENHOUSE",
+      "display": "Greenhouse",
+      "hint": "A glass building that keeps plants cozy and warm.",
+      "hint2": "Gardeners grow seedlings here in early spring.",
+      "fact": "Sunlight comes through the glass walls and warms the air inside.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-hailstone",
+      "word": "HAILSTONE",
+      "display": "Hailstone",
+      "hint": "A ball of ice that falls from a storm cloud.",
+      "hint2": "These icy pellets bounce off the ground.",
+      "fact": "Hail grows in layers as it is tossed up and down inside a cloud.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "water"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-hedgerow",
+      "word": "HEDGEROW",
+      "display": "Hedgerow",
+      "hint": "A long line of bushes that grows along a field.",
+      "hint2": "Birds build nests in this green wall.",
+      "fact": "Hedges give birds and small animals a safe path and a cozy home.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-honeysuckle",
+      "word": "HONEYSUCKLE",
+      "display": "Honeysuckle",
+      "hint": "A climbing plant with sweet, trumpet-shaped flowers.",
+      "hint2": "Kids sip the tiny drop of nectar from its blossoms.",
+      "fact": "Many kinds smell sweetest in the evening, when moths come to visit.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-hummingbird",
+      "word": "HUMMINGBIRD",
+      "display": "Hummingbird",
+      "hint": "A tiny flier that hovers to sip nectar.",
+      "hint2": "Its wings move so fast they blur.",
+      "fact": "A hummingbird can flap its wings dozens of times each second.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-king-protea",
+      "word": "KING PROTEA",
+      "display": "King Protea",
+      "hint": "A big flower from South Africa that looks like a pink crown.",
+      "hint2": "It is the national flower of South Africa.",
+      "fact": "The king protea has the biggest flower head of all the protea plants.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "king_protea",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-landscape",
+      "word": "LANDSCAPE",
+      "display": "Landscape",
+      "hint": "A wide view of hills, fields and trees.",
+      "hint2": "An artist might paint a scene of the countryside.",
+      "fact": "Farms, forests and rivers all help shape a landscape.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-lightning",
+      "word": "LIGHTNING",
+      "display": "Lightning",
+      "hint": "A giant spark that zaps between storm clouds and the ground.",
+      "hint2": "You see this flash before you hear the boom.",
+      "fact": "Its flash is hotter than the surface of the sun.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-monkey-puzzle",
+      "word": "MONKEY PUZZLE",
+      "display": "Monkey Puzzle",
+      "hint": "An evergreen with spiky, scale-like leaves that twist along its branches.",
+      "hint2": "It comes from the mountains of Chile and has twisty branches.",
+      "fact": "The monkey puzzle tree comes from the mountains of Chile and can live for over a thousand years.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "monkey_puzzle_tree",
+      "tags": [
+        "tree",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-moonlight",
+      "word": "MOONLIGHT",
+      "display": "Moonlight",
+      "hint": "The soft silver glow that shines on a dark garden after sunset.",
+      "hint2": "Owls hunt by it.",
+      "fact": "The moon makes no glow of its own; it reflects sunlight.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-mountain",
+      "word": "MOUNTAIN",
+      "display": "Mountain",
+      "hint": "A very tall hill with a high peak.",
+      "hint2": "Snow often sits at the top.",
+      "fact": "The tops of tall mountains are often cool, even in summer.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-mushroom",
+      "word": "MUSHROOM",
+      "display": "Mushroom",
+      "hint": "A soft fungus shaped like a little umbrella.",
+      "hint2": "It pops up in damp woods.",
+      "fact": "Mushrooms are not plants. They belong to a group called fungi.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-nocturnal",
+      "word": "NOCTURNAL",
+      "display": "Nocturnal",
+      "hint": "Awake and busy at night.",
+      "hint2": "Owls and bats are like this.",
+      "fact": "Owls have big eyes that help them see in the dark.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-pineapple",
+      "word": "PINEAPPLE",
+      "display": "Pineapple",
+      "hint": "A spiky tropical fruit with a leafy crown.",
+      "hint2": "It is yellow inside, sweet and juicy.",
+      "fact": "A plant takes about two years to grow just one of these fruits.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-pomegranate",
+      "word": "POMEGRANATE",
+      "display": "Pomegranate",
+      "hint": "A round red fruit packed with juicy seeds.",
+      "hint2": "Each little red jewel inside holds a seed.",
+      "fact": "One fruit can hold hundreds of seeds.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-porcupine",
+      "word": "PORCUPINE",
+      "display": "Porcupine",
+      "hint": "A slow animal covered in sharp quills.",
+      "hint2": "Its spiky coat keeps hungry animals away.",
+      "fact": "A porcupine can have thousands of quills.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-rafflesia",
+      "word": "RAFFLESIA",
+      "display": "Rafflesia",
+      "hint": "A giant flower from the rainforest with no leaves, roots or stem.",
+      "hint2": "It is one of the biggest flowers in the world.",
+      "fact": "One rafflesia flower can grow about one meter across.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "rafflesia",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-rainforest",
+      "word": "RAINFOREST",
+      "display": "Rainforest",
+      "hint": "A thick, warm jungle where showers fall almost every day.",
+      "hint2": "Many bright parrots and frogs call it home.",
+      "fact": "Rainforests are home to more kinds of plants and animals than almost anywhere else.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-riverbank",
+      "word": "RIVERBANK",
+      "display": "Riverbank",
+      "hint": "The sloping ground along the edge of a stream.",
+      "hint2": "Ducks rest on the grass beside the water.",
+      "fact": "Plants along a stream edge hold the soil in place with their roots.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-rosemary",
+      "word": "ROSEMARY",
+      "display": "Rosemary",
+      "hint": "A woody herb with needle-like leaves and a piney smell.",
+      "hint2": "Cooks put it on roast potatoes.",
+      "fact": "Bees love its small blue flowers.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-sago-palm",
+      "word": "SAGO PALM",
+      "display": "Sago Palm",
+      "hint": "A very old kind of plant with a stout trunk and a crown of stiff, feathery leaves.",
+      "hint2": "It looks like a tropical tree but is really a cycad.",
+      "fact": "Cycads like the sago palm have grown on Earth since the age of dinosaurs.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "sago_palm",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-salamander",
+      "word": "SALAMANDER",
+      "display": "Salamander",
+      "hint": "A small, smooth-skinned animal that looks like a lizard but lives near water.",
+      "hint2": "It is an amphibian with a long tail, like a newt.",
+      "fact": "Many salamanders can grow back a tail or even a leg.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "water"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-seashell",
+      "word": "SEASHELL",
+      "display": "Seashell",
+      "hint": "A hard case a sea animal once lived in, found on the beach.",
+      "hint2": "Hold it to your ear and listen.",
+      "fact": "Seashells come in many shapes, like spirals and fans.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-seaweed",
+      "word": "SEAWEED",
+      "display": "Seaweed",
+      "hint": "A plant-like growth that floats and sways in the ocean.",
+      "hint2": "Some kinds are wrapped around sushi.",
+      "fact": "Kelp is a kind of seaweed that can grow very tall under the sea.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-slipper-orchid",
+      "word": "SLIPPER ORCHID",
+      "display": "Slipper Orchid",
+      "hint": "A flower with a pouch-shaped petal that looks like a tiny shoe.",
+      "hint2": "Its bloom looks like a shoe for a fairy.",
+      "fact": "Bees climb into the slipper-shaped pouch and then wriggle out past the pollen.",
+      "level": 4,
+      "kind": "hero",
+      "plantId": "ladys_slipper_orchid",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-snowdrop",
+      "word": "SNOWDROP",
+      "display": "Snowdrop",
+      "hint": "A tiny white flower that pokes up through late winter frost.",
+      "hint2": "Its white bells hang down like little lamps.",
+      "fact": "It is one of the first flowers to bloom each year.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-succulent",
+      "word": "SUCCULENT",
+      "display": "Succulent",
+      "hint": "A plant with thick, juicy leaves that hold water.",
+      "hint2": "Aloe and jade plants are this kind.",
+      "fact": "Succulents store water in their leaves so they can go many days between drinks.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-sunbeam",
+      "word": "SUNBEAM",
+      "display": "Sunbeam",
+      "hint": "A single bright ray shining down through the clouds.",
+      "hint2": "Cats love to nap in a warm patch of it.",
+      "fact": "A sunbeam looks bright in dusty air because the dust catches the light.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "weather"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-sunshine",
+      "word": "SUNSHINE",
+      "display": "Sunshine",
+      "hint": "Warm, bright light from the sky on a clear day.",
+      "hint2": "Plants stretch toward it.",
+      "fact": "Light from the sun takes about eight minutes to reach Earth.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-taproot",
+      "word": "TAPROOT",
+      "display": "Taproot",
+      "hint": "One long, thick part of a plant that grows straight down into soil.",
+      "hint2": "A carrot is a good example.",
+      "fact": "A dandelion has a deep root that reaches far into the soil.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-terrarium",
+      "word": "TERRARIUM",
+      "display": "Terrarium",
+      "hint": "A small glass garden for tiny plants.",
+      "hint2": "You can grow moss and ferns in a jar like this.",
+      "fact": "A closed glass garden can water itself, because moisture drips back to the soil.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-tidepool",
+      "word": "TIDEPOOL",
+      "display": "Tidepool",
+      "hint": "A small pocket of seawater held in the rocks by the shore.",
+      "hint2": "Starfish and crabs live in these little puddles.",
+      "fact": "Tiny sea creatures live in pools by the shore and wait for the tide.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "animal"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-tumbleweed",
+      "word": "TUMBLEWEED",
+      "display": "Tumbleweed",
+      "hint": "A dry plant that breaks free and rolls across the plains in the wind.",
+      "hint2": "You see it bounce along in western movies.",
+      "fact": "As it rolls, it scatters its seeds across the land.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-waterfall",
+      "word": "WATERFALL",
+      "display": "Waterfall",
+      "hint": "A stream that tumbles over a high cliff.",
+      "hint2": "Rivers do this when the ground drops away.",
+      "fact": "Some waterfalls make a soft mist that can create a rainbow.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "water"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-watermelon",
+      "word": "WATERMELON",
+      "display": "Watermelon",
+      "hint": "A big green-striped fruit with sweet red flesh.",
+      "hint2": "You spit out the black seeds on a hot day.",
+      "fact": "It is mostly water, which makes it a great summer snack.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-wildflower",
+      "word": "WILDFLOWER",
+      "display": "Wildflower",
+      "hint": "A bloom that grows by itself without a gardener.",
+      "hint2": "Meadows are dotted with these in summer.",
+      "fact": "Wildflowers grow from seeds that wind and birds carry about.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-wildlife",
+      "word": "WILDLIFE",
+      "display": "Wildlife",
+      "hint": "Animals and plants that live free in nature.",
+      "hint2": "Think of deer, birds and foxes in the woods.",
+      "fact": "Parks and forests give homes to many kinds of animals.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-woodland",
+      "word": "WOODLAND",
+      "display": "Woodland",
+      "hint": "A place with many trees growing close together.",
+      "hint2": "Squirrels and deer live among the trees here.",
+      "fact": "Fallen leaves in a woodland slowly turn back into rich soil.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "everyday"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l4-woodpecker",
+      "word": "WOODPECKER",
+      "display": "Woodpecker",
+      "hint": "A bird that drums on tree trunks with its beak.",
+      "hint2": "Tap tap tap! It looks for bugs inside bark.",
+      "fact": "Its stiff tail feathers prop it up as it clings to a tree.",
+      "level": 4,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "tree"
+      ],
+      "minAge": 6,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-angiosperm",
+      "word": "ANGIOSPERM",
+      "display": "Angiosperm",
+      "hint": "Any plant that makes flowers and keeps its seeds inside fruit.",
+      "hint2": "Roses, apple trees and grasses are all this kind of plant.",
+      "fact": "Most kinds of plants on Earth today are flowering plants.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-arboretum",
+      "word": "ARBORETUM",
+      "display": "Arboretum",
+      "hint": "A garden full of many kinds of trees.",
+      "hint2": "You can visit one to learn tree names.",
+      "fact": "Some of these gardens hold thousands of different kinds of trees.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "garden"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-arthropod",
+      "word": "ARTHROPOD",
+      "display": "Arthropod",
+      "hint": "An animal with jointed legs and a hard outer shell.",
+      "hint2": "Spiders, crabs and insects all belong to this big group.",
+      "fact": "Its name means jointed foot.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-atmosphere",
+      "word": "ATMOSPHERE",
+      "display": "Atmosphere",
+      "hint": "The blanket of air that wraps around Earth.",
+      "hint2": "Weather happens in the lowest layer of it.",
+      "fact": "It keeps Earth warm and blocks much of the sun's harsh rays.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "weather"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-biodiversity",
+      "word": "BIODIVERSITY",
+      "display": "Biodiversity",
+      "hint": "The huge variety of living things on Earth.",
+      "hint2": "All the different plants, animals and tiny life in one place.",
+      "fact": "A single teaspoon of healthy soil can hold billions of tiny living things.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-bioluminescent",
+      "word": "BIOLUMINESCENT",
+      "display": "Bioluminescent",
+      "hint": "Describes living things that make their own glow.",
+      "hint2": "Fireflies and some deep-sea fish are this way.",
+      "fact": "Some mushrooms glow softly in the dark woods.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-black-bat-flower",
+      "word": "BLACK BAT FLOWER",
+      "display": "Black Bat Flower",
+      "hint": "A dark bloom with long whiskers and wide, wing-shaped petals.",
+      "hint2": "Its petals look like a bat in flight.",
+      "fact": "This flower comes from the warm forests of Southeast Asia.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "black_bat_flower",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-botanist",
+      "word": "BOTANIST",
+      "display": "Botanist",
+      "hint": "A scientist who studies plants.",
+      "hint2": "This person might name a brand new flower.",
+      "fact": "Botanists have named more than 300,000 kinds of plants.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-camouflage",
+      "word": "CAMOUFLAGE",
+      "display": "Camouflage",
+      "hint": "Colors or shapes that help a creature blend in.",
+      "hint2": "A stick bug uses this to look like a twig.",
+      "fact": "Some moths look just like tree bark when they rest.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-carnivorous",
+      "word": "CARNIVOROUS",
+      "display": "Carnivorous",
+      "hint": "Describes a plant that catches and digests insects.",
+      "hint2": "A Venus flytrap is this kind of plant.",
+      "fact": "Plants like these grow in soil that has very few nutrients, so bugs give them extra food.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-chloroplast",
+      "word": "CHLOROPLAST",
+      "display": "Chloroplast",
+      "hint": "A tiny green part inside a leaf cell that uses sunlight.",
+      "hint2": "It gives leaves their green color.",
+      "fact": "One leaf can hold millions of these tiny green parts.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-chocolate-cosmos",
+      "word": "CHOCOLATE COSMOS",
+      "display": "Chocolate Cosmos",
+      "hint": "A deep red bloom that smells like something sweet.",
+      "hint2": "Its scent is like warm cocoa.",
+      "fact": "On warm summer days its flowers smell a little like chocolate.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "chocolate_cosmos",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-coco-de-mer",
+      "word": "COCO DE MER",
+      "display": "Coco de Mer",
+      "hint": "A palm that grows the biggest seed in the world.",
+      "hint2": "The seed is huge and heavy, and it grows on islands in the Indian Ocean.",
+      "fact": "One seed can weigh more than a bowling ball.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "coco_de_mer",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-condensation",
+      "word": "CONDENSATION",
+      "display": "Condensation",
+      "hint": "When water vapor cools and turns back into drops.",
+      "hint2": "It makes droplets on the outside of a cold glass.",
+      "fact": "Clouds form when water vapor cools into tiny droplets.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "water"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-coniferous",
+      "word": "CONIFEROUS",
+      "display": "Coniferous",
+      "hint": "Describes trees that grow cones and needles.",
+      "hint2": "Pine and spruce forests are this type.",
+      "fact": "Most of these trees keep their needles all winter.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "tree"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-conservation",
+      "word": "CONSERVATION",
+      "display": "Conservation",
+      "hint": "Taking good care of nature so it stays healthy.",
+      "hint2": "Protecting forests, rivers and animals is part of it.",
+      "fact": "Planting trees and keeping rivers clean are ways to help nature.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "everyday"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-cotyledon",
+      "word": "COTYLEDON",
+      "display": "Cotyledon",
+      "hint": "The first seed leaf that pops out of a sprouting seed.",
+      "hint2": "Beans have two of these baby leaves.",
+      "fact": "Grasses have one seed leaf, while beans have two.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-cultivation",
+      "word": "CULTIVATION",
+      "display": "Cultivation",
+      "hint": "The work of growing crops and garden plants.",
+      "hint2": "Farmers do this with seeds, soil and care.",
+      "fact": "People have grown plants on farms for about ten thousand years.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-decomposer",
+      "word": "DECOMPOSER",
+      "display": "Decomposer",
+      "hint": "A living thing that turns old leaves into soil.",
+      "hint2": "Mushrooms and worms do this job.",
+      "fact": "Mushrooms break down fallen leaves and return food to the soil.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-dormancy",
+      "word": "DORMANCY",
+      "display": "Dormancy",
+      "hint": "A deep rest that plants take in cold or dry times.",
+      "hint2": "Trees do this in winter, and then wake in spring.",
+      "fact": "Many bulbs rest underground until the weather turns warm.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "weather"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-echolocation",
+      "word": "ECHOLOCATION",
+      "display": "Echolocation",
+      "hint": "How bats find bugs in the dark by listening to sound bounce back.",
+      "hint2": "Bats and dolphins use this sound trick.",
+      "fact": "A bat can find a tiny moth in the dark just by listening for echoes.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-ecologist",
+      "word": "ECOLOGIST",
+      "display": "Ecologist",
+      "hint": "A scientist who studies how living things connect.",
+      "hint2": "This person looks at how plants, animals and soil fit together.",
+      "fact": "Ecologists often study ponds, forests and meadows.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "everyday"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-ecosystem",
+      "word": "ECOSYSTEM",
+      "display": "Ecosystem",
+      "hint": "A community of living things and the place they share.",
+      "hint2": "A pond with its fish, frogs and plants is one of these.",
+      "fact": "An ecosystem can be as small as a puddle or as big as an ocean.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "everyday"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-epiphyte",
+      "word": "EPIPHYTE",
+      "display": "Epiphyte",
+      "hint": "A plant that grows on a tree branch instead of in soil.",
+      "hint2": "Some orchids and ferns live high up in the trees this way.",
+      "fact": "Many of these plants catch rain and mist straight from the air.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "tree"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-exoskeleton",
+      "word": "EXOSKELETON",
+      "display": "Exoskeleton",
+      "hint": "The hard outer shell that covers an insect's body.",
+      "hint2": "A crab and a beetle both wear this hard armor.",
+      "fact": "Insects shed this hard shell so they can grow bigger.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-fertilizer",
+      "word": "FERTILIZER",
+      "display": "Fertilizer",
+      "hint": "Food you add to soil to help plants grow.",
+      "hint2": "Gardeners sprinkle it around their flowers.",
+      "fact": "Compost is a natural kind that gardeners make at home.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-franklin-tree",
+      "word": "FRANKLIN TREE",
+      "display": "Franklin Tree",
+      "hint": "A plant with white flowers that today grows in gardens, not in the wild.",
+      "hint2": "It was named for a famous American statesman and inventor.",
+      "fact": "Its white flowers with golden centers open in late summer and autumn.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "franklin_tree",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-ghost-orchid",
+      "word": "GHOST ORCHID",
+      "display": "Ghost Orchid",
+      "hint": "A pale bloom that seems to float in the air.",
+      "hint2": "It has no leaves and clings to swamp trees.",
+      "fact": "Its white flower has long thin tails that look like a frog's legs.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "ghost_orchid",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-gravitropism",
+      "word": "GRAVITROPISM",
+      "display": "Gravitropism",
+      "hint": "How a root senses which way is down and grows that way.",
+      "hint2": "Roots grow down and shoots grow up because of it.",
+      "fact": "Even if you plant a seed upside down, its root turns to grow downward.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-gymnosperm",
+      "word": "GYMNOSPERM",
+      "display": "Gymnosperm",
+      "hint": "A plant with bare seeds, often held in cones.",
+      "hint2": "Pines, firs and ginkgo trees are this kind.",
+      "fact": "Its name means naked seed in Greek.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "plant",
+        "tree"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-herbaceous",
+      "word": "HERBACEOUS",
+      "display": "Herbaceous",
+      "hint": "Describes a plant with soft green stems instead of wood.",
+      "hint2": "Daisies and mint are this type.",
+      "fact": "Herbaceous plants often grow new stems each spring.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "garden"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-herbivore",
+      "word": "HERBIVORE",
+      "display": "Herbivore",
+      "hint": "An animal that eats plants and nothing else.",
+      "hint2": "Rabbits, deer and cows are this kind of eater.",
+      "fact": "A cow's stomach has four parts to help break down grass.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-horticulture",
+      "word": "HORTICULTURE",
+      "display": "Horticulture",
+      "hint": "The art and science of growing garden plants.",
+      "hint2": "Gardeners and nursery workers practice this.",
+      "fact": "People have grown gardens for thousands of years.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-hydroponics",
+      "word": "HYDROPONICS",
+      "display": "Hydroponics",
+      "hint": "Growing plants in water with no soil.",
+      "hint2": "The roots float in water full of plant food.",
+      "fact": "Some farms grow salad leaves in water and use less of it than fields do.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "water"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-invertebrate",
+      "word": "INVERTEBRATE",
+      "display": "Invertebrate",
+      "hint": "An animal with no backbone, like a worm or a snail.",
+      "hint2": "Insects, spiders and slugs are all this kind of animal.",
+      "fact": "Most kinds of animals on Earth have no backbone.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-jade-vine",
+      "word": "JADE VINE",
+      "display": "Jade Vine",
+      "hint": "A climbing plant with turquoise flowers shaped like claws.",
+      "hint2": "Its glowing blue-green blooms hang down in long chains.",
+      "fact": "Bats visit this vine from the Philippines to sip its nectar.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "jade_vine",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-metamorphosis",
+      "word": "METAMORPHOSIS",
+      "display": "Metamorphosis",
+      "hint": "The big body change from caterpillar to butterfly.",
+      "hint2": "A tadpole turning into a frog goes through this.",
+      "fact": "A tadpole grows legs and its tail shrinks as it becomes a frog.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-microclimate",
+      "word": "MICROCLIMATE",
+      "display": "Microclimate",
+      "hint": "A small spot with its own weather, like a sunny wall.",
+      "hint2": "A cozy corner of the garden can be warmer than the rest.",
+      "fact": "A garden wall can make a warm pocket where tender plants grow well.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "weather",
+        "garden"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-microorganism",
+      "word": "MICROORGANISM",
+      "display": "Microorganism",
+      "hint": "A living thing so tiny you need a lens to see it.",
+      "hint2": "Bacteria are this kind of very small life.",
+      "fact": "Some of them help turn milk into yogurt.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-monoculture",
+      "word": "MONOCULTURE",
+      "display": "Monoculture",
+      "hint": "A field planted with just one kind of crop.",
+      "hint2": "Rows and rows of the same plant, as far as you can see.",
+      "fact": "Planting many kinds of crops makes a field more welcoming for wildlife.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-mycorrhiza",
+      "word": "MYCORRHIZA",
+      "display": "Mycorrhiza",
+      "hint": "A friendly partnership between a fungus and plant roots.",
+      "hint2": "Threads under the soil link trees together.",
+      "fact": "Tree roots and fungus threads swap food and water under the forest floor.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-nitrogen",
+      "word": "NITROGEN",
+      "display": "Nitrogen",
+      "hint": "A gas that makes up most of the air we breathe.",
+      "hint2": "Plants need it for green leaves, and clover helps add it to soil.",
+      "fact": "About four fifths of the air around us is this gas.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-nutrient",
+      "word": "NUTRIENT",
+      "display": "Nutrient",
+      "hint": "Something in food or soil that living things need to grow.",
+      "hint2": "Plants pull these up from the soil through their roots.",
+      "fact": "Plants need nitrogen, phosphorus and potassium most of all.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-omnivore",
+      "word": "OMNIVORE",
+      "display": "Omnivore",
+      "hint": "An animal that eats both plants and meat.",
+      "hint2": "Bears and people are this kind of eater.",
+      "fact": "Raccoons eat fruit, nuts, insects and fish.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-permaculture",
+      "word": "PERMACULTURE",
+      "display": "Permaculture",
+      "hint": "A way of gardening that works with the land.",
+      "hint2": "It designs food gardens to look after themselves.",
+      "fact": "These gardens use plants, animals and water to help each other.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-permafrost",
+      "word": "PERMAFROST",
+      "display": "Permafrost",
+      "hint": "Ground that stays frozen all year round.",
+      "hint2": "It lies under the Arctic tundra.",
+      "fact": "Some of it has stayed frozen for thousands of years.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-phototropism",
+      "word": "PHOTOTROPISM",
+      "display": "Phototropism",
+      "hint": "When a plant bends toward the light.",
+      "hint2": "A windowsill plant leans toward the glass.",
+      "fact": "The shady side of a stem grows faster, so the stem bends toward the light.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-pollinator",
+      "word": "POLLINATOR",
+      "display": "Pollinator",
+      "hint": "A bee or butterfly that carries dust from flower to flower.",
+      "hint2": "It helps flowers make seeds as it visits them.",
+      "fact": "Bees, bats, birds and beetles all help flowers make seeds.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "animal",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-precipitation",
+      "word": "PRECIPITATION",
+      "display": "Precipitation",
+      "hint": "Any water that falls from clouds, like rain, snow or hail.",
+      "hint2": "Weather reports tell you the chance of this.",
+      "fact": "Snow, sleet, hail and rain are all kinds of it.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "weather"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-propagate",
+      "word": "PROPAGATE",
+      "display": "Propagate",
+      "hint": "To make new plants from a cutting or a seed.",
+      "hint2": "Snip a stem, put it in water and watch roots grow.",
+      "fact": "Many houseplants grow roots when you put a cutting in water.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-puya",
+      "word": "PUYA",
+      "display": "Puya",
+      "hint": "A giant mountain plant that makes a very tall flower spike.",
+      "hint2": "It grows high in the Andes, and its spike is taller than a house.",
+      "fact": "It can grow for eighty years or more before it blooms.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "puya_raimondii",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-rhizosphere",
+      "word": "RHIZOSPHERE",
+      "display": "Rhizosphere",
+      "hint": "The narrow zone of soil around a plant's roots.",
+      "hint2": "Tiny helpers live right beside the roots.",
+      "fact": "Roots share sugar with tiny soil helpers in this zone.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-sediment",
+      "word": "SEDIMENT",
+      "display": "Sediment",
+      "hint": "Sand, mud and tiny bits of rock carried by water.",
+      "hint2": "It settles on the bottom of a river or lake.",
+      "fact": "Layers of it, pressed down over long ages, can turn into rock.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "water"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-solstice",
+      "word": "SOLSTICE",
+      "display": "Solstice",
+      "hint": "The day with the longest or shortest daylight of the year.",
+      "hint2": "Midsummer and midwinter each have one.",
+      "fact": "It happens twice a year, in June and December.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "weather"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-symbiosis",
+      "word": "SYMBIOSIS",
+      "display": "Symbiosis",
+      "hint": "Two living things helping each other live well.",
+      "hint2": "Bees and flowers are good partners like this.",
+      "fact": "Clownfish and sea anemones help each other in this way.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-taxonomy",
+      "word": "TAXONOMY",
+      "display": "Taxonomy",
+      "hint": "The science of naming and sorting living things into groups.",
+      "hint2": "It puts lions and tigers in the same cat family.",
+      "fact": "Every known plant has a two-part science name, like Bellis perennis for the daisy.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-transpiration",
+      "word": "TRANSPIRATION",
+      "display": "Transpiration",
+      "hint": "How a plant releases water vapor through its leaves.",
+      "hint2": "Water travels up from the roots and floats out into the air.",
+      "fact": "A big tree can send more than a hundred liters of water into the air on a summer day.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "plant",
+        "water",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-understory",
+      "word": "UNDERSTORY",
+      "display": "Understory",
+      "hint": "The layer of smaller plants beneath tall forest trees.",
+      "hint2": "Shade-loving ferns and shrubs grow here.",
+      "fact": "Many shy forest birds build nests in the understory.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "tree",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-vermicompost",
+      "word": "VERMICOMPOST",
+      "display": "Vermicompost",
+      "hint": "Rich soil food made by worms eating scraps.",
+      "hint2": "Red wigglers turn kitchen peels into garden gold.",
+      "fact": "Worms can turn apple cores and leaves into rich soil for plants.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "garden",
+        "animal"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-watershed",
+      "word": "WATERSHED",
+      "display": "Watershed",
+      "hint": "Land where rain flows downhill into the same river.",
+      "hint2": "All the streams in one valley join up.",
+      "fact": "Every raindrop that lands in a watershed ends up in the same river or lake.",
+      "level": 5,
+      "kind": "vocab",
+      "tags": [
+        "water",
+        "science"
+      ],
+      "minAge": 8,
+      "dailyEligible": true,
+      "source": "original",
+      "license": "proprietary",
+      "reviewedBy": "pending"
+    },
+    {
+      "id": "l5-wollemi-pine",
+      "word": "WOLLEMI PINE",
+      "display": "Wollemi Pine",
+      "hint": "An ancient tree found in a hidden canyon in Australia.",
+      "hint2": "Its family was known from fossils until a bushwalker found it in 1994.",
+      "fact": "Fewer than a hundred grown trees are known in the wild.",
+      "level": 5,
+      "kind": "hero",
+      "plantId": "wollemi_pine",
+      "tags": [
+        "plant"
+      ],
+      "minAge": 8,
       "dailyEligible": true,
       "source": "original",
       "license": "proprietary",

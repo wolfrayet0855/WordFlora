@@ -38,6 +38,66 @@ final class WordProviderTests: XCTestCase {
         XCTAssertEqual(levels, [1, 2, 3, 4, 5])
     }
 
+    // MARK: shipped bank content (T-A)
+    func testShippedBankVersionIsBumped() throws {
+        XCTAssertEqual(try WordBank.load().bankVersion, "2026.11.1")
+    }
+
+    func testShippedBankHasAtLeastThreeHundredEntries() throws {
+        XCTAssertGreaterThanOrEqual(try WordBank.load().entries.count, 300)
+    }
+
+    func testShippedBankHasAtLeastFiftyEntriesPerLevel() throws {
+        let byLevel = Dictionary(grouping: try WordBank.load().entries, by: \.level)
+        for level in 1...5 {
+            XCTAssertGreaterThanOrEqual(byLevel[level]?.count ?? 0, 50, "level \(level)")
+        }
+    }
+
+    func testShippedBankWordsAndIdsAreUnique() throws {
+        let entries = try WordBank.load().entries
+        let words = entries.map { $0.word.lowercased() }
+        let ids = entries.map(\.id)
+        XCTAssertEqual(Set(words).count, words.count, "duplicate words: \(Dictionary(grouping: words, by: { $0 }).filter { $1.count > 1 }.keys.sorted())")
+        XCTAssertEqual(Set(ids).count, ids.count, "duplicate ids")
+    }
+
+    func testShippedBankTextIsPresent() throws {
+        for e in try WordBank.load().entries {
+            XCTAssertFalse(e.hint.trimmingCharacters(in: .whitespaces).isEmpty, "\(e.id): hint")
+            XCTAssertFalse(e.fact.trimmingCharacters(in: .whitespaces).isEmpty, "\(e.id): fact")
+            if let h2 = e.hint2 { XCTAssertFalse(h2.trimmingCharacters(in: .whitespaces).isEmpty, "\(e.id): hint2") }
+        }
+    }
+
+    func testShippedBankTextPassesCopySafety() throws {
+        for e in try WordBank.load().entries {
+            for text in [e.hint, e.hint2, e.fact].compactMap({ $0 }) {
+                XCTAssertEqual(CopySafety.check(text), [], "\(e.id): \(text)")
+            }
+        }
+    }
+
+    func testShippedBankHeroPlantsExistInCatalog() throws {
+        let known = Set(try PlantCatalog.load().map(\.plantId))
+        for e in try WordBank.load().entries where e.kind == .hero {
+            XCTAssertNotNil(e.plantId, "\(e.id): hero without plantId")
+            if let pid = e.plantId { XCTAssertTrue(known.contains(pid), "\(e.id): unknown plant \(pid)") }
+        }
+    }
+
+    func testShippedBankDailySelectionIsDeterministicAndCoversEveryEntry() throws {
+        let b = try WordBank.load()
+        XCTAssertEqual(b.daily, DailyConfig(epoch: "2026-01-01", seed: 20260101))
+        var utc = Calendar(identifier: .gregorian); utc.timeZone = TimeZone(identifier: "UTC")!
+        let start = utc.date(from: DateComponents(year: 2026, month: 1, day: 1, hour: 12))!
+        let eligible = b.entries.filter(\.dailyEligible).count
+        let a = DailyBloom(bank: b, calendar: utc), c = DailyBloom(bank: b, calendar: utc)
+        let ids = (0..<eligible).map { a.wordId(for: utc.date(byAdding: .day, value: $0, to: start)!) }
+        XCTAssertEqual(ids, (0..<eligible).map { c.wordId(for: utc.date(byAdding: .day, value: $0, to: start)!) })
+        XCTAssertEqual(Set(ids.compactMap { $0 }).count, eligible)
+    }
+
     // MARK: validator
     func testValidatorRejectsDigitsAndSymbols() {
         let issues = WordBankValidator.validate(bank([entry("a", "H2O", level: 1), entry("b", "212F", level: 1)]), knownPlantIds: [])
