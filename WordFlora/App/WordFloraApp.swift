@@ -50,6 +50,12 @@ struct WordFloraApp: App {
             model.profile?.water = 5; model.profile?.soil = 3
             try? model.context.save()
         }
+        if uiTesting, let id = args.first(where: { $0.hasPrefix("-uitest-plant=") })?.dropFirst("-uitest-plant=".count) {
+            // One named plant found, with supplies, for the plant page tests (fact card, tending).
+            model.plants().first { $0.plantId == String(id) }?.earnedCount = 1
+            model.profile?.water = 5; model.profile?.soil = 3
+            try? model.context.save()
+        }
         if uiTesting && args.contains("-uitest-seed") {
             // One found plant that has rested long enough to be a seed, for the wake flow UI test.
             if let p = model.plants().first { p.earnedCount = 1; p.lastLovedAt = Date.now.addingTimeInterval(-6 * 86_400) }

@@ -46,7 +46,6 @@ struct NameStoryCard: View {
     let content: Content
     @State private var expanded = false
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
-    @ScaledMetric(relativeTo: .largeTitle) private var nameSize: CGFloat = 38
 
     init(content: Content) { self.content = content }
     init(plant: PlantInfo) { self.content = Content(plant: plant) }
@@ -61,7 +60,7 @@ struct NameStoryCard: View {
             HStack(alignment: .center) {
                 Text(content.title)
                     .textCase(.uppercase).kerning(0.8)
-                    .font(Theme.font(.caption, weight: .heavy)).foregroundStyle(Color.secondaryText)
+                    .font(Theme.font(.caption, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityAddTraits(.isHeader)
                 Spacer(minLength: 8)
@@ -119,13 +118,13 @@ struct NameStoryCard: View {
     private var storyText: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(content.name)
-                .font(.system(size: nameSize, weight: .bold, design: .serif))
+                .font(.system(.largeTitle, design: .serif, weight: .bold))
                 .foregroundStyle(Color.appPrimaryText)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 2)
             Text(content.botanicalName)
                 .font(.system(.subheadline, design: .serif).italic())
-                .foregroundStyle(Color.secondaryText)
+                .foregroundStyle(Color.appPrimaryText)
                 .padding(.top, 2).padding(.bottom, 10)
 
             if let chip = content.chip {
@@ -146,7 +145,7 @@ struct NameStoryCard: View {
             if expanded, let more = content.more {
                 VStack(alignment: .leading, spacing: 8) {
                     Line().stroke(Color.appPrimaryText.opacity(0.2), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4])).frame(height: 1.5)
-                    Text(more).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
+                    Text(more).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 .padding(.top, 8)

@@ -4,8 +4,10 @@ import SwiftData
 
 /// The plant's page: the plant in the centre (drawn from its layered art at its love petal count), the love petal
 /// row under it, rain and gentle thunder after a day with no love, the seed pot when it rests, and the Life panel
-/// at the left edge (a sheet with pinned actions at accessibility text sizes). Approved design:
-/// design-preview/tending/lifestats.html (option B petal row).
+/// at the left edge (a sheet at accessibility text sizes). Under the plant sits the fact card; the tend buttons are
+/// pinned at the bottom and show each action's state; a tap plays that action's effect over the plant.
+/// Approved designs: design-preview/tending/lifestats.html (option B petal row), design-preview/tending/actions.html
+/// (button states and the four effects), design-preview/fact-card (card placement).
 struct PlantDetailView: View {
     let plantId: String
 
@@ -16,7 +18,8 @@ struct PlantDetailView: View {
     @Environment(\.colorScheme) private var colorScheme
     @AppStorage("lifePanelHidden") private var panelHidden = false
     @AccessibilityFocusState private var focus: PanelFocus?
-    @State private var toast: String?
+    @State private var toast: ToastItem?
+    @State private var toastCount = 0
     @State private var sway = 0.0
     @State private var hellos = 0
     @State private var showRepot = false
@@ -29,11 +32,23 @@ struct PlantDetailView: View {
     @State private var flash = 0.0
     @State private var stageVisible = true
     @State private var lowPower = LowPowerWatch()
+    @State private var tends = TendSequencer()
+    @State private var tendTaps = 0
+    @State private var nudges: [TendKind: Int] = [:]
+    @State private var pot: TendPot = .plainBlue
 
     private enum PanelFocus: Hashable { case show, hide }
 
+    struct ToastItem: Equatable {
+        let text: String
+        let ok: Bool
+        let id: Int
+    }
+
     private var plant: PlantCollectible? { app.plants().first { $0.plantId == plantId } }
     private var large: Bool { typeSize.isAccessibilitySize }
+    /// Reduce Motion and Low Power Mode both get the short fade instead of the travelling effects.
+    private var calm: Bool { reduceMotion || lowPower.isOn }
 
     var body: some View {
         Group {
@@ -63,8 +78,15 @@ struct PlantDetailView: View {
                                   && scenePhase == .active && !lowPower.isOn,
                           dark: colorScheme == .dark, haptics: app.settings.hapticsOn, flash: $flash)
         }
-        .overlay(alignment: .bottom) { toastView }
-        .sheet(isPresented: $showRepot) { repotSheet(plant).presentationDetents([.medium]) }
+        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: tendTaps) { _, _ in app.settings.hapticsOn }
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button { draftName = plant.nickname; renaming = true } label: { Image(systemName: "pencil") }
+                    .accessibilityLabel(PlantDetailCopy.rename)
+                    .accessibilityHint(PlantDetailCopy.renameHint)
+            }
+        }
+        .sheet(isPresented: $showRepot) { repotSheet(plant).presentationDetents([.medium, .large]) }
         .sheet(isPresented: $showWake) { WakeSheet(plant: plant).environment(app) }   // Wake the seed
         .alert("Name your plant", isPresented: $renaming) {
             TextField("Name", text: $draftName)
@@ -75,20 +97,23 @@ struct PlantDetailView: View {
 
     // MARK: Layouts
 
+    /// The tend buttons sit below the scroll view (not over it), so nothing scrolls behind them.
     private func standardLayout(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot) -> some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                ZStack(alignment: .topLeading) {
-                    stage(plant, snap, plantSize: 220, plantTop: 92, cloudTop: 4)
-                    panel(snap)
-                }
+        VStack(spacing: 0) {
+            ScrollView {
                 VStack(spacing: 16) {
-                    nameBlock(plant, snap)
-                    details(plant, includeActions: true)
+                    ZStack(alignment: .topLeading) {
+                        stage(plant, snap, plantSize: 220, plantTop: 92, cloudTop: 4)
+                        panel(snap)
+                    }
+                    VStack(spacing: 16) {
+                        below(plant, snap)
+                    }
+                    .padding(.horizontal, 20)
                 }
-                .padding(.horizontal, 20)
+                .padding(.bottom, 20)
             }
-            .padding(.bottom, 20)
+            actionBar(plant)
         }
     }
 
@@ -98,15 +123,14 @@ struct PlantDetailView: View {
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     LifeSheet(snapshot: snap, collapsed: panelHidden) { togglePanel() }
-                    nameBlock(plant, snap).frame(maxWidth: .infinity)
-                    details(plant, includeActions: false)
+                    below(plant, snap)
                 }
                 .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 20)
             }
             .background(LifePalette.glass, in: UnevenRoundedRectangle(topLeadingRadius: 30, topTrailingRadius: 30))
             .overlay(UnevenRoundedRectangle(topLeadingRadius: 30, topTrailingRadius: 30).stroke(LifePalette.line))
+            actionBar(plant)
         }
-        .safeAreaInset(edge: .bottom) { pinnedActions(plant) }
     }
 
     // MARK: Stage: weather, plant, love petal row
@@ -139,6 +163,10 @@ struct PlantDetailView: View {
             }
 
             plantView(plant, snap, size: s, showPot: showPot, thirsty: thirsty, name: name)
+                .padding(.top, plantTop)
+
+            // The tend effect plays over the plant; taps pass through to it.
+            TendAnimationView(play: tends.current, size: s, calm: calm)
                 .padding(.top, plantTop)
 
             if raining && !reduceMotion {
@@ -187,6 +215,7 @@ struct PlantDetailView: View {
             }
         }
         .frame(width: s, height: s)
+        .tendMotion(tends.current, size: s, calm: calm)
         .animation(.easeInOut(duration: reduceMotion ? 0.3 : 1.2), value: showPot)
         .contentShape(Rectangle())
         .onTapGesture { hello(plant) }
@@ -246,58 +275,36 @@ struct PlantDetailView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) { focus = target }
     }
 
-    // MARK: Below the stage
+    // MARK: Below the stage: the seed card, the fact card, the plant's line, supplies
 
-    private func nameBlock(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot) -> some View {
-        let thirsty = TendingEngine.isThirsty(plant, now: .now, calm: app.settings.calmMode)
-        let name = displayName(plant)
-        let line = snap.rainDay > 0 ? LoveEngine.rainLine(name: name)
-            : (thirsty ? "Thirsty. A drink will perk it right up." : LifeStats.stageWord(snap.stage, seed: snap.isSeed))
-        return VStack(spacing: 4) {
-            Button { draftName = plant.nickname; renaming = true } label: {
-                HStack(spacing: 6) {
-                    Text(name).font(Theme.font(.title2, weight: .bold))
-                    Image(systemName: "pencil").font(.footnote)
-                }.foregroundStyle(Color.appPrimaryText)
-            }
-            .accessibilityHint("Give your plant a name")
-            Text(plant.botanicalName).font(Theme.font(.subheadline)).italic().foregroundStyle(Color.secondaryText)
-            Text(line).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText).multilineTextAlignment(.center)
-            if !snap.isSeed {
-                Label(LifeStats.hint(name: name), systemImage: "heart")
-                    .font(Theme.font(.footnote, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                    .padding(.top, 2)
-            }
-        }
-    }
-
-    @ViewBuilder private func details(_ plant: PlantCollectible, includeActions: Bool) -> some View {
+    @ViewBuilder private func below(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot) -> some View {
         let quiet = app.settings.quietGarden
-        if !quiet { resources }
 
         // MARK: Wake the seed (begin). Kept to this one block for the planned redesign of this screen.
         if app.showsWakeCard(plant) { WakeSeedCard(plant: plant, isPresented: $showWake) }
         // MARK: Wake the seed (end)
 
-        if includeActions { actions(plant) } else if app.inventory.tier(of: .shears) > 0 || app.settings.showEverything {
-            action("Prune", "scissors") { run(.prune, plant) }
+        NameStoryCard(name: plant.name, botanicalName: plant.botanicalName, fact: plant.botanicalFact,
+                      story: PlantCatalog.nameStory(for: plant.plantId))
+
+        statusBlock(plant, snap)
+
+        if !quiet { resources }
+
+        if large && showsPrune {
+            tendButton(.prune, plant)
         }
 
         if quiet {
-            Text("Take your time. Plants grow at their own pace.").font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
-        } else {
-            let cap = TendingEngine.capacityState(plant, now: .now, calendar: .current, economy: .default)
-            Label(TendingEngine.capacityLine(cap, name: displayName(plant)), systemImage: cap == .plenty ? "checkmark.seal.fill" : "leaf.fill")
-                .font(Theme.font(.footnote, weight: .semibold)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
+            Text(PlantDetailCopy.quiet).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                .frame(maxWidth: .infinity).multilineTextAlignment(.center)
         }
 
         if app.canOfferRewarded && !quiet && (app.profile?.water ?? 0) == 0 {
-            Button { Task { if await app.watchRewardedAd() { run(.water, plant) } } } label: {
+            Button { Task { if await app.watchRewardedAd() { run(.water, kind: .water, plant) } } } label: {
                 Label("Watch a short video for 2 drops", systemImage: "play.rectangle.fill")
             }.buttonStyle(SecondaryButtonStyle())
         }
-
-        Card { Text(plant.botanicalFact).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText) }
 
         if GardenAIProvider.isModelBacked() {
             if let aiText {
@@ -308,10 +315,28 @@ struct PlantDetailView: View {
                     }
                 }
             } else {
-                Button { Task { await tellMore(plant) } } label: { Label(aiBusy ? "Thinking…" : "Tell me more", systemImage: "sparkles") }
+                Button { Task { await tellMore(plant) } } label: { Label(aiBusy ? "Thinking…" : PlantDetailCopy.askAI, systemImage: "sparkles") }
                     .buttonStyle(SecondaryButtonStyle()).disabled(aiBusy)
             }
         }
+    }
+
+    /// The plant's line today (stage, thirsty or rain) and the hello hint.
+    private func statusBlock(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot) -> some View {
+        let thirsty = TendingEngine.isThirsty(plant, now: .now, calm: app.settings.calmMode)
+        let name = displayName(plant)
+        let line = snap.rainDay > 0 ? LoveEngine.rainLine(name: name)
+            : (thirsty ? PlantDetailCopy.thirsty : LifeStats.stageWord(snap.stage, seed: snap.isSeed))
+        return VStack(spacing: 4) {
+            Text(line).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText).multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+            if !snap.isSeed {
+                Label(LifeStats.hint(name: name), systemImage: "heart")
+                    .font(Theme.font(.footnote, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                    .padding(.top, 2)
+            }
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var resources: some View {
@@ -320,6 +345,7 @@ struct PlantDetailView: View {
             HStack(spacing: 10) { chips(p) }
             VStack(spacing: 8) { chips(p) }
         }
+        .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder private func chips(_ p: PlayerProfile?) -> some View {
@@ -334,74 +360,119 @@ struct PlantDetailView: View {
             .accessibilityLabel("\(n) \(label)")
     }
 
-    private func actions(_ plant: PlantCollectible) -> some View {
-        let owns = app.inventory
-        return LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-            action("Water", "drop.fill") { run(.water, plant) }
-            action("Feed", "leaf.arrow.triangle.circlepath") { run(.feed, plant) }
-            action("Sun", "sun.max.fill") { run(.sun, plant) }
-            if owns.tier(of: .shears) > 0 || app.settings.showEverything { action("Prune", "scissors") { run(.prune, plant) } }
-            action("Repot", "shippingbox") { showRepot = true }
+    // MARK: Tend buttons (pinned at the bottom; each shows its own state from AppModel.actionState)
+
+    private var showsPrune: Bool { app.inventory.tier(of: .shears) > 0 || app.settings.showEverything }
+
+    private func action(for kind: TendKind) -> AppModel.TendAction {
+        switch kind {
+        case .water: return .water
+        case .feed: return .feed
+        case .sun: return .sun
+        case .prune: return .prune
+        case .repot: return .repot(.loam)       // the soil is picked in the sheet; the state does not depend on it
         }
     }
 
-    /// Accessibility text sizes: Water, Feed, Sun and Repot stay pinned under the Life sheet as a 2 by 2 bar.
-    private func pinnedActions(_ plant: PlantCollectible) -> some View {
-        Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-            GridRow {
-                pinned("Water", "drop.fill", LifePalette.water) { run(.water, plant) }
-                pinned("Feed", "leaf.fill", LifePalette.leaf) { run(.feed, plant) }
-            }
-            GridRow {
-                pinned("Sun", "sun.max.fill", LifePalette.sun) { run(.sun, plant) }
-                pinned("Repot", "shippingbox.fill", LifePalette.clay) { showRepot = true }
+    private func actionBar(_ plant: PlantCollectible) -> some View {
+        Group {
+            if large {
+                Grid(horizontalSpacing: 8, verticalSpacing: 8) {
+                    GridRow { tendButton(.water, plant); tendButton(.feed, plant) }
+                    GridRow { tendButton(.sun, plant); tendButton(.repot, plant) }
+                }
+            } else {
+                HStack(spacing: 8) {
+                    ForEach([TendKind.water, .feed, .sun] + (showsPrune ? [.prune] : []) + [.repot], id: \.self) { tendButton($0, plant) }
+                }
+                .fixedSize(horizontal: false, vertical: true)       // every tile as tall as the tallest
             }
         }
         .padding(.horizontal, 14).padding(.top, 10).padding(.bottom, 6)
         .background(Color.appBackground.ignoresSafeArea(edges: .bottom))
         .overlay(alignment: .top) { Rectangle().fill(LifePalette.line).frame(height: 1) }
-    }
-
-    private func pinned(_ title: String, _ icon: String, _ tint: Color, _ tap: @escaping () -> Void) -> some View {
-        Button(action: tap) {
-            HStack(spacing: 8) {
-                Image(systemName: icon).foregroundStyle(tint)
-                Text(title).foregroundStyle(Color.appPrimaryText).lineLimit(1).minimumScaleFactor(0.6)
-            }
-            .font(Theme.font(.body, weight: .heavy))
-            .frame(maxWidth: .infinity, minHeight: 64)
-            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 20))
-            .overlay(RoundedRectangle(cornerRadius: 20).stroke(LifePalette.line))
+        .overlay(alignment: .top) {
+            toastView.padding(.horizontal, 16)
+                .alignmentGuide(.top) { d in d[.bottom] + 10 }
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel(title)
     }
 
-    private func action(_ title: String, _ icon: String, _ tap: @escaping () -> Void) -> some View {
-        Button(action: tap) { Label(title, systemImage: icon) }.buttonStyle(SecondaryButtonStyle())
+    private func tendButton(_ kind: TendKind, _ plant: PlantCollectible) -> some View {
+        let state = app.actionState(action(for: kind), plant: plant)
+        return TendActionButton(kind: kind, look: TendButtonLook(kind: kind, state: state), large: large, nudge: nudges[kind, default: 0]) {
+            tap(kind, plant)
+        }
+    }
+
+    private func tap(_ kind: TendKind, _ plant: PlantCollectible) {
+        if kind == .repot {
+            let state = app.actionState(.repot(.loam), plant: plant)
+            if state.isReady { showRepot = true } else { refuse(kind, state.line ?? TendKind.repot.supplyCaption) }
+            return
+        }
+        run(action(for: kind), kind: kind, plant)
     }
 
     private func repotSheet(_ plant: PlantCollectible) -> some View {
-        VStack(spacing: 14) {
-            Text("Choose a soil").font(Theme.font(.title3, weight: .bold))
-            Text("Plants have favorite soils. Try one and see how it reacts.").font(Theme.font(.callout)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                ForEach(SoilType.allCases, id: \.self) { soil in
-                    Button { showRepot = false; run(.repot(soil), plant) } label: { Text(soil.rawValue.capitalized) }
-                        .buttonStyle(SecondaryButtonStyle())
+        ScrollView {
+            VStack(spacing: 14) {
+                Text("Choose a soil").font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                Text("Plants have favorite soils. Try one and see how it reacts.").font(Theme.font(.callout)).foregroundStyle(Color.secondaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
+                    ForEach(SoilType.allCases, id: \.self) { soil in
+                        Button { showRepot = false; run(.repot(soil), kind: .repot, plant) } label: { Text(soil.rawValue.capitalized) }
+                            .buttonStyle(SecondaryButtonStyle())
+                    }
+                }
+                potRow
+            }
+            .padding(24)
+        }
+    }
+
+    /// The pot the repot plays with.
+    /// HOOK (pot collection): the shed's pot row is not built yet, so plain blue is the one pot here. When it lands,
+    /// list the player's pots from the shed in this row and keep the picked one in `pot`.
+    private var potRow: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(PlantDetailCopy.potTitle).font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+            HStack(spacing: 10) {
+                ForEach(TendPot.allCases, id: \.self) { p in
+                    Button { pot = p } label: {
+                        Label(p.name, systemImage: pot == p ? "checkmark.circle.fill" : "circle")
+                            .font(Theme.font(.subheadline, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                            .padding(.horizontal, 14).frame(minHeight: Theme.minTap)
+                            .background(p.rim.opacity(0.35), in: Capsule())
+                            .overlay(Capsule().stroke(pot == p ? p.shade : LifePalette.line, lineWidth: 2))
+                    }
+                    .accessibilityAddTraits(pot == p ? .isSelected : [])
                 }
             }
+            Text(PlantDetailCopy.potNote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(24)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     @ViewBuilder private var toastView: some View {
         if let toast {
-            Text(toast).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
-                .padding(.horizontal, 16).padding(.vertical, 12)
-                .background(Color.appSurface, in: Capsule()).shadow(radius: 6, y: 2).padding(.bottom, 20)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .accessibilityAddTraits(.updatesFrequently)
+            HStack(spacing: 10) {
+                Image(systemName: toast.ok ? "checkmark.circle.fill" : "moon.fill")
+                    .foregroundStyle(toast.ok ? LifePalette.leafBright : Color.appBackground.opacity(0.85))
+                    .accessibilityHidden(true)
+                Text(toast.text).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appBackground)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .padding(.horizontal, 16).padding(.vertical, 12)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(Color.appPrimaryText, in: RoundedRectangle(cornerRadius: 16))
+            .shadow(color: .black.opacity(0.15), radius: 6, y: 2)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+            .accessibilityElement(children: .combine)
+            .accessibilityAddTraits(.updatesFrequently)
+            .accessibilityIdentifier("tend-toast")
+            .id(toast.id)
         }
     }
 
@@ -415,21 +486,52 @@ struct PlantDetailView: View {
         aiBusy = false
     }
 
-    private func run(_ action: AppModel.TendAction, _ plant: PlantCollectible) {
+    /// A tap: on success the effect plays once (replacing any effect still playing), with its sound and one soft
+    /// haptic, and the toast follows the pour; a refused tap gets a soft nudge and the kind reason at once.
+    private func run(_ action: AppModel.TendAction, kind: TendKind, _ plant: PlantCollectible) {
         let outcome = app.tend(action, plant: plant)
-        if outcome.applied {
-            switch action {
-            case .water: app.play(.water)
-            case .feed, .repot: app.play(.soil)
-            case .sun: app.play(.sun)
-            case .prune: app.play(.snip)
-            }
+        guard outcome.applied else { refuse(kind, outcome.message); return }
+        tendTaps += 1
+        if let effect = TendEffect(action) {
+            app.play(effect.sound)
+            let play = tends.start(effect, pot: pot, at: .now)
+            let life = TendMotion.lifetime(effect, calm: calm, hold: TendMotion.uiTestHold)
+            DispatchQueue.main.asyncAfter(deadline: .now() + life) { tends.finish(id: play.id) }
+        } else {
+            app.play(.snip)
         }
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { toast = outcome.message }
-        if outcome.stageUp { bump.toggle() }
-        AccessibilityNotification.Announcement(outcome.message).post()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) { withAnimation { toast = nil } }
+        let delay = TendEffect(action) == nil ? 0 : (calm ? 0.4 : 0.9)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { if outcome.stageUp { bump.toggle() } }
+        show(outcome.message, ok: true, after: delay)
     }
+
+    private func refuse(_ kind: TendKind, _ line: String) {
+        nudges[kind, default: 0] += 1
+        show(line, ok: false, after: 0)
+    }
+
+    private func show(_ text: String, ok: Bool, after delay: Double) {
+        toastCount += 1
+        let item = ToastItem(text: text, ok: ok, id: toastCount)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
+            guard toastCount == item.id else { return }          // a newer tap took over
+            withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { toast = item }
+            AccessibilityNotification.Announcement(text).post()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { if toast?.id == item.id { withAnimation { toast = nil } } }
+        }
+    }
+}
+
+/// Words that appear only on the plant page (checked by the copy tests).
+enum PlantDetailCopy {
+    static let rename = "Rename"
+    static let renameHint = "Give your plant a name"
+    static let quiet = "Take your time. Plants grow at their own pace."
+    static let thirsty = "Thirsty. A drink will perk it right up."
+    static let askAI = "Ask for a fun fact"
+    static let potTitle = "Pot"
+    static let potNote = "Plain blue is always here. More pots will come from the shed."
+    static var all: [String] { [rename, renameHint, quiet, thirsty, askAI, potTitle, potNote] }
 }
 
 /// The "tap your plant" hint is hidden while VoiceOver runs, since VoiceOver users get the plant's own hint.

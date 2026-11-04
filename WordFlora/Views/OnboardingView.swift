@@ -85,6 +85,8 @@ private struct FirstGardenTipView: View {
     @Environment(AppModel.self) private var app
     @State private var watered = false
     @State private var toast: String?
+    @State private var pour: TendPlay?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @ScaledMetric(relativeTo: .title2) private var tipIcon: CGFloat = 44
 
     private var plant: PlantCollectible? { app.plants().first { $0.earnedCount > 0 } }
@@ -104,9 +106,11 @@ private struct FirstGardenTipView: View {
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                     .accessibilityAddTraits(.isHeader)
                 if let plant {
-                    // HOOK (T5): the water pour storyboard plays here once, over the plant, when `watered` turns true.
+                    // The water pour plays here once, over the plant, when the free drink is poured.
                     PlantCard(plant: plant).frame(maxWidth: 220)
-                        .scaleEffect(watered ? 1.04 : 1).animation(.spring(response: 0.4, dampingFraction: 0.5), value: watered)
+                        .tendMotion(pour, size: 92, calm: reduceMotion)
+                        .overlay(alignment: .top) { TendAnimationView(play: pour, size: 92, calm: reduceMotion).padding(.top, 12) }
+                        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: pour?.id ?? 0) { old, new in new > old && app.settings.hapticsOn }
                 }
                 if watered {
                     Label("Watered. It will grow a little every day.", systemImage: "checkmark.circle.fill")
@@ -161,7 +165,13 @@ private struct FirstGardenTipView: View {
         guard let plant, let profile = app.profile else { withAnimation { watered = true }; return }
         profile.water += 1                       // the free first drop
         let outcome = app.tend(.water, plant: plant)
-        if outcome.applied { app.play(.water) }
+        if outcome.applied {
+            app.play(.water)
+            let play = TendPlay(effect: .water, startedAt: .now, id: 1)
+            pour = play
+            let life = TendMotion.lifetime(.water, calm: reduceMotion, hold: TendMotion.uiTestHold)
+            DispatchQueue.main.asyncAfter(deadline: .now() + life) { if pour == play { pour = nil } }
+        }
         withAnimation { watered = true }
         withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { toast = outcome.message }
         AccessibilityNotification.Announcement(outcome.message).post()
