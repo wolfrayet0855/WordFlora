@@ -158,6 +158,31 @@ final class AppModel {
         plant.lastLovedAt = now(); try? context.save()
     }
 
+    // MARK: Wake the seed
+
+    /// The seed card (and its quiet "Wake" button) shows only for a seed; Quiet Garden and Calm mode never make one.
+    func showsWakeCard(_ plant: PlantCollectible) -> Bool { loveState(plant).isSeed }
+
+    var wakeSuggestion: WakeChallenge { WakeRule.suggestion(last: settings.lastWakeChallenge, lastResult: settings.lastWakeResult) }
+    var wakeIsEasier: Bool { WakeRule.isEasier(dreamsInARow: settings.wakeDreamsInARow) }
+    var wakeButterflyGoal: Int { WakeRule.butterflyGoal(dreamsInARow: settings.wakeDreamsInARow) }
+
+    /// Today's word puzzle for this seed: a name from the plants the player has found when there are enough, else any.
+    func wakePuzzle(for plant: PlantCollectible) -> WakePuzzle? {
+        let all = plants()
+        let found = all.filter { $0.earnedCount > 0 }.map(\.name)
+        let names = WakePuzzle.candidates(from: found).count >= 3 ? found : all.map(\.name)
+        return WakePuzzle.make(plantId: plant.plantId, day: WakePuzzle.day(for: now()), names: names, easier: wakeIsEasier)
+    }
+
+    /// Records a wake try. A win wakes the seed; "still dreaming" changes nothing but the next suggestion.
+    func finishWake(_ plant: PlantCollectible, challenge: WakeChallenge, woke: Bool) {
+        settings.lastWakeChallenge = challenge
+        settings.lastWakeResult = woke ? .woke : .stillDreaming
+        settings.wakeDreamsInARow = woke ? 0 : settings.wakeDreamsInARow + 1
+        if woke { wake(plant); play(.wake) }
+    }
+
     func tend(_ action: TendAction, plant: PlantCollectible) -> TendOutcome {
         guard let p = profile else { return TendOutcome(applied: false, message: "Something went wrong. Try again.") }
         if loveState(plant).isSeed { return TendOutcome(applied: false, message: LoveEngine.seedLine(name: plant.nickname.isEmpty ? plant.name : plant.nickname)) }

@@ -20,6 +20,7 @@
 		1A0DEDAC7F9EC16779453E20 /* WordFloraWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 99F163FA4DA73F8563DD08F0 /* WordFloraWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1A1EF2246D18FBC822B23F43 /* wf-butterfly.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B3C67B3F3D18A565BC91069D /* wf-butterfly.m4a */; };
 		1B1F6E25CDDEF290B4E2EDA4 /* VoicePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673807997651A94A74A50735 /* VoicePickerTests.swift */; };
+		1CE9AE24116B633B3AF3403A /* WakePuzzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60BDD5B19B690060D44B813 /* WakePuzzle.swift */; };
 		1CEC41D7155EFBA55139F8BF /* ButterflyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F887962950E79A156ED26A3F /* ButterflyView.swift */; };
 		1D3676A7C18FACB6F1FC68CD /* RoseMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */; };
 		204098414E074C6111011CE4 /* TendingEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A934E0013AAE5EB7DE9896 /* TendingEngineTests.swift */; };
@@ -84,6 +85,7 @@
 		8CDA4D0BA93F589962585DB8 /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6305635D642316CCE8610F /* GameRecord.swift */; };
 		8D0713077E5F0FB67B6E3389 /* PlantCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9112EA0C7C78CD5C0BBDF205 /* PlantCard.swift */; };
 		8D183901C6FE706E07BB9C19 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */; };
+		8D71B5862E6878124BB379B1 /* WakeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B08CBCAEE1D5A24848BAF8 /* WakeTests.swift */; };
 		8EE94A601E0EFA010CB76EE6 /* Badges.json in Resources */ = {isa = PBXBuildFile; fileRef = DE3B9B93CE1A034E8C165CB7 /* Badges.json */; };
 		94D8860C3740EB26ADB252F0 /* ToolEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D9F7603039699D755A5EDB /* ToolEngineTests.swift */; };
 		9603333091B94F1CE68C0A45 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9075581718316A5EDE6C92FD /* GameViewModel.swift */; };
@@ -146,6 +148,7 @@
 		DD628744087E1FD65B092F00 /* WordFlora.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 437A27B2E9B24CF220BF4444 /* WordFlora.storekit */; };
 		E34CA6A0C7858CAEEA182CCF /* GardenBackup.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFF28D3D26629318AA9D49A4 /* GardenBackup.swift */; };
 		E5108E2647FAB92A41BE8E53 /* StoreResolveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4FB003E686D225F4D94B47 /* StoreResolveTests.swift */; };
+		E6D3B7F0C76AD474A6CF68A5 /* WakeChallenge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6B246B40089EA34F9E6A1CE5 /* WakeChallenge.swift */; };
 		E7EE45CC3E1C7571FF926CB0 /* DailyBloom.swift in Sources */ = {isa = PBXBuildFile; fileRef = BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */; };
 		EC4500E6CD3A54445703ACAF /* ReconcileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5603BA4007B124D652F8467 /* ReconcileTests.swift */; };
 		EDB86ADCB596F2390F8642F7 /* wf-word.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9BB89B0B7D5A508F1A4C13B4 /* wf-word.m4a */; };
@@ -199,6 +202,7 @@
 /* Begin PBXFileReference section */
 		025558730A17C81DFFB5A5C3 /* LevelMapView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LevelMapView.swift; sourceTree = "<group>"; };
 		03162041D3ADF3CEE1CCF23B /* CoreRulesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoreRulesTests.swift; sourceTree = "<group>"; };
+		03B08CBCAEE1D5A24848BAF8 /* WakeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WakeTests.swift; sourceTree = "<group>"; };
 		045A383C28CF63B7AA1690E5 /* Economy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Economy.swift; sourceTree = "<group>"; };
 		07E6A1305C8A4BB87A255C2F /* WordProviderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordProviderTests.swift; sourceTree = "<group>"; };
 		08D9F7603039699D755A5EDB /* ToolEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ToolEngineTests.swift; sourceTree = "<group>"; };
@@ -250,6 +254,7 @@
 		673807997651A94A74A50735 /* VoicePickerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoicePickerTests.swift; sourceTree = "<group>"; };
 		6ABB0A3A61951013C0E5506F /* CapacityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CapacityTests.swift; sourceTree = "<group>"; };
 		6ACF0034A28D0F546B9B9DB9 /* wf-badgeSilver.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeSilver.m4a"; sourceTree = "<group>"; };
+		6B246B40089EA34F9E6A1CE5 /* WakeChallenge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WakeChallenge.swift; sourceTree = "<group>"; };
 		6BA2FA0C2D96FAD52648169E /* Sound.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Sound.swift; sourceTree = "<group>"; };
 		6D34CCDEB804DD45AF53C466 /* PlusOfferPolicyTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlusOfferPolicyTests.swift; sourceTree = "<group>"; };
 		6E08620029509154DEB72456 /* AssistTuner.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AssistTuner.swift; sourceTree = "<group>"; };
@@ -292,6 +297,7 @@
 		A2BDF97F749985947F3401F0 /* WordFloraWidget.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = WordFloraWidget.entitlements; sourceTree = "<group>"; };
 		A52DDAFDFAE9419F12ADE568 /* WordFloraUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A567F6286A4FDF9DA2E6D05B /* wf-wake.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-wake.m4a"; sourceTree = "<group>"; };
+		A60BDD5B19B690060D44B813 /* WakePuzzle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WakePuzzle.swift; sourceTree = "<group>"; };
 		A6A01FC491120FB6F06CDF63 /* VoicePicker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoicePicker.swift; sourceTree = "<group>"; };
 		A86EDC2288FBFA94769434C1 /* wf-rest.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-rest.m4a"; sourceTree = "<group>"; };
 		B0DEEEBD8B052299970213DD /* wf-key.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-key.m4a"; sourceTree = "<group>"; };
@@ -425,6 +431,8 @@
 				2732222DBF50FDA29A7C62BE /* PlantVoice.swift */,
 				C2004661176B5B7000630E9F /* LoveEngine.swift */,
 				4DA662141FB5A76A22AE6D6E /* PlusOfferPolicy.swift */,
+				6B246B40089EA34F9E6A1CE5 /* WakeChallenge.swift */,
+				A60BDD5B19B690060D44B813 /* WakePuzzle.swift */,
 			);
 			name = Rules;
 			path = Rules;
@@ -552,6 +560,7 @@
 				EF908A564AC2DBFD8ADCFBBA /* LoveEngineTests.swift */,
 				DBDCE1A9248AD5C4EDCBE08A /* GardenBackupTests.swift */,
 				6D34CCDEB804DD45AF53C466 /* PlusOfferPolicyTests.swift */,
+				03B08CBCAEE1D5A24848BAF8 /* WakeTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -954,6 +963,7 @@
 				B2D7AF20A245D095F5421AF1 /* LoveEngineTests.swift in Sources */,
 				B36DF466DA00B53CA30EB993 /* GardenBackupTests.swift in Sources */,
 				AFF9B401B1E6E463C7CC2E57 /* PlusOfferPolicyTests.swift in Sources */,
+				8D71B5862E6878124BB379B1 /* WakeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1056,6 +1066,8 @@
 				D51839FD5EE99D7181E304F0 /* LoveEngine.swift in Sources */,
 				E34CA6A0C7858CAEEA182CCF /* GardenBackup.swift in Sources */,
 				A2D216419ECE5F147321CFD4 /* PlusOfferPolicy.swift in Sources */,
+				E6D3B7F0C76AD474A6CF68A5 /* WakeChallenge.swift in Sources */,
+				1CE9AE24116B633B3AF3403A /* WakePuzzle.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

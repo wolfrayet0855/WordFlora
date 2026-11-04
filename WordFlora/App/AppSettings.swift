@@ -31,6 +31,10 @@ final class AppSettings {
     /// Milestones the Plus card has already appeared for, and when it last appeared (PlusOfferPolicy).
     var plusOfferMilestones: [String] { didSet { defaults.set(plusOfferMilestones, forKey: "plusOfferMilestones") } }
     var plusOfferLastAt: Date? { didSet { defaults.set(plusOfferLastAt, forKey: "plusOfferLastAt") } }
+    /// The most recent wake-the-seed try, which drives the suggested challenge (WakeRule).
+    var lastWakeChallenge: WakeChallenge? { didSet { defaults.set(lastWakeChallenge?.rawValue, forKey: "lastWakeChallenge") } }
+    var lastWakeResult: WakeResult? { didSet { defaults.set(lastWakeResult?.rawValue, forKey: "lastWakeResult") } }
+    var wakeDreamsInARow: Int { didSet { defaults.set(wakeDreamsInARow, forKey: "wakeDreamsInARow") } }
 
     var isUnderThirteen: Bool { ageBand == .under13 }
     var colorScheme: ColorScheme? {
@@ -63,6 +67,9 @@ final class AppSettings {
         lastOpenedAt = defaults.object(forKey: "lastOpenedAt") as? Date
         plusOfferMilestones = defaults.stringArray(forKey: "plusOfferMilestones") ?? []
         plusOfferLastAt = defaults.object(forKey: "plusOfferLastAt") as? Date
+        lastWakeChallenge = defaults.string(forKey: "lastWakeChallenge").flatMap(WakeChallenge.init(rawValue:))
+        lastWakeResult = defaults.string(forKey: "lastWakeResult").flatMap(WakeResult.init(rawValue:))
+        wakeDreamsInARow = defaults.integer(forKey: "wakeDreamsInARow")
     }
 
     /// Applies the defaults that depend on the age answer (called once, when the player answers).
