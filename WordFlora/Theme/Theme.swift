@@ -19,12 +19,36 @@ extension View {
     func tapTarget() -> some View { frame(minWidth: Theme.minTap, minHeight: Theme.minTap).contentShape(Rectangle()) }
 }
 
+/// The WordFlora wordmark: vector artwork with a flower in each O (design-preview/logo/final).
+/// Light and dark come from the asset's appearances; Increase Contrast swaps in the mono art,
+/// tinted with the primary text colour so it reads in both modes. Below 130 pt the solo art
+/// (flower only in Flora's O) is used, as the artwork notes ask.
 struct WordmarkView: View {
     var style: Font.TextStyle = .largeTitle
+    @Environment(\.colorSchemeContrast) private var contrast
+    @ScaledMetric(relativeTo: .title) private var titleWidth: CGFloat = 172
+    @ScaledMetric(relativeTo: .largeTitle) private var largeWidth: CGFloat = 262
+
+    private var base: CGFloat { style == .largeTitle ? 262 : 172 }
+    /// Grows with Dynamic Type, capped at 1.6x so the Home header keeps room for its controls.
+    private var width: CGFloat { min(style == .largeTitle ? largeWidth : titleWidth, base * 1.6) }
+
     var body: some View {
-        (Text("Word").foregroundColor(.appPrimaryText) + Text("Flora").foregroundColor(.wordmarkFlora))
-            .font(Theme.font(style, weight: .heavy))
+        art
+            .resizable()
+            .scaledToFit()
+            .foregroundStyle(Color.appPrimaryText)   // only tints the template (mono) art
+            .frame(maxWidth: width)
+            .accessibilityElement(children: .ignore)
             .accessibilityLabel("WordFlora")
+            .accessibilityAddTraits([.isHeader, .isImage])
+    }
+
+    private var art: Image {
+        if contrast == .increased {
+            return Image("WordmarkMono").renderingMode(.template)
+        }
+        return Image(width < 130 ? "WordmarkSolo" : "Wordmark").renderingMode(.original)
     }
 }
 

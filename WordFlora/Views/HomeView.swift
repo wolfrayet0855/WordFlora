@@ -130,7 +130,7 @@ struct HomeView: View {
 
     private var topBar: some View {
         HStack {
-            WordmarkView(style: .title)
+            WordmarkView(style: .title).layoutPriority(1)
             Spacer()
             Button { router.go(.settings) } label: {
                 Image(systemName: "gearshape.fill").font(.system(size: gearSize)).frame(minWidth: Theme.minTap, minHeight: Theme.minTap)

@@ -34,6 +34,7 @@ final class WordFloraUITests: XCTestCase {
         launch()
         XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Garden"].exists)
+        XCTAssertTrue(app.images["WordFlora"].exists)                           // the wordmark artwork, one labelled element
         shot("home")
     }
 

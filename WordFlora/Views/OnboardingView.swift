@@ -33,7 +33,7 @@ private struct IntroView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 8) {
-                WordmarkView(style: .largeTitle).scaleEffect(1.25)
+                WordmarkView(style: .largeTitle)
                 Text("Guess words. Grow a garden.").font(Theme.font(.callout, weight: .medium)).foregroundStyle(Color.secondaryText)
             }
             .opacity(showTitle ? 1 : 0)
