@@ -22,6 +22,8 @@ struct PotPlusTag: View {
         .foregroundStyle(PotPalette.plusInk)
         .padding(.horizontal, 6).padding(.vertical, 1)
         .background(PotPalette.plus, in: Capsule())
+        // A tag, not a label: at accessibility text sizes it would cover the pot and its name.
+        .dynamicTypeSize(...DynamicTypeSize.large)
         .accessibilityHidden(true)
     }
 }
@@ -35,6 +37,7 @@ struct PotCheckBadge: View {
             .frame(width: size, height: size)
             .background(PotPalette.ring, in: Circle())
             .overlay(Circle().stroke(Color.appSurface, lineWidth: 2))
+            .dynamicTypeSize(...DynamicTypeSize.large)
             .accessibilityHidden(true)
     }
 }
@@ -87,11 +90,14 @@ struct PotPickGrid: View {
                 PotArtView(pot: pot, style: toEarn ? .toEarn : .full, width: 50)
                 Text(pot.name).font(Theme.font(.caption, weight: .heavy))
                     .foregroundStyle(toEarn ? Color.secondaryText : Color.appPrimaryText)
-                    // Wraps only at spaces: a one-word name shrinks a little instead of breaking inside the word.
-                    .multilineTextAlignment(.center).lineLimit(pot.name.contains(" ") ? 2 : 1).minimumScaleFactor(0.7)
+                    // Wraps only at spaces: a one-word name shrinks instead of breaking inside the word or clipping.
+                    // Capped so "Terracotta" still fits a tile at accessibility sizes; VoiceOver reads the full label.
+                    .multilineTextAlignment(.center).lineLimit(pot.name.contains(" ") ? 2 : 1).minimumScaleFactor(0.5)
+                    .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.top, 9).padding(.bottom, 6).padding(.horizontal, 2)
+            // Room above the pot for the Plus tag, and beside the name so it clears the 3pt picked ring.
+            .padding(.top, 12).padding(.bottom, 6).padding(.horizontal, 5)
             .frame(maxWidth: .infinity, minHeight: 86, alignment: .top)
             .background(Color.appBackground, in: RoundedRectangle(cornerRadius: 16))
             .overlay {
@@ -107,6 +113,7 @@ struct PotPickGrid: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(PotCatalog.tileLabel(pot, state: isCurrent ? .owned : s, inUse: isCurrent))
+        .accessibilityHint(toEarn ? PotCatalog.Copy.hintToEarn : plusTag ? PotCatalog.Copy.hintPlus : "")
         .accessibilityAddTraits(isPicked ? .isSelected : [])
         .accessibilityIdentifier("pot-tile-\(pot.id)")
     }
@@ -213,6 +220,7 @@ struct ShedPotsSection: View {
         return Button { message = tapLine(pot, s) } label: {
             VStack(spacing: 4) {
                 PotArtView(pot: pot, style: toEarn ? .toEarn : .full, width: 76)
+                    .padding(.top, 12)         // clears the check badge and Plus tag in the corner
                 Text(pot.name).font(Theme.font(.subheadline, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                 switch s {
@@ -236,8 +244,8 @@ struct ShedPotsSection: View {
             .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appPrimaryText.opacity(toEarn ? 0.14 : 0.08), lineWidth: toEarn ? 1.5 : 1))
             .overlay(alignment: .topTrailing) {
                 switch s {
-                case .owned: PotCheckBadge(size: 20).padding(7)
-                case .plus: PotPlusTag().padding(7)
+                case .owned: PotCheckBadge(size: 20).padding(4)
+                case .plus: PotPlusTag().padding(4)
                 case .toEarn: EmptyView()
                 }
             }

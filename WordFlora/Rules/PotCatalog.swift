@@ -172,9 +172,12 @@ enum PotCatalog {
         static let shedSub = "Tap a pot to see how to earn it"
         static let shedFooter = "Pots you earn stay yours. " + plusKeep
         static let freshSoil = "Repot with fresh soil"
+        /// VoiceOver hints on pick tiles that are not chosen on tap.
+        static let hintToEarn = "Shows how to earn it"
+        static let hintPlus = "Shows where to find Plus"
         static var all: [String] {
             [earned, current, pickTitle, pickSub, plusTag, plusKeep, plusSettings, progressFirst, yours, plusCard,
-             shedTitle, shedSub, shedFooter, freshSoil]
+             shedTitle, shedSub, shedFooter, freshSoil, hintToEarn, hintPlus]
         }
     }
 
