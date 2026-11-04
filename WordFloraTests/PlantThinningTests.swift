@@ -157,12 +157,13 @@ final class PlantThinningTests: XCTestCase {
             return Set(units.values.filter { u in u.petals.allSatisfy { showing.contains(PetalRef(ring: $0[0], petal: $0[1])) } }.map(\.id))
         }
         XCTAssertEqual(unitsShowing(5).count, 8)
-        XCTAssertEqual(unitsShowing(4), ["o0", "o72", "o216", "wrap", "swirl", "heart"])
-        XCTAssertEqual(unitsShowing(3), ["wrap", "swirl", "heart"])
+        XCTAssertEqual(unitsShowing(4), ["o0", "o72", "o288", "wrap", "swirl", "heart"])
+        XCTAssertEqual(unitsShowing(3), ["o72", "o288", "wrap", "swirl", "heart"])
         XCTAssertEqual(unitsShowing(2), ["swirl", "heart"])
         XCTAssertEqual(unitsShowing(1), ["heart"])
         XCTAssertEqual(unitsShowing(0), [])
-        XCTAssertEqual(units["o288"]?.lostAtPips, 4)
+        XCTAssertEqual(units["o144"]?.lostAtPips, 4)
+        XCTAssertEqual(units["o288"]?.lostAtPips, 2)
         XCTAssertEqual(units["heart"]?.lostAtPips, 0)
         // an outer petal and its valley petal leave together
         XCTAssertEqual(units["o0"]?.petals.count, 2)
@@ -170,6 +171,72 @@ final class PlantThinningTests: XCTestCase {
         XCTAssertEqual(rose.layers.filter { $0.role == "sepal" }.count, 2)
         XCTAssertNotNil(rule.settle?["1"])
         XCTAssertEqual(rule.splayAt, 0)
+    }
+
+    func testRoseCurlsThePetalsThatStay() throws {
+        let rose = try XCTUnwrap(try manifest().plants["plant_rose"])
+        let curl = try XCTUnwrap(rose.rule?.curl)
+        func at(_ pips: Int, _ petal: Int, ring: Int = 1) -> PlantThinning.Rule.Curl.Entry? {
+            rose.curl(for: PetalRef(ring: ring, petal: petal), pips: pips)
+        }
+        // 4 pips: the three outer petals left (o0, o72, o288) roll back and droop (stage 1)
+        XCTAssertEqual(at(4, 0)?.image, "plant_rose_curl_o0_1")
+        XCTAssertEqual(at(4, 1)?.image, "plant_rose_curl_o72_1")
+        XCTAssertEqual(at(4, 4)?.image, "plant_rose_curl_o288_1")
+        XCTAssertEqual(at(4, 0)?.rotate, 16)
+        XCTAssertEqual(at(4, 1)?.rotate, 17)
+        XCTAssertEqual(at(4, 4)?.rotate, -17)
+        XCTAssertEqual(at(4, 0)?.pivot, [100, 74])
+        XCTAssertEqual(at(4, 1)?.pivot, [105.71, 78.15])
+        XCTAssertEqual(at(4, 4)?.pivot, [94.29, 78.15])
+        // 3 pips: the mirror pair rolls further beside the closed bud (stage 2)
+        XCTAssertEqual(at(3, 1)?.image, "plant_rose_curl_o72_2")
+        XCTAssertEqual(at(3, 4)?.image, "plant_rose_curl_o288_2")
+        XCTAssertEqual(at(3, 1)?.rotate, 25)
+        XCTAssertEqual(at(3, 4)?.rotate, -25)
+        XCTAssertNil(at(3, 0), "o0 is gone at 3 pips")
+        // 5 pips look as the art; 2, 1 and 0 as before (no outer petals left)
+        for pips in [5, 2, 1, 0] {
+            for ring in rose.rings.indices {
+                for petal in rose.rings[ring].petals.indices {
+                    XCTAssertNil(at(pips, petal, ring: ring), "\(pips) pips [\(ring), \(petal)]")
+                }
+            }
+        }
+        // the valley ring never curls; a curl only ever applies to a petal that is showing
+        for pips in 0...5 {
+            let showing = Set(rose.visiblePetals(pips: pips))
+            for ring in rose.rings.indices {
+                for petal in rose.rings[ring].petals.indices {
+                    let ref = PetalRef(ring: ring, petal: petal)
+                    guard rose.curl(for: ref, pips: pips) != nil else { continue }
+                    XCTAssertEqual(ring, 1)
+                    XCTAssertTrue(showing.contains(ref))
+                }
+            }
+        }
+        // the peel order keeps the curled petals to 3 pips
+        XCTAssertEqual(rose.rings[0].keptCounts, [0, 0, 0, 2, 3, 5])
+        XCTAssertEqual(rose.rings[1].keptCounts, [0, 1, 2, 5, 6, 8])
+        XCTAssertEqual(rose.fallOrder(fromPips: 3).count, 5, "o72, o288, their valleys and the wrap")
+        XCTAssertGreaterThanOrEqual(rose.maxFallPerPip, 5, "all five drift")
+        // the five sprites ship and are drawn
+        XCTAssertEqual(curl.sprites, ["plant_rose_curl_o0_1", "plant_rose_curl_o72_1", "plant_rose_curl_o288_1",
+                                      "plant_rose_curl_o72_2", "plant_rose_curl_o288_2"])
+        for image in curl.sprites {
+            XCTAssertTrue(rose.imageNames.contains(image), image)
+            XCTAssertNotNil(UIImage(named: image), "missing \(image)")
+        }
+        XCTAssertEqual(Set(curl.pips.values.flatMap { $0.map(\.image) }), Set(curl.sprites))
+    }
+
+    func testOnlyTheRoseCurls() throws {
+        for (name, plant) in try manifest().plants where name != "plant_rose" {
+            XCTAssertNil(plant.rule?.curl, name)
+            for pips in 0...5 {
+                XCTAssertTrue(plant.visiblePetals(pips: pips).allSatisfy { plant.curl(for: $0, pips: pips) == nil }, name)
+            }
+        }
     }
 
     // MARK: droop and exempt

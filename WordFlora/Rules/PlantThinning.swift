@@ -209,6 +209,22 @@ struct PlantThinning: Codable {
             var dx: Double
             var dy: Double
         }
+        /// The rose's curl (design-preview/tending/parts/notes/rose-curl.md): petals that stay at low counts swap to a
+        /// shorter, rolled-back sprite and droop by `rotate` degrees (clockwise) about `pivot`, their base.
+        struct Curl: Codable {
+            struct Entry: Codable, Equatable {
+                /// [ring, petal] pairs this look applies to.
+                var petals: [[Int]]
+                /// Imageset in PlantLayers, drawn in place in the 200 box (no petal transform).
+                var image: String
+                /// View box units.
+                var pivot: [Double]
+                var rotate: Double
+            }
+            var sprites: [String]
+            /// Keyed by pip count: applies at that count and below, the smallest matching key wins (as `settle`).
+            var pips: [String: [Entry]]
+        }
         var name: String
         /// applied | pending
         var status: String
@@ -222,6 +238,7 @@ struct PlantThinning: Codable {
         var splayAt: Int?
         /// Delay before crossfading to the seed pot at 0 pips.
         var seedAfterMs: Int?
+        var curl: Curl?
         var motion: [String: String]?
     }
 
@@ -237,10 +254,23 @@ struct PlantThinning: Codable {
     var note: String?
     var warnings: [String]?
 
-    /// Every image this plant draws: layers, petal sprites and dedicated fall sprites.
+    /// Every image this plant draws: layers, petal sprites, dedicated fall sprites and curled petals.
     var imageNames: [String] {
         layers.compactMap(\.image) + rings.flatMap { $0.sprites.map(\.image) }
             + rings.flatMap { $0.petals.compactMap(\.fallSprite) } + (rule?.fallSprites?.values.map(\.image) ?? [])
+            + (rule?.curl?.sprites ?? [])
+    }
+
+    /// The curled look of a petal still showing at `pips` (rule `curl`): the smallest pip key at or above `pips`
+    /// that lists the petal wins, as with settle. Nil for petals that are gone, fresh, or on plants without a curl.
+    func curl(for ref: PetalRef, pips: Int) -> Rule.Curl.Entry? {
+        guard let curl = rule?.curl, rings.indices.contains(ref.ring),
+              rings[ref.ring].visiblePetals(pips: pips).contains(ref.petal) else { return nil }
+        let pair = [ref.ring, ref.petal]
+        return curl.pips.compactMap { key, entries -> (Int, Rule.Curl.Entry)? in
+            guard let n = Int(key), n >= pips, let e = entries.first(where: { $0.petals.contains(pair) }) else { return nil }
+            return (n, e)
+        }.min { $0.0 < $1.0 }?.1
     }
 
     /// True when something besides petals is always drawn, so the plant never goes blank.

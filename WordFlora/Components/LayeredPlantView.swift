@@ -27,12 +27,17 @@ struct LayeredPlantView: View {
     @State private var fading: Set<PetalRef> = []
     @State private var fadeOut = false
     @State private var pending: Set<PetalRef> = []
+    /// The count the last change came from: curled petals cross-fade from their look there (the `fading` pattern),
+    /// and leaving petals keep it.
+    @State private var changedFrom: Int?
     @State private var generation = 0
 
     struct Falling: Identifiable, Equatable {
         let ref: PetalRef
         let index: Int
         let rest: CGPoint
+        /// The count the petal last showed at, so a curled petal falls as it looked.
+        let look: Int
         var id: PetalRef { ref }
     }
 
@@ -72,7 +77,8 @@ struct LayeredPlantView: View {
                     case .static: layerImage(layer, rule: t.rule, pips: shown)
                     case .petals:
                         ForEach(layer.petalRefs.filter { visible.contains($0) }, id: \.self) { ref in
-                            petal(t, ref)
+                            let leaving = fading.contains(ref)
+                            petal(t, ref, pips: leaving ? (changedFrom ?? shown) : shown, from: leaving ? nil : changedFrom)
                                 .offset(settle(t, ref, pips: shown))
                                 .opacity(fading.contains(ref) && fadeOut ? 0 : 1)
                                 .scaleEffect(pending.contains(ref) ? (reduceMotion ? 1 : 0.05) : 1, anchor: headAnchor(t, ref))
@@ -88,9 +94,10 @@ struct LayeredPlantView: View {
             .animation(.easeInOut(duration: reduceMotion ? 0.3 : 1.4), value: shown)
 
             ForEach(falling) { f in
-                petal(t, f.ref)
-                    .modifier(FallEffect(t: localT(f.index), reduceMotion: reduceMotion,
-                                         start: centre(t, f.ref), rest: f.rest, angle: angle(t, f.ref), k: k))
+                // a drooped petal starts its fall at its angle + droop
+                petal(t, f.ref, pips: f.look)
+                    .modifier(FallEffect(t: localT(f.index), reduceMotion: reduceMotion, start: centre(t, f.ref), rest: f.rest,
+                                         angle: angle(t, f.ref) + (t.curl(for: f.ref, pips: f.look)?.rotate ?? 0), k: k))
             }
         }
         .frame(width: size, height: size, alignment: .topLeading)
@@ -103,10 +110,35 @@ struct LayeredPlantView: View {
             .rotationEffect(.degrees(splay), anchor: UnitPoint(x: o[0] / 200, y: o[1] / 200))
     }
 
-    private func petal(_ t: PlantThinning, _ ref: PetalRef) -> some View {
+    /// A petal as it looks at `pips`. With a curl rule (the rose) a petal that stays swaps to its curled sprite and
+    /// droops about its base; when the count changed from `from`, the two sprites cross-fade with `fadeOut` and the
+    /// droop eases with the head's state animation (0.3 s under Reduce Motion).
+    @ViewBuilder private func petal(_ t: PlantThinning, _ ref: PetalRef, pips: Int, from: Int? = nil) -> some View {
         let ring = t.rings[ref.ring], p = ring.petals[ref.petal]
-        let m = p.transform.count == 6 ? p.transform : [1, 0, 0, 1, 0, 0]
-        return Image(ring.sprites[min(p.sprite, ring.sprites.count - 1)].image).resizable().frame(width: size, height: size)
+        let fresh = ring.sprites[min(p.sprite, ring.sprites.count - 1)].image
+        if t.rule?.curl == nil {
+            sprite(fresh, p)
+        } else {
+            let entry = t.curl(for: ref, pips: pips)
+            let now = entry?.image ?? fresh
+            let was = from.flatMap { f in ring.visiblePetals(pips: f).contains(ref.petal) ? (t.curl(for: ref, pips: f)?.image ?? fresh) : nil }
+            let images = was.map { $0 == now ? [now] : [$0, now] } ?? [now]
+            let pivot = (entry ?? from.flatMap { t.curl(for: ref, pips: $0) })?.pivot ?? [100, 100]
+            ZStack(alignment: .topLeading) {
+                // keyed by image so a sprite that stays keeps its opacity across the change
+                ForEach(images, id: \.self) { name in
+                    sprite(name, name == fresh ? p : nil)
+                        .opacity(images.count == 1 || (name == now) == fadeOut ? 1 : 0)
+                }
+            }
+            .rotationEffect(.degrees(entry?.rotate ?? 0), anchor: UnitPoint(x: pivot[0] / 200, y: pivot[1] / 200))
+        }
+    }
+
+    /// A ring sprite moved onto its petal, or (no petal) a curled sprite already drawn in place.
+    private func sprite(_ image: String, _ p: PlantThinning.Ring.Petal?) -> some View {
+        let m = p.flatMap { $0.transform.count == 6 ? $0.transform : nil } ?? [1, 0, 0, 1, 0, 0]
+        return Image(image).resizable().frame(width: size, height: size)
             .transformEffect(CGAffineTransform(a: m[0], b: m[1], c: m[2], d: m[3], tx: m[4] * k, ty: m[5] * k))
     }
 
@@ -145,13 +177,15 @@ struct LayeredPlantView: View {
         switch motion {
         case .still:
             display = pips
+            changedFrom = nil
         case let .fall(from, to):
             var lost: [PetalRef] = []
             for p in stride(from: to + 1, through: from, by: 1) { lost += t.fallOrder(fromPips: p) }
             let drift = Array(lost.prefix(max(1, t.maxFallPerPip)))
             fading = Set(lost.dropFirst(drift.count)); fadeOut = false
-            falling = drift.enumerated().map { i, ref in Falling(ref: ref, index: i, rest: restSpot(i)) }
+            falling = drift.enumerated().map { i, ref in Falling(ref: ref, index: i, rest: restSpot(i), look: from) }
             pending = []
+            changedFrom = t.rule?.curl == nil ? nil : from
             fallT = 0
             display = to
             let n = Double(drift.count), total = Self.fallDuration + Self.stagger * max(0, n - 1)
@@ -180,6 +214,13 @@ struct LayeredPlantView: View {
             pending = groups.reduce(into: Set<PetalRef>()) { $0.formUnion($1) }
             display = to
             onShown(to)
+            if t.rule?.curl != nil {            // curled petals cross-fade back to their fresher look
+                changedFrom = from; fadeOut = false
+                DispatchQueue.main.async {
+                    guard gen == generation else { return }
+                    withAnimation(reduceMotion ? .easeIn(duration: 0.25) : .easeInOut(duration: 0.6)) { fadeOut = true }
+                }
+            }
             for (i, g) in groups.enumerated() {
                 let delay = reduceMotion ? 0.05 : 0.3 + 0.3 * Double(i)
                 DispatchQueue.main.asyncAfter(deadline: .now() + delay) {
