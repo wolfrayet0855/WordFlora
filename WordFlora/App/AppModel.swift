@@ -241,6 +241,8 @@ final class AppModel {
             case done
             /// Today's allowance is there, but the can is dry or the scoops are out.
             case needsSupply
+            /// The plant rests as a seed: every action waits until it is woken (tend refuses with the same line).
+            case seed
         }
         var status: Status
         /// The button's words: the action name, or its done label ("Fed today").
@@ -251,6 +253,7 @@ final class AppModel {
     }
 
     static let doneLabels = (water: "Had a drink", feed: "Fed today", sun: "Sunny today")
+    static let wakeFirstLabel = "Wake first"
 
     /// What the plant page's buttons show before a tap, using the very same rules `tend` applies.
     func actionState(_ action: TendAction, plant: PlantCollectible) -> ActionState {
@@ -258,6 +261,7 @@ final class AppModel {
         let date = now(), cal = Calendar.current, eco = Economy.default
         let name = Self.displayName(plant)
         let p = profile
+        if loveState(plant).isSeed { return ActionState(status: .seed, label: Self.wakeFirstLabel, line: LoveEngine.seedLine(name: name)) }
         func state(_ care: TendingEngine.Care, label: String, done: String, supply: Bool, noSupply: TendResult.Reason) -> ActionState {
             if TendingEngine.isDone(care, plant: plant, now: date, calendar: cal, economy: eco) {
                 return ActionState(status: .done, label: done, line: Self.message(for: .doneForToday, action: action, name: name))
@@ -310,7 +314,7 @@ final class AppModel {
         let reasons: [TendResult.Reason?] = [.noWater, .noSoil, .doneForToday, .notOwned, .cooldown, nil]
         let actions: [TendAction] = [.water, .feed, .sun, .prune]
         return reasons.flatMap { r in actions.map { message(for: r, action: $0, name: name) } }
-            + [doneLabels.water, doneLabels.feed, doneLabels.sun]
+            + [doneLabels.water, doneLabels.feed, doneLabels.sun, wakeFirstLabel, LoveEngine.seedLine(name: name)]
     }
 
     // MARK: Ads (spec sections 12, 16, 18, 19; ruling in section 20)

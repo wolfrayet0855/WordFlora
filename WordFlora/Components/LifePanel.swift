@@ -161,6 +161,224 @@ struct LifeTab: View {
     }
 }
 
+// MARK: Tend buttons (design-preview/tending/actions.html, section 1)
+
+/// The plant page's tend buttons.
+enum TendKind: String, CaseIterable, Equatable {
+    case water, feed, sun, prune, repot
+
+    var title: String {
+        switch self {
+        case .water: return "Water"
+        case .feed: return "Feed"
+        case .sun: return "Sun"
+        case .prune: return "Prune"
+        case .repot: return "Repot"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .water: return "drop.fill"
+        case .feed: return "leaf.fill"
+        case .sun: return "sun.max.fill"
+        case .prune: return "scissors"
+        case .repot: return "shippingbox.fill"
+        }
+    }
+
+    var tint: Color {
+        switch self {
+        case .water: return LifePalette.water
+        case .feed: return LifePalette.soil
+        case .sun: return LifePalette.sun
+        case .prune: return LifePalette.leaf
+        case .repot: return LifePalette.clay
+        }
+    }
+
+    /// Ready: what the tap will do.
+    var readyCaption: String {
+        switch self {
+        case .water: return "Give a drink"
+        case .feed: return "Add soil"
+        case .sun: return "Let it shine"
+        case .prune: return "Give a trim"
+        case .repot: return "Pick a pot"
+        }
+    }
+
+    /// Needs a supply: the short reason (the tap says the next step).
+    var supplyCaption: String {
+        switch self {
+        case .water: return "Can is dry"
+        case .feed, .repot: return "Need scoops"
+        case .prune: return "Need shears"
+        case .sun: return "Let it shine"
+        }
+    }
+
+    static let wakeFirst = "Wake first"
+    static let wakeCaption = "Tap the seed"
+    static let moreTomorrow = "More tomorrow"
+    static let trimLater = "Trim in 2 days"
+    static let trimmed = "Trimmed"
+}
+
+/// What one tend button shows for its action state: lit when ready, softly checked when done for today,
+/// a small plus when a supply is needed, a moon while the plant rests as a seed. Never colour alone.
+struct TendButtonLook: Equatable {
+    enum Badge: Equatable { case none, check, supply, rest }
+
+    let title: String
+    let caption: String
+    let badge: Badge
+    let lit: Bool
+    let accessibilityLabel: String
+    let accessibilityValue: String
+    /// What a tap will do, or the kind reason and next step when it will not.
+    let hint: String
+
+    init(kind: TendKind, state: AppModel.ActionState) {
+        accessibilityLabel = kind.title
+        switch state.status {
+        case .ready:
+            title = kind.title; caption = kind.readyCaption; badge = .none; lit = true
+            accessibilityValue = kind.readyCaption
+            hint = kind.readyCaption
+        case .done:
+            title = kind == .prune ? TendKind.trimmed : state.label
+            caption = kind == .prune ? TendKind.trimLater : TendKind.moreTomorrow
+            badge = .check; lit = false
+            accessibilityValue = "\(title), \(caption.lowercased())"
+            hint = state.line ?? caption
+        case .needsSupply:
+            title = kind.title; caption = kind.supplyCaption; badge = .supply; lit = false
+            accessibilityValue = kind.supplyCaption
+            hint = state.line ?? kind.supplyCaption
+        case .seed:
+            title = state.label; caption = TendKind.wakeCaption; badge = .rest; lit = false
+            accessibilityValue = state.label
+            hint = state.line ?? TendKind.wakeCaption
+        }
+    }
+}
+
+/// A tend button. `large` is the accessibility-size row (icon beside the words); otherwise the icon sits on top.
+/// `nudge` gives a soft press when a tap is refused (no shake).
+struct TendActionButton: View {
+    let kind: TendKind
+    let look: TendButtonLook
+    var large = false
+    var nudge = 0
+    let action: () -> Void
+
+    @Environment(\.colorScheme) private var scheme
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var squeeze = false
+
+    var body: some View {
+        Button(action: action) {
+            Group {
+                if large {
+                    HStack(spacing: 10) { dot(40); words(alignment: .leading) }
+                        .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
+                        .padding(.horizontal, 10)
+                } else {
+                    VStack(spacing: 4) { dot(44); words(alignment: .center); Spacer(minLength: 0) }
+                        .frame(maxWidth: .infinity, minHeight: 64, maxHeight: .infinity)
+                        .padding(.vertical, 8).padding(.horizontal, 2)
+                }
+            }
+            .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18))
+            .overlay(RoundedRectangle(cornerRadius: 18).stroke(LifePalette.line))
+            .scaleEffect(squeeze ? 0.93 : 1)
+        }
+        .buttonStyle(TendPressStyle(reduceMotion: reduceMotion))
+        .accessibilityLabel(look.accessibilityLabel)
+        .accessibilityValue(look.accessibilityValue)
+        .accessibilityHint(look.hint)
+        .accessibilityIdentifier("tend-\(kind.rawValue)")
+        .onChange(of: nudge) {
+            guard !reduceMotion else { return }
+            withAnimation(.spring(response: 0.16, dampingFraction: 0.6)) { squeeze = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) { withAnimation(.spring(response: 0.3, dampingFraction: 0.55)) { squeeze = false } }
+        }
+    }
+
+    private func dot(_ d: CGFloat) -> some View {
+        let restTint = LifePalette.ghost
+        return ZStack {
+            if look.lit {
+                Circle().stroke(kind.tint.opacity(0.45), lineWidth: 3).frame(width: d + 8, height: d + 8)
+                Circle().fill(kind.tint)
+                Image(systemName: kind.icon).font(.system(size: d * 0.46, weight: .bold))
+                    .foregroundStyle(scheme == .dark ? LifePalette.leafInk : Color.white)
+            } else {
+                Circle().fill((look.badge == .check ? kind.tint : restTint).opacity(look.badge == .check ? 0.2 : 0.16))
+                Image(systemName: kind.icon).font(.system(size: d * 0.46, weight: .bold))
+                    .foregroundStyle(look.badge == .check ? kind.tint : restTint)
+            }
+        }
+        .frame(width: d, height: d)
+        .overlay(alignment: .topTrailing) { badge(look.badge == .check ? kind.tint : restTint).offset(x: 5, y: -5) }
+        .frame(width: d + 8, height: d + 8)
+        .accessibilityHidden(true)
+    }
+
+    /// The badge is drawn, not a glyph, so it never reads as text that should scale.
+    @ViewBuilder private func badge(_ tint: Color) -> some View {
+        if look.badge != .none {
+            BadgeMark(badge: look.badge).stroke(tint, style: StrokeStyle(lineWidth: 2.2, lineCap: .round, lineJoin: .round))
+                .frame(width: 10, height: 10)
+                .frame(width: 20, height: 20)
+                .background(Color.appSurface, in: Circle())
+                .overlay(Circle().stroke(tint, lineWidth: 2))
+        }
+    }
+
+    private func words(alignment: HorizontalAlignment) -> some View {
+        VStack(alignment: alignment, spacing: 1) {
+            Text(look.title).font(Theme.font(large ? .body : .footnote, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                .fixedSize(horizontal: false, vertical: true)
+            Text(look.caption).font(Theme.font(large ? .footnote : .caption2, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .multilineTextAlignment(alignment == .leading ? .leading : .center)
+    }
+}
+
+/// Check (done), plus (needs a supply) or crescent moon (resting seed), in a 10 point box.
+private struct BadgeMark: Shape {
+    let badge: TendButtonLook.Badge
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        switch badge {
+        case .none: break
+        case .check:
+            p.move(to: CGPoint(x: r.minX, y: r.midY + 0.5)); p.addLine(to: CGPoint(x: r.minX + r.width * 0.38, y: r.maxY - 1))
+            p.addLine(to: CGPoint(x: r.maxX, y: r.minY + 1))
+        case .supply:
+            p.move(to: CGPoint(x: r.midX, y: r.minY)); p.addLine(to: CGPoint(x: r.midX, y: r.maxY))
+            p.move(to: CGPoint(x: r.minX, y: r.midY)); p.addLine(to: CGPoint(x: r.maxX, y: r.midY))
+        case .rest:
+            p.addArc(center: CGPoint(x: r.midX, y: r.midY), radius: r.width / 2, startAngle: .degrees(-60), endAngle: .degrees(200), clockwise: false)
+            p.addQuadCurve(to: CGPoint(x: r.midX + r.width * 0.25, y: r.minY + r.height * 0.07), control: CGPoint(x: r.midX + r.width * 0.05, y: r.midY + r.height * 0.1))
+        }
+        return p
+    }
+}
+
+private struct TendPressStyle: ButtonStyle {
+    let reduceMotion: Bool
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.95 : 1)
+            .opacity(configuration.isPressed && reduceMotion ? 0.8 : 1)
+            .animation(.easeOut(duration: 0.12), value: configuration.isPressed)
+    }
+}
+
 /// At accessibility text sizes the panel is a sheet under the plant; it collapses to its header.
 struct LifeSheet: View {
     let snapshot: LifeStats.Snapshot
