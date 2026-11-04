@@ -577,6 +577,16 @@ final class AppModel {
         SoundPlayer.shared.play(event, volume: volume)
     }
 
+    /// When the last thunder roll played, app-wide, for the 3-minute cooldown (ThunderGate.rollCooldown).
+    var lastThunderRoll: Date?
+
+    /// The soft thunder roll after a flash on the plant page. Counts toward the cooldown only when heard.
+    func rollThunder() {
+        guard settings.soundOn else { return }
+        lastThunderRoll = now()
+        play(.thunder, volume: ThunderGate.soundVolume)
+    }
+
     func updateAmbience() {
         SoundPlayer.shared.enabled = settings.soundOn
         if settings.soundOn && settings.ambienceOn { SoundPlayer.shared.startAmbient() } else { SoundPlayer.shared.stopAmbient() }

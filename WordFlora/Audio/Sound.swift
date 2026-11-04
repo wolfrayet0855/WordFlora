@@ -43,7 +43,7 @@ enum SoundCatalog {
         .badgeGold: SoundSpec(file: "wf-badgeGold", ext: "m4a", gainDb: -3.8),
         .button: SoundSpec(file: "wf-button", ext: "m4a", gainDb: -5.9),
         .ambient: SoundSpec(file: "wf-ambient", ext: "caf", gainDb: -0.6),
-        // Procedural (tools/make_thunder.py), about -31 LUFS: kept well under the action sounds on purpose, never boosted.
+        // Procedural (tools/make_thunder.py), about -26 LUFS: kept well under the action sounds on purpose, never boosted.
         .thunder: SoundSpec(file: "wf-thunder", ext: "m4a", gainDb: 0, ducksAmbient: true),
     ]
 
@@ -71,16 +71,32 @@ extension SoundPlaying {
     func play(_ event: SoundEvent) { play(event, volume: 1) }
 }
 
+/// Why the ambient bed is lowered. It comes back only when no reason is left.
+struct DuckState: Equatable {
+    enum Reason { case readAloud, thunder }
+    private(set) var readAloud = false
+    private(set) var thunder = false
+    var ducked: Bool { readAloud || thunder }
+
+    /// Sets one reason; returns the new ducked state when it changed, nil when nothing needs doing.
+    mutating func set(_ reason: Reason, _ on: Bool) -> Bool? {
+        let before = ducked
+        switch reason { case .readAloud: readAloud = on; case .thunder: thunder = on }
+        return ducked == before ? nil : ducked
+    }
+}
+
 @MainActor
 final class SoundPlayer: SoundPlaying {
     static let shared = SoundPlayer()
 
-    var enabled = true { didSet { if !enabled { stopAmbient() } } }
+    var enabled = true { didSet { if !enabled { stopAmbient(); cancelThunderDuck() } } }
     var master: Float = 0.8
     private(set) var playCount = 0
     private var players: [SoundEvent: AVAudioPlayer] = [:]
     private var ambient: AVAudioPlayer?
     private var unduck: DispatchWorkItem?
+    private var duck = DuckState()
 
     struct Jitter { var volumeScale: Float; var rate: Float }
 
@@ -112,9 +128,9 @@ final class SoundPlayer: SoundPlaying {
         player.currentTime = 0
         player.play()
         if SoundCatalog.specs[event]?.ducksAmbient == true, ambient != nil {
-            duckAmbient(true)
+            setDuck(.thunder, true)
             unduck?.cancel()
-            let item = DispatchWorkItem { [weak self] in self?.duckAmbient(false) }
+            let item = DispatchWorkItem { [weak self] in self?.unduck = nil; self?.setDuck(.thunder, false) }
             unduck = item
             DispatchQueue.main.asyncAfter(deadline: .now() + player.duration / Double(max(player.rate, 0.5)), execute: item)
         }
@@ -123,15 +139,25 @@ final class SoundPlayer: SoundPlaying {
     func startAmbient() {
         guard enabled, ambient?.isPlaying != true, let url = SoundCatalog.url(for: .ambient), let p = try? AVAudioPlayer(contentsOf: url) else { return }
         p.numberOfLoops = -1
-        p.volume = SoundCatalog.ambientVolume
+        p.volume = duck.ducked ? Self.duckedVolume : SoundCatalog.ambientVolume
         p.play()
         ambient = p
     }
 
-    func stopAmbient() { ambient?.stop(); ambient = nil }
+    func stopAmbient() { ambient?.stop(); ambient = nil; cancelThunderDuck() }
 
-    /// Lowers the garden bed while a clue is read aloud, then brings it back.
-    func duckAmbient(_ on: Bool) {
-        ambient?.setVolume(on ? 0.08 : SoundCatalog.ambientVolume, fadeDuration: on ? 0.25 : 0.6)
+    /// Lowers the garden bed while a clue is read aloud, then brings it back (unless the thunder roll still plays).
+    func duckAmbient(_ on: Bool) { setDuck(.readAloud, on) }
+
+    static let duckedVolume: Float = 0.08
+
+    private func setDuck(_ reason: DuckState.Reason, _ on: Bool) {
+        guard let change = duck.set(reason, on) else { return }
+        ambient?.setVolume(change ? Self.duckedVolume : SoundCatalog.ambientVolume, fadeDuration: change ? 0.25 : 0.6)
+    }
+
+    private func cancelThunderDuck() {
+        unduck?.cancel(); unduck = nil
+        _ = duck.set(.thunder, false)
     }
 }

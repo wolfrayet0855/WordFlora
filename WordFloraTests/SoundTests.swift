@@ -57,17 +57,50 @@ final class SoundTests: XCTestCase {
         XCTAssertFalse(SoundCatalog.specs[.water]?.ducksAmbient == true)
     }
 
-    func testThunderRollsAfterTheFirstFlashOnlyOncePerVisit() {
-        for r in [-1.0, 0.0, 0.5, 1.0, 2.0] { XCTAssertTrue((0.6...1.2).contains(ThunderGate.soundDelay(unit: r)), "\(r)") }
-        XCTAssertLessThan(ThunderGate.soundDelay(unit: 0), ThunderGate.soundDelay(unit: 1))   // sound follows light, never with it
-        XCTAssertTrue(ThunderGate.shouldSound(playedThisVisit: false))
-        XCTAssertFalse(ThunderGate.shouldSound(playedThisVisit: true))
+    func testThunderRollsWellAfterTheFlashAndTheFirstFlashWaitsForTheChildToSettle() {
+        for r in [-1.0, 0.0, 0.5, 1.0, 2.0] {
+            XCTAssertTrue((1.5...3.0).contains(ThunderGate.soundDelay(unit: r)), "\(r)")          // distant: sound follows light
+            XCTAssertTrue((4.0...6.0).contains(ThunderGate.firstFlashDelay(unit: r)), "\(r)")
+        }
+        XCTAssertEqual(ThunderGate.soundDelay(unit: 0), 1.5, accuracy: 0.001)
+        XCTAssertEqual(ThunderGate.soundDelay(unit: 1), 3.0, accuracy: 0.001)
+        XCTAssertGreaterThan(ThunderGate.soundDelay(unit: 0), ThunderGate.hapticDelay(unit: 1))
+    }
+
+    func testThunderRollsOncePerVisitAndAtMostEveryThreeMinutesAppWide() {
+        let t0 = Date(timeIntervalSinceReferenceDate: 1_000_000)
+        XCTAssertEqual(ThunderGate.rollCooldown, 180)
+        XCTAssertTrue(ThunderGate.shouldSound(playedThisVisit: false, lastRoll: nil, now: t0))
+        XCTAssertFalse(ThunderGate.shouldSound(playedThisVisit: true, lastRoll: nil, now: t0))
+        XCTAssertFalse(ThunderGate.shouldSound(playedThisVisit: false, lastRoll: t0, now: t0.addingTimeInterval(179)))   // hopping plants
+        XCTAssertTrue(ThunderGate.shouldSound(playedThisVisit: false, lastRoll: t0, now: t0.addingTimeInterval(180)))
+        XCTAssertFalse(ThunderGate.shouldSound(playedThisVisit: true, lastRoll: t0, now: t0.addingTimeInterval(600)))
+    }
+
+    func testAVisitIsOnlyMarkedPlayedOnceTheRollHasRun() {
+        let t0 = Date(timeIntervalSinceReferenceDate: 1_000_000)
         var visit = ThunderGate.Visit()
-        XCTAssertTrue(visit.flash())                    // first flash of the visit rolls
-        XCTAssertFalse(visit.flash())                   // later flashes stay silent
-        XCTAssertFalse(visit.flash())
-        visit = ThunderGate.Visit()                     // a new visit (the page appears again) may roll once more
-        XCTAssertTrue(visit.flash())
+        XCTAssertTrue(visit.wantsRoll(lastRoll: nil, now: t0))
+        XCTAssertTrue(visit.wantsRoll(lastRoll: nil, now: t0))         // asking does not use it up (the roll may be cancelled)
+        visit.markPlayed()
+        XCTAssertFalse(visit.wantsRoll(lastRoll: nil, now: t0.addingTimeInterval(600)))   // later flashes stay silent
+        visit = ThunderGate.Visit()                                     // the page appears again: a new visit
+        XCTAssertTrue(visit.wantsRoll(lastRoll: nil, now: t0))
+        XCTAssertFalse(visit.wantsRoll(lastRoll: t0, now: t0.addingTimeInterval(60)))     // but the app-wide cooldown still holds
+    }
+
+    func testTheAmbientBedComesBackOnlyWhenNothingIsDuckingIt() {
+        var d = DuckState()
+        XCTAssertFalse(d.ducked)
+        XCTAssertEqual(d.set(.readAloud, true), true)                   // changed: duck now
+        XCTAssertNil(d.set(.thunder, true))                             // already ducked: nothing to do
+        XCTAssertNil(d.set(.thunder, false))                            // reading aloud still: stay ducked
+        XCTAssertTrue(d.ducked)
+        XCTAssertNil(d.set(.thunder, true))
+        XCTAssertNil(d.set(.readAloud, false))                          // the roll still plays: stay ducked
+        XCTAssertEqual(d.set(.thunder, false), false)                   // both done: bring the bed back
+        XCTAssertFalse(d.ducked)
+        XCTAssertNil(d.set(.thunder, false))
     }
 
     func testPlayingAtAVolumePassesItThroughAndThePlainCallIsFullVolume() {

@@ -168,20 +168,28 @@ enum ThunderGate {
 
     /// The soft thunder roll plays at this share of the player's level.
     static let soundVolume: Float = 0.35
-    /// Sound follows light: the roll starts 0.6 to 1.2 s after the flash begins.
-    static func soundDelay(unit: Double) -> TimeInterval { 0.6 + 0.6 * min(max(unit, 0), 1) }
-    /// Only the first flash of a plant-page visit rolls; later flashes stay silent.
-    static func shouldSound(playedThisVisit: Bool) -> Bool { !playedThisVisit }
+    /// Sound follows light, from far away: the roll starts 1.5 to 3 s after the flash begins.
+    static func soundDelay(unit: Double) -> TimeInterval { 1.5 + 1.5 * min(max(unit, 0), 1) }
+    /// The first flash waits 4 to 6 s after the page opens, so the child has settled.
+    static func firstFlashDelay(unit: Double) -> TimeInterval { 4 + 2 * min(max(unit, 0), 1) }
+    /// At most one roll every 3 minutes across the whole app (hopping between plants must not stack rolls).
+    static let rollCooldown: TimeInterval = 180
+    /// Only the first flash of a plant-page visit rolls, and only when no roll played in the last 3 minutes.
+    static func shouldSound(playedThisVisit: Bool, lastRoll: Date?, now: Date) -> Bool {
+        guard !playedThisVisit else { return false }
+        guard let lastRoll else { return true }
+        return now.timeIntervalSince(lastRoll) >= rollCooldown
+    }
 
     /// One plant-page visit (from the page appearing until it goes away).
     struct Visit {
         private(set) var playedThisVisit = false
-        /// Call on every flash; true when this flash should bring the thunder roll.
-        mutating func flash() -> Bool {
-            guard ThunderGate.shouldSound(playedThisVisit: playedThisVisit) else { return false }
-            playedThisVisit = true
-            return true
+        /// Whether a flash now should bring the roll. Asking does not use the visit up.
+        func wantsRoll(lastRoll: Date?, now: Date) -> Bool {
+            ThunderGate.shouldSound(playedThisVisit: playedThisVisit, lastRoll: lastRoll, now: now)
         }
+        /// Call once the roll has actually played.
+        mutating func markPlayed() { playedThisVisit = true }
     }
 }
 

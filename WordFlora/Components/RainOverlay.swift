@@ -126,15 +126,19 @@ struct RainCanvas: View {
     }
 }
 
-/// Drives the gentle thunder: a slow 1.4 s flash every 8 to 15 s (never closer than 8 s), then a soft haptic
-/// 0.3 to 0.5 s later. The first flash of a visit also calls `roll` 0.6 to 1.2 s after it (the soft thunder sound);
-/// later flashes stay silent. It only runs while `active` (thunder days, on screen, app active, not Reduce Motion,
+/// Drives the gentle thunder: the first flash 4 to 6 s after the page opens, then a slow 1.4 s flash every 8 to 15 s
+/// (never closer than 8 s). A silent flash gets a soft haptic 0.3 to 0.5 s later. The first flash of a visit (sound on,
+/// no roll anywhere in the app for 3 minutes) instead calls `roll` 1.5 to 3 s after it, with the haptic at the same
+/// moment so the thump is felt as it is heard; later flashes stay silent. It only runs while `active` (thunder days, on screen, app active, not Reduce Motion,
 /// Calm or Quiet Garden). `flash` is the white overlay's opacity.
 struct ThunderDriver: View {
     let active: Bool
     let dark: Bool
     let haptics: Bool
+    var sound = false
     @Binding var flash: Double
+    /// When the last roll played anywhere in the app.
+    var lastRoll: () -> Date? = { nil }
     /// Plays the thunder sound; called at most once per visit.
     var roll: () -> Void = {}
     @State private var lastFlash: Date?
@@ -146,14 +150,17 @@ struct ThunderDriver: View {
             .onAppear { visit = ThunderGate.Visit() }       // each appearance of the plant page is a new visit
             .task(id: active) {
                 guard active else { flash = 0; return }
-                try? await Task.sleep(for: .seconds(2.5))      // the first flash comes soon after the page opens
+                try? await Task.sleep(for: .seconds(ThunderGate.firstFlashDelay(unit: .random(in: 0...1))))   // let the child settle
                 while !Task.isCancelled && active {
                     if ThunderGate.canFlash(lastFlash: lastFlash, now: .now) {
-                        strike()
-                        if visit.flash() {                            // sound follows light, once per visit
+                        let rolls = sound && visit.wantsRoll(lastRoll: lastRoll(), now: .now)
+                        strike(silent: !rolls)
+                        if rolls {                                    // sound follows light, once per visit
                             try? await Task.sleep(for: .seconds(ThunderGate.soundDelay(unit: .random(in: 0...1))))
                             guard !Task.isCancelled && active else { break }
                             roll()
+                            visit.markPlayed()
+                            if haptics { thump() }
                         }
                     }
                     try? await Task.sleep(for: .seconds(ThunderGate.nextDelay(unit: .random(in: 0...1))))
@@ -162,14 +169,16 @@ struct ThunderDriver: View {
             }
     }
 
-    private func strike() {
+    private func thump() { UIImpactFeedbackGenerator(style: .soft).impactOccurred(intensity: 0.5) }
+
+    private func strike(silent: Bool) {
         lastFlash = .now
         let peak = ThunderGate.peakOpacity(dark: dark)
         withAnimation(.easeIn(duration: ThunderGate.flashDuration * 0.25)) { flash = peak }
         DispatchQueue.main.asyncAfter(deadline: .now() + ThunderGate.flashDuration * 0.25) {
             withAnimation(.easeOut(duration: ThunderGate.flashDuration * 0.75)) { flash = 0 }
         }
-        if haptics {
+        if haptics && silent {
             DispatchQueue.main.asyncAfter(deadline: .now() + ThunderGate.hapticDelay(unit: .random(in: 0...1))) {
                 UIImpactFeedbackGenerator(style: .soft).impactOccurred(intensity: 0.5)
             }
