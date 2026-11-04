@@ -1,0 +1,277 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Rose Curled Petals</title>
+<link rel="stylesheet" href="../../theme.css"><script src="../../theme.js"></script>
+<script>(function(){var t=new URLSearchParams(location.search).get('theme');if(t)document.documentElement.setAttribute('data-theme',t)})()</script>
+<script>document.addEventListener('DOMContentLoaded',()=>{const q=new URLSearchParams(location.search);if(q.get('w')){document.querySelector('.wrap').style.maxWidth=q.get('w')+'px';document.querySelector('.wrap').style.margin='0';document.documentElement.style.overflowX='hidden'}
+ if(q.get('focus'))document.querySelectorAll('section').forEach(x=>{if(!q.get('focus').split(',').includes(x.id))x.style.display='none'});if(q.get('focus'))document.querySelectorAll('.wrap>.sub,.wrap>.bar,.wrap>h1').forEach(x=>x.style.display='none')})</script>
+<style>
+:root,[data-theme=light]{--leaf:#9BCB3C;--leaf-ink:#22331A;--txt2:#4F5F4F;--glass:rgba(255,255,255,.94);--petal:#F2788A;--petal-edge:#D9566C;--ghost:#7C867C;--soil:#7A5238;--drop:70,110,150;--tile:#FFFFFF}
+[data-theme=dark]{--leaf:#A8D84A;--leaf-ink:#1A2E1A;--txt2:#B9D0B9;--glass:rgba(44,62,44,.95);--petal:#F58A9B;--petal-edge:#E06B80;--ghost:#A9B8A9;--soil:#A47550;--drop:170,200,230;--tile:#22361F}
+body{line-height:1.45;background:var(--bg);color:var(--text)}
+.wrap{max-width:1180px;margin:0 auto;padding:16px 10px 60px}
+h1{font-size:24px;margin:0 0 4px}h2{font-size:19px;margin:26px 0 4px}h3{font-size:15px;margin:14px 0 4px}
+.sub,.note{color:var(--txt2);max-width:75ch;margin:4px 0 10px;font-size:14px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.btn{font:inherit;font-weight:800;font-size:14px;border:0;border-radius:999px;min-height:44px;padding:8px 16px;background:var(--leaf);color:var(--leaf-ink);cursor:pointer}
+.btn.alt{background:color-mix(in srgb,var(--leaf) 30%,transparent);color:var(--text)}
+.btn[aria-pressed=true]{box-shadow:0 0 0 3px var(--text)}
+:focus-visible{outline:3px solid var(--text);outline-offset:2px}
+.blk{background:var(--bg);color:var(--text);border-radius:18px;padding:6px;box-shadow:0 0 0 1px var(--line)}
+.blk>b{font-size:12px;color:var(--txt2);display:block;margin:2px 0 6px 4px}
+.blocks{display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start}
+.cmp{display:grid;grid-template-columns:repeat(2,max-content);gap:8px}
+.cmp .hd{font-size:12px;font-weight:800;color:var(--txt2);text-align:center}
+.tile{overflow:hidden;background:var(--tile);border-radius:14px;padding:4px 4px 6px;text-align:center;box-shadow:0 0 0 1px var(--line);font-size:12px;font-weight:700;color:var(--txt2)}
+.tile svg.pl{display:block;margin:0 auto}
+.s160 svg.pl{width:160px;height:160px}.s320 svg.pl{width:320px;height:320px}
+.s160 .tile{width:168px}.s320 .tile{width:328px}
+.tile img.pot{display:block;margin:0 auto;padding:24px 20px 8px}
+.s160 img.pot{width:160px;height:160px}.s320 img.pot{width:320px;height:320px}
+.tile .cap{display:block;margin-top:1px}
+.pips{display:inline-flex;align-items:center;gap:3px;margin-top:2px}
+.pips .lf{width:13px;height:13px;margin-right:2px;flex:none}
+.pip{width:9px;height:13px;overflow:visible;flex:none}
+.pg{fill:color-mix(in srgb,var(--ghost) 16%,transparent);stroke:var(--ghost);stroke-width:1.4;stroke-dasharray:2.6 2.1;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+.pf{fill:var(--petal);stroke:var(--petal-edge);stroke-width:1.5;vector-effect:non-scaling-stroke;stroke-linejoin:round;transform-box:fill-box;transform-origin:50% 100%}
+.pf.out{animation:pout .6s ease .7s both}@keyframes pout{to{opacity:0;transform:scale(.55)}}
+.pf.in{animation:grow .5s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--i) * .3s + .3s)}
+@keyframes grow{0%{transform:scale(.15);opacity:0}100%{transform:scale(1);opacity:1}}
+.still .pf.out{animation:fade .4s ease both}.still .pf.in{animation:none}
+@keyframes fade{to{opacity:0}}
+.stages{display:flex;flex-wrap:wrap;gap:12px}
+.stage{position:relative;width:min(360px,100%);height:430px;border-radius:28px;overflow:hidden;box-shadow:0 0 0 1px var(--line);background:linear-gradient(color-mix(in srgb,rgb(var(--drop)) 14%,var(--bg)),var(--bg) 70%)}
+.stage .tag{position:absolute;left:14px;top:12px;font-size:12px;font-weight:800;color:var(--txt2)}
+.stage .ground{position:absolute;left:0;right:0;top:250px;height:110px;background:linear-gradient(transparent,color-mix(in srgb,var(--soil) 18%,transparent) 45%,transparent)}
+.stage svg.pl{position:absolute;left:50%;top:60px;width:280px;height:280px;margin-left:-140px;overflow:visible;transition:opacity .8s}
+.stage .pot{position:absolute;left:50%;top:130px;width:170px;margin-left:-85px;opacity:0;transition:opacity .8s}
+.stage.seed .pot{opacity:1}.stage.seed svg.pl{opacity:0}
+.stage .row{position:absolute;left:50%;top:352px;transform:translateX(-50%);background:var(--glass);border-radius:999px;padding:5px 11px 5px 8px;box-shadow:0 0 0 1px var(--line),var(--shadow);display:flex}
+.stage .row .pips{gap:4px}.stage .row .lf{width:18px;height:18px}.stage .row .pip{width:13px;height:18px}
+.stage .lab{position:absolute;left:0;right:0;top:396px;text-align:center;font-size:13px;font-weight:800;color:var(--txt2)}
+.sprites{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;max-width:720px}
+.sprites .tile svg{width:100%;aspect-ratio:1;display:block}
+pre{background:var(--tile);box-shadow:0 0 0 1px var(--line);border-radius:12px;padding:10px;font-size:11px;overflow:auto;max-width:100%;white-space:pre}
+table{border-collapse:collapse;font-size:13px;margin:6px 0;max-width:100%}td,th{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+.curlv,.fresh{transition:opacity .6s ease}
+@media (prefers-reduced-motion:reduce){.pf.in,.pf.out{animation:none!important}}
+</style></head><body><div class="wrap">
+<h1>Rose: curled petals</h1>
+<p class="sub">The petals that stay on the head now get sleepy as the pips fall. Each one rolls its tip back into a tube, so the petal gets shorter, and it droops toward the ground about its base. At 4 pips three outer petals stay, curled and drooping a little. At 3 pips a mirrored pair stays beside the closed bud, rolled further and drooping more. The curled rose also peels in a new order so this lasts two pips. At 5 pips nothing changes: it is the same rose as the art. Everything stays in the rose's own reds and nothing is see-through.</p>
+<div class="bar"><button class="btn alt" id="th">Toggle dark</button><button class="btn alt" id="rm" aria-pressed="false">Preview Reduce Motion: off</button></div>
+
+<section id="sec160"><h2>160 px: today and curled</h2>
+<div class="blocks s160" id="cmp160"></div></section>
+
+<section id="secLive"><h2>Watch it, 5 to 0</h2>
+<p class="note">Both stages use the same falling petals and motion as rose-thinning.html. The curled stage peels in the new order. It also cross-fades the staying petals to their curled sprite (0.6 s) and eases the droop in (1.4 s, rotation only) while the others fall.</p>
+<div class="stages" id="stages"></div>
+<div class="bar"><button class="btn" id="play">Play 5 to 0</button><button class="btn alt" id="lose">One pip</button><button class="btn alt" id="love">Love comes back</button><button class="btn alt" id="reset">Reset</button></div></section>
+
+<section id="sec320"><h2>320 px: today and curled</h2>
+<div class="blocks s320" id="cmp320"></div></section>
+
+<section id="secSprites"><h2>The five new sprites</h2>
+<p class="note">Each sprite is drawn in place in the 200 box, like the other PlantLayers sprites. Fresh is on the left and curled on the right, cropped to the petal. The tip is gone: it rolls back as one opaque tube in the edge red (#B52C52), with a thin highlight along the roll and a dark fold line where it meets the face. Stage 1 is used at 4 pips and stage 2 (rolled further) at 3 pips.</p>
+<div class="sprites" id="sprites"></div></section>
+
+<section id="secAlt"><h2>The other background</h2>
+<div class="blocks s160" id="cmpAlt"></div></section>
+
+<section id="secJson"><h2>Integration data</h2>
+<p class="note">This is the same data as notes/rose-curl.md. Each pip key means "at this pip count and below, and the smallest matching key wins", the same as <code>settle</code>. A matched petal draws <code>image</code> (if there is one) in place of its ring sprite. It turns by <code>rotate</code> degrees about <code>pivot</code> (rotationEffect with that anchor). The curled rose also uses the new <code>lose</code> order shown here.</p>
+<pre id="json"></pre></section>
+</div>
+<script>
+const NS='http://www.w3.org/2000/svg';
+// ===== THE RULE (unchanged from rose-thinning.html / notes/rose-rule.md) =====
+const C=[100,80];
+const P=(r,a)=>[+(C[0]+r*Math.sin(a*Math.PI/180)).toFixed(2),+(C[1]-r*Math.cos(a*Math.PI/180)).toFixed(2)];
+const VALLEY='M0 -5C-4.8 -10 -7.6 -16 -7.4 -20.6C-7.2 -23.6 -6.8 -25.2 -5.63 -25.38A26 26 0 0 1 5.63 -25.38C6.8 -25.2 7.2 -23.6 7.4 -20.6C7.6 -16 4.8 -10 0 -5Z';
+const PETAL={
+ face:'M0 0C-3.6 -.8 -9.6 -5.4 -11.4 -11.4C-12.8 -16.4 -10.2 -21.4 -5.6 -22.2C-3.2 -22.6 -1.4 -22 0 -20.8C1.6 -22.2 3.8 -22.9 6.2 -22.4C10.6 -21.4 12.8 -17 11.8 -12C10.8 -6.2 4.6 -.8 0 0Z',
+ lip:'M0 -20.8C1.6 -22.2 3.8 -22.9 6.2 -22.4C10.6 -21.4 12.8 -17 11.8 -12C11.4 -10 10.6 -8.2 9.6 -6.6C10.2 -9.6 9.8 -13.4 8.2 -15.6C6.4 -18.2 3.4 -19 1.2 -18.2C.7 -19 .3 -19.9 0 -20.8Z',
+ claw:'M0 -.6C-2.6 -2.6 -4 -6.6 -3.4 -10.6C-1.6 -8.4 -.4 -5 0 -.6Z'};
+const RULE={
+ plant:'plant_rose', centre:C,
+ hide:[{i:7}],
+ add:[
+  {id:'cradle',after:6,svg:`<path d="M93 100C92 92 95.5 88 100 88C104.5 88 108 92 107 100Z" fill="#3F8A4A"/><g class="sepal" data-splay="-24" style="transform-origin:95px 100px"><path d="M95 101C88 99 84 94 82.5 86C87 89 91.5 92 97 96Z" fill="#3F8A4A"/></g><g class="sepal" data-splay="24" style="transform-origin:105px 100px"><path d="M105 101C112 99 116 94 117.5 86C113 89 108.5 92 103 96Z" fill="#3F8A4A"/></g><path d="M96 99C97 94 98.5 91 100 89.5C101.5 91 103 94 104 99Z" fill="#5FA860"/>`},
+  {id:'valleys',replaces:7,svg:[36,108,180,252,324].map(a=>`<g data-back="${(a+324)%360}"><path d="${VALLEY}" transform="translate(100 80) rotate(${a})" fill="#B52C52"/></g>`).join('')}],
+ sprites:{
+  outer:{face:'#D94668',lip:'#E86A88',claw:'#B52C52',scale:1},
+  wrap:{face:'#C2335A',lip:'#D94668',claw:'#9E2449',scale:.9},
+  swirl:{face:'#E0587A',lip:'#EE84A0',claw:'#C2335A',scale:.75},
+  heart:{face:'#B52C52',lip:'#D94668',claw:'#8E1F3E',scale:.62}},
+ units:{
+  o0:{els:[8,'valley0'],sprite:'outer',drops:[[19,0]]},
+  o72:{els:[9,'valley72'],sprite:'outer',drops:[[19,72]]},
+  o144:{els:[10,'valley144'],sprite:'outer',drops:[[19,144]]},
+  o216:{els:[11,'valley216'],sprite:'outer',drops:[[19,216]]},
+  o288:{els:[12,'valley288'],sprite:'outer',drops:[[19,288]]},
+  wrap:{els:[13],sprite:'wrap',drops:[[10,250],[10,110]]},
+  swirl:{els:[14],sprite:'swirl',drops:[[7,300]]},
+  heart:{els:[15,16],sprite:'heart',drops:[[6,60]]}},
+ lose:{4:['o288','o144'],3:['o216','o72','o0'],2:['wrap'],1:['swirl'],0:['heart']},
+ settle:{2:{els:[14,15,16],dx:1,dy:4},1:{els:[15,16],dx:-3,dy:6}},
+ splayAt:0,
+ seedAfterMs:1200
+};
+// ===== THE CURL (new: same data as notes/rose-curl.md) =====
+// The curled rose also peels in a new order, so its outer petals stay on the head at 4 and 3 pips (critic, rose-curl-review.md).
+const LOSE_CURL={4:['o144','o216'],3:['o0'],2:['o72','o288','wrap'],1:['swirl'],0:['heart']};
+// Local shapes: petal centre at 0,0 (r12), pointing up (outward); placed by translate(100 80) rotate(angle) translate(0 -19.5).
+// The tip is gone (the silhouette is about 30% shorter) and rolls back as one opaque tube in the edge red,
+// with one thin highlight line along the roll and a crisp dark fold line where it meets the face. Nothing translucent.
+const CURL={
+ shapes:{
+  s1:{ // stage 1: tube 3.6 thick, top of the roll at y -5 (was -12): the petal is 16.8 tall instead of 24
+   face:'M-11.97 .8A12 12 0 0 0 11.97 .8L10.4 .8Q1.2 -3.6 -10.4 .8Z',
+   tube:'M-10.4 -2.8Q1.2 -7.2 10.4 -2.8A1.8 1.8 0 0 1 10.4 .8Q1.2 -3.6 -10.4 .8A1.8 1.8 0 0 1 -10.4 -2.8Z',
+   hi:'M-8 -2.6Q1.2 -5.6 8 -2.6', fold:'M10.4 .8Q1.2 -3.6 -10.4 .8', hiW:.8, foldW:.9},
+  s2:{ // stage 2: rolled further, tube 4 thick, top of the roll at y -3.4: the petal is 15.4 tall
+   face:'M-11.71 2.6A12 12 0 0 0 11.71 2.6L10.8 2.6Q1.2 -1.4 -10.8 2.6Z',
+   tube:'M-10.8 -1.4Q1.2 -5.4 10.8 -1.4A2 2 0 0 1 10.8 2.6Q1.2 -1.4 -10.8 2.6A2 2 0 0 1 -10.8 -1.4Z',
+   hi:'M-8.4 -1Q1.2 -4 8.4 -1', fold:'M10.8 2.6Q1.2 -1.4 -10.8 2.6', hiW:.8, foldW:.9}},
+ fill:{face:'#D94668',tube:'#B52C52',hi:'#E0587A',fold:'#8E1F3E'},
+ // a curled petal sits 2.5 units further out than the fresh one (17), so its face still clears the r15 wrap: it loosens as it tires
+ out:19.5,
+ // one in-place sprite per petal and stage: plant_rose_curl_<unit>_<stage>
+ sprites:{
+  o0_1:{unit:'o0',angle:0,shape:'s1'},
+  o72_1:{unit:'o72',angle:72,shape:'s1'},
+  o288_1:{unit:'o288',angle:288,shape:'s1',mirror:true},
+  o72_2:{unit:'o72',angle:72,shape:'s2'},
+  o288_2:{unit:'o288',angle:288,shape:'s2',mirror:true}},
+ // at this pip count and below (smallest matching key wins, as settle). Rotation only, clockwise degrees, about the
+ // petal base (6 units out from the head centre along the petal's angle).
+ pips:{
+  4:[{units:['o0'],  image:'o0_1',  pivot:P(6,0),   rotate:16},
+     {units:['o72'], image:'o72_1', pivot:P(6,72),  rotate:17},
+     {units:['o288'],image:'o288_1',pivot:P(6,288), rotate:-17}],
+  3:[{units:['o72'], image:'o72_2', pivot:P(6,72),  rotate:25},
+     {units:['o288'],image:'o288_2',pivot:P(6,288), rotate:-25}]}
+};
+function curlSpriteSVG(id){const s=CURL.sprites[id],sh=CURL.shapes[s.shape],f=CURL.fill;
+ return `<g transform="translate(100 80) rotate(${s.angle}) translate(0 -${CURL.out})${s.mirror?' scale(-1 1)':''}"><path d="${sh.face}" fill="${f.face}"/><path d="${sh.tube}" fill="${f.tube}"/><path d="${sh.hi}" fill="none" stroke="${f.hi}" stroke-width="${sh.hiW}" stroke-linecap="round"/><path d="${sh.fold}" fill="none" stroke="${f.fold}" stroke-width="${sh.foldW}" stroke-linecap="round"/></g>`}
+// per element index: the curl entry that applies at k pips (smallest key >= k)
+function curlAt(k){const out={};Object.keys(CURL.pips).map(Number).sort((a,b)=>b-a).forEach(kk=>{if(k<=kk)CURL.pips[kk].forEach(e=>e.units.forEach(u=>RULE.units[u].els.filter(x=>typeof x==='number').forEach(i=>out[i]=e)))});return out}
+
+// ===== engine (copied from rose-thinning.html, plus the curl layer and a per-rose lose order) =====
+const cache={};async function svgText(n){return cache[n]||=await (await fetch('../../plants/'+n+'.svg')).text()}
+function lostSet(R,k){const s=new Set();for(let j=4;j>=k;j--)R.lose[j].forEach(u=>s.add(u));return s}
+function spriteSVG(kind,extra=''){const s=RULE.sprites[kind];return `<g ${extra}><path d="${PETAL.face}" fill="${s.face}"/><path d="${PETAL.lip}" fill="${s.lip}"/><path d="${PETAL.claw}" fill="${s.claw}" opacity=".5"/></g>`}
+async function makeRose(curled){
+ const doc=new DOMParser().parseFromString(await svgText(RULE.plant),'image/svg+xml');const svg=document.importNode(doc.documentElement,true);
+ svg.removeAttribute('width');svg.removeAttribute('height');svg.setAttribute('class','pl');svg.setAttribute('aria-hidden','true');svg.style.overflow='visible';
+ const kids=[...svg.children],el={};kids.forEach((c,i)=>el[i]=c);
+ RULE.add.forEach(a=>{const g=document.createElementNS(NS,'g');g.innerHTML=a.svg;g.dataset.add=a.id;
+  if(a.after!==undefined)el[a.after].after(g);else el[a.replaces].after(g)});
+ RULE.hide.forEach(h=>el[h.i].style.display='none');
+ svg.querySelectorAll('[data-back]').forEach(b=>el['valley'+b.dataset.back]=b);
+ const fresh={},curlv={};
+ if(curled){// wrap each curl-able element: the wrapper carries gone-opacity and the droop; inside, fresh and its curled stages cross-fade
+  Object.entries(CURL.sprites).forEach(([id,s])=>{const i=RULE.units[s.unit].els[0];
+   if(!fresh[i]){const w=document.createElementNS(NS,'g');el[i].before(w);w.appendChild(el[i]);fresh[i]=el[i];fresh[i].classList.add('fresh');curlv[i]={};el[i]=w}
+   const v=document.createElementNS(NS,'g');v.setAttribute('class','curlv');v.innerHTML=curlSpriteSVG(id);v.style.opacity='0';el[i].appendChild(v);curlv[i][id]=v})}
+ const fallen=document.createElementNS(NS,'g');fallen.setAttribute('class','fallen');svg.appendChild(fallen);
+ const R={svg,el,fresh,curlv,fallen,k:5,curled,lose:curled?LOSE_CURL:RULE.lose};
+ R.unitEls=u=>RULE.units[u].els.map(e=>el[e]);
+ return R}
+function setState(R,k){R.k=k;const gone=lostSet(R,k);
+ Object.keys(RULE.units).forEach(u=>R.unitEls(u).forEach(e=>{e.style.opacity=gone.has(u)?'0':''}));
+ pose(R,k,false);splay(R,k,false)}
+// settle (translate) and, on the curled rose, the curl: sprite swap + rotation about the petal base. Deepest matching entry wins.
+function pose(R,k,anim){const m={};Object.keys(RULE.settle).map(Number).sort((a,b)=>b-a).forEach(kk=>{if(k<=kk)RULE.settle[kk].els.forEach(i=>m[i]=RULE.settle[kk])});
+ const cu=R.curled?curlAt(k):{};
+ [8,9,10,11,12,13,14,15,16].forEach(i=>{const e=R.el[i],s=m[i],c=cu[i];
+  e.style.transformBox='view-box';e.style.transformOrigin='0 0';
+  e.style.transition=anim?'transform 1.4s cubic-bezier(.4,0,.2,1) .9s':'none';
+  const parts=[];if(s)parts.push(`translate(${s.dx}px,${s.dy}px)`);if(c)parts.push(`translate(${c.pivot[0]}px,${c.pivot[1]}px) rotate(${c.rotate}deg) translate(${-c.pivot[0]}px,${-c.pivot[1]}px)`);
+  e.style.transform=parts.join(' ');
+  if(R.curlv[i]){const layers=[R.fresh[i],...Object.values(R.curlv[i])];
+   layers.forEach(x=>{x.style.transitionDelay=anim?'.9s':'0s';if(!anim){x.style.transition='none';requestAnimationFrame(()=>x.style.transition='')}});
+   const on=c&&c.image;R.fresh[i].style.opacity=on?'0':'';Object.entries(R.curlv[i]).forEach(([id,v])=>v.style.opacity=id===on?'1':'0')}})}
+function splay(R,k,anim){R.svg.querySelectorAll('.sepal').forEach(g=>{g.style.transition=anim?'transform 1.6s cubic-bezier(.4,0,.2,1) .8s':'none';g.style.transform=k<=RULE.splayAt?`rotate(${g.dataset.splay}deg)`:''})}
+function sprite(R,u,d){const U=RULE.units[u],s=RULE.sprites[U.sprite],[x,y]=P(d[0],d[1]);
+ const g=document.createElementNS(NS,'g');g.innerHTML=spriteSVG(U.sprite,`transform="translate(${x} ${y}) rotate(${d[1]}) scale(${s.scale})"`);
+ g.style.transformBox='view-box';g.style.transformOrigin=`${x}px ${y}px`;R.fallen.appendChild(g);return {g,x,y,a:d[1]}}
+function rest(i){const side=i%2?-1:1,x=100+side*(22+Math.floor(i/2)*12+(i%3)*2),y=171-(i%3)*1.4;return {x,y,rot:side*(80+((i*23)%24))}}
+function restTransform(sp,r){let d=r.rot-sp.a;d=((d+540)%360)-180;return `translate(${r.x-sp.x}px,${r.y-sp.y}px) scale(1,.62) rotate(${d}deg) scale(.82)`}
+// on the curled rose a drooped petal lets go from where it now points
+function drops(k,R){const out=[],cu=R.curled?curlAt(k+1):{};R.lose[k].forEach(u=>RULE.units[u].drops.forEach(d=>{const c=cu[RULE.units[u].els[0]];out.push([u,c?[d[0],d[1]+c.rotate]:d])}));return out}
+function restLast(R,k){R.fallen.innerHTML='';if(k>=5)return;drops(k,R).forEach(([u,d],i)=>{const sp=sprite(R,u,d);sp.g.style.transform=restTransform(sp,rest(i));sp.g.style.opacity=.94})}
+function fall(R,still){const k=R.k-1,ds=drops(k,R);R.k=k;const anims=[];
+ R.fallen.querySelectorAll(':scope>g').forEach(g=>g.animate([{opacity:g.style.opacity||1},{opacity:0}],{duration:900,fill:'forwards'}).finished.then(()=>g.remove()));
+ ds.forEach(([u,d],i)=>{const sp=sprite(R,u,d),r=rest(i),end=restTransform(sp,r);sp.g.style.opacity=.94;
+  if(still){sp.g.style.transform=end;anims.push(sp.g.animate([{opacity:0},{opacity:.94}],{duration:600,delay:200,fill:'both'}));return}
+  const dx=r.x-sp.x,dy=r.y-sp.y,sw=i%2?-1:1,ox=Math.sin(d[1]*Math.PI/180)*5,oy=-Math.cos(d[1]*Math.PI/180)*5;
+  let rd=r.rot-sp.a;rd=((rd+540)%360)-180;const N=14,kf=[{transform:'translate(0px,0px) rotate(0deg) scale(1,1)',offset:0},{transform:`translate(${ox}px,${oy}px) rotate(${8*sw}deg) scale(1,1)`,offset:.08}];
+  for(let n=1;n<=N;n++){const t=n/N,e=t*t*(3-2*t),y=oy+(dy-oy)*(.15*t+.85*e),x=ox+(dx-ox)*t+Math.sin(t*Math.PI*2.5)*14*sw*(1-t*.7),
+   rot=8*sw+(rd-8*sw)*t+Math.sin(t*Math.PI*2.5+.6)*30*sw*(1-t),flip=.55+.45*Math.abs(Math.cos(t*Math.PI*3)),fl=t<1?flip:1;
+   kf.push({transform:t<1?`translate(${x}px,${y}px) rotate(${rot}deg) scale(${fl},1)`:end,offset:.08+.92*t})}
+  anims.push(sp.g.animate(kf,{duration:3800,delay:250+i*320,easing:'linear',fill:'both'}));
+  sp.g.firstChild.animate([{opacity:0},{opacity:1}],{duration:300,delay:250+i*320,fill:'backwards'});
+ });
+ const first={};ds.forEach(([u],i)=>{if(first[u]===undefined)first[u]=i});
+ R.lose[k].forEach(u=>R.unitEls(u).forEach(e=>{if(still){e.animate([{opacity:1},{opacity:0}],{duration:500,fill:'forwards'}).finished.then(an=>{e.style.opacity='0';an.cancel()});return}
+  e.animate([{opacity:1},{opacity:0}],{duration:350,delay:250+first[u]*320,fill:'both'}).finished.then(an=>{e.style.opacity='0';an.cancel()})}));
+ pose(R,k,!still);splay(R,k,!still);
+ return Promise.all(anims.map(a=>a.finished))}
+function regrow(R,still){const from=R.k;R.k=5;
+ R.fallen.querySelectorAll(':scope>g').forEach(g=>g.animate([{opacity:g.style.opacity||1},{opacity:0}],{duration:700,fill:'forwards'}).finished.then(()=>g.remove()));
+ pose(R,5,!still);splay(R,5,!still);
+ let step=0;const ps=[];
+ for(let k=from;k<=4;k++,step++)R.lose[k].forEach(u=>R.unitEls(u).forEach(e=>{e.style.opacity='';
+  if(still){ps.push(e.animate([{opacity:0},{opacity:1}],{duration:250,fill:'backwards'}).finished);return}
+  const a=e.animate([{transform:`translate(${C[0]}px,${C[1]}px) scale(.05) translate(${-C[0]}px,${-C[1]}px)`,opacity:0},{transform:`translate(${C[0]}px,${C[1]}px) scale(1.06) translate(${-C[0]}px,${-C[1]}px)`,opacity:1,offset:.7},{transform:'none',opacity:1}],{duration:650,delay:300+step*300,easing:'cubic-bezier(.34,1.56,.64,1)',fill:'backwards'});
+  ps.push(a.finished.then(()=>a.cancel()))}));
+ return Promise.all(ps)}
+
+// ===== page =====
+const PET='M100 74 C81 62 83 30 100 20 C117 30 119 62 100 74Z';
+const FLOWER=`<svg class="lf" viewBox="30 18 140 140" aria-hidden="true">${[0,1,2,3,4].map(i=>`<path d="${PET}" transform="rotate(${i*72} 100 88)" fill="var(--petal)" stroke="var(--petal-edge)" stroke-width="7" stroke-linejoin="round"/>`).join('')}<circle cx="100" cy="88" r="18" fill="#F2B632" stroke="#D48E1B" stroke-width="5"/></svg>`;
+function pips(n,mode,from=0){let s=`<span class="pips" aria-hidden="true">${FLOWER}`;
+ for(let i=0;i<5;i++){const f=mode==='fall'&&i===n,on=i<n;
+  s+=`<svg class="pip" viewBox="78 16 44 62"><path class="pg" d="${PET}"/>${on||f?`<path class="pf${f?' out':''}${mode==='grow'&&on&&i>=from?' in':''}" style="--i:${i-from}" d="${PET}"/>`:''}</svg>`}
+ return s+'</span>'}
+const media=matchMedia('(prefers-reduced-motion: reduce)');let forceRM=false;const still=()=>forceRM||media.matches;
+const theme=()=>document.documentElement.getAttribute('data-theme')||'light';
+document.getElementById('th').onclick=()=>{const t=theme()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);try{localStorage.setItem('wf-theme',t)}catch(e){};buildAlt()};
+document.getElementById('rm').onclick=e=>{forceRM=!forceRM;e.target.setAttribute('aria-pressed',forceRM);e.target.textContent='Preview Reduce Motion: '+(forceRM?'on':'off');document.body.classList.toggle('still',forceRM)};
+const LABEL={5:'5: full bloom',4:'4: tips curling',3:'3: sleepy rose',2:'2: small bud',1:'1: little bud',0:'0: resting stem'};
+async function tile(k,curled){const t=document.createElement('div');t.className='tile';const R=await makeRose(curled);R.svg.setAttribute('viewBox','14 8 172 172');t.appendChild(R.svg);
+ t.insertAdjacentHTML('beforeend',`${pips(k)}<span class="cap">${LABEL[k]}</span>`);t.setAttribute('role','img');t.setAttribute('aria-label',`Rose, ${k} of 5 love petals${curled?', curled':''}`);setState(R,k);restLast(R,k);return t}
+async function comparison(host,themes){host.innerHTML='';
+ for(const th of themes){const b=document.createElement('div');b.className='blk';if(th)b.dataset.theme=th;b.innerHTML=`<b>${th?(th==='dark'?'Dark':'Light'):''}</b><div class="cmp"><div class="hd">Today</div><div class="hd">Curled</div></div>`;host.appendChild(b);const g=b.querySelector('.cmp');
+  for(const k of [5,4,3,2,1,0]){g.appendChild(await tile(k,false));g.appendChild(await tile(k,true))}}}
+async function buildAlt(){await comparison(document.getElementById('cmpAlt'),[theme()==='dark'?'light':'dark'])}
+function spriteSheet(){
+ document.getElementById('sprites').innerHTML=Object.entries(CURL.sprites).map(([id,s])=>{const [x,y]=P(17,s.angle),vb=`${x-17} ${y-17} 34 34`;
+  return `<div class="tile" style="display:grid;grid-template-columns:1fr 1fr;gap:2px"><svg viewBox="${vb}"><circle cx="${x}" cy="${y}" r="12" fill="#D94668"/></svg><svg viewBox="${vb}">${curlSpriteSVG(id)}</svg><span class="cap" style="grid-column:1/3">plant_rose_curl_${id}</span></div>`}).join('')}
+// integration JSON (what the integrator adds to the rose rule and what thin_svg.py writes to PlantThinning.json)
+function integration(){const ring={o0:[1,0],o72:[1,1],o144:[1,2],o216:[1,3],o288:[1,4],wrap:[1,5],swirl:[1,6],heart:[1,7]};
+ const kept=(units)=>[0,1,2,3,4,5].map(k=>units.filter(u=>{const by=+Object.keys(LOSE_CURL).find(j=>LOSE_CURL[j].includes(u));return by<k}).length);
+ const out={lose:LOSE_CURL,keptCounts:{valleys:kept(['o0','o72','o144','o216','o288']),petals:kept(Object.keys(RULE.units))},
+  maxFallPerPip:'>= 5 (going 3 to 2 drops o72, o288 and the wrap: 5 petal refs with their valleys; the build has 5)',
+  curl:{sprites:{},pips:{}}};
+ Object.keys(CURL.sprites).forEach(id=>out.curl.sprites[id]='plant_rose_curl_'+id);
+ Object.entries(CURL.pips).forEach(([k,list])=>out.curl.pips[k]=list.map(e=>({petals:e.units.map(u=>ring[u]),image:'plant_rose_curl_'+e.image,pivot:e.pivot,rotate:e.rotate})));
+ document.getElementById('json').textContent=JSON.stringify(out,null,1).replace(/\[\s+([-\d.,\s"a-z0-9]+?)\s+\]/g,(m,a)=>'['+a.replace(/\s+/g,' ')+']');window.INTEGRATION=out}
+// live: two stages driven together
+const stagesHost=document.getElementById('stages');let ST=[],busy=false;
+function stageEl(tag){const s=document.createElement('div');s.className='stage';s.innerHTML=`<div class="tag">${tag}</div><div class="ground"></div><img class="pot" src="seed-pot.svg" alt=""><div class="row"></div><div class="lab" aria-live="polite"></div>`;stagesHost.appendChild(s);return s}
+function label(S){S.el.querySelector('.lab').textContent=S.el.classList.contains('seed')?'Rose is resting as a seed':`Rose, ${S.R.k} of 5 love petals`}
+async function load(){if(!ST.length)ST=[{el:stageEl('Today'),curled:false},{el:stageEl('Curled'),curled:true}];
+ for(const S of ST){S.el.classList.remove('seed');S.el.querySelector('svg.pl')?.remove();S.R=await makeRose(S.curled);S.el.insertBefore(S.R.svg,S.el.querySelector('.pot'));setState(S.R,5);S.el.querySelector('.row').innerHTML=pips(5);label(S)}}
+async function lose(){if(busy||ST[0].R.k===0)return;busy=true;
+ await Promise.all(ST.map(async S=>{S.el.querySelector('.row').innerHTML=pips(S.R.k-1,'fall');const p=fall(S.R,still());label(S);await p;
+  if(S.R.k===0){await new Promise(r=>setTimeout(r,RULE.seedAfterMs));S.el.classList.add('seed');label(S)}}));busy=false}
+document.getElementById('lose').onclick=lose;
+document.getElementById('play').onclick=async()=>{if(busy)return;if(ST[0].R.k<5)await load();for(let i=0;i<5;i++){await lose();await new Promise(r=>setTimeout(r,500))}};
+document.getElementById('love').onclick=async()=>{if(busy||ST[0].R.k===5)return;busy=true;await Promise.all(ST.map(async S=>{const from=S.R.k;S.el.classList.remove('seed');S.el.querySelector('.row').innerHTML=pips(5,'grow',from);const p=regrow(S.R,still());label(S);await p}));busy=false};
+document.getElementById('reset').onclick=()=>{if(!busy)load()};
+// ?pips=N jumps both stages to N without motion; ?play starts the 5 to 0 demo; ?pips=N&fall drops one pip from N (for screenshots)
+window.RULE=RULE;window.CURL=CURL;
+(async()=>{await comparison(document.getElementById('cmp160'),[null]);await load();
+ const q=new URLSearchParams(location.search);if(q.has('pips'))ST.forEach(S=>{const k=+q.get('pips');setState(S.R,k);restLast(S.R,k);S.el.querySelector('.row').innerHTML=pips(k);label(S)});
+ await comparison(document.getElementById('cmp320'),[null]);spriteSheet();await buildAlt();integration();document.body.dataset.ready=1;if(q.has('play'))document.getElementById('play').click();if(q.has('fall'))lose()})();
+</script></body></html>
