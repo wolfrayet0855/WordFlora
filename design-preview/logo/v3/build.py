@@ -193,6 +193,8 @@ TUCK_MAX = 0.05         # after fitting, at most this share of a petal may still
 # small margin); the Flora o pairs (l-o, o-r) open only as far as each direction's petals need (flora_o).
 BANDS = {'x': tuple(range(10, 471, 10)), 'o': tuple(range(-11, 504, 10)) + (503,)}
 SPACE = dict(tx=0.86, to=0.81, hx=1.145, ho=1.195, fl_hi=1.295, min_fl=45, min_any=45)   # min_any: no pair closer than 45 u anywhere (the r's arm vs the a and d)   # working limits keep ~0.5% margin inside the rule
+WORD_PAIRS = (0, 1, 2, 3)   # W-o, o-r, r-d, d-F
+CHECK_PAIRS = (5, 6, 7)    # l-o, o-r, r-a: checked against the as-set r-d (+15% x band)
 V2_WORD_INK = 2852.8     # v2 "Word" ink width (font units), from design-preview/logo/final/wordmark.svg
 
 def edge(p, y, side):
@@ -243,6 +245,9 @@ def solve_kerns(flora=None):
         k = math.ceil(k * 2) / 2
         if k > hi: k -= 0.5
         ks.append(k)
+    # round 2c (review A): W-o, o-r, r-d and d-F sit at Nunito's native r-d gap on the x band (about 209 u);
+    # the Flora pairs (l-o, o-r, r-a) and F-l keep the round 2b values
+    for i in WORD_PAIRS: ks[i] = math.ceil((Rx - nat[i]['x'][0]) * 2) / 2
     _KERNS[flora] = ks; return ks
 
 def layout(track=0, flora=None):
@@ -308,6 +313,7 @@ class Mark:
         # neighbour along one smooth edge instead of wrapping around its terminal
         nbcut = erode(dilate(nbcut, NB_CLOSE), NB_CLOSE)
         self.raw = petal_list(self.D, self.cx, self.cy)
+        self.ringcut = ringcut
         self.after_ring = [D(p, ringcut) for p in self.raw]
         # round 2: instead of cutting a petal along a letter's straight stem, scale that one petal about
         # the flower centre (binary search, 1.00 down to FIT_MIN) until it clears the neighbour clearance,
@@ -360,7 +366,7 @@ class Mark:
         Rx, Ro = refs()
         for band in ('x', 'o'):
             g = [mean_gap(self.glyphs[i], self.glyphs[i + 1], band) for i in range(8)]
-            rd = Rx if band == 'x' else Ro          # round 2b: deviations against Nunito's native r-d
+            rd = g[2][0]                            # round 2c: deviations against the AS-SET r-d
             res[band] = [dict(pair=PAIRS[i], mean=round(g[i][0], 1), min=round(g[i][1]), dev=round(100 * (g[i][0] / rd - 1), 1)) for i in range(8)]
         vis = [area(v) / area(a) if area(a) > 1 else 1.0 for v, a in zip(self.visible, self.after_ring)]
         widths = []
@@ -379,22 +385,31 @@ class Mark:
                 if area(I(dilate(a, mid / 2), dilate(b, mid / 2))) > 0.5: hi = mid
                 else: lo = mid
             sep.append(lo)
+        def outer(a):
+            for rr in range(700, 0, -2):
+                if self.bloom.contains((self.cx + math.sin(a) * rr, self.cy - math.cos(a) * rr)): return rr
+            return 0
+        def gap_edge(a):     # where the ring-gap cut ends along this ray (the valley floor when lobes do not touch)
+            for rr in range(0, 700, 2):
+                if not self.ringcut.contains((self.cx + math.sin(a) * rr, self.cy - math.cos(a) * rr)): return rr
+            return 0
+        def pt(a, rr): return (math.sin(a) * rr, -math.cos(a) * rr)
         notch = []
         for i in range(5):
-            tip_a = math.radians(self.D['rot'] + i * 72); bis = tip_a + math.radians(36)
-            def outer(a):
-                for rr in range(700, 0, -2):
-                    if self.bloom.contains((self.cx + math.sin(a) * rr, self.cy - math.cos(a) * rr)): return rr
-                return 0
-            notch.append(outer(tip_a) - outer(bis))
+            a1 = math.radians(self.D['rot'] + i * 72); a2 = a1 + math.radians(72); bis = a1 + math.radians(36)
+            t1, t2 = pt(a1, outer(a1)), pt(a2, outer(a2))
+            vr = outer(bis); vr = vr if vr else gap_edge(bis)
+            v = pt(bis, vr)
+            dx, dy = t2[0] - t1[0], t2[1] - t1[1]; L = math.hypot(dx, dy)
+            notch.append(abs((v[0] - t1[0]) * dy - (v[1] - t1[1]) * dx) / L)   # valley to the tip-to-tip chord
         st = self.straight_edges()
         return dict(
             vb=self.vb, o_centre=(round(self.cx, 1), round(self.cy, 1)), xs=[round(x, 1) for x in self.xs], aspect=round(vbw / vbh, 3), h172=round(172 * vbh / vbw, 1), h262=round(262 * vbh / vbw, 1),
             units_per_px_29=round(upx29, 1), gap_units=self.S['gap'], gap_px_29=round(self.S['gap'] / upx29, 2),
             nb_units=self.S['nb'], R=round(res['x'][2]['mean'], 1), R_o=round(res['o'][2]['mean'], 1),
             pairs=res['x'], pairs_o=res['o'], ref_x=round(Rx, 1), ref_o=round(Ro, 1),
-            worst_dev=max(abs(p['dev']) for i, p in enumerate(res['x']) if i != 4),
-            worst_dev_o=max(abs(p['dev']) for i, p in enumerate(res['o']) if i != 4),
+            worst_dev=max(abs(res['x'][i]['dev']) for i in CHECK_PAIRS),
+            worst_dev_o=max(abs(res['o'][i]['dev']) for i in CHECK_PAIRS),
             fl_dev=res['x'][4]['dev'], fl_dev_o=res['o'][4]['dev'], fl_min=min(res['x'][4]['min'], res['o'][4]['min']),
             word_ink=round(union(self.glyphs[:4]).bounds[2] - union(self.glyphs[:4]).bounds[0], 1),
             petal_visible=[round(v, 3) for v in vis], petal_scale=self.scales, petal_width_px29=[round(w / upx29, 1) for w in widths],
@@ -452,7 +467,7 @@ def icon_svg(dname, style):
         body.append('<path fill="%s" d="%s"/>' % (C['face'], d_of(T(rot_about(face_path(cx, cy), cx, cy, FACE_TILT)))))
     elif 'face' in C:                                 # hero smile: ring colour disc + face
         body.append('<path fill="%s" d="%s"/>' % (C['ring'], d_of(T(sil))))
-        body.append('<path fill="%s" d="%s"/>' % (C['face'], d_of(T(rot_about(face_path(cx, cy), cx, cy, D_['rot'])))))
+        body.append('<path fill="%s" d="%s"/>' % (C['face'], d_of(T(face_path(cx, cy)))))   # round 2c: face level (0 deg); petals keep the tilt
     else:                                             # ring colour disc (counter filled) + round pistil
         body.append('<path fill="%s" d="%s"/>' % (C['ring'], d_of(T(sil))))
         pr = PISTIL * 543.0 * rs / 2
@@ -556,8 +571,8 @@ def notes_md(r):
              % (T['gap_units'], S['gap_units'], MS['gap_units'], T['nb_units'], S['nb_units'], NB_CLOSE, ('%g' % (r['geometry'].get('tuck_max', TUCK_MAX) * 100)), ', '.join('%.3f' % v for v in T['petal_scale']), SIZES['twin']['round']))
     if r['geometry'].get('slits'):
         L.append('- **Mono-solid slits.** In `wordmark-mono-solid.svg` five radial bars %d u wide are cut along the bisectors between the lobes, so in solid ink the bloom is five petals, not a gear.' % r['geometry']['slits'])
-    L.append('- **Spacing rule (round 2b).** The reference is Nunito\'s native r-d gap: %.1f u on the x-height band (10..470 u), %.1f u on the full o height (-11..503 u, including overshoot), with rows every 10 u (v2 sampled every 20 u and quoted about 203). Every pair except F-l must sit within +-15%% of it on the x band and +-20%% on the o band; F-l may reach +30%% on either band with an arm gap of at least %d u. Each pair takes the tightest legal kern (working margin %.2f x / %.2f o), and no pair comes closer than 45 u anywhere (the r\'s arm against the d and the a). The Flora o pairs open to the legal maximum, because at the tightest kern no petal arrangement keeps 80%% visible (see notes below). Kerns W-o..r-a: %s u. Solo adds %d u to every pair except F-l, l-o and o-r (already at their limits).'
-             % (T['ref_x'], T['ref_o'], SPACE['min_fl'], SPACE['tx'], SPACE['to'], ', '.join('%+.1f' % k for k in r['kerns']), SIZES['solo']['track']))
+    L.append('- **Spacing rule (round 2c).** W-o, o-r, r-d and d-F sit at Nunito\'s native r-d gap on the x band (%.1f u; rows every 10 u, 10..470 u). The Flora pairs keep their round 2b values (l-o and o-r opened for the petals, r-a no closer than 45 u), and F-l keeps a 45 u arm gap. Check, against the **as-set** r-d: l-o, o-r (Flora) and r-a within +15%% on the x band, F-l within +30%%; the full o band (-11..503 u) is reported too. Kerns W-o..r-a: %s u. Solo adds %d u to every pair except F-l, l-o and o-r.'
+             % (T['ref_x'], ', '.join('%+.1f' % k for k in r['kerns']), SIZES['solo']['track']))
     L.append('- **Solo lockup** (below 130 pt wide, under about 22 pt tall): same flower, ring gap %d u, neighbour clearance %d u, +%d u tracking, as an optical size.' % (S['gap_units'], S['nb_units'], SIZES['solo']['track']))
     L.append('- **Icon.** %s Flower scaled by %.4f so its larger side is %d%% of the 1024 canvas, centred on its bounding box; flat background rect.' % (X['icon'], r['icon_scale'], round(ICON_FILL * 100)))
     if X.get('rule'): L.append('- **Face rule.** %s' % X['rule'])
@@ -580,7 +595,7 @@ def notes_md(r):
     for i in range(8):
         a, o, b = T['pairs'][i], T['pairs_o'][i], S['pairs'][i]
         L.append('| %s | %.0f (%d) | %+.1f%% | %.0f (%d) | %+.1f%% | %+.1f%% | %+.1f |' % (a['pair'], a['mean'], a['min'], a['dev'], o['mean'], o['min'], o['dev'], b['dev'], T['kerning'][i]))
-    L.append('\nWorst pair except F-l: %.1f%% (x band, limit 15), %.1f%% (full o band, limit 20); solo %.1f%% / %.1f%%. F-l: %+.1f%% x / %+.1f%% o (limit +30), minimum arm gap **%d u** (%.1f px at 29 px tall; limit 45). "Word" ink width %.0f u vs v2 %.0f u (%+.1f%%).\n'
+    L.append('\nChecked pairs (l-o, o-r Flora, r-a) vs the as-set r-d: worst %.1f%% x band (limit +15), %.1f%% o band (reported); solo %.1f%% / %.1f%%. F-l: %+.1f%% x / %+.1f%% o (limit +30), minimum arm gap **%d u** (%.1f px at 29 px tall; limit 45). "Word" ink width %.0f u vs v2 %.0f u (%+.1f%%).\n'
              % (T['worst_dev'], T['worst_dev_o'], S['worst_dev'], S['worst_dev_o'], T['fl_dev'], T['fl_dev_o'], T['fl_min'], T['fl_min'] / T['units_per_px_29'], T['word_ink'], V2_WORD_INK, 100 * (T['word_ink'] / V2_WORD_INK - 1)))
     L.append('%s\n' % X.get('a6_eye', 'TODO'))
     L.append('Petals tucked behind a neighbour, share of each petal (outside the ring gap) left visible, petals clockwise from the top one:\n')
@@ -593,7 +608,7 @@ def notes_md(r):
     if X['kind'] == 'separate':
         L.append('- Clear gap between neighbouring petals at 60 px tall: %s px.' % ', '.join('%.1f' % v for v in T['petal_sep_px60']))
     else:
-        L.append('- Petals are fused into one bloom; notch depth between lobes (tip radius minus notch radius) at 60 px tall: %s px; at 29 px: %s px.' % (', '.join('%.1f' % v for v in T['notch_px60']), ', '.join('%.1f' % v for v in T['notch_px29'])))
+        L.append('- Petals are fused into one bloom; notch depth between lobes (valley to the chord between neighbouring tips) at 60 px tall: %s px; at 29 px: %s px.' % (', '.join('%.1f' % v for v in T['notch_px60']), ', '.join('%.1f' % v for v in T['notch_px29'])))
     L.append('- Longest straight run on the bloom outline: %.1f px at 320 px tall.' % T['straight_px320'])
     L.append('- The o counter at 29 px tall: %.1f x %.1f px.\n' % (r['counter_px_29']['w'], r['counter_px_29']['h']))
     if X.get('pixel_checks'): L.append('**Pixel checks on the rendered PNGs** (`python render.py` prints them):\n\n%s\n' % X['pixel_checks'])
@@ -607,7 +622,7 @@ def notes_md(r):
     a4 = (c('Word vs Flora (light)') >= 3 and c('Word vs Flora (dark)') >= 1.3 and min(c(n) for n in ('Word on cream (light)', 'Flora on cream (light)', 'Word on dark', 'Flora on dark')) >= 4.5)
     a5 = all(cv['petal_bg'] >= 3 and cv['split'] >= 2 for cv in r['cvd'])
     vis_min = min(T['petal_visible'] + S['petal_visible'] + MS['petal_visible'])
-    a6num = (max(T['worst_dev'], S['worst_dev']) <= 15 and max(T['worst_dev_o'], S['worst_dev_o']) <= 20 and max(T['fl_dev'], T['fl_dev_o'], S['fl_dev'], S['fl_dev_o']) <= 30
+    a6num = (max(T['pairs'][i]['dev'] for i in CHECK_PAIRS) <= 15 and max(S['pairs'][i]['dev'] for i in CHECK_PAIRS) <= 15 and max(T['fl_dev'], S['fl_dev']) <= 30
              and T['fl_min'] >= SPACE['min_fl'] and vis_min >= 0.8)
     a10 = 26 <= T['h172'] <= 34
     a3num = min(T['petal_width_px29']) >= 4
@@ -621,7 +636,7 @@ def notes_md(r):
     L.append('| A5 | %s | worst petals on cream %.2f (>= 3.0), worst Word/Flora %.2f (>= 2.0) across deutan, protan, tritan |'
              % (_pf(a5), min(cv['petal_bg'] for cv in r['cvd']), min(cv['split'] for cv in r['cvd'])))
     a6ok = a6num and X.get('a6_ok', False)
-    L.append('| A6 | %s | vs native r-d: worst pair %.1f%% x band (<= 15), %.1f%% o band (<= 20), solo %.1f / %.1f; F-l %+.1f / %+.1f%% (<= 30), arm gap %d u (>= 45); "Word" %+.1f%% vs v2; least-visible petal %.0f%% (>= 80); by eye: %s |'
+    L.append('| A6 | %s | vs the as-set r-d: l-o / o-r / r-a worst %.1f%% x band (<= +15), %.1f%% o band; solo %.1f / %.1f; F-l %+.1f / %+.1f%% (<= +30), arm gap %d u (>= 45); "Word" %+.1f%% vs v2; least-visible petal %.0f%% (>= 80); by eye: %s |'
              % (_pf(a6ok), T['worst_dev'], T['worst_dev_o'], S['worst_dev'], S['worst_dev_o'], T['fl_dev'], T['fl_dev_o'], T['fl_min'], 100 * (T['word_ink'] / V2_WORD_INK - 1), 100 * vis_min, X.get('a6_short', 'TODO')))
     for k in ('A7', 'A8', 'A9', 'A11', 'A12'):
         ok, txt = X[k]

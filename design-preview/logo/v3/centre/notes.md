@@ -2,7 +2,7 @@
 
 Preview: http://localhost:8765/logo/v3/index.html#centre. Brief: `docs/pm/logo-critique.md`; reviews: `review/review-a.md`, `review/review-b.md`. Build: `python build.py --direction centre` (writes the SVGs, `measurements.json` and this file), then `python render.py --direction centre` (PNGs and `compare/`, headless Chromium over file://, sRGB, no ICC profile) and `python page.py` (index page). Every number below is computed by `build.py`.
 
-**Changes in round 2:** sRGB PNGs. The o ring is Flora green again (#2E803F light, #8FCB8F dark), so "Flora" is one colour and the rose disc alone marks the flower. The bloom is rebuilt from r = 215 u circles on a 270 u circle (tips 485 u), turned -8 degrees: notches 6.4 to 7.5 px at 60 px on all five lobes, no straight edge longer than 5 px at 320 px; the left lobe is scaled to 0.963 to clear the l. Icon: ring and counter scaled to 0.75x, counter filled with the ring colour plus a round pistil, tinted centre mid-grey; ground #1F3D24 so the petals stay at least 3.44:1 under protanopia. Ring gap 52 u (mono-solid 60 u). Round 2b re-spaced to the corrected rule and scaled the flower to 0.91.
+**Changes in round 2:** sRGB PNGs. The o ring is Flora green again (#2E803F light, #8FCB8F dark), so "Flora" is one colour and the rose disc alone marks the flower. The bloom is rebuilt from r = 215 u circles on a 270 u circle (tips 485 u), turned -8 degrees (round 2 quoted notches of 6.4 to 7.5 px at 60 px, which measured tip radius minus valley radius; round 2c measures valley to chord: 1.6 to 2.5 px), no straight edge longer than 5 px at 320 px; the left lobe is scaled to clear the l. Icon: ring and counter scaled to 0.75x, counter filled with the ring colour plus a round pistil, tinted centre mid-grey; ground #1F3D24 so the petals stay at least 3.44:1 under protanopia. Ring gap 52 u (mono-solid 60 u). Round 2b re-spaced to the corrected rule and scaled the flower to 0.91. Round 2c: W-o, o-r, r-d and d-F back at Nunito's native r-d gap (about 209 u); notch depth re-measured as valley to chord (1.6 to 2.5 px at 60 px, so C2's 5 px is not met).
 
 ## Idea
 
@@ -11,9 +11,9 @@ A solid rose bloom disc (#CF5D78) with five clear scallops sits behind a plain g
 ## Construction
 
 - **Letters.** Nunito Black (wght 900, `../fonts/Nunito-900.ttf`, SIL OFL), unaltered glyphs. The o ring is the font's own o with its open counter. The Word o is a plain letter.
-- **Flower.** Five circles of radius 215 u on a 270 u circle (tips at 485 u, 1.84x the o radius), one up, turned -8 degrees, then scaled to 0.91 (round 2b): tips 441 u. Neighbouring circles overlap outside the ring, so the bloom is one disc with notches about 7.5 px deep at 60 px (3.6 px at 29 px).
+- **Flower.** Five circles of radius 215 u on a 270 u circle (tips at 485 u, 1.84x the o radius), one up, turned -8 degrees, then scaled to 0.91 (round 2b): tips 441 u. Neighbouring circles overlap outside the ring, so the bloom is one disc. Notch depth, measured properly in round 2c as the valley's distance from the chord between neighbouring tips: 1.6 to 2.5 px at 60 px. The shallow scallops are what make it read as one shape.
 - **Cuts and fit (boolean path ops, no masks).** Petals minus the o silhouette dilated by the ring gap (52 u twin, 62 u solo, 60 u mono-solid). A petal that would reach a neighbour (the l or the r dilated by 40 u, solo 40 u, then closed by 100 u) is not cut along the letter: it is scaled about the flower centre until it clears, until at most 0.5% of it would sit behind the letter (4x that in the solo lockup), then that small remainder tucks behind; so it keeps its rounded tip (scales P1..P5: 1.000, 1.000, 1.000, 1.000, 0.976). An opening of 12 u rounds every corner.
-- **Spacing rule (round 2b).** The reference is Nunito's native r-d gap: 208.8 u on the x-height band (10..470 u), 214.5 u on the full o height (-11..503 u, including overshoot), with rows every 10 u (v2 sampled every 20 u and quoted about 203). Every pair except F-l must sit within +-15% of it on the x band and +-20% on the o band; F-l may reach +30% on either band with an arm gap of at least 45 u. Each pair takes the tightest legal kern (working margin 0.86 x / 0.81 o), and no pair comes closer than 45 u anywhere (the r's arm against the d and the a). The Flora o pairs open to the legal maximum, because at the tightest kern no petal arrangement keeps 80% visible (see notes below). Kerns W-o..r-a: -68.0, +56.5, -26.0, +61.5, -44.0, +80.5, +108.5, -25.0 u. Solo adds 10 u to every pair except F-l, l-o and o-r (already at their limits).
+- **Spacing rule (round 2c).** W-o, o-r, r-d and d-F sit at Nunito's native r-d gap on the x band (208.8 u; rows every 10 u, 10..470 u). The Flora pairs keep their round 2b values (l-o and o-r opened for the petals, r-a no closer than 45 u), and F-l keeps a 45 u arm gap. Check, against the **as-set** r-d: l-o, o-r (Flora) and r-a within +15% on the x band, F-l within +30%; the full o band (-11..503 u) is reported too. Kerns W-o..r-a: -39.0, +86.0, +0.0, +90.5, -44.0, +80.5, +108.5, -25.0 u. Solo adds 10 u to every pair except F-l, l-o and o-r.
 - **Solo lockup** (below 130 pt wide, under about 22 pt tall): same flower, ring gap 62 u, neighbour clearance 40 u, +10 u tracking, as an optical size.
 - **Icon.** Deep green ground #1F3D24. Rose bloom #E8758F. The centre is the o's silhouette at 0.75x, filled amber #F0B848, with a round pistil #C27A18 (diameter 0.40x the scaled ring width). Dark: #D95B7A, #E9A93A, #A8620C on #132313. Tinted: light-grey bloom, mid-grey centre, dark-grey pistil. Flower scaled by 0.9591 so its larger side is 80% of the 1024 canvas, centred on its bounding box; flat background rect.
 - **Icon colour rule.** The wordmark is rose and green only. Amber appears only as the icon's flower centre, because a green centre would vanish on the green ground. This is a palette deviation from R3, stated here.
@@ -66,18 +66,18 @@ No meaning depends on hue: the flower is separated from the background by lightn
 
 | Pair | x-band mean (min) u | vs r-d | full-o-band mean (min) u | vs r-d | solo x-band vs r-d | Kern u |
 |---|---|---|---|---|---|---|
-| W-o | 180 (118) | -13.9% | 191 (118) | -11.1% | -9.1% | -68.0 |
-| o-r | 180 (140) | -13.8% | 204 (140) | -4.7% | -9.0% | +56.5 |
-| r-d | 183 (46) | -12.5% | 191 (46) | -10.8% | -7.7% | -26.0 |
-| d-F | 180 (177) | -13.7% | 182 (177) | -15.2% | -8.9% | +61.5 |
-| F-l | 261 (45) | +25.1% | 276 (45) | +28.8% | +25.1% | -44.0 |
-| l-o | 235 (147) | +12.5% | 247 (146) | +15.1% | +12.5% | +80.5 |
-| o-r | 232 (191) | +11.0% | 246 (191) | +14.7% | +11.0% | +108.5 |
-| r-a | 221 (45) | +6.0% | 223 (45) | +4.0% | +10.8% | -25.0 |
+| W-o | 209 (147) | +0.0% | 220 (147) | +2.4% | +0.0% | -39.0 |
+| o-r | 209 (169) | +0.2% | 234 (169) | +9.0% | +0.1% | +86.0 |
+| r-d | 209 (72) | +0.0% | 214 (71) | +0.0% | +0.0% | +0.0 |
+| d-F | 209 (206) | +0.2% | 211 (206) | -1.7% | +0.2% | +90.5 |
+| F-l | 262 (45) | +25.4% | 277 (45) | +29.1% | +19.7% | -44.0 |
+| l-o | 235 (146) | +12.7% | 252 (147) | +17.5% | +7.5% | +80.5 |
+| o-r | 232 (192) | +11.1% | 256 (192) | +19.6% | +6.0% | +108.5 |
+| r-a | 221 (45) | +6.0% | 222 (45) | +3.3% | +5.7% | -25.0 |
 
-Worst pair except F-l: 13.9% (x band, limit 15), 15.2% (full o band, limit 20); solo 12.5% / 15.1%. F-l: +25.1% x / +28.8% o (limit +30), minimum arm gap **45 u** (1.4 px at 29 px tall; limit 45). "Word" ink width 2655 u vs v2 2853 u (-6.9%).
+Checked pairs (l-o, o-r Flora, r-a) vs the as-set r-d: worst 12.7% x band (limit +15), 19.6% o band (reported); solo 7.5% / 14.3%. F-l: +25.4% x / +29.1% o (limit +30), minimum arm gap **45 u** (1.4 px at 29 px tall; limit 45). "Word" ink width 2740 u vs v2 2853 u (-4.0%).
 
-**Round 2b spacing.** The rule now measures against Nunito's native r-d. Every Word pair and d-F takes its tightest legal kern: about -14% on the x band, with no pair closer than 45 u, which keeps the r's arm off the d and the a. "Word" is 2655 u of ink against v2's 2853 (-6.9%). At the tightest Flora gaps (l-o, o-r at -14%), no petal arrangement keeps 80% of a petal visible. Even at the widest legal gaps (+12.5% / +11.0% x, +15.1% / +14.7% o), a full-size flower scaled no lower than 0.94 per petal reaches only 72%. So, against the brief's "do not reopen", two levers were used instead. (1) The Flora o pairs sit at the legal maximum, still tighter than round 2 (235 vs 272 u). (2) The whole flower is scaled uniformly (hero and unified 0.92, centre 0.91), the same in the wordmark and the icon. The tightest-gap alternative needed a 0.80 flower, which turns the petals back into v2-style slivers round a heavy ring (rejected by eye). By eye on `compare/word-alone-320.png` (v2 above v3, same letter size), v3 "Word" is visibly tighter than v2 and o-r-d no longer reads looser: **the P3 eye check passes**. W-o and r-d sit close but clear, and the r's arm keeps 45 u from the d.
+**Round 2c spacing (review A).** Round 2b made "Word" tight (-14%) while the Flora pairs sat at +12%, so the word read "Word  Fl o r a". W-o, o-r, r-d and d-F are now back at Nunito's native r-d gap (about 209 u on the x band). The Flora pairs keep their round 2b values, which give the petals room, and the flower stays at 0.92 (centre 0.91). "Word" is 2739 u of ink against v2's 2853 (-4.0%). Judged by eye on the whole-word rows of `compare/word-alone-320.png` (v2 and v3 at the same letter size): the rhythm is even across "WordFlora", the two o's carry similar air, and nothing bunches. o-r-d is no looser than v2. On the o band, the round letters measure wider (o-r +9%, Flora o-r +19.6%, as overshoot rows add air), but the rule checks the x band.
 
 Petals tucked behind a neighbour, share of each petal (outside the ring gap) left visible, petals clockwise from the top one:
 
@@ -91,7 +91,7 @@ Petals tucked behind a neighbour, share of each petal (outside the ring gap) lef
 
 - Units per pixel at 29 px tall: 31.8. Ring gap 52 u = **1.64 px** (mono-solid 60 u = 1.89 px; A2 needs >= 1.0 px, i.e. >= 32 u).
 - Widest visible width of each petal at 29 px tall: 12.3, 12.3, 12.3, 12.3, 12.3 px (A3 needs >= 4).
-- Petals are fused into one bloom; notch depth between lobes (tip radius minus notch radius) at 60 px tall: 28.7, 28.7, 7.2, 28.7, 28.0 px; at 29 px: 13.9, 13.9, 3.5, 13.9, 13.5 px.
+- Petals are fused into one bloom; notch depth between lobes (valley to the chord between neighbouring tips) at 60 px tall: 2.5, 2.0, 1.7, 1.6, 1.7 px; at 29 px: 1.2, 0.9, 0.8, 0.8, 0.8 px.
 - Longest straight run on the bloom outline: 2.0 px at 320 px tall.
 - The o counter at 29 px tall: 5.7 x 7.8 px.
 
@@ -103,8 +103,8 @@ See `compare/pixel-checks.json`: exact sRGB fills, sheet margins and the ring ga
 
 | Lockup | viewBox | Aspect | Height at 172 pt wide | Height at 262 pt wide |
 |---|---|---|---|---|
-| twin (wordmark*.svg) | 20 46 5410 921 | 5.87 : 1 | 29.3 pt | 44.6 pt |
-| solo | 20 46 5460 921 | 5.93 : 1 | 29.0 pt | 44.2 pt |
+| twin (wordmark*.svg) | 20 46 5524 921 | 6.00 : 1 | 28.7 pt | 43.7 pt |
+| solo | 20 46 5574 921 | 6.05 : 1 | 28.4 pt | 43.3 pt |
 
 v2 was 5.83 : 1, about 29.5 pt tall at 172 pt.
 
@@ -114,16 +114,16 @@ v2 was 5.83 : 1, about 29.5 pt tall at 172 pt.
 |---|---|---|
 | A1 | **pass** | petals 3.58 on cream, 4.14 on dark (>= 3.0) |
 | A2 | **pass** | petal/ring 1.28 light, 1.85 dark; ring gap 52 u = 1.64 px at 29 px tall (>= 1.0), mono-solid 1.89 px |
-| A3 | **pass** | petal width at 29 px 12.3 px min (>= 4); notches 6.4 to 7.5 px at 60 px on all five lobes, so five can be counted in light, dark, mono and mono-solid; at 29 px one rose flower shape |
+| A3 | **pass** | petal width at 29 px 12.3 px min (>= 4); by eye, five scallops can be counted at 60 px in light, dark, mono and mono-solid, but they are shallow: 1.6 to 2.5 px valley-to-chord, so the round-2 target of 5 px (C2) is not met under the proper measure; at 29 px one rose flower shape |
 | A4 | **pass** | Word/Flora 3.15 light (>= 3.0), 1.56 dark (>= 1.3); Word 14.48, Flora 4.59 on cream; 11.94, 7.66 on dark (>= 4.5) |
 | A5 | **pass** | worst petals on cream 3.21 (>= 3.0), worst Word/Flora 3.04 (>= 2.0) across deutan, protan, tritan |
-| A6 | **pass** | vs native r-d: worst pair 13.9% x band (<= 15), 15.2% o band (<= 20), solo 12.5 / 15.1; F-l +25.1 / +28.8% (<= 30), arm gap 45 u (>= 45); "Word" -6.9% vs v2; least-visible petal 84% (>= 80); by eye: "Word" 6.9% narrower than v2 and o-r-d no tighter-looking than needed; P3 eye check passes |
+| A6 | **pass** | vs the as-set r-d: l-o / o-r / r-a worst 12.7% x band (<= +15), 19.6% o band; solo 7.5 / 14.3; F-l +25.4 / +29.1% (<= +30), arm gap 45 u (>= 45); "Word" -4.0% vs v2; least-visible petal 84% (>= 80); by eye: even rhythm across the whole word; "Word" 4.0% narrower than v2; o-r-d no looser than v2 |
 | A7 | **pass** | reads "WordFlora" at 29 px in all variants; the o is plain Flora green inside a cream gap, so "Flora" is one word in one colour. Mono-solid: the scallops are deep enough to read as a flower rather than a seal, but the bloom is still one solid shape |
 | A8 | **pass** | 1024, flat green rect, no text or transparency; a pink blossom with a small amber centre and a pistil; reads as a flower at 29 px; tinted centre is mid-grey, not a white donut |
 | A9 | **pass** | light, dark, mono, mono-solid each rendered and inspected at 29 and 60 px |
 | A11 | **pass** | no bounce, gloss, sparkle or bevel; no face |
 | A12 | **pass** | by description only, reviewers to confirm. The silhouette is in the ume/sakura crest and cherry-blossom emoji family, which is generic and not an app mark. It is not confusable with Duolingo, Forest, Headspace, Calm, Finch, Wordscapes, Lily's Garden, Gardenscapes, PictureThis, Seek, Flora, Blossom or Planta. Nothing copied |
-| A10 | **pass** | 5.87 : 1; 29.3 pt at 172 pt wide (26-34), 44.6 pt at 262 pt |
+| A10 | **pass** | 6.00 : 1; 28.7 pt at 172 pt wide (26-34), 43.7 pt at 262 pt |
 | A13 | **pass** | `compare/before-after-light.png`, `compare/before-after-dark.png` (v2 left, v3 right at 29, 60, 172 wide, 320; nothing clipped), "Word" alone at equal scale in `compare/word-alone-320.png`, `compare/icon-before-after.png` |
 
 ## Honest weaknesses
@@ -132,7 +132,7 @@ v2 was 5.83 : 1, about 29.5 pt tall at 172 pt.
 - Mono-solid stays one solid black disc around the o. The scallops help, but it is still the most badge-like of the three in Increase Contrast.
 - The icon centre is amber, a colour the wordmark no longer uses (see the colour rule).
 - The cherry-blossom silhouette is generic: pleasant, but the least ownable of the three.
-- **Round 2b spacing.** The rule now measures against Nunito's native r-d. Every Word pair and d-F takes its tightest legal kern: about -14% on the x band, with no pair closer than 45 u, which keeps the r's arm off the d and the a. "Word" is 2655 u of ink against v2's 2853 (-6.9%). At the tightest Flora gaps (l-o, o-r at -14%), no petal arrangement keeps 80% of a petal visible. Even at the widest legal gaps (+12.5% / +11.0% x, +15.1% / +14.7% o), a full-size flower scaled no lower than 0.94 per petal reaches only 72%. So, against the brief's "do not reopen", two levers were used instead. (1) The Flora o pairs sit at the legal maximum, still tighter than round 2 (235 vs 272 u). (2) The whole flower is scaled uniformly (hero and unified 0.92, centre 0.91), the same in the wordmark and the icon. The tightest-gap alternative needed a 0.80 flower, which turns the petals back into v2-style slivers round a heavy ring (rejected by eye). By eye on `compare/word-alone-320.png` (v2 above v3, same letter size), v3 "Word" is visibly tighter than v2 and o-r-d no longer reads looser: **the P3 eye check passes**. W-o and r-d sit close but clear, and the r's arm keeps 45 u from the d.
+- **Round 2c spacing (review A).** Round 2b made "Word" tight (-14%) while the Flora pairs sat at +12%, so the word read "Word  Fl o r a". W-o, o-r, r-d and d-F are now back at Nunito's native r-d gap (about 209 u on the x band). The Flora pairs keep their round 2b values, which give the petals room, and the flower stays at 0.92 (centre 0.91). "Word" is 2739 u of ink against v2's 2853 (-4.0%). Judged by eye on the whole-word rows of `compare/word-alone-320.png` (v2 and v3 at the same letter size): the rhythm is even across "WordFlora", the two o's carry similar air, and nothing bunches. o-r-d is no looser than v2. On the o band, the round letters measure wider (o-r +9%, Flora o-r +19.6%, as overshoot rows add air), but the rule checks the x band.
 
 ## Files
 

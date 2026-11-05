@@ -101,7 +101,14 @@ def word_rows(d, k=0.32):
     return ('<h2>"Word" alone, same scale (%.2f px per font unit, so the letters are the same size)</h2>'
             '<p>Ink width of "Word": v2 %d u, v3 %d u (%+.1f%%).</p>'
             '<div class="row"><div class="lab">v2 (final)</div>%s</div><div class="row"><div class="lab">v3 %s</div>%s</div>'
-            % (k, v2w, v3w, 100 * (v3w / v2w - 1), v2h, d, v3h)), v2w, v3w
+            '<h2>Whole word, same scale, so the rhythm can be judged across "WordFlora"</h2>'
+            '<div class="row"><div class="lab">v2 (final)</div>%s</div><div class="row"><div class="lab">v3 %s</div>%s</div>'
+            % (k, v2w, v3w, 100 * (v3w / v2w - 1), v2h, d, v3h, full_img(os.path.join(V2, 'wordmark.svg'), k), d,
+               full_img(os.path.join(HERE, d, 'wordmark.svg'), k))), v2w, v3w
+
+def full_img(svg_path, k):
+    vb = [float(v) for v in re.search(r'viewBox="([^"]+)"', open(svg_path).read()).group(1).split()]
+    return '<img src="file://%s" style="height:%dpx;width:%dpx">' % (svg_path, round(vb[3] * k), round(vb[2] * k))
 
 def ba_sheet(d, mode):
     fg = '#182818' if mode == 'light' else '#DCEEDC'
@@ -154,7 +161,7 @@ def render_compare(d):
     full_shot(html, os.path.join(out, 'icon-before-after.png'), 900, 140 + 236 * n)
     wr, v2w, v3w = word_rows(d)
     full_shot('<!doctype html><meta charset="utf-8"><style>%s</style>%s' % (CSS % (BG['light'], '#182818', '#182818'), wr),
-              os.path.join(out, 'word-alone-320.png'), 2400, 900)
+              os.path.join(out, 'word-alone-320.png'), 2400, 1700)
 
 # ------------------------------------------------------------- pixel checks
 def hexrgb(h): h = h.lstrip('#'); return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
