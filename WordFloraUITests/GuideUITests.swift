@@ -104,7 +104,9 @@ final class GuideUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.buttons["Under 13"].waitForExistence(timeout: 12))
         app.buttons["Under 13"].tap()
-        XCTAssertTrue(app.buttons["Yes, keep it quiet"].waitForExistence(timeout: 3))
+        // As in openGuide: a tap while the age question is still fading in from the intro is tried once more.
+        if !app.buttons["Yes, keep it quiet"].waitForExistence(timeout: 4) { app.buttons["Under 13"].tap() }
+        XCTAssertTrue(app.buttons["Yes, keep it quiet"].waitForExistence(timeout: 4))
         app.buttons["Yes, keep it quiet"].tap()
         XCTAssertTrue(next.waitForExistence(timeout: 5))
         goTo(page: 4)
