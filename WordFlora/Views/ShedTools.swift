@@ -139,7 +139,13 @@ struct ToolTile: View {
         let shape = RoundedRectangle(cornerRadius: 20, style: .continuous)
         Button(action: open) {
             Group {
-                if typeSize.isAccessibilitySize {
+                if typeSize >= .accessibility3 {
+                    // The largest sizes: the art sits above the words, which then get the whole row, so names stay
+                    // whole ("Mis-ter" and "Butter-fly" broke beside the art).
+                    VStack(alignment: .leading, spacing: 6) { art; text(alignment: .leading) }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 6)
+                } else if typeSize.isAccessibilitySize {
                     HStack(alignment: .center, spacing: 12) { art; text(alignment: .leading) }
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
@@ -168,10 +174,9 @@ struct ToolTile: View {
         tint.fill.opacity(0.45)
     }
 
-    /// The art grows with the text, but stops at 84pt so the words keep the row at the largest sizes (whole words,
-    /// no "Mis-ter"), as in design-preview/shed-visitors/shed-v2 p-ax.
-    private var circleSide: CGFloat { min(circle, 84) }
-    private var artSide: CGFloat { min(artW, 74) }
+    /// The art grows with the text, but stops at 84pt (it sits above the words at the largest sizes).
+    private var circleSide: CGFloat { typeSize >= .accessibility3 ? min(circle, 84) : circle }
+    private var artSide: CGFloat { typeSize >= .accessibility3 ? min(artW, 74) : artW }
 
     private var art: some View {
         let circle = circleSide, artW = artSide
