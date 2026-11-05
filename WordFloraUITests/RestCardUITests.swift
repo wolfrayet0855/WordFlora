@@ -49,7 +49,22 @@ final class RestCardUITests: XCTestCase {
             next.tap()
         }
         XCTAssertTrue(app.staticTexts["The garden is resting"].waitForExistence(timeout: 5))
-        sleep(1)                                     // let the card finish fading in
+        settle(element("restCard"))
+    }
+
+    /// Waits until the card has finished opening (it fades in and grows a little): its frame stays the same for two
+    /// looks in a row. A fixed one second was not always enough on a busy machine, and the Dynamic Type audit then
+    /// measured text that was still being scaled.
+    private func settle(_ el: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
+        XCTAssertTrue(el.waitForExistence(timeout: 5), file: file, line: line)
+        var previous = CGRect.null
+        for _ in 0..<20 {
+            let f = el.frame
+            if f == previous { return }
+            previous = f
+            usleep(400_000)
+        }
+        XCTFail("\(el) kept moving", file: file, line: line)
     }
 
     private func openBreakCard(_ extra: [String] = []) {
@@ -58,7 +73,7 @@ final class RestCardUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 8))
         app.buttons["Play"].tap()
         XCTAssertTrue(app.staticTexts["Time for a little break"].waitForExistence(timeout: 5))
-        sleep(1)
+        settle(element("breakCard"))
     }
 
     /// Scrolls the card until the element can be tapped.
