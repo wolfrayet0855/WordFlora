@@ -19,6 +19,9 @@ enum LifeStats {
         /// Quiet Garden or Calm mode: no rain, no falling petals, no seed.
         var exempt: Bool
         var economy: Economy = .default
+        /// Today's garden weather for this plant, when there is any. It only adds `Snapshot.weather`: the meters,
+        /// hearts and stored stage never change because of weather.
+        var weather: WeatherLook.Input? = nil
     }
 
     struct Meter: Equatable {
@@ -44,6 +47,8 @@ enum LifeStats {
         var isSeed: Bool
         /// Days without love while it rains (0 when dry, exempt or resting as a seed).
         var rainDay: Int
+        /// The weather look and any shown-stage dip, computed only (nil when there is nothing to show).
+        var weather: WeatherLook.Output? = nil
 
         var stageLabel: String { "Growing, \(LifeStats.stageNames[stage].lowercased()) stage" }
         var heartsLabel: String { "Love, \(hearts) of 5 hearts. \(loveLine)" }
@@ -139,7 +144,17 @@ enum LifeStats {
         }()
 
         return Snapshot(water: water, sunshine: sunshine, happiness: happiness, stage: stage, hearts: hearts, loveLine: line,
-                        pips: love.petalsLeft, isSeed: false, rainDay: rainDay)
+                        pips: love.petalsLeft, isSeed: false, rainDay: rainDay, weather: weatherOutput(i, love: love))
+    }
+
+    /// The weather overlay for this plant. Love rain wins and a resting seed shows none; nothing else on the panel changes.
+    private static func weatherOutput(_ i: Inputs, love: LoveEngine.State) -> WeatherLook.Output? {
+        guard var w = i.weather else { return nil }
+        w.loveRaining = w.loveRaining || love.raining
+        w.isSeed = w.isSeed || love.isSeed
+        w.stage = i.stage
+        let out = WeatherLook.compute(w)
+        return out.isEmpty ? nil : out
     }
 
     /// Rain grows a little steadier each day without love; soft thunder joins from day four.

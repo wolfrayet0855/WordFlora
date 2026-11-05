@@ -42,6 +42,34 @@ final class PlayerProfile {
     var rewardedToday: Int = 0
     var rewardedDay: Date?
 
+    // Garden weather and the endgame (docs/pm/endgame-and-events-spec.md section 7, added 2026-11-05). All defaulted,
+    // no unique constraints and no relationships, so lightweight migration and CloudKit accept them. Merged by
+    // DataReconciler with the rule noted on each line; nothing here ever lowers an earned value.
+    /// The per-player weather seed (0 = unset). Never derived from a device or user id. Merged with `weatherStartDay` as a pair.
+    var weatherSeed: Int64 = 0
+    /// The first day key weather may come (a week after the garden began). Pair rule: the smaller nonzero start wins.
+    var weatherStartDay: Int = 0
+    /// The highest day key the app has computed (clock guard). Merge: max.
+    var weatherHighWaterDay: Int = 0
+    /// The event day key the weather helpers were set out for. Merge: max.
+    var weatherShelterDay: Int = 0
+    /// Event day keys whose weather puzzle was solved. Merge: union, trimmed to the latest 30.
+    var weatherRescuedDays: [Int] = []
+    /// Fresh weather puzzles today (`weatherPuzzleDay` is its day key). Merge: the later day wins; same day, max.
+    var weatherPuzzleDay: Int = 0
+    var weatherPuzzleCount: Int = 0
+    /// Wild Weather opt-in (13+, Calm off only; never under 13). Merge: AND, so off wins.
+    var wildWeather: Bool = false
+    /// The first day key the weather gate opened. Merge: min of nonzero.
+    var weatherGatedFromDay: Int = 0
+    /// When the garden or Home was first opened on or after the latest event day. Merge: max.
+    var weatherSeenAt: Date?
+    /// When the free weather kit (all six helpers) arrived. Merge: min of non-nil.
+    var weatherKitAt: Date?
+    /// When the Grand Garden ceremony and the gold crown moment were seen, so each plays once. Merge: min of non-nil.
+    var crownSeenAt: Date?
+    var goldCrownSeenAt: Date?
+
     var createdAt: Date = Date.now
 
     init() {}

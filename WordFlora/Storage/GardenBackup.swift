@@ -22,6 +22,14 @@ struct GardenBackup: Codable, Equatable {
         var wordsTowardPlant: Int?
         // Pots recorded as earned (added 2026-11-04). Optional, so backups saved before then still read (as none).
         var earnedPotIds: [String]?
+        // Garden weather and the endgame (added 2026-11-05). All optional, so older backups still read (as unset).
+        var weatherSeed: Int64?, weatherStartDay: Int?, weatherHighWaterDay: Int?, weatherShelterDay: Int?
+        var weatherRescuedDays: [Int]?
+        var weatherPuzzleDay: Int?, weatherPuzzleCount: Int?
+        /// Restores only as off: a backup can turn Wild Weather off, never on.
+        var wildWeather: Bool?
+        var weatherGatedFromDay: Int?
+        var weatherSeenAt: Date?, weatherKitAt: Date?, crownSeenAt: Date?, goldCrownSeenAt: Date?
     }
 
     struct Plant: Codable, Equatable {
@@ -37,6 +45,8 @@ struct GardenBackup: Codable, Equatable {
         var potId: String?
         // When that pot was chosen (added 2026-11-04). Optional, so older backups still read.
         var potChosenAt: Date?
+        // Golden blooms (added 2026-11-05). Optional, so older backups still read (as none).
+        var goldenDays: Int?, goldenDayKey: Int?
     }
 
     enum ImportError: Error, Equatable {
@@ -78,13 +88,21 @@ struct GardenBackup: Codable, Equatable {
                            gardenDays: p.gardenDays, shedPoints: p.shedPoints, glowLanterns: p.glowLanterns, widgetPlantID: p.widgetPlantID,
                            toolsJSON: p.toolsJSON, badgesJSON: p.badgesJSON, albumJSON: p.albumJSON, wordsTowardPlant: p.wordsTowardPlant)
         }
-        if let p { snap.earnedPotIds = p.earnedPotIds }
+        if let p {
+            snap.earnedPotIds = p.earnedPotIds
+            snap.weatherSeed = p.weatherSeed; snap.weatherStartDay = p.weatherStartDay; snap.weatherHighWaterDay = p.weatherHighWaterDay
+            snap.weatherShelterDay = p.weatherShelterDay; snap.weatherRescuedDays = p.weatherRescuedDays
+            snap.weatherPuzzleDay = p.weatherPuzzleDay; snap.weatherPuzzleCount = p.weatherPuzzleCount; snap.wildWeather = p.wildWeather
+            snap.weatherGatedFromDay = p.weatherGatedFromDay; snap.weatherSeenAt = p.weatherSeenAt; snap.weatherKitAt = p.weatherKitAt
+            snap.crownSeenAt = p.crownSeenAt; snap.goldCrownSeenAt = p.goldCrownSeenAt
+        }
         let plants = ((try? context.fetch(FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.plantId)]))) ?? []).map {
             Plant(plantId: $0.plantId, earnedCount: $0.earnedCount, growthPoints: $0.growthPoints, stage: $0.stage, hydration: $0.hydration,
                   soilRichness: $0.soilRichness, soilType: $0.soilType, nickname: $0.nickname, lastTendedAt: $0.lastTendedAt,
                   lastSunnyAt: $0.lastSunnyAt, lastPrunedAt: $0.lastPrunedAt, lastLovedAt: $0.lastLovedAt,
                   waterToday: $0.waterToday, waterDay: $0.waterDay, lastFedAt: $0.lastFedAt, lastRepotGrowthAt: $0.lastRepotGrowthAt,
-                  potId: $0.potId, potChosenAt: $0.potChosenAt == .distantPast ? nil : $0.potChosenAt)
+                  potId: $0.potId, potChosenAt: $0.potChosenAt == .distantPast ? nil : $0.potChosenAt,
+                  goldenDays: $0.goldenDays, goldenDayKey: $0.goldenDayKey)
         }
         let games = (try? context.fetchCount(FetchDescriptor<GameRecord>())) ?? 0
         return GardenBackup(exportedAt: now, profile: snap, plants: plants, gamesRecorded: games)
@@ -122,8 +140,11 @@ struct GardenBackup: Codable, Equatable {
         let counts = [p.currentLevel, p.plantsEarnedThisLevel, p.roseOfJerichoCount, p.gamesPlayed, p.water, p.soil, p.streak,
                       p.bestStreak, p.streakFreezes, p.roseSeedProgress, p.gardenDays, p.shedPoints, p.glowLanterns, p.wordsTowardPlant ?? 0, gamesRecorded]
         guard counts.allSatisfy({ $0 >= 0 }), (1...100).contains(p.currentLevel) else { return false }
+        let weatherCounts = [p.weatherHighWaterDay, p.weatherShelterDay, p.weatherPuzzleDay, p.weatherPuzzleCount, p.weatherGatedFromDay]
+        guard weatherCounts.allSatisfy({ ($0 ?? 0) >= 0 }), (p.weatherRescuedDays ?? []).count <= 200 else { return false }
         return plants.allSatisfy { !$0.plantId.isEmpty && $0.earnedCount >= 0 && $0.growthPoints >= 0 && (0...4).contains($0.stage)
-            && $0.hydration.isFinite && $0.soilRichness.isFinite && $0.nickname.count <= 60 && ($0.potId ?? "").count <= 40 }
+            && $0.hydration.isFinite && $0.soilRichness.isFinite && $0.nickname.count <= 60 && ($0.potId ?? "").count <= 40
+            && ($0.goldenDays ?? 0) >= 0 && ($0.goldenDayKey ?? 0) >= 0 }
     }
 
     static func restore(_ data: Data, into context: ModelContext, badgeDefs: [BadgeDef]) -> Result<RestoreReport, ImportError> {
@@ -146,6 +167,15 @@ struct GardenBackup: Codable, Equatable {
         o.glowLanterns = profile.glowLanterns; o.widgetPlantID = profile.widgetPlantID
         o.toolsJSON = profile.toolsJSON; o.badgesJSON = profile.badgesJSON; o.albumJSON = profile.albumJSON
         o.wordsTowardPlant = profile.wordsTowardPlant ?? 0
+        o.weatherSeed = profile.weatherSeed ?? 0; o.weatherStartDay = profile.weatherStartDay ?? 0
+        o.weatherHighWaterDay = profile.weatherHighWaterDay ?? 0; o.weatherShelterDay = profile.weatherShelterDay ?? 0
+        o.weatherRescuedDays = profile.weatherRescuedDays ?? []
+        o.weatherPuzzleDay = profile.weatherPuzzleDay ?? 0; o.weatherPuzzleCount = profile.weatherPuzzleCount ?? 0
+        // Merged by AND: a backup can only turn Wild Weather off, and one that never knew it leaves the setting alone.
+        o.wildWeather = profile.wildWeather ?? keeper.wildWeather
+        o.weatherGatedFromDay = profile.weatherGatedFromDay ?? 0
+        o.weatherSeenAt = profile.weatherSeenAt; o.weatherKitAt = profile.weatherKitAt
+        o.crownSeenAt = profile.crownSeenAt; o.goldCrownSeenAt = profile.goldCrownSeenAt
         DataReconciler.merge(o, into: keeper, defs: badgeDefs)
 
         var report = RestoreReport()
@@ -158,6 +188,7 @@ struct GardenBackup: Codable, Equatable {
             c.lastTendedAt = s.lastTendedAt; c.lastSunnyAt = s.lastSunnyAt; c.lastPrunedAt = s.lastPrunedAt; c.lastLovedAt = s.lastLovedAt
             c.waterToday = max(0, s.waterToday ?? 0); c.waterDay = s.waterDay; c.lastFedAt = s.lastFedAt; c.lastRepotGrowthAt = s.lastRepotGrowthAt
             c.potId = s.potId ?? ""; c.potChosenAt = s.potChosenAt ?? .distantPast
+            c.goldenDays = max(0, s.goldenDays ?? 0); c.goldenDayKey = max(0, s.goldenDayKey ?? 0)
             DataReconciler.merge(c, into: k)
             report.plantsUpdated += 1
         }

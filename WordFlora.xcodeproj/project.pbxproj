@@ -196,6 +196,11 @@
 		F935EF5C075DD18A90D60D6E /* OnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB68790025C9135B9C9E7DA /* OnboardingFlow.swift */; };
 		F99A70A6E0D4D6CBCB8204F2 /* TendingEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 545F60B78CCEA135D7B2E627 /* TendingEngine.swift */; };
 		FDE23E6797130C5C56A65DA1 /* StorageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE6B054B52FF203A9392E361 /* StorageTests.swift */; };
+		604D4730FA07745402D9F3A2 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FDAD053638CA18F19E93110 /* Weather.swift */; };
+		C8709A468B9511BE3FDCBD99 /* WeatherLook.swift in Sources */ = {isa = PBXBuildFile; fileRef = D11EE6155AE83E8642FBA80A /* WeatherLook.swift */; };
+		2E2C08DB24F3B53768CA51E8 /* Endgame.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1CCA3DFFA37FA255F780D53F /* Endgame.swift */; };
+		79EAC747CBAC36831FB4CA85 /* WeatherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E2B4BA7F79178D9473B616 /* WeatherTests.swift */; };
+		DE7AA3C310999E655FB4FAE4 /* EndgameTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 883A6BAC468814CB14620178 /* EndgameTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -419,6 +424,11 @@
 		FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-wrong.m4a"; sourceTree = "<group>"; };
 		FBB3484DBA881E17BA5D174F /* wf-badgeBronze.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeBronze.m4a"; sourceTree = "<group>"; };
 		FBDA79853A58ADD9A3C086E7 /* SimplerClueTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SimplerClueTests.swift; sourceTree = "<group>"; };
+		8FDAD053638CA18F19E93110 /* Weather.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Weather.swift; sourceTree = "<group>"; };
+		D11EE6155AE83E8642FBA80A /* WeatherLook.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherLook.swift; sourceTree = "<group>"; };
+		1CCA3DFFA37FA255F780D53F /* Endgame.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Endgame.swift; sourceTree = "<group>"; };
+		40E2B4BA7F79178D9473B616 /* WeatherTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherTests.swift; sourceTree = "<group>"; };
+		883A6BAC468814CB14620178 /* EndgameTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EndgameTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -511,6 +521,9 @@
 				3E9482B7E7B497DE1F68D020 /* LifeStats.swift */,
 				1E72C046D44E8C67ECE69705 /* PotCatalog.swift */,
 				8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */,
+				8FDAD053638CA18F19E93110 /* Weather.swift */,
+				D11EE6155AE83E8642FBA80A /* WeatherLook.swift */,
+				1CCA3DFFA37FA255F780D53F /* Endgame.swift */,
 			);
 			name = Rules;
 			path = Rules;
@@ -659,6 +672,8 @@
 				4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */,
 				31A01BCA86B388E2D94431DD /* RestCardTests.swift */,
 				F70EB58E222988AA85D5FD80 /* CelebrationTests.swift */,
+				40E2B4BA7F79178D9473B616 /* WeatherTests.swift */,
+				883A6BAC468814CB14620178 /* EndgameTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -1086,6 +1101,8 @@
 				73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */,
 				54C470839654E5464D7662F7 /* RestCardTests.swift in Sources */,
 				08A9BBC309E50A7990922ED1 /* CelebrationTests.swift in Sources */,
+				79EAC747CBAC36831FB4CA85 /* WeatherTests.swift in Sources */,
+				DE7AA3C310999E655FB4FAE4 /* EndgameTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1214,6 +1231,9 @@
 				5C79C89D5D157B3BC8D2F263 /* RestScene.swift in Sources */,
 				7B821C6FCAD64E3AF76503B9 /* RestCardCopy.swift in Sources */,
 				1355711493BE367E7DC6B3D7 /* ShedTools.swift in Sources */,
+				604D4730FA07745402D9F3A2 /* Weather.swift in Sources */,
+				C8709A468B9511BE3FDCBD99 /* WeatherLook.swift in Sources */,
+				2E2C08DB24F3B53768CA51E8 /* Endgame.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

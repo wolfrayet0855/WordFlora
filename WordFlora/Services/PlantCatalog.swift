@@ -9,6 +9,9 @@ struct PlantInfo: Decodable, Equatable {
     let imageName: String
     /// How the plant got its name (fact card V2). Missing for plants whose story is not verified yet.
     var nameStory: NameStory? = nil
+    /// Botanical traits garden weather reads (`WeatherEngine.effect`). Optional so a plant entry without the key still decodes.
+    var traits: [String]? = nil
+    var traitSet: Set<String> { Set(traits ?? []) }
 
     /// Stable identity derived from the asset name ("plant_rose" -> "rose").
     var plantId: String {

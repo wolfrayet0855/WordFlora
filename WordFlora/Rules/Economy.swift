@@ -34,5 +34,39 @@ struct Economy: Codable, Equatable {
     var levelBaseCost = 200.0
     var levelCostMultipliers = [1.0, 1.1, 1.2, 1.3, 1.4]
 
+    // Garden weather (docs/pm/endgame-and-events-spec.md section 6.1; owner decisions 2026-11-04). Weather only ever
+    // changes a look, or in opt-in Wild Weather a shown stage computed at display time: no stored value goes down.
+    var weatherFirstWeekDays = 7
+    var weatherBlockDays = 14
+    var weatherEventWindow = 7
+    var weatherBlockChance = 0.75
+    var weatherBagBig = 3
+    var weatherBagGentle = 7
+    var weatherAffectedCap = 0.4
+    var weatherLingerDays = 3
+    var weatherMinPlants = 5
+    var weatherMinTends = 2
+    var weatherPuzzlesPerDay = 3
+    var weatherPuzzleDays = 4          // the event day + 3
+    var calmLingerDays = 1
+    var weatherAwardGardenDays = 7
+    var weatherClockSlackDays = 1
+    var weatherPuzzleWords = 1
+    var weatherAlgoVersion = 1
+    /// The day key from which `weatherAlgoVersion` applies. Blocks that start earlier keep the previous version, so an
+    /// update never rewrites a forecast already shown.
+    var weatherAlgoCutoverDay = 0
+    var wildMaxPlants = 4
+    var wildMaxPlantsSheltered = 2
+    var wildLingerDays = 4
+    var wildSetback = 1
+    var stormMinLetters = 7
+    var stormMaxLetters = 14
+    var stormDecoys = 1
+
+    // Endgame (spec section 2)
+    var goldenDaysNeeded = 7
+    var bloomRankThresholds = [1, 10, 30, 75, 150, 300]
+
     static let `default` = Economy()
 }

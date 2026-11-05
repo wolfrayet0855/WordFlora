@@ -49,6 +49,25 @@ enum DataReconciler {
         k.badgesJSON = BadgeState(json: k.badgesJSON, defs: defs).merged(with: BadgeState(json: o.badgesJSON, defs: defs)).json
         k.toolsJSON = ToolInventory(json: k.toolsJSON).merged(with: ToolInventory(json: o.toolsJSON)).json
         k.albumJSON = StickerAlbum(json: k.albumJSON).merged(with: StickerAlbum(json: o.albumJSON)).json
+        mergeWeather(o, into: k)
+    }
+
+    /// Garden weather and endgame fields (endgame-and-events spec section 7). Every rule is commutative and idempotent.
+    static func mergeWeather(_ o: PlayerProfile, into k: PlayerProfile) {
+        let pair = WeatherEngine.mergedSeedPair((k.weatherSeed, k.weatherStartDay), (o.weatherSeed, o.weatherStartDay))
+        k.weatherSeed = pair.seed; k.weatherStartDay = pair.startDay
+        k.weatherHighWaterDay = max(k.weatherHighWaterDay, o.weatherHighWaterDay)
+        k.weatherShelterDay = max(k.weatherShelterDay, o.weatherShelterDay)
+        let rescued = WeatherEngine.mergedRescuedDays(k.weatherRescuedDays, o.weatherRescuedDays)
+        if rescued != k.weatherRescuedDays { k.weatherRescuedDays = rescued }
+        let puzzles = WeatherEngine.mergedDayCount((k.weatherPuzzleDay, k.weatherPuzzleCount), (o.weatherPuzzleDay, o.weatherPuzzleCount))
+        k.weatherPuzzleDay = puzzles.day; k.weatherPuzzleCount = puzzles.count
+        k.wildWeather = k.wildWeather && o.wildWeather                       // off wins
+        k.weatherGatedFromDay = WeatherEngine.minNonzero(k.weatherGatedFromDay, o.weatherGatedFromDay)
+        k.weatherSeenAt = [k.weatherSeenAt, o.weatherSeenAt].compactMap { $0 }.max()
+        k.weatherKitAt = [k.weatherKitAt, o.weatherKitAt].compactMap { $0 }.min()
+        k.crownSeenAt = [k.crownSeenAt, o.crownSeenAt].compactMap { $0 }.min()
+        k.goldCrownSeenAt = [k.goldCrownSeenAt, o.goldCrownSeenAt].compactMap { $0 }.min()
     }
 
     static func merge(_ o: PlantCollectible, into k: PlantCollectible) {
@@ -82,6 +101,9 @@ enum DataReconciler {
         case let (kd?, od?) where od == kd: k.waterToday = max(k.waterToday, o.waterToday)
         default: break
         }
+        // Golden days: the later day key wins; the count of days earned takes the max, so it never goes down.
+        k.goldenDayKey = max(k.goldenDayKey, o.goldenDayKey)
+        k.goldenDays = max(k.goldenDays, o.goldenDays)
         if k.nickname.isEmpty { k.nickname = o.nickname }
         if k.soilType.isEmpty { k.soilType = o.soilType }
     }

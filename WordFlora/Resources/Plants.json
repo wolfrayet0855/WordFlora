@@ -5,6 +5,7 @@
     "botanicalFact": "Dandelion seeds can drift for miles on the wind, and bees love the flowers.",
     "level": 1,
     "imageName": "plant_dandelion",
+    "traits": ["meadow", "flexible"],
     "nameStory": {
       "origin": "dent de lion",
       "language": "French",
@@ -20,6 +21,7 @@
     "botanicalFact": "Its name comes from 'day's eye': petals close at night.",
     "level": 1,
     "imageName": "plant_daisy",
+    "traits": ["meadow", "flexible"],
     "nameStory": {
       "origin": "dæges ēage",
       "language": "Old English",
@@ -35,6 +37,7 @@
     "botanicalFact": "Clover's root bacteria turn nitrogen from the air into plant food for the soil.",
     "level": 1,
     "imageName": "plant_clover",
+    "traits": ["meadow", "flexible"],
     "nameStory": {
       "origin": "tri + folium",
       "language": "Latin",
@@ -50,6 +53,7 @@
     "botanicalFact": "Roots release compounds that deter harmful nematodes.",
     "level": 1,
     "imageName": "plant_marigold",
+    "traits": ["annual"],
     "nameStory": {
       "origin": "Mary + gold",
       "language": "Middle English",
@@ -65,6 +69,7 @@
     "botanicalFact": "Young blooms track the sun: heliotropism.",
     "level": 1,
     "imageName": "plant_sunflower",
+    "traits": ["annual", "tall"],
     "nameStory": {
       "origin": "hēlios + anthos",
       "language": "Greek",
@@ -80,6 +85,7 @@
     "botanicalFact": "Tulip bulbs fueled a speculative price bubble in the Netherlands in the 1630s.",
     "level": 1,
     "imageName": "plant_tulip",
+    "traits": ["bulb"],
     "nameStory": {
       "origin": "dulband",
       "language": "Persian",
@@ -95,6 +101,7 @@
     "botanicalFact": "Its fruits, called rose hips, are rich in vitamin C.",
     "level": 1,
     "imageName": "plant_rose",
+    "traits": ["woody"],
     "nameStory": {
       "origin": "Rosa gallica",
       "language": "Latin",
@@ -109,7 +116,8 @@
     "botanicalName": "Papaver rhoeas",
     "botanicalFact": "Poppy seeds can sleep in the soil for many years. They wake and grow when the soil is dug up.",
     "level": 1,
-    "imageName": "plant_poppy"
+    "imageName": "plant_poppy",
+    "traits": ["annual", "meadow"]
   },
   {
     "name": "Fern",
@@ -117,6 +125,7 @@
     "botanicalFact": "Ferns reproduce with spores rather than seeds or flowers.",
     "level": 1,
     "imageName": "plant_fern",
+    "traits": ["shade"],
     "nameStory": {
       "origin": "nephros + lepis",
       "language": "Greek",
@@ -132,6 +141,7 @@
     "botanicalFact": "The tiny 'seeds' on its surface are actually separate fruits; the red flesh is an enlarged flower base.",
     "level": 1,
     "imageName": "plant_strawberry",
+    "traits": ["fruit"],
     "nameStory": {
       "origin": "strēaw + berġe",
       "language": "Old English",
@@ -147,6 +157,7 @@
     "botanicalFact": "One of the two largest flowering plant families.",
     "level": 2,
     "imageName": "plant_orchid",
+    "traits": ["tropical", "epiphyte"],
     "nameStory": {
       "origin": "phalaina + opsis",
       "language": "Greek",
@@ -161,7 +172,8 @@
     "botanicalName": "Lavandula angustifolia",
     "botanicalFact": "People have used lavender for scent and bathing for thousands of years.",
     "level": 2,
-    "imageName": "plant_lavender"
+    "imageName": "plant_lavender",
+    "traits": ["herb"]
   },
   {
     "name": "Lotus",
@@ -169,6 +181,7 @@
     "botanicalFact": "Leaves repel water: the 'lotus effect'.",
     "level": 2,
     "imageName": "plant_lotus",
+    "traits": ["aquatic"],
     "nameStory": {
       "origin": "nucifera",
       "language": "Latin",
@@ -183,7 +196,8 @@
     "botanicalName": "Jasminum officinale",
     "botanicalFact": "Blooms release most scent at night.",
     "level": 2,
-    "imageName": "plant_jasmine"
+    "imageName": "plant_jasmine",
+    "traits": ["woody", "vine"]
   },
   {
     "name": "Snapdragon",
@@ -191,6 +205,7 @@
     "botanicalFact": "Squeeze a bloom's sides and the 'dragon' opens its mouth.",
     "level": 2,
     "imageName": "plant_snapdragon",
+    "traits": ["tall"],
     "nameStory": {
       "origin": "snap + dragon",
       "language": "English",
@@ -206,6 +221,7 @@
     "botanicalFact": "A saguaro often waits 50 to 70 years before it grows its first arm.",
     "level": 2,
     "imageName": "plant_saguaro_cactus",
+    "traits": ["desert", "cactus", "succulent"],
     "nameStory": {
       "origin": "gigantea",
       "language": "Latin",
@@ -221,6 +237,7 @@
     "botanicalFact": "Its thick leaves store a water-rich gel inside.",
     "level": 2,
     "imageName": "plant_aloe_vera",
+    "traits": ["desert", "succulent"],
     "nameStory": {
       "origin": "vera",
       "language": "Latin",
@@ -236,6 +253,7 @@
     "botanicalFact": "Giant moso bamboo can grow about a meter in one day.",
     "level": 2,
     "imageName": "plant_bamboo",
+    "traits": ["woody", "flexible", "tall"],
     "nameStory": {
       "origin": "edulis",
       "language": "Latin",
@@ -251,6 +269,7 @@
     "botanicalFact": "Each bloom typically lasts about a day.",
     "level": 2,
     "imageName": "plant_hibiscus",
+    "traits": ["tropical", "bigLeaf"],
     "nameStory": {
       "origin": "hibiskos",
       "language": "Greek",
@@ -266,6 +285,7 @@
     "botanicalFact": "Japan's hanami custom of viewing the blossoms is centuries old.",
     "level": 2,
     "imageName": "plant_cherry_blossom",
+    "traits": ["woody", "tree"],
     "nameStory": {
       "origin": "serrulata",
       "language": "Latin",
@@ -281,6 +301,7 @@
     "botanicalFact": "Traps shut in about 0.1s when two hairs are touched.",
     "level": 3,
     "imageName": "plant_venus_flytrap",
+    "traits": ["carnivorous", "bog"],
     "nameStory": {
       "origin": "muscipula",
       "language": "Latin",
@@ -296,6 +317,7 @@
     "botanicalFact": "Big baobab trunks can store over 100,000 liters of water.",
     "level": 3,
     "imageName": "plant_baobab",
+    "traits": ["desert", "hardyTree", "tree"],
     "nameStory": {
       "origin": "Adansonia",
       "language": "Latin",
@@ -311,6 +333,7 @@
     "botanicalFact": "Smells like rotting flesh to attract pollinators.",
     "level": 3,
     "imageName": "plant_corpse_flower",
+    "traits": ["tropical", "tall", "bigLeaf"],
     "nameStory": {
       "origin": "titanum",
       "language": "Latin",
@@ -326,6 +349,7 @@
     "botanicalFact": "Grows just two leaves in its life, for 1,000+ years.",
     "level": 3,
     "imageName": "plant_welwitschia",
+    "traits": ["desert"],
     "nameStory": {
       "origin": "Welwitschia",
       "language": "Latin",
@@ -341,6 +365,7 @@
     "botanicalFact": "Its bark bleeds a deep red resin.",
     "level": 3,
     "imageName": "plant_dragon_blood_tree",
+    "traits": ["desert", "hardyTree", "tree"],
     "nameStory": {
       "origin": "drakaina",
       "language": "Greek",
@@ -356,6 +381,7 @@
     "botanicalFact": "Its pitcher-shaped leaves hold digestive fluid that drowns insects.",
     "level": 3,
     "imageName": "plant_pitcher_plant",
+    "traits": ["carnivorous", "bog"],
     "nameStory": {
       "origin": "pitcher",
       "language": "English",
@@ -371,6 +397,7 @@
     "botanicalFact": "Its leaflets fold shut within seconds of being touched.",
     "level": 3,
     "imageName": "plant_sensitive_plant",
+    "traits": ["tropical"],
     "nameStory": {
       "origin": "pudica",
       "language": "Latin",
@@ -386,6 +413,7 @@
     "botanicalFact": "Native to South Africa, its bloom resembles a colorful bird's head.",
     "level": 3,
     "imageName": "plant_bird_of_paradise",
+    "traits": ["tropical", "tall", "bigLeaf"],
     "nameStory": {
       "origin": "reginae",
       "language": "Latin",
@@ -401,6 +429,7 @@
     "botanicalFact": "It depends on yucca moths for pollination.",
     "level": 3,
     "imageName": "plant_joshua_tree",
+    "traits": ["desert", "hardyTree", "tree"],
     "nameStory": {
       "origin": "brevifolia",
       "language": "Latin",
@@ -416,6 +445,7 @@
     "botanicalFact": "These 'living stones' from southern Africa are camouflaged to look like pebbles.",
     "level": 3,
     "imageName": "plant_lithops",
+    "traits": ["desert", "succulent"],
     "nameStory": {
       "origin": "lithos + ops",
       "language": "Greek",
@@ -431,6 +461,7 @@
     "botanicalFact": "Produces the world's largest single flower, about a meter across.",
     "level": 4,
     "imageName": "plant_rafflesia",
+    "traits": ["tropical", "parasitic"],
     "nameStory": {
       "origin": "Rafflesia",
       "language": "Latin",
@@ -446,6 +477,7 @@
     "botanicalFact": "Native to Chile and Argentina, it is the national tree of Chile.",
     "level": 4,
     "imageName": "plant_monkey_puzzle_tree",
+    "traits": ["hardyTree", "evergreen", "tree"],
     "nameStory": {
       "origin": "monkey puzzle",
       "language": "English",
@@ -461,6 +493,7 @@
     "botanicalFact": "Despite the name it is not a palm but a cycad, an ancient seed-plant lineage. Every part is poisonous, so never eat it.",
     "level": 4,
     "imageName": "plant_sago_palm",
+    "traits": ["hardyTree", "evergreen"],
     "nameStory": {
       "origin": "revoluta",
       "language": "Latin",
@@ -476,6 +509,7 @@
     "botanicalFact": "It has no chlorophyll and draws nutrients through fungi linked to tree roots.",
     "level": 4,
     "imageName": "plant_ghost_pipe",
+    "traits": ["shade"],
     "nameStory": {
       "origin": "monos + tropos",
       "language": "Greek",
@@ -491,6 +525,7 @@
     "botanicalFact": "Its name comes from Spanish missionaries who saw symbols of the Passion in the bloom.",
     "level": 4,
     "imageName": "plant_passionflower",
+    "traits": ["tropical", "woody", "vine"],
     "nameStory": {
       "origin": "caerulea",
       "language": "Latin",
@@ -506,6 +541,7 @@
     "botanicalFact": "It is the national flower of South Africa.",
     "level": 4,
     "imageName": "plant_king_protea",
+    "traits": ["alpine", "woody"],
     "nameStory": {
       "origin": "Proteus",
       "language": "Greek",
@@ -521,6 +557,7 @@
     "botanicalFact": "Native to Siberia, northern China, Korea and Japan.",
     "level": 4,
     "imageName": "plant_bleeding_heart",
+    "traits": ["shade"],
     "nameStory": {
       "origin": "spectabilis",
       "language": "Latin",
@@ -536,6 +573,7 @@
     "botanicalFact": "Its floating leaves can exceed 2 m across.",
     "level": 4,
     "imageName": "plant_giant_water_lily",
+    "traits": ["aquatic", "bigLeaf"],
     "nameStory": {
       "origin": "Victoria",
       "language": "Latin",
@@ -551,6 +589,7 @@
     "botanicalFact": "Sticky tentacles on its leaves trap and digest small insects.",
     "level": 4,
     "imageName": "plant_sundew",
+    "traits": ["carnivorous", "bog"],
     "nameStory": {
       "origin": "ros solis",
       "language": "Latin",
@@ -566,6 +605,7 @@
     "botanicalFact": "Its slipper-shaped pouch acts as a trap that guides insects past the pollen.",
     "level": 4,
     "imageName": "plant_ladys_slipper_orchid",
+    "traits": ["shade"],
     "nameStory": {
       "origin": "Paphos + pedilon",
       "language": "Greek",
@@ -581,6 +621,7 @@
     "botanicalFact": "Scientists knew it from fossils until living trees were found in Australia in 1994.",
     "level": 5,
     "imageName": "plant_wollemi_pine",
+    "traits": ["hardyTree", "evergreen", "tree"],
     "nameStory": {
       "origin": "Wollemia nobilis",
       "language": "Latin",
@@ -596,6 +637,7 @@
     "botanicalFact": "Its turquoise, claw-shaped flowers are pollinated by bats.",
     "level": 5,
     "imageName": "plant_jade_vine",
+    "traits": ["tropical", "woody", "vine"],
     "nameStory": {
       "origin": "makros + botrys",
       "language": "Greek",
@@ -611,6 +653,7 @@
     "botanicalFact": "It produces the heaviest seed of any plant.",
     "level": 5,
     "imageName": "plant_coco_de_mer",
+    "traits": ["tropical", "tall", "tree"],
     "nameStory": {
       "origin": "coco de mer",
       "language": "French",
@@ -626,6 +669,7 @@
     "botanicalFact": "Long whisker-like bracts dangle from its near-black blooms.",
     "level": 5,
     "imageName": "plant_black_bat_flower",
+    "traits": ["tropical", "shade"],
     "nameStory": {
       "origin": "bat flower",
       "language": "English",
@@ -641,6 +685,7 @@
     "botanicalFact": "It has not been seen in the wild since the early 1800s; all living trees descend from cultivated ones.",
     "level": 5,
     "imageName": "plant_franklin_tree",
+    "traits": ["woody", "tree"],
     "nameStory": {
       "origin": "Franklinia",
       "language": "Latin",
@@ -656,6 +701,7 @@
     "botanicalFact": "Extinct in the wild, its blooms smell of chocolate.",
     "level": 5,
     "imageName": "plant_chocolate_cosmos",
+    "traits": ["tuber"],
     "nameStory": {
       "origin": "kosmos",
       "language": "Greek",
@@ -671,6 +717,7 @@
     "botanicalFact": "It has no leaves and photosynthesizes through its roots.",
     "level": 5,
     "imageName": "plant_ghost_orchid",
+    "traits": ["tropical", "bog", "epiphyte"],
     "nameStory": {
       "origin": "ghost orchid",
       "language": "English",
@@ -686,6 +733,7 @@
     "botanicalFact": "Native to Hawaii, high on its volcanic slopes.",
     "level": 5,
     "imageName": "plant_silversword",
+    "traits": ["alpine"],
     "nameStory": {
       "origin": "argyros + xiphos",
       "language": "Greek",
@@ -701,6 +749,7 @@
     "botanicalFact": "Bark peels in strips at different times, revealing multicolored layers.",
     "level": 5,
     "imageName": "plant_rainbow_eucalyptus",
+    "traits": ["tropical", "woody", "tall", "tree"],
     "nameStory": {
       "origin": "deglupta",
       "language": "Latin",
@@ -716,6 +765,7 @@
     "botanicalFact": "The largest bromeliad flowers once after many decades, then sets seed.",
     "level": 5,
     "imageName": "plant_puya_raimondii",
+    "traits": ["alpine", "tall"],
     "nameStory": {
       "origin": "raimondii",
       "language": "Latin",

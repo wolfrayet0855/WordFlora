@@ -42,6 +42,10 @@ final class PlantCollectible {
     /// When the pot was last chosen, so iCloud keeps the latest pick. Kept apart from `lastTendedAt`, because picking
     /// a pot is not tending (it must not reset the thirsty look or move the widget). Defaulted for migration and CloudKit.
     var potChosenAt: Date = Date.distantPast
+    /// Golden blooms (endgame): different days of tending once every plant is found, and the day key last counted.
+    /// Merge: the later key wins and the count takes the max, so a count never goes down. Defaulted for migration and CloudKit.
+    var goldenDays: Int = 0
+    var goldenDayKey: Int = 0
 
     init(name: String, botanicalName: String, botanicalFact: String,
          level: Int, imageName: String, plantId: String? = nil) {
