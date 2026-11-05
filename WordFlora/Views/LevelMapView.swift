@@ -45,24 +45,27 @@ struct LevelMapView: View {
     }
 
     private var navBar: some View {
-        ZStack {
-            // Decorative: the "Garden Path" header below is the screen's title for VoiceOver. Fixed size, not scaled.
-            // At accessibility text sizes the large "Home" button would run into it, so the bar shows the button only.
-            if !oneColumn {
-                Image("Wordmark").resizable().scaledToFit().frame(height: 24).accessibilityHidden(true)
+        // Decorative: the "Garden Path" header below is the screen's title for VoiceOver. Fixed size, not scaled.
+        let wordmark = Image("Wordmark").resizable().scaledToFit().frame(height: 24).accessibilityHidden(true)
+        let back = Button { dismiss() } label: {
+            HStack(spacing: 3) {
+                Image(systemName: "chevron.left").font(Theme.font(.body, weight: .bold))
+                Text(LevelMapCopy.back).font(Theme.font(.body, weight: .bold))
             }
-            HStack {
-                Button { dismiss() } label: {
-                    HStack(spacing: 3) {
-                        Image(systemName: "chevron.left").font(Theme.font(.body, weight: .bold))
-                        Text(LevelMapCopy.back).font(Theme.font(.body, weight: .bold))
-                    }
-                    .foregroundStyle(Color.accentText)
-                    .padding(.horizontal, 4)
-                    .tapTarget()
+            .foregroundStyle(Color.accentText)
+            .padding(.horizontal, 4)
+            .tapTarget()
+        }
+        .accessibilityLabel(LevelMapCopy.back)
+        return Group {
+            if oneColumn {
+                // Large text: side by side, so the big "Home" never runs into the wordmark.
+                HStack(spacing: 8) { back; Spacer(minLength: 0); wordmark }
+            } else {
+                ZStack {
+                    wordmark
+                    HStack { back; Spacer(minLength: 0) }
                 }
-                .accessibilityLabel(LevelMapCopy.back)
-                Spacer(minLength: 0)
             }
         }
         .padding(.horizontal, 12).padding(.vertical, 2)
@@ -380,7 +383,7 @@ private struct MapStopCard: View {
         VStack(alignment: .leading, spacing: 3) {
             if stop.isCurrent {
                 HStack(spacing: 4) {
-                    Image(systemName: "mappin").font(.system(size: 11, weight: .bold)).foregroundStyle(Color.accentText)
+                    Image(systemName: "mappin").font(Theme.font(.caption2, weight: .bold)).foregroundStyle(Color.accentText)
                     Text(LevelMapCopy.chip).font(Theme.font(.footnote, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                 }
                 .padding(.horizontal, 9).padding(.vertical, 3)
@@ -443,7 +446,7 @@ private struct MapStopCard: View {
         let button = RoundedRectangle(cornerRadius: 14)
         return Button(action: play) {
             HStack(spacing: 8) {
-                Image(systemName: "play.fill").font(.system(size: 14, weight: .heavy))
+                Image(systemName: "play.fill").font(Theme.font(.subheadline, weight: .heavy))
                 Text(LevelMapCopy.play(stop.level)).font(Theme.font(.body, weight: .heavy))
             }
             .foregroundStyle(stop.isCurrent ? Color.ink : Color.appPrimaryText)
