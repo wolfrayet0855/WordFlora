@@ -36,8 +36,6 @@ struct PlantDetailView: View {
     @State private var tends = TendSequencer()
     @State private var tendTaps = 0
     @State private var nudges: [TendKind: Int] = [:]
-    @State private var pickedPot = ""        // the pot picked in the repot sheet (PotCatalog id)
-    @State private var pickedSoil: SoilType = .loam
 
     private enum PanelFocus: Hashable { case show, hide }
 
@@ -444,8 +442,6 @@ struct PlantDetailView: View {
         if kind == .repot {
             let state = app.actionState(.repot(.loam), plant: plant)
             if state.isReady {
-                pickedPot = PotCatalog.pot(id: plant.potId).id
-                pickedSoil = SoilType(rawValue: plant.soilType) ?? .loam
                 showRepot = true
             } else { refuse(kind, state.line ?? TendKind.repot.supplyCaption) }
             return
@@ -453,47 +449,16 @@ struct PlantDetailView: View {
         run(action(for: kind), kind: kind, plant)
     }
 
-    /// The repot sheet (design-preview/pots, section 2): pick a pot (free to change), pick a soil (a scoop, as
-    /// before), then one button that names the new pot. Only pots the player has (or the pot already on the plant)
-    /// can be picked; the others say how to earn them.
+    /// The repot sheet (design-preview/repot-sheet): pick a pot (free to change), pick a soil (a scoop, as before),
+    /// then one button that names the new pot. The picked pot and soil start from the plant's own each time it opens.
     private func repotSheet(_ plant: PlantCollectible) -> some View {
-        let picked = PotCatalog.pot(id: pickedPot)
-        return ScrollView {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Repot \(displayName(plant))").font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                    .accessibilityAddTraits(.isHeader)
-                PotPickGrid(currentId: plant.potId, picked: $pickedPot, stats: app.potStats, hasPlus: app.hasPlusForPots,
-                            record: { app.recordEarnedPots() })
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("Choose a soil").font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                        .accessibilityAddTraits(.isHeader)
-                    Text("Plants have favorite soils. Try one and see how it reacts.").font(Theme.font(.callout)).foregroundStyle(Color.secondaryText)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                    ForEach(SoilType.allCases, id: \.self) { soil in
-                        Button { pickedSoil = soil } label: { Text(soil.rawValue.capitalized) }
-                            .buttonStyle(SecondaryButtonStyle())
-                            .overlay {
-                                if pickedSoil == soil { RoundedRectangle(cornerRadius: Theme.cornerRadius).strokeBorder(PotPalette.ring, lineWidth: 3) }
-                            }
-                            .accessibilityAddTraits(pickedSoil == soil ? .isSelected : [])
-                    }
-                }
-            }
-            .padding(24)
+        RepotSheet(plantName: displayName(plant), imageName: plant.imageName, currentId: plant.potId,
+                   soil: SoilType(rawValue: plant.soilType) ?? .loam, stats: app.potStats, hasPlus: app.hasPlusForPots,
+                   reduceMotionOverride: app.settings.reduceMotionOverride,
+                   record: { app.recordEarnedPots() }) { pot, soil in
+            showRepot = false
+            run(.repot(soil), kind: .repot, plant, pot: pot)
         }
-        .safeAreaInset(edge: .bottom) {
-            Button {
-                showRepot = false
-                run(.repot(pickedSoil), kind: .repot, plant, pot: picked)
-            } label: { Text(PotCatalog.repotTitle(picked: picked, currentId: plant.potId)) }
-                .buttonStyle(PrimaryButtonStyle())
-                .accessibilityIdentifier("repot-go")
-                .padding(.horizontal, 24).padding(.top, 10).padding(.bottom, 8)
-                .background(Color.appBackground)
-        }
-        .background(Color.appBackground)
     }
 
     @ViewBuilder private var toastView: some View {
