@@ -65,7 +65,9 @@ final class GameViewModelTests: XCTestCase {
 
     func testPetalAccessibilityLabel() throws {
         let vm = try makeVM(); vm.start(entry: entry("a", "LOTUS")); guess(vm, "Z")
-        XCTAssertEqual(vm.petalsAccessibilityLabel, "7 of 8 petals left")
+        XCTAssertEqual(vm.petalsAccessibilityLabel, "7 of 8 petals on the flower")
+        XCTAssertEqual(CopySafety.check(vm.petalsAccessibilityLabel), [], "VoiceOver words follow the copy rules too")
+        XCTAssertEqual(FlowerView.petalsLabel(7), "7 of 8 petals on the flower")
     }
 
     // MARK: win and awards

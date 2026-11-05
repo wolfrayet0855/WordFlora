@@ -47,8 +47,11 @@ struct FlowerView: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(resting ? "Flower resting" : "\(petals) of 8 petals left")
+        .accessibilityLabel(resting ? "Flower resting" : Self.petalsLabel(petals))
     }
+
+    /// VoiceOver's count of the petals still on the flower (never "left": CopySafety).
+    static func petalsLabel(_ petals: Int) -> String { "\(petals) of 8 petals on the flower" }
 
     // MARK: Parts
 

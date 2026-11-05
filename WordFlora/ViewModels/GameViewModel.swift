@@ -82,7 +82,7 @@ final class GameViewModel {
     var isWordComplete: Bool {
         !currentWord.isEmpty && currentWord.filter { $0.isLetter }.allSatisfy { guessedLetters.contains($0) }
     }
-    var petalsAccessibilityLabel: String { "\(petalsRemaining) of \(economy.maxPetals) petals left" }
+    var petalsAccessibilityLabel: String { "\(petalsRemaining) of \(economy.maxPetals) petals on the flower" }
 
     init(modelContext: ModelContext, bank: WordBank, economy: Economy = .default,
          now: @escaping () -> Date = { .now }, calendar: Calendar = .current, seed: UInt64 = UInt64.random(in: .min ... .max),
