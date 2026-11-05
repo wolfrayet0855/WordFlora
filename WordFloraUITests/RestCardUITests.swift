@@ -22,7 +22,8 @@ final class RestCardUITests: XCTestCase {
 
     private static let axL = ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]
     /// A free adult past the grace period: with three words since the last ad, "One more" may try one.
-    private static let freeWithAds = ["-uitest-ads-offline", "-uitest-sessions=3"]
+    /// `-uitest-daytime`: the night rule (no ad 9 pm to 8 am) would hide the note when the suite runs late.
+    private static let freeWithAds = ["-uitest-ads-offline", "-uitest-sessions=3", "-uitest-daytime"]
 
     private func shot(_ name: String) {
         let data = XCUIScreen.main.screenshot().pngRepresentation

@@ -115,6 +115,7 @@ struct WordFloraApp: App {
         }
         // `-uitest-ads-offline`: ad rules stay live but the ad SDK never starts (no consent prompt, no real ad).
         if uiTesting && args.contains("-uitest-ads-offline") { model.ads.offline = true }
+        if uiTesting && args.contains("-uitest-daytime") { model.uiTestDaytime = true }
         if uiTesting && !args.contains("-uitest-ads") && !args.contains("-uitest-ads-offline") { model.adsEnabled = false }
         if uiTesting { model.plusOfferEnabled = false }
         if !uiTesting { try? Tips.configure([.displayFrequency(.daily)]) }

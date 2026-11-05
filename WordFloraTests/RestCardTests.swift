@@ -12,12 +12,16 @@ final class RestCardTests: XCTestCase {
     }
 
     /// A free adult player past the grace period with three rounds since the last ad: every AdGate rule passes.
-    private func makeApp(ageBand: AgeBand? = .eighteenPlus, sessions: Int = 3, roundsSinceAd: Int = 3) throws -> AppModel {
+    /// Noon local time: the night rule (no ad 9 pm to 8 am) never decides these tests unless one asks for it.
+    nonisolated private static let noon = Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date(timeIntervalSince1970: 1_780_000_000))!
+
+    private func makeApp(ageBand: AgeBand? = .eighteenPlus, sessions: Int = 3, roundsSinceAd: Int = 3,
+                         now: @escaping () -> Date = { RestCardTests.noon }) throws -> AppModel {
         let container = try SharedContainer.make(inMemory: true)
         let settings = AppSettings(defaults: UserDefaults(suiteName: "wf-rest-\(UUID().uuidString)")!)
         settings.ageBand = ageBand
         let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [entry("a", "LOTUS")], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
-        let app = AppModel(container: container, settings: settings, bank: bank)
+        let app = AppModel(container: container, settings: settings, bank: bank, now: now)
         app.settings.completedSessions = sessions
         app.profile?.roundsSinceAd = roundsSinceAd
         return app
@@ -97,6 +101,24 @@ final class RestCardTests: XCTestCase {
         // The win above added one round, so check before it would count.
         soon.profile?.roundsSinceAd = 2
         XCTAssertFalse(soon.adWouldPlayOnOneMore)
+    }
+
+    /// The reminders' quiet hours: no interstitial on "One more" from 9 pm to 8 am, so no note either.
+    func testNoAdOnOneMoreAtNight() throws {
+        let cal = Calendar.current
+        for hour in [21, 23, 0, 5, 7] {
+            let t = cal.date(bySettingHour: hour, minute: 30, second: 0, of: Self.noon)!
+            let app = try makeApp(now: { t })
+            app.game.start(entry: entry("a", "LOTUS")); win(app)
+            XCTAssertTrue(app.adContext(choice: .oneMore).isNight, "\(hour):30")
+            XCTAssertFalse(app.adWouldPlayOnOneMore, "\(hour):30")
+        }
+        for hour in [8, 13, 20] {
+            let t = cal.date(bySettingHour: hour, minute: 30, second: 0, of: Self.noon)!
+            let app = try makeApp(now: { t })
+            app.game.start(entry: entry("a", "LOTUS")); win(app)
+            XCTAssertTrue(app.adWouldPlayOnOneMore, "\(hour):30 is day")
+        }
     }
 
     func testNoAdNoteWhenAdsAreSwitchedOff() throws {

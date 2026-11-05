@@ -105,6 +105,15 @@ final class ReturnNudgeRuleTests: XCTestCase {
         XCTAssertEqual(visit(r), .nudge)
     }
 
+    /// "One more" on the resting card keeps the same quiet hours as reminders: no interstitial from 9 pm to 8 am.
+    func testOneMoreNeverPlaysAnAdAtNight() {
+        var c = AdGate.Context(now: noon)
+        c.roundsSinceAd = 3; c.completedSessions = 3; c.choice = .oneMore
+        XCTAssertTrue(AdGate.shouldShowInterstitial(c), "by day every rule passes")
+        c.isNight = true
+        XCTAssertFalse(AdGate.shouldShowInterstitial(c), "at night One more never plays an ad")
+    }
+
     // MARK: the existing "One more" rule is unchanged
 
     func testOneMoreKeepsItsRulesAndIgnoresTheReturnWindow() {

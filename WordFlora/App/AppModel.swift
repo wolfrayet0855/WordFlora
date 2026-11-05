@@ -328,6 +328,9 @@ final class AppModel {
 
     func markPeakDismissed() { lastPeakAt = now() }
 
+    /// `-uitest-daytime`: UI tests that check the ad note judge the rules as by day, so they pass at any hour.
+    var uiTestDaytime = false
+
     func adContext(choice: AdGate.Choice?) -> AdGate.Context {
         var c = AdGate.Context(now: now())
         let p = profile
@@ -343,6 +346,7 @@ final class AppModel {
         c.lastAdAt = p?.lastAdAt
         if let day = p?.adsDay, Calendar.current.isDate(day, inSameDayAs: now()) { c.adsToday = p?.adsToday ?? 0 }
         c.lastPeakAt = lastPeakAt
+        c.isNight = AdGate.isNight(c.now) && !uiTestDaytime
         return c
     }
 
@@ -419,7 +423,7 @@ final class AppModel {
         let t = now()
         var ad = adContext(choice: .playSoonAfterEnough)
         ad.now = t.addingTimeInterval(ad.peakWindowSeconds)
-        ad.isNight = AdGate.isNight(t)
+        ad.isNight = AdGate.isNight(t) && !uiTestDaytime
         var r = AdGate.ReturnContext(now: t, enoughAt: restExitAt, ad: ad)
         r.calmMode = settings.calmMode
         r.quietGarden = settings.quietGarden

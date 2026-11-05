@@ -19,7 +19,8 @@ enum AdGate {
         var lastAdAt: Date?
         var adsToday = 0
         var lastPeakAt: Date?
-        /// 9 pm to 8 am local (`isNight`). A return soon after "That's enough" never plays an ad at night.
+        /// 9 pm to 8 am local (`isNight`, the reminders' quiet hours). No interstitial plays at night: not on
+        /// "One more", and not on a return soon after "That's enough" (that one gets the day-scene nudge instead).
         var isNight = false
         // remote-config tunables
         var frequency = 3
@@ -36,7 +37,7 @@ enum AdGate {
         guard mayLoadAnyAd(isUnderThirteen: c.isUnderThirteen, hasRemoveAds: c.hasRemoveAds) else { return false }
         // Only on the player's own tap: "One more", or Play again soon after "That's enough" (never the exit itself).
         guard c.choice == .oneMore || c.choice == .playSoonAfterEnough else { return false }
-        if c.choice == .playSoonAfterEnough, c.isNight { return false }
+        guard !c.isNight else { return false }
         guard !c.midRound, !c.aroundDailyBloom, !c.lastRoundWasLoss else { return false }
         guard c.roundsSinceAd >= c.frequency else { return false }
         guard c.completedSessions >= 1 else { return false }                              // never in the first session
