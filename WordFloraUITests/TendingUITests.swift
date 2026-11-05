@@ -61,11 +61,14 @@ final class TendingUITests: XCTestCase {
         water.tap()
         let pour = element("tend-anim-water")
         XCTAssertTrue(pour.waitForExistence(timeout: 2), "the pour plays over the plant")
-        let plant = app.buttons["plant-love"]
-        XCTAssertTrue(plant.frame.intersects(pour.frame), "it plays over the plant")
-        shot("tend-water-mid")
+        // The toast follows the pour after 0.9 s and stays 3 s, while the held pour stays about 6 s; check the toast
+        // first, while it is surely up (each query waits on the running animation, so later checks can miss it).
         XCTAssertTrue(toast.waitForExistence(timeout: 3), "then the toast says what happened")
         XCTAssertTrue(toast.label.contains("growth"), toast.label)
+        XCTAssertTrue(pour.exists, "the toast comes while the pour is still playing")
+        shot("tend-water-mid")
+        let plant = app.buttons["plant-love"]
+        XCTAssertTrue(plant.frame.intersects(pour.frame), "it plays over the plant")
         XCTAssertTrue(plant.isHittable, "taps still reach the plant during the effect")
         let gone = NSPredicate(format: "exists == false")
         expectation(for: gone, evaluatedWith: pour); waitForExpectations(timeout: 8)

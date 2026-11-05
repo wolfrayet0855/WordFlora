@@ -557,7 +557,9 @@ struct PlantDetailView: View {
             guard toastCount == item.id else { return }          // a newer tap took over
             withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) { toast = item }
             AccessibilityNotification.Announcement(text).post()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) { if toast?.id == item.id { withAnimation { toast = nil } } }
+            // A UI test hold (`-uitest-tend-hold`) keeps the toast up as long as it holds the effect.
+            let stay = 3 + (TendMotion.uiTestHold ? TendMotion.holdSeconds : 0)
+            DispatchQueue.main.asyncAfter(deadline: .now() + stay) { if toast?.id == item.id { withAnimation { toast = nil } } }
         }
     }
 }
