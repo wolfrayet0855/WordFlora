@@ -108,3 +108,9 @@ No App Store submission until ALL of the following are done and reviewed by the 
 
 ## Endgame and garden weather (design only, 2026-11-04, awaiting owner decision)
 Spec `docs/pm/endgame-and-events-spec.md` (decisions in section 9); research `docs/research/endgame-disasters-{design,tech}.md`; audio plan `docs/pm/endgame-events-audio-plan.md` with prototypes from `tools/make_weather_sounds.py`; mockups `design-preview/events/` and `design-preview/endgame/` (critic notes and Revision 1 in each). Recommendation: "Weather, not loss" for everyone (looks only, mended by care), and Wild Weather (shown-stage dip on up to 4 plants, word level never drops) as a 13+ opt-in. No Swift changed.
+
+## 2026-11-05 autonomous run (project manager)
+Checkpoint notes; each item below is updated as it lands.
+- **Level map mockup refined** (7996e14): `design-preview/level-map/` now uses the v3 hero wordmark, keeps the app's level names (Level 3 stays "Bloom"), adds the all-found state and a solid gold ring for a full-bloom level; `critic.md` and `README.md` (Swift spec). Decision taken for the owner: the five theme lines (Garden friends / Plants from far away / Strange and wild plants / Rare wonders / Old, giant and rare) and the hero plant per level ship provisionally; the owner may rename them.
+- **Onboarding guide mockup** (7996e14): `design-preview/onboarding-guide/` (8 pages, `copy.js` is the single copy source, `critic.md`, `README.md` spec, shots in light/dark/AX/Reduce Motion/Quiet Garden/replay). Decisions taken: the guide sits after the age question (so Quiet Garden changes page 4), eight pages all before the tutorial word and skippable; Level 3 reads "Bloom" (the mockup's page 7 still says Wildwood and the Swift build must use the app names).
+- **In flight** (worktree branches, merged here when green): petal celebrations + intro bloom (`feat-petal-celebrations`), Garden Path level map, weather/endgame rules E-1..E-4 + G-1.
