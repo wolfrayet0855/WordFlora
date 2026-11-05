@@ -75,7 +75,7 @@ struct HomeView: View {
     @ScaledMetric(relativeTo: .title2) private var playIcon: CGFloat = 22
     @ScaledMetric(relativeTo: .body) private var leafIcon: CGFloat = 18
     @ScaledMetric(relativeTo: .headline) private var sunDisc: CGFloat = 36
-    @ScaledMetric(relativeTo: .body) private var tileIcon: CGFloat = 28
+    @ScaledMetric(relativeTo: .body) private var tileIcon: CGFloat = 24
     @ScaledMetric(relativeTo: .caption) private var lockIcon: CGFloat = 13
 
     @State private var labelLines: [String: Int] = [:]
@@ -175,8 +175,11 @@ struct HomeView: View {
                     .font(Theme.font(.subheadline, weight: .medium)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
                 HStack(spacing: 6) {
-                    Image(systemName: "leaf.fill").font(.system(size: leafIcon)).foregroundStyle(Color.successText)
-                        .accessibilityHidden(true)
+                    // At accessibility sizes the leaf would take a column of its own beside the words.
+                    if !singleColumn {
+                        Image(systemName: "leaf.fill").font(.system(size: leafIcon)).foregroundStyle(Color.successText)
+                            .accessibilityHidden(true)
+                    }
                     Text(days == 0 ? "Your garden is new" : "\(days) Garden \(days == 1 ? "Day" : "Days")")
                         .font(Theme.font(.body, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
@@ -312,8 +315,10 @@ struct HomeView: View {
 
     private var dailyBloom: some View {
         let done = app.dailyBloomDoneToday
+        // At accessibility sizes the disc sits above the words and the chevron goes, so "everyone" never breaks mid-word.
+        let layout = singleColumn ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8)) : AnyLayout(HStackLayout(spacing: 12))
         return Button { router.go(.game(daily: true, level: nil)) } label: {
-            HStack(spacing: 12) {
+            layout {
                 ZStack {
                     Circle().fill(done ? Color.successText.opacity(0.22) : Color.petalRose.opacity(0.3))
                     Image(systemName: done ? "checkmark.circle.fill" : "sun.max.fill")
@@ -329,8 +334,8 @@ struct HomeView: View {
                         .font(Theme.font(.footnote)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                Spacer(minLength: 0)
-                if !done {
+                if !singleColumn { Spacer(minLength: 0) }
+                if !done && !singleColumn {
                     Image(systemName: "chevron.right").font(.footnote.weight(.bold)).foregroundStyle(Color.bloomIcon)
                         .accessibilityHidden(true)
                 }
@@ -353,9 +358,9 @@ struct HomeView: View {
             VStack(spacing: 10) {
                 featureTile(unlocked, nil, "Garden", "leaf.fill", .garden, .garden)
                 featureTile(unlocked, .butterfly, "Levels", "map.fill", .levelMap, .levels)
-                featureTile(unlocked, .shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
+                featureTile(unlocked, .shed, "Shed", "wrench.adjustable.fill", .shed, .shed)
                 featureTile(unlocked, .butterfly, "Visitors", "ladybug.fill", .visitors, .visitors)
-                featureTile(unlocked, .badges, "Badges", "rosette", .badges, .badges)
+                featureTile(unlocked, .badges, "Badges", "medal.fill", .badges, .badges)
             }
         } else {
             Grid(horizontalSpacing: 10, verticalSpacing: 10) {
@@ -364,11 +369,11 @@ struct HomeView: View {
                     featureTile(unlocked, .butterfly, "Levels", "map.fill", .levelMap, .levels)
                 }
                 GridRow {
-                    featureTile(unlocked, .shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
+                    featureTile(unlocked, .shed, "Shed", "wrench.adjustable.fill", .shed, .shed)
                     featureTile(unlocked, .butterfly, "Visitors", "ladybug.fill", .visitors, .visitors)
                 }
                 GridRow {
-                    featureTile(unlocked, .badges, "Badges", "rosette", .badges, .badges, wide: true)
+                    featureTile(unlocked, .badges, "Badges", "medal.fill", .badges, .badges, wide: true)
                         .gridCellColumns(2)
                 }
             }
@@ -415,18 +420,19 @@ struct HomeView: View {
                         text
                         if singleColumn { Spacer(minLength: 0) }
                     }
-                    .frame(maxWidth: .infinity, minHeight: singleColumn ? 72 : 64, alignment: singleColumn ? .leading : .center)
+                    .frame(maxWidth: .infinity, alignment: singleColumn ? .leading : .center)
                 } else {
                     VStack(spacing: 6) {
                         iconView
                         text
                     }
                     .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-                    .frame(minHeight: 96)
                 }
             }
             .padding(.horizontal, row ? 14 : 8)
             .padding(.top, row ? 10 : 14).padding(.bottom, row ? 10 : 12)
+            // The whole tile is 96pt (rows 64pt, 72pt at accessibility sizes), padding included, as in home-v2.
+            .frame(maxWidth: .infinity, minHeight: row ? (singleColumn ? 72 : 64) : 96)
             .background(open ? tint.fill : Color.appPrimaryText.opacity(0.06), in: shape)
             .background(Color.appBackground, in: shape)
             .overlay {
