@@ -1,12 +1,77 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>WordFlora design preview</title><link rel="stylesheet" href="theme.css"><script src="theme.js"></script>
-<style>.wrap{max-width:1240px;margin:0 auto;padding:28px 20px 60px}header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}h1{font-size:32px;margin:0}.sub{color:var(--muted);margin:4px 0 24px}
-.tg{font-family:inherit;font-weight:800;border:0;border-radius:999px;padding:10px 18px;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-size:15px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:26px}.s{text-decoration:none;color:inherit;text-align:center;display:block}.s b{display:block;margin-top:10px;font-size:16px}
+<style>.wrap{max-width:1240px;margin:0 auto;padding:28px 16px 60px}header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;flex-direction:column;gap:6px}.brand img{height:56px;width:auto;max-width:100%;display:block}.brand .d{display:none}[data-theme=dark] .brand .l{display:none}[data-theme=dark] .brand .d{display:block}
+h1{font-size:15px;margin:0;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}.sub{color:var(--muted);margin:4px 0 20px}
+.tg{font-family:inherit;font-weight:800;border:0;border-radius:999px;padding:10px 18px;background:var(--accent);color:var(--accent-ink);cursor:pointer;font-size:15px;min-height:44px}
+nav.toc{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0 8px}nav.toc a{font-size:13px;font-weight:800;color:var(--text);text-decoration:none;background:var(--surface);padding:8px 12px;border-radius:99px;box-shadow:var(--shadow)}
+h2{margin:44px 0 6px;font-size:24px}h2+p.note{margin:0 0 14px;color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:26px}.s{text-decoration:none;color:inherit;text-align:center;display:block}.s b{display:block;margin-top:10px;font-size:16px}.s small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
 .fw{width:250px;height:540px;margin:0 auto;position:relative;pointer-events:none;border-radius:30px;overflow:hidden;box-shadow:var(--shadow);background:var(--stage)}.fw iframe{width:420px;height:900px;border:0;transform:scale(.6);transform-origin:0 0;position:absolute;left:-1px;top:0}
-h2{margin:44px 0 12px}.links{display:flex;gap:12px;flex-wrap:wrap}.links a{background:var(--surface);box-shadow:var(--shadow);padding:14px 18px;border-radius:16px;color:var(--text);text-decoration:none;font-weight:700}
-.sw{display:flex;gap:8px;flex-wrap:wrap}.sw span{display:flex;align-items:center;gap:8px;background:var(--surface);padding:6px 12px 6px 6px;border-radius:99px;font-size:12px;font-weight:700;box-shadow:var(--shadow)}.sw i{width:22px;height:22px;border-radius:50%;border:1px solid var(--line)}</style></head><body><div class="wrap">
-<header><div><h1>WordFlora design preview</h1><p class="sub">Static mockups of the overhaul. Click any screen to open it full size.</p></div><button class="tg" onclick="wfToggle()">Toggle light / dark</button></header>
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+.c{display:flex;flex-direction:column;background:var(--surface);box-shadow:var(--shadow);border-radius:18px;overflow:hidden;color:var(--text);text-decoration:none}
+.c .th{height:150px;background:var(--stage);display:flex;align-items:flex-start;justify-content:center;overflow:hidden}.c .th img{width:100%;height:100%;object-fit:cover;object-position:top center}.c .th img.fit{object-fit:contain;padding:14px}
+.c .tx{padding:10px 14px 12px}.c b{display:block;font-size:15px}.c small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.tag{display:inline-block;font-size:11px;font-weight:800;padding:2px 8px;border-radius:99px;background:color-mix(in srgb,var(--accent) 30%,var(--surface));margin-left:6px;vertical-align:middle}
+.tag.new{background:color-mix(in srgb,var(--success) 30%,var(--surface))}
+.links{display:flex;gap:12px;flex-wrap:wrap}.links a{background:var(--surface);box-shadow:var(--shadow);padding:14px 18px;border-radius:16px;color:var(--text);text-decoration:none;font-weight:700}
+.sw{display:flex;gap:8px;flex-wrap:wrap}.sw span{display:flex;align-items:center;gap:8px;background:var(--surface);padding:6px 12px 6px 6px;border-radius:99px;font-size:12px;font-weight:700;box-shadow:var(--shadow)}.sw i{width:22px;height:22px;border-radius:50%;border:1px solid var(--line)}
+@media (max-width:560px){.fw{width:100%;max-width:250px}}</style></head><body><div class="wrap">
+<header><div class="brand"><img class="l" src="logo/final/wordmark.svg" alt="WordFlora"><img class="d" src="logo/final/wordmark-dark.svg" alt="WordFlora"><h1>Design preview</h1></div><button class="tg" onclick="wfToggle()">Toggle light / dark</button></header>
+<p class="sub">Static mockups for the app. Click any card to open it full size. Newest work is near the top.</p>
+<nav class="toc"><a href="#current">Current designs</a><a href="#logo">Logo &amp; icon</a><a href="#tending">Tending parts</a><a href="#celebrate">Celebrate</a><a href="#qa">App vs mockups</a><a href="#screens">First-round screens</a><a href="#brand">Brand &amp; earlier rounds</a><a href="#audio">Audio</a></nav>
 <div class="sw"><span><i style="background:var(--bg)"></i>appBackground</span><span><i style="background:var(--surface)"></i>appSurface</span><span><i style="background:var(--text)"></i>appPrimaryText</span><span><i style="background:var(--accent)"></i>appAccent</span><span><i style="background:var(--danger)"></i>appDanger</span><span><i style="background:var(--success)"></i>appSuccess</span></div>
-<h2>Screens</h2><div class="grid"><a class="s" href="screens/home.html"><div class="fw"><iframe src="screens/home.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Home</b></a><a class="s" href="screens/game.html"><div class="fw"><iframe src="screens/game.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Game: playing</b></a><a class="s" href="screens/game_dead.html"><div class="fw"><iframe src="screens/game_dead.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Game: dead</b></a><a class="s" href="screens/level_map.html"><div class="fw"><iframe src="screens/level_map.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Level map</b></a><a class="s" href="screens/garden.html"><div class="fw"><iframe src="screens/garden.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Garden</b></a><a class="s" href="screens/plant_earned.html"><div class="fw"><iframe src="screens/plant_earned.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Plant earned</b></a>
-<a class="s" href="screens/share_card.html"><div class="fw" style="background:var(--stage)"><iframe src="screens/share_card.html" scrolling="no"></iframe></div><b>Share card</b></a></div>
-<h2>Components &amp; art</h2><div class="links"><a href="flower.html">Flower states + motion demo</a><a href="prototype/index.html"><b>Clickable prototype (whole app)</b></a><a href="brand/index.html">Brand: icon, intro, subscriptions</a><a href="brand/v4/index.html">Round 4: tools, visitors, badges</a><a href="brand/v3/rain.html">Intro: flower rain</a><a href="brand/v3/subscriptions.html">Plus, ads &amp; age mockups</a><a href="plants.html">Plant gallery (15) + Rose of Jericho</a></div></div></body></html>
+
+<h2 id="current">Current designs</h2><p class="note">The latest round. These are the targets for the app build.</p>
+<div class="cards">
+<a class="c" href="level-map/"><div class="th"><img src="level-map/shots/mid-light.png" alt=""></div><div class="tx"><b>Level map: Garden Path <span class="tag new">new</span></b><small>5 levels, petals for plants found, gold ring for full bloom</small></div></a>
+<a class="c" href="home-v2/"><div class="th"><img src="home-v2/shots/unlocked-light-c0.png" alt=""></div><div class="tx"><b>Home v2</b><small>?state=unlocked|early|large</small></div></a>
+<a class="c" href="fact-card/"><div class="th"><img src="fact-card/shots/b-daisy-light.png" alt=""></div><div class="tx"><b>Fact card (plant detail)</b><small>Name story, did you know</small></div></a>
+<a class="c" href="tending/"><div class="th"><img src="tending/parts/shots/optB-light-01.png" alt=""></div><div class="tx"><b>Tending</b><small>Plant care screen</small></div></a>
+<a class="c" href="tending/actions.html"><div class="th"><img src="tending/parts/shots/act-states.png" alt=""></div><div class="tx"><b>Tending: actions</b><small>Water, sun, soil, repot</small></div></a>
+<a class="c" href="tending/lifestats.html"><div class="th"><img src="tending/parts/shots/life-light-01.png" alt=""></div><div class="tx"><b>Tending: life stats</b></div></a>
+<a class="c" href="pots/"><div class="th"><img src="pots/shots/s2-pick-light.png" alt=""></div><div class="tx"><b>Pots</b><small>Pot picker, Shed, stage</small></div></a>
+<a class="c" href="qa/"><div class="th"><img src="qa/shots/home-light.png" alt="" onerror="this.parentNode.style.display='none'"></div><div class="tx"><b>App vs mockups (QA shots)</b><small>Current build screenshots</small></div></a>
+</div>
+
+<h2 id="logo">Logo &amp; icon</h2><p class="note">The final wordmark is "B uncut": flower o's in Word and Flora.</p>
+<div class="cards">
+<a class="c" href="logo/final/"><div class="th"><img class="fit" src="logo/final/wordmark.svg" alt=""></div><div class="tx"><b>Wordmark: final</b><small>Twin, solo, dark, mono</small></div></a>
+<a class="c" href="logo/final/compare/sheet-light.png"><div class="th"><img src="logo/final/compare/sheet-light.png" alt=""></div><div class="tx"><b>Wordmark: compare sheet</b><small>Light · <span>also dark and mono in compare/</span></small></div></a>
+<a class="c" href="logo/icon/"><div class="th"><img class="fit" src="logo/icon/png/icon-180.png" alt=""></div><div class="tx"><b>App icon</b><small>Light, dark, tinted</small></div></a>
+<a class="c" href="logo/"><div class="th"><img class="fit" src="logo/final/png/wordmark-solo-320.png" alt=""></div><div class="tx"><b>Logo directions A, B, C</b><small>Gallery and critic notes</small></div></a>
+</div>
+
+<h2 id="tending">Tending parts</h2><p class="note">Building blocks used by the tending screen.</p>
+<div class="cards">
+<a class="c" href="tending/parts/wake-options.html"><div class="th"><img src="tending/parts/shots/wake-light-2.png" alt=""></div><div class="tx"><b>Wake options</b></div></a>
+<a class="c" href="tending/parts/weather.html"><div class="th"><img src="tending/parts/shots/weather.png" alt=""></div><div class="tx"><b>Weather</b></div></a>
+<a class="c" href="tending/parts/thinning.html"><div class="th"><img src="tending/parts/shots/thin-all50.png" alt=""></div><div class="tx"><b>Thinning</b><small>Petals fall and regrow</small></div></a>
+<a class="c" href="tending/parts/rose-thinning.html"><div class="th"><img src="tending/parts/shots/rose-states.png" alt=""></div><div class="tx"><b>Rose thinning</b></div></a>
+<a class="c" href="tending/parts/rose-curl.html"><div class="th"><img src="tending/parts/shots/rose-curl-light.png" alt=""></div><div class="tx"><b>Rose curl</b></div></a>
+<a class="c" href="tending/parts/crown-options.html"><div class="th"><img src="tending/parts/shots/crown-A-light.png" alt=""></div><div class="tx"><b>Crown options</b></div></a>
+<a class="c" href="tending/parts/flower-sprite.html"><div class="th"><img src="tending/parts/shots/rose-sprites.png" alt=""></div><div class="tx"><b>Flower sprite</b></div></a>
+</div>
+
+<h2 id="celebrate">Celebrate <span class="tag">in progress</span></h2><p class="note">Intro and confetti work. Another designer owns this; links may change.</p>
+<div class="cards">
+<a class="c" href="celebrate/intro.html"><div class="th"><img src="celebrate/shots/intro-light.png" alt=""></div><div class="tx"><b>Intro</b></div></a>
+<a class="c" href="celebrate/confetti.html"><div class="th"><img src="celebrate/shots/confetti-large-light.png" alt=""></div><div class="tx"><b>Confetti</b><small>?level=small|medium|large|badge</small></div></a>
+<a class="c" href="celebrate/strip.html?src=intro.html&times=0,1,2,3"><div class="th"><img src="celebrate/shots/intro-dark.png" alt=""></div><div class="tx"><b>Frame strip viewer</b></div></a>
+</div>
+<div id="restcard"></div>
+
+<h2 id="screens">First-round screens</h2><p class="note">The first overhaul pass. Kept for history; the current designs above replace them.</p>
+<div class="grid"><a class="s" href="screens/home.html"><div class="fw"><iframe src="screens/home.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Home</b></a><a class="s" href="screens/game.html"><div class="fw"><iframe src="screens/game.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Game: playing</b></a><a class="s" href="screens/game_dead.html"><div class="fw"><iframe src="screens/game_dead.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Game: round over</b></a><a class="s" href="screens/level_map.html"><div class="fw"><iframe src="screens/level_map.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Level map (old)</b><small>Replaced by Garden Path</small></a><a class="s" href="screens/garden.html"><div class="fw"><iframe src="screens/garden.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Garden</b></a><a class="s" href="screens/plant_earned.html"><div class="fw"><iframe src="screens/plant_earned.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Plant earned</b></a>
+<a class="s" href="screens/share_card.html"><div class="fw" style="background:var(--stage)"><iframe src="screens/share_card.html" loading="lazy" scrolling="no" tabindex="-1"></iframe></div><b>Share card</b></a></div>
+
+<h2 id="brand">Brand &amp; earlier rounds</h2>
+<div class="links"><a href="prototype/index.html"><b>Clickable prototype (whole app)</b></a><a href="brand/index.html">Brand: icon, intro, subscriptions</a><a href="brand/v4/index.html">Round 4: tools, visitors, badges</a><a href="brand/v4/tools.html">Round 4: tools</a><a href="brand/v4/visitors.html">Round 4: visitors</a><a href="brand/v4/badges.html">Round 4: badges</a><a href="brand/v3/rain.html">Intro: flower rain</a><a href="brand/v3/subscriptions.html">Plus, ads &amp; age mockups</a><a href="flower.html">Flower states + motion demo</a><a href="plants.html">Plant gallery + Rose of Jericho</a></div>
+
+<h2 id="audio">Audio</h2>
+<div class="links"><a href="audio/index.html">Sound set: A / B / C options for every cue</a></div>
+</div>
+<script>
+// Rest card mockup is being made by another designer; show the link once the folder exists.
+fetch('rest-card/',{method:'HEAD'}).then(r=>{if(r.ok)document.getElementById('restcard').innerHTML='<h2>Rest card <span class="tag">in progress</span></h2><div class="cards"><a class="c" href="rest-card/"><div class="th"></div><div class="tx"><b>Rest card</b><small>Another designer owns this</small></div></a></div>'}).catch(()=>{});
+</script>
+</body></html>

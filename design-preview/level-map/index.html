@@ -1,0 +1,169 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Garden Path</title>
+<link rel="stylesheet" href="../theme.css"><script src="../theme.js"></script>
+<!--
+  Level map v2 ("Garden Path"). iPhone 393 x 852.
+  Params: ?frame=1 renders one phone (no board).
+          &theme=light|dark   &text=large (Dynamic Type accessibility size)
+          &state=mid (L1 found, L2 current, default) | new (first day) | late (L1-2 full bloom, L3 current)
+  With no ?frame the page shows a board of every state.
+  Rules (ProgressionPolicy): word level = 10 unique plants found in a level -> next level opens.
+  Garden level = all 10 plants of a level at stage 4 ("full bloom"), drawn as the outer ring.
+  Nothing earned is ever removed. No locks: unopened levels are "Coming soon in your garden".
+-->
+<style>
+:root{--scale:1;--tx:color-mix(in srgb,var(--text) 80%,transparent);--card-line:color-mix(in srgb,var(--text) 14%,transparent)}
+[data-theme=light]{--accent-text:#8A5A00;--leaf:#2E7D32;--path:#E3D7BC;--path-edge:#D2C29D;--soil:#B98A5E;--glow:#FFF3D6;--seed:#C9B58F;
+  --l1:#E6F1DF;--l1i:#2E7D32;--l2:#DFEAF5;--l2i:#2F5F8F;--l3:#F7E7D4;--l3i:#9A5A1E;--l4:#ECE5F5;--l4i:#6A4C93;--l5:#E2F0EC;--l5i:#2D6B5E;--petal:#E07A8B;--petal-off:color-mix(in srgb,var(--text) 13%,transparent);--bloom:#E8A838}
+[data-theme=dark]{--accent-text:#F0C060;--leaf:#81C784;--path:#4A6342;--path-edge:#5C7A52;--soil:#8C6A48;--glow:#3B4A2A;--seed:#7F7458;
+  --l1:#23392A;--l1i:#9CD39A;--l2:#213447;--l2i:#9DC3EA;--l3:#3A2F22;--l3i:#E7B27A;--l4:#2F2A3F;--l4i:#C7B1EA;--l5:#1F3A35;--l5i:#8FD3C1;--petal:#F09AA8;--petal-off:color-mix(in srgb,var(--text) 18%,transparent);--bloom:#F0C060}
+html{font-size:calc(16px*var(--scale))}
+body{margin:0;line-height:1.25}
+.board{display:flex;flex-wrap:wrap;gap:28px;padding:24px;justify-content:center;background:var(--stage);min-height:100vh}
+.board figure{margin:0;text-align:center}.board figcaption{font-weight:800;margin-top:10px;color:var(--text)}
+.board iframe{width:393px;height:852px;border:0;border-radius:44px;box-shadow:var(--shadow);background:var(--bg)}
+.phone{width:393px;min-height:852px;background:var(--bg);position:relative;overflow:hidden}
+.status{height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px;font-size:15px;font-weight:700}
+.nav{display:grid;grid-template-columns:88px 1fr 88px;align-items:center;min-height:44px;padding:0 8px}
+.back{display:flex;align-items:center;gap:2px;min-height:44px;color:var(--accent-text);font-weight:700;font-size:1.0625rem;padding:0 8px}
+.back svg{width:12px;height:20px}
+.wm{justify-self:center;height:22px;display:block}
+.wm.d{display:none}[data-theme=dark] .wm.l{display:none}[data-theme=dark] .wm.d{display:block}
+.head{padding:8px 20px 4px}
+h1{font-size:1.75rem;margin:0;font-weight:900;letter-spacing:-.01em}
+.head p{margin:4px 0 0;color:var(--tx);font-size:1rem}
+.trail{position:relative;padding:6px 16px 120px}
+.trail svg.path{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+.stop{position:relative;display:flex;align-items:center;gap:12px;margin:0 0 26px}
+.stop.r{flex-direction:row-reverse}
+.medal{flex:none;width:128px;height:128px;position:relative}
+.medal svg{width:100%;height:100%;display:block;overflow:visible}
+.card{flex:1;min-width:0;background:var(--surface);border:1px solid var(--card-line);border-radius:18px;box-shadow:var(--shadow);padding:12px 14px 13px}
+.stop.cur .card{border:2px solid var(--accent);box-shadow:0 0 0 5px color-mix(in srgb,var(--accent) 18%,transparent),var(--shadow)}
+.lv{font-size:.8125rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--tx)}
+.nm{font-size:1.25rem;font-weight:900;margin:1px 0 1px}
+.th{font-size:.875rem;color:var(--tx);margin-bottom:8px}
+.row{display:flex;align-items:center;gap:7px;font-size:.9375rem;font-weight:700;min-height:24px}
+.row i{width:.75rem;height:.75rem;border-radius:50% 0 50% 0;flex:none;background:var(--petal);transform:rotate(-45deg)}
+.row i.b{border-radius:50%;background:none;border:3px solid var(--bloom);width:.8rem;height:.8rem}
+.here{display:inline-flex;align-items:center;gap:5px;background:color-mix(in srgb,var(--accent) 24%,var(--surface));color:var(--text);font-weight:800;font-size:.8125rem;border-radius:99px;padding:3px 10px 3px 8px;margin-bottom:6px}
+.here svg{width:.875rem;height:.875rem;color:var(--accent-text)}
+.go{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:10px;min-height:48px;border-radius:14px;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:1.0625rem;border:0;width:100%;font-family:inherit}
+.go.soft{background:none;border:1.5px solid var(--card-line);color:var(--text)}
+.go svg{width:1rem;height:1rem}
+.next{font-size:.875rem;color:var(--tx);margin-top:6px;text-wrap:balance}
+.yay{font-size:.875rem;font-weight:800;color:var(--leaf);margin-top:6px;text-wrap:balance}
+.soon .card{background:color-mix(in srgb,var(--surface) 55%,var(--bg));box-shadow:none;border-style:dashed}
+.soon .nm{color:var(--tx)}
+.soon .tag{display:block;text-wrap:balance;font-weight:800;font-size:.875rem;color:var(--leaf);margin-top:2px}
+.full{display:inline-flex;align-items:center;gap:5px;font-weight:800;font-size:.8125rem;color:var(--accent-text);margin-top:4px}
+.full svg{width:15px;height:15px}
+.end{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--tx);font-size:.875rem;font-weight:700;position:relative}
+.home-ind{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:var(--text);opacity:.85}
+.key{margin:10px 16px 6px;padding:12px 14px;border-radius:16px;background:color-mix(in srgb,var(--surface) 60%,var(--bg));display:flex;gap:16px;flex-wrap:wrap;font-size:.875rem;color:var(--tx);font-weight:700}
+.key span{display:flex;align-items:center;gap:7px}
+/* Dynamic Type accessibility size: one column, medal above card */
+.large .stop,.large .stop.r{flex-direction:column;align-items:stretch}
+.large .medal{width:96px;height:96px;align-self:center}
+.large .nav{grid-template-columns:auto 1fr 44px}
+.large .status{font-size:15px}
+</style></head><body>
+<script>
+const Q=new URLSearchParams(location.search);
+if(Q.get('theme'))document.documentElement.setAttribute('data-theme',Q.get('theme'));
+const LEVELS=[
+ {n:1,name:'Seedling',theme:'Garden friends',plant:'daisy',hue:'l1'},
+ {n:2,name:'Sprout',theme:'Plants from far away',plant:'lotus',hue:'l2'},
+ {n:3,name:'Wildwood',theme:'Strange and wild plants',plant:'venus_flytrap',hue:'l3'},
+ {n:4,name:'Grove',theme:'Rare wonders',plant:'giant_water_lily',hue:'l4'},
+ {n:5,name:'Ancient',theme:'Old, giant and rare',plant:'wollemi_pine',hue:'l5'}];
+// found = plants earned in the level, bloom = plants at stage 4. current = word level.
+const STATES={
+ new:{cur:1,found:[0,0,0,0,0],bloom:[0,0,0,0,0]},
+ mid:{cur:2,found:[10,4,0,0,0],bloom:[7,0,0,0,0]},
+ late:{cur:3,found:[10,10,3,0,0],bloom:[10,10,0,0,0]}};
+const ic={
+ play:'<svg viewBox="0 0 16 16"><path d="M4 2.5v11l9.5-5.5z" fill="currentColor"/></svg>',
+ pin:'<svg viewBox="0 0 16 16"><path d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5c0 3.4 4.5 8.5 4.5 8.5s4.5-5.1 4.5-8.5A4.5 4.5 0 0 0 8 1.5zm0 6.2a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4z" fill="currentColor"/></svg>',
+ sun:'<svg viewBox="0 0 16 16" fill="currentColor"><circle cx="8" cy="8" r="3.2"/><g stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 1v1.8M8 13.2V15M1 8h1.8M13.2 8H15M3 3l1.3 1.3M11.7 11.7 13 13M3 13l1.3-1.3M11.7 4.3 13 3"/></g></svg>'};
+
+function medal(L,found,bloom,soon,cur){
+  // Medallion: soil bed + plant (or a seed sprout when coming soon), ring of 10 petals = plants found,
+  // outer ring of 10 arcs = plants in full bloom (garden level).
+  const c=64,R=40,pr=50,br=60;let s='';
+  s+=`<circle cx="${c}" cy="${c}" r="${R}" fill="var(--${L.hue})" stroke="var(--card-line)"/>`;
+  if(cur)s+=`<circle cx="${c}" cy="${c}" r="${R+3}" fill="none" stroke="var(--accent)" stroke-width="3"/>`;
+  // outer bloom ring
+  for(let i=0;i<10;i++){const a0=(i*36-90+3)*Math.PI/180,a1=((i+1)*36-90-3)*Math.PI/180;
+    if(soon)break;const on=i<bloom;s+=`<path d="M${c+br*Math.cos(a0)} ${c+br*Math.sin(a0)} A${br} ${br} 0 0 1 ${c+br*Math.cos(a1)} ${c+br*Math.sin(a1)}" fill="none" stroke="${on?'var(--bloom)':'var(--petal-off)'}" stroke-width="${on?4.5:2}" stroke-linecap="round" opacity="${soon?.6:1}"/>`;}
+  // petal ring
+  for(let i=0;i<10&&!soon;i++){const a=i*36-90,on=i<found;
+    s+=`<g transform="translate(${c} ${c}) rotate(${a+90}) translate(0 ${-pr})"><ellipse rx="4.6" ry="7.2" fill="${on?'var(--petal)':'none'}" stroke="${on?'none':'var(--petal-off)'}" stroke-width="1.6"/></g>`;}
+  if(soon){ // soil mound + small sprout: something is growing here
+    s+=`<ellipse cx="${c}" cy="${c+14}" rx="22" ry="8" fill="var(--soil)" opacity=".85"/>
+        <path d="M${c} ${c+10} C${c} ${c} ${c} ${c-4} ${c} ${c-8}" stroke="var(--leaf)" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <path d="M${c} ${c-2} C${c-12} ${c-4} ${c-14} ${c-14} ${c-12} ${c-16} C${c-4} ${c-14} ${c-1} ${c-8} ${c} ${c-2}Z" fill="var(--leaf)"/>
+        <path d="M${c} ${c-5} C${c+10} ${c-8} ${c+13} ${c-17} ${c+11} ${c-19} C${c+4} ${c-17} ${c+1} ${c-11} ${c} ${c-5}Z" fill="var(--leaf)" opacity=".8"/>`;
+  } else {
+    s+=`<image href="../plants/plant_${L.plant}.svg" x="${c-34}" y="${c-38}" width="68" height="68"/>`;
+  }
+  if(found>=10&&bloom<10)s+=`<g transform="translate(${c+42} ${c-46})"><circle r="13" fill="var(--leaf)"/><path d="M-5.5 0.5 -1.5 4.5 6 -4" stroke="var(--surface)" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>`;
+  if(bloom>=10)s+=`<g transform="translate(${c+42} ${c-46})"><circle r="13" fill="var(--bloom)"/><g transform="translate(-8 -8)" color="var(--accent-ink)">${ic.sun.replace('<svg','<svg width="16" height="16"')}</g></g>`;
+  return `<svg viewBox="0 0 128 128" aria-hidden="true">${s}</svg>`;
+}
+
+function stop(L,st,i,large){
+  const found=st.found[i],bloom=st.bloom[i],cur=L.n===st.cur,soon=L.n>st.cur,done=found>=10;
+  let body=`<div class="lv">Level ${L.n}</div><div class="nm">${L.name}</div><div class="th">${L.theme}</div>`;
+  if(cur)body=`<div class="here">${ic.pin}You are here</div>`+body;
+  if(soon){
+    body+=`<div class="tag">Coming soon in your garden</div><div class="next">Opens when Level&nbsp;${L.n-1} has 10&nbsp;plants.</div>`;
+  } else {
+    if(found===0){body+=`<div class="row"><i></i>Find your first plant!</div>`}
+    else{body+=`<div class="row"><i></i>${found} of 10 plants found</div>`;
+      body+=`<div class="row"><i class="b"></i>${bloom} of 10 in full bloom</div>`;}
+    if(done&&!cur&&L.n<5)body+=`<div class="yay">All 10 found! Level&nbsp;${L.n+1} is open.</div>`;
+    if(bloom>=10)body+=`<div class="full">${ic.sun}Full bloom garden!</div>`;
+    if(cur&&found>0&&found<10)body+=`<div class="next">Find ${10-found} more to open Level&nbsp;${L.n+1}.</div>`;
+    if(cur&&found===0)body+=`<div class="next">Find 10 plants to open Level&nbsp;${L.n+1}.</div>`;
+    body+=`<button class="go${cur?'':' soft'}">${ic.play}Play Level ${L.n}</button>`;
+  }
+  const label=soon?`Level ${L.n}, ${L.name}. Coming soon in your garden. Opens when Level ${L.n-1} has 10 plants.`:`Level ${L.n}, ${L.name}.${cur?' You are here.':''} ${found} of 10 plants found. ${bloom} of 10 in full bloom.${bloom>=10?' Full bloom garden.':''}`;
+  return `<section role="group" class="stop ${i%2&&!large?'r':''} ${cur?'cur':''} ${soon?'soon':''}" aria-label="${label}"><div class="medal">${medal(L,found,bloom,soon,cur)}</div><div class="card">${body}</div></section>`;
+}
+
+function phone(){
+  const st=STATES[Q.get('state')||'mid']||STATES.mid,large=Q.get('text')==='large';
+  if(large){document.documentElement.style.setProperty('--scale','2');document.body.classList.add('large')}
+  const total=st.found.reduce((a,b)=>a+b,0);
+  document.body.innerHTML=`<div class="phone">
+  <div class="status"><span>9:41</span><span>100%</span></div>
+  <div class="nav"><span class="back"><svg viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Home</span>
+   <img class="wm l" src="../logo/final/wordmark.svg" alt="WordFlora"><img class="wm d" src="../logo/final/wordmark-dark.svg" alt="WordFlora"><span></span></div>
+  <div class="head"><h1>Garden Path</h1><p>${total?total+' plants found. ':''}Every 10 plants opens a new level.</p></div>
+  <div class="key"><span><i style="width:12px;height:12px;border-radius:50% 0 50% 0;background:var(--petal);transform:rotate(-45deg);display:inline-block"></i>Petal = plant found</span><span><i style="width:13px;height:13px;border-radius:50%;border:3px solid var(--bloom);display:inline-block"></i>Gold ring = full bloom</span></div>
+  <div class="trail"><svg class="path" aria-hidden="true"></svg>${LEVELS.map((L,i)=>stop(L,st,i,large)).join('')}<div class="end"><svg viewBox="0 0 60 30" width="60" height="30" aria-hidden="true"><path d="M8 12h44M8 18h44" stroke="var(--soil)" stroke-width="4" stroke-linecap="round"/><path d="M14 18v10M46 18v10" stroke="var(--soil)" stroke-width="3.5" stroke-linecap="round"/></svg><span>A bench to rest at the end of the path</span></div>
+  </div><div class="home-ind"></div></div>`;
+  drawPath(large);
+}
+
+function drawPath(large){
+  // A soft dirt path that winds through every medallion centre.
+  const tr=document.querySelector('.trail'),svg=tr.querySelector('svg.path'),b=tr.getBoundingClientRect();
+  const pts=[...tr.querySelectorAll('.medal')].map(m=>{const r=m.getBoundingClientRect();return[r.left-b.left+r.width/2,r.top-b.top+r.height/2]});
+  svg.setAttribute('viewBox',`0 0 ${b.width} ${b.height}`);
+  let d=`M${pts[0][0]} ${pts[0][1]}`;
+  for(let i=1;i<pts.length;i++){const[a,c]=[pts[i-1],pts[i]],my=(a[1]+c[1])/2;d+=` C${a[0]} ${my} ${c[0]} ${my} ${c[0]} ${c[1]}`}
+  const cur=document.querySelectorAll('.stop').length;
+  svg.innerHTML=`<path d="${d}" fill="none" stroke="var(--path-edge)" stroke-width="26" stroke-linecap="round"/>
+   <path d="${d}" fill="none" stroke="var(--path)" stroke-width="20" stroke-linecap="round"/>
+   <path d="${d}" fill="none" stroke="var(--path-edge)" stroke-width="2.5" stroke-dasharray="1 14" stroke-linecap="round"/>`;
+}
+
+if(Q.get('frame')){phone()}
+else{
+  const F=[['mid','light',''],['mid','dark',''],['new','light',''],['late','dark',''],['mid','light','large'],['mid','dark','large']];
+  const cap={mid:'Level 2 in progress',new:'First day',late:'Two gardens in full bloom'};
+  document.body.innerHTML=`<div class="board">${F.map(([s,t,x])=>`<figure><iframe title="${cap[s]} ${t}" src="?frame=1&state=${s}&theme=${t}${x?'&text=large':''}" scrolling="${x?'yes':'no'}"></iframe><figcaption>${cap[s]} · ${t}${x?' · large text':''}</figcaption></figure>`).join('')}</div>`;
+}
+</script></body></html>
