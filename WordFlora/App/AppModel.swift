@@ -118,6 +118,13 @@ final class AppModel {
         onboarding.skip()
     }
 
+    /// The guide closed (Skip, Start playing, Close or Done). Records it on the synced profile and, in the first
+    /// session, moves on to the tutorial word. Writes nothing else: nothing earned changes.
+    func finishGuide() {
+        if let p = profile, !p.guideSeen { p.guideSeen = true; try? context.save() }
+        onboarding.guideFinished()
+    }
+
     // MARK: Tools and tending
 
     var inventory: ToolInventory {

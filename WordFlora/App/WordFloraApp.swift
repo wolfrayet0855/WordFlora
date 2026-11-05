@@ -107,6 +107,9 @@ struct WordFloraApp: App {
             model.enqueueBadgeMoments([BadgeUnlock(badgeId: "perfect_bloom", tier: 1, at: .now)])
         }
         if uiTesting && args.contains("-uitest-quiet") { model.settings.quietGarden = true }
+        // The in-app Reduce Motion switch and a fixed theme, for the guide's still and dark screenshots.
+        if uiTesting && args.contains("-uitest-reduce-motion") { model.settings.reduceMotionOverride = true }
+        if uiTesting && args.contains("-uitest-dark") { model.settings.appearance = .dark }
         if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-sessions=") }).flatMap({ Int($0.dropFirst("-uitest-sessions=".count)) }) {
             model.settings.completedSessions = n            // past the first sessions, so the ad rules can say yes
         }

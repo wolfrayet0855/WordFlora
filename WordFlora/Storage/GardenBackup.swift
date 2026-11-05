@@ -30,6 +30,8 @@ struct GardenBackup: Codable, Equatable {
         var wildWeather: Bool?
         var weatherGatedFromDay: Int?
         var weatherSeenAt: Date?, weatherKitAt: Date?, crownSeenAt: Date?, goldCrownSeenAt: Date?
+        // The onboarding guide was seen (added 2026-11-05). Optional, so older backups read as not seen; merged by OR.
+        var guideSeen: Bool?
     }
 
     struct Plant: Codable, Equatable {
@@ -95,6 +97,7 @@ struct GardenBackup: Codable, Equatable {
             snap.weatherPuzzleDay = p.weatherPuzzleDay; snap.weatherPuzzleCount = p.weatherPuzzleCount; snap.wildWeather = p.wildWeather
             snap.weatherGatedFromDay = p.weatherGatedFromDay; snap.weatherSeenAt = p.weatherSeenAt; snap.weatherKitAt = p.weatherKitAt
             snap.crownSeenAt = p.crownSeenAt; snap.goldCrownSeenAt = p.goldCrownSeenAt
+            snap.guideSeen = p.guideSeen
         }
         let plants = ((try? context.fetch(FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.plantId)]))) ?? []).map {
             Plant(plantId: $0.plantId, earnedCount: $0.earnedCount, growthPoints: $0.growthPoints, stage: $0.stage, hydration: $0.hydration,
@@ -176,6 +179,7 @@ struct GardenBackup: Codable, Equatable {
         o.weatherGatedFromDay = profile.weatherGatedFromDay ?? 0
         o.weatherSeenAt = profile.weatherSeenAt; o.weatherKitAt = profile.weatherKitAt
         o.crownSeenAt = profile.crownSeenAt; o.goldCrownSeenAt = profile.goldCrownSeenAt
+        o.guideSeen = profile.guideSeen ?? false
         DataReconciler.merge(o, into: keeper, defs: badgeDefs)
 
         var report = RestoreReport()

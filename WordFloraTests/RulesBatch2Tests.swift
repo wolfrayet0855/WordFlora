@@ -148,7 +148,8 @@ final class RulesBatch2Tests: XCTestCase {
     func testHappyPathOrder() {
         var f = OnboardingFlow()
         f.introFinished(); XCTAssertEqual(f.step, .age)
-        f.selectAge(.thirteenPlus); XCTAssertEqual(f.step, .tutorialWord)
+        f.selectAge(.thirteenPlus); XCTAssertEqual(f.step, .guide)
+        f.guideFinished(); XCTAssertEqual(f.step, .tutorialWord)
         f.tutorialSolved(); XCTAssertEqual(f.step, .plantEarned)
         f.plantEarnedDismissed(); XCTAssertEqual(f.step, .gardenTip)
         f.tipCompleted(); XCTAssertEqual(f.step, .home)
@@ -170,7 +171,7 @@ final class RulesBatch2Tests: XCTestCase {
     func testNoPromptsBeforeAdsEligibleAndNoPaywallInSessionOne() {
         var f = OnboardingFlow()
         XCTAssertFalse(f.mayShowPaywall); XCTAssertFalse(f.mayRequestPermissions)
-        f.introFinished(); f.selectAge(.eighteenPlus); f.tutorialSolved(); f.plantEarnedDismissed(); f.tipCompleted()
+        f.introFinished(); f.selectAge(.eighteenPlus); f.guideFinished(); f.tutorialSolved(); f.plantEarnedDismissed(); f.tipCompleted()
         XCTAssertFalse(f.mayShowPaywall)          // still session one
         f.startNextSession()
         XCTAssertTrue(f.mayShowPaywall)

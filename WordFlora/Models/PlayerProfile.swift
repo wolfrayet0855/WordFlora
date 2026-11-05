@@ -70,6 +70,10 @@ final class PlayerProfile {
     var crownSeenAt: Date?
     var goldCrownSeenAt: Date?
 
+    /// The onboarding guide was seen (finished or skipped) on some device. Defaulted, so older stores and CloudKit
+    /// records read as not seen. Merge: OR, so once seen it stays seen.
+    var guideSeen: Bool = false
+
     var createdAt: Date = Date.now
 
     init() {}

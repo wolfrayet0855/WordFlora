@@ -108,6 +108,9 @@ final class WordFloraUITests: XCTestCase {
         shot("age")
         XCTAssertFalse(app.buttons["Play"].exists)                              // no home chrome in session one
         app.buttons["18 or older"].tap()
+        // The onboarding guide comes next (GuideUITests covers it); Skip goes straight to the tutorial word.
+        XCTAssertTrue(app.buttons["onboardingGuide.skip"].waitForExistence(timeout: 5))
+        app.buttons["onboardingGuide.skip"].tap()
         XCTAssertTrue(app.staticTexts["Tap a letter to guess"].waitForExistence(timeout: 5))
         for ch in "ZXQJKVWYUPMN" { app.buttons[String(ch)].tap() }              // wrong guesses cannot end the tutorial
         XCTAssertFalse(app.staticTexts["This one's resting."].exists)

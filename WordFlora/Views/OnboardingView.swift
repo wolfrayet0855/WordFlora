@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// First session (spec section 19, P-03): petal intro, one neutral age question, an unloseable tutorial word,
+/// First session (spec section 19, P-03): petal intro, one neutral age question, the skippable guide, an unloseable tutorial word,
 /// the first plant, one gentle tip. No ads, paywall or permission prompts here.
 struct OnboardingView: View {
     @Environment(AppModel.self) private var app
@@ -12,6 +12,7 @@ struct OnboardingView: View {
             switch app.onboarding.step {
             case .intro: IntroView()
             case .age: AgeQuestionView()
+            case .guide: GuideView(mode: .firstRun).transition(.opacity)
             case .tutorialWord:
                 GameView(daily: false, tutorial: true) {
                     app.onboarding.tutorialSolved()
@@ -61,12 +62,12 @@ private struct AgeQuestionView: View {
     private func ageButton(_ title: String, _ band: AgeBand) -> some View {
         Button {
             app.settings.applyAgeDefaults(band)
-            if band == .under13 { offerQuiet = true } else { app.onboarding.selectAge(band) }
+            if band == .under13 { offerQuiet = true } else { app.onboarding.selectAge(band, guideSeen: app.profile?.guideSeen ?? false) }
         } label: { Text(title) }
         .buttonStyle(SecondaryButtonStyle())
         .confirmationDialog("Would you like a quieter garden?", isPresented: $offerQuiet, titleVisibility: .visible) {
-            Button("Yes, keep it quiet") { app.settings.quietGarden = true; app.onboarding.selectAge(.under13) }
-            Button("No thanks") { app.onboarding.selectAge(.under13) }
+            Button("Yes, keep it quiet") { app.settings.quietGarden = true; app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
+            Button("No thanks") { app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
         } message: { Text("Quiet Garden hides numbers and timers so tending is just relaxing. You can change it any time in Settings.") }
     }
 }

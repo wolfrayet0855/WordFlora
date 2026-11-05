@@ -43,6 +43,7 @@ enum DataReconciler {
         k.lastPlayedDay = [k.lastPlayedDay, o.lastPlayedDay].compactMap { $0 }.max()
         k.lastAdAt = [k.lastAdAt, o.lastAdAt].compactMap { $0 }.max()
         if k.ageBand == nil { k.ageBand = o.ageBand }
+        k.guideSeen = k.guideSeen || o.guideSeen                            // once seen, always seen
         if k.widgetPlantID == nil { k.widgetPlantID = o.widgetPlantID }
         var seen = k.seenIds; for id in o.seenIds where !seen.contains(id) { seen.append(id) }; k.seenIds = seen
         k.earnedPotIds = Set(k.earnedPotIds).union(o.earnedPotIds).sorted()      // earned pots are never removed

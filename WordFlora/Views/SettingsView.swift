@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var exporting = false
     @State private var importing = false
     @State private var backupMessage: (text: String, ok: Bool)?
+    @State private var showGuide = false
 
     var body: some View {
         @Bindable var s = app.settings
@@ -21,6 +22,11 @@ struct SettingsView: View {
                     Text("Tricky").tag(AppSettings.Difficulty.tricky)
                 }
                 Toggle("Show streak", isOn: $s.showStreak)
+            }
+            Section(GuideCopy.UI.settingsHeader) {
+                Button { showGuide = true } label: { Label(GuideCopy.UI.settingsRow, systemImage: "book.pages") }
+                    .accessibilityIdentifier("settings.showGuide")
+                Text(GuideCopy.UI.settingsFoot).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
             Section("Comfort") {
                 Toggle("Sound", isOn: $s.soundOn).onChange(of: s.soundOn) { _, v in app.game.soundEnabled = v; app.updateAmbience() }
@@ -91,6 +97,11 @@ struct SettingsView: View {
         .fileImporter(isPresented: $importing, allowedContentTypes: [.json]) { result in
             guard case .success(let url) = result else { return }
             restore(from: url)
+        }
+        .fullScreenCover(isPresented: $showGuide) {
+            GuideView(mode: .replay) { showGuide = false }
+                .environment(app)
+                .preferredColorScheme(app.settings.colorScheme)
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
