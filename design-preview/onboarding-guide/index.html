@@ -1,0 +1,310 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WordFlora Guide</title>
+<!-- Params: ?page=1..8  &theme=light|dark  &ax=1 (AX large text)  &rm=1 (Reduce Motion / Calm: static art, crossfade)
+             &quiet=1 (Quiet Garden copy on page 4)  &replay=1 (opened from Settings: Close / Done)  &shot=1 (centre for render.sh)  &still=1 (freeze loops, used by strip.html) -->
+<link rel="stylesheet" href="../theme.css">
+<script src="copy.js"></script>
+<style>
+:root{--scale:1;--ink:var(--accent-ink);--tx:color-mix(in srgb,var(--text) 82%,transparent);--card-line:color-mix(in srgb,var(--text) 16%,transparent)}
+[data-theme=light]{--accent-text:#8A5A00;--ok:#2E7D32;--leaf:#2E7D32;
+ --garden-bg:#E3F1DD;--garden-ic:#2E7D32;--levels-bg:#DFEDF8;--levels-ic:#1F5F8F;--shed-bg:#F7E5D8;--shed-ic:#8F4A26;--vis-bg:#ECE5F6;--vis-ic:#6A4A9C;--badge-bg:#FBEFCB;--badge-ic:#8A5A00;
+ --bloom-bg:#FDE9EE;--bloom-ic:#B03A55;--bloom-line:#F2788A;--play-a:#F2C25E;--play-b:#E8A838;--heart:#D9566C;--path:#E2D6B8;--gold:#E8A838;--tile:#FFFFFF;--tile-hit:#E3F1DD}
+[data-theme=dark]{--accent-text:#F0C060;--ok:#81C784;--leaf:#81C784;
+ --garden-bg:#2F4F30;--garden-ic:#81C784;--levels-bg:#2A4358;--levels-ic:#8CC4EC;--shed-bg:#4B3A2D;--shed-ic:#E8AE88;--vis-bg:#40395A;--vis-ic:#CDB8F2;--badge-bg:#4A4122;--badge-ic:#F0C060;
+ --bloom-bg:#4D3039;--bloom-ic:#F5A0B0;--bloom-line:#F2788A;--play-a:#F5CC70;--play-b:#E8A838;--heart:#F28A9C;--path:#4A5A3A;--gold:#F0C060;--tile:#24382A;--tile-hit:#2F4F30}
+html{font-size:calc(16px*var(--scale))}
+body{margin:0;min-height:100vh}
+html.shot body{display:flex;justify-content:center;background:var(--bg);padding-top:87px}
+.phone{position:relative;width:393px;height:852px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+.status{height:47px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 24px 4px;font-size:15px;font-weight:600}
+/* header: wordmark left (decorative here), Skip right */
+.head{height:52px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 18px}
+.wm{height:24px;display:block}.wm.dk{display:none}[data-theme=dark] .wm.lt{display:none}[data-theme=dark] .wm.dk{display:block}
+.skip{min-width:44px;min-height:44px;padding:0 12px;border:0;background:none;font:inherit;font-weight:800;font-size:1.0625rem;color:var(--accent-text);border-radius:12px}
+/* pager */
+.viewport{flex:1;min-height:0;overflow:hidden;position:relative}
+.track{display:flex;height:100%;transition:transform .42s cubic-bezier(.3,.8,.3,1)}
+.pg{flex:none;width:393px;height:100%;overflow-y:auto;padding:4px 16px 8px;display:flex;flex-direction:column}
+.art{position:relative;height:372px;flex:none;border-radius:28px;overflow:hidden;background:linear-gradient(160deg,var(--a1),var(--a2) 75%);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--text) 8%,transparent)}
+.txt{padding:22px 8px 0;text-align:center}
+h1{text-wrap:balance;margin:0 0 10px;font-size:1.75rem;line-height:1.15;font-weight:900;letter-spacing:-.01em}
+.txt p{margin:0 auto 8px;max-width:330px;text-wrap:balance;font-size:1.0625rem;line-height:1.38;color:var(--tx);font-weight:500}
+/* footer: dots, Back + Next */
+.foot{flex:none;padding:8px 16px 0}
+.dots{display:flex;justify-content:center;align-items:center;gap:8px;height:28px}
+.dots i{width:8px;height:8px;border-radius:4px;background:color-mix(in srgb,var(--text) 28%,transparent);transition:width .3s}
+.dots i.on{width:24px;background:var(--text)}
+.btns{display:flex;gap:10px;margin-top:8px}
+.btn{height:56px;border-radius:18px;font:inherit;font-weight:800;font-size:1.1875rem;border:0;display:flex;align-items:center;justify-content:center;gap:8px}
+.next{flex:1;background:linear-gradient(180deg,var(--play-a),var(--play-b));color:var(--ink);box-shadow:0 6px 16px color-mix(in srgb,var(--play-b) 40%,transparent),inset 0 1px 0 rgba(255,255,255,.35)}
+[data-theme=light] .next{color:#1F3320}
+.back{width:104px;background:var(--surface);color:var(--text);box-shadow:inset 0 0 0 1.5px var(--card-line)}
+.back[hidden]{display:none}
+.btn svg{width:1.1rem;height:1.1rem}
+.homebar{height:34px;flex:none;display:grid;place-items:center}.homebar i{width:134px;height:5px;border-radius:3px;background:var(--text)}
+/* page colour pairs (Home tile colours, so each page reads as the feature it explains) */
+.c-guess{--a1:var(--levels-bg);--a2:var(--garden-bg)}
+.c-plants{--a1:var(--garden-bg);--a2:var(--badge-bg)}
+.c-tend{--a1:var(--levels-bg);--a2:var(--garden-bg)}
+.c-love{--a1:var(--bloom-bg);--a2:var(--garden-bg)}
+.c-garden{--a1:var(--vis-bg);--a2:var(--shed-bg)}
+.c-daily{--a1:var(--bloom-bg);--a2:var(--badge-bg)}
+.c-levels{--a1:var(--levels-bg);--a2:var(--garden-bg)}
+.c-peeks{--a1:var(--badge-bg);--a2:var(--vis-bg)}
+/* shared art bits */
+.abs{position:absolute}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;background:var(--surface);font-weight:800;font-size:13px;color:var(--text);box-shadow:0 2px 6px rgba(0,0,0,.08);white-space:nowrap}
+.chip svg{width:16px;height:16px;flex:none}
+.card{background:var(--surface);border-radius:18px;box-shadow:0 4px 12px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.06)}
+.tiles{display:flex;gap:6px;justify-content:center}
+.tl{width:40px;height:48px;border-radius:10px;background:var(--tile);display:grid;place-items:center;font-weight:900;font-size:24px;box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--text) 14%,transparent)}
+.tl.hit{background:var(--tile-hit);color:var(--garden-ic)}
+.tl.blank{background:transparent;box-shadow:inset 0 -3px 0 color-mix(in srgb,var(--text) 45%,transparent)}
+.keys{display:flex;gap:5px;justify-content:center}
+.key{width:30px;height:38px;border-radius:8px;background:var(--surface);display:grid;place-items:center;font-weight:800;font-size:16px;box-shadow:0 1px 0 color-mix(in srgb,var(--text) 22%,transparent)}
+.key.in{background:var(--garden-ic);color:#fff}[data-theme=dark] .key.in{color:#1A2E1A}
+.key.out{opacity:.38}
+.lbl{font-size:12px;font-weight:800;color:var(--tx);text-align:center}
+.act{display:flex;flex-direction:column;align-items:center;gap:4px;width:58px}
+.act b{width:46px;height:46px;border-radius:15px;display:grid;place-items:center;background:var(--surface);box-shadow:0 2px 6px rgba(0,0,0,.08)}
+.act b svg{width:24px;height:24px}
+.act span{font-size:12px;font-weight:800}
+.hearts{display:flex;gap:4px}.hearts svg{width:24px;height:24px}
+.peek{width:104px;padding:12px 6px 10px;border-radius:18px;background:color-mix(in srgb,var(--surface) 82%,transparent);border:1.5px dashed color-mix(in srgb,var(--text) 30%,transparent);display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.peek .nm{font-weight:800;font-size:13px}
+.soon{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:999px;background:var(--garden-bg);color:var(--garden-ic);font-size:11px;font-weight:900;letter-spacing:.02em}
+.soon svg{width:11px;height:11px}
+/* gentle motion (off with rm=1 or prefers-reduced-motion) */
+@keyframes sway{0%,100%{transform:rotate(-1.6deg)}50%{transform:rotate(1.6deg)}}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes flut{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.72)}}
+@keyframes drift{0%{transform:translate(0,0)}50%{transform:translate(10px,-8px)}100%{transform:translate(0,0)}}
+@keyframes twinkle{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
+@keyframes zz{0%{opacity:0;transform:translate(0,4px)}30%,70%{opacity:1}100%{opacity:0;transform:translate(6px,-12px)}}
+@keyframes drop{0%{transform:translateY(-6px);opacity:0}25%{opacity:1}100%{transform:translateY(18px);opacity:0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.m-sway{transform-origin:50% 100%;animation:sway 3.2s ease-in-out infinite}
+.m-bob{animation:bob 2.6s ease-in-out infinite}
+.m-pulse{animation:pulse 1.8s ease-in-out infinite}
+.m-flut{transform-origin:50% 50%;animation:flut .5s ease-in-out infinite}
+.m-drift{animation:drift 4s ease-in-out infinite}
+.m-tw{transform-box:fill-box;transform-origin:center;animation:twinkle 2.2s ease-in-out infinite}
+.m-zz{animation:zz 2.6s ease-out infinite}
+.m-drop{animation:drop 1.6s ease-in infinite}
+.m-spin{animation:spin 40s linear infinite}
+html.rm *,html.rm *::before{animation:none!important}
+/* ?shot=1 freezes every loop 0.7 s in, so PNGs are repeatable */
+html.still:not(.rm) *{animation-delay:-.7s!important;animation-play-state:paused!important}
+html.rm .track{transition:none}
+html.rm .pg{transition:opacity .25s}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}.track{transition:none!important}}
+/* AX large text (accessibility sizes): bigger type, smaller art, page scrolls, buttons stack */
+html.ax{--scale:1.7}
+.ax .art{height:226px}
+.ax .art .inner{transform:scale(.6);transform-origin:50% 0;width:361px;height:372px;position:absolute;left:0;top:0}
+.ax .art .inner{left:50%;margin-left:-180.5px}
+.ax .txt{text-align:left;padding:16px 4px 0}.ax .txt p,.ax h1{max-width:none;text-wrap:pretty}
+.ax .viewport::after{content:"";position:absolute;left:0;right:0;bottom:0;height:28px;background:linear-gradient(transparent,var(--bg));pointer-events:none}
+.ax h1{font-size:1.5rem}
+.ax .btns{flex-direction:column-reverse;gap:8px}
+.ax .btn{height:auto;min-height:56px;padding:10px;font-size:1.0625rem}
+.ax .back{width:auto}
+.ax .wm{height:20px}
+.ax .head{height:auto;min-height:52px}
+.ax .skip{font-size:1rem}
+.ax .dots{height:22px}
+/* Quiet/Calm note for the review frames */
+.inner{position:absolute;inset:0}
+</style>
+<script>
+const q=new URLSearchParams(location.search);
+const TH=q.get('theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+const H=document.documentElement;H.dataset.theme=TH;
+if(q.get('ax')==='1')H.classList.add('ax');
+if(q.get('rm')==='1')H.classList.add('rm');
+if(q.get('shot'))H.classList.add('shot','still');if(q.get('still'))H.classList.add('still');
+</script>
+</head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="bulb" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 0 0-4 12.700V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.300A7 7 0 0 0 12 2zM9 20h6v1a1 1 0 0 1-1 1h-4a1 1 0 0 1-1-1z"/></symbol>
+<symbol id="drop" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.500C8 8 5.500 11.500 5.500 15a6.500 6.500 0 0 0 13 0C18.500 11.500 16 8 12 2.500z"/></symbol>
+<symbol id="sun" viewBox="0 0 24 24"><path fill="currentColor" d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10zM11 1h2v3h-2zm0 19h2v3h-2zM1 11h3v2H1zm19 0h3v2h-3zM4.200 5.600l1.400-1.400 2.100 2.100-1.400 1.400zm12.100 12.100l1.400-1.400 2.100 2.100-1.400 1.400zM5.600 19.800l-1.400-1.400 2.100-2.100 1.400 1.400zM17.700 7.700l-1.400-1.400 2.100-2.100 1.400 1.400z"/></symbol>
+<symbol id="soil" viewBox="0 0 24 24"><path fill="currentColor" d="M6 4h12l-1 3H7zM5.500 8h13l1 12a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2z"/><path fill="var(--surface)" d="M12 11c0 3-1.500 4.500-4 4.500 0-3 1.500-4.500 4-4.500zm0 0c0 3 1.500 4.500 4 4.500 0-3-1.500-4.500-4-4.500zm-.7 3h1.400v5h-1.400z"/></symbol>
+<symbol id="shears" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="2.200" stroke-linecap="round"><circle cx="6.500" cy="17.500" r="3"/><circle cx="17.500" cy="17.500" r="3"/><path d="M8.500 15.300L18 3M15.500 15.300L6 3"/></g></symbol>
+<symbol id="pot" viewBox="0 0 24 24"><path fill="currentColor" d="M3 6h18v4h-1.400l-1.600 10a2 2 0 0 1-2 1.700H8a2 2 0 0 1-2-1.700L4.400 10H3z"/><path fill="currentColor" d="M12 5C12 2.500 14 1 16.500 1 16.500 3.500 14.500 5 12 5zm0 0C12 3 10.500 2 8.500 2 8.500 4 10 5 12 5z"/></symbol>
+<symbol id="heart" viewBox="-9 -9 18 16"><path d="M0 5 C-8 -1 -8 -8 -3 -8 C-1 -8 0 -6 0 -6 C0 -6 1 -8 3 -8 C8 -8 8 -1 0 5Z"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm-1.500 14.500L6 12l1.400-1.400 3.100 3.100 6.100-6.100L18 9z"/></symbol>
+<symbol id="leaf" viewBox="0 0 24 24"><path fill="currentColor" d="M20 3C9 3 4 8 4 15c0 1.500.3 2.700.8 3.700C3.700 19.800 3 21 3 21h2c.4-.6 1-1.300 1.700-1.800 1 .5 2.200.8 3.300.8 8 0 11-6 10-16z"/></symbol>
+<symbol id="tools" viewBox="0 0 24 24"><path fill="currentColor" d="M22 6.500a5 5 0 0 1-6.700 4.700L8.500 18a2.100 2.100 0 0 1-3-3l6.800-6.800A5 5 0 0 1 17.500 2l-3 3 .5 2.500L17.500 8l3-3c.9.4 1.500 1 1.500 1.500z"/></symbol>
+<symbol id="bug" viewBox="0 0 24 24"><ellipse cx="12" cy="14" rx="5" ry="7" fill="currentColor"/><circle cx="12" cy="6" r="3" fill="currentColor"/><path stroke="currentColor" stroke-width="1.800" stroke-linecap="round" d="M10 4L8 1.500M14 4l2-2.500M7 11l-4-1.500M17 11l4-1.500M7 15H3M17 15h4M7.500 19l-3 2M16.500 19l3 2"/></symbol>
+<symbol id="sprout" viewBox="0 0 24 24"><path fill="currentColor" d="M12 13C12 8 8 6 4 6c0 4 3 7 8 7Zm0-2c0-4 3-6 8-6 0 4-3 6-8 6Z"/><rect x="11" y="10" width="2" height="11" rx="1" fill="currentColor"/></symbol>
+<symbol id="spark" viewBox="-8 -8 16 16"><path fill="currentColor" d="M0 -7 Q1 -1.500 7 0 Q1 1.500 0 7 Q-1 1.500 -7 0 Q-1 -1.500 0 -7Z"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="2.600" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></symbol>
+<symbol id="pin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.500A2.500 2.500 0 1 1 12 6.500a2.500 2.500 0 0 1 0 5z"/></symbol>
+</defs></svg>
+
+<!-- VoiceOver order (top to bottom): Skip, button -> page content (illustration image, then title as header, then the lines) -> "Page n of 8" (adjustable) -> Back, button -> Next / Start playing, button.
+     The wordmark and the status bar are not focusable here (wordmark is decorative inside the guide). -->
+<div class="phone" id="phone">
+ <div class="status" aria-hidden="true"><span>9:41</span><span>100%</span></div>
+ <div class="head">
+  <img class="wm lt" src="../logo/v3/hero/wordmark.svg" alt=""><img class="wm dk" src="../logo/v3/hero/wordmark-dark.svg" alt="">
+  <button class="skip" id="skip" data-id="guide-skip"></button>
+ </div>
+ <div class="viewport"><div class="track" id="track"></div></div>
+ <div class="foot">
+  <div class="dots" id="dots" role="slider" aria-valuemin="1" aria-valuemax="8"></div>
+  <div class="btns"><button class="btn back" id="back" data-id="guide-back"></button><button class="btn next" id="next" data-id="guide-next"></button></div>
+ </div>
+ <div class="homebar" aria-hidden="true"><i></i></div>
+</div>
+
+<script>
+const C=GUIDE_COPY, N=C.pages.length, RM=H.classList.contains('rm'), QUIET=q.get('quiet')==='1', REPLAY=q.get('replay')==='1';
+const I=(n,s='')=>`<svg aria-hidden="true" ${s}><use href="#${n}"/></svg>`;
+const plant=(id,w,extra='')=>`<img src="../plants/plant_${id}.svg" width="${w}" height="${w}" alt="" ${extra}>`;
+const vis=(id,f,w)=>`<img src="../brand/v4/svg/visitors/${id}-${f}.svg" width="${w}" height="${w}" alt="">`;
+/* pot drawing: same geometry as ../pots/index.html potSVG / PotArtView (120 x 100 box) */
+const BODY='M18 20 H102 L92 88 Q91 96 82 96 H38 Q29 96 28 88Z', STAR='M0 -7 Q1 -1.5 7 0 Q1 1.5 0 7 Q-1 1.5 -7 0 Q-1 -1.5 0 -7Z';
+const POTS={terracotta:{body:'#C8734A',rim:'#DD8C63',shade:'#A85A36',deco:k=>`<rect x="18" y="38" width="84" height="7" fill="#7E3F22"/><rect x="18" y="52" width="84" height="7" fill="#7E3F22" opacity=".7"/>`},
+ plainBlue:{body:'#5B8FD0',rim:'#7AA6DE',shade:'#4677B3',deco:()=>''},
+ starlight:{body:'#2F6670',rim:'#5A98A2',shade:'#224C54',deco:()=>[[38,46,1.25,'#FFE27A'],[80,52,1,'#FFE27A'],[60,74,1.4,'#FFE27A'],[88,76,.7,'#fff'],[34,72,.7,'#fff']].map(([x,y,s,c])=>`<path d="${STAR}" transform="translate(${x} ${y}) scale(${s})" fill="${c}"/>`).join('')}};
+let uid=0;
+function pot(id,w,soil=false){const p=POTS[id],c='pc'+(uid++);
+ return `<svg width="${w}" height="${w*100/120}" viewBox="0 0 120 100" aria-hidden="true"><defs><clipPath id="${c}"><path d="${BODY}"/></clipPath></defs><path d="${BODY}" fill="${p.body}"/><g clip-path="url(#${c})"><path d="M18 20 H34 L42 96 H38 Q29 96 28 88Z" fill="#fff" opacity=".14"/><path d="M102 20 H88 L82 96 Q91 96 92 88Z" fill="${p.shade}" opacity=".45"/>${p.deco()}</g><rect x="10" y="4" width="100" height="18" rx="9" fill="${p.rim}"/>${soil?'<ellipse cx="60" cy="9" rx="44" ry="5" fill="#5A3B26"/>':'<rect x="16" y="8" width="88" height="5" rx="2.5" fill="#fff" opacity=".35"/>'}</svg>`}
+const heart=(on)=>`<svg viewBox="-9 -9 18 16" aria-hidden="true"><path d="M0 5 C-8 -1 -8 -8 -3 -8 C-1 -8 0 -6 0 -6 C0 -6 1 -8 3 -8 C8 -8 8 -1 0 5Z" fill="${on?'var(--heart)':'none'}" stroke="var(--heart)" stroke-width="1.6"/></svg>`;
+const sproutArt=(w)=>`<svg width="${w}" height="${w}" viewBox="0 0 200 200" aria-hidden="true"><ellipse cx="100" cy="177" rx="40" ry="6" fill="#2C3E2C" opacity=".14"/><path d="M100 176 C100 160 100 150 100 138" stroke="#5E9F55" stroke-width="6" stroke-linecap="round" fill="none"/><path d="M100 146 C88 128 70 126 60 132 C70 146 88 150 100 146Z" fill="#5FA860"/><path d="M100 140 C112 120 132 118 142 124 C132 140 114 144 100 140Z" fill="#3F8A4A"/></svg>`;
+const budArt=(w)=>`<svg width="${w}" height="${w}" viewBox="0 0 200 200" aria-hidden="true"><ellipse cx="100" cy="177" rx="50" ry="6" fill="#2C3E2C" opacity=".14"/><path d="M100 176 C99 150 101 120 100 96" stroke="#5E9F55" stroke-width="6" stroke-linecap="round" fill="none"/><path d="M100 160 C84 140 62 138 52 146 C62 160 84 164 100 160Z" fill="#5FA860"/><path d="M100 150 C116 130 138 128 148 136 C138 150 116 154 100 150Z" fill="#3F8A4A"/><path d="M100 98 C86 88 86 66 100 56 C114 66 114 88 100 98Z" fill="#F4F1E8" stroke="#D9D2BE" stroke-width="2"/><path d="M100 100 C92 96 90 88 92 82 L100 90 L108 82 C110 88 108 96 100 100Z" fill="#5FA860"/></svg>`;
+
+/* ---------- illustrations, one per page (361 x 340) ---------- */
+const ART={
+guess:()=>`
+ <div class="abs" style="left:16px;top:16px;right:16px"><div class="card" style="padding:10px 14px;font-size:14px;font-weight:600;color:var(--tx)"><b style="color:var(--text)">Clue</b> &middot; A white flower with a sunny middle</div></div>
+ <div class="abs m-sway" style="left:22px;top:74px;width:150px;height:180px"><img src="../flowers/flower_6.svg" width="150" height="180" alt=""></div>
+ <div class="abs" style="left:34px;top:250px"><span class="chip" style="font-size:12px">${I('spark','style="color:var(--bloom-ic)"')}Petals = tries</span></div>
+ <div class="abs" style="right:22px;top:92px"><span class="chip" style="padding:10px 16px;font-size:15px;background:var(--accent);color:#1F3320">${I('bulb')}Help</span></div>
+ <div class="abs" style="right:14px;top:150px;width:176px">
+   <div class="tiles" style="gap:5px"><div class="tl hit" style="width:30px">D</div><div class="tl hit" style="width:30px">A</div><div class="tl blank" style="width:30px"></div><div class="tl hit" style="width:30px">S</div><div class="tl blank" style="width:30px"></div></div></div>
+ <div class="abs" style="left:0;right:0;bottom:16px"><div class="keys"><div class="key in">A</div><div class="key">B</div><div class="key out">C</div><div class="key in">D</div><div class="key">E</div><div class="key">I</div><div class="key out">O</div><div class="key in">S</div><div class="key m-pulse">Y</div></div></div>`,
+plants:()=>`
+ <div class="abs" style="left:0;right:0;top:22px;display:flex;justify-content:center;gap:10px">
+  ${['DAISY','CLOUD','MAPLE'].map((w,i)=>`<div class="card" style="padding:8px 10px;display:flex;flex-direction:column;align-items:center;gap:4px;width:92px"><span style="font-weight:900;font-size:15px;letter-spacing:.06em">${w}</span><span style="color:var(--ok)">${I('check','width="22" height="22"')}</span></div>`).join('')}
+ </div>
+ <svg class="abs" style="left:0;top:96px" width="361" height="50" aria-hidden="true"><path d="M70 4 C90 34 150 30 172 44 M180 4 V44 M290 4 C270 34 210 30 188 44" fill="none" stroke="var(--tx)" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round"/></svg>
+ <div class="abs" style="left:50%;top:132px;margin-left:-70px;width:140px;height:190px">
+   <div class="abs m-sway" style="left:10px;top:0;width:120px">${plant('daisy',120)}</div>
+   <div class="abs" style="left:16px;top:98px">${pot('terracotta',108,true)}</div>
+ </div>
+ <div class="abs" style="left:0;right:0;bottom:16px;text-align:center"><span class="chip">${I('spark','class="m-tw" style="color:var(--gold)"')}New plant found!</span></div>
+ <div class="abs m-tw" style="left:96px;top:170px;color:var(--gold)">${I('spark','width="20" height="20"')}</div>
+ <div class="abs m-tw" style="right:92px;top:200px;color:var(--bloom-line);animation-delay:-1.1s">${I('spark','width="16" height="16"')}</div>`,
+tend:()=>{const names=['Tiny','Sprout','Bud','Bloom','Full bloom'];return `
+ <div class="abs" style="left:22px;right:22px;top:20px">
+  <div style="position:relative;height:22px"><div style="position:absolute;left:10px;right:10px;top:9px;height:3px;background:color-mix(in srgb,var(--text) 18%,transparent)"></div>
+   <div style="position:relative;display:flex;justify-content:space-between">${names.map((n,i)=>`<i style="width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:${i<2?'var(--garden-ic)':'var(--surface)'};box-shadow:inset 0 0 0 ${i==2?3:2}px ${i<=2?'var(--garden-ic)':'color-mix(in srgb,var(--text) 22%,transparent)'}">${i<2?'<svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7" fill="none" stroke="var(--surface)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>':i==2?'<b style="width:8px;height:8px;border-radius:50%;background:var(--garden-ic)"></b>':''}</i>`).join('')}</div></div>
+  <div style="display:flex;justify-content:space-between;margin-top:4px">${names.map(n=>`<span class="lbl" style="width:56px;margin:0 -17px;font-size:11px">${n}</span>`).join('')}</div>
+ </div>
+ <div class="abs" style="left:10px;right:10px;top:84px;height:150px;display:flex;align-items:flex-end;justify-content:space-around">
+  <div>${sproutArt(84)}</div><div>${budArt(112)}</div><div class="m-sway">${plant('daisy',148)}</div>
+ </div>
+ <div class="abs m-drop" style="left:44px;top:96px;color:#5B8FD0">${I('drop','width="14" height="14"')}</div>
+ <div class="abs" style="left:0;right:0;bottom:16px;display:flex;justify-content:center;gap:4px">
+  ${[['drop','Water','#3E7BC4'],['soil','Feed','#8F4A26'],['sun','Sun','#C98A10'],['shears','Prune','#2E7D32'],['pot','Repot','#B85A3A']].map(([ic,t,c])=>`<div class="act"><b style="color:${c}">${I(ic)}</b><span>${t}</span></div>`).join('')}
+ </div>`},
+love:()=>`
+ <div class="abs" style="left:24px;top:14px;width:150px">
+  <div class="m-sway">${plant('rose',140)}</div>
+ </div>
+ <div class="abs m-bob" style="left:150px;top:26px"><div class="card" style="padding:8px 14px;font-weight:900;font-size:16px;border-bottom-left-radius:4px">Hello!</div></div>
+ <div class="abs" style="left:176px;top:96px"><div class="lbl" style="text-align:left;margin-bottom:4px">Love</div><div class="hearts">${[1,1,1,1,0].map((h,i)=>`<span class="${i==3?'m-pulse':''}" style="display:inline-block">${heart(h)}</span>`).join('')}</div></div>
+ <div class="abs card" style="left:14px;right:14px;bottom:14px;height:160px;display:flex;align-items:center;justify-content:space-around;padding:0 6px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
+   <svg class="abs" style="left:24px;top:-6px" width="60" height="30" viewBox="0 0 60 30" aria-hidden="true"><path d="M14 24a9 9 0 0 1 2-17.700A11 11 0 0 1 37 6a8 8 0 0 1 8 18z" fill="color-mix(in srgb,#8EA6C4 55%,var(--surface))"/></svg>
+   <span class="abs m-drop" style="left:40px;top:22px;color:#8EA6C4">${I('drop','width="8" height="8"')}</span>
+   <span class="abs m-drop" style="left:56px;top:22px;color:#8EA6C4;animation-delay:-.8s">${I('drop','width="8" height="8"')}</span>
+   <img src="../tending/parts/seed-pot.svg" width="84" height="90" alt="" style="margin-top:14px">
+   <span class="lbl" style="margin-top:-4px">Naps as a seed</span>
+  </div>
+  <svg width="44" height="24" viewBox="0 0 44 24" aria-hidden="true"><path d="M4 12h30m-8-8 8 8-8 8" fill="none" stroke="var(--tx)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:2px;position:relative">
+   <div style="position:relative;width:96px;height:118px"><div class="abs" style="left:6px;top:-28px">${sproutArt(84)}</div><div class="abs" style="left:6px;top:46px">${pot('terracotta',84,true)}</div>
+    <span class="abs m-tw" style="right:0;top:10px;color:var(--gold)">${I('spark','width="18" height="18"')}</span></div>
+   <span class="lbl" style="margin-top:-4px">Wakes with a challenge</span>
+  </div>
+ </div>`,
+garden:()=>{const t=(lab,bg,ic,inner,x,y,w,h)=>`<div class="abs" style="left:${x}px;top:${y}px;width:${w}px;height:${h}px;border-radius:20px;background:var(--${bg}-bg);border:1px solid color-mix(in srgb,var(--${bg}-ic) 30%,transparent);box-shadow:0 4px 12px color-mix(in srgb,var(--${bg}-ic) 16%,transparent);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">${inner}<span style="font-weight:900;font-size:15px;display:flex;align-items:center;gap:5px"><span style="color:var(--${bg}-ic)">${I(ic,'width="18" height="18"')}</span>${lab}</span></div>`;return `
+ ${t('Garden','garden','leaf',`<div style="display:flex;align-items:flex-end;gap:0">${plant('tulip',62)}${plant('daisy',70)}${plant('sunflower',66)}${plant('lavender',60)}</div>`,16,16,329,124)}
+ ${t('Visitors','vis','bug',`${vis('ladybug','sticker',62)}`,16,200,156,150)}
+ ${t('Shed','shed','tools',`<img src="../brand/v4/svg/tools/can-t1-color.svg" width="62" height="67" alt="">`,189,200,156,150)}
+ <svg class="abs" style="left:96px;top:150px" width="170" height="70" aria-hidden="true"><path d="M8 62 C40 6 130 6 162 62" fill="none" stroke="var(--vis-ic)" stroke-width="2.5" stroke-dasharray="2 7" stroke-linecap="round"/></svg>
+ <div class="abs m-drift" style="left:156px;top:140px"><div class="m-flut">${vis('monarch','a',48)}</div></div>
+ <div class="abs" style="left:250px;top:214px"><span class="chip" style="font-size:12px;padding:4px 9px">+5 points</span></div>`},
+daily:()=>`
+ <div class="abs" style="left:50%;top:14px;margin-left:-80px;width:160px;height:160px">
+  <svg class="abs m-spin" style="left:0;top:0" width="160" height="160" viewBox="-80 -80 160 160" aria-hidden="true">${[...Array(12)].map((_,i)=>`<rect x="-4" y="-78" width="8" height="18" rx="4" fill="var(--gold)" opacity=".55" transform="rotate(${i*30})"/>`).join('')}</svg>
+  <div class="abs m-sway" style="left:14px;top:6px">${plant('sunflower',132)}</div>
+ </div>
+ <div class="abs" style="left:16px;right:16px;top:186px"><div class="card" style="background:var(--bloom-bg);border:1px solid color-mix(in srgb,var(--bloom-line) 40%,transparent);display:flex;align-items:center;gap:12px;padding:12px 14px">
+  <span style="width:38px;height:38px;border-radius:50%;display:grid;place-items:center;flex:none;background:color-mix(in srgb,var(--bloom-line) 30%,var(--bloom-bg));color:var(--bloom-ic)">${I('sun','width="20" height="20"')}</span>
+  <span style="flex:1"><b style="display:block;font-size:17px">Daily Bloom</b><span style="font-size:13px;color:var(--tx)">One word for everyone today</span></span><span style="color:var(--bloom-ic)">${I('chev','width="18" height="18"')}</span></div></div>
+ <div class="abs" style="left:0;right:0;bottom:18px"><div class="tiles">${[0,1,2,3,4].map(i=>`<div class="tl" style="color:var(--bloom-ic)">?</div>`).join('')}</div></div>`,
+levels:()=>{const L=[['Seedling','daisy',72,64],['Sprout','lotus',180,124],['Wildwood','venus_flytrap',290,64],['Grove','orchid',248,214],['Ancient','baobab',112,214]];
+ return `
+ <svg class="abs" style="left:0;top:0" width="361" height="340" aria-hidden="true"><path d="M72 64 C110 64 140 124 180 124 C220 124 250 64 290 64 C345 64 340 214 248 214 C200 214 160 214 112 214" fill="none" stroke="var(--path)" stroke-width="16" stroke-linecap="round"/><path d="M72 64 C110 64 140 124 180 124 C220 124 250 64 290 64 C345 64 340 214 248 214 C200 214 160 214 112 214" fill="none" stroke="color-mix(in srgb,var(--text) 22%,transparent)" stroke-width="2" stroke-dasharray="1 9" stroke-linecap="round"/></svg>
+ ${L.map(([n,p,x,y],i)=>`<div class="abs" style="left:${x-34}px;top:${y-34}px;width:68px;display:flex;flex-direction:column;align-items:center">
+   <div style="width:68px;height:68px;border-radius:50%;background:var(--surface);display:grid;place-items:center;overflow:hidden;box-shadow:${i==0?'0 0 0 4px var(--gold),':''}0 2px 8px rgba(0,0,0,.1)${i==1?',0 0 0 3px var(--surface),0 0 0 6px var(--levels-ic)':''}">${i<2?plant(p,60):`<span style="color:var(--leaf);opacity:.8">${I('sprout','width="30" height="30"')}</span>`}</div>
+   <span class="lbl" style="margin:5px -20px 0;font-size:12px;color:var(--text);white-space:nowrap">${i+1}. ${n}</span></div>`).join('')}
+ ${'' /* check badge on level 1 */}<div class="abs" style="left:88px;top:24px;color:var(--ok)">${I('check','width="22" height="22" style="background:var(--surface);border-radius:50%"')}</div>
+ <div class="abs m-bob" style="left:124px;top:30px"><span class="chip" style="font-size:12px;padding:4px 10px;background:var(--levels-bg)">${I('pin','style="color:var(--levels-ic)"')}You are here</span></div>
+ <div class="abs" style="left:0;right:0;bottom:14px;display:flex;flex-direction:column;align-items:center;gap:6px">
+  <span class="chip" style="font-size:12px"><i style="width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 3px var(--gold)"></i>Gold ring = full bloom</span>
+  <span class="chip" style="font-size:12px">${I('leaf','style="color:var(--leaf)"')}10 plants opens the next level</span></div>`},
+peeks:()=>{const soon=`<span class="soon">${I('sprout')}Soon</span>`;return `
+ <div class="abs m-tw" style="left:30px;top:22px;color:var(--gold)">${I('spark','width="18" height="18"')}</div>
+ <div class="abs m-tw" style="right:36px;top:30px;color:var(--bloom-line);animation-delay:-.9s">${I('spark','width="14" height="14"')}</div>
+ <div class="abs m-tw" style="right:60px;bottom:96px;color:var(--gold);animation-delay:-1.5s">${I('spark','width="16" height="16"')}</div>
+ <div class="abs" style="left:0;right:0;top:44px;display:flex;justify-content:center;gap:10px">
+  <div class="peek">${plant('rafflesia',78)}<span class="nm">Rare plants</span>${soon}</div>
+  <div class="peek m-bob" style="animation-duration:3.4s"><div style="height:78px;display:grid;place-items:center">${pot('starlight',80)}</div><span class="nm">Pots</span>${soon}</div>
+  <div class="peek"><img src="../brand/v4/svg/badges/rare_finds-t2.svg" width="78" height="78" alt=""><span class="nm">Badges</span>${soon}</div>
+ </div>
+ <div class="abs" style="left:0;right:0;bottom:22px;display:flex;justify-content:center">
+  <div class="card" style="display:flex;align-items:center;gap:10px;padding:10px 16px 10px 10px"><span style="width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--levels-bg);color:var(--levels-ic)">${I('sprout','width="24" height="24"')}</span>
+  <span><b style="display:block;font-size:15px">Level 5</b><span style="font-size:13px;color:var(--tx)">Ancient</span></span>${soon}</div></div>`},
+};
+
+/* ---------- build pages ---------- */
+const track=document.getElementById('track');
+track.innerHTML=C.pages.map((p,i)=>{const lines=(QUIET&&p.linesQuiet)?p.linesQuiet:p.lines;
+ // VoiceOver: illustration = one image with p.art; title = header; lines = static text
+ return `<section class="pg c-${p.id}" data-page="${i+1}" aria-roledescription="page" aria-label="${p.title}" ${i?'':''}>
+  <div class="art" role="img" aria-label="${p.art}"><div class="inner">${ART[p.id]()}</div></div>
+  <div class="txt"><h1>${p.title}</h1>${lines.map(l=>`<p>${l}</p>`).join('')}</div></section>`}).join('');
+const dots=document.getElementById('dots');dots.innerHTML=C.pages.map(()=>'<i></i>').join('');
+const $skip=document.getElementById('skip'),$back=document.getElementById('back'),$next=document.getElementById('next');
+$skip.textContent=REPLAY?C.ui.close:C.ui.skip;$back.textContent=C.ui.back;
+let cur=Math.min(N,Math.max(1,parseInt(q.get('page')||'1',10)))-1;
+function show(i,instant){cur=Math.max(0,Math.min(N-1,i));
+ if(RM){track.style.transition='none';track.querySelectorAll('.pg').forEach((s,k)=>s.style.opacity=k===cur?1:0)}
+ else if(instant)track.style.transition='none';else track.style.transition='';
+ track.style.transform=`translateX(${-cur*393}px)`;
+ track.querySelectorAll('.pg').forEach((s,k)=>{s.inert=k!==cur;s.setAttribute('aria-hidden',k!==cur)});
+ [...dots.children].forEach((d,k)=>d.classList.toggle('on',k===cur));
+ dots.setAttribute('aria-valuenow',cur+1);dots.setAttribute('aria-valuetext',C.ui.dots.replace('{n}',cur+1).replace('{total}',N));
+ dots.setAttribute('aria-label','Guide');
+ const lastPage=cur===N-1;
+ $next.innerHTML=lastPage?(REPLAY?C.ui.done:C.ui.start):`${C.ui.next}${I('chev')}`;
+ $next.setAttribute('aria-label',lastPage?(REPLAY?C.ui.done:C.ui.start):C.ui.next);
+ $back.hidden=cur===0; $skip.style.visibility=lastPage?'hidden':'visible';
+ if(!instant){const u=new URL(location);u.searchParams.set('page',cur+1);history.replaceState(null,'',u)}}
+show(cur,true);
+$next.onclick=()=>{if(cur<N-1)show(cur+1);else alert(REPLAY?'Done: back to Settings':'Start playing: on to the first word')};
+$back.onclick=()=>show(cur-1);
+$skip.onclick=()=>alert(REPLAY?'Close: back to Settings':'Skip: straight to the first word');
+addEventListener('keydown',e=>{if(e.key==='ArrowRight')show(cur+1);if(e.key==='ArrowLeft')show(cur-1)});
+let sx=null;const vp=document.querySelector('.viewport');
+vp.addEventListener('pointerdown',e=>sx=e.clientX);
+vp.addEventListener('pointerup',e=>{if(sx===null)return;const dx=e.clientX-sx;sx=null;if(Math.abs(dx)>40)show(cur+(dx<0?1:-1))});
+document.body.dataset.ready='1';
+</script></body></html>

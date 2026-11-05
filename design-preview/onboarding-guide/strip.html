@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Guide Strip</title>
+<style>
+  body { margin: 0; background: #8a8a84; font: 600 15px ui-rounded, system-ui, sans-serif; color: #fff; }
+  .row { display: flex; gap: 12px; padding: 8px 12px 12px; }
+  .cell { display: flex; flex-direction: column; gap: 6px; }
+  .cell span { height: 20px; }
+  iframe { width: 393px; height: 852px; border: 0; display: block; }
+</style>
+</head>
+<body>
+<div class="row" id="row"></div>
+<script>
+  // strip.html?q=theme=dark%26rm=1&pages=1,2,3
+  const q = new URLSearchParams(location.search);
+  const extra = q.get('q') || '', pages = (q.get('pages') || '1,2,3,4,5,6,7,8').split(',');
+  const row = document.getElementById('row');
+  for (const p of pages) {
+    const cell = document.createElement('div'); cell.className = 'cell';
+    cell.innerHTML = `<span>page ${p}  ${extra.replace(/&/g, '  ')}</span>`;
+    const f = document.createElement('iframe'); f.src = `index.html?still=1&page=${p}&${extra}`;
+    cell.appendChild(f); row.appendChild(cell);
+  }
+</script>
+</body>
+</html>

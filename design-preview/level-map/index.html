@@ -6,6 +6,7 @@
   Params: ?frame=1 renders one phone (no board).
           &theme=light|dark   &text=large (Dynamic Type accessibility size)
           &state=mid (L1 found, L2 current, default) | new (first day) | late (L1-2 full bloom, L3 current)
+                | all (all 50 found, L1-3 full bloom, L5 current)
   With no ?frame the page shows a board of every state.
   Rules (ProgressionPolicy): word level = 10 unique plants found in a level -> next level opens.
   Garden level = all 10 plants of a level at stage 4 ("full bloom"), drawn as the outer ring.
@@ -27,7 +28,7 @@ body{margin:0;line-height:1.25}
 .nav{display:grid;grid-template-columns:88px 1fr 88px;align-items:center;min-height:44px;padding:0 8px}
 .back{display:flex;align-items:center;gap:2px;min-height:44px;color:var(--accent-text);font-weight:700;font-size:1.0625rem;padding:0 8px}
 .back svg{width:12px;height:20px}
-.wm{justify-self:center;height:22px;display:block}
+.wm{justify-self:center;height:24px;width:auto;display:block}
 .wm.d{display:none}[data-theme=dark] .wm.l{display:none}[data-theme=dark] .wm.d{display:block}
 .head{padding:8px 20px 4px}
 h1{font-size:1.75rem;margin:0;font-weight:900;letter-spacing:-.01em}
@@ -74,14 +75,15 @@ if(Q.get('theme'))document.documentElement.setAttribute('data-theme',Q.get('them
 const LEVELS=[
  {n:1,name:'Seedling',theme:'Garden friends',plant:'daisy',hue:'l1'},
  {n:2,name:'Sprout',theme:'Plants from far away',plant:'lotus',hue:'l2'},
- {n:3,name:'Wildwood',theme:'Strange and wild plants',plant:'venus_flytrap',hue:'l3'},
+ {n:3,name:'Bloom',theme:'Strange and wild plants',plant:'venus_flytrap',hue:'l3'},
  {n:4,name:'Grove',theme:'Rare wonders',plant:'giant_water_lily',hue:'l4'},
  {n:5,name:'Ancient',theme:'Old, giant and rare',plant:'wollemi_pine',hue:'l5'}];
 // found = plants earned in the level, bloom = plants at stage 4. current = word level.
 const STATES={
  new:{cur:1,found:[0,0,0,0,0],bloom:[0,0,0,0,0]},
  mid:{cur:2,found:[10,4,0,0,0],bloom:[7,0,0,0,0]},
- late:{cur:3,found:[10,10,3,0,0],bloom:[10,10,0,0,0]}};
+ late:{cur:3,found:[10,10,3,0,0],bloom:[10,10,0,0,0]},
+ all:{cur:5,found:[10,10,10,10,10],bloom:[10,10,10,6,2]}};
 const ic={
  play:'<svg viewBox="0 0 16 16"><path d="M4 2.5v11l9.5-5.5z" fill="currentColor"/></svg>',
  pin:'<svg viewBox="0 0 16 16"><path d="M8 1.5a4.5 4.5 0 0 0-4.5 4.5c0 3.4 4.5 8.5 4.5 8.5s4.5-5.1 4.5-8.5A4.5 4.5 0 0 0 8 1.5zm0 6.2a1.7 1.7 0 1 1 0-3.4 1.7 1.7 0 0 1 0 3.4z" fill="currentColor"/></svg>',
@@ -94,7 +96,8 @@ function medal(L,found,bloom,soon,cur){
   s+=`<circle cx="${c}" cy="${c}" r="${R}" fill="var(--${L.hue})" stroke="var(--card-line)"/>`;
   if(cur)s+=`<circle cx="${c}" cy="${c}" r="${R+3}" fill="none" stroke="var(--accent)" stroke-width="3"/>`;
   // outer bloom ring
-  for(let i=0;i<10;i++){const a0=(i*36-90+3)*Math.PI/180,a1=((i+1)*36-90-3)*Math.PI/180;
+  if(!soon&&bloom>=10)s+=`<circle cx="${c}" cy="${c}" r="${br}" fill="none" stroke="var(--bloom)" stroke-width="5"/>`;
+  else for(let i=0;i<10;i++){const a0=(i*36-90+3)*Math.PI/180,a1=((i+1)*36-90-3)*Math.PI/180;
     if(soon)break;const on=i<bloom;s+=`<path d="M${c+br*Math.cos(a0)} ${c+br*Math.sin(a0)} A${br} ${br} 0 0 1 ${c+br*Math.cos(a1)} ${c+br*Math.sin(a1)}" fill="none" stroke="${on?'var(--bloom)':'var(--petal-off)'}" stroke-width="${on?4.5:2}" stroke-linecap="round" opacity="${soon?.6:1}"/>`;}
   // petal ring
   for(let i=0;i<10&&!soon;i++){const a=i*36-90,on=i<found;
@@ -112,6 +115,11 @@ function medal(L,found,bloom,soon,cur){
   return `<svg viewBox="0 0 128 128" aria-hidden="true">${s}</svg>`;
 }
 
+// Next-step line under the current level. Level 5 has no level after it, so it counts toward the set of 10.
+function nextLine(n,found){
+  if(n<5)return found===0?`Find 10 plants to open Level&nbsp;${n+1}.`:`Find ${10-found} more to open Level&nbsp;${n+1}.`;
+  return found===0?'Find 10 plants for Level&nbsp;5.':`Find ${10-found} more for Level&nbsp;5.`;
+}
 function stop(L,st,i,large){
   const found=st.found[i],bloom=st.bloom[i],cur=L.n===st.cur,soon=L.n>st.cur,done=found>=10;
   let body=`<div class="lv">Level ${L.n}</div><div class="nm">${L.name}</div><div class="th">${L.theme}</div>`;
@@ -122,13 +130,16 @@ function stop(L,st,i,large){
     if(found===0){body+=`<div class="row"><i></i>Find your first plant!</div>`}
     else{body+=`<div class="row"><i></i>${found} of 10 plants found</div>`;
       body+=`<div class="row"><i class="b"></i>${bloom} of 10 in full bloom</div>`;}
-    if(done&&!cur&&L.n<5)body+=`<div class="yay">All 10 found! Level&nbsp;${L.n+1} is open.</div>`;
+    if(done&&L.n<5)body+=`<div class="yay">All 10 found! Level&nbsp;${L.n+1} is open.</div>`;
+    if(done&&L.n===5)body+=`<div class="yay">All 10 found! Every level is open.</div>`;
     if(bloom>=10)body+=`<div class="full">${ic.sun}Full bloom garden!</div>`;
-    if(cur&&found>0&&found<10)body+=`<div class="next">Find ${10-found} more to open Level&nbsp;${L.n+1}.</div>`;
-    if(cur&&found===0)body+=`<div class="next">Find 10 plants to open Level&nbsp;${L.n+1}.</div>`;
+    if(cur&&!done)body+=`<div class="next">${nextLine(L.n,found)}</div>`;
     body+=`<button class="go${cur?'':' soft'}">${ic.play}Play Level ${L.n}</button>`;
   }
-  const label=soon?`Level ${L.n}, ${L.name}. Coming soon in your garden. Opens when Level ${L.n-1} has 10 plants.`:`Level ${L.n}, ${L.name}.${cur?' You are here.':''} ${found} of 10 plants found. ${bloom} of 10 in full bloom.${bloom>=10?' Full bloom garden.':''}`;
+  const label=soon?`Level ${L.n}, ${L.name}. ${L.theme}. Coming soon in your garden. Opens when Level ${L.n-1} has 10 plants.`
+   :`Level ${L.n}, ${L.name}. ${L.theme}.${cur?' You are here.':''} `+(found===0?'Find your first plant!':`${found} of 10 plants found. ${bloom} of 10 in full bloom.`)
+   +(done?(L.n<5?` All 10 found! Level ${L.n+1} is open.`:' All 10 found! Every level is open.'):'')+(bloom>=10?' Full bloom garden!':'')
+   +(cur&&!done?' '+nextLine(L.n,found).replace(/&nbsp;/g,' '):'');
   return `<section role="group" class="stop ${i%2&&!large?'r':''} ${cur?'cur':''} ${soon?'soon':''}" aria-label="${label}"><div class="medal">${medal(L,found,bloom,soon,cur)}</div><div class="card">${body}</div></section>`;
 }
 
@@ -139,9 +150,9 @@ function phone(){
   document.body.innerHTML=`<div class="phone">
   <div class="status"><span>9:41</span><span>100%</span></div>
   <div class="nav"><span class="back"><svg viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" stroke="currentColor" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Home</span>
-   <img class="wm l" src="../logo/final/wordmark.svg" alt="WordFlora"><img class="wm d" src="../logo/final/wordmark-dark.svg" alt="WordFlora"><span></span></div>
-  <div class="head"><h1>Garden Path</h1><p>${total?total+' plants found. ':''}Every 10 plants opens a new level.</p></div>
-  <div class="key"><span><i style="width:12px;height:12px;border-radius:50% 0 50% 0;background:var(--petal);transform:rotate(-45deg);display:inline-block"></i>Petal = plant found</span><span><i style="width:13px;height:13px;border-radius:50%;border:3px solid var(--bloom);display:inline-block"></i>Gold ring = full bloom</span></div>
+   <img class="wm l" src="../logo/v3/hero/wordmark.svg" alt=""><img class="wm d" src="../logo/v3/hero/wordmark-dark.svg" alt=""><span></span></div>
+  <div class="head"><h1>Garden Path</h1><p>${total>=50?'All 50 plants found! Grow them all to full bloom.':(total?total+' plants found. ':'')+'Every 10 plants opens a new level.'}</p></div>
+  <div class="key"><span><i style="width:.75rem;height:.75rem;border-radius:50% 0 50% 0;background:var(--petal);transform:rotate(-45deg);display:inline-block"></i>Petal = plant found</span><span><i style="width:.8rem;height:.8rem;border-radius:50%;border:3px solid var(--bloom);display:inline-block"></i>Gold ring = full bloom</span></div>
   <div class="trail"><svg class="path" aria-hidden="true"></svg>${LEVELS.map((L,i)=>stop(L,st,i,large)).join('')}<div class="end"><svg viewBox="0 0 60 30" width="60" height="30" aria-hidden="true"><path d="M8 12h44M8 18h44" stroke="var(--soil)" stroke-width="4" stroke-linecap="round"/><path d="M14 18v10M46 18v10" stroke="var(--soil)" stroke-width="3.5" stroke-linecap="round"/></svg><span>A bench to rest at the end of the path</span></div>
   </div><div class="home-ind"></div></div>`;
   drawPath(large);
@@ -162,8 +173,8 @@ function drawPath(large){
 
 if(Q.get('frame')){phone()}
 else{
-  const F=[['mid','light',''],['mid','dark',''],['new','light',''],['late','dark',''],['mid','light','large'],['mid','dark','large']];
-  const cap={mid:'Level 2 in progress',new:'First day',late:'Two gardens in full bloom'};
+  const F=[['new','light',''],['mid','light',''],['mid','dark',''],['late','light',''],['all','light',''],['all','dark',''],['mid','light','large'],['mid','dark','large']];
+  const cap={mid:'Level 2 in progress',new:'First day',late:'Two gardens in full bloom',all:'All 50 plants found'};
   document.body.innerHTML=`<div class="board">${F.map(([s,t,x])=>`<figure><iframe title="${cap[s]} ${t}" src="?frame=1&state=${s}&theme=${t}${x?'&text=large':''}" scrolling="${x?'yes':'no'}"></iframe><figcaption>${cap[s]} · ${t}${x?' · large text':''}</figcaption></figure>`).join('')}</div>`;
 }
 </script></body></html>
