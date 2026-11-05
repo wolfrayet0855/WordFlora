@@ -330,10 +330,18 @@ enum Ease {
 
 /// The landing intro (design-preview/celebrate/intro.html, README section A): 41 petals fall into seven heaps and loose
 /// petals, each heap grows a stem and its petals gather into a bud that opens into a five-petal flower. The row sits in
-/// the lower third; the wordmark and tagline fade in above it. Everything is over by `finish` (3.5 s); then a 0.4 s
-/// hand-off. A tap jumps to the final frame.
+/// the lower third; the wordmark and tagline fade in above it. No petal starts to fall until the wordmark has settled
+/// (`wordmarkSettled`), so the mark never dissolves into petals of its own colours, and falling petals pass faintly
+/// behind the tagline, never over it (docs/pm/logo-decision.md, item 3). Petals are the logo's rose family and gold.
+/// Everything is over by `finish` (3.5 s); then a 0.4 s hand-off. A tap jumps to the final frame.
 struct IntroTimeline {
     static let finish = 3.5
+    /// The wordmark has faded in and settled into place by here; the first petal starts falling no earlier.
+    static let wordmarkSettled = 0.9
+    /// The palette entries the intro draws: rose, marigold gold, logo rose and deep logo rose #C9506C (`PetalKit.palette`).
+    static let introTints = [0, 1, 3, 6]
+    /// How faint a falling petal is while it crosses the text band, so the wordmark and tagline always read.
+    static let inBandAlpha = 0.35
     static let handoff = 0.4
     /// Reduce Motion: the wordmark, tagline and bloomed row fade in together over this long, opacity only...
     static let reduceMotionFade = 0.6
@@ -393,17 +401,17 @@ struct IntroTimeline {
         func r() -> Double { Double(g.next() >> 11) / Double(1 << 53) }
 
         let heights = [70.0, 50, 80, 58, 76, 48, 66]
-        let tints = [0, 1, 3, 2, 4, 1, 0]                        // neighbours never share a colour
-        var lands = [Double]()
+        let tints = [6, 1, 3, 0, 6, 1, 3]                        // rose family and gold; neighbours never share a colour
+        var starts = [Double]()
         for c in 0..<Self.heaps {
             let rank = Double(abs(c - 3))                         // the row blooms from the middle outwards
             clusters.append(Cluster(x: (34 + Double(c) * (325.0 / 6) + (r() - 0.5) * 10) * sx, h: heights[c], rad: 16 + r() * 4,
                                     tint: tints[c], lean: (r() - 0.5) * 0.12, bloomStart: 0))
-            lands.append(1.15 + rank * 0.15 + r() * 0.06)
+            starts.append(Self.wordmarkSettled + rank * 0.08)
         }
-        func faller(cluster: Int, k: Int, tint: Int, len: Double, xL: Double, yL: Double, rest: Double, land: Double) -> Faller {
-            let D = 0.95 + r() * 0.35
-            return Faller(cluster: cluster, k: k, tint: tint, len: len, xL: xL, yL: yL, rest: rest, ts: land - D, D: D,
+        func faller(cluster: Int, k: Int, tint: Int, len: Double, xL: Double, yL: Double, rest: Double, start: Double) -> Faller {
+            let D = 0.75 + r() * 0.2
+            return Faller(cluster: cluster, k: k, tint: tint, len: len, xL: xL, yL: yL, rest: rest, ts: start, D: D,
                           y0: -30 - r() * 60, drift: (r() - 0.5) * 120 * sx, swayA: 14 + r() * 18, swayW: 5 + r() * 4, ph: r() * 2 * .pi,
                           spin0: r() * 2 * .pi, spin: (r() - 0.5) * 7, flipW: 7 + r() * 6, ph2: r() * 2 * .pi, back: r() < 0.4)
         }
@@ -413,17 +421,17 @@ struct IntroTimeline {
                 let xL = c.x + Double(k - 2) * 5.5 + (r() - 0.5) * 3
                 let yL = ground - heap[k] - r() * 1.5             // a little heap
                 let rest = (r() < 0.5 ? -1.0 : 1.0) * (1.25 + r() * 0.45)   // lying on its side, slight tilt
-                let land = lands[ci] - r() * 0.3
-                fallers.append(faller(cluster: ci, k: k, tint: c.tint, len: 18 + r() * 3, xL: xL, yL: yL, rest: rest, land: land))
+                let start = starts[ci] + r() * 0.15
+                fallers.append(faller(cluster: ci, k: k, tint: c.tint, len: 18 + r() * 3, xL: xL, yL: yL, rest: rest, start: start))
             }
         }
         for i in 0..<Self.loosePetals {                            // loose petals between the flowers
             let x = (16 + r() * 361) * sx
-            let tint = Int(r() * 4)
+            let tint = Self.introTints[min(Int(r() * 4), 3)]
             let len = 12 + r() * 4
             let rest = (r() < 0.5 ? -1.0 : 1.0) * (1.2 + r() * 0.6)
-            let land = 0.75 + r() * 1.2
-            fallers.append(faller(cluster: -1, k: i, tint: tint, len: len, xL: x, yL: ground + 3 - (i % 4 == 0 ? 3 : 0), rest: rest, land: land))
+            let start = Self.wordmarkSettled + r() * 0.5
+            fallers.append(faller(cluster: -1, k: i, tint: tint, len: len, xL: x, yL: ground + 3 - (i % 4 == 0 ? 3 : 0), rest: rest, start: start))
         }
         for ci in clusters.indices {
             clusters[ci].bloomStart = (fallers.filter { $0.cluster == ci }.map(\.lands).max() ?? 0) + 0.12
@@ -434,11 +442,11 @@ struct IntroTimeline {
 
     struct TextPose: Equatable { var opacity: Double, dy: Double, scale: Double }
 
-    /// 0-0.8 s: fade in, rise 14 pt, scale 0.94 to 1; 1.8-3.2 s: settle 18 pt up as the row blooms.
+    /// 0-0.8 s: fade in, rise 14 pt, scale 0.94 to 1; 0.5-0.9 s: settle 18 pt up, before any petal falls.
     static func wordmark(at t: Double, reduceMotion: Bool) -> TextPose {
         if reduceMotion { return TextPose(opacity: Ease.outCubic(Ease.seg(t, 0, reduceMotionFade)), dy: -18, scale: 1) }
         let mIn = Ease.outCubic(Ease.seg(t, 0, 0.8))
-        let settle = Ease.inOutCubic(Ease.seg(t, 1.8, 3.2))
+        let settle = Ease.inOutCubic(Ease.seg(t, 0.5, wordmarkSettled))
         return TextPose(opacity: mIn, dy: 14 * (1 - mIn) - 18 * settle, scale: 0.94 + 0.06 * mIn)
     }
 
@@ -478,7 +486,7 @@ struct IntroTimeline {
         return StemTop(x: c.x + sin(c.lean + sway) * h, y: ground - cos(c.lean + sway) * h, growth: g, height: h, rotation: c.lean + sway)
     }
 
-    /// How faint a falling petal is: 85 % for the petals marked "back", and for any petal while it crosses the text band.
+    /// How faint a falling petal is: 85 % for the petals marked "back", and `inBandAlpha` while it crosses the text band.
     static func fallingAlpha(back: Bool, y: Double, band: ClosedRange<Double>?) -> Double {
         let base = back ? 0.85 : 1
         guard let band else { return base }
@@ -487,7 +495,7 @@ struct IntroTimeline {
         if y < band.lowerBound { w = Ease.seg(y, band.lowerBound - margin, band.lowerBound) }
         else if y > band.upperBound { w = 1 - Ease.seg(y, band.upperBound, band.upperBound + margin) }
         else { w = 1 }
-        return base + (min(base, 0.85) - base) * w
+        return base + (inBandAlpha - base) * w
     }
 
     /// Everything to draw at time t, back to front. Falling petals sit behind the text layer; landed heaps,
@@ -509,7 +517,7 @@ struct IntroTimeline {
             let layer: Layer = q.falling ? .behindText : .front
             let fallAlpha = q.falling ? Self.fallingAlpha(back: p.back, y: q.y, band: textBand) : 1
             if p.cluster < 0 {                                   // loose petals soak into the soil once the row has bloomed
-                let soak = 1 - Ease.inOutCubic(Ease.seg(t, 2.6, 3.2))
+                let soak = 1 - Ease.inOutCubic(Ease.seg(t, 2.8, 3.3))
                 if soak > 0 { out.append(.petal(layer: layer, x: q.x, y: q.y, angle: q.a, len: p.len, tint: p.tint, alpha: fallAlpha * soak, flip: q.flip, pivot: .mid)) }
                 continue
             }
@@ -542,10 +550,10 @@ struct IntroTimeline {
         items(at: Self.finish + 10).filter { if case .petal = $0 { return false } else { return true } }
     }
 
-    /// When the last thing moves: the last flower finishes opening, the wordmark settles, loose petals soak away.
+    /// When the last thing moves: the last flower finishes opening, landed petals stop rocking, loose petals soak away.
     var lastMotion: Double {
         let flowers = clusters.map { $0.bloomStart + 0.95 }.max() ?? 0
         let settles = fallers.map { $0.lands + 0.45 }.max() ?? 0         // the landing bounce has died away by then
-        return max(flowers, settles, 3.2)
+        return max(flowers, settles, 3.3)
     }
 }

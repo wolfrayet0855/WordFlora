@@ -111,6 +111,28 @@ final class CelebrationTests: XCTestCase {
         XCTAssertEqual(IntroTimeline.reduceMotionHandoff, 2.0)
     }
 
+    /// docs/pm/logo-decision.md item 3: the petals wait for the wordmark to settle, are the logo's rose family and
+    /// gold (deep rose #C9506C included, never white), and stay faint behind the wordmark and tagline.
+    func testIntroPetalsWaitForTheWordmarkAndUseTheLogoRoseAndGold() {
+        let settled = IntroTimeline.wordmark(at: IntroTimeline.wordmarkSettled, reduceMotion: false)
+        XCTAssertEqual(settled.opacity, IntroTimeline.wordmark(at: IntroTimeline.finish, reduceMotion: false).opacity, accuracy: 0.05)
+        XCTAssertEqual(settled.dy, -18, accuracy: 1e-9)
+        XCTAssertEqual(IntroTimeline.wordmark(at: 2.0, reduceMotion: false), IntroTimeline.wordmark(at: IntroTimeline.finish, reduceMotion: false))
+        let roseAndGold: Set<UInt32> = [0xF2788A, 0xF5C858, 0xE27D8A, 0xC9506C]
+        XCTAssertTrue(IntroTimeline.introTints.map { PetalKit.palette[$0].fill }.contains(0xC9506C))
+        for size in sizes {
+            let intro = IntroTimeline(size: size)
+            for p in intro.fallers {
+                XCTAssertGreaterThanOrEqual(p.ts, IntroTimeline.wordmarkSettled, "no petal falls before the wordmark settles")
+                XCTAssertTrue(roseAndGold.contains(PetalKit.palette[p.tint].fill), "petal tint \(p.tint)")
+            }
+            for c in intro.clusters { XCTAssertTrue(roseAndGold.contains(PetalKit.palette[c.tint].fill), "flower tint \(c.tint)") }
+            XCTAssertTrue(intro.items(at: IntroTimeline.wordmarkSettled - 0.01).isEmpty, "nothing is drawn while the wordmark arrives")
+        }
+        XCTAssertLessThanOrEqual(IntroTimeline.fallingAlpha(back: false, y: 100, band: 50...150), IntroTimeline.inBandAlpha)
+        XCTAssertLessThan(IntroTimeline.inBandAlpha, 0.5)
+    }
+
     func testEveryHeapHasLandedBeforeItsStemGrows() {
         let intro = IntroTimeline(size: phone)
         for (i, c) in intro.clusters.enumerated() {
@@ -132,7 +154,7 @@ final class CelebrationTests: XCTestCase {
                     switch item {
                     case let .petal(layer, _, y, _, _, _, alpha, _, _):
                         if layer == .front { XCTAssertGreaterThanOrEqual(y, lowerThird, "t \(t)") }
-                        if layer == .behindText && band.contains(y) { XCTAssertLessThanOrEqual(alpha, 0.85 + 1e-9, "t \(t)") }
+                        if layer == .behindText && band.contains(y) { XCTAssertLessThanOrEqual(alpha, IntroTimeline.inBandAlpha + 1e-9, "t \(t)") }
                     case let .blossom(_, y, _, _, _, _, _, _): XCTAssertGreaterThanOrEqual(y, lowerThird, "t \(t)")
                     case let .stem(_, _, _, topY, _, _, _): XCTAssertGreaterThanOrEqual(topY, lowerThird, "t \(t)")
                     case .leaf: break
@@ -256,8 +278,7 @@ final class CelebrationTests: XCTestCase {
         app.roundFinished()
         XCTAssertEqual(app.pendingBadge?.badgeId, "perfect_bloom")
         XCTAssertNil(app.presentNextBadge(), "held while the round's card is up")
-        app.pauseBadgeMoments(.round, false)
-        XCTAssertEqual(app.presentNextBadge()?.badgeId, "perfect_bloom")
+        app.pauseBadgeMoments(.round, false)                    // Continue: it shows at once, in the same update
         XCTAssertEqual(app.shownBadge?.badgeId, "perfect_bloom")
         XCTAssertNil(app.presentNextBadge(), "one at a time")
         app.dismissBadgeMoment()

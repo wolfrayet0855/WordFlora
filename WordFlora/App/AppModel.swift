@@ -602,8 +602,12 @@ final class AppModel {
     private(set) var badgePauses: Set<BadgePause> = []
     var badgeMomentsPaused: Bool { !badgePauses.isEmpty }
 
+    /// Releasing the last hold shows a waiting badge at once, in the same update as the tap that closed the card,
+    /// so the next screen never takes a tap meant for it first.
     func pauseBadgeMoments(_ reason: BadgePause, _ paused: Bool) {
-        if paused { badgePauses.insert(reason) } else { badgePauses.remove(reason) }
+        if paused { badgePauses.insert(reason); return }
+        guard badgePauses.remove(reason) != nil else { return }
+        if !badgeMomentsPaused && badgeMomentDelay == 0 { presentNextBadge() }
     }
 
     /// One moment per badge (its highest new tier), in the order they were earned. Quiet Garden never unlocks badges,

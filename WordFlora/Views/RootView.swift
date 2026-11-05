@@ -39,9 +39,9 @@ struct RootView: View {
     private func mainStack(router path: Binding<[GameRoute]>) -> some View {
         NavigationStack(path: path) {
             HomeView()
-                .accessibilityHidden(app.shownBadge != nil)      // each pushed screen too: the stack's own pages need it
+                .accessibilityHidden(app.shownBadge != nil)      // the stack's pages need it themselves (GameView does too)
                 .navigationDestination(for: GameRoute.self) { route in
-                    Group { switch route {
+                    switch route {
                     case .garden: GardenView()
                     case .game(let daily, let level): GameView(daily: daily, level: level)
                     case .plant(let id): PlantDetailView(plantId: id)
@@ -53,8 +53,7 @@ struct RootView: View {
                     case .settings: SettingsView()
                     case .levelMap: LevelMapView()
                     default: ComingSoonView(title: String(describing: route))
-                    } }
-                    .accessibilityHidden(app.shownBadge != nil)
+                    }
                 }
         }
     }
