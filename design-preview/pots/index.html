@@ -19,7 +19,7 @@ h1{font-size:28px;margin:0 0 4px}h2{font-size:22px;margin:40px 0 4px}h3{font-siz
 .btn{font:inherit;font-weight:800;border:0;border-radius:999px;min-height:44px;padding:8px 18px;background:var(--card);color:var(--text);box-shadow:inset 0 0 0 2px var(--line);cursor:pointer}
 :focus-visible{outline:3px solid var(--text);outline-offset:2px}
 [data-only] section{display:none}
-[data-only=s1] #s1,[data-only=s1b] #s1b,[data-only=s2] #s2,[data-only=s3] #s3,[data-only=s4] #s4{display:block}
+[data-only=s6] #s6,[data-only=s1] #s1,[data-only=s1b] #s1b,[data-only=s2] #s2,[data-only=s3] #s3,[data-only=s4] #s4{display:block}
 [data-only] header{display:none}
 [data-only] h2{margin-top:0}
 .row{display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
@@ -123,6 +123,27 @@ svg.pot{display:block;overflow:visible}
 [data-theme=dark] .stage .shadow{background:rgba(0,0,0,.35)}
 .stage .name{position:absolute;left:14px;top:14px;background:var(--surface);border-radius:14px;padding:6px 12px;font-weight:800;font-size:14px;box-shadow:var(--shadow)}
 .stage .name small{display:block;font-weight:700;font-size:12px;color:var(--txt2)}
+/* 6. proposed */
+.prop{border:3px dashed var(--plus);border-radius:24px;padding:4px 16px 18px;margin-top:22px;background:color-mix(in srgb,var(--plus) 8%,transparent)}
+.prop .flag{display:inline-block;background:var(--plus);color:var(--plus-ink);font-weight:800;font-size:13px;border-radius:999px;padding:2px 12px;margin-top:14px;letter-spacing:.04em}
+.tiers{display:grid;gap:10px}
+.tier{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:10px 14px;display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center}
+.tier .tn{font-weight:800;font-size:15px}.tier .tn small{display:block;font-weight:600;color:var(--txt2);font-size:12.5px;line-height:1.3}
+.tier .ps{display:flex;gap:14px;flex-wrap:wrap}
+.tier figure{margin:0;width:96px;text-align:center;font-size:12px;line-height:1.25}
+.tier figure svg{margin:0 auto 3px}
+.tier figure b{display:block;font-size:13px}
+.tier figure span{display:block;color:var(--txt2);font-weight:700}
+.tier figure i{display:block;font-style:normal;font-weight:800;color:var(--ok)}
+.tier figure .new,.tier figure .chg{display:inline-block}
+.tier figure span.new{color:var(--leaf-ink)}
+.prop .pc .sizes{flex-wrap:wrap}
+.new{display:inline-block;font-size:10px;font-weight:800;background:var(--leaf);color:var(--leaf-ink);border-radius:999px;padding:0 6px;margin-top:2px}
+.chg{display:inline-block;font-size:10px;font-weight:800;box-shadow:inset 0 0 0 1.5px var(--txt2);color:var(--txt2);border-radius:999px;padding:0 6px;margin-top:2px}
+@media (max-width:560px){.tier{grid-template-columns:1fr}}
+.tl{background:var(--card);border-radius:18px;box-shadow:var(--shadow);padding:12px 14px;margin-top:12px;overflow-x:auto}
+.tl table{box-shadow:none;max-width:none}
+.tl td svg{display:inline-block;vertical-align:middle}
 table{border-collapse:collapse;width:100%;max-width:1100px;background:var(--card);border-radius:14px;overflow:hidden}
 td,th{padding:7px 10px;text-align:left;font-size:13.5px;border-bottom:1px solid var(--line);vertical-align:top}
 th{background:color-mix(in srgb,var(--leaf) 30%,transparent)}
@@ -136,7 +157,15 @@ th{background:color-mix(in srgb,var(--leaf) 30%,transparent)}
 <header><h1>Pot collection</h1>
 <p class="sub">Ten cosmetic pots. Plain blue to start, six earned by play and kept for good, three with WordFlora Plus. Each pot has its own pattern, so it reads by shape as well as colour. Design review only, not built yet. Catalog data: <a href="pots.json" style="color:var(--text)">pots.json</a>.</p>
 <div class="bar"><button class="btn" id="thT">Dark mode</button>
-<a href="#s1">1 Pots</a><a href="#s2">2 Pick a pot</a><a href="#s3">3 Shed</a><a href="#s4">4 Plant page</a><a href="#s5">5 Table</a></div></header>
+<a href="#s6">Proposed ladder</a><a href="#s1">1 Pots</a><a href="#s2">2 Pick a pot</a><a href="#s3">3 Shed</a><a href="#s4">4 Plant page</a><a href="#s5">5 Table</a></div></header>
+
+<section id="s6" class="prop"><span class="flag">PROPOSED, NOT APPROVED</span><h2 style="margin-top:8px">Proposed: sixteen pots that climb with the plants</h2>
+<p class="sub">From docs/pm/pot-earning-review.md, for the 3-words-per-plant pace. Six new pots (marked NEW) and four earlier unlocks (marked EARLIER, old rule crossed out). Every change moves a goal earlier, never later, so no one loses a pot. Day estimates assume 5 correct words a day, the first plant on word 1 and a plant every 3 words after (hero words make it sooner).</p>
+<div class="tiers" id="tiers"></div>
+<h3 style="margin-top:18px">New pots at 44, 88 and 120 pt, plus the to-earn outline</h3><div class="cat" id="newcat"></div>
+<h3 style="margin-top:18px">All sixteen at 44 pt, colour-blind check</h3><div class="cb" id="cb2"></div>
+<h3 style="margin-top:18px">When each pot arrives</h3><div class="tl"><table id="tl"></table></div>
+</section>
 
 <section id="s1"><h2>1. The ten pots at 44, 88 and 120 pt</h2>
 <p class="sub">Same pot shape as the repot effect today (rim, body, light and shade strips). The pattern sits on the body, clipped to it.</p>
@@ -186,6 +215,12 @@ function potSVG(p,size,mode='full'){
  if(k==='stripes')d=[22,42,62,82,102].map(x=>`<rect x="${x-4.5}" y="20" width="9" height="80" fill="${C(0)}"/>`).join('');
  if(k==='moon')d=`<path fill="${C(0)}" d="M54.62 41.06A15 15 0 1 0 69.68 62.15A13 13 0 0 1 54.62 41.06Z"/>`+[[84,42],[82,78]].map(([x,y])=>`<path d="${STAR}" transform="translate(${x} ${y}) scale(.55)" fill="${C(1)}"/>`).join('')+`<circle cx="36" cy="40" r="2" fill="${C(1)}"/><circle cx="40" cy="80" r="2" fill="${C(1)}"/>`;
  if(k==='flowerBand'){d=`<g fill="${C(0)}"><rect x="18" y="70" width="84" height="30"/>${[26,35,44,53,62,71,80,89,98].map(x=>`<circle cx="${x}" cy="70" r="5"/>`).join('')}</g>`+[32,48,64,80,94].map((x,i)=>`<g transform="translate(${x} 80)" fill="${g?'var(--lock)':p.decoration.colors[i%2?2:1]}">${[0,72,144,216,288].map(a=>`<circle cx="0" cy="-3.5" r="3" transform="rotate(${a})"/>`).join('')}<circle r="2" fill="${g?'var(--lockink)':p.decoration.colors[3]}"/></g>`).join('')}
+ if(k==='blossoms')d=[[40,44,1],[78,40,.85],[62,68,1.15],[36,76,.75],[86,72,.8]].map(([x,y,s])=>`<g transform="translate(${x} ${y}) scale(${s})">${[0,72,144,216,288].map(a=>`<circle cx="0" cy="-5" r="4.6" fill="${C(0)}" transform="rotate(${a})"/>`).join('')}<circle r="2.4" fill="${g?'var(--lock)':C(1)}"/></g>`).join('');
+ if(k==='pebbles')d=`<g fill="${C(1)}" opacity=".6">${[[32,40],[50,34],[74,38],[90,46],[56,46]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="1.6"/>`).join('')}</g>`+[[40,72,13,11],[64,64,14,12],[86,76,11,9]].map(([x,y,rx,ry])=>`<ellipse cx="${x}" cy="${y}" rx="${rx}" ry="${ry}" fill="${C(0)}"/><rect x="${x-1.3}" y="${y-ry}" width="2.6" height="${(1.2*ry).toFixed(1)}" rx="1.3" fill="${g?'var(--lock)':C(1)}"/>`).join('');
+ if(k==='zigzag')d=`<g fill="${C(0)}"><rect x="18" y="20" width="84" height="6"/>${[24,36,48,60,72,84,96].map(x=>`<path d="M${x-6} 26H${x+6}L${x} 38Z"/>`).join('')}<rect x="18" y="86" width="84" height="14"/>${[36,48,60,72,84].map(x=>`<path d="M${x-6} 86H${x+6}L${x} 74Z"/>`).join('')}</g>`+(g?'':[24,36,48,60,72,84,96].map(x=>`<circle cx="${x}" cy="40" r="2.2" fill="${C(1)}"/>`).join(''));
+ if(k==='bark')d=[[24,20,26,0],[24,50,30,2],[38,28,22,1],[38,54,36,3],[52,20,18,2],[52,42,26,0],[52,72,26,1],[66,24,30,3],[66,58,40,2],[80,20,22,1],[80,46,28,0],[80,78,22,3],[94,30,28,2],[94,62,38,1]].map(([x,y,hh,c])=>`<rect x="${x-4.5}" y="${y}" width="9" height="${hh}" rx="4.5" fill="${C(c)}"/>`).join('');
+ if(k==='vine')d=`<rect x="18" y="26" width="84" height="4" fill="${C(1)}"/>`+[41,63,85].map(x=>`<rect x="${x-1.5}" y="30" width="3" height="26" rx="1.5" fill="${C(1)}"/>`).join('')+[[30,30],[52,30],[74,30],[94,30],[41,56],[63,56],[85,56]].map(([x,y])=>[155,180,205].map(a=>`<ellipse cx="${x}" cy="${y-11}" rx="3.2" ry="7.5" transform="rotate(${a} ${x} ${y})" fill="${C(0)}"/>`).join('')).join('');
+ if(k==='drops')d=[[38,44,1.1],[64,36,.9],[86,54,1.2],[50,70,1.3],[76,82,.9],[34,66,.7]].map(([x,y,s])=>`<path d="M0 -9C4 -3 6 0 6 3A6 6 0 0 1 -6 3C-6 0 -4 -3 0 -9Z" transform="translate(${x} ${y}) scale(${s})" fill="${C(0)}"/>`).join('')+(g?'':[[60,54],[80,70]].map(([x,y])=>`<path d="${STAR}" transform="translate(${x} ${y}) scale(.5)" fill="${C(1)}"/>`).join(''));
  const strips=g?'':`<path d="M18 20 H34 L42 96 H38 Q29 96 28 88Z" fill="#fff" opacity=".14"/><path d="M102 20 H88 L82 96 Q91 96 92 88Z" fill="${S}" opacity=".45"/>`;
  const deco=g?`<g opacity=".55">${d}</g>`:d;
  const outline=g?`<path d="${BODY}" fill="none" stroke="var(--lockink)" stroke-width="2" stroke-dasharray="5 4"/>`:'';
@@ -238,6 +273,27 @@ fetch('pots.json').then(r=>r.json()).then(J=>{const P=J.pots;
  $('#stages').innerHTML=st('daisy','Daisy','sageGlaze')+st('sunflower','Sunny','sunflower')+st('rose','Rosie','rosePink')+st('lavender','Lavender','moonlit')+st('marigold','Goldie','meadow');
  /* 5 */
  $('#tbl').innerHTML='<tr><th>id</th><th>Name</th><th>Body / rim / shade</th><th>Pattern</th><th>Unlock</th><th>Hint</th></tr>'+P.map(p=>`<tr><td><code>${p.id}</code></td><td>${p.name}</td><td>${p.body} / ${p.rim} / ${p.shade}</td><td>${p.decoration.kind}</td><td>${p.unlock.kind}${p.unlock.value?' '+p.unlock.value:''}</td><td>${p.hint}</td></tr>`).join('');
+ /* 6 proposed */
+ (()=>{const X=J.proposal;const all=Object.fromEntries([...P,...X.pots].map(p=>[p.id,p]));
+  const W=k=>k<=0?0:3*k-2;
+  const ruleOf=p=>{const c=X.changedUnlocks[p.id];return c?c.new:p.unlock};
+  const words=u=>u.kind==='plants'?W(u.value):u.kind==='level'?W(u.value*10):0;
+  const say=u=>({free:'Start',plants:u.value===1?'First plant':u.value+' plants',level:'Finish level '+u.value,plus:'Plus',gardenDays:u.value+' garden days'})[u.kind];
+  const days=u=>u.kind==='gardenDays'?u.value:u.kind==='plus'?null:u.kind==='free'?1:Math.max(1,Math.ceil(words(u)/5));
+  const isNew=id=>X.pots.some(p=>p.id===id);
+  const SUB={'1':'Level 1: daisy, sunflower, rose','2':'Level 2: orchid, lotus, cherry blossom, cactus','3':'Level 3: flytrap, baobab, Lithops','4':'Level 4: sundew (a sticky bug-catcher), ghost pipe, water lily','5':'Level 5: jade vine, rainbow eucalyptus, ghost orchid','days':'Any 7 days count, in a row or not','plus':'Extra pots, as decided'};
+  $('#tiers').innerHTML=Object.entries(X.tiers).map(([t,label])=>{const ids=X.order.filter(id=>X.tierOf[id]===t);
+   return `<div class="tier"><div class="tn">${label}<small>${SUB[t]}</small></div><div class="ps">${ids.map(id=>{const p=all[id],u=ruleOf(p),c=X.changedUnlocks[id],d=days(u);
+    return `<figure>${potSVG(p,64)}<b>${p.name}</b><span>${c?`<s>${say(c.old)}</s> `:''}${say(u)}</span>${d?`<i>day ${d}</i>`:''}${isNew(id)?'<span class="new">NEW</span>':c?'<span class="chg">EARLIER</span>':''}</figure>`}).join('')}</div></div>`}).join('');
+  $('#newcat').innerHTML=X.pots.map(p=>`<article class="pc"><div class="meta"><b>${p.name}</b><span class="how">${say(p.unlock)}</span></div>
+   <div class="sizes">${[44,88,120].map(s=>`<figure>${potSVG(p,s)}${s}</figure>`).join('')}<figure>${potSVG(p,44,'ghost')}to earn</figure></div>
+   <p class="hint">${p.hint}</p><code>${p.id} · <span class="sw" style="background:${p.body}"></span> ${p.body} <span class="sw" style="background:${p.rim}"></span> ${p.rim} <span class="sw" style="background:${p.shade}"></span> ${p.shade} · ${p.decoration.kind} · ${p.a11y}</code></article>`).join('');
+  const ord=X.order.map(id=>all[id]);
+  $('#cb2').innerHTML=[['','As seen'],['gray','Grey'],['deut','Deuteranopia'],['prot','Protanopia'],['trit','Tritanopia']].map(([c,t])=>`<h3>${t}</h3><div class="lane ${c}">${ord.map(p=>`<figure>${potSVG(p,44)}${p.name}</figure>`).join('')}</div>`).join('');
+  const earned=ord.filter(p=>!['free','plus'].includes(ruleOf(p).kind));
+  $('#tl').innerHTML='<tr><th>Pot</th><th>Goal</th><th>Correct words</th><th>Day at 3 a day</th><th>Day at 5 a day</th><th>Day at 15 a day</th></tr>'+earned.map(p=>{const u=ruleOf(p),w=words(u),gd=u.kind==='gardenDays';
+   return `<tr><td>${potSVG(p,30)} ${p.name}</td><td>${say(u)}</td><td>${gd?'any':w}</td>${[3,5,15].map(r=>`<td>${gd?u.value:Math.max(1,Math.ceil(w/r))}</td>`).join('')}</tr>`}).join('');
+ })();
  document.body.dataset.ready='1';
  if(new URLSearchParams(location.search).has('debug')){const W=innerWidth;const bad=[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>W+1&&e.offsetParent).slice(0,8).map(e=>e.tagName+'.'+e.className.baseVal+e.className+':'+Math.round(e.getBoundingClientRect().right));document.body.dataset.debug=W+' '+document.documentElement.scrollWidth+' '+bad.join(' | ')}
 });

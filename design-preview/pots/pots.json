@@ -257,5 +257,242 @@
     "toGoOne": "One more level to go!",
     "toGoMany": "{k} more levels to go!",
     "progressFirst": "Grow one plant to earn this pot."
+  },
+  "proposal": {
+    "status": "PROPOSED, not approved (docs/pm/pot-earning-review.md, revision 1 after critic review). The `pots` array above is what the app ships today; nothing here is built.",
+    "rule": "Thresholds may only move earlier (fewer plants, an earlier level), never later, so a pot owned under the old rules stays owned under the new ones.",
+    "changedUnlocks": {
+      "sageGlaze": {
+        "old": {
+          "kind": "plants",
+          "value": 10
+        },
+        "new": {
+          "kind": "plants",
+          "value": 5
+        },
+        "hint": "Grow 5 plants to earn this pot."
+      },
+      "sunflower": {
+        "old": {
+          "kind": "level",
+          "value": 3
+        },
+        "new": {
+          "kind": "level",
+          "value": 1
+        },
+        "hint": "Finish level 1 to earn this pot."
+      },
+      "mint": {
+        "old": {
+          "kind": "plants",
+          "value": 50
+        },
+        "new": {
+          "kind": "plants",
+          "value": 15
+        },
+        "hint": "Grow 15 plants to earn this pot."
+      },
+      "starlight": {
+        "old": {
+          "kind": "level",
+          "value": 5
+        },
+        "new": {
+          "kind": "level",
+          "value": 4
+        },
+        "hint": "Finish level 4 to earn this pot."
+      }
+    },
+    "tiers": {
+      "1": "Simple clay and glaze",
+      "2": "Patterned",
+      "3": "Garden and wild",
+      "4": "Rare and shimmer",
+      "5": "Exotic collector",
+      "days": "Garden Days (any days count)",
+      "plus": "WordFlora Plus"
+    },
+    "order": [
+      "plainBlue",
+      "terracotta",
+      "sageGlaze",
+      "sunflower",
+      "mint",
+      "blossom",
+      "rosePink",
+      "livingStones",
+      "flytrap",
+      "starlight",
+      "jadeVine",
+      "rainbowBark",
+      "dewdrop",
+      "honeyStripe",
+      "moonlit",
+      "meadow"
+    ],
+    "tierOf": {
+      "plainBlue": "1",
+      "terracotta": "1",
+      "sageGlaze": "1",
+      "sunflower": "1",
+      "mint": "2",
+      "blossom": "2",
+      "rosePink": "3",
+      "flytrap": "4",
+      "starlight": "4",
+      "rainbowBark": "5",
+      "dewdrop": "days",
+      "honeyStripe": "plus",
+      "moonlit": "plus",
+      "meadow": "plus",
+      "livingStones": "3",
+      "jadeVine": "5"
+    },
+    "newDecorations": {
+      "blossoms": "Five-petal blossoms: petals are circles r 4.6*s centred 5*s from the flower centre, petal 0 up then every 72 degrees clockwise, colors[0]; centre circle r 2.4*s colors[1]. Flowers (cx,cy,s): (40,44,1.0) (78,40,0.85) (62,68,1.15) (36,76,0.75) (86,72,0.8).",
+      "pebbles": "Living stones (Lithops): three domes, each an ellipse colors[0] with a cleft capsule colors[1] (width 2.6, centred on the dome's x, from the dome top down 1.2*ry). Domes (cx,cy,rx,ry): (40,72,13,11) (64,64,14,12) (86,76,11,9). Sand specks circles r 1.6 colors[1] at 60% at (32,40) (50,34) (74,38) (90,46) (56,46).",
+      "zigzag": "Flytrap jaws: top band rect (18,20,84,6) plus seven teeth triangles hanging from y 26 to y 38, base 12 wide, centred at x 24,36,48,60,72,84,96; bottom band rect (18,86,84,14) plus five teeth rising from y 86 to y 74, centred at x 36,48,60,72,84; all colors[0]. Dew dots circles r 2.2 colors[1] at each top tooth tip (y 40).",
+      "bark": "Rainbow bark: rounded bars width 9 (corner 4.5), centre x and (top y, height, colour index): x24 (20,26,0) (50,30,2); x38 (28,22,1) (54,36,3); x52 (20,18,2) (42,26,0) (72,26,1); x66 (24,30,3) (58,40,2); x80 (20,22,1) (46,28,0) (78,22,3); x94 (30,28,2) (62,38,1). Green body shows in the gaps.",
+      "drops": "Dewdrops: path M0 -9 C4 -3 6 0 6 3 A6 6 0 0 1 -6 3 C-6 0 -4 -3 0 -9 Z scaled, colors[0]: (38,44,1.1) (64,36,0.9) (86,54,1.2) (50,70,1.3) (76,82,0.9) (34,66,0.7). Sparkles (the stars path) x0.5 colors[1] at (60,54) and (80,70).",
+      "vine": "Jade vine: stem band rect (18,26,84,4) colors[1]; claw flowers are petals (the `petal` shape: ellipse rx 3.2 ry 7.5 centred 11 from the anchor, turned 155, 180 and 205 degrees so they hang down), colors[0]. Upper clusters anchored at (30,30) (52,30) (74,30) (94,30); lower clusters anchored at (41,56) (63,56) (85,56), with a stem capsule colors[1] width 3 from y 30 to y 56 above each lower anchor."
+    },
+    "pots": [
+      {
+        "id": "blossom",
+        "name": "Blossom",
+        "body": "#9A6A9E",
+        "rim": "#BE93C2",
+        "shade": "#7A4F7E",
+        "decoration": {
+          "kind": "blossoms",
+          "colors": [
+            "#FFE6EE",
+            "#F2C14E"
+          ]
+        },
+        "unlock": {
+          "kind": "level",
+          "value": 2
+        },
+        "hint": "Finish level 2 to earn this pot.",
+        "a11y": "Plum pot with pink blossoms",
+        "tier": "2"
+      },
+      {
+        "id": "livingStones",
+        "name": "Living stones",
+        "body": "#DDBB8E",
+        "rim": "#ECD3AE",
+        "shade": "#B89262",
+        "decoration": {
+          "kind": "pebbles",
+          "colors": [
+            "#55663A",
+            "#3B2E22"
+          ]
+        },
+        "unlock": {
+          "kind": "level",
+          "value": 3
+        },
+        "hint": "Finish level 3 to earn this pot.",
+        "a11y": "Sandy pot with little living stones",
+        "tier": "3"
+      },
+      {
+        "id": "flytrap",
+        "name": "Flytrap",
+        "body": "#4E8A3A",
+        "rim": "#7BB25C",
+        "shade": "#3A6C2B",
+        "decoration": {
+          "kind": "zigzag",
+          "colors": [
+            "#F29A8A",
+            "#FFFFFF"
+          ]
+        },
+        "unlock": {
+          "kind": "plants",
+          "value": 35
+        },
+        "hint": "Grow 35 plants to earn this pot.",
+        "a11y": "Green pot with flytrap teeth",
+        "tier": "4"
+      },
+      {
+        "id": "jadeVine",
+        "name": "Jade vine",
+        "body": "#E9EEF0",
+        "rim": "#4FA89A",
+        "shade": "#C4CED2",
+        "decoration": {
+          "kind": "vine",
+          "colors": [
+            "#3FB8A6",
+            "#2F6B4A"
+          ]
+        },
+        "unlock": {
+          "kind": "plants",
+          "value": 45
+        },
+        "hint": "Grow 45 plants to earn this pot.",
+        "a11y": "White pot with hanging jade flowers",
+        "tier": "5"
+      },
+      {
+        "id": "rainbowBark",
+        "name": "Rainbow bark",
+        "body": "#8A7B63",
+        "rim": "#AA9B80",
+        "shade": "#6E6150",
+        "decoration": {
+          "kind": "bark",
+          "colors": [
+            "#EE8A3C",
+            "#8C5BA6",
+            "#4E8FC4",
+            "#B5474A"
+          ]
+        },
+        "unlock": {
+          "kind": "level",
+          "value": 5
+        },
+        "hint": "Finish level 5 to earn this pot.",
+        "a11y": "Brown pot with rainbow bark stripes",
+        "tier": "5"
+      },
+      {
+        "id": "dewdrop",
+        "name": "Dewdrop",
+        "body": "#9686CC",
+        "rim": "#B9ADE3",
+        "shade": "#7666B0",
+        "decoration": {
+          "kind": "drops",
+          "colors": [
+            "#E3F2FC",
+            "#FFFFFF"
+          ]
+        },
+        "unlock": {
+          "kind": "gardenDays",
+          "value": 7
+        },
+        "hint": "Play on 7 different days to earn this pot. Any days count!",
+        "a11y": "Lilac pot with dewdrops",
+        "tier": "days"
+      }
+    ],
+    "copy": {
+      "progressDays": "{n} of {goal} garden days",
+      "progressLevelPlants": "{n} of 10 plants in level {level}"
+    }
   }
 }
