@@ -275,12 +275,25 @@ struct TendActionButton: View {
 
     @Environment(\.colorScheme) private var scheme
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var squeeze = false
+
+    /// From accessibility size 3 up, a 2 x 2 tile has no room for the icon beside two lines of words: the icon goes on
+    /// top and only the title shows, shrinking to fit one line (the caption is still the VoiceOver value).
+    private var compact: Bool { large && typeSize >= .accessibility3 }
 
     var body: some View {
         Button(action: action) {
             Group {
-                if large {
+                if compact {
+                    VStack(spacing: 4) {
+                        dot(34)
+                        Text(look.title).font(Theme.font(.body, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                            .lineLimit(1).minimumScaleFactor(0.4)
+                    }
+                    .frame(maxWidth: .infinity, minHeight: 64)
+                    .padding(.vertical, 6).padding(.horizontal, 6)
+                } else if large {
                     HStack(spacing: 10) { dot(40); words(alignment: .leading) }
                         .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
                         .padding(.horizontal, 10)

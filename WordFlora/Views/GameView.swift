@@ -126,9 +126,15 @@ struct GameView: View {
                 .lineLimit(2).multilineTextAlignment(.center)
             Spacer()
             Button { vm.useHelp() } label: {
-                Label("Help", systemImage: "lightbulb.fill").labelStyle(.titleAndIcon).font(Theme.font(.subheadline, weight: .semibold))
-                    .padding(.horizontal, 10).frame(minHeight: Theme.minTap)
+                // At accessibility sizes the word would break mid-word ("Hel-p"); the bulb alone keeps the label "Help".
+                Group {
+                    if dynamicTypeSize.isAccessibilitySize { Image(systemName: "lightbulb.fill") }
+                    else { Label("Help", systemImage: "lightbulb.fill").labelStyle(.titleAndIcon) }
+                }
+                .font(Theme.font(.subheadline, weight: .semibold))
+                .padding(.horizontal, 10).frame(minWidth: Theme.minTap, minHeight: Theme.minTap)
             }
+            .accessibilityLabel("Help")
             .disabled(!vm.canUseHelp)
             .symbolEffect(.pulse, isActive: helpPulse)
             .accessibilityHint("Gives a free clue")
@@ -145,13 +151,16 @@ struct GameView: View {
     private var hintCard: some View {
         Card {
             VStack(alignment: .leading, spacing: 6) {
-                HStack(alignment: .top) {
+                HStack(alignment: .center) {
                     Text(vm.hint).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
                     Spacer(minLength: 0)
                     if ReadAloud.shouldOffer(voiceOverRunning: UIAccessibility.isVoiceOverRunning) {
                         Button { ReadAloud.shared.speak(hint: vm.hint, extra: vm.extraHint, simpler: vm.simplerClue) } label: {
                             Image(systemName: "speaker.wave.2.fill").frame(width: Theme.minTap, height: Theme.minTap)
                         }
+                        // The hit area stays 44pt; it may reach past the line so a one-line clue keeps a short card.
+                        .padding(.vertical, -10)
                         .accessibilityLabel("Read the clue aloud")
                     }
                 }

@@ -21,7 +21,9 @@ struct KeyboardView: View {
         let s = state(ch)
         return Button { onTap(ch) } label: {
             ZStack(alignment: .topTrailing) {
-                Text(String(ch)).font(Theme.font(.title3, weight: .bold)).frame(maxWidth: .infinity, maxHeight: .infinity)
+                // The letter grows with the text size up to what the key can hold, then shrinks to fit (keys keep their size).
+                Text(String(ch)).font(Theme.font(.title3, weight: .bold)).lineLimit(1).minimumScaleFactor(0.4)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 // Colour is never the only signal: used keys carry a glyph too.
                 if s == .correct { Image(systemName: "checkmark").font(.system(size: 9, weight: .black)).padding(3) }
                 if s == .wrong { Image(systemName: "xmark").font(.system(size: 9, weight: .black)).padding(3) }

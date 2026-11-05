@@ -168,8 +168,14 @@ struct ToolTile: View {
         tint.fill.opacity(0.45)
     }
 
+    /// The art grows with the text, but stops at 84pt so the words keep the row at the largest sizes (whole words,
+    /// no "Mis-ter"), as in design-preview/shed-visitors/shed-v2 p-ax.
+    private var circleSide: CGFloat { min(circle, 84) }
+    private var artSide: CGFloat { min(artW, 74) }
+
     private var art: some View {
-        ZStack {
+        let circle = circleSide, artW = artSide
+        return ZStack {
             Circle().fill(Color.appSurface.opacity(0.72)).frame(width: circle, height: circle)
             if owned {
                 Image("tool_\(tool.rawValue)_t\(tier)").resizable().scaledToFit().frame(width: artW, height: artW * 62 / 58)

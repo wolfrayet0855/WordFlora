@@ -88,6 +88,7 @@ struct RepotSheet: View {
     @State private var newIds: Set<String> = []
     @State private var showNewPill = false
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.dynamicTypeSize) private var typeSize
     /// The in-app Reduce Motion switch (Settings), on top of the system one.
     var reduceMotionOverride = false
     private var reduceMotion: Bool { systemReduceMotion || reduceMotionOverride }
@@ -114,6 +115,9 @@ struct RepotSheet: View {
                 PotPickGrid(currentId: currentId, picked: $picked, hinted: $hinted, newIds: newIds, stats: stats, hasPlus: hasPlus)
                     .padding(.top, 14)
                 SoilPicker(picked: $pickedSoil).padding(.top, 20)
+                // At accessibility sizes the summary scrolls with the sheet, so the pinned footer is only the button
+                // (and a tapped pot's hint) and the first pots show on the first screen.
+                if typeSize.isAccessibilitySize { RepotSummary(pot: pot, soil: pickedSoil).padding(.top, 16) }
             }
             .padding(.horizontal, 20).padding(.top, 24).padding(.bottom, 16)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -462,6 +466,7 @@ struct RepotFooter: View {
     let hasPlus: Bool
     var go: () -> Void
     @Environment(\.repotReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     static let fade: CGFloat = 28
 
@@ -470,7 +475,7 @@ struct RepotFooter: View {
             Group {
                 if let hinted {
                     PotHintCard(pot: PotCatalog.pot(id: hinted), stats: stats, hasPlus: hasPlus).id(hinted)
-                } else {
+                } else if !typeSize.isAccessibilitySize {
                     RepotSummary(pot: picked, soil: soil)
                 }
             }
