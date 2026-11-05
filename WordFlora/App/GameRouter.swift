@@ -8,6 +8,7 @@ enum GameRoute: Hashable {
     case settings
     case shed
     case butterfly
+    case visitors
     case badges
     case plus
 }

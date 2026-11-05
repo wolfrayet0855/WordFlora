@@ -240,7 +240,7 @@ struct WakeButterflyGame: View {
     var body: some View {
         VStack(spacing: 8) {
             Text(WakeCopy.caughtSoFar(game?.caught.count ?? 0, goal: goal))
-                .font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.ink)
+                .font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                 .padding(.top, 20).accessibilityAddTraits(.updatesFrequently)
             GeometryReader { geo in
                 ZStack {
@@ -262,7 +262,13 @@ struct WakeButterflyGame: View {
             .padding(16)
         }
         .onAppear {
-            if game == nil { game = app.startButterflyGame(reduceMotion: reduceMotion); lastTick = Date() }
+            if game == nil { game = app.startButterflyGame(reduceMotion: reduceMotion, wake: true); lastTick = Date() }
+        }
+        .onDisappear {
+            // Closed partway: the hellos so far still go to the album (no wake result is recorded).
+            guard !ended, let game, !game.caught.isEmpty else { return }
+            ended = true
+            app.finishButterflyGame(game, wake: true)
         }
         .onReceive(ticker) { now in
             guard var g = game, !ended else { return }
@@ -275,7 +281,8 @@ struct WakeButterflyGame: View {
 
     private func catchAt(_ point: CGPoint, in size: CGSize) {
         guard var g = game, !ended, size.width > 0, size.height > 0 else { return }
-        guard let species = g.catchAt(x: point.x / size.width, y: point.y / size.height, radius: max(0.08, 48 / size.width)) else { return }
+        let radius = ToolEngine.netCatchRadius(tier: app.inventory.tier(of: .net)) / size.width
+        guard let species = g.catchAt(x: point.x / size.width, y: point.y / size.height, radius: max(0.08, radius)) else { return }
         game = g
         app.play(.butterfly)
         AccessibilityNotification.Announcement("\(VisitorCatalog.species(species)?.name ?? "Visitor") says hello").post()
@@ -285,6 +292,8 @@ struct WakeButterflyGame: View {
     private func end(_ woke: Bool) {
         guard !ended else { return }
         ended = true
+        // Every hello counts toward the album and badges (no shed points from a wake game).
+        if let game { app.finishButterflyGame(game, wake: true) }
         onEnd(woke)
     }
 }

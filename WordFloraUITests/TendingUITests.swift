@@ -306,7 +306,7 @@ final class TendingUITests: XCTestCase {
             app.launch()
             app.buttons["Shed"].tap()
             let stones = app.buttons["shed-pot-livingStones"].firstMatch
-            _ = app.staticTexts["Watering can"].waitForExistence(timeout: 5)
+            _ = app.buttons["shed.tool.can"].waitForExistence(timeout: 5)
             for _ in 0..<14 where !(stones.exists && stones.isHittable) { app.swipeUp() }
             XCTAssertTrue(stones.label.contains("6 of 10 plants in level 3"), stones.label)
             XCTAssertTrue(app.buttons["shed-pot-dewdrop"].firstMatch.label.contains("3 of 7 garden days"))
@@ -344,7 +344,7 @@ final class TendingUITests: XCTestCase {
             app.launch()
             app.buttons["Shed"].tap()
             let card = app.buttons["shed-pot-terracotta"].firstMatch
-            _ = app.staticTexts["Watering can"].waitForExistence(timeout: 5)
+            _ = app.buttons["shed.tool.can"].waitForExistence(timeout: 5)
             for _ in 0..<14 where !(card.exists && card.isHittable) { app.swipeUp() }
             app.swipeUp(); sleep(1)
             let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'shed-pot-'")).allElementsBoundByIndex.map(\.frame)
@@ -364,7 +364,7 @@ final class TendingUITests: XCTestCase {
             app.launch()
             app.buttons["Shed"].tap()
             let card = app.buttons["shed-pot-plainBlue"].firstMatch
-            _ = app.staticTexts["Watering can"].waitForExistence(timeout: 5)
+            _ = app.buttons["shed.tool.can"].waitForExistence(timeout: 5)
             for _ in 0..<12 where !(card.exists && card.isHittable) { app.swipeUp() }
             XCTAssertTrue(card.isHittable, "the pots grid is in the Shed")
             app.swipeUp(); sleep(1); shot("shed-pots-\(size)")

@@ -20,8 +20,73 @@ final class ButterflyAndBadgeTests: XCTestCase {
     }
 
     func testCorrectedFactsAreUsed() {
-        XCTAssertEqual(VisitorCatalog.species("cabbagewhite")?.fact, "Cabbage whites began in Eurasia and now live on many continents, spread by people.")
-        XCTAssertEqual(VisitorCatalog.species("dragonfly")?.fact, "Dragonfly ancestors zoomed through the sky about 300 million years ago, before dinosaurs.")
+        XCTAssertEqual(VisitorCatalog.species("monarch")?.fact, "Monarch butterflies can fly up to 3,000 miles to a warm place for winter.")
+        XCTAssertEqual(VisitorCatalog.species("dragonfly")?.fact, "Dragonfly ancestors flew in the sky about 300 million years ago, before dinosaurs.")
+        XCTAssertEqual(VisitorCatalog.species("hummingbird")?.fact, "A hummingbird flaps its wings about 50 times a second.")
+    }
+
+    /// Every visitor has a short, fact-checked line a 7 to 9 year old can read (sources: docs/research/visitor-facts.md).
+    func testEveryVisitorHasAShortGentleFact() throws {
+        for v in VisitorCatalog.all {
+            let fact = try XCTUnwrap(v.fact, "\(v.id) has no fact")
+            let words = fact.split(whereSeparator: { $0 == " " }).map { $0.trimmingCharacters(in: .punctuationCharacters) }
+            XCTAssertLessThanOrEqual(fact.count, 90, v.id)
+            XCTAssertLessThanOrEqual(words.count, 16, v.id)
+            // Short words: long ones are allowed only for the visitor's own name and a few science words we explain.
+            let nameWords = v.name.lowercased().split(separator: " ").map(String.init)
+            let long = words.map { $0.lowercased() }.filter { w in
+                w.count > 9 && !nameWords.contains { w.hasPrefix($0) } && !["butterflies", "caterpillars"].contains(w)
+            }
+            XCTAssertEqual(long, [], v.id)
+            let avg = Double(words.map(\.count).reduce(0, +)) / Double(words.count)
+            XCTAssertLessThanOrEqual(avg, 5.5, v.id)
+            XCTAssertEqual(CopySafety.check(fact), [], fact)
+            XCTAssertTrue(fact.hasSuffix(".") || fact.hasSuffix("!"), v.id)
+        }
+    }
+
+    func testRarityHasAPlainWord() {
+        XCTAssertEqual(VisitorCatalog.Rarity.common.label, "Often seen")
+        XCTAssertEqual(VisitorCatalog.Rarity.uncommon.label, "Sometimes seen")
+        XCTAssertEqual(VisitorCatalog.Rarity.rare.label, "Rare visitor")
+    }
+
+    // MARK: Visitors page
+    func testAlbumRemembersWhenEachFriendWasSeen() {
+        var a = StickerAlbum()
+        a.add(["monarch"], on: at(9))
+        a.add(["monarch", "ladybug"], on: at(15))
+        XCTAssertEqual(a.count(of: "monarch"), 2)
+        XCTAssertEqual(a.lastSeen(of: "monarch"), at(15))
+        XCTAssertNil(a.lastSeen(of: "luna"))
+        XCTAssertEqual(StickerAlbum(json: a.json), a)
+    }
+
+    func testOldAlbumJSONWithoutDatesStillReads() {
+        let old = StickerAlbum(json: #"{"counts":{"monarch":3}}"#)
+        XCTAssertEqual(old.count(of: "monarch"), 3)
+        XCTAssertNil(old.lastSeen(of: "monarch"))
+    }
+
+    func testAlbumMergeKeepsTheLaterSeenDate() {
+        var a = StickerAlbum(); a.add(["monarch"], on: at(9))
+        var b = StickerAlbum(); b.add(["monarch", "monarch"], on: at(12))
+        let m = a.merged(with: b)
+        XCTAssertEqual(m.count(of: "monarch"), 2)
+        XCTAssertEqual(m.lastSeen(of: "monarch"), at(12))
+        XCTAssertEqual(b.merged(with: a).lastSeen(of: "monarch"), at(12))
+    }
+
+    func testVisitorsCopy() {
+        XCTAssertEqual(VisitorsCopy.friendsMet(7, of: 12), "7 of 12 friends met")
+        XCTAssertEqual(VisitorsCopy.metCount(1), "Met once")
+        XCTAssertEqual(VisitorsCopy.metCount(3), "Met 3 times")
+        XCTAssertEqual(VisitorsCopy.seen(at(15), now: at(18), calendar: utc), "Seen today")
+        XCTAssertEqual(VisitorsCopy.seen(at(15), now: at(15).addingTimeInterval(86_400), calendar: utc), "Seen yesterday")
+        XCTAssertEqual(VisitorsCopy.seen(at(15), now: at(15).addingTimeInterval(5 * 86_400), calendar: utc), "Seen 5 days ago")
+        XCTAssertEqual(VisitorsCopy.notMetHint(nightOnly: true), "Comes out in the evening")
+        XCTAssertEqual(VisitorsCopy.notMetHint(nightOnly: false), "Say hello in the game")
+        for line in VisitorsCopy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
     }
 
     // MARK: evening window

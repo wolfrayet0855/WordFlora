@@ -71,11 +71,12 @@ enum WakeCopy {
         return parts.joined(separator: ", ")
     }
 
-    static func butterflyIntro(goal: Int) -> String { "Tap \(goal) butterflies. Take your time." }
+    static func butterflyIntro(goal: Int) -> String { "Say hello to \(goal) garden friends. Take your time." }
     static let puzzleIntroAnagram = "Make a word from the letters. Take your time."
     static let puzzleIntroVowels = "Fill in the blank spots to make a word. Take your time."
     static let start = "Start"
-    static func caughtSoFar(_ n: Int, goal: Int) -> String { "\(n) of \(goal) butterflies" }
+    /// Bees, ladybugs and others count too, so the count says "friends".
+    static func caughtSoFar(_ n: Int, goal: Int) -> String { "\(n) of \(goal) friends" }
 
     static let notQuite = "Not quite. Try again."
     static let peek = "Peek a letter"

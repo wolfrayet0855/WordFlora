@@ -80,6 +80,19 @@ struct WordFloraApp: App {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
         if uiTesting && args.contains("-uitest-everything") { model.settings.showEverything = true; model.syncToolUnlocks() }
+        // Visitors and Shed tests: a few friends in the album, shed points, Calm mode or Quiet Garden.
+        if uiTesting && args.contains("-uitest-album") {
+            var album = StickerAlbum()
+            album.add(["monarch", "monarch", "ladybug", "honeybee"], on: Date.now)
+            model.profile?.albumJSON = album.json
+            try? model.context.save()
+        }
+        if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-points=") }).flatMap({ Int($0.dropFirst("-uitest-points=".count)) }) {
+            model.profile?.shedPoints = n
+            try? model.context.save()
+        }
+        if uiTesting && args.contains("-uitest-calm") { model.settings.calmMode = true }
+        if uiTesting && args.contains("-uitest-quiet") { model.settings.quietGarden = true }
         if uiTesting && !args.contains("-uitest-ads") { model.adsEnabled = false }
         if uiTesting { model.plusOfferEnabled = false }
         if !uiTesting { try? Tips.configure([.displayFrequency(.daily)]) }

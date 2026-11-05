@@ -293,7 +293,7 @@ struct HomeView: View {
                 featureTile(unlocked, nil, "Garden", "leaf.fill", .garden, .garden)
                 featureTile(unlocked, .butterfly, "Levels", "map.fill", .levelMap, .levels)
                 featureTile(unlocked, .shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
-                featureTile(unlocked, .butterfly, "Visitors", "ladybug.fill", .butterfly, .visitors)
+                featureTile(unlocked, .butterfly, "Visitors", "ladybug.fill", .visitors, .visitors)
                 featureTile(unlocked, .badges, "Badges", "rosette", .badges, .badges)
             }
         } else {
@@ -304,7 +304,7 @@ struct HomeView: View {
                 }
                 GridRow {
                     featureTile(unlocked, .shed, "Shed", "wrench.and.screwdriver.fill", .shed, .shed)
-                    featureTile(unlocked, .butterfly, "Visitors", "ladybug.fill", .butterfly, .visitors)
+                    featureTile(unlocked, .butterfly, "Visitors", "ladybug.fill", .visitors, .visitors)
                 }
                 GridRow {
                     featureTile(unlocked, .badges, "Badges", "rosette", .badges, .badges, wide: true)
@@ -314,7 +314,7 @@ struct HomeView: View {
         }
     }
 
-    /// Every destination is visible. Ones that are not open yet are dashed, dimmed and locked, with a kind line on how to reach them.
+    /// Every destination is visible. Ones that are not open yet are dashed and dimmed with a soft sparkle (never a lock), with a kind line on how to reach them.
     private func featureTile(_ unlocked: Set<Feature>, _ feature: Feature?, _ title: String, _ icon: String, _ route: GameRoute,
                              _ tint: TileTint, wide: Bool = false) -> some View {
         let open = feature.map { unlocked.contains($0) } ?? true
@@ -324,7 +324,9 @@ struct HomeView: View {
 
         let label = HStack(spacing: 5) {
             if !open {
-                Image(systemName: "lock.fill").font(.system(size: lockIcon)).foregroundStyle(Color.appPrimaryText)
+                // A soft "on its way" sparkle, never a lock (no lock icons anywhere in the app).
+                Image(systemName: "sparkles").font(.system(size: lockIcon)).foregroundStyle(Color.appPrimaryText)
+                    .accessibilityHidden(true)
             }
             Text(title).font(labelFont).foregroundStyle(Color.appPrimaryText)
                 .measuresLines(title, font: labelFont)

@@ -261,7 +261,7 @@ final class WordFloraUITests: XCTestCase {
         app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything"]
         app.launch()
         app.buttons["Shed"].tap()
-        XCTAssertTrue(app.staticTexts["Watering can"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["shed.tool.can"].waitForExistence(timeout: 5))
         shot("shed")
         app.navigationBars.buttons.firstMatch.tap()
         app.buttons["Badges"].tap()
@@ -273,9 +273,11 @@ final class WordFloraUITests: XCTestCase {
         app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything"]
         app.launch()
         app.buttons["Visitors"].tap()
-        XCTAssertTrue(app.staticTexts["Meet your garden visitors"].waitForExistence(timeout: 5))
+        // The Visitors page leads; "Say hello" opens the game, which starts on open (no separate Start step).
+        XCTAssertTrue(app.buttons["Say hello"].waitForExistence(timeout: 5))
         shot("butterfly-intro")
-        app.buttons["Start"].tap()
+        app.buttons["Say hello"].tap()
+        XCTAssertTrue(app.navigationBars["Butterfly game"].waitForExistence(timeout: 5))
         sleep(3)
         shot("butterfly-playing")
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.93)).tap()      // a miss on empty ground is free
@@ -287,6 +289,67 @@ final class WordFloraUITests: XCTestCase {
         shot("butterfly-after-wait")
         XCTAssertTrue(thanks.exists || met.exists, "summary never appeared")
         shot("butterfly-summary")
+    }
+
+    // MARK: Visitors page, Shed (lead decisions 2026-11-04)
+
+    func testVisitorsPageOpensFromHomeWithSoftOutlinesAndAFact() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything", "-uitest-album"]
+        app.launch()
+        app.buttons["Visitors"].tap()
+        XCTAssertTrue(app.staticTexts["3 of 12 friends met"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Say hello"].exists)
+        let unmet = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'visitor-unmet-'"))
+        XCTAssertEqual(unmet.count, 9, "friends not met yet show as soft outlines")
+        XCTAssertFalse(app.images["lock.fill"].exists)
+        XCTAssertFalse(app.images["Lock"].exists)
+        shot("visitors-page")
+        let monarch = app.buttons["visitor-monarch"]
+        XCTAssertTrue(monarch.label.contains("met 2 times"), monarch.label)
+        XCTAssertTrue(monarch.label.contains("sometimes seen"), monarch.label)
+        monarch.tap()
+        XCTAssertTrue(app.staticTexts["You met this friend 2 times."].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Monarch butterflies can fly up to 3,000 miles to a warm place for winter."].exists)
+        shot("visitors-detail")
+        app.buttons["Done"].tap()
+        app.buttons["Say hello"].tap()
+        XCTAssertTrue(app.navigationBars["Butterfly game"].waitForExistence(timeout: 5))
+    }
+
+    func testCalmModeGameHasADoneButtonAndNoTimeBar() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything", "-uitest-calm"]
+        app.launch()
+        app.buttons["Visitors"].tap()
+        app.buttons["Say hello"].tap()
+        XCTAssertTrue(app.buttons["calm-done"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.progressIndicators["Game progress"].exists)
+        shot("butterfly-calm")
+        app.buttons["calm-done"].tap()
+        XCTAssertTrue(app.staticTexts["Thanks for visiting the garden"].waitForExistence(timeout: 5) || app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'You met'")).firstMatch.exists)
+    }
+
+    func testShedInQuietGardenShowsNoPricesOrPoints() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything", "-uitest-quiet"]
+        app.launch()
+        app.buttons["Shed"].tap()
+        XCTAssertTrue(app.staticTexts["Quiet Garden is on"].waitForExistence(timeout: 5))
+        let prices = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] 'points' OR label CONTAINS[c] 'Upgrade'"))
+        XCTAssertEqual(prices.count, 0, "Quiet Garden shows no points, prices or upgrades")
+        app.buttons["shed.tool.can"].tap()
+        XCTAssertTrue(app.staticTexts["Waters your plants"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["shed.upgradeButton"].exists)
+        XCTAssertEqual(prices.count, 0)
+        shot("shed-quiet-sheet")
+    }
+
+    func testAuditVisitorsAndShed() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything", "-uitest-album"]; app.launch()
+        app.buttons["Visitors"].tap(); XCTAssertTrue(app.buttons["Say hello"].waitForExistence(timeout: 5)); audit("visitors")
+        app.buttons["visitor-monarch"].tap(); XCTAssertTrue(app.buttons["Done"].waitForExistence(timeout: 5)); audit("visitor-detail")
+        app.buttons["Done"].tap()
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Shed"].tap(); XCTAssertTrue(app.buttons["shed.tool.can"].waitForExistence(timeout: 5)); audit("shed-v2")
+        app.buttons["shed.tool.trowel"].tap(); XCTAssertTrue(app.staticTexts["Trowel"].waitForExistence(timeout: 5)); audit("shed-tool-sheet")
     }
 
     // MARK: accessibility audits (Apple's automated audit: labels, hit areas, Dynamic Type, contrast)
@@ -343,7 +406,7 @@ final class WordFloraUITests: XCTestCase {
 
     func testAuditMoreScreens() {
         app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything"]; app.launch()
-        app.buttons["Shed"].tap(); XCTAssertTrue(app.staticTexts["Watering can"].waitForExistence(timeout: 5)); audit("shed")
+        app.buttons["Shed"].tap(); XCTAssertTrue(app.buttons["shed.tool.can"].waitForExistence(timeout: 5)); audit("shed")
         app.navigationBars.buttons.firstMatch.tap()
         app.buttons["Badges"].tap(); XCTAssertTrue(app.staticTexts["Green Thumb"].waitForExistence(timeout: 5)); audit("badges")
         app.navigationBars.buttons.firstMatch.tap()

@@ -135,7 +135,7 @@ final class AppModel {
 
     func refreshFreeDrops() {
         guard let p = profile else { return }
-        TendingEngine.applyTrickle(p, now: now(), economy: .default)
+        ToolEngine.applyTrickle(p, inventory: inventory, now: now(), economy: .default)   // the mister speeds the drops
         try? context.save()
     }
 
@@ -508,35 +508,41 @@ final class AppModel {
         return counter.playsToday(on: now(), calendar: .current)
     }
 
-    func startButterflyGame(seed: UInt64 = UInt64.random(in: .min ... .max), useLantern: Bool = false, reduceMotion: Bool = false) -> ButterflyGameModel {
+    /// Calm mode gives the gentle round (no clock, slower visitors, 5 hellos). The wake game keeps its own goal.
+    func startButterflyGame(seed: UInt64 = UInt64.random(in: .min ... .max), useLantern: Bool = false, reduceMotion: Bool = false,
+                            wake: Bool = false) -> ButterflyGameModel {
         let evening = VisitorSpawner.isEvening(now(), calendar: .current)
         var lantern = false
         if useLantern, !evening, let p = profile, p.glowLanterns > 0 { p.glowLanterns -= 1; lantern = true; try? context.save() }
         let flowering = plants().filter { $0.earnedCount > 0 && $0.stage >= 3 }.count
         return ButterflyGameModel(pool: VisitorSpawner.pool(evening: evening, lantern: lantern), floweringPlants: flowering,
-                                  reduceMotion: reduceMotion, seed: seed)
+                                  reduceMotion: reduceMotion, seed: seed, calm: settings.calmMode && !wake)
     }
 
     /// Applies the end-of-game rewards. Stickers always count; currency respects the 3-a-day limit and Quiet Garden.
+    /// A wake game (`wake: true`) credits the album and badges only: no water, shed points or soil, and no rewarded play used.
     @discardableResult
-    func finishButterflyGame(_ game: ButterflyGameModel) -> ButterflyRewards.Summary {
+    func finishButterflyGame(_ game: ButterflyGameModel, wake: Bool = false) -> ButterflyRewards.Summary {
         guard let p = profile else { return ButterflyRewards.Summary() }
         let quiet = settings.quietGarden, t = now()
         var rng = SystemRandomNumberGenerator()
         var summary = ButterflyRewards.summary(catches: game.caught, playsToday: butterflyPlaysToday, using: &rng)
-        if quiet { summary.water = 0; summary.shedPoints = 0; summary.scoops = 0 }
+        if quiet || wake { summary.water = 0; summary.shedPoints = 0; summary.scoops = 0 }
+        summary.newFriendIds = summary.newStickerIds.filter { album.count(of: $0) == 0 }
 
         p.water = min(Economy.default.waterBankCap, p.water + summary.water)
         p.shedPoints += summary.shedPoints
         p.soil += summary.scoops
 
         var a = album
-        a.add(game.caught)
+        a.add(game.caught, on: t)
         p.albumJSON = a.json
 
-        var counter = (p.butterflyPlaysJSON.data(using: .utf8).flatMap { try? JSONDecoder().decode(DailyPlayCounter.self, from: $0) }) ?? DailyPlayCounter()
-        counter.record(on: t, calendar: .current)
-        p.butterflyPlaysJSON = (try? JSONEncoder().encode(counter)).flatMap { String(data: $0, encoding: .utf8) } ?? ""
+        if !wake {
+            var counter = (p.butterflyPlaysJSON.data(using: .utf8).flatMap { try? JSONDecoder().decode(DailyPlayCounter.self, from: $0) }) ?? DailyPlayCounter()
+            counter.record(on: t, calendar: .current)
+            p.butterflyPlaysJSON = (try? JSONEncoder().encode(counter)).flatMap { String(data: $0, encoding: .utf8) } ?? ""
+        }
 
         badges.record(.visitorSpecies, value: a.species, now: t, quiet: quiet)
         badges.record(.butterflyPlays, now: t, quiet: quiet)

@@ -1,74 +1,58 @@
 import SwiftUI
 
+/// The Garden Shed (design-preview/shed-visitors/shed-v2, direction B): the shed scene with the points bar,
+/// a grid of tool tiles that open a tool sheet, then the pots. Quiet Garden shows no points, prices or upgrades.
 struct ShedView: View {
     @Environment(AppModel.self) private var app
-    @State private var message: String?
+    @Environment(GameRouter.self) private var router
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @State private var selected: ShedToolPick?
+    @State private var justUpgraded: (tool: ToolID, tier: Int)?
 
-    private static let info: [(ToolID, String, String)] = [
-        (.can, "Watering can", "Waters your plants. Better cans water more plants at once."),
-        (.trowel, "Trowel", "Digs in soil for stronger growth."),
-        (.net, "Butterfly net", "For catching garden visitors."),
-        (.mister, "Mister", "Finish all of level 1 in your garden to find it."),
-        (.shears, "Shears", "Finish level 2 in your garden to find them."),
-        (.lamp, "Sun lamp", "Finish level 3 in your garden to find it."),
-    ]
+    private var reduceMotion: Bool { systemReduceMotion || app.settings.reduceMotionOverride }
 
     var body: some View {
         let inv = app.inventory
         let points = app.profile?.shedPoints ?? 0
+        let quiet = !ShedPolicy.showsUpgrades(quietGarden: app.settings.quietGarden)
+        let columns = typeSize.isAccessibilitySize ? [GridItem(.flexible())] : [GridItem(.flexible(), spacing: 10), GridItem(.flexible())]
         ScrollView {
-            VStack(spacing: 12) {
-                if !app.settings.quietGarden {
-                    Label("\(points) shed points", systemImage: "star.fill").font(Theme.font(.headline))
-                        .foregroundStyle(Color.accentText).frame(maxWidth: .infinity, alignment: .leading)
-                        .accessibilityLabel("\(points) shed points")
+            VStack(alignment: .leading, spacing: 12) {
+                ShedHeader(points: points, quiet: quiet) { router.go(.butterfly) }
+                sectionHeader(ShedCopy.toolsTitle, ShedCopy.toolsSubtitle).padding(.top, 6)
+                LazyVGrid(columns: columns, spacing: 10) {
+                    ForEach(ShedTool.order, id: \.self) { tool in
+                        ToolTile(tool: tool, tier: inv.tier(of: tool), points: points, quiet: quiet) { selected = ShedToolPick(tool: tool) }
+                    }
                 }
-                ForEach(Self.info, id: \.0) { tool, name, blurb in card(tool, name, blurb, tier: inv.tier(of: tool), points: points) }
-                if let message { Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText) }
                 ShedPotsSection(stats: app.potStats, hasPlus: app.hasPlusForPots, users: { pot in
                     app.plantsUsing(pot).map { $0.nickname.isEmpty ? $0.name : $0.nickname }
                 }, record: { app.recordEarnedPots() })
+                .padding(.top, 6)
             }
-            .padding(20)
+            .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 40)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Garden Shed")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $selected) { pick in
+            ToolSheet(tool: pick.tool) { tool, tier in justUpgraded = (tool, tier) }.environment(app)
+        }
+        .overlay {
+            if let up = justUpgraded {
+                UpgradeCard(tool: up.tool, tier: up.tier, reduceMotion: reduceMotion) { justUpgraded = nil }
+            }
+        }
         .onAppear { app.syncToolUnlocks() }
     }
 
-    private func card(_ tool: ToolID, _ name: String, _ blurb: String, tier: Int, points: Int) -> some View {
-        let owned = tier > 0
-        let next = ToolInventory.upgradeCost(toTier: tier + 1)
-        return Card {
-            HStack(spacing: 14) {
-                Image("tool_\(tool.rawValue)_t\(max(1, tier))").resizable().scaledToFit().frame(width: 64, height: 64)
-                    .saturation(owned ? 1 : 0).opacity(owned ? 1 : 0.4).accessibilityHidden(true)
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(name).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
-                    if owned {
-                        Text("Tier \(tier) of 3").font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                            .fixedSize().padding(.horizontal, 8).padding(.vertical, 2).background(Color.appAccent.opacity(0.25), in: Capsule())
-                    }
-                    Text(blurb).font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).fixedSize(horizontal: false, vertical: true)
-                    if owned, let cost = next {
-                        Button { upgrade(tool, name) } label: {
-                            Text("Upgrade for \(cost) points").font(Theme.font(.footnote, weight: .semibold))
-                                .foregroundStyle(points >= cost ? Color.successText : Color.secondaryText).fixedSize(horizontal: false, vertical: true)
-                        }
-                        .disabled(points < cost).tapTarget()
-                    } else if owned {
-                        Text("Fully upgraded").font(Theme.font(.caption, weight: .semibold)).foregroundStyle(Color.successText)
-                    }
-                }
-                Spacer(minLength: 0)
-            }
+    private func sectionHeader(_ title: String, _ subtitle: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title.uppercased()).font(Theme.font(.footnote, weight: .heavy)).tracking(1.2).foregroundStyle(Color.secondaryText)
+                .accessibilityLabel(title).accessibilityAddTraits(.isHeader)
+            Text(subtitle).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
         }
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(owned ? "\(name), tier \(tier) of 3" : "\(name), not found yet")
-    }
-
-    private func upgrade(_ tool: ToolID, _ name: String) {
-        message = app.upgradeTool(tool) ? "\(name) upgraded!" : "Not enough shed points yet."
+        .fixedSize(horizontal: false, vertical: true)
     }
 }

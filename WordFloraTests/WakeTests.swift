@@ -208,6 +208,41 @@ final class WakeInAppTests: XCTestCase {
         XCTAssertEqual(app.wakeSuggestion, .wordPuzzle)
         XCTAssertEqual(app.settings.wakeDreamsInARow, 0)
     }
+    func testTheWakeCountSaysFriendsBecauseEveryVisitorCounts() {
+        XCTAssertEqual(WakeCopy.caughtSoFar(2, goal: 3), "2 of 3 friends")
+        XCTAssertFalse(WakeCopy.butterflyIntro(goal: 3).contains("butterflies"))
+    }
+
+    /// Wake-game hellos go to the album and badges through the same path as the main game, but pay no shed points or
+    /// water and never use up one of the day's rewarded plays.
+    func testWakeCatchesCreditTheAlbumAndBadgesButNotPoints() throws {
+        let clock = Date(timeIntervalSince1970: 1_780_000_000)
+        let app = try makeApp(now: { clock })
+        let p = try XCTUnwrap(app.profile)
+        let pointsBefore = p.shedPoints, waterBefore = p.water, soilBefore = p.soil
+        var g = app.startButterflyGame(seed: 4, reduceMotion: true, wake: true)
+        var caught = 0, t = 0.0
+        while caught < 3 && t < 30 { g.tick(0.1); t += 0.1; if let v = g.visitors.first, g.catchAt(x: v.x, y: v.y) != nil { caught += 1 } }
+        XCTAssertEqual(caught, 3)
+        let summary = app.finishButterflyGame(g, wake: true)
+        XCTAssertEqual(summary.shedPoints, 0); XCTAssertEqual(summary.water, 0); XCTAssertEqual(summary.scoops, 0)
+        XCTAssertEqual(p.shedPoints, pointsBefore); XCTAssertEqual(p.water, waterBefore); XCTAssertEqual(p.soil, soilBefore)
+        XCTAssertEqual(g.caught.reduce(0) { $0 + (app.album.count(of: $1) > 0 ? 1 : 0) }, 3)
+        XCTAssertEqual(Set(g.caught).map { app.album.count(of: $0) }.reduce(0, +), 3)
+        XCTAssertEqual(app.badges.progress(of: .visitorSpecies), Set(g.caught).count)
+        XCTAssertEqual(app.butterflyPlaysToday, 0, "a wake game never uses a rewarded play")
+        XCTAssertEqual(Set(summary.newFriendIds), Set(g.caught), "first hellos are new friends")
+    }
+
+    func testCalmModeGivesTheGentleGameButNeverInTheWakeGame() throws {
+        let clock = Date(timeIntervalSince1970: 1_780_000_000)
+        let app = try makeApp(now: { clock }, calm: true)
+        XCTAssertTrue(app.startButterflyGame().calm)
+        XCTAssertFalse(app.startButterflyGame(wake: true).calm)
+        app.settings.calmMode = false
+        XCTAssertFalse(app.startButterflyGame().calm)
+    }
+
     func testTwoDreamsInARowMakeTheNextTryEasier() throws {
         let clock = Date(timeIntervalSince1970: 1_780_000_000)
         let app = try makeApp(now: { clock })

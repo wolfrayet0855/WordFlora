@@ -146,4 +146,107 @@ final class ToolEngineTests: XCTestCase {
         XCTAssertEqual(p.growthPoints, 4)
         XCTAssertEqual(ToolEngine.repot(p, to: good, profile: pr, now: t0.addingTimeInterval(86_400), calendar: cal, economy: eco).tend.gpGained, 4)
     }
+    // MARK: price truth (Shed text reads these numbers; 6 tools x (30 + 120) = 900 points to fill the Shed)
+    func testUpgradePricesAreThirtyAndOneTwentyAndTheWholeShedIsNineHundred() {
+        XCTAssertEqual(ToolInventory.upgradeCost(toTier: 2), 30)
+        XCTAssertEqual(ToolInventory.upgradeCost(toTier: 3), 120)
+        XCTAssertNil(ToolInventory.upgradeCost(toTier: 4))
+        XCTAssertEqual(ToolInventory.totalUpgradeCostForAllTools, 900)
+    }
+
+    // MARK: net
+    func testNetCatchCircleGrowsByTier() {
+        XCTAssertEqual(ToolEngine.netCatchRadius(tier: 1), 48)
+        XCTAssertEqual(ToolEngine.netCatchRadius(tier: 2), 64)
+        XCTAssertEqual(ToolEngine.netCatchRadius(tier: 3), 80)
+        XCTAssertEqual(ToolEngine.netCatchRadius(tier: 0), 48)        // before the net is found, the small circle
+        XCTAssertEqual(ToolEngine.netCatchRadius(tier: 9), 80)
+    }
+
+    func testABiggerNetCatchesAVisitorASmallNetCannotReach() {
+        var g = ButterflyGameModel(pool: ["monarch"], floweringPlants: 4, reduceMotion: true, seed: 1)
+        g.tick(0.5)
+        let v = try! XCTUnwrap(g.visitors.first)
+        let width = 400.0, offset = 56.0 / width          // 56 pt away: outside 48, inside 64
+        var small = g, big = g
+        XCTAssertNil(small.catchAt(x: v.x + offset, y: v.y, radius: ToolEngine.netCatchRadius(tier: 1) / width))
+        XCTAssertEqual(big.catchAt(x: v.x + offset, y: v.y, radius: ToolEngine.netCatchRadius(tier: 2) / width), "monarch")
+    }
+
+    // MARK: mister
+    func testMisterSpeedsTheFreeDropsByTier() {
+        XCTAssertEqual(ToolEngine.trickleHours(forMister: 1), 4); XCTAssertEqual(ToolEngine.trickleCap(forMister: 1), 5)
+        XCTAssertEqual(ToolEngine.trickleHours(forMister: 2), 3); XCTAssertEqual(ToolEngine.trickleCap(forMister: 2), 6)
+        XCTAssertEqual(ToolEngine.trickleHours(forMister: 3), 2); XCTAssertEqual(ToolEngine.trickleCap(forMister: 3), 7)
+        // No mister yet: the plain free drops from Economy.
+        XCTAssertEqual(ToolEngine.trickleHours(forMister: 0), eco.trickleHours); XCTAssertEqual(ToolEngine.trickleCap(forMister: 0), eco.trickleCap)
+        XCTAssertEqual(ToolEngine.trickleHours(forMister: 1), eco.trickleHours); XCTAssertEqual(ToolEngine.trickleCap(forMister: 1), eco.trickleCap)
+    }
+
+    func testTrickleWithATierThreeMisterGivesADropEveryTwoHoursUpToSeven() {
+        let p = profile(water: 0); p.lastTrickleAt = t0
+        var inv = ToolInventory(); inv.unlock(.mister); var pts = 150
+        XCTAssertTrue(inv.upgrade(.mister, shedPoints: &pts)); XCTAssertTrue(inv.upgrade(.mister, shedPoints: &pts))
+        ToolEngine.applyTrickle(p, inventory: inv, now: t0.addingTimeInterval(5 * 3600), economy: eco)
+        XCTAssertEqual(p.water, 2)
+        ToolEngine.applyTrickle(p, inventory: inv, now: t0.addingTimeInterval(100 * 3600), economy: eco)
+        XCTAssertEqual(p.water, 7)
+    }
+
+    func testTrickleWithoutAMisterIsUnchanged() {
+        let p = profile(water: 0); p.lastTrickleAt = t0
+        ToolEngine.applyTrickle(p, inventory: ToolInventory(), now: t0.addingTimeInterval(9 * 3600), economy: eco)
+        XCTAssertEqual(p.water, 2)
+        ToolEngine.applyTrickle(p, inventory: ToolInventory(), now: t0.addingTimeInterval(100 * 3600), economy: eco)
+        XCTAssertEqual(p.water, 5)
+    }
+
+    func testMisterNeverChangesTheDailyDrinksOrTheBankCap() {
+        var inv = ToolInventory(); inv.unlock(.mister); var pts = 150
+        _ = inv.upgrade(.mister, shedPoints: &pts); _ = inv.upgrade(.mister, shedPoints: &pts)
+        let tuned = ToolEngine.trickleEconomy(eco, inventory: inv)
+        XCTAssertEqual(tuned.waterPerDay, eco.waterPerDay)
+        XCTAssertEqual(tuned.waterBankCap, eco.waterBankCap)
+        XCTAssertEqual(tuned.waterGrowth, eco.waterGrowth)
+    }
+
+    func testShedToolLinesSayWhatEachTierDoes() {
+        XCTAssertEqual(ShedCopy.effect(.mister, tier: 1), "A free drop every 4 hours")
+        XCTAssertEqual(ShedCopy.effect(.mister, tier: 2), "A free drop every 3 hours")
+        XCTAssertEqual(ShedCopy.effect(.mister, tier: 3), "A free drop every 2 hours")
+        XCTAssertEqual(ShedCopy.effect(.net, tier: 1), "Small catch circle")
+        XCTAssertEqual(ShedCopy.effect(.net, tier: 3), "Biggest catch circle")
+        XCTAssertEqual(ShedCopy.effect(.can, tier: 1), "Waters 1 plant per tap")
+        XCTAssertEqual(ShedCopy.effect(.can, tier: 2), "Waters 2 plants per tap")
+        XCTAssertEqual(ShedCopy.upgradedLine(.trowel, tier: 2), "Now: bigger soil boost.")
+    }
+
+    func testFoundToolsDropTheFindItLine() {
+        XCTAssertEqual(ShedCopy.blurb(.mister, owned: false), "Find at garden level 1")
+        XCTAssertEqual(ShedCopy.blurb(.shears, owned: false), "Find at garden level 2")
+        for tool in ToolID.allCases { XCTAssertFalse(ShedCopy.blurb(tool, owned: true).contains("Find"), "\(tool)") }
+    }
+
+    func testToolTileLabelsSayTheTierAndEffect() {
+        XCTAssertEqual(ShedCopy.tileLabel(.net, tier: 2, quiet: false, ready: true), "Butterfly net. Tier 2 of 3. Bigger catch circle. Upgrade ready.")
+        XCTAssertEqual(ShedCopy.tileLabel(.shears, tier: 0, quiet: false, ready: false), "Shears. Find at garden level 2.")
+        XCTAssertFalse(ShedCopy.tileLabel(.can, tier: 2, quiet: true, ready: false).contains("Tier"), "Quiet Garden shows no tiers or numbers")
+    }
+
+    func testQuietGardenHidesUpgradesAndPrices() {
+        XCTAssertFalse(ShedPolicy.showsUpgrades(quietGarden: true))
+        XCTAssertTrue(ShedPolicy.showsUpgrades(quietGarden: false))
+    }
+
+    func testHowFarLineCountsThePointsToGo() {
+        XCTAssertEqual(ShedCopy.toGo(have: 16, cost: 30), "14 more to go")
+        XCTAssertEqual(ShedCopy.toGo(have: 29, cost: 30), "1 more to go")
+        XCTAssertEqual(ShedCopy.toGo(have: 44, cost: 30), "You have enough points!")
+        XCTAssertEqual(ShedCopy.progress(have: 44, cost: 120), "44 of 120 points")
+        XCTAssertEqual(ShedCopy.upgradeButton(cost: 30), "Upgrade for 30 shed points")
+    }
+
+    func testShedCopyIsGentle() {
+        for line in ShedCopy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
+    }
 }

@@ -17,6 +17,7 @@
 		0D40FB8B459939AEF138E877 /* LifePanel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DACB1B15E0B500548ECCC8E /* LifePanel.swift */; };
 		0ED6F1FF31FA92710DC232E9 /* PlantThinning.swift in Sources */ = {isa = PBXBuildFile; fileRef = E0F27137167AD56F3C378B56 /* PlantThinning.swift */; };
 		0EF248DB19561DBC0B3A3911 /* wf-sun.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 78262DDD42B5B0B95B53888A /* wf-sun.m4a */; };
+		1355711493BE367E7DC6B3D7 /* ShedTools.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA8D41F1F986145B3482846F /* ShedTools.swift */; };
 		1581D6A2E8210D4686510D56 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
 		170893E1A2616D1CEACC9A9D /* wf-earned.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5510B1B69285FC4D97F91D07 /* wf-earned.m4a */; };
 		19FC1E7D0E23F1EEAA3D062F /* wf-thunder.m4a in Resources */ = {isa = PBXBuildFile; fileRef = DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */; };
@@ -103,6 +104,7 @@
 		8D71B5862E6878124BB379B1 /* WakeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B08CBCAEE1D5A24848BAF8 /* WakeTests.swift */; };
 		8E6670903E6120DF66036EBF /* HomeLayoutUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 394854942795553C29283849 /* HomeLayoutUITests.swift */; };
 		8EE94A601E0EFA010CB76EE6 /* Badges.json in Resources */ = {isa = PBXBuildFile; fileRef = DE3B9B93CE1A034E8C165CB7 /* Badges.json */; };
+		91FC2D3DEAB36F45F4159DF9 /* ToolEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */; };
 		94D8860C3740EB26ADB252F0 /* ToolEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D9F7603039699D755A5EDB /* ToolEngineTests.swift */; };
 		9603333091B94F1CE68C0A45 /* GameViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9075581718316A5EDE6C92FD /* GameViewModel.swift */; };
 		9640E4CF89AD1324C08B70FE /* CoreRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03162041D3ADF3CEE1CCF23B /* CoreRulesTests.swift */; };
@@ -342,6 +344,7 @@
 		A60BDD5B19B690060D44B813 /* WakePuzzle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WakePuzzle.swift; sourceTree = "<group>"; };
 		A6A01FC491120FB6F06CDF63 /* VoicePicker.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoicePicker.swift; sourceTree = "<group>"; };
 		A86EDC2288FBFA94769434C1 /* wf-rest.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-rest.m4a"; sourceTree = "<group>"; };
+		AA8D41F1F986145B3482846F /* ShedTools.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShedTools.swift; sourceTree = "<group>"; };
 		AF243532D79B05FABE12F6B1 /* RainOverlay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RainOverlay.swift; sourceTree = "<group>"; };
 		B0DEEEBD8B052299970213DD /* wf-key.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-key.m4a"; sourceTree = "<group>"; };
 		B1A188B4F331705EAF0FD7F2 /* ProgressionPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProgressionPolicy.swift; sourceTree = "<group>"; };
@@ -737,6 +740,7 @@
 				1F9C82D7DFDE6E520A95AC7E /* WakeSheet.swift */,
 				EF01514127063E580BD3F0E2 /* WakePuzzleView.swift */,
 				2A7721B11B88B81E56630C05 /* PotPickerViews.swift */,
+				AA8D41F1F986145B3482846F /* ShedTools.swift */,
 			);
 			name = Views;
 			path = Views;
@@ -1068,6 +1072,7 @@
 				8D183901C6FE706E07BB9C19 /* SharedDefaults.swift in Sources */,
 				27DE73638621154797E3BDFE /* GardenIntents.swift in Sources */,
 				579A86FB03D91481C075214E /* WaterControl.swift in Sources */,
+				91FC2D3DEAB36F45F4159DF9 /* ToolEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1168,6 +1173,7 @@
 				1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */,
 				347A410A75615F9238BE8729 /* PotArtView.swift in Sources */,
 				EDC9869F995C67A16F2AB495 /* PotPickerViews.swift in Sources */,
+				1355711493BE367E7DC6B3D7 /* ShedTools.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

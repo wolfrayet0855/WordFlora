@@ -5,26 +5,33 @@ struct VisitorSpecies: Equatable {
     var name: String
     var rarity: VisitorCatalog.Rarity
     var nightOnly = false
-    /// Only fact-checked lines ship; nil means "no fact yet" and the UI shows none.
+    /// Only fact-checked lines ship; every visitor has one (tested).
     var fact: String?
 }
 
 enum VisitorCatalog {
-    enum Rarity: Hashable { case common, uncommon, rare }
+    enum Rarity: Hashable {
+        case common, uncommon, rare
+        /// How often a visitor comes, in plain words (shown on album cards).
+        var label: String {
+            switch self { case .common: return "Often seen"; case .uncommon: return "Sometimes seen"; case .rare: return "Rare visitor" }
+        }
+    }
 
+    // Grade 2-3 facts, each checked against a source (docs/research/visitor-facts.md).
     static let all: [VisitorSpecies] = [
-        VisitorSpecies(id: "monarch", name: "Monarch", rarity: .uncommon, fact: "Monarch butterflies can migrate up to 3,000 miles."),
-        VisitorSpecies(id: "swallowtail", name: "Swallowtail", rarity: .uncommon, fact: "Swallowtail hindwing tails may trick predators into pecking the wings, not the body."),
-        VisitorSpecies(id: "cabbagewhite", name: "Cabbage White", rarity: .common, fact: "Cabbage whites began in Eurasia and now live on many continents, spread by people."),
-        VisitorSpecies(id: "paintedlady", name: "Painted Lady", rarity: .common),
-        VisitorSpecies(id: "honeybee", name: "Honeybee", rarity: .common),
-        VisitorSpecies(id: "bumblebee", name: "Bumblebee", rarity: .common),
-        VisitorSpecies(id: "ladybug", name: "Ladybug", rarity: .common),
-        VisitorSpecies(id: "dragonfly", name: "Dragonfly", rarity: .uncommon, fact: "Dragonfly ancestors zoomed through the sky about 300 million years ago, before dinosaurs."),
-        VisitorSpecies(id: "morpho", name: "Blue Morpho", rarity: .rare),
-        VisitorSpecies(id: "hummingbird", name: "Hummingbird", rarity: .rare, fact: "A hummingbird's wings flap about 50 times a second."),
-        VisitorSpecies(id: "firefly", name: "Firefly", rarity: .uncommon, nightOnly: true),
-        VisitorSpecies(id: "luna", name: "Luna Moth", rarity: .rare, nightOnly: true),
+        VisitorSpecies(id: "monarch", name: "Monarch", rarity: .uncommon, fact: "Monarch butterflies can fly up to 3,000 miles to a warm place for winter."),
+        VisitorSpecies(id: "swallowtail", name: "Swallowtail", rarity: .uncommon, fact: "A swallowtail has long points on its back wings that look like tails."),
+        VisitorSpecies(id: "cabbagewhite", name: "Cabbage White", rarity: .common, fact: "Baby cabbage whites are green caterpillars that love to eat cabbage leaves."),
+        VisitorSpecies(id: "paintedlady", name: "Painted Lady", rarity: .common, fact: "Painted ladies are found in more parts of the world than most butterflies."),
+        VisitorSpecies(id: "honeybee", name: "Honeybee", rarity: .common, fact: "Honeybees do a waggle dance to show other bees where to find flowers."),
+        VisitorSpecies(id: "bumblebee", name: "Bumblebee", rarity: .common, fact: "Bumblebees buzz to shake pollen out of some flowers, like tomato flowers."),
+        VisitorSpecies(id: "ladybug", name: "Ladybug", rarity: .common, fact: "Ladybugs eat tiny bugs called aphids. That helps keep plants healthy."),
+        VisitorSpecies(id: "dragonfly", name: "Dragonfly", rarity: .uncommon, fact: "Dragonfly ancestors flew in the sky about 300 million years ago, before dinosaurs."),
+        VisitorSpecies(id: "morpho", name: "Blue Morpho", rarity: .rare, fact: "A blue morpho shines blue because tiny scales on its wings bounce light."),
+        VisitorSpecies(id: "hummingbird", name: "Hummingbird", rarity: .rare, fact: "A hummingbird flaps its wings about 50 times a second."),
+        VisitorSpecies(id: "firefly", name: "Firefly", rarity: .uncommon, nightOnly: true, fact: "Fireflies make their own light. They blink to talk to each other."),
+        VisitorSpecies(id: "luna", name: "Luna Moth", rarity: .rare, nightOnly: true, fact: "A grown-up luna moth has no mouth. It does not need to eat!"),
     ]
 
     static func species(_ id: String) -> VisitorSpecies? { all.first { $0.id == id } }
@@ -67,23 +74,96 @@ enum VisitorSpawner {
 
 struct StickerAlbum: Codable, Equatable {
     private(set) var counts: [String: Int] = [:]
+    /// When each friend was most recently met. Older albums have no dates (read as "not known").
+    private(set) var seenAt: [String: Date] = [:]
 
     init() {}
     init(json: String) {
         if let d = json.data(using: .utf8), let a = try? JSONDecoder().decode(StickerAlbum.self, from: d) { self = a } else { self = StickerAlbum() }
+    }
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        counts = try c.decodeIfPresent([String: Int].self, forKey: .counts) ?? [:]
+        seenAt = (try? c.decodeIfPresent([String: Date].self, forKey: .seenAt)) ?? [:]
     }
     var json: String { (try? JSONEncoder().encode(self)).flatMap { String(data: $0, encoding: .utf8) } ?? "" }
 
     func merged(with other: StickerAlbum) -> StickerAlbum {
         var m = self
         for (k, v) in other.counts { m.counts[k] = max(m.counts[k] ?? 0, v) }
+        for (k, d) in other.seenAt { m.seenAt[k] = max(m.seenAt[k] ?? d, d) }
         return m
     }
 
-    mutating func add(_ ids: [String]) { for id in ids { counts[id, default: 0] += 1 } }
+    mutating func add(_ ids: [String], on date: Date? = nil) {
+        for id in ids {
+            counts[id, default: 0] += 1
+            if let date { seenAt[id] = max(seenAt[id] ?? date, date) }
+        }
+    }
     func count(of id: String) -> Int { counts[id] ?? 0 }
+    func lastSeen(of id: String) -> Date? { seenAt[id] }
     var species: Int { counts.values.filter { $0 > 0 }.count }
     var isComplete: Bool { VisitorCatalog.all.allSatisfy { count(of: $0.id) > 0 } }
+}
+
+/// Every Visitors page string, grade 2-3 reading level, checked by CopySafety in tests.
+enum VisitorsCopy {
+    static let title = "Visitors"
+    static func friendsMet(_ n: Int, of total: Int) -> String { "\(n) of \(total) friends met" }
+    static let moreFlowers = "More flowers in bloom bring more visitors."
+    static let playTitle = "Say hello to visitors"
+    static let playBlurb = "About half a minute. Swipe or tap. Every visit is a good one."
+    static let playBlurbCalm = "Take your time. Say hello to 5 friends, or tap Done."
+    static let playBlurbTap = "Tap the visitors resting on the flowers. Every visit is a good one."
+    static let sayHello = "Say hello"
+    static let eveningTitle = "Evening friends"
+    static let eveningTimes = "5:30 to 9:30 pm"
+    static func netTitle(tier: Int) -> String { "Your net: " + ["small", "medium", "big"][min(3, max(1, tier)) - 1] }
+    static let netGrows = "It grows in the Shed"
+    static let netFull = "As big as it gets"
+    static let album = "Album"
+    static let notMet = "Not met yet"
+    static func notMetHint(nightOnly: Bool) -> String { nightOnly ? "Comes out in the evening" : "Say hello in the game" }
+    static func metCount(_ n: Int) -> String { n == 1 ? "Met once" : "Met \(n) times" }
+    static func metSentence(_ n: Int) -> String { n == 1 ? "You met this friend once." : "You met this friend \(n) times." }
+    static let funFact = "Fun fact"
+    static let notMetDetail = "Say hello in the butterfly game to meet this friend."
+    static let done = "Done"
+    static let newFriend = "New friend"
+    static func newFriendTitle(_ name: String) -> String { "New friend: \(name)" }
+    static func newFriendLine(_ rarity: VisitorCatalog.Rarity) -> String { "\(rarity.label). Added to your album." }
+    static func saidHello(_ n: Int) -> String { "\(n) said hello" }
+    static func caughtPill(_ name: String) -> String { "\(name)!" }
+    static func summaryTitle(friends n: Int) -> String {
+        n == 0 ? "Thanks for visiting the garden" : (n == 1 ? "You met 1 friend" : "You met \(n) friends")
+    }
+    static func newInAlbum(_ n: Int) -> String { n == 1 ? "1 new friend in your album" : "\(n) new friends in your album" }
+
+    static func seen(_ date: Date, now: Date, calendar: Calendar) -> String {
+        let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: date), to: calendar.startOfDay(for: now)).day ?? 0
+        switch days {
+        case ...0: return "Seen today"
+        case 1: return "Seen yesterday"
+        default: return "Seen \(days) days ago"
+        }
+    }
+
+    static func cardLabel(name: String, rarity: VisitorCatalog.Rarity, met: Int, seen: String?) -> String {
+        guard met > 0 else { return "\(notMet), \(rarity.label.lowercased())" }
+        return [name, rarity.label.lowercased(), metCount(met).lowercased(), seen?.lowercased()].compactMap { $0 }.joined(separator: ", ")
+    }
+
+    static var all: [String] {
+        var lines = [title, friendsMet(7, of: 12), moreFlowers, playTitle, playBlurb, playBlurbCalm, playBlurbTap, sayHello, eveningTitle, eveningTimes,
+                     netTitle(tier: 1), netTitle(tier: 3), netGrows, netFull, album, notMet, notMetHint(nightOnly: true), notMetHint(nightOnly: false),
+                     metCount(1), metCount(4), metSentence(1), metSentence(3), funFact, notMetDetail, done, newFriend, newFriendTitle("Monarch"),
+                     saidHello(2), caughtPill("Monarch"), summaryTitle(friends: 0), summaryTitle(friends: 1), summaryTitle(friends: 4),
+                     newInAlbum(1), newInAlbum(3), "Seen today", "Seen yesterday", "Seen 5 days ago",
+                     cardLabel(name: "Monarch", rarity: .uncommon, met: 3, seen: "Seen today"), cardLabel(name: "Luna Moth", rarity: .rare, met: 0, seen: nil)]
+        for r in [VisitorCatalog.Rarity.common, .uncommon, .rare] { lines += [r.label, newFriendLine(r)] }
+        return lines
+    }
 }
 
 struct DailyPlayCounter: Codable, Equatable {
@@ -104,7 +184,10 @@ enum ButterflyRewards {
         var water = 0
         var shedPoints = 0
         var scoops = 0
+        /// The distinct visitors met this round (old friends too).
         var newStickerIds: [String] = []
+        /// Visitors met for the very first time this round (new to the album).
+        var newFriendIds: [String] = []
     }
     static let rewardedPlaysPerDay = 3
 

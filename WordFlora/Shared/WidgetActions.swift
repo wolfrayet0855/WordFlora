@@ -53,7 +53,7 @@ enum WidgetActions {
               let plant = (try? context.fetch(FetchDescriptor<PlantCollectible>()))?.first(where: { $0.plantId == plantId && $0.earnedCount > 0 })
         else { return .blocked(.noWater) }
         let eco = Economy.default
-        TendingEngine.applyTrickle(profile, now: now, economy: eco)
+        ToolEngine.applyTrickle(profile, inventory: ToolInventory(json: profile.toolsJSON), now: now, economy: eco)
         let result = TendingEngine.water(plant, profile: profile, now: now, calendar: calendar, economy: eco, quiet: quiet)
         try? context.save()
         return result

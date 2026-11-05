@@ -91,4 +91,43 @@ final class ButterflyGameModelTests: XCTestCase {
         XCTAssertGreaterThan(m.visitors.count, 0)
         XCTAssertTrue(m.visitors.allSatisfy { $0.resting })
     }
+
+    // MARK: calm mode (no time bar, slower visitors, ends after 5 hellos or Done)
+    func testCalmGameHasNoTimeLimit() {
+        var m = ButterflyGameModel(pool: dayPool, floweringPlants: 4, reduceMotion: false, seed: 3, calm: true)
+        run(&m, seconds: ButterflyGameModel.duration + 30)
+        XCTAssertFalse(m.isFinished)
+        XCTAssertFalse(m.showsTimeBar)
+        XCTAssertTrue(make().showsTimeBar)
+    }
+
+    func testCalmGameEndsAfterFiveCatches() {
+        var m = ButterflyGameModel(pool: dayPool, floweringPlants: 4, reduceMotion: true, seed: 3, calm: true)
+        var caught = 0
+        var t = 0.0
+        while caught < 5 && t < 200 {
+            m.tick(0.1); t += 0.1
+            if let v = m.visitors.first, m.catchAt(x: v.x, y: v.y, radius: 0.01) != nil { caught += 1 }
+        }
+        XCTAssertEqual(caught, 5)
+        XCTAssertTrue(m.isFinished)
+        XCTAssertEqual(ButterflyGameModel.calmCatchGoal, 5)
+    }
+
+    func testDoneEndsTheGameAtOnceAndKeepsTheCatches() {
+        var m = ButterflyGameModel(pool: dayPool, floweringPlants: 4, reduceMotion: true, seed: 3, calm: true)
+        run(&m, seconds: 1)
+        let v = m.visitors[0]; m.catchAt(x: v.x, y: v.y)
+        m.finishNow()
+        XCTAssertTrue(m.isFinished)
+        XCTAssertEqual(m.caught.count, 1)
+        XCTAssertNil(m.catchAt(x: 0.5, y: 0.5, radius: 1))
+    }
+
+    func testCalmVisitorsDriftAtAboutSixtyPercentSpeed() {
+        var normal = make(seed: 9), calm = ButterflyGameModel(pool: dayPool, floweringPlants: 4, reduceMotion: false, seed: 9, calm: true)
+        run(&normal, seconds: 0.5); run(&calm, seconds: 0.5)
+        let a = normal.visitors[0].vx, b = calm.visitors[0].vx
+        XCTAssertEqual(b / a, 0.6, accuracy: 0.001)
+    }
 }
