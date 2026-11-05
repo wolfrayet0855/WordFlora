@@ -1,0 +1,305 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Garden Shed v2</title>
+<link rel="stylesheet" href="../../theme.css"><link rel="stylesheet" href="../common.css">
+<script src="../../theme.js"></script><script src="../common.js"></script><script src="pots-lib.js"></script>
+<style>
+/* ---------- colour layer: existing app colorsets only (see notes.md) ---------- */
+[data-theme=light]{--lv-bg:#DFEDF8;--lv-ic:#1F5F8F;--sh-bg:#F7E5D8;--sh-ic:#8F4A26;--vi-bg:#ECE5F6;--vi-ic:#6A4A9C;--gd-bg:#E3F1DD;--gd-ic:#2E7D32;
+ --bl-bg:#FDE9EE;--bl-ic:#B03A55;--bd-bg:#FBEFCB;--bd-ic:#8A5A00;--lockfill:#F1EEE6;--lock:#E4DFD2;--lockink:#746F5E;
+ /* shed art (lives inside the ShedHeader image asset, not colorsets) */
+ --w1:#E6BE8E;--w2:#D9AE7C;--wl:#B9875A;--wd:#8F5E38;--wdk:#6E4528;--sky:#CFE8F5;--grass:#8CC46A;--glass:rgba(255,255,255,.55);--glow:#FFE7A3;--shadow-c:rgba(60,40,20,.18)}
+[data-theme=dark]{--lv-bg:#2A4358;--lv-ic:#8CC4EC;--sh-bg:#4B3A2D;--sh-ic:#E8AE88;--vi-bg:#40395A;--vi-ic:#CDB8F2;--gd-bg:#2F4F30;--gd-ic:#81C784;
+ --bl-bg:#4D3039;--bl-ic:#F5A0B0;--bd-bg:#4A4122;--bd-ic:#F0C060;--lockfill:#233823;--lock:#3A4C3A;--lockink:#8FA48F;
+ --w1:#5E4734;--w2:#543F2E;--wl:#3D2D20;--wd:#3A2A1D;--wdk:#2A1D13;--sky:#30506A;--grass:#3F6B3A;--glass:rgba(255,255,255,.14);--glow:#FFD77A;--shadow-c:rgba(0,0,0,.35)}
+.t-lv{--tb:var(--lv-bg);--ti:var(--lv-ic)}.t-sh{--tb:var(--sh-bg);--ti:var(--sh-ic)}.t-vi{--tb:var(--vi-bg);--ti:var(--vi-ic)}
+.t-gd{--tb:var(--gd-bg);--ti:var(--gd-ic)}.t-bl{--tb:var(--bl-bg);--ti:var(--bl-ic)}.t-bd{--tb:var(--bd-bg);--ti:var(--bd-ic)}
+
+.doc .dir{display:inline-block;font-weight:900;background:var(--text);color:var(--bg);border-radius:8px;padding:0 8px;margin-right:6px}
+.verdict{max-width:90ch}
+.verdict li{margin:3px 0}
+.phone .body{padding:4px 20px 40px}
+.sv{transition:none}
+.sec{font-size:.8125em;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--txt2);margin:18px 2px 8px}
+.sec small{display:block;text-transform:none;letter-spacing:0;font-weight:600;font-size:1em;margin-top:1px}
+
+/* header scene */
+.scene{position:relative;border-radius:20px;overflow:hidden;border:1.5px solid color-mix(in srgb,var(--sh-ic) 30%,transparent);box-shadow:0 1px 2px var(--shadow-c)}
+.scene svg{display:block;width:100%;height:auto}
+.lamp{transform-origin:176px 0;animation:sway 6s ease-in-out infinite}
+.halo{animation:glow 4s ease-in-out infinite}
+.bfly{animation:bob 5s ease-in-out infinite}
+@keyframes sway{0%,100%{transform:rotate(-2deg)}50%{transform:rotate(2deg)}}
+@keyframes glow{0%,100%{opacity:.55}50%{opacity:.85}}
+@keyframes bob{0%,100%{transform:translate(0,0)}50%{transform:translate(-6px,-5px)}}
+.rm .lamp,.rm .halo,.rm .bfly{animation:none}
+
+/* jar card */
+.jar{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:20px;background:var(--bd-bg);border:1.5px solid color-mix(in srgb,var(--bd-ic) 30%,transparent);margin-top:12px}
+.jar svg{width:52px;height:62px;flex:none}
+.jar .t{flex:1;min-width:0}
+.jar b{display:block;font-size:1.0625em;font-weight:800}
+.jar span{font-size:.875em;color:var(--txt2)}
+.jar .go{display:flex;align-items:center;gap:2px;color:var(--bd-ic);font-weight:800;font-size:.875em;min-height:44px;white-space:nowrap}
+.jar .go svg{width:8px;height:13px}
+.ax .jar{flex-wrap:wrap}.ax .jar .go{width:100%}
+
+/* A: tool rows */
+.trow{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;margin-bottom:10px;border-radius:20px;background:var(--tb);border:1.5px solid color-mix(in srgb,var(--ti) 30%,transparent);box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.trow .art{width:60px;height:60px;flex:none;border-radius:50%;background:color-mix(in srgb,var(--surface) 70%,transparent);display:grid;place-items:center}
+.trow .art img{width:54px;height:58px}
+.trow .t{flex:1;min-width:0}
+.trow .h{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.trow h3{margin:0;font-size:1.0625em;font-weight:800}
+.pips{display:inline-flex;gap:4px;align-items:center}
+.pips i{width:.7em;height:.7em;border-radius:50%;box-shadow:inset 0 0 0 1.6px var(--ti)}
+.pips i.on{background:var(--ti);box-shadow:none}
+.now{margin:2px 0 0;font-size:.9375em;font-weight:700}
+.next{margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.next .nx{font-size:.8125em;color:var(--txt2);flex:1 1 100%;margin:0}
+.next .nx b{color:var(--text)}
+.bar{flex:1;min-width:80px;height:8px;border-radius:4px;background:color-mix(in srgb,var(--ti) 18%,var(--surface));overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ti);border-radius:4px}
+.of{font-size:.75em;font-weight:700;color:var(--txt2);white-space:nowrap}
+.upb{display:inline-flex;align-items:center;gap:6px;border:0;border-radius:14px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:800;font-size:.875em;min-height:44px;padding:6px 14px}
+.upb svg{width:1.05em;height:1.05em}
+.full{font-size:.8125em;font-weight:800;color:var(--ti);margin-top:6px}
+.trow.find,.tile.find{background:var(--lockfill);border:1.5px dashed color-mix(in srgb,var(--text) 60%,var(--lockfill));box-shadow:none}
+.trow.find .art,.tile.find .art{background:transparent;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--text) 30%,transparent)}
+.trow.find .art img{opacity:.5}
+.trow.find .hint{font-size:.8125em;color:var(--txt2);margin:2px 0 0}
+.ax .trow{flex-direction:column}.ax .trow .art{width:72px;height:72px}
+
+/* B: tile grid */
+.tgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ax .tgrid{grid-template-columns:1fr}
+.tile{position:relative;display:flex;flex-direction:column;align-items:center;text-align:center;gap:3px;padding:12px 8px 12px;border-radius:20px;background:var(--tb);border:1.5px solid color-mix(in srgb,var(--ti) 30%,transparent);min-height:170px}
+.tile .art{width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--surface) 70%,transparent);display:grid;place-items:center}
+.tile .art img{width:56px;height:60px}
+.tile h3{margin:2px 0 0;font-size:1em;font-weight:800}
+.tile .now{font-size:.8125em;font-weight:600;color:var(--txt2)}
+.tile .ready{position:absolute;top:8px;right:8px;display:flex;align-items:center;gap:3px;font-size:.6875em;font-weight:800;background:var(--accent);color:var(--accent-ink);padding:2px 8px;border-radius:999px}
+.tile .ready svg{width:10px;height:10px}
+.tile.trow.find .art img{opacity:.5}
+.bhead{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:20px;background:var(--sh-bg);border:1.5px solid color-mix(in srgb,var(--sh-ic) 30%,transparent)}
+.bhead svg.house{width:84px;height:76px;flex:none}
+.bhead .jarmini{display:flex;align-items:center;gap:8px;flex:1}
+.bhead .jarmini svg{width:40px;height:48px;flex:none}
+.bhead b{display:block;font-weight:800;font-size:1.0625em}.bhead span{font-size:.8125em;color:var(--txt2)}
+.bhead .go{color:var(--sh-ic);font-weight:800}
+
+/* C: pegboard */
+.peg{position:relative;border-radius:22px;overflow:hidden;background:var(--sh-bg);border:1.5px solid color-mix(in srgb,var(--sh-ic) 30%,transparent);padding:16px 10px 0;
+ background-image:radial-gradient(circle,color-mix(in srgb,var(--sh-ic) 35%,transparent) 1.6px,transparent 2.2px);background-size:18px 18px;background-position:9px 9px}
+.hooks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 4px}
+.hook{display:flex;flex-direction:column;align-items:center;gap:3px;padding-bottom:8px}
+.hook .pin{width:12px;height:12px;border-radius:50%;background:var(--wd);box-shadow:inset 0 -2px 0 var(--wdk)}
+.hook .str{width:2px;height:8px;background:var(--wd)}
+.hook .art{width:66px;height:66px;border-radius:50%;background:var(--surface);display:grid;place-items:center;box-shadow:0 2px 4px var(--shadow-c),0 0 0 3px var(--tb),0 0 0 4.5px color-mix(in srgb,var(--ti) 45%,transparent)}
+.hook .art img{width:56px;height:60px}
+.hook .tag{background:var(--tb);border:1.5px solid color-mix(in srgb,var(--ti) 40%,transparent);border-radius:10px;padding:3px 8px 4px;font-size:.75em;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:3px;margin-top:4px;min-width:84px}
+.hook .tag .pips i{width:.6em;height:.6em}
+.hook.find .art{background:var(--lockfill);box-shadow:0 0 0 2px var(--lockfill),0 0 0 3.5px color-mix(in srgb,var(--text) 40%,transparent)}
+.hook.find .art img{opacity:.45}
+.hook.find .tag{background:var(--lockfill);border-style:dashed;border-color:color-mix(in srgb,var(--text) 45%,var(--lockfill));font-weight:700}
+.hook .up{position:relative}
+.hook .dot{position:absolute;top:-2px;right:-6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;box-shadow:0 0 0 2px var(--surface)}
+.hook .dot svg{width:12px;height:12px}
+.bench{margin:4px -10px 0;height:64px;position:relative}
+.bench svg{position:absolute;inset:0;width:100%;height:100%}
+.ptsline{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:10px 2px 0;font-size:.875em}
+.ptsline b{font-weight:800}.ptsline a{color:var(--bd-ic);font-weight:800;text-decoration:none;min-height:44px;display:flex;align-items:center}
+.ax .hooks{grid-template-columns:repeat(2,1fr)}
+
+/* sheet */
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.32);z-index:6}
+.sheet{position:absolute;left:0;right:0;bottom:0;z-index:7;background:var(--surface);border-radius:28px 28px 0 0;padding:10px 20px 34px;box-shadow:0 -8px 30px rgba(0,0,0,.2)}
+.sheet .grab{width:40px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 12px}
+.sheet .top{display:flex;gap:14px;align-items:center;padding:12px;border-radius:20px;background:var(--tb)}
+.sheet .top .art{width:76px;height:76px;border-radius:50%;background:color-mix(in srgb,var(--surface) 75%,transparent);display:grid;place-items:center;flex:none}
+.sheet .top img{width:66px;height:70px}
+.sheet h3{margin:0 0 4px;font-size:1.25em}
+.sheet .rows{margin:14px 2px 10px;display:grid;gap:8px}
+.sheet .rows p{margin:0;font-size:.9375em}.sheet .rows p span{display:block;font-size:.8125em;font-weight:800;color:var(--txt2);text-transform:uppercase;letter-spacing:.05em}
+.sheet .pbtn{margin-top:10px}
+
+/* pots shelf */
+.shelf{background:var(--surface);border:1px solid var(--card-line);border-radius:20px;padding:12px 10px 10px;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.prow{position:relative;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;align-items:start;margin-bottom:10px}
+.prow::after{content:"";position:absolute;left:0;right:0;top:var(--ph);height:9px;border-radius:4px;background:linear-gradient(var(--w1),var(--w2));box-shadow:inset 0 -2px 0 var(--wl),0 2px 3px var(--shadow-c)}
+html:not(.only) .row.gap{margin-top:22px}
+.ax .prow{grid-template-columns:repeat(2,1fr)}
+.pc{display:flex;flex-direction:column;align-items:center;text-align:center;padding:4px 1px 0;min-height:44px;position:relative}
+.pc .pw{position:relative;line-height:0;height:var(--ph);display:flex;align-items:flex-end}
+.pc .ck{position:absolute;top:-4px;right:-7px;width:18px;height:18px;border-radius:50%;background:var(--gd-ic);color:var(--surface);display:grid;place-items:center;box-shadow:0 0 0 2px var(--surface)}
+.pc .ck svg{width:11px;height:11px}
+.pc .pl{display:inline-block;margin-top:3px;font-size:.6875em;font-weight:900;padding:1px 6px;border-radius:999px;background:var(--bd-bg);color:var(--bd-ic);box-shadow:inset 0 0 0 1.2px color-mix(in srgb,var(--bd-ic) 55%,transparent)}
+
+.plank{height:9px;border-radius:4px;margin:2px 0 8px;background:linear-gradient(var(--w1),var(--w2));box-shadow:inset 0 -2px 0 var(--wl),0 2px 3px var(--shadow-c)}
+.pc b{font-size:.75em;font-weight:800;margin-top:15px;line-height:1.15}
+.pc em{font-style:normal;font-size:.6875em;font-weight:700;color:var(--txt2);line-height:1.2;margin-top:1px}
+.pc.ear b{font-weight:700}
+.shfoot{font-size:.8125em;color:var(--txt2);margin:4px 4px 0}
+.shfoot p{margin:4px 0}
+.shfoot b{color:var(--text)}
+/* upgrade moment */
+.cele{position:absolute;left:16px;right:16px;bottom:90px;z-index:7;background:var(--surface);border-radius:24px;padding:18px 16px 16px;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.25)}
+.cele .ring{width:96px;height:96px;margin:0 auto;border-radius:50%;background:var(--tb);display:grid;place-items:center}
+.cele img{width:80px;height:86px}
+.cele h3{margin:8px 0 2px;font-size:1.25em}.cele p{margin:0 0 12px;color:var(--txt2)}
+.cele .pips{margin:4px 0 8px}.cele .pips i{width:.85em;height:.85em}
+.sparks{position:absolute;inset:0;pointer-events:none}
+.quietcard{display:flex;gap:12px;align-items:center;padding:12px 14px;border-radius:20px;background:var(--gd-bg);border:1.5px solid color-mix(in srgb,var(--gd-ic) 30%,transparent);margin-top:12px}
+.quietcard svg{width:30px;height:30px;color:var(--gd-ic);flex:none}
+.quietcard p{margin:0;font-size:.875em}.quietcard b{display:block;font-size:1.0625em}
+.rmnote{position:absolute;top:58px;left:14px;z-index:8}
+</style></head><body><div class="doc">
+<header>WM_HERE<h1>Garden Shed, v2</h1><button class="btn" id="th"></button></header>
+<nav class="links"><a href="../index.html">Hub</a><a href="../shed.html">Shed v1 mockup</a><a href="../../pots/index.html#s6">Sixteen pots</a><a href="../../home-v2/index.html">Home v2</a><a href="notes.md">notes.md (SwiftUI)</a></nav>
+<p class="sub">Make the Shed feel like a little potting shed, not a settings list. Uses the colours already approved on Home v2 (tile fills and icons, bloom, accent, success). Example player: 44 shed points, 12 plants, garden level 1 finished, no Plus. Can at tier 2; trowel, net and mister at tier 1; shears and sun lamp still to find. Pots follow the proposed sixteen-pot ladder.</p>
+
+<section id="cmp"><h2>1. Three directions</h2>
+<p class="sub"><span class="dir">A</span>Shed wall: a wooden shed scene up top, a seed jar, then colour-coded tool rows that say what each tool does and what comes next. <span class="dir">B</span>Tool tiles: a small shed front with the jar, then a two-column grid of tool tiles; tap a tile for a sheet. <span class="dir">C</span>Pegboard: the tools hang on a pegboard above a bench with the jar; tap a tool for a sheet. All three share the pots shelf: sixteen pots on four wooden planks.</p>
+<div class="row" id="rowA"></div><div class="row gap" id="rowB"></div><div class="row gap" id="rowC"></div>
+</section>
+
+<section id="crit"><h2>2. Critic round</h2>
+<div class="verdict" id="verdict"><p class="sub">Critic notes go here after the first review.</p></div>
+</section>
+
+<section id="pick"><h2>3. Chosen direction, revised <span class="tagp tag-prop">Proposed</span></h2>
+<p class="sub" id="picksub"></p>
+<div class="row" id="rowP"></div>
+</section>
+</div>
+<script>
+document.querySelector('header').innerHTML=document.querySelector('header').innerHTML.replace('WM_HERE',WM.replaceAll('../logo','../../logo'));themeButton('#th');
+const ART2='../../brand/v4/svg/';
+const toolImg=(id,t,mono)=>`${ART2}tools/${id}-t${Math.max(1,t)}-${mono?'mono':'color'}.svg`;
+const UP='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M6 11l6-6 6 6"/></svg>';
+const CHEV='<svg viewBox="0 0 8 13"><path d="M1.5 1.5L6.5 6.5 1.5 11.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const ACORN='<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c.6 0 1 .4 1 1v1.1c3.9.4 7 2.5 7 5.4H4c0-2.9 3.1-5 7-5.4V3c0-.6.4-1 1-1zM5 11h14c0 5-3.2 9.5-7 11-3.8-1.5-7-6-7-11z"/></svg>';
+const PTS=44, ME={plants:12,levels:1,days:4};
+const cost=t=>({2:30,3:120})[t];
+const TOOLS=[
+ {id:'can',name:'Watering can',tier:2,tint:'lv',does:['Waters 1 plant per tap','Waters 2 plants per tap','Waters 3 plants per tap'],quiet:'Waters your plants'},
+ {id:'trowel',name:'Trowel',tier:1,tint:'sh',does:['Soil gives a small boost','Soil gives a bigger boost','Soil gives the biggest boost'],quiet:'Adds soil for growing'},
+ {id:'net',name:'Butterfly net',tier:1,tint:'vi',does:['Small catch circle','Bigger catch circle','Biggest catch circle'],quiet:'Catches visitors gently'},
+ {id:'mister',name:'Mister',tier:1,tint:'gd',does:['A drip of mist every 4 hours','A drip of mist every 3 hours','A drip of mist every 2 hours'],quiet:'Mists your plants'},
+ {id:'shears',name:'Shears',tier:0,tint:'bl',does:['A trim helps plants grow','A trim helps more','A trim helps the most'],find:'Finish level 2 in your garden to find them.',quietFind:'You will find these as your garden grows.'},
+ {id:'lamp',name:'Sun lamp',tier:0,tint:'bd',does:['Sunshine helps a little','Sunshine helps more','Sunshine helps the most'],find:'Finish level 3 in your garden to find it.',quietFind:'You will find this as your garden grows.'},
+];
+const pips=(t,label=true)=>`<span class="pips" ${label?`role="img" aria-label="Tier ${t} of 3"`:''}>${[1,2,3].map(i=>`<i class="${i<=t?'on':''}"></i>`).join('')}</span>`;
+
+/* ---------- art ---------- */
+function jarSVG(fill=0.8){ // acorn and seed jar
+ return `<svg viewBox="0 0 60 72" aria-hidden="true"><rect x="16" y="3" width="28" height="9" rx="3" fill="var(--wd)"/><rect x="18" y="4.5" width="24" height="2.5" rx="1.2" fill="#fff" opacity=".25"/>
+ <path d="M14 14h32c4 0 7 3 7 7v40c0 5-4 8-8 8H15c-4 0-8-3-8-8V21c0-4 3-7 7-7z" fill="var(--glass)" stroke="var(--bd-ic)" stroke-width="2.2"/>
+ <g>${[[18,58],[30,61],[42,57],[24,48],[37,47],[17,38],[44,40]].slice(0,Math.round(7*fill)).map(([x,y],i)=>`<g transform="translate(${x} ${y}) rotate(${(i%3-1)*14})"><ellipse cx="0" cy="2" rx="5.2" ry="6" fill="${i%2?'#B9783F':'#C98A4B'}"/><path d="M-6 -1.5C-6 -5 6 -5 6 -1.5Z" fill="#7A4C26"/><rect x="-.8" y="-7" width="1.6" height="3" rx=".8" fill="#7A4C26"/></g>`).join('')}
+ ${[[27,54],[34,42],[22,44],[46,50],[31,33]].map(([x,y])=>`<ellipse cx="${x}" cy="${y}" rx="1.6" ry="2.6" fill="#E9D7A5" transform="rotate(30 ${x} ${y})"/>`).join('')}</g>
+ <rect x="11" y="26" width="38" height="11" rx="3" fill="var(--bd-bg)" stroke="var(--bd-ic)" stroke-width="1.4"/><path d="M24 31.5h12" stroke="var(--bd-ic)" stroke-width="1.6" stroke-linecap="round"/>
+ <path d="M12 22c0-3 2-5 5-5" stroke="#fff" stroke-width="2.4" stroke-linecap="round" fill="none" opacity=".6"/></svg>`}
+
+function sceneSVG(withJar){ // wooden potting shed wall, 353 x 150
+ const planks=[...Array(12)].map((_,i)=>`<rect x="${i*30}" y="0" width="30" height="150" fill="${i%2?'var(--w2)':'var(--w1)'}"/><path d="M${i*30} 0V150" stroke="var(--wl)" stroke-width="1.5"/><circle cx="${i*30+15}" cy="22" r="1.3" fill="var(--wl)"/><circle cx="${i*30+15}" cy="128" r="1.3" fill="var(--wl)"/>`).join('');
+ const flags=['#8CC4EC','#F5A0B0','#F0C060','#CDB8F2','#81C784','#E8AE88','#8CC4EC','#F5A0B0','#F0C060','#CDB8F2','#81C784'];
+ const bunting=`<path d="M0 10 Q176 34 353 10" stroke="var(--wdk)" stroke-width="1.4" fill="none"/>`+flags.map((c,i)=>{const x=12+i*30.5,y=10+24*(1-Math.pow((x-176)/176,2));if(Math.abs(x-176)<22)return '';return `<path d="M${x-8} ${y-1}L${x+8} ${y-1}L${x} ${y+13}Z" fill="${c}"/>`}).join('');
+ const win=`<g transform="translate(20 40)"><rect x="-4" y="-4" width="78" height="62" rx="6" fill="var(--wd)"/><rect width="70" height="54" rx="3" fill="var(--sky)"/><circle cx="52" cy="14" r="8" fill="#F6C85A"/><path d="M0 44 Q18 34 36 42 T70 38V54H0Z" fill="var(--grass)"/><path d="M35 0V54M0 27H70" stroke="var(--wd)" stroke-width="4"/>
+  <rect x="-8" y="56" width="86" height="12" rx="3" fill="var(--wdk)"/>${[[6,'#F2788A'],[22,'#F0C060'],[38,'#CDB8F2'],[54,'#F2788A'],[68,'#8CC4EC']].map(([x,c])=>`<path d="M${x} 56v-8" stroke="#4E8A3A" stroke-width="2"/><circle cx="${x}" cy="47" r="4.2" fill="${c}"/><circle cx="${x}" cy="47" r="1.5" fill="#FFF3C4"/>`).join('')}</g>`;
+ const shelf=`<g transform="translate(110 0)"><rect x="0" y="100" width="130" height="7" rx="2" fill="var(--wd)"/><path d="M14 107l8 10M116 107l-8 10" stroke="var(--wdk)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M10 100l3-20h22l3 20z" fill="#C8734A"/><rect x="11" y="77" width="26" height="6" rx="3" fill="#DD8C63"/><path d="M24 77c-6-8-2-14 0-16 2 2 6 8 0 16z" fill="#4E8A3A"/><path d="M24 77c4-6 10-6 12-6-1 4-6 7-12 6z" fill="#6BA34F"/>
+  <rect x="48" y="78" width="18" height="22" rx="2" fill="#8CC4EC"/><rect x="48" y="78" width="18" height="6" fill="#5B8FD0"/><circle cx="57" cy="91" r="4" fill="#F0C060"/>
+  <rect x="70" y="82" width="16" height="18" rx="2" fill="#F5A0B0"/><rect x="70" y="82" width="16" height="5" fill="#D77A8C"/><circle cx="78" cy="93" r="3" fill="#fff" opacity=".8"/>
+  ${withJar?`<g transform="translate(92 46) scale(.75)">${jarSVG().replace('<svg viewBox="0 0 60 72" aria-hidden="true">','').replace('</svg>','')}</g>`:`<path d="M94 100l2.5-15h17l2.5 15z" fill="#8FB08C"/><rect x="95" y="82" width="20" height="5" rx="2.5" fill="#B4CCB1"/>
+  <circle cx="122" cy="94" r="6" fill="#E9D7A5"/><path d="M117 92q5 3 10 0M117 96q5 3 10 0" stroke="#B9A06A" stroke-width="1" fill="none"/>`}</g>`;
+ const lamp=`<g transform="translate(0 10)"><g class="lamp"><path d="M176 -10V40" stroke="var(--wdk)" stroke-width="1.6"/><circle class="halo" cx="176" cy="54" r="20" fill="var(--glow)" opacity=".6"/><path d="M164 46h24l-4-8h-16z" fill="#3F7A45"/><rect x="174" y="34" width="4" height="5" fill="#2E5E33"/><circle cx="176" cy="52" r="7" fill="#FFF3C4"/><path d="M170 50q6 10 12 0" stroke="#3F7A45" stroke-width="1.6" fill="none"/></g></g>`;
+ const door=`<g transform="translate(258 26)"><rect x="-4" y="-4" width="86" height="128" rx="5" fill="var(--wdk)"/><rect width="78" height="124" fill="var(--sky)"/><path d="M0 84 Q30 72 78 80V124H0Z" fill="var(--grass)"/>
+  <path d="M18 84v-14" stroke="#4E8A3A" stroke-width="2.4"/><g transform="translate(18 66)">${[0,72,144,216,288].map(a=>`<ellipse cx="0" cy="-5" rx="3.4" ry="5" fill="#F2788A" transform="rotate(${a})"/>`).join('')}<circle r="3" fill="#F6C85A"/></g>
+  <path d="M46 92v-10" stroke="#4E8A3A" stroke-width="2"/><circle cx="46" cy="80" r="4" fill="#F0C060"/>
+  <g class="bfly"><g transform="translate(58 34)"><path d="M0 0C-8 -10 -14 -2 -10 4C-7 8 -2 6 0 2C2 6 7 8 10 4C14 -2 8 -10 0 0Z" fill="#E8913A"/><rect x="-.9" y="-5" width="1.8" height="11" rx=".9" fill="#3B2A1A"/></g></g>
+  <path d="M78 0L104 10V114L78 124Z" fill="var(--wd)"/><path d="M82 30L100 36M82 92L100 90M82 32L100 88" stroke="var(--wdk)" stroke-width="3"/><circle cx="96" cy="64" r="2.6" fill="#F0C060"/></g>`;
+ const floor=`<rect x="0" y="140" width="353" height="10" fill="var(--wl)"/>`;
+ return `<svg viewBox="0 0 353 150" role="img" aria-label="A cosy wooden garden shed with a window, a shelf of pots and an open door to the garden">${planks}${bunting}${win}${shelf}${lamp}${floor}${door}</svg>`}
+
+function houseSVG(){ // small shed front for B
+ return `<svg class="house" viewBox="0 0 84 76" aria-hidden="true"><path d="M6 32L42 4L78 32Z" fill="var(--sh-ic)"/><path d="M2 34L42 2L82 34" stroke="var(--wdk)" stroke-width="4" stroke-linecap="round" fill="none"/>
+ <rect x="12" y="30" width="60" height="44" fill="var(--w1)"/>${[0,1,2,3,4].map(i=>`<path d="M${12+i*12} 30V74" stroke="var(--wl)" stroke-width="1.2"/>`).join('')}
+ <rect x="34" y="44" width="18" height="30" rx="2" fill="var(--wd)"/><circle cx="48" cy="60" r="1.6" fill="#F0C060"/>
+ <rect x="16" y="40" width="13" height="12" rx="2" fill="var(--sky)" stroke="var(--wd)" stroke-width="2.4"/><circle cx="64" cy="48" r="5" fill="#F2788A"/><path d="M64 53v8" stroke="#4E8A3A" stroke-width="2"/>
+ <circle cx="42" cy="22" r="4" fill="var(--glow)"/><rect x="2" y="72" width="80" height="4" rx="2" fill="var(--grass)"/></svg>`}
+
+function benchSVG(){
+ return `<svg viewBox="0 0 373 64" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="22" width="373" height="12" fill="var(--wd)"/><rect x="0" y="22" width="373" height="3" fill="#fff" opacity=".18"/><rect x="0" y="34" width="373" height="30" fill="var(--wdk)" opacity=".55"/><rect x="24" y="34" width="10" height="30" fill="var(--wdk)"/><rect x="339" y="34" width="10" height="30" fill="var(--wdk)"/></svg>`}
+
+/* ---------- shared pieces ---------- */
+const jarCard=(o={})=>o.quiet?`<div class="quietcard"><svg viewBox="0 0 24 24">${IC.leaf.replace(/^<svg[^>]*>|<\/svg>$/g,'')}</svg><p><b>Quiet Garden is on</b>Your tools are ready to use. No points here.</p></div>`
+ :`<div class="jar" role="button" aria-label="${PTS} shed points. Earn them in the butterfly game. Opens Visitors.">${jarSVG()}<div class="t"><b>${PTS} shed points</b><span>Earn them in the butterfly game.</span></div><span class="go">Play ${CHEV}</span></div>`;
+
+function nextBlock(t){const c=cost(t.tier+1);
+ if(!c)return `<div class="full">All three tiers. Great tool!</div>`;
+ const ok=PTS>=c;
+ return `<div class="next"><p class="nx">Next: <b>${t.does[t.tier]}</b></p>${ok?`<button class="upb">${UP}Upgrade for ${c}</button>`:`<span class="bar"><i style="width:${PTS/c*100}%"></i></span><span class="of">${PTS} of ${c}</span>`}</div>`}
+
+function rowA(t,o={}){
+ if(!t.tier)return `<div class="trow find t-${t.tint}" aria-label="${t.name}. ${o.quiet?t.quietFind:t.find}"><div class="art"><img src="${toolImg(t.id,1,true)}" alt=""></div><div class="t"><div class="h"><h3>${t.name}</h3></div><p class="hint">${o.quiet?t.quietFind:t.find}</p></div></div>`;
+ return `<div class="trow t-${t.tint}"><div class="art"><img src="${toolImg(t.id,t.tier)}" alt=""></div><div class="t"><div class="h"><h3>${t.name}</h3>${pips(t.tier)}</div><p class="now">${o.quiet?t.quiet:t.does[t.tier-1]}</p>${o.quiet?'':nextBlock(t)}</div></div>`}
+
+function tileB(t){
+ if(!t.tier)return `<div class="tile find t-${t.tint}"><div class="art"><img src="${toolImg(t.id,1,true)}" alt=""></div><h3>${t.name}</h3><span class="now">${t.find.replace(' in your garden','')}</span></div>`;
+ const c=cost(t.tier+1);
+ return `<div class="tile t-${t.tint}">${c&&PTS>=c?`<span class="ready">${UP}Ready</span>`:''}<div class="art"><img src="${toolImg(t.id,t.tier)}" alt=""></div><h3>${t.name}</h3>${pips(t.tier)}<span class="now">${t.does[t.tier-1]}</span></div>`}
+
+function hookC(t){
+ if(!t.tier)return `<div class="hook find t-${t.tint}"><span class="pin"></span><span class="str"></span><span class="art"><img src="${toolImg(t.id,1,true)}" alt=""></span><span class="tag">${t.name}<span style="font-weight:600;font-size:.9em">To find</span></span></div>`;
+ const c=cost(t.tier+1);
+ return `<div class="hook t-${t.tint}"><span class="pin"></span><span class="str"></span><span class="up"><span class="art"><img src="${toolImg(t.id,t.tier)}" alt=""></span>${c&&PTS>=c?`<span class="dot">${UP}</span>`:''}</span><span class="tag">${t.name}${pips(t.tier)}</span></div>`}
+
+function potCell(p,o={}){
+ const k=p.unlock.kind,v=p.unlock.value;
+ let st='own';
+ if(k==='plus')st='plus';else if(k==='plants'&&ME.plants<v)st='ear';else if(k==='level'&&ME.levels<v)st='ear';else if(k==='gardenDays'&&ME.days<v)st='ear';
+ const size=o.ax?78:56;
+ const goal={plants:`Grow ${v} plants`,level:`Finish level ${v}`,gardenDays:`Visit ${v} days`}[k];
+ const sub=st==='own'?(p.id==='sageGlaze'?'Used by Daisy':p.id==='plainBlue'?'In use':'Yours'):st==='plus'?'':(o.quiet?'Comes as you grow':goal);
+ const lab=st==='own'?`${p.name}, yours`:st==='plus'?`${p.name}, part of WordFlora Plus`:`${p.name}, to earn. ${o.quiet?'Comes as you grow':goal}`;
+ return `<div class="pc ${st}" role="button" aria-label="${lab}"><span class="pw">${potSVG16(p,size,st==='ear'?'ghost':'full')}${st==='own'?`<span class="ck">${IC.ck}</span>`:''}</span><b>${p.name}</b>${sub?`<em>${sub}</em>`:''}${st==='plus'?'<span class="pl">Plus</span>':''}</div>`}
+
+function shelf(o={}){
+ const per=o.ax?2:4,rows=[];for(let i=0;i<POTS16.length;i+=per)rows.push(POTS16.slice(i,i+per));
+ const own=POTS16.filter(p=>p.unlock.kind!=='plus'&&!(p.unlock.kind==='plants'&&ME.plants<p.unlock.value)&&!(p.unlock.kind==='level'&&ME.levels<p.unlock.value)&&!(p.unlock.kind==='gardenDays'&&ME.days<p.unlock.value)).length;
+ return `<div class="potsec"><div class="sec">${o.quiet?'Your pot shelf':'Pots'}<small>${o.quiet?'Tap a pot to see it up close.':`${own} of 16 on your shelf. Tap a pot to see how to earn it.`}</small></div><div class="shelf">${rows.map(r=>`<div class="prow" style="--ph:${((o.ax?78:56)*100/120+2).toFixed(1)}px">${r.map(p=>potCell(p,o)).join('')}</div>`).join('')}
+ <div class="shfoot"><p><b>Pots you earn stay yours.</b> A pot on a plant stays on it.</p><p>Plus pots are extra. A grown-up can find Plus in Settings.</p></div></div></div>`}
+
+const toolsHead=(o={})=>`<div class="sec">Tools<small>${o.quiet?'What each tool does.':'What each tool does, and what comes next.'}</small></div>`;
+
+/* ---------- direction screens ---------- */
+const scrA=(o={})=>`<div class="scene">${sceneSVG()}</div>${jarCard(o)}${toolsHead(o)}${TOOLS.map(t=>rowA(t,o)).join('')}${shelf(o)}`;
+const scrB=(o={})=>`<div class="bhead">${houseSVG()}<div class="jarmini">${jarSVG()}<div><b>${PTS} shed points</b><span>Earn them in the butterfly game. <span class="go">Play &rsaquo;</span></span></div></div></div><div class="sec">Tools<small>Tap a tool to see what it does.</small></div><div class="tgrid">${TOOLS.map(tileB).join('')}</div>${shelf(o)}`;
+const scrC=(o={})=>`<div class="peg"><div class="hooks">${TOOLS.map(hookC).join('')}</div><div class="bench">${benchSVG()}<div style="position:absolute;left:20px;bottom:30px;width:40px;height:48px">${jarSVG()}</div><div style="position:absolute;left:150px;bottom:30px;line-height:0">${potSVG16(POTS16[1],44)}</div><div style="position:absolute;right:26px;bottom:30px;line-height:0">${potSVG16(POTS16[3],38)}</div></div></div>
+ <div class="ptsline"><span><b>${PTS} shed points</b> from the butterfly game</span><a>Play &rsaquo;</a></div><div class="sec" style="margin-top:6px">Tap a tool to see what it does.</div>${shelf(o)}`;
+function sheet(t){const c=cost(t.tier+1);
+ return `<div class="dim"></div><div class="sheet t-${t.tint}"><div class="grab"></div><div class="top"><span class="art"><img src="${toolImg(t.id,t.tier)}" alt=""></span><div><h3>${t.name}</h3>${pips(t.tier)}</div></div>
+ <div class="rows"><p><span>Now</span>${t.does[t.tier-1]}</p><p><span>Next</span>${t.does[t.tier]}</p></div>
+ ${PTS>=c?`<button class="pbtn">Upgrade for ${c} shed points</button>`:`<div class="next" style="margin:0"><span class="bar"><i style="width:${PTS/c*100}%"></i></span><span class="of">${PTS} of ${c} points</span></div>`}</div>`}
+
+const wrap=(html,scroll)=>`<div class="sv" ${scroll?`data-scroll="${scroll}"`:''}>${html}</div>`;
+const P=(html,o={})=>phone(wrap(html,o.scroll),{title:'Garden Shed',tag:'proposed',...o});
+document.getElementById('rowA').innerHTML=[
+ fig('a-light','A. Shed wall, light','Scene, jar, colour rows. Each row: name, tier pips, what it does now, then the next step as a button or a bar.',P(scrA())),
+ fig('a-dark','A. Shed wall, dark','Same layout; wood and fills switch to the dark set.',P(scrA(),{theme:'dark'})),
+ fig('a-pots','A. Scrolled to pots','Sixteen pots on four planks. Earned: colour and a check. To earn: soft silhouette and the goal. Plus: colour and a small tag, no price.',P(scrA(),{scroll:'pots'})),
+].join('');
+document.getElementById('rowB').innerHTML=[
+ fig('b-light','B. Tool tiles, light','Small shed front with the jar. Two-column tiles with pips and the current effect; "Ready" when an upgrade is affordable.',P(scrB())),
+ fig('b-dark','B. Tool tiles, dark','',P(scrB(),{theme:'dark'})),
+ fig('b-sheet','B. Tile tapped','Sheet: Now, Next and the upgrade button.',P(scrB(),{over:sheet(TOOLS[1])})),
+].join('');
+document.getElementById('rowC').innerHTML=[
+ fig('c-light','C. Pegboard, light','Tools hang on hooks in their own colour ring; the jar sits on the bench. A small up arrow means an upgrade is ready.',P(scrC())),
+ fig('c-dark','C. Pegboard, dark','',P(scrC(),{theme:'dark'})),
+ fig('c-sheet','C. Tool tapped','Same sheet as B.',P(scrC(),{over:sheet(TOOLS[0])})),
+].join('');
+function applyScroll(){document.querySelectorAll('.sv[data-scroll]').forEach(el=>{const tg=el.querySelector('.'+(el.dataset.scroll==='pots'?'potsec':el.dataset.scroll));if(tg)el.style.transform=`translateY(-${tg.offsetTop-6}px)`;});}
+window.addEventListener('load',applyScroll);
+</script>
+<script src="pick.js"></script>
+</body></html>
