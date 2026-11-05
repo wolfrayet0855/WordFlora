@@ -262,11 +262,17 @@ final class TendingUITests: XCTestCase {
         let top = nav.exists ? nav.frame.maxY : 0
         // The repot sheet's footer is pinned over the bottom of its scroll view, with a 28pt fade above it: text under
         // the footer or the fade is clipped or faded on purpose, so the visible area ends at the footer's top minus the fade.
+        // At accessibility sizes the summary scrolls with the sheet instead, so only a summary or hint sitting right
+        // above the button counts as the footer; with neither, the footer is the button and the fade above it.
+        let go = app.buttons["repot-go"]
         let pinned: XCUIElement? = {
-            for id in ["repot-summary", "pot-hint"] where element(id).exists { return element(id) }
-            return app.buttons["repot-go"].exists ? app.buttons["repot-go"] : nil
+            for id in ["repot-summary", "pot-hint"] where element(id).exists {
+                let e = element(id)
+                if !go.exists || (e.frame.maxY <= go.frame.minY + 1 && go.frame.minY - e.frame.maxY < 24) { return e }
+            }
+            return go.exists ? go : nil
         }()
-        let footerTop = pinned.map { $0.identifier == "repot-go" ? $0.frame.minY : $0.frame.minY - 8 - 28 }
+        let footerTop = pinned.map { $0.frame.minY - 8 - 28 }
         let visible: CGRect? = scroll.exists ? {
             let f = scroll.frame
             let bottom = footerTop.map { $0 > f.minY ? min(f.maxY, $0) : f.maxY } ?? f.maxY
@@ -418,6 +424,7 @@ final class TendingUITests: XCTestCase {
     /// Picker and Shed part way up the ladder (levels 1 and 2 finished, 6 plants in level 3, 3 Garden Days), in light,
     /// dark and an accessibility size, to compare with design-preview/pots section 6.
     func testPotScreensPartWayUpTheLadder() {
+        executionTimeAllowance = 300          // three looks, two launches each, scrolling the whole Shed: about 2 minutes
         let looks: [(String, XCUIDevice.Appearance, [String])] = [
             // The app's own dark setting too: the device switch does not always reach a freshly launched app in time.
             ("light", .light, []), ("dark", .dark, ["-uitest-dark"]),
