@@ -146,6 +146,85 @@ final class RestCardUITests: XCTestCase {
         audit("rest-card-dark-axl")
     }
 
+    // MARK: back soon after "That's enough for now" (docs/pm/ad-gate-return-nudge.md)
+
+    /// Three words, "That's enough for now", then Home within the 3 minute window.
+    private func backHomeSoon(_ extra: [String] = []) {
+        openRestCard(extra)
+        app.buttons["restCard.enough"].tap()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
+    }
+
+    private var nudge: XCUIElement { element("nudgeCard") }
+
+    func testAFreeAdultBackSoonIsToldOnPlayAndAnAdThatCannotPlayBringsTheNudge() {
+        backHomeSoon(Self.freeWithAds)                   // ads offline: the rules say yes, but no real ad can load
+        let note = element("home.adNote")
+        XCTAssertTrue(note.waitForExistence(timeout: 3), "the honest line under Play")
+        XCTAssertEqual(note.label, "A short ad may play first.")
+        XCTAssertLessThan(app.buttons["Play"].frame.maxY, note.frame.minY + 1, "said right under Play")
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label MATCHES '.*[0-9]+ ?(s|sec|min).*'")).firstMatch.exists,
+                       "no timer on screen")
+        shot("home-ad-note")
+        app.buttons["Play"].tap()
+        XCTAssertTrue(nudge.waitForExistence(timeout: 8), "the ad could not play, so the nudge shows instead of a wait")
+        app.buttons["nudgeCard.playAnyway"].tap()
+        XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5), "Play anyway starts a word")
+    }
+
+    func testPlusPlayersBackSoonGetTheNudgeAndPlayAnywayPlays() {
+        backHomeSoon(Self.freeWithAds + ["-uitest-plus"])
+        XCTAssertFalse(element("home.adNote").exists, "no ad note with Plus")
+        app.buttons["Play"].tap()
+        XCTAssertTrue(nudge.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Your garden would love a visit"].exists)
+        for id in ["nudgeCard.visit", "nudgeCard.puzzle", "nudgeCard.playAnyway"] { XCTAssertTrue(app.buttons[id].exists, id) }
+        XCTAssertFalse(app.buttons["Play"].exists, "Home's own content steps aside under the card")
+        shot("nudge-light")
+        app.buttons["nudgeCard.playAnyway"].tap()
+        XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
+    }
+
+    func testCalmPlayersBackSoonCanVisitTheGarden() {
+        backHomeSoon(Self.freeWithAds + ["-uitest-calm"])
+        XCTAssertFalse(element("home.adNote").exists, "Calm mode never gets an ad")
+        app.buttons["Play"].tap()
+        XCTAssertTrue(app.buttons["nudgeCard.visit"].waitForExistence(timeout: 5))
+        app.buttons["nudgeCard.visit"].tap()
+        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
+        app.buttons["Play"].tap()
+        XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5), "the nudge shows once; Play is ordinary after it")
+    }
+
+    func testQuietGardenBackSoonCanTryTheDailyBloom() {
+        backHomeSoon(Self.freeWithAds + ["-uitest-quiet"])
+        XCTAssertFalse(element("home.adNote").exists, "Quiet Garden never gets an ad")
+        app.buttons["Play"].tap()
+        XCTAssertTrue(app.buttons["nudgeCard.puzzle"].waitForExistence(timeout: 5))
+        app.buttons["nudgeCard.puzzle"].tap()
+        XCTAssertTrue(app.staticTexts["Daily Bloom"].waitForExistence(timeout: 5), "the puzzle is today's Daily Bloom")
+    }
+
+    func testAuditNudgeCard() {
+        backHomeSoon(Self.freeWithAds + ["-uitest-plus"])
+        app.buttons["Play"].tap()
+        settle(nudge)
+        audit("nudge-card")
+    }
+
+    func testAuditNudgeCardDarkAtALargeTextSize() {
+        backHomeSoon(Self.freeWithAds + ["-uitest-plus"] + Self.axL)
+        app.buttons["Play"].tap()
+        settle(nudge)
+        XCUIDevice.shared.appearance = .dark
+        sleep(1)
+        shot("nudge-dark-axl")
+        reach(app.buttons["nudgeCard.playAnyway"], "Play anyway")
+        audit("nudge-card-dark-axl")
+    }
+
     // MARK: break card
 
     func testTheBreakCardHasNoAdNoteAndNoPlusRow() {

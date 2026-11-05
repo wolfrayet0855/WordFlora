@@ -79,6 +79,10 @@ struct HomeView: View {
     @ScaledMetric(relativeTo: .caption) private var lockIcon: CGFloat = 13
 
     @State private var labelLines: [String: Int] = [:]
+    /// "A short ad may play first." under Play, in the 3 minutes after "That's enough for now" (AdGate.returnVisit).
+    @State private var playAdNote = false
+    @State private var showNudge = false
+    @State private var playStarting = false
     private let reportsLayout = LineProbe.enabled
 
     /// Accessibility text sizes switch the Explore grid to one column of list rows.
@@ -91,39 +95,58 @@ struct HomeView: View {
         // One look at the unlock stats per render (each look fetches the garden), shared by every tile.
         let stats = app.unlockStats, showAll = app.settings.showEverything
         let unlocked = Set(Feature.allCases.filter { FeatureUnlockPolicy.isUnlocked($0, stats: stats, showEverything: showAll) })
-        ScrollView {
-            VStack(alignment: .leading, spacing: 12) {
-                topBar
-                hero(days: profile?.gardenDays ?? 0, roseStock: profile?.roseOfJerichoCount ?? 0, roseProgress: profile?.roseSeedProgress ?? 0,
-                     showRose: unlocked.contains(.rose),
-                     // Before the first plant the next word brings one at once, so the count only shows after it (and not in Quiet Garden).
-                     wordsTowardPlant: stats.plantsEarned > 0 && !app.settings.quietGarden ? app.game.wordsTowardPlant : nil)
+        ZStack {
+            // While the nudge card shows, Home's own content leaves the hierarchy (the audit still measures hidden text).
+            if !showNudge {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 12) {
+                        topBar
+                        hero(days: profile?.gardenDays ?? 0, roseStock: profile?.roseOfJerichoCount ?? 0, roseProgress: profile?.roseSeedProgress ?? 0,
+                             showRose: unlocked.contains(.rose),
+                             // Before the first plant the next word brings one at once, so the count only shows after it (and not in Quiet Garden).
+                             wordsTowardPlant: stats.plantsEarned > 0 && !app.settings.quietGarden ? app.game.wordsTowardPlant : nil)
 
-                if app.showWelcomeBack || app.plusOffer != nil {
-                    VStack(spacing: 10) {
-                        if app.showWelcomeBack { welcomeCard.transition(.opacity) }
-                        if app.plusOffer != nil { plusOfferCard.transition(.opacity) }
+                        if app.showWelcomeBack || app.plusOffer != nil {
+                            VStack(spacing: 10) {
+                                if app.showWelcomeBack { welcomeCard.transition(.opacity) }
+                                if app.plusOffer != nil { plusOfferCard.transition(.opacity) }
+                            }
+                        }
+
+                        playButton
+                        playAdNoteLabel
+                        if unlocked.contains(.dailyBloom) { dailyBloom.padding(.bottom, 4) }
+
+                        Text("Explore")
+                            .textCase(.uppercase).kerning(1.4)
+                            .font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.secondaryText)
+                            .padding(.horizontal, 4)
+                            .accessibilityAddTraits(.isHeader)
+                        exploreGrid(unlocked)
                     }
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 24)
+                    .onPreferenceChange(LabelLinesKey.self) { if reportsLayout { labelLines = $0 } }
                 }
-
-                playButton
-                if unlocked.contains(.dailyBloom) { dailyBloom.padding(.bottom, 4) }
-
-                Text("Explore")
-                    .textCase(.uppercase).kerning(1.4)
-                    .font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.secondaryText)
-                    .padding(.horizontal, 4)
-                    .accessibilityAddTraits(.isHeader)
-                exploreGrid(unlocked)
             }
-            .padding(.horizontal, 16)
-            .padding(.bottom, 24)
-            .onPreferenceChange(LabelLinesKey.self) { if reportsLayout { labelLines = $0 } }
+            if showNudge {
+                NudgeCard(puzzle: NudgeCardCopy.puzzleTarget(dailyBloomOpen: unlocked.contains(.dailyBloom),
+                                                             dailyDone: app.dailyBloomDoneToday, butterflyOpen: unlocked.contains(.butterfly)),
+                          onVisit: { closeNudge(); router.go(.garden) },
+                          onPuzzle: {
+                              closeNudge()
+                              if !app.dailyBloomDoneToday && unlocked.contains(.dailyBloom) { router.go(.game(daily: true, level: nil)) }
+                              else { router.go(.butterfly) }
+                          },
+                          onPlay: { closeNudge(); router.go(.game(daily: false, level: nil)) })
+                .transition(.opacity)
+            }
         }
         .background(Color.appBackground.ignoresSafeArea())
-        .safeAreaInset(edge: .bottom) { bannerArea }
+        .safeAreaInset(edge: .bottom) { if !showNudge { bannerArea } }
+        .task(id: app.restExitAt) { await followReturnWindow() }
         .task { await app.prepareBannerIfAllowed() }
-        .onAppear { app.checkPlusOffer() }
+        .onAppear { app.checkPlusOffer(); playAdNote = app.returnVisit == .adMayPlay }
         .navigationBarHidden(true)
         .overlay(alignment: .bottomLeading) { layoutReport }
     }
@@ -232,8 +255,46 @@ struct HomeView: View {
 
     // MARK: play
 
+    /// Play: an ordinary start, or (soon after "That's enough for now") an ad that may play first on this tap, or the
+    /// nudge card (AppModel.playTappedOnHome).
+    private func play() {
+        guard !playStarting else { return }
+        playStarting = true
+        Task {
+            let start = await app.playTappedOnHome(adNoteShown: playAdNote)
+            playStarting = false
+            playAdNote = false
+            if start { router.go(.game(daily: false, level: nil)) } else { withAnimation(.easeOut(duration: 0.3)) { showNudge = true } }
+        }
+    }
+
+    private func closeNudge() { showNudge = false }
+
+    /// The honest ad note follows the 3 minute window: judged as Home appears or the window starts, and dropped when
+    /// it ends. Nothing on screen counts down.
+    private func followReturnWindow() async {
+        playAdNote = app.returnVisit == .adMayPlay
+        guard playAdNote, let since = app.restExitAt else { return }
+        let left = AdGate.returnWindowSeconds - Date.now.timeIntervalSince(since)
+        if left > 0 { try? await Task.sleep(for: .seconds(left)) }
+        guard !Task.isCancelled else { return }
+        playAdNote = app.returnVisit == .adMayPlay
+    }
+
+    @ViewBuilder private var playAdNoteLabel: some View {
+        if playAdNote {
+            // Said beside the choice that can lead to an ad, never hidden away (as on the resting card).
+            Label(NudgeCardCopy.adNote, systemImage: "info.circle")
+                .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity)
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("home.adNote")
+        }
+    }
+
     private var playButton: some View {
-        Button { router.go(.game(daily: false, level: nil)) } label: {
+        Button { play() } label: {
             HStack(spacing: 10) {
                 Image(systemName: "play.fill").font(.system(size: playIcon)).accessibilityHidden(true)
                 Text("Play").measuresLines("Play", font: Theme.font(.title2, weight: .heavy))

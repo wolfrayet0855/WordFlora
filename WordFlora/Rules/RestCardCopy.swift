@@ -33,3 +33,31 @@ enum RestCardCopy {
             + [reward(isDaily: false, wordsPlayed: 1), reward(isDaily: false, wordsPlayed: 3), reward(isDaily: true, wordsPlayed: 3)]
     }
 }
+
+/// Words for the nudge card: Play tapped again soon after "That's enough for now" by a player who gets no ad
+/// (Plus, under 13, Calm mode, Quiet Garden, ads off or not possible right now). Never blocks play, never mentions
+/// ads, timers or Plus. Positive only, grade 2-3; checked by CopySafety in ReturnNudgeTests.
+enum NudgeCardCopy {
+    static let title = "Your garden would love a visit"
+    static let body = "Say hello to your plants, or try a fun puzzle."
+    static let visit = "Visit my garden"
+    static let puzzle = "Try a puzzle"
+    static let playAnyway = "Play anyway"
+    static let dailyBloomHint = "Opens the Daily Bloom"
+    static let butterflyHint = "Opens the butterfly game"
+    static let playAnywayHint = "Starts a new word"
+    /// Shown under Play on Home when an ad may play on the player's tap (the rest card's honest line).
+    static let adNote = RestCardCopy.adNote
+
+    enum Puzzle: Equatable { case dailyBloom, butterfly }
+
+    /// The Daily Bloom until it is done today, then the butterfly game; nothing if neither is open yet.
+    static func puzzleTarget(dailyBloomOpen: Bool, dailyDone: Bool, butterflyOpen: Bool) -> Puzzle? {
+        if dailyBloomOpen && !dailyDone { return .dailyBloom }
+        return butterflyOpen ? .butterfly : nil
+    }
+
+    static var allLines: [String] {
+        [title, body, visit, puzzle, playAnyway, dailyBloomHint, butterflyHint, playAnywayHint, adNote]
+    }
+}

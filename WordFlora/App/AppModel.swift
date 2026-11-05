@@ -404,6 +404,48 @@ final class AppModel {
         return AdGate.shouldShowInterstitial(ctx)
     }
 
+    // MARK: Coming back soon after "That's enough for now" (docs/pm/ad-gate-return-nudge.md)
+
+    /// When the player last tapped "That's enough for now" on the resting card; cleared by their next Play on Home.
+    private(set) var restExitAt: Date?
+
+    /// The exit itself never plays or counts an ad; it only starts the 3 minute window.
+    func markRestExit() { restExitAt = now() }
+
+    /// What Home's Play does right now (AdGate.returnVisit): ordinary, "A short ad may play first.", or the nudge card.
+    /// As with the resting card's note, the ad rules are judged as of the end of the celebration's quiet window, so a
+    /// note decided as Home appears right after the last word still holds for the player's tap.
+    var returnVisit: AdGate.ReturnVisit {
+        let t = now()
+        var ad = adContext(choice: .playSoonAfterEnough)
+        ad.now = t.addingTimeInterval(ad.peakWindowSeconds)
+        ad.isNight = AdGate.isNight(t)
+        var r = AdGate.ReturnContext(now: t, enoughAt: restExitAt, ad: ad)
+        r.calmMode = settings.calmMode
+        r.quietGarden = settings.quietGarden
+        r.adsAvailable = adsEnabled
+        return AdGate.returnVisit(r)
+    }
+
+    /// The player's Play tap on Home. True: start the round. False: show the nudge card (which can still play).
+    /// The window is answered once: the next Play, from the nudge card or later, starts at once.
+    /// `adNoteShown`: an ad only ever follows a Play that said "A short ad may play first."; otherwise the nudge.
+    func playTappedOnHome(adNoteShown: Bool = true) async -> Bool {
+        let visit = returnVisit
+        restExitAt = nil
+        switch visit {
+        case .free: return true
+        case .nudge: return false
+        case .adMayPlay:
+            guard adNoteShown else { return false }
+            await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
+            // An ad that cannot play (not loaded, offline, refused) brings the nudge, never a wait.
+            guard mayStillLoadAds, await ads.showInterstitial() else { return false }
+            recordAdShown()
+            return true
+        }
+    }
+
     func prepareBannerIfAllowed() async {
         guard showBanner else { return }
         await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })

@@ -317,7 +317,7 @@ struct GameView: View {
                                 .accessibilityElement(children: .combine)
                                 .accessibilityIdentifier("restCard.adNote")
                         }
-                        Button(RestCardCopy.enough) { showRestCard = false; router.home() }
+                        Button(RestCardCopy.enough) { showRestCard = false; app.markRestExit(); router.home() }
                             .buttonStyle(SecondaryButtonStyle()).accessibilityIdentifier("restCard.enough")
                     }
                     .padding(.top, 6)
