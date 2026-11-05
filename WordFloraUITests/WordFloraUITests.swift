@@ -453,3 +453,112 @@ final class WordFloraUITests: XCTestCase {
     }
 }
 
+
+/// Screens for the app-vs-mockup fidelity review (`docs/pm/app-vs-mockups.md`). Each test only checks that the screen
+/// opened; the PNGs go to `SCREENSHOT_DIR` (pass `TEST_RUNNER_SCREENSHOT_DIR` to xcodebuild) and to the result bundle.
+final class FidelityScreensUITests: XCTestCase {
+    var app: XCUIApplication!
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        executionTimeAllowance = 360          // three looks per test, several launches each
+        app = XCUIApplication()
+    }
+
+    override func tearDown() {
+        XCUIDevice.shared.appearance = .light
+        super.tearDown()
+    }
+
+    private func shot(_ name: String) {
+        let data = XCUIScreen.main.screenshot().pngRepresentation
+        if let dir = ProcessInfo.processInfo.environment["SCREENSHOT_DIR"] {
+            try? data.write(to: URL(fileURLWithPath: dir).appendingPathComponent("fid-\(name).png"))
+        }
+        let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
+    }
+
+    /// light, dark (device and app switch, as the device switch does not always reach a fresh app), largest text size.
+    private static let looks: [(String, XCUIDevice.Appearance, [String])] = [
+        ("light", .light, []), ("dark", .dark, ["-uitest-dark"]),
+        ("ax5", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]),
+    ]
+
+    private func launch(_ look: (String, XCUIDevice.Appearance, [String]), _ extra: [String]) {
+        XCUIDevice.shared.appearance = look.1
+        app.launchArguments = ["-uitest", "-uitest-onboarded"] + extra + look.2
+        app.launch()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 8))
+    }
+
+    func testHomeScreens() {
+        for look in Self.looks {
+            launch(look, ["-uitest-gardened", "-uitest-everything"])
+            sleep(2); shot("home-open-\(look.0)")
+            app.swipeUp(); sleep(1); shot("home-open-\(look.0)-end")
+            app.terminate()
+            launch(look, [])
+            sleep(2); shot("home-early-\(look.0)")
+            app.terminate()
+        }
+    }
+
+    func testPlantPageScreens() {
+        for look in Self.looks {
+            launch(look, ["-uitest-plant=daisy"])
+            app.buttons["Garden"].tap()
+            let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Daisy'")).firstMatch
+            XCTAssertTrue(tile.waitForExistence(timeout: 5))
+            sleep(1); shot("garden-\(look.0)")
+            tile.tap()
+            XCTAssertTrue(app.buttons["tend-water"].waitForExistence(timeout: 5))
+            sleep(3); shot("plant-\(look.0)")
+            app.swipeUp(); sleep(2); shot("plant-\(look.0)-scrolled")
+            app.terminate()
+        }
+    }
+
+    func testShedVisitorsAndLevelScreens() {
+        for look in Self.looks {
+            launch(look, ["-uitest-gardened", "-uitest-everything", "-uitest-album", "-uitest-points=12"])
+            app.buttons["Shed"].tap()
+            XCTAssertTrue(app.buttons["shed.tool.can"].waitForExistence(timeout: 5))
+            sleep(1); shot("shed-\(look.0)")
+            for i in 1...3 { app.swipeUp(); sleep(1); shot("shed-\(look.0)-\(i)") }
+            app.terminate()
+            launch(look, ["-uitest-gardened", "-uitest-everything", "-uitest-album"])
+            app.buttons["Visitors"].tap()
+            XCTAssertTrue(app.buttons["Say hello"].waitForExistence(timeout: 5))
+            sleep(1); shot("visitors-\(look.0)")
+            app.swipeUp(); sleep(1); shot("visitors-\(look.0)-2")
+            app.terminate()
+            launch(look, ["-uitest-gardened", "-uitest-everything"])
+            app.buttons["Levels"].tap()
+            XCTAssertTrue(app.staticTexts["Garden Path"].waitForExistence(timeout: 5))
+            sleep(1); shot("levels-\(look.0)")
+            app.terminate()
+        }
+    }
+
+    func testPotPickerAndGameScreens() {
+        for look in Self.looks {
+            launch(look, ["-uitest-plant=daisy", "-uitest-pots"])
+            app.buttons["Garden"].tap()
+            let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Daisy'")).firstMatch
+            XCTAssertTrue(tile.waitForExistence(timeout: 5))
+            for _ in 0..<10 where !tile.isHittable { app.swipeUp() }
+            tile.tap()
+            XCTAssertTrue(app.buttons["tend-repot"].waitForExistence(timeout: 5))
+            app.buttons["tend-repot"].tap()
+            XCTAssertTrue(app.buttons["repot-go"].waitForExistence(timeout: 5))
+            sleep(2); shot("repot-\(look.0)")
+            app.terminate()
+            launch(look, ["-uitest-word=LOTUS"])
+            app.buttons["Play"].tap()
+            XCTAssertTrue(app.buttons["Z"].waitForExistence(timeout: 5))
+            for ch in "ZX" { app.buttons[String(ch)].tap() }
+            sleep(1); shot("game-\(look.0)")
+            app.terminate()
+        }
+    }
+}
