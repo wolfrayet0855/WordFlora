@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// First session (spec section 19, P-03): rain intro, one neutral age question, an unloseable tutorial word,
+/// First session (spec section 19, P-03): petal intro, one neutral age question, an unloseable tutorial word,
 /// the first plant, one gentle tip. No ads, paywall or permission prompts here.
 struct OnboardingView: View {
     @Environment(AppModel.self) private var app
@@ -26,21 +26,12 @@ struct OnboardingView: View {
     }
 }
 
+/// The landing intro: petals fall, land in heaps and bloom into a row of flowers under the wordmark (IntroBloomView).
 private struct IntroView: View {
     @Environment(AppModel.self) private var app
-    @State private var showTitle = false
 
     var body: some View {
-        ZStack {
-            VStack(spacing: 8) {
-                WordmarkView(style: .largeTitle)
-                Text("Guess words. Grow a garden.").font(Theme.font(.callout, weight: .medium)).foregroundStyle(Color.secondaryText)
-            }
-            .opacity(showTitle ? 1 : 0)
-            FlowerRainView(onFinish: { withAnimation { app.onboarding.introFinished() } })
-        }
-        .onAppear { withAnimation(.easeOut(duration: 0.8).delay(0.5)) { showTitle = true } }
-        .accessibilityLabel("WordFlora")
+        IntroBloomView { withAnimation(.easeInOut(duration: IntroTimeline.handoff)) { app.onboarding.introFinished() } }
     }
 }
 
