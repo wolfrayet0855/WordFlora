@@ -109,13 +109,27 @@ struct RestScene: View {
             dx = 8 * eased; dy = 6 - 24 * eased                       // from +6 to -18
             opacity = phase < 0.3 ? 0.8 * phase / 0.3 : 0.8 * (1 - (phase - 0.3) / 0.7)
         }
-        return Text(verbatim: "z").font(.system(size: size, weight: .bold, design: .rounded))
-            .foregroundStyle(Color.tileVisitorsIcon)
-            .fixedSize()
+        // Drawn as a shape, not text: it is decoration, so it has no text for VoiceOver or the audit to find.
+        return ZeeShape()
+            .stroke(Color.tileVisitorsIcon, style: StrokeStyle(lineWidth: size * 0.16, lineCap: .round, lineJoin: .round))
+            .frame(width: size * 0.5, height: size * 0.5)
+            .padding(size * 0.25)
             .opacity(opacity)
             .offset(x: x + dx, y: top + dy)
     }
 
     /// 0 -> 1 -> 0 over one period, eased at both ends.
     private func wave(_ t: Double, period: Double) -> Double { 0.5 - 0.5 * cos(2 * .pi * t / period) }
+}
+
+/// A small lowercase "z" for the sleeping plant: top bar, diagonal, bottom bar.
+private struct ZeeShape: Shape {
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: r.minX, y: r.minY))
+        p.addLine(to: CGPoint(x: r.maxX, y: r.minY))
+        p.addLine(to: CGPoint(x: r.minX, y: r.maxY))
+        p.addLine(to: CGPoint(x: r.maxX, y: r.maxY))
+        return p
+    }
 }

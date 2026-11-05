@@ -17,7 +17,11 @@ struct GameView: View {
     @State private var showBreak = false
     /// Whether "One more" may lead to an ad, captured once as the resting card opens so its note never flickers.
     @State private var adNoteOnOneMore = false
+    /// Whether the card offers the quiet "Go ad-free" row, also captured once as the card opens: the card then does
+    /// not redraw when the ad rules' inputs (store state, settings) update behind it.
+    @State private var goAdFreeOnCard = false
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     private var reduceMotion: Bool { systemReduceMotion || app.settings.reduceMotionOverride }
     /// UI tests open the break card straight away (`-uitest-break-card`) instead of after 20 minutes.
     private static let uiTestBreakCard = ProcessInfo.processInfo.arguments.contains("-uitest-break-card")
@@ -25,32 +29,38 @@ struct GameView: View {
     @State private var speaker = AVSpeechSynthesizer()
 
     private var vm: GameViewModel { app.game }
+    /// The resting and break cards are modal: only the flower shows, dimmed, behind them (as in the mockup).
+    private var cardIsModal: Bool { showBreak || showRestCard }
     private var correctCount: Int { vm.guessedLetters.filter { vm.currentWord.contains($0) }.count }
 
     var body: some View {
         ZStack {
             Color.appBackground.ignoresSafeArea()
             VStack(spacing: 10) {
-                topBar
+                topBar.modifier(BehindModalCard(active: cardIsModal, minHeight: Theme.minTap))
                 FlowerView(petals: vm.petalsRemaining, resting: vm.phase == .restingOffer || vm.phase == .rested)
                     .frame(height: 170)
-                hintCard
-                WordTilesView(word: vm.currentWord, guessed: vm.guessedLetters, revealAll: vm.phase == .rested)
-                    .padding(.horizontal, 8)
-                if tutorial && vm.guessedLetters.isEmpty {
-                    Text("Tap a letter to guess").font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText)
-                        .symbolEffect(.pulse)
+                VStack(spacing: 10) {
+                    hintCard
+                    WordTilesView(word: vm.currentWord, guessed: vm.guessedLetters, revealAll: vm.phase == .rested)
+                        .padding(.horizontal, 8)
+                    if tutorial && vm.guessedLetters.isEmpty {
+                        Text("Tap a letter to guess").font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText)
+                            .symbolEffect(.pulse)
+                    }
                 }
+                .modifier(BehindModalCard(active: cardIsModal))
                 Spacer(minLength: 4)
                 KeyboardView(state: { vm.keyState(for: $0) }, onTap: tap, enabled: vm.phase == .playing)
                     .padding(.bottom, 8)
+                    .modifier(BehindModalCard(active: cardIsModal))
             }
             .padding(.horizontal, 12)
             // The resting and break cards are modal: the dimmed round behind them is hidden from VoiceOver.
-            .accessibilityHidden(showBreak || showRestCard)
+            .accessibilityHidden(cardIsModal)
             .focusable()
             .onKeyPress { press in
-                guard let ch = press.characters.uppercased().first, ch.isLetter, vm.phase == .playing else { return .ignored }
+                guard let ch = press.characters.uppercased().first, ch.isLetter, vm.phase == .playing, !cardIsModal else { return .ignored }
                 tap(ch); return .handled
             }
 
@@ -243,13 +253,12 @@ struct GameView: View {
                 VStack(spacing: 12) {
                     cardTitle(RestCardCopy.breakTitle)
                     cardBody(RestCardCopy.breakBody)
-                    // The three things to look at, as pictures; the line above already says them.
-                    HStack(alignment: .top, spacing: 22) {
-                        look(RestCardCopy.looks[0], systemImage: "square.split.2x2", color: .tileLevelsIcon)
-                        look(RestCardCopy.looks[1], systemImage: "leaf", color: .successText)
-                        look(RestCardCopy.looks[2], systemImage: "cloud.sun", color: .tileLevelsIcon)
-                    }
-                    .accessibilityHidden(true)
+                    // The three things to look at: pictures with their names, read as one line (never buttons).
+                    // At accessibility text sizes a row would break the names mid-word, so it stacks instead.
+                    let looksLayout = dynamicTypeSize.isAccessibilitySize
+                        ? AnyLayout(VStackLayout(spacing: 10)) : AnyLayout(HStackLayout(alignment: .top, spacing: 22))
+                    looksLayout { looks }
+                        .accessibilityElement(children: .combine)
                     VStack(spacing: 10) {
                         Button(RestCardCopy.takeBreak) { showBreak = false; router.home() }
                             .buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("breakCard.takeBreak")
@@ -298,7 +307,7 @@ struct GameView: View {
                             .buttonStyle(SecondaryButtonStyle()).accessibilityIdentifier("restCard.enough")
                     }
                     .padding(.top, 6)
-                    if app.showBanner { goAdFreeRow.padding(.top, 2) }
+                    if goAdFreeOnCard { goAdFreeRow.padding(.top, 2) }
                 }
                 .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
             }
@@ -342,9 +351,15 @@ struct GameView: View {
             .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
     }
 
+    @ViewBuilder private var looks: some View {
+        look(RestCardCopy.looks[0], systemImage: "square.split.2x2", color: .tileLevelsIcon)
+        look(RestCardCopy.looks[1], systemImage: "leaf", color: .successText)
+        look(RestCardCopy.looks[2], systemImage: "cloud.sun", color: .tileLevelsIcon)
+    }
+
     private func look(_ title: String, systemImage: String, color: Color) -> some View {
         VStack(spacing: 4) {
-            Image(systemName: systemImage).font(.system(size: 36)).foregroundStyle(color)
+            Image(systemName: systemImage).font(.system(size: 36)).foregroundStyle(color).accessibilityHidden(true)
             Text(title).font(Theme.font(.footnote, weight: .semibold)).foregroundStyle(Color.secondaryText)
         }
     }
@@ -418,6 +433,7 @@ struct GameView: View {
         if tutorial { onTutorialFinished(); return }
         if vm.sessionBeat {
             adNoteOnOneMore = app.adWouldPlayOnOneMore
+            goAdFreeOnCard = app.showBanner
             openCard { showRestCard = true }
         } else if daily { router.home() } else { vm.startRound() }
     }
@@ -427,5 +443,23 @@ struct GameView: View {
         u.rate = 0.42
         speaker.stopSpeaking(at: .immediate)
         speaker.speak(u)
+    }
+}
+
+/// Behind a modal card the round's text (top bar, clue, tiles, keyboard) is taken away and only the dimmed flower
+/// stays, as in the mockup. Hiding is not enough: the accessibility audit still measures hidden or transparent text,
+/// so the views leave the hierarchy. A clear box of the same size keeps the flower where it was, and the round comes
+/// back unchanged when the card closes (its state lives in the view model).
+private struct BehindModalCard: ViewModifier {
+    var active: Bool
+    var minHeight: CGFloat = 0
+    @State private var size: CGSize = .zero
+
+    func body(content: Content) -> some View {
+        if active {
+            Color.clear.frame(height: max(size.height, minHeight)).accessibilityHidden(true)
+        } else {
+            content.onGeometryChange(for: CGSize.self) { $0.size } action: { size = $0 }
+        }
     }
 }

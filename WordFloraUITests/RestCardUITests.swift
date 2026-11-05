@@ -9,6 +9,9 @@ final class RestCardUITests: XCTestCase {
 
     override func setUpWithError() throws {
         continueAfterFailure = false
+        // The resting card needs three whole words first. The flower sways for ever, so every tap waits out the
+        // idle check (about 5 s on a slow simulator): give these tests more than the 2 minute default.
+        executionTimeAllowance = 360
         app = XCUIApplication()
     }
 
