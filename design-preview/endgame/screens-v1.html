@@ -1,0 +1,477 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Endgame and weather</title>
+<!--
+  One phone (393 x 852) per URL. Params:
+    s=a        Grand Garden A: panoramic garden reveal (all 50 plants on terraced hills)
+    s=b        Grand Garden B: Gardener's Crown on the wordmark, wreath of all 50 plants
+    s=c        Grand Garden C: garden postcard (share card)
+    s=next     "What grows next" card (Seasons, endless Daily Bloom ranks, Visitor Sanctuary)
+    s=rescue   Rescue puzzle, step 1 of 2: long plant name (10 letters), peek ladder, skip path
+    s=rescue2  Rescue puzzle, step 2 of 2: short butterfly catch
+    s=mended   Recovery success: "Weathered the storm"
+    s=settings Settings row: Wild Weather (for grown-ups), off by default
+    theme=light|dark   rm=1 (Reduce Motion still: no petals, no drift)   scale=1|1.35 (larger text)   tall=1 (frame grows to fit)
+    static=1 (freeze animation for PNG renders)
+  Copy rules: CopySafety.banned (checked in index.html and by render.sh).
+-->
+<style>
+:root,[data-theme=light]{
+  --bg:#FAF7F0;--surface:#FFFFFF;--text:#2C3E2C;--accent:#E8A838;--ink:#1F3320;--accent-text:#8A5A00;--ok:#2E7D32;
+  --sec:color-mix(in srgb,var(--text) 88%,transparent);--line:color-mix(in srgb,var(--text) 12%,transparent);
+  --visit:#ECE5F6;--bloom:#FDE9EE;--levels:#DFEDF8;--garden:#E3F1DD;--visit-ink:#6A4A9C;--levels-ink:#1F5F8F;--bloom-ink:#A33A55;
+  --shadow:0 10px 30px rgba(44,62,44,.16);--soft:0 2px 8px rgba(44,62,44,.10);
+  --h1:#DCEBD2;--h2:#CDE3C0;--h3:#BFDAAF;--h4:#B0D19E;--h5:#A2C78E;
+  --petal:#F2A0B0;--gold:#E8A838;--tile:#FFFFFF;--slot:#F1ECE0;--storm:#C9D3DC;--toggle-off:#E3DED2}
+[data-theme=dark]{
+  --bg:#1A2E1A;--surface:#2C3E2C;--text:#D4EDD4;--accent:#F0C060;--ink:#1A2E1A;--accent-text:#F0C060;--ok:#81C784;
+  --visit:#40395A;--bloom:#4D3039;--levels:#2A4358;--garden:#2F4F30;--visit-ink:#CDB8F2;--levels-ink:#8CC4EC;--bloom-ink:#F4A9BC;
+  --shadow:0 10px 30px rgba(0,0,0,.45);--soft:0 2px 8px rgba(0,0,0,.35);
+  --h1:#263F27;--h2:#2B482D;--h3:#305133;--h4:#355A38;--h5:#3A633E;
+  --petal:#E98DA0;--gold:#F0C060;--tile:#34493A;--slot:#223822;--storm:#33475A;--toggle-off:#3E5540}
+*{box-sizing:border-box}
+html{font-size:calc(16px*var(--scale,1))}
+body{margin:0;background:#888;font-family:ui-rounded,"SF Pro Rounded","Nunito",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;color:var(--text)}
+.phone{width:393px;height:852px;position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+.tall .phone{height:auto;min-height:max(852px,100vh)}
+.status{height:54px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;font:600 15px system-ui;position:relative;z-index:5}
+h1{font-size:1.75rem;line-height:1.15;font-weight:800;margin:0;letter-spacing:-.01em;text-align:center;text-wrap:balance}
+p.body{font-size:1.0625rem;line-height:1.35;margin:0;text-align:center;color:var(--sec);text-wrap:balance}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;font-family:inherit;cursor:pointer;text-align:center;padding:10px 16px;color:var(--text)}
+.btn svg{width:1.25rem;height:1.25rem;flex:none}
+.btn.primary{min-height:56px;border-radius:18px;background:var(--accent);color:var(--ink);font-size:1.25rem;font-weight:800}
+.btn.secondary{min-height:52px;border-radius:18px;background:var(--surface);font-size:1.0625rem;font-weight:700;box-shadow:inset 0 0 0 1px var(--line)}
+.btn.quiet{min-height:44px;background:none;font-size:1.0625rem;font-weight:700;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--text) 30%,transparent);text-underline-offset:4px}
+.stack{display:flex;flex-direction:column;align-items:center;gap:10px;width:100%}
+.btns{display:flex;flex-direction:column;gap:10px;width:100%}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:5px 12px 5px 8px;border-radius:999px;font-size:.875rem;font-weight:800;line-height:1.2}
+.chip svg{width:1.1rem;height:1.1rem;flex:none}
+.chip.gold{background:color-mix(in srgb,var(--accent) 22%,var(--bg));color:var(--accent-text)}
+.chip.green{background:var(--garden);color:var(--text)}
+.chip.green svg{color:var(--ok)}
+.chip.sky{background:var(--levels);color:var(--levels-ink)}
+.home{height:5px;width:134px;border-radius:3px;background:color-mix(in srgb,var(--text) 70%,transparent);margin:8px auto 8px;flex:none}
+
+/* ---------- garden panorama (all 50 plants on five terraced hills) ---------- */
+.pano{position:relative;width:393px;height:330px;overflow:hidden;flex:none}
+.pano .hill{position:absolute;left:-14%;right:-14%;border-radius:50% 50% 0 0/100% 100% 0 0}
+.pano img{position:absolute;transform-origin:50% 92%}
+.pano .sun{position:absolute;width:44px;height:44px;border-radius:50%;background:var(--accent);opacity:.9;top:14px;right:40px;box-shadow:0 0 0 14px color-mix(in srgb,var(--accent) 18%,transparent),0 0 0 30px color-mix(in srgb,var(--accent) 9%,transparent)}
+[data-theme=dark] .pano .sun{width:44px;height:44px;background:none;box-shadow:-10px 4px 0 0 var(--accent);transform:rotate(-20deg);opacity:1}
+.sky{background:linear-gradient(180deg,var(--levels) 0%,color-mix(in srgb,var(--bloom) 70%,var(--levels)) 55%,var(--bg) 100%)}
+.fly{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px 2px color-mix(in srgb,var(--accent) 60%,transparent);display:none}
+[data-theme=dark] .fly{display:block}
+
+/* soft petals (never a storm: 7 at most, slow) */
+.petal{position:absolute;width:10px;height:7px;border-radius:70% 10% 70% 10%;background:var(--petal);opacity:.85;z-index:3;pointer-events:none}
+.petal.g{background:var(--gold)}
+.rm .petal{display:none}
+
+/* crown medallion */
+.medal{width:104px;height:104px;border-radius:50%;display:grid;place-items:center;background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 30%,var(--bg)) 60%,color-mix(in srgb,var(--accent) 10%,var(--bg)));box-shadow:0 0 0 6px color-mix(in srgb,var(--accent) 14%,transparent)}
+.medal svg{width:96px;margin-top:8px}
+
+/* ---------- A ---------- */
+.va{background:linear-gradient(180deg,var(--levels) 0,color-mix(in srgb,var(--bloom) 60%,var(--levels)) 420px,color-mix(in srgb,var(--bloom) 40%,var(--bg)) 640px,var(--bg) 700px)}
+.va .pano{background:none;overflow:visible}
+.va .top{padding:0 24px 0;display:flex;flex-direction:column;align-items:center;gap:8px;position:relative;z-index:2}
+.va .bottom{flex:1;display:flex;flex-direction:column;justify-content:flex-end;padding:14px 24px 0;gap:12px;background:var(--bg)}
+.va .count{align-self:center}
+
+/* ---------- B ---------- */
+.ring{position:relative;width:393px;height:400px;flex:none}
+.ring img.p{position:absolute;transform-origin:50% 90%}
+.ring .band{position:absolute;left:50%;top:50%;width:372px;height:372px;margin:-186px;border-radius:50%;background:radial-gradient(closest-side,transparent 56%,color-mix(in srgb,var(--garden) 85%,var(--bg)) 57%,var(--garden) 78%,color-mix(in srgb,var(--garden) 70%,var(--bg)) 99%,transparent 100%)}
+.ring .glow{position:absolute;left:50%;top:50%;width:230px;height:230px;margin:-115px;border-radius:50%;background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 22%,var(--bg)),var(--bg))}
+.ring .centre{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:190px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.ring .crownwrap{position:relative;width:100%;height:96px}
+.ring .crownwrap svg{position:absolute;width:112px;left:50%;top:6px;transform:translateX(-50%) rotate(-5deg)}
+.ring .crownwrap img{position:absolute;width:180px;left:5px;bottom:0}
+.ring .lab{font-size:.9375rem;font-weight:800;color:var(--accent-text)}
+.vb .ring{margin-top:18px}
+.vb .bottom{flex:1;display:flex;flex-direction:column;padding:26px 24px 0;gap:10px}
+.vb .bottom .btns{margin-top:auto}
+
+/* ---------- C ---------- */
+.vc .wrap{flex:1;display:flex;flex-direction:column;align-items:center;padding:12px 24px 0;gap:12px}
+.card{width:345px;background:#FFFDF8;border-radius:14px;padding:9px 9px 0;box-shadow:var(--shadow);transform:rotate(-2deg);position:relative;flex:none;color:#2C3E2C}
+[data-theme=dark] .card{background:#F3EEDF}
+.card .pic{width:327px;height:272px;border-radius:8px;overflow:hidden;position:relative}
+.card .pic .pano{transform:scale(.832);transform-origin:0 0;position:absolute;left:0;top:-4px}
+.card .cap{display:flex;align-items:center;justify-content:space-between;padding:10px 6px 12px}
+.card .cap b{font-size:1.0625rem;font-weight:800}.card .cap span{font-size:.875rem;font-weight:700;color:#3F5A3F}
+.stamp{position:absolute;top:20px;right:20px;width:76px;height:86px;background:#FFFDF8;padding:5px;border-radius:3px;outline:3px dotted #FFFDF8;outline-offset:1px;box-shadow:0 3px 8px rgba(0,0,0,.25);transform:rotate(4deg)}
+.stamp div{width:100%;height:100%;border:1.5px solid #E8A838;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:#FFF4DC}
+.stamp svg{width:52px}.stamp i{font-style:normal;font-size:9px;font-weight:800;color:#7A4E00;letter-spacing:.02em}
+.vc .btns{margin-top:auto}
+
+/* ---------- what grows next ---------- */
+.vn .wrap{flex:1;display:flex;flex-direction:column;padding:6px 20px 0;gap:12px}
+.vn .head{display:flex;flex-direction:column;align-items:center;gap:6px}
+.vn .head svg.crown{width:72px}
+.tile{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border-radius:20px;padding:16px 14px;box-shadow:var(--soft)}
+.keep{display:block;text-wrap:balance;font-size:.9375rem;font-weight:700;color:var(--sec);text-align:center;margin:4px 0 0}
+.keep svg{width:1.1rem;height:1.1rem;color:var(--ok);vertical-align:-3px;margin-right:6px}
+.tile .art{width:100px;flex:none;display:flex;align-items:flex-end;justify-content:center;gap:0;min-height:92px;border-radius:14px;padding:6px 2px 4px}
+.tile .t{flex:1;min-width:0}
+.tile h2{font-size:1.1875rem;margin:0 0 3px;font-weight:800}
+.tile p{margin:0;font-size:.9375rem;line-height:1.32;color:var(--sec)}
+.tile .tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:7px}
+.tile .tags span{font-size:.75rem;font-weight:800;padding:3px 8px;border-radius:999px;background:var(--bg);box-shadow:inset 0 0 0 1px var(--line)}
+.tile .tags span.on{background:var(--accent);color:var(--ink);box-shadow:none}
+.seas{background:linear-gradient(180deg,var(--levels),var(--garden))}
+.seas img{width:42px;margin:0 -5px}
+.gold-look{filter:sepia(.55) saturate(2.4) hue-rotate(-8deg) brightness(1.08) drop-shadow(0 0 4px rgba(240,192,96,.9))}
+.frost-look{filter:saturate(.35) hue-rotate(170deg) brightness(1.18) drop-shadow(0 0 3px rgba(200,230,255,.95))}
+.bloomart{background:linear-gradient(180deg,var(--bloom),color-mix(in srgb,var(--bloom) 40%,var(--surface)))}
+.bloomart img{width:62px}
+.visart{background:linear-gradient(180deg,var(--visit),color-mix(in srgb,var(--visit) 40%,var(--surface)));position:relative}
+.visart img{width:58px}
+.visart svg{position:absolute;width:26px}
+
+/* ---------- rescue ---------- */
+.vr .nav{display:flex;align-items:center;justify-content:space-between;padding:0 16px;min-height:44px;flex:none}
+.steps{display:flex;gap:6px;align-items:center;font-size:.875rem;font-weight:800}
+.steps i{width:26px;height:6px;border-radius:3px;background:var(--line)}
+.steps i.on{background:var(--ok)}
+.scene{position:relative;height:178px;margin:0 16px;border-radius:24px;overflow:hidden;flex:none;
+  background:linear-gradient(180deg,var(--storm) 0%,var(--levels) 70%,var(--garden) 100%)}
+.scene .ground{position:absolute;left:-10%;right:-10%;bottom:-36px;height:76px;border-radius:50%;background:var(--h3)}
+.scene .bent{position:absolute;left:50%;bottom:12px;width:132px;margin-left:-66px;transform-origin:50% 88%;transform:rotate(16deg) skewX(-6deg);filter:saturate(.45) brightness(.94)}
+[data-theme=dark] .scene .bent{filter:saturate(.5) brightness(.9)}
+.cloud{position:absolute;height:30px;border-radius:30px;background:color-mix(in srgb,var(--surface) 80%,var(--storm))}
+[data-theme=dark] .cloud{background:color-mix(in srgb,var(--text) 38%,var(--storm))}
+.cloud:before,.cloud:after{content:"";position:absolute;border-radius:50%;background:inherit}
+.cloud:before{width:34px;height:34px;left:14px;top:-16px}.cloud:after{width:26px;height:26px;left:40px;top:-11px}
+.scene .sunpeek{position:absolute;width:46px;height:46px;border-radius:50%;background:var(--accent);top:22px;right:52px;box-shadow:0 0 0 10px color-mix(in srgb,var(--accent) 20%,transparent)}
+.drop{position:absolute;width:2px;height:10px;border-radius:2px;background:color-mix(in srgb,var(--levels-ink) 45%,transparent);transform:rotate(14deg)}
+.leaf{position:absolute;width:12px;height:7px;border-radius:70% 10%;background:#6BA35C;opacity:.8}
+.vr .main{padding:12px 20px 0;display:flex;flex-direction:column;align-items:center;gap:8px;flex:1}
+.vr h1{font-size:1.5rem}
+.vr p.body{font-size:1.0625rem}
+.hint{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.slots{display:flex;gap:3px;justify-content:center;margin-top:2px}
+.slots i{width:32px;height:46px;border-radius:9px;background:var(--slot);box-shadow:inset 0 0 0 1.5px var(--line);display:grid;place-items:center;font-style:normal;font-size:1.25rem;font-weight:800;position:relative}
+.slots i.f{background:var(--tile);box-shadow:inset 0 0 0 2px var(--ok)}
+.slots i.k{background:color-mix(in srgb,var(--accent) 30%,var(--tile));box-shadow:inset 0 0 0 2px var(--accent)}
+.slots i.k:after{content:"";position:absolute;top:3px;right:3px;width:6px;height:6px;border-radius:50%;background:var(--accent-text)}
+.slots i.next{box-shadow:inset 0 0 0 2px var(--text)}
+.slots .gap{width:8px}
+.tiles{display:grid;grid-template-columns:repeat(5,58px);gap:8px;justify-content:center;margin-top:4px}
+.tiles button{height:54px;border-radius:14px;border:0;background:var(--tile);box-shadow:0 2px 0 color-mix(in srgb,var(--text) 18%,transparent),inset 0 0 0 1px var(--line);font-family:inherit;font-size:1.5rem;font-weight:800;line-height:1;color:var(--text)}
+.tiles button.used{opacity:.28;box-shadow:inset 0 0 0 1px var(--line)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;width:100%;margin-top:2px}
+.tools .btn{width:auto;flex:1 1 auto;min-height:48px;white-space:nowrap;border-radius:14px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);font-size:1rem;font-weight:700;padding:8px 10px}
+.tools .btn.peek{flex:1.6;background:color-mix(in srgb,var(--accent) 24%,var(--surface));box-shadow:inset 0 0 0 1.5px var(--accent)}
+.ladder{display:flex;align-items:center;gap:6px;font-size:.8125rem;font-weight:700;color:var(--sec);width:100%;justify-content:center}
+.ladder span{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;box-shadow:inset 0 0 0 1px var(--line)}
+.ladder span.done{background:var(--garden);box-shadow:none}
+.ladder span.ready{background:color-mix(in srgb,var(--accent) 24%,var(--bg));box-shadow:inset 0 0 0 1px var(--accent);color:var(--text)}
+.ladder svg{width:.9rem;height:.9rem}
+.skip{margin-top:auto;width:100%;display:flex;flex-direction:column;align-items:center;padding-bottom:2px}
+.skip small{font-size:.875rem;color:var(--sec);text-align:center;line-height:1.3}
+
+/* rescue 2: butterflies */
+.catch{position:relative;flex:1;margin:10px 16px 0;border-radius:24px;overflow:hidden;background:linear-gradient(180deg,var(--levels),var(--garden));min-height:300px}
+.catch .ground{position:absolute;left:-10%;right:-10%;bottom:-40px;height:90px;border-radius:50%;background:var(--h3)}
+.catch .half{position:absolute;left:50%;bottom:20px;width:150px;margin-left:-75px;transform-origin:50% 88%;transform:rotate(9deg) skewX(-3deg);filter:saturate(.7)}
+.bfly{position:absolute;width:64px;height:64px;border-radius:50%;display:grid;place-items:center}
+.bfly svg{width:46px}
+.bfly.got{opacity:.0}
+.counter{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:var(--surface);border-radius:999px;padding:6px 14px;font-weight:800;font-size:.9375rem;box-shadow:var(--soft);white-space:nowrap}
+
+/* ---------- mended ---------- */
+.vm .hero{position:relative;height:470px;flex:none;overflow:hidden;background:linear-gradient(180deg,var(--levels) 0%,color-mix(in srgb,var(--garden) 60%,var(--levels)) 75%,var(--bg) 100%)}
+.vm .ground{position:absolute;left:-30%;right:-30%;bottom:-120px;height:260px;border-radius:50%;background:var(--h3)}
+.vm .tallplant{position:absolute;left:50%;bottom:72px;width:220px;margin-left:-110px}
+.vm .bow{position:absolute;left:50%;top:60px;width:420px;height:420px;margin-left:-210px;border-radius:50%;
+  background:radial-gradient(closest-side,transparent 80%,rgba(242,120,138,.22) 82%,rgba(232,168,56,.22) 87%,rgba(102,187,106,.20) 91%,rgba(140,196,236,.22) 95%,transparent 98%)}
+.vm .sunbig{position:absolute;width:58px;height:58px;border-radius:50%;background:var(--accent);top:96px;right:52px;box-shadow:0 0 0 12px color-mix(in srgb,var(--accent) 20%,transparent),0 0 0 26px color-mix(in srgb,var(--accent) 9%,transparent)}
+.spark{position:absolute;color:var(--accent);width:22px}
+.rm .spark.m{display:none}
+.badge{display:flex;align-items:center;gap:10px;padding:8px 16px 8px 8px;border-radius:999px;background:var(--surface);box-shadow:var(--shadow);margin-top:-30px;position:relative;z-index:2}
+.badge .ic{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 28%,var(--bg))}
+.badge .ic svg{width:30px}
+.badge b{font-size:1.0625rem;font-weight:800;display:block}.badge span{font-size:.8125rem;font-weight:700;color:var(--sec)}
+.vm .rest{flex:1;display:flex;flex-direction:column;align-items:center;gap:10px;padding:0 24px}
+.vm .rest .btns{margin-top:auto}
+
+/* ---------- settings ---------- */
+.vs .nav{display:grid;grid-template-columns:88px 1fr 88px;align-items:center;min-height:44px;padding:0 8px;flex:none}
+.vs .nav b{text-align:center;font-size:1.0625rem}
+.vs .nav a{display:flex;align-items:center;gap:2px;color:var(--accent-text);font-weight:700;font-size:1.0625rem;min-height:44px;text-decoration:none}
+.vs .nav a svg{width:20px}
+.vs .wrap{padding:8px 16px 0;display:flex;flex-direction:column;gap:6px;flex:1}
+.vs h2{font-size:.8125rem;text-transform:uppercase;letter-spacing:.06em;font-weight:800;color:var(--sec);margin:14px 16px 4px}
+.group{background:var(--surface);border-radius:16px;overflow:hidden;box-shadow:var(--soft)}
+.row{display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 16px}
+.row+.row{box-shadow:inset 0 1px 0 var(--line)}
+.row .ic{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;flex:none}
+.row .ic svg{width:18px;height:18px}
+.row .lab{flex:1;font-size:1.0625rem;font-weight:650;line-height:1.25}
+.row .lab small{display:block;font-size:.8125rem;font-weight:700;color:var(--sec)}
+.sw{width:51px;height:31px;border-radius:16px;background:var(--toggle-off);position:relative;flex:none;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--text) 22%,transparent)}
+.sw.on{box-shadow:none}
+.row .chev{width:18px;height:18px;color:var(--sec);flex:none}
+.sw:after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.sw.on{background:var(--ok)}.sw.on:after{left:22px}
+.explain{padding:10px 16px 14px;font-size:.9375rem;line-height:1.4;color:var(--sec);box-shadow:inset 0 1px 0 var(--line)}
+.explain ul{margin:6px 0 0;padding-left:18px}.explain li{margin:2px 0}
+.explain .gate{display:flex;gap:6px;align-items:center;margin-top:8px;font-weight:700;color:var(--text);font-size:.875rem}
+.explain .gate svg{width:16px;height:16px;flex:none;color:var(--levels-ink)}
+.foot{font-size:.8125rem;color:var(--sec);padding:6px 16px 0;line-height:1.35}
+
+/* motion: everything slow; Reduce Motion = fades only, no drifting petals */
+@keyframes sway{0%,100%{transform:rotate(-1.4deg)}50%{transform:rotate(1.4deg)}}
+@keyframes fall{0%{transform:translate(0,-20px) rotate(0);opacity:0}15%{opacity:.85}100%{transform:translate(40px,260px) rotate(200deg);opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes flit{0%,100%{transform:translate(0,0)}50%{transform:translate(12px,-10px)}}
+.anim .pano img,.anim .ring img.p{animation:sway 6s ease-in-out infinite}
+.anim .petal{animation:fall 9s linear infinite}
+.anim .bfly{animation:flit 4s ease-in-out infinite}
+.anim .enter{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
+.rm .enter{animation:fade .3s ease-out both}
+.static *{animation:none!important}
+</style></head><body>
+<div id="root"></div>
+<script>
+const q=new URLSearchParams(location.search);
+const s=q.get('s')||'a', theme=q.get('theme')||'light', rm=q.get('rm')==='1', scale=q.get('scale')||'1';
+document.documentElement.dataset.theme=theme;document.documentElement.style.setProperty('--scale',scale);
+document.body.classList.add(rm?'rm':'anim');if(q.get('static')==='1')document.body.classList.add('static');if(q.get('tall')==='1')document.body.classList.add('tall');
+const dark=theme==='dark';
+
+// all 50 plants, by level (design-preview/plants/plants.json)
+const NAMES=['dandelion','daisy','clover','marigold','sunflower','tulip','rose','poppy','fern','strawberry',
+ 'orchid','lavender','lotus','jasmine','snapdragon','saguaro_cactus','aloe_vera','bamboo','hibiscus','cherry_blossom',
+ 'venus_flytrap','baobab','corpse_flower','welwitschia','dragon_blood_tree','pitcher_plant','sensitive_plant','bird_of_paradise','joshua_tree','lithops',
+ 'rafflesia','monkey_puzzle_tree','sago_palm','ghost_pipe','passionflower','king_protea','bleeding_heart','giant_water_lily','sundew','ladys_slipper_orchid',
+ 'wollemi_pine','jade_vine','coco_de_mer','black_bat_flower','franklin_tree','chocolate_cosmos','ghost_orchid','silversword','rainbow_eucalyptus','puya_raimondii'];
+const P=n=>`../plants/plant_${n}.svg`;
+
+const I={
+ sprout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9"/><path d="M12 12c0-4-3-6-7-6 0 4 3 6 7 6z" fill="currentColor"/><path d="M12 14c0-3.5 2.5-5.5 6.5-5.5 0 3.5-2.5 5.5-6.5 5.5z" fill="currentColor"/></svg>',
+ sparkle:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.6L19.5 9l-5.7 1.6L12 16l-1.8-5.4L4.5 9l5.7-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>',
+ eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>',
+ back:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 6l-6 6 6 6"/><path d="M4 12h16"/></svg>',
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+ clock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/><circle cx="12" cy="12" r="3.2" fill="currentColor"/></svg>',
+ pic:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M6 16l4-4 3 3 2-2 3 3"/></svg>',
+ share:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V3M7.5 7.5L12 3l4.5 4.5"/><path d="M5 12v6.5A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V12"/></svg>',
+ chevL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+ cloud:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 19h10.5a4.5 4.5 0 0 0 .6-8.96A6 6 0 0 0 6.3 11.1 4 4 0 0 0 7 19z"/></svg>',
+ heart:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z"/></svg>',
+ note:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 18a3 3 0 1 1-2-2.8V5l11-2v12a3 3 0 1 1-2-2.8V6.5l-7 1.3z"/></svg>',
+ buzz:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="8" y="3" width="8" height="18" rx="2"/><path d="M4 9v6M20 9v6"/></svg>',
+ storm:'<svg viewBox="0 0 24 24"><path d="M7 15h10.5a4.5 4.5 0 0 0 .6-8.96A6 6 0 0 0 6.3 7.1 4 4 0 0 0 7 15z" fill="currentColor"/><path d="M12 15l-2 4h3l-2 4" fill="none" stroke="#E8A838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+ chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+ lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+};
+
+// Gardener's Crown: a ring of leaves and seven small flowers (a flower crown, not a royal crown)
+function crown(){
+  const bz=(t,a,c,b)=>[(1-t)**2*a[0]+2*(1-t)*t*c[0]+t*t*b[0],(1-t)**2*a[1]+2*(1-t)*t*c[1]+t*t*b[1]];
+  const A=[8,40],B=[112,40],F=[60,66],K=[60,16];
+  const cols=['#F2788A','#E8A838','#B89AE0','#FFFFFF','#E8A838','#B89AE0','#F2788A'];
+  let leaves='',flowers='';
+  for(let i=0;i<=12;i++){const t=i/12,[x,y]=bz(t,A,F,B);leaves+=`<ellipse cx="${x}" cy="${y-2}" rx="7" ry="3.6" fill="${i%2?'#5E9E4E':'#3F8A4A'}" transform="rotate(${-40+i*7} ${x} ${y-2})"/>`;}
+  cols.forEach((c,i)=>{const t=.08+i*(.84/6),[x,y]=bz(t,A,F,B);const r=i===3?7.5:5.6,lift=i===3?6:Math.abs(3-i)<2?3:0;
+    let pet='';for(let k=0;k<5;k++){const a=k*72*Math.PI/180;pet+=`<circle cx="${(x+Math.sin(a)*r*.75).toFixed(1)}" cy="${(y-lift-Math.cos(a)*r*.75).toFixed(1)}" r="${(r*.62).toFixed(1)}" fill="${c}" stroke="${c==='#FFFFFF'?'#D9CBB0':'none'}" stroke-width="1"/>`;}
+    flowers+=pet+`<circle cx="${x}" cy="${y-lift}" r="${(r*.38).toFixed(1)}" fill="${c==='#E8A838'?'#B5651D':'#F6C445'}"/>`;});
+  return `<svg class="crown" viewBox="0 0 120 74" aria-hidden="true"><path d="M8 40Q60 16 112 40" fill="none" stroke="#6BA35C" stroke-width="3" opacity=".55" stroke-linecap="round"/>${leaves}<path d="M8 40Q60 66 112 40" fill="none" stroke="#3F8A4A" stroke-width="3.2" stroke-linecap="round"/>${flowers}</svg>`;
+}
+function butterfly(c1='#B89AE0',c2='#F2A0B0'){return `<svg viewBox="0 0 48 40" aria-hidden="true"><ellipse cx="14" cy="14" rx="12" ry="11" fill="${c1}"/><ellipse cx="34" cy="14" rx="12" ry="11" fill="${c1}"/><ellipse cx="16" cy="29" rx="8" ry="8" fill="${c2}"/><ellipse cx="32" cy="29" rx="8" ry="8" fill="${c2}"/><rect x="22.5" y="8" width="3" height="26" rx="1.5" fill="#4A3B2A"/><path d="M23 9q-3-6-7-7M25 9q3-6 7-7" stroke="#4A3B2A" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>`;}
+function bee(){return `<svg viewBox="0 0 40 32" aria-hidden="true"><ellipse cx="14" cy="9" rx="8" ry="6" fill="#DCEBFA" opacity=".95"/><ellipse cx="24" cy="8" rx="7" ry="5.5" fill="#DCEBFA" opacity=".95"/><ellipse cx="20" cy="20" rx="12" ry="9" fill="#F6C445"/><path d="M15 12v16M21 11.5v17" stroke="#3A2E1E" stroke-width="3.2"/><circle cx="30" cy="18" r="1.6" fill="#3A2E1E"/></svg>`;}
+function bird(){return `<svg viewBox="0 0 44 36" aria-hidden="true"><ellipse cx="20" cy="22" rx="14" ry="11" fill="#8CC4EC"/><circle cx="32" cy="14" r="8" fill="#8CC4EC"/><path d="M39 13l5 2-5 2z" fill="#E8A838"/><circle cx="34" cy="12.5" r="1.6" fill="#1F3320"/><path d="M10 20q8-8 16 2-8 6-16-2z" fill="#5E9FCC"/><path d="M6 22l-6-3 2 7z" fill="#5E9FCC"/></svg>`;}
+
+const petals=(list)=>list.map(([x,y,r,g],i)=>`<i class="petal ${g?'g':''}" aria-hidden="true" style="left:${x}px;top:${y}px;transform:rotate(${r}deg);animation-delay:${i*1.3}s"></i>`).join('');
+
+// panorama: 5 hills, 12+11+10+9+8 = 50 plants, rarer plants at the back
+function pano(){
+  const rows=[[12,36,232],[11,42,186],[10,50,138],[9,58,88],[8,68,34]];
+  const hills=['--h1','--h2','--h3','--h4','--h5'];
+  let k=49,html='<span class="sun" aria-hidden="true"></span>';
+  html+=[[60,60],[150,40],[300,110],[220,80],[30,130]].map(([x,y])=>`<i class="fly" style="left:${x}px;top:${y}px"></i>`).join('');
+  rows.forEach(([n,sz,b],r)=>{
+    const pad=10,step=(393-2*pad)/n;
+    html+=`<span class="hill" aria-hidden="true" style="bottom:0;height:${b+sz*.18}px;background:var(${hills[r]});border-radius:${r%2?'55% 45%':'45% 55%'} 0 0/${70+r*6}px ${60+r*6}px 0 0"></span>`;
+    for(let i=0;i<n;i++){
+      const jitter=((i*37+r*11)%9)-4, x=pad+i*step+step/2-sz/2+jitter, y=b-sz*.08+((i+r)%2?3:0);
+      html+=`<img src="${P(NAMES[k--])}" alt="" style="left:${x.toFixed(1)}px;bottom:${y}px;width:${sz}px;animation-delay:${(i*.4+r*.7)%5}s">`;
+    }
+  });
+  return `<div class="pano sky" role="img" aria-label="Your garden with all 50 plants in bloom">${html}</div>`;
+}
+
+function status(){return `<div class="status"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>`}
+let out='';
+
+if(s==='a'){
+  out=`<div class="phone va">${status()}
+    ${petals([[34,130,20],[330,150,-30,1],[86,70,60],[22,330,10,1],[356,300,40],[300,90,-50]])}
+    <div class="top enter">
+      <div class="medal" aria-hidden="true">${crown()}</div>
+      <span class="chip gold" role="text">${I.sparkle}You earned the Gardener's Crown</span>
+      <h1 id="h">Your whole garden is in bloom!</h1>
+      <p class="body">Every plant found. What a garden!</p>
+    </div>
+    ${pano()}
+    <div class="bottom">
+      <span class="chip green count" role="text">${I.sprout}50 of 50 plants found</span>
+      <div class="btns"><button class="btn primary">See what grows next</button><button class="btn secondary">Walk my garden</button></div>
+      <div class="home"></div>
+    </div></div>`;
+}
+
+else if(s==='b'){
+  // wreath of 50: outer ring 28, inner ring 22
+  const cx=196.5,cy=200; let k=0,ring='';
+  [[28,168,40],[22,118,34]].forEach(([n,R,sz])=>{for(let i=0;i<n;i++){const a=(i/n)*2*Math.PI-Math.PI/2+(n===22?.14:0);
+    const x=cx+Math.cos(a)*R-sz/2,y=cy+Math.sin(a)*R-sz*.62;ring+=`<img class="p" src="${P(NAMES[k++])}" alt="" style="left:${x.toFixed(1)}px;top:${y.toFixed(1)}px;width:${sz}px;animation-delay:${(i*.3)%5}s">`;}});
+  const wm=dark?'../logo/final/wordmark-dark.svg':'../logo/final/wordmark.svg';
+  out=`<div class="phone vb">${status()}
+    ${petals([[60,90,10],[320,70,-30,1],[30,420,50],[350,440,20,1],[200,60,70]])}
+    <div class="ring enter" role="img" aria-label="The Gardener's Crown on WordFlora, with all 50 plants in a ring">
+      <span class="band"></span><span class="glow"></span>${ring}
+      <div class="centre"><div class="crownwrap">${crown()}<img src="${wm}" alt=""></div><span class="lab">Gardener's Crown</span></div>
+    </div>
+    <div class="bottom stack">
+      <h1 id="h">Your whole garden is in bloom!</h1>
+      <p class="body">You found all 50 plants. The crown is yours to keep.</p>
+      <div class="btns"><button class="btn primary">See what grows next</button><button class="btn secondary">Walk my garden</button></div>
+      <div class="home"></div>
+    </div></div>`;
+}
+
+else if(s==='c'){
+  out=`<div class="phone vc">${status()}
+    <div class="wrap">
+      <span class="chip gold" role="text">${I.sparkle}Gardener's Crown</span>
+      <div class="card enter" role="img" aria-label="Postcard: My WordFlora garden, 50 of 50 plants, with the Gardener's Crown stamp">
+        <div class="pic">${pano()}</div>
+        <div class="stamp" aria-hidden="true"><div>${crown()}<i>50 OF 50</i></div></div>
+        <div class="cap"><b>My WordFlora garden</b><span>50 of 50 plants</span></div>
+      </div>
+      <div class="stack" style="margin-top:6px">
+        <h1 id="h">Every plant found. What a garden!</h1>
+        <p class="body">Here is a postcard of your garden to keep or share.</p>
+      </div>
+      <div class="btns"><button class="btn primary">${I.share}Share my postcard</button><button class="btn secondary">See what grows next</button><button class="btn quiet">Save to my album</button></div>
+      <div class="home"></div>
+    </div></div>`;
+}
+
+else if(s==='next'){
+  out=`<div class="phone vn">${status()}
+   <div class="wrap">
+    <div class="head enter">${crown()}<h1 id="h">What grows next</h1><p class="body">Your garden keeps growing. Here is what opens up.</p></div>
+    <div class="tile"><div class="art seas" aria-hidden="true"><img src="${P('sunflower')}" alt=""><img class="gold-look" src="${P('sunflower')}" alt=""><img class="frost-look" src="${P('sunflower')}" alt=""></div>
+      <div class="t"><h2>Seasons</h2><p>Each plant can grow a new look. Play to grow it.</p><div class="tags"><span>Golden</span><span>Frosty</span><span>Blossom</span></div></div></div>
+    <div class="tile"><div class="art bloomart" aria-hidden="true"><img src="../flowers/flower_8.svg" alt=""></div>
+      <div class="t"><h2>Daily Bloom ranks</h2><p>A new word every day, with no end. Each day you play adds up.</p><div class="tags" role="text" aria-label="Ranks: Bud, Blossom, Meadow, Grove, Evergreen. You are a Bud."><span class="on">Bud</span><span>Blossom</span><span>Meadow</span><span>Grove</span><span>Evergreen</span></div></div></div>
+    <div class="tile"><div class="art visart" aria-hidden="true"><img src="${P('lavender')}" alt=""><span style="left:6px;top:6px;position:absolute;width:28px">${butterfly()}</span><span style="right:6px;top:14px;position:absolute;width:24px">${bee()}</span></div>
+      <div class="t"><h2>Visitor Sanctuary</h2><p>A calm spot where butterflies, bees and birds come to stay.</p></div></div>
+    <p class="keep">${I.sprout}Your crown and all your plants stay with you.</p>
+    <div class="btns" style="margin-top:auto"><button class="btn primary">Back to my garden</button></div>
+    <div class="home"></div>
+   </div></div>`;
+}
+
+else if(s==='rescue'||s==='rescue2'){
+  const two=s==='rescue2';
+  const word='SNAPDRAGON'.split('');
+  // state: S peeked (locked), N and A placed, next spot P
+  const filled={0:'k',1:'f',2:'f'};
+  const slots=word.map((ch,i)=>`<i class="${filled[i]||''} ${i===3?'next':''}" aria-label="${filled[i]?ch:'open spot'}">${filled[i]?ch:''}</i>`).join('');
+  const tiles=['D','A','N','O','G','R','S','P','A','N'], used=[2,6,8];
+  const scene=`<div class="scene" aria-hidden="true">
+      <span class="sunpeek"></span><span class="cloud" style="left:20px;top:34px;width:90px"></span><span class="cloud" style="left:236px;top:50px;width:80px;opacity:.85"></span>
+      ${[[60,96],[96,120],[300,110],[330,88],[140,80]].map(([x,y])=>`<i class="drop" style="left:${x}px;top:${y}px"></i>`).join('')}
+      <span class="ground"></span>
+      <i class="leaf" style="left:110px;bottom:14px;transform:rotate(-20deg)"></i><i class="leaf" style="left:262px;bottom:18px;transform:rotate(30deg)"></i>
+      <img class="bent" src="${P('sunflower')}" alt="">
+    </div>`;
+  const nav=`<div class="nav"><span class="chip sky" role="text">${I.cloud}After the storm</span>
+      <span class="steps" role="text" aria-label="Step ${two?2:1} of 2"><i class="on"></i><i class="${two?'on':''}"></i><span style="margin-left:4px">Step ${two?2:1} of 2</span></span></div>`;
+  const skip=`<div class="skip"><button class="btn quiet">Skip for now</button><small>Care will help it mend. No hearts are used.</small></div>`;
+  if(!two){
+  out=`<div class="phone vr">${status()}${nav}${scene}
+    <div class="main">
+      <h1 id="h">The storm has passed.</h1>
+      <p class="body">Let us help Sunflower stand tall.</p>
+      <div class="hint"><span class="chip green" role="text">${I.sprout}A plant name with 10 letters</span></div>
+      <div class="slots" role="group" aria-label="Your word, 3 of 10 letters">${slots}</div>
+      <div class="tiles" role="group" aria-label="Letters">${tiles.map((t,i)=>`<button class="${used.includes(i)?'used':''}" aria-label="${t}${used.includes(i)?', placed':''}">${t}</button>`).join('')}</div>
+      <div class="tools"><button class="btn" aria-label="Take back a letter">${I.back}Take back</button><button class="btn">Clear</button><button class="btn peek">${I.eye}Peek a letter</button></div>
+      <div class="ladder" role="text" aria-label="Free peeks. One used, one ready, a picture clue comes soon."><span class="done">${I.check}Peek</span><span class="ready">${I.eye}Peek</span><span>${I.pic}Picture clue soon</span></div>
+      ${skip}
+    </div><div class="home"></div></div>`;
+  }else{
+  out=`<div class="phone vr">${status()}${nav}
+    <div class="main" style="flex:none;padding-top:4px">
+      <h1 id="h">Snapdragon! Well done.</h1>
+      <p class="body">Now catch 3 butterflies. They help Sunflower lift up.</p>
+    </div>
+    <div class="catch" aria-label="Butterfly garden">
+      <span class="counter" role="status">1 of 3 butterflies</span>
+      <span class="cloud" style="left:30px;top:60px;width:84px;opacity:.7"></span><span class="cloud" style="left:250px;top:240px;width:70px;opacity:.55"></span><span class="ground"></span>
+      <img class="half" src="${P('sunflower')}" alt="">
+      <button class="bfly" style="left:40px;top:90px;border:0;background:none" aria-label="Butterfly">${butterfly()}</button>
+      <button class="bfly" style="left:270px;top:130px;border:0;background:none;animation-delay:1.2s" aria-label="Butterfly">${butterfly('#8CC4EC','#F6C445')}</button>
+      <i class="petal g" style="left:120px;top:200px" aria-hidden="true"></i>
+    </div>
+    <div class="main" style="flex:none;padding-top:8px">
+      <span class="chip green" role="text">${I.sprout}Take your time. They float slowly.</span>
+      ${skip}
+    </div><div class="home"></div></div>`;
+  }
+}
+
+else if(s==='mended'){
+  const sp=[[70,90,1],[300,150,1],[110,230,0],[268,60,0],[330,260,1],[50,300,0]];
+  out=`<div class="phone vm">
+    <div class="hero" aria-hidden="true">${status()}<span class="sunbig"></span><span class="bow"></span><span class="ground"></span>
+      ${sp.map(([x,y,m],i)=>`<span class="spark ${m?'m':''}" style="left:${x}px;top:${y}px;width:${i%2?16:22}px">${I.sparkle}</span>`).join('')}
+      <img class="tallplant enter" src="${P('sunflower')}" alt="">
+      ${petals([[150,120,30,1],[240,190,-20]])}
+    </div>
+    <div class="rest">
+      <div class="badge enter" role="text" aria-label="New badge: Weathered the storm"><span class="ic">${crownless()}</span><span><b>Weathered the storm</b><span>New badge for your shelf</span></span></div>
+      <h1 id="h" style="margin-top:6px">Sunflower is standing tall again!</h1>
+      <p class="body">Your care helped it mend. The sun is back.</p>
+      <div class="btns"><button class="btn primary">Back to my garden</button><button class="btn secondary">See my badges</button></div>
+      <div class="home"></div>
+    </div></div>`;
+}
+
+else if(s==='settings'){
+  out=`<div class="phone vs">${status()}
+    <div class="nav"><a href="#">${I.chevL}Home</a><b>Settings</b><span></span></div>
+    <div class="wrap">
+      <h2>Play</h2>
+      <div class="group">
+        <div class="row"><span class="ic" style="background:var(--bloom);color:var(--bloom-ink)">${I.note}</span><span class="lab">Sounds</span><span class="sw on" role="switch" aria-checked="true" aria-label="Sounds"></span></div>
+        <div class="row"><span class="ic" style="background:var(--levels);color:var(--levels-ink)">${I.buzz}</span><span class="lab">Gentle buzz</span><span class="sw on" role="switch" aria-checked="true" aria-label="Gentle buzz"></span></div>
+      </div>
+      <h2>Garden</h2>
+      <div class="group">
+        <div class="row"><span class="ic" style="background:var(--storm);color:var(--levels-ink)">${I.storm}</span>
+          <span class="lab">Wild Weather<small>For grown-ups</small></span><span class="sw" role="switch" aria-checked="false" aria-label="Wild Weather, for grown-ups, off"></span></div>
+        <div class="explain">
+          Off means calm skies, always.<br>When it is on:
+          <ul><li>Once in a while, a storm may bend a plant.</li><li>A harder word puzzle helps it stand tall.</li><li>You can skip. Plants always mend with care.</li><li>No hearts are used. No timer.</li></ul>
+          <div class="gate">${I.lock}A grown-up check comes first.</div>
+        </div>
+      </div>
+      <p class="foot">Wild Weather starts off. It never turns on by itself.</p>
+      <h2>More</h2>
+      <div class="group">
+        <div class="row"><span class="ic" style="background:var(--garden);color:var(--ok)">${I.sprout}</span><span class="lab">Grown-up area</span><span class="chev">${I.chev}</span></div>
+        <div class="row"><span class="ic" style="background:var(--visit);color:var(--visit-ink)">${I.sparkle}</span><span class="lab">About WordFlora</span><span class="chev">${I.chev}</span></div>
+      </div>
+    </div><div class="home"></div></div>`;
+}
+function crownless(){return `<svg viewBox="0 0 32 32" aria-hidden="true"><path d="M8 20h16a5 5 0 0 0 .8-9.9A7 7 0 0 0 11 10.5 5 5 0 0 0 8 20z" fill="var(--levels-ink)" opacity=".55"/><circle cx="22" cy="12" r="6" fill="#E8A838"/><path d="M16 30V18" stroke="#3F8A4A" stroke-width="2.4" stroke-linecap="round"/><path d="M16 22c0-3-2.5-4.5-5.5-4.5 0 3 2.5 4.5 5.5 4.5z" fill="#3F8A4A"/></svg>`}
+document.getElementById('root').innerHTML=out;
+</script>
+</body></html>

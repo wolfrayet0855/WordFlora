@@ -1,0 +1,420 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Weather days</title>
+<!-- Params: s=warn-wind|warn-dry|chips|dry|bugs|wind|frost|heat|hail|flood|shrug|bar|shed|set-wind   theme=light|dark   rm=1 (Reduce Motion: still picture)   static=1 (no animation; used for PNGs)
+-->
+<style>
+:root,[data-theme=light]{
+  --bg:#FAF7F0;--surface:#FFFFFF;--text:#2C3E2C;--accent:#E8A838;--ink:#1F3320;--ok:#2E7D32;--ok-bg:#E3F1DD;
+  --sec:color-mix(in srgb,var(--text) 88%,transparent);--line:color-mix(in srgb,var(--text) 14%,transparent);
+  --soil:#7A5238;--soil-dry:#C9A070;--crack:#6B4630;--pot:#C8734A;--pot-rim:#DD8C63;--shelf:#E3D9C0;
+  --rain:#4C7396;--swoosh:#FFFFFF;--pellet:#FFFFFF;--pellet-edge:#7F95A9;--ring:#8A5A2B;--net:#2C3E2C;--water:rgba(95,165,230,.42);--water-line:#BFE0F7;
+  --shadow:0 6px 18px rgba(44,62,44,.12)}
+[data-theme=dark]{
+  --bg:#1A2E1A;--surface:#2C3E2C;--text:#D4EDD4;--accent:#F0C060;--ink:#1A2E1A;--ok:#81C784;--ok-bg:#35523A;
+  --sec:color-mix(in srgb,var(--text) 88%,transparent);--line:color-mix(in srgb,var(--text) 18%,transparent);
+  --soil:#A47550;--soil-dry:#D2AE7C;--crack:#6B4630;--pot:#C8734A;--pot-rim:#DD8C63;--shelf:#3A503A;
+  --rain:#A9CBEA;--swoosh:#D4EDD4;--pellet:#F2F7FB;--pellet-edge:#7F95A9;--ring:#E0B070;--net:#D4EDD4;--water:rgba(120,185,240,.38);--water-line:#CBE6FA;
+  --shadow:0 6px 18px rgba(0,0,0,.35)}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:#888;font-family:ui-rounded,"SF Pro Rounded","Nunito",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;color:var(--text)}
+.phone{width:393px;height:852px;position:relative;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+.status{height:54px;flex:none;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;font:600 15px system-ui}
+.pad{padding:0 16px}
+.nav{height:44px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 8px 0 4px}
+.back{min-width:44px;min-height:44px;display:flex;align-items:center;gap:2px;font-weight:650;font-size:17px;color:var(--text)}
+.back svg{width:22px;height:22px}
+.navt{font-size:20px;font-weight:800}
+.navr{min-width:44px;display:flex;justify-content:flex-end}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;font-family:inherit;padding:10px 16px;text-align:center}
+.btn.primary{min-height:56px;border-radius:18px;background:var(--accent);color:var(--ink);font-size:20px;font-weight:800}
+.btn.secondary{min-height:48px;border-radius:16px;background:var(--surface);color:var(--text);font-size:17px;font-weight:700;box-shadow:inset 0 0 0 1.5px var(--line)}
+.btn.quiet{min-height:44px;background:none;color:var(--text);font-size:17px;font-weight:700;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.btn svg{width:22px;height:22px;flex:none}
+.pill{display:inline-flex;align-items:center;gap:8px;min-height:36px;padding:4px 14px 4px 10px;border-radius:999px;font-weight:800;font-size:16px;background:color-mix(in srgb,var(--ev) 26%,var(--surface));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ev) 70%,var(--text) 20%);color:var(--text)}
+.pill svg{width:22px;height:22px}
+.pill.tag{font-size:14px;min-height:30px}
+.rmtag{position:absolute;top:156px;left:28px;z-index:9;background:var(--surface);color:var(--text);font-size:13px;font-weight:800;border-radius:999px;padding:5px 10px;box-shadow:inset 0 0 0 1.5px var(--line)}
+
+/* stage (plant + pot + weather) */
+.stage{position:relative;width:361px;height:310px;border-radius:28px;overflow:hidden;margin:0 auto;flex:none;box-shadow:var(--shadow)}
+.stage{--sky-b:color-mix(in srgb,var(--ev) 22%,var(--surface))}
+.stage .sky{position:absolute;inset:0;background:linear-gradient(180deg,color-mix(in srgb,var(--ev) 34%,var(--surface)),color-mix(in srgb,var(--ev) 12%,var(--surface)))}
+.stage .lay{position:absolute;inset:0;width:100%;height:100%}
+.stage .plant{position:absolute;left:70px;top:14px;width:220px;height:220px;transform-origin:50% 88%}
+.haze{position:absolute;inset:0;pointer-events:none}
+.ev-dry,.ev-shrug{--ev:#E3A23C}.ev-bugs{--ev:#8FB052}.ev-wind{--ev:#7FA0BD}.ev-frost{--ev:#8CCBEA}.ev-heat{--ev:#F08A3C}.ev-hail{--ev:#9DB0C2}.ev-flood{--ev:#4F93CF}.ev-calm{--ev:#9CCB7A}.ev-warn{--ev:#7FA0BD}
+.cap{padding:14px 20px 0;text-align:center}
+.cap h2{font-size:22px;line-height:1.2;margin:0;font-weight:800;text-wrap:balance}
+.cap p{font-size:16px;line-height:1.35;margin:4px 0 0;color:var(--sec);text-wrap:balance}
+.card{background:var(--surface);border-radius:20px;box-shadow:var(--shadow)}
+.growth{padding:12px 16px 12px;margin:12px 16px 0}
+.growth .row{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:15px}
+.rest-chip{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--ok-bg);color:var(--text)}
+.growth svg.path{display:block;width:100%;height:auto;margin-top:2px}
+.growth .note{font-size:14px;line-height:1.35;color:var(--sec);margin:2px 0 0;text-align:center}
+.act{padding:12px 16px 0;display:flex;flex-direction:column;gap:2px}
+.hint{font-size:14px;color:var(--sec);text-align:center;line-height:1.3;padding:6px 24px 0}
+.spacer{flex:1}
+
+/* warning card */
+.hi{padding:6px 20px 12px;display:flex;justify-content:space-between;align-items:center}
+.hi h1{margin:0;font-size:28px;font-weight:800}
+.coin{min-width:44px;height:44px;border-radius:22px;background:var(--surface);box-shadow:inset 0 0 0 1.5px var(--line);display:grid;place-items:center;font-weight:800;font-size:15px;padding:0 12px}
+.warn{margin:0 16px;overflow:hidden}
+.warn .art{height:150px;display:block;width:100%}
+.warn .in{padding:12px 18px 14px}
+.warn h2{margin:0;font-size:24px;line-height:1.15;font-weight:800;text-wrap:balance}
+.warn .lead{font-size:17px;margin:4px 0 8px;color:var(--sec)}
+.steps{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:2px}
+.steps li{display:flex;align-items:center;gap:12px;min-height:44px;font-size:17px;font-weight:650;line-height:1.25}
+.steps .n{width:30px;height:30px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:800;font-size:16px;background:color-mix(in srgb,var(--ev) 30%,var(--surface));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--text) 62%,transparent)}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 16px 0}
+.tile{height:92px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);padding:12px 14px;font-weight:800;font-size:17px;display:flex;flex-direction:column;justify-content:space-between}
+.tile i{display:block;height:8px;width:60%;border-radius:4px;background:var(--line)}
+.tile.wide{grid-column:span 2;height:84px}
+
+/* garden header / chips */
+.garden-h{display:flex;align-items:center;justify-content:space-between;padding:6px 20px 10px;gap:8px}
+.garden-h h1{margin:0;font-size:28px;font-weight:800}
+.row3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:6px 16px 0}
+.gcard{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:8px 6px 10px;text-align:center;font-weight:700;font-size:14px;position:relative}
+.gcard img{width:84px;height:84px;display:block;margin:0 auto}
+.gcard .badge{position:absolute;top:6px;right:6px;width:28px;height:28px;border-radius:50%;background:var(--ok-bg);display:grid;place-items:center;box-shadow:inset 0 0 0 1.5px var(--line)}
+.sect{margin:18px 20px 8px;font-size:15px;font-weight:800;color:var(--sec)}
+.wall{margin:0 16px;border-radius:30px;padding:18px 14px;background:linear-gradient(160deg,#6F8FB4,#8E7BB5 60%,#D69A82)}
+.widget{background:rgba(255,255,255,.92);color:#2C3E2C;border-radius:24px;padding:14px 16px;display:flex;gap:12px;align-items:center;height:130px}
+[data-theme=dark] .widget{background:rgba(32,48,32,.92);color:#D4EDD4}
+.widget .wt{font-size:13px;font-weight:800;opacity:.85;display:flex;align-items:center;gap:6px}
+.widget .wl{font-size:18px;font-weight:800;line-height:1.2;margin-top:4px}
+.widget .ws{font-size:14px;margin-top:4px;line-height:1.3;opacity:.9}
+.widget img{width:84px;height:84px;flex:none}
+.lock{margin:12px 16px 0;border-radius:22px;padding:14px;background:linear-gradient(160deg,#42557A,#6E5C93);color:#fff;text-align:center}
+.lock .t{font-size:44px;font-weight:300;letter-spacing:-1px;line-height:1}
+.lock .inline{display:inline-flex;align-items:center;gap:6px;font-size:15px;font-weight:700;margin-top:6px}
+.cap2{margin:6px 20px 0;font-size:14px;color:var(--sec);line-height:1.3}
+
+/* bar screen */
+.barc{margin:10px 16px 0;padding:12px 16px 10px}
+.barc h3{margin:0 0 2px;font-size:17px;font-weight:800}
+
+/* shed */
+.shed-h{padding:2px 20px 8px}
+.shed-h h2{margin:0;font-size:24px;font-weight:800}
+.shed-h p{margin:4px 0 0;font-size:15px;line-height:1.35;color:var(--sec)}
+.tool{display:flex;align-items:center;gap:10px;padding:10px 12px;margin:0 16px 8px;min-height:84px}
+.tool .ic{width:52px;height:52px;flex:none}
+.tool .tx{flex:1;min-width:0}
+.tool .nm{font-weight:800;font-size:17px}
+.tool .us{font-size:14px;line-height:1.3;color:var(--sec);margin-top:1px}
+.tool .go{width:92px;flex:none}
+.tool .go .btn{min-height:44px;border-radius:14px;font-size:16px;font-weight:800;padding:6px 8px}
+.btn.set{background:var(--ok-bg);color:var(--text);box-shadow:inset 0 0 0 2px var(--ok)}
+.tool.todo .ic{opacity:.45}
+.tool.todo .go{font-size:13px;font-weight:700;color:var(--sec);text-align:center;line-height:1.25}
+.eyebrow{font-size:13px;font-weight:800;letter-spacing:.02em;color:var(--sec);margin:6px 20px 8px}
+
+@keyframes sway{0%,100%{transform:rotate(13deg) skewX(-5deg)}50%{transform:rotate(17deg) skewX(-7deg)}}
+@keyframes drift{from{transform:translate(0,0)}to{transform:translate(-14px,22px)}}
+@keyframes shimmer{0%,100%{opacity:.5}50%{opacity:.8}}
+.anim .ev-wind .plant{animation:sway 5s ease-in-out infinite}
+.anim .rainy{animation:drift 2.4s linear infinite}
+.anim .shim{animation:shimmer 4s ease-in-out infinite}
+.static *{animation:none!important}
+.stage>.pill{position:absolute;top:10px;left:10px;z-index:6;min-height:36px}
+.puz{margin:10px 16px 0;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.puz .fr{width:44px;height:44px;flex:none}
+.puz .tx{flex:1;min-width:0;font-size:14px;line-height:1.3;color:var(--sec)}
+.puz .tx b{display:block;color:var(--text);font-size:16px;margin-bottom:1px}
+.puz .btn{width:76px;min-height:44px;border-radius:14px;font-size:16px;padding:6px}
+.dn{margin:8px 16px 0;padding:8px 12px;border:1.5px dashed var(--line);border-radius:12px;font-size:12.5px;line-height:1.35;color:var(--sec)}
+.dn b{color:var(--text)}
+.tool .go.ready{display:flex;align-items:center;justify-content:center;gap:4px;min-height:44px;font-size:16px;font-weight:800;color:var(--text)}
+.tool .go.ready svg{width:18px;height:18px;color:var(--ok)}
+.tint{fill:color-mix(in srgb,var(--ev) 38%,transparent)}
+.setbtn{margin:2px 0 8px 42px;width:calc(100% - 42px)}
+.kit6{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;padding:0 14px;margin-top:6px}
+.kit6 svg{width:100%;height:auto}
+.hdr{padding:4px 20px 8px;font-weight:800}
+.ax .phone{height:auto;min-height:852px;overflow:visible}
+.ax .warn h2{font-size:34px}.ax .warn .lead{font-size:26px}.ax .steps li{font-size:26px;min-height:64px}.ax .steps .n{width:44px;height:44px;font-size:24px}
+.ax .btn.primary{font-size:28px;min-height:76px}.ax .btn.secondary{font-size:26px;min-height:68px}.ax .btn.quiet{font-size:26px;min-height:60px}
+.ax .cap h2{font-size:34px}.ax .cap p{font-size:24px}.ax .growth .row{font-size:22px}.ax .growth .note{font-size:20px}.ax .rest-chip{font-size:20px}
+.ax .tool{flex-wrap:wrap}.ax .tool .nm{font-size:28px}.ax .tool .us{font-size:22px}.ax .tool .go{width:100%}.ax .tool .go .btn{font-size:24px;min-height:60px}.ax .tool .go.ready{font-size:22px}
+.ax .shed-h h2{font-size:32px}.ax .shed-h p{font-size:22px}.ax .puz .tx{font-size:20px}.ax .puz .tx b{font-size:24px}.ax .puz{flex-wrap:wrap}.ax .puz .btn{width:100%;font-size:24px;min-height:60px}.ax .hint{font-size:20px}
+.ax .navt,.ax .back{font-size:24px}.ax .pill{font-size:22px}
+</style></head><body>
+<div id="root"></div>
+<script>
+const q=new URLSearchParams(location.search);
+let S=q.get('s')||'dry';const theme=q.get('theme')||'light';
+const AX=S.startsWith('ax-');if(AX)S=S.slice(3);
+const RM=q.get('rm')==='1'||/-rm$/.test(S);S=S.replace(/-rm$/,'');
+document.documentElement.setAttribute('data-theme',theme);
+const sv=(p,x='')=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" ${x}>${p}</svg>`;
+const IC={
+ back:sv('<path d="M15 5l-7 7 7 7"/>','stroke-width="2.4"'),
+ check:sv('<path d="M5 12.5l4.5 4.5L19 7.5"/>','stroke-width="3"'),
+ wind:sv('<path d="M3 9h11a3 3 0 1 0-3-3"/><path d="M3 14h15a3 3 0 1 1-3 3"/><path d="M3 19h6"/>'),
+ sun:sv('<circle cx="12" cy="12" r="4.5"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/>'),
+ hot:sv('<circle cx="12" cy="8" r="3.4"/><path d="M12 1.8v1.4M5.8 8H4.4M19.6 8h-1.4M7.6 3.6l1 1M16.4 3.6l-1 1"/><path d="M4 15c2-1.6 3-1.6 5 0s3 1.6 5 0 3-1.6 6 0M4 20c2-1.6 3-1.6 5 0s3 1.6 5 0 3-1.6 6 0"/>'),
+ bug:sv('<ellipse cx="12" cy="14" rx="5" ry="6.5"/><circle cx="12" cy="6" r="2.6"/><path d="M3.5 11l4 2M3.5 18l4-2M20.5 11l-4 2M20.5 18l-4-2M9.5 3.5L8 2M14.5 3.5L16 2"/>'),
+ snow:sv('<path d="M12 2.5v19M3.8 7.2l16.4 9.6M3.8 16.8l16.4-9.6M9.5 4.5L12 7l2.5-2.5M9.5 19.5L12 17l2.5 2.5"/>'),
+ hail:sv('<path d="M6.5 14a4.5 4.5 0 0 1 .8-8.9A6 6 0 0 1 18.8 7a3.8 3.8 0 0 1-.8 7.5z"/><circle cx="8" cy="19" r="1.2"/><circle cx="13" cy="21" r="1.2"/><circle cx="17.5" cy="18.5" r="1.2"/>'),
+ puddle:sv('<path d="M12 3c3.2 4 5.5 6.6 5.5 9.6a5.5 5.5 0 0 1-11 0C6.5 9.6 8.8 7 12 3z"/><path d="M4 21c2-1.2 3.4-1.2 5 0s3 1.2 5 0 3-1.2 6 0"/>'),
+ drop:sv('<path d="M12 3c3.2 4 5.5 6.6 5.5 9.6a5.5 5.5 0 0 1-11 0C6.5 9.6 8.8 7 12 3z"/>'),
+ heart:sv('<path d="M12 21s-7-4.4-7-10a4 4 0 0 1 7-2.4A4 4 0 0 1 19 11c0 5.6-7 10-7 10z"/>','stroke-width="2.4"')
+};
+const EV={dry:{name:'Dry spell',ic:'sun',cls:'ev-dry',word:'Thirsty'},bugs:{name:'Busy bugs',ic:'bug',cls:'ev-bugs',word:'Bug visit'},wind:{name:'Big wind',ic:'wind',cls:'ev-wind',word:'Windswept'},
+ frost:{name:'Frosty night',ic:'snow',cls:'ev-frost',word:'Chilly'},heat:{name:'Hot day',ic:'hot',cls:'ev-heat',word:'Warm'},hail:{name:'Hail shower',ic:'hail',cls:'ev-hail',word:'Icy'},flood:{name:'Big puddles',ic:'puddle',cls:'ev-flood',word:'Splashed'}};
+const P=n=>`../plants/plant_${n}.svg`;
+function rnd(s){let x=Math.sin(s*127.1)*43758.5453;return x-Math.floor(x)}
+
+/* ---- art pieces ---- */
+const termite=(x,y,s,r)=>`<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})" stroke="#4A2F18" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+ <path d="M-6 5l-3 6M0 6v6.5M6 5l3 6M-6 -5l-3 -6M0 -6v-6.5M6 -5l3 -6" fill="none"/>
+ <ellipse cx="0" cy="0" rx="13" ry="7" fill="#EBC283"/><path d="M-5 -6.5v13M3 -6.5v13" stroke="#B9854A" fill="none"/>
+ <circle cx="15" cy="0" r="7" fill="#D79A55"/>
+ <circle cx="17.5" cy="-3" r="2.6" fill="#fff" stroke-width="1"/><circle cx="18.2" cy="-3" r="1.2" fill="#2C1A0C" stroke="none"/>
+ <circle cx="17.5" cy="3.4" r="2.6" fill="#fff" stroke-width="1"/><circle cx="18.2" cy="3.4" r="1.2" fill="#2C1A0C" stroke="none"/>
+ <path d="M20 -5q4 -5 8 -4M20 5q4 5 8 4" fill="none"/></g>`;
+const leafBlow=(x,y,r,s=1,trail=true)=>`<g transform="translate(${x} ${y}) rotate(${r}) scale(${s})"><path d="M-14 0C-8 -10 8 -10 14 0C8 10 -8 10 -14 0Z" fill="#6DAF4A" stroke="#2E6B2E" stroke-width="1.6"/><path d="M-12 0H12" stroke="#2E6B2E" stroke-width="1.4"/>${trail?'<path d="M-20 -3h-12M-22 4h-16" stroke="var(--swoosh)" stroke-width="2.2" stroke-linecap="round"/>':''}</g>`;
+const sparkle=(x,y,s=1)=>`<g transform="translate(${x} ${y}) scale(${s})" stroke="#fff" stroke-width="2.2" stroke-linecap="round"><path d="M0 -7v14M-6 -3.5l12 7M-6 3.5l12 -7"/></g>`;
+const cloud=(x,y,s,c='#fff',o=.9)=>`<g transform="translate(${x} ${y}) scale(${s})" fill="${c}" opacity="${o}"><ellipse cx="0" cy="0" rx="34" ry="14"/><ellipse cx="-16" cy="-8" rx="16" ry="14"/><ellipse cx="10" cy="-12" rx="20" ry="16"/></g>`;
+const sunDraw=(x,y,r,fill='#FFC84A')=>{let rays='';for(let i=0;i<12;i++){const a=i*30*Math.PI/180;rays+=`<path d="M${(x+Math.cos(a)*(r+6)).toFixed(1)} ${(y+Math.sin(a)*(r+6)).toFixed(1)}L${(x+Math.cos(a)*(r+15)).toFixed(1)} ${(y+Math.sin(a)*(r+15)).toFixed(1)}"/>`}return `<g stroke="${fill}" stroke-width="4" stroke-linecap="round">${rays}</g><circle cx="${x}" cy="${y}" r="${r}" fill="${fill}"/>`};
+const HAILDEF=`<defs><radialGradient id="ph" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#CFE0EF"/></radialGradient></defs>`;
+function pellets(n,seed){let o='';for(let i=0;i<n;i++){const x=rnd(i+seed)*350+5,y=rnd(i*3+seed+4)*190+6,r=(3.6+rnd(i+4)*2).toFixed(1);o+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${r}"/><path d="M${(x-3).toFixed(0)} ${(y-r*1.9-3).toFixed(0)}l-2 -5" stroke="#fff" stroke-width="1.4" stroke-linecap="round" opacity=".7"/>`}return `<g fill="url(#ph)" stroke="#8FA6BB" stroke-width="1.2">${o}</g>`}
+function rain(n,seed,dx,dy,w=2){let o='';for(let i=0;i<n;i++){const x=rnd(i+seed)*380,y=rnd(i*3+seed+9)*300;o+=`<path d="M${x.toFixed(0)} ${y.toFixed(0)}l${dx} ${dy}"/>`}return `<g stroke="var(--rain)" stroke-width="${w}" stroke-linecap="round" opacity=".7" fill="none">${o}</g>`}
+const frog=`<svg class="fr" viewBox="0 0 44 44" aria-hidden="true"><circle cx="22" cy="22" r="21" fill="color-mix(in srgb,#8FC46A 55%,var(--surface))" stroke="var(--ring)" stroke-width="2"/><circle cx="14" cy="16" r="6" fill="#fff" stroke="#2E6B2E" stroke-width="1.6"/><circle cx="30" cy="16" r="6" fill="#fff" stroke="#2E6B2E" stroke-width="1.6"/><circle cx="15" cy="16.5" r="2.4" fill="#1F3320"/><circle cx="29" cy="16.5" r="2.4" fill="#1F3320"/><ellipse cx="22" cy="27" rx="12" ry="9" fill="#6DAF4A" stroke="#2E6B2E" stroke-width="1.6"/><path d="M15 28q7 6 14 0" fill="none" stroke="#1F3320" stroke-width="1.8" stroke-linecap="round"/></svg>`;
+
+/* ---- plant stage ---- */
+function stage(o){
+ const soilCol=o.dry?'var(--soil-dry)':'var(--soil)';
+ return `<div class="stage ${o.cls}">
+ <div class="sky"></div>
+ <svg class="lay" viewBox="0 0 361 310">${o.back||''}</svg>
+ <svg class="lay" viewBox="0 0 361 310"><ellipse cx="180" cy="214" rx="86" ry="13" fill="${soilCol}"/>${o.soil||''}</svg>
+ <img class="plant" src="${P(o.plant)}" alt="" style="filter:${o.filter||'none'};transform:${o.tf||'none'}">
+ <svg class="lay" viewBox="0 0 361 310">
+  <rect x="0" y="292" width="361" height="18" fill="var(--shelf)"/>
+  <ellipse cx="180" cy="293" rx="96" ry="6" fill="#000" opacity=".12"/>
+  <path d="M96 226L264 226L252 288Q251 293 246 293L114 293Q109 293 108 288Z" fill="var(--pot)"/>
+  <rect x="88" y="214" width="184" height="18" rx="7" fill="var(--pot-rim)"/>
+  <path d="M112 258h136" stroke="#000" stroke-opacity=".1" stroke-width="3"/>
+  ${o.pot||''}
+ </svg>
+ <svg class="lay" viewBox="0 0 361 310">${HAILDEF}${o.over||''}</svg>
+ ${o.haze?`<div class="haze shim" style="background:${o.haze}"></div>`:''}
+ ${o.pill||''}
+ </div>`}
+const soilCracks=`<g stroke="var(--crack)" stroke-width="1.8" fill="none" stroke-linecap="round"><path d="M112 212l12 3 6 -4M236 211l-14 3 -5 -4M150 220l8 -4 10 3M205 221l9 -3 12 2M96 216l10 -2"/></g>`;
+const pillIn=(k)=>{const e=EV[k];return `<span class="pill"><span style="display:grid">${IC[e.ic]}</span>${e.name}</span>`};
+const LOOK={
+ dry:()=>stage({cls:'ev-dry',plant:'fern',dry:1,filter:'saturate(.5) sepia(.3) brightness(1.06)',tf:'rotate(-5deg) scaleY(.88) skewX(4deg)',back:sunDraw(310,70,22,'#FFC04A'),soil:soilCracks,
+  haze:'radial-gradient(ellipse at 85% 10%,rgba(255,196,80,.38),transparent 60%),linear-gradient(rgba(255,214,140,.12),rgba(255,214,140,.12))',pill:pillIn('dry')}),
+ 'dry-mild':()=>stage({cls:'ev-dry',plant:'daisy',dry:1,filter:'saturate(.8) sepia(.1)',tf:'rotate(-3deg)',back:sunDraw(310,70,22,'#FFC04A'),
+  haze:'radial-gradient(ellipse at 85% 10%,rgba(255,196,80,.25),transparent 60%)',pill:pillIn('dry')}),
+ shrug:()=>stage({cls:'ev-shrug',plant:'lithops',dry:1,back:sunDraw(300,60,24,'#FFC04A'),soil:`<g stroke="var(--crack)" stroke-width="1.8" fill="none" stroke-linecap="round"><path d="M104 214l10 -2M244 213l-10 -2"/></g>`,
+  over:`<g stroke="#fff" stroke-width="2.4" stroke-linecap="round">${[[96,120],[270,150],[60,170]].map(([x,y])=>`<path d="M${x} ${y-6}v12M${x-6} ${y}h12"/>`).join('')}</g>`,
+  haze:'radial-gradient(ellipse at 85% 10%,rgba(255,196,80,.30),transparent 60%)',pill:`<span class="pill" style="--ev:#9CCB7A"><span style="display:grid">${IC.sun}</span>Dry spell: Lithops loves it</span>`}),
+ bugs:()=>stage({cls:'ev-bugs',plant:'rose',pill:pillIn('bugs'),
+  over:`${termite(184,170,1.05,-88)}${termite(120,214,.9,8)}
+   <g stroke="#6B4630" stroke-width="2" stroke-linecap="round"><path d="M175 150l5 1M186 134l-5 1M176 118l4 1"/></g>
+   <g fill="#C9A070" stroke="#6B4630" stroke-width="1">${[[168,196,2.4],[176,208,2],[160,205,1.8],[196,188,2.2],[130,225,2],[150,222,1.8]].map(([x,y,r])=>`<circle cx="${x}" cy="${y}" r="${r}"/>`).join('')}</g>`}),
+ wind:()=>stage({cls:'ev-wind',plant:'sunflower',tf:'rotate(15deg) skewX(-6deg)',pill:pillIn('wind'),
+  back:cloud(70,50,1.1,'#fff',.85)+cloud(290,76,.9,'#fff',.7),
+  over:`<g fill="none" stroke="var(--swoosh)" stroke-width="3" stroke-linecap="round" opacity=".9"><path d="M14 112C80 90 130 132 210 104S300 100 346 118"/><path d="M30 158C90 144 140 170 200 152"/><path d="M230 180C270 170 310 182 346 170"/></g>
+   ${leafBlow(300,70,-20,.9,!RM)}${leafBlow(250,138,10,.8,!RM)}${leafBlow(60,70,25,.7,!RM)}`,
+  haze:'linear-gradient(rgba(70,90,110,.10),rgba(70,90,110,.04))'}),
+ frost:()=>stage({cls:'ev-frost',plant:'orchid',pill:pillIn('frost'),filter:'hue-rotate(20deg) saturate(.8) brightness(1.1) drop-shadow(0 0 2px #fff) drop-shadow(0 0 2px #fff) drop-shadow(0 0 1px #fff)',
+  soil:`<ellipse cx="180" cy="214" rx="86" ry="13" fill="none" stroke="#fff" stroke-width="3.4" stroke-dasharray="2 5" stroke-linecap="round"/>`,
+  over:`${sparkle(88,80,1.2)}${sparkle(284,66,1)}${sparkle(64,150,.9)}${sparkle(300,130,1.2)}${sparkle(240,44,.8)}${sparkle(130,56,.9)}${sparkle(150,160,.7)}${sparkle(215,170,.7)}`,
+  haze:'linear-gradient(180deg,rgba(210,235,255,.18),rgba(200,230,255,.28))'}),
+ heat:()=>stage({cls:'ev-heat',plant:'lotus',filter:'saturate(.82) brightness(1.04)',tf:'rotate(-5deg) scaleY(.88) translateY(10px)',pill:pillIn('heat'),
+  back:sunDraw(296,68,30,'#FFC04A'),
+  over:`<g fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" opacity=".75"><path d="M60 200c8-14-8-26 0-40s-8-26 0-40"/><path d="M300 210c8-14-8-26 0-40"/><path d="M96 190c6-12-6-22 0-34"/></g>`,
+  haze:'radial-gradient(ellipse at 85% 12%,rgba(255,200,90,.5),transparent 62%),linear-gradient(rgba(255,190,100,.12),rgba(255,190,100,.12))'}),
+ hail:()=>stage({cls:'ev-hail',plant:'hibiscus',tf:'rotate(-1.5deg)',pill:pillIn('hail'),
+  back:cloud(80,56,1.2,'#C5D0DB',.95)+cloud(280,52,1.1,'#B4C2CF',.95)+cloud(180,38,1.2,'#D2DBE4',.9),
+  soil:`<g fill="url(#ph)" stroke="#8FA6BB" stroke-width="1.2">${[[112,213],[130,219],[150,216],[214,219],[236,212],[252,216],[96,217]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="4.2"/>`).join('')}</g>`,
+  over:`${pellets(14,5)}<g fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity=".8"><path d="M120 206q5 -10 10 0M232 206q5 -10 10 0"/></g>`,
+  haze:'linear-gradient(rgba(90,105,120,.12),rgba(90,105,120,.05))'}),
+ flood:()=>stage({cls:'ev-flood',plant:'aloe_vera',pill:pillIn('flood'),
+  back:cloud(86,56,1.1,'#fff',.8)+cloud(290,72,.9,'#fff',.7),
+  over:`${rain(10,7,-3,12,1.8)}<ellipse cx="180" cy="299" rx="150" ry="9" fill="var(--water)"/><ellipse cx="180" cy="299" rx="150" ry="9" fill="none" stroke="var(--water-line)" stroke-width="2.4"/>
+   <g fill="none" stroke="var(--water-line)" stroke-width="2.2" stroke-linecap="round"><ellipse cx="62" cy="299" rx="16" ry="3.5"/><ellipse cx="300" cy="300" rx="14" ry="3"/><ellipse cx="140" cy="302" rx="8" ry="2"/></g>`}),
+};
+const CAP={
+ dry:['Fern is thirsty and droopy.','A drink or a hello will perk it up.'],'dry-mild':['Daisy is a little thirsty.','A drink or a hello will perk it up.'],
+ shrug:['Lithops loves dry days!','It is happy and growing as usual.'],
+ bugs:['Busy bugs are visiting Rose.','Tiny nibbles on the stem. A hello will help.'],
+ wind:['A big wind is bending Sunflower.','It will stand tall again with a hello.'],
+ frost:['A frosty night. Orchid is chilly.','A drink or a hello will warm it up.'],
+ heat:['A hot day. Lotus feels very warm.','A drink or a hello will cool it down.'],
+ hail:['Hail is bouncing off Hibiscus.','A hello will help it shake off the ice.'],
+ flood:['Big puddles. Aloe has wet feet.','A sunny hello will help.']};
+const NAME={dry:'Fern','dry-mild':'Daisy',shrug:'Lithops',bugs:'Rose',wind:'Sunflower',frost:'Orchid',heat:'Lotus',hail:'Hibiscus',flood:'Aloe'};
+const BTN={dry:['drop','Give Fern a drink'],'dry-mild':['drop','Give Daisy a drink'],bugs:['heart','Say hello to Rose'],wind:['heart','Say hello to Sunflower'],frost:['heart','Say hello to Orchid'],heat:['drop','Give Lotus a drink'],hail:['heart','Say hello to Hibiscus'],flood:['heart','Say hello to Aloe'],shrug:['heart','Say hello to Lithops']};
+const EVK={dry:'dry','dry-mild':'dry',bugs:'bugs',wind:'wind',frost:'frost',heat:'heat',hail:'hail',flood:'flood',shrug:'dry'};
+
+/* ---- growth bar: same earned fill always; weather = soft tint + word ---- */
+function bar(weathered){
+ const xs=[14,80,148,216,290],y=24,labs=['Tiny','Sprout','Bud','Bloom','Full bloom'],reach=2,partial=30;
+ let o='';
+ if(weathered)o+=`<rect class="tint" x="0" y="10" width="330" height="28" rx="14"/>`;
+ o+=`<path d="M${xs[0]} ${y}H${xs[reach]+partial}" stroke="var(--ok)" stroke-width="8" stroke-linecap="round"/><path d="M${xs[reach]+partial} ${y}H${xs[4]}" stroke="var(--line)" stroke-width="8" stroke-linecap="round" opacity="${weathered?0:1}"/>`;
+ if(weathered)o+=`<path d="M${xs[reach]+partial+2} ${y}H${xs[4]}" stroke="var(--sec)" stroke-width="2" stroke-linecap="round" opacity=".55"/>`;
+ let nodes='';
+ xs.forEach((x,i)=>{
+  nodes+=i<=reach?`<circle cx="${x}" cy="${y}" r="12" fill="var(--ok)"/><path d="M${x-5} ${y}l3.5 3.5L${x+6} ${y-4}" stroke="var(--surface)" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`
+   :`<circle cx="${x}" cy="${y}" r="11" fill="var(--surface)" stroke="var(--sec)" stroke-width="2.2"/>`;
+  if(!AX)nodes+=`<text x="${x}" y="56" text-anchor="${i==0?'start':i==4?'end':'middle'}" font-size="13" font-weight="700" fill="var(--text)" ${i==0?'transform="translate(-8 0)"':i==4?'transform="translate(40 0)"':''}>${labs[i]}</text>`;
+ });
+ return `<svg class="path" viewBox="-8 0 346 62" role="img" aria-label="Growth: Bud reached, Bloom next.${weathered?' Windswept today.':''}"><g aria-hidden="true">${o}${nodes}</g></svg>`}
+function growth(k,weathered){
+ const e=EV[EVK[k]]||EV.dry;
+ const chip=weathered?`<span class="rest-chip" style="background:color-mix(in srgb,var(--ev) 30%,var(--surface))"><span style="display:grid;width:16px;height:16px">${IC[e.ic]}</span>${e.word}</span>`:`<span class="rest-chip"><span style="display:grid;width:16px;height:16px">${IC.check}</span>${k==='shrug'?'Happy':'Mended'}</span>`;
+ return `<div class="card growth ${e.cls}"><div class="row"><span>Growth</span>${chip}</div>${bar(weathered)}${AX?'<p class="note">Bud reached, Bloom next.</p>':''}<p class="note">Growth keeps going. Care helps it shake off the weather.</p></div>`}
+const puzzle=`<div class="card puz">${frog}<div class="tx"><b>Weather puzzle</b>Solve it for the Frog friend sticker and a word toward your next plant.</div><button class="btn secondary">Play</button></div>`;
+function plantPage(k,o={}){
+ const nm=NAME[k],cap=CAP[k],b=BTN[k];
+ return `<div class="phone">
+ <div class="status"><span>9:41</span><span>100%</span></div>
+ <div class="nav"><span class="back">${IC.back}Garden</span><span class="navt">${nm}</span><span class="navr"></span></div>
+ ${o.stage||LOOK[k]()}
+ <div class="cap"><h2>${cap[0]}</h2><p>${cap[1]}</p></div>
+ ${k==='shrug'?growth(k,false).replace('Growth keeps going. Care helps it shake off the weather.','Desert plants shrug off a dry spell.'):growth(k,true)}
+ <div class="act"><button class="btn primary">${IC[b[0]]}${b[1]}</button></div>
+ ${k==='shrug'?'':puzzle+'<p class="hint">Skip is free. Care will help it mend.</p>'}
+ </div>`}
+
+/* ---- Home: forecast, kit, event-day banner ---- */
+function helperIcons(keys){return `<div class="kit6">${keys.map(k=>`<svg viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="var(--surface)" stroke="var(--ring)" stroke-width="2.6"/>${TI[k]}</svg>`).join('')}</div>`}
+function artWind(){return `<svg class="art" viewBox="0 0 361 150" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="color-mix(in srgb,#7FA0BD 45%,var(--surface))"/><stop offset="1" stop-color="color-mix(in srgb,#7FA0BD 14%,var(--surface))"/></linearGradient></defs>
+ <rect width="361" height="150" fill="url(#g1)"/>${cloud(80,40,1.2,'#fff',.9)}${cloud(290,58,1,'#fff',.8)}
+ <g fill="none" stroke="var(--swoosh)" stroke-width="3.4" stroke-linecap="round"><path d="M20 78C80 58 130 98 200 72S300 70 345 86"/><path d="M60 108C110 96 150 120 200 106"/></g>
+ <path d="M0 150V132C60 124 120 130 180 128S300 124 361 132V150Z" fill="color-mix(in srgb,#6DAF4A 45%,var(--surface))"/>
+ <g transform="translate(180 140) rotate(12)"><path d="M0 0C0 -22 1 -44 2 -62" stroke="#3F8F3F" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M0 -26C-14 -34 -22 -30 -24 -22C-14 -18 -6 -20 0 -26Z" fill="#4FA64F"/>
+  <g transform="translate(2 -72)">${Array.from({length:12},(_,i)=>`<ellipse cx="0" cy="-15" rx="5" ry="9" fill="#F5B93A" stroke="#C98A12" stroke-width="1" transform="rotate(${i*30})"/>`).join('')}<circle r="10" fill="#7A4B25"/></g></g>
+ ${leafBlow(305,100,-15,.7)}${leafBlow(60,60,20,.6)}</svg>`}
+function artDry(){return `<svg class="art" viewBox="0 0 361 150" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="color-mix(in srgb,#E3A23C 42%,var(--surface))"/><stop offset="1" stop-color="color-mix(in srgb,#E3A23C 12%,var(--surface))"/></linearGradient></defs>
+ <rect width="361" height="150" fill="url(#g2)"/>${sunDraw(290,52,26,'#FFC04A')}
+ <circle cx="281" cy="48" r="2.6" fill="#7A4B00"/><circle cx="299" cy="48" r="2.6" fill="#7A4B00"/><path d="M280 59q10 8 20 0" stroke="#7A4B00" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+ ${cloud(70,44,.9,'#fff',.7)}
+ <path d="M0 150V126C70 118 130 124 190 122S300 118 361 126V150Z" fill="color-mix(in srgb,#C9A070 70%,var(--surface))"/>
+ <path d="M30 138l12-4 8 3M250 136l10-4 12 3M130 142l9-3" stroke="var(--crack)" stroke-width="2" fill="none" stroke-linecap="round" opacity=".7"/>
+ <g transform="translate(150 128)"><rect x="-9" y="-48" width="18" height="48" rx="9" fill="#5FA45F" stroke="#2E6B2E" stroke-width="2"/><path d="M-9 -22H-20a6 6 0 0 1-6-6v-12a6 6 0 0 1 12 0v6H-9" fill="#5FA45F" stroke="#2E6B2E" stroke-width="2" stroke-linejoin="round"/><circle cx="0" cy="-52" r="6" fill="#F2788A" stroke="#C94F66" stroke-width="1.5"/></g></svg>`}
+function artKit(){return `<svg class="art" viewBox="0 0 361 110" preserveAspectRatio="xMidYMid slice" style="height:110px"><defs><linearGradient id="g3" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="color-mix(in srgb,#9CCB7A 40%,var(--surface))"/><stop offset="1" stop-color="color-mix(in srgb,#9CCB7A 12%,var(--surface))"/></linearGradient></defs><rect width="361" height="110" fill="url(#g3)"/>${cloud(70,36,.9,'#fff',.8)}${cloud(300,50,.8,'#fff',.7)}${sunDraw(200,40,14,'#FFC04A')}
+ <path d="M0 110V92C60 86 120 90 180 88S300 86 361 92V110Z" fill="color-mix(in srgb,#6DAF4A 45%,var(--surface))"/></svg>`}
+const ORDER=['shade','bug','net','frost','umbrella','bed'];
+function home(kind,mode='warn'){
+ const wind=kind==='wind',ev=wind?'ev-warn':'ev-dry',hn=wind?'wind net':'shade cloth';
+ let body='';
+ if(mode==='kit'){
+  body=`<div class="card warn ev-calm">${artKit()}<div class="in"><h2>A weather kit for you, from the Shed.</h2><p class="lead">Six free helpers for your garden. Set one out the day before a weather day.</p>${helperIcons(ORDER)}<div style="height:14px"></div><button class="btn primary">Got it</button><button class="btn quiet">Open the Shed</button></div></div>`;
+ }else if(mode==='banner'){
+  body=`<div class="card warn ${ev}"><div style="position:relative">${wind?artWind():artDry()}</div><div class="in"><h2>${wind?'A big wind is here today.':'A dry spell is here today.'}</h2><p class="lead">${wind?'The wind net is out for your whole garden. Your plants are snug.':'The shade cloth is out for your whole garden. Your plants are snug.'}</p>
+  <div class="card puz" style="margin:0 0 10px;box-shadow:inset 0 0 0 1.5px var(--line)">${frog}<div class="tx"><b>Weather puzzle</b>Solve it for the Frog friend sticker and a word toward your next plant.</div></div>
+  <button class="btn primary">Play the weather puzzle</button><button class="btn quiet">Skip is free</button></div></div>`;
+ }else{
+  const out=mode==='set';
+  const lead=wind?'Here is how to get ready.':'Here is how to get ready.';
+  body=`<div class="card warn ${ev}"><div style="position:relative">${wind?artWind():artDry()}</div><div class="in"><h2>${wind?'A big wind is coming tomorrow':'A dry spell is coming tomorrow'}</h2><p class="lead">${lead}</p>
+  <ol class="steps"><li><span class="n">1</span><span>Give a drink or a hello today.</span></li>
+  <li><span class="n" ${out?'style="background:var(--ok-bg);box-shadow:inset 0 0 0 1.5px var(--ok)"':''}>${out?IC.check.replace('<svg','<svg style="width:18px;height:18px"'):2}</span><span>${out?`The ${hn} is out for your whole garden.`:`Set out the ${hn}.`}</span></li></ol>
+  ${out?'':`<button class="btn secondary setbtn">Set out the ${hn}</button>`}
+  <button class="btn primary">Got it</button></div></div>`;
+ }
+ return `<div class="phone"><div class="status"><span>9:41</span><span>100%</span></div>
+ <div class="hi"><h1>Good morning!</h1><span class="coin">12</span></div>${body}
+ ${mode==='kit'||AX?'':`<div class="tiles"><div class="tile"><span>Play</span><i></i></div><div class="tile"><span>Daily Bloom</span><i></i></div></div>`}</div>`}
+
+/* ---- chips / widget ---- */
+function chips(){
+ const pill=(txt,ic,ev,extra='')=>`<span class="pill" style="--ev:${ev};min-height:44px"><span style="display:grid;width:22px;height:22px">${IC[ic]}</span>${txt}${extra}</span>`;
+ return `<div class="phone"><div class="status"><span>9:41</span><span>100%</span></div>
+ <div class="garden-h"><h1>My Garden</h1>${pill('Tomorrow: windy','wind','#7FA0BD')}</div>
+ <div class="row3"><div class="gcard"><img src="${P('daisy')}" alt="">Daisy</div><div class="gcard"><img src="${P('sunflower')}" alt="">Sunflower</div><div class="gcard"><img src="${P('lithops')}" alt="">Lithops</div></div>
+ <div class="dn"><b>Design note, not in app.</b> The chip sits in the garden header the day before. Tap it to open the forecast card. It is 44 pt tall.</div>
+ <div class="sect">Other days, same chip</div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap;padding:0 16px">${pill('Tomorrow: dry','sun','#E3A23C')}${pill('Tomorrow: hot','hot','#F08A3C')}${pill('Tomorrow: frosty','snow','#8CCBEA')}${pill('Net is out','wind','#7FA0BD',`<span style="display:grid;width:18px;height:18px;margin-left:2px">${IC.check}</span>`)}</div>
+ <div class="sect">Widget, the day before</div>
+ <div class="wall"><div class="widget"><div style="flex:1;min-width:0"><div class="wt">WordFlora</div><div class="wl">Garden forecast: a little windy tomorrow</div><div class="ws">Your garden is ready.</div></div><img src="${P('sunflower')}" alt=""></div></div>
+ <div class="sect">Lock screen line</div>
+ <div class="lock"><div class="t">9:41</div><div class="inline"><span style="display:grid;width:20px;height:20px">${IC.wind}</span>Garden: a little windy tomorrow</div></div>
+ </div>`}
+
+/* ---- Shed ---- */
+const TI={
+ umbrella:`<path d="M7 26C8 12 36 12 37 26Z" fill="#5B9BD5" stroke="#2F5F94" stroke-width="2" stroke-linejoin="round"/><path d="M22 14V26M15 26c0-8 3-11 7-12M29 26c0-8-3-11-7-12" stroke="#2F5F94" stroke-width="1.6" fill="none"/><path d="M22 26v9c0 3-5 3-5 0" stroke="#7A5238" stroke-width="2.6" fill="none" stroke-linecap="round"/>`,
+ net:`<path d="M8 12h28v22H8z" fill="#fff" fill-opacity=".5" stroke="#5E8F1F" stroke-width="2"/><path d="M15 12v22M22 12v22M29 12v22M8 19h28M8 26h28" stroke="#5E8F1F" stroke-width="1.4"/><path d="M8 34v5M36 34v5" stroke="#7A5238" stroke-width="3" stroke-linecap="round"/>`,
+ frost:`<path d="M8 14h28v18c-5 3-9 3-14 0s-9-3-14 0z" fill="#CFE6F5" stroke="#4E86AD" stroke-width="2" stroke-linejoin="round"/><path d="M22 17v11M17 19.5l10 6M17 25.5l10-6" stroke="#4E86AD" stroke-width="1.8" stroke-linecap="round"/>`,
+ shade:`<circle cx="31" cy="12" r="5" fill="#FFC04A"/><path d="M6 20l30-6v6L6 28z" fill="#6B8F71" stroke="#3E6247" stroke-width="2" stroke-linejoin="round"/><path d="M10 28v9M32 21v16" stroke="#7A5238" stroke-width="2.8" stroke-linecap="round"/>`,
+ bed:`<rect x="7" y="22" width="30" height="11" rx="2" fill="#B98558" stroke="#7A5238" stroke-width="2"/><path d="M11 33v6M33 33v6" stroke="#7A5238" stroke-width="3" stroke-linecap="round"/><path d="M22 22v-8M22 17c-5 0-7-3-7-6 4 0 7 2 7 6zM22 17c5 0 7-3 7-6-4 0-7 2-7 6z" fill="#5FA45F" stroke="#2E6B2E" stroke-width="1.6" stroke-linejoin="round"/>`,
+ bug:`<path d="M6 34C6 16 38 16 38 34Z" fill="#fff" fill-opacity=".5" stroke="#5E8F1F" stroke-width="2"/><path d="M12 34c0-9 5-13 10-13M32 34c0-9-5-13-10-13M22 21v13" stroke="#5E8F1F" stroke-width="1.4" fill="none"/><circle cx="22" cy="31" r="3" fill="#D79A55" stroke="#4A2F18" stroke-width="1.2"/>`};
+const HELP={shade:['Shade cloth','For Dry spell and Hot day.'],bug:['Bug cover','For Busy bugs. No sprays.'],net:['Wind net','For Big wind.'],frost:['Frost cloth','For Frosty night.'],umbrella:['Garden umbrella','For Hail shower.'],bed:['Raised bed','For Big puddles.']};
+function tool(k,state){
+ const [nm,us]=HELP[k];
+ const ic=`<svg class="ic" viewBox="0 0 44 44"><circle cx="22" cy="22" r="20" fill="var(--surface)" stroke="var(--ring)" stroke-width="2.6"/>${TI[k]}</svg>`;
+ let go;
+ if(state==='set')go=`<div class="go"><button class="btn set">${IC.check.replace('<svg','<svg style="width:18px;height:18px"')}Out</button></div>`;
+ else if(state==='ready-btn')go=`<div class="go"><button class="btn secondary" style="background:var(--accent);color:var(--ink);box-shadow:none">Set out</button></div>`;
+ else go=`<div class="go ready">${IC.check}Ready</div>`;
+ return `<div class="card tool">${ic}<div class="tx"><div class="nm">${nm}</div><div class="us">${us}</div></div>${go}</div>`}
+function shed(out){
+ return `<div class="phone"><div class="status"><span>9:41</span><span>100%</span></div>
+ <div class="nav"><span class="back">${IC.back}Home</span><span class="navt">Garden Shed</span><span class="navr"></span></div>
+ <div class="shed-h"><h2>Weather helpers</h2><p>A weather kit for you, from the Shed. Set out the helper for tomorrow's weather.</p></div>
+ <div class="pill" style="--ev:#7FA0BD;margin:0 16px 10px;align-self:flex-start"><span style="display:grid">${IC.wind}</span>Tomorrow: Big wind</div>
+ ${ORDER.map(k=>tool(k,k==='net'?(out?'set':'ready-btn'):'ready')).join('')}
+ </div>`}
+
+/* ---- Snug garden frame (big wind, net over the whole garden) ---- */
+function snug(){
+ const xs=[62,180,298],names=['sunflower','rose','daisy'];
+ let beads='';for(let i=0;i<30;i++){const x=24+rnd(i+11)*314,y=60+rnd(i*5+2)*170;beads+=`<circle cx="${x.toFixed(0)}" cy="${y.toFixed(0)}" r="${(2.2+rnd(i)*1.6).toFixed(1)}"/>`}
+ const pots=xs.map(c=>`<g transform="translate(${c} 0)"><path d="M-48 242L48 242L42 282Q41 286 37 286L-37 286Q-41 286 -42 282Z" fill="var(--pot)"/><rect x="-53" y="232" width="106" height="14" rx="6" fill="var(--pot-rim)"/></g>`).join('');
+ const soils=xs.map(c=>`<ellipse cx="${c}" cy="232" rx="52" ry="9" fill="var(--soil)"/>`).join('');
+ const strands=Array.from({length:12},(_,i)=>`<path d="M${-30+i*44} 10L${-30+i*44-90} 290M${-30+i*44} 10L${-30+i*44+90} 290"/>`).join('');
+ const dome='M8 292C8 76 76 26 180 26S352 76 352 292Z';
+ return `<div class="stage ev-wind"><div class="sky"></div>
+ <svg class="lay" viewBox="0 0 361 310">${cloud(60,34,.9,'#fff',.85)}${cloud(300,40,.8,'#fff',.7)}<g fill="none" stroke="var(--swoosh)" stroke-width="3" stroke-linecap="round" opacity=".9"><path d="M2 20C30 12 50 28 80 20"/><path d="M290 120C320 112 340 126 358 118"/></g>${rain(10,9,-8,20,1.6)}${leafBlow(332,78,-15,.6,!RM)}</svg>
+ <svg class="lay" viewBox="0 0 361 310">${soils}</svg>
+ ${xs.map((c,i)=>`<img src="${P(names[i])}" alt="" style="position:absolute;left:${c-62}px;top:116px;width:124px;height:124px">`).join('')}
+ <svg class="lay" viewBox="0 0 361 310"><rect x="0" y="292" width="361" height="18" fill="var(--shelf)"/>${pots}</svg>
+ <svg class="lay" viewBox="0 0 361 310"><defs><clipPath id="dm"><path d="${dome}"/></clipPath></defs>
+  <path d="${dome}" fill="#fff" fill-opacity=".12"/>
+  <g clip-path="url(#dm)" stroke="var(--net)" stroke-width="2.6" opacity=".38">${strands}</g>
+  <path d="${dome}" fill="none" stroke="var(--net)" stroke-width="3.4" stroke-linecap="round"/>
+  <g fill="#fff" fill-opacity=".85" stroke="var(--rain)" stroke-width="1.2" clip-path="url(#dm)">${beads}</g></svg>
+ <span class="pill" style="--ev:#7FA0BD"><span style="display:grid">${IC.wind}</span>Big wind: net is out</span></div>`}
+function snugPage(){
+ return `<div class="phone"><div class="status"><span>9:41</span><span>100%</span></div>
+ <div class="nav"><span class="back">${IC.back}Home</span><span class="navt">My Garden</span><span class="navr"></span></div>
+ ${snug()}
+ <div class="cap"><h2>Your garden is snug.</h2><p>The wind net is out for your whole garden. The plants stay tall and happy.</p></div>
+ <div class="card growth ev-wind" style="margin-top:12px"><div class="row"><span>Garden</span><span class="rest-chip"><span style="display:grid;width:16px;height:16px">${IC.check}</span>Sheltered</span></div><p class="note" style="margin-top:6px">Sheltered plants need no mending. A hello is always a nice thing to do.</p></div>
+ ${puzzle}<p class="hint">Skip is free.</p></div>`}
+
+/* ---- growth bar explainer ---- */
+function barScreen(){
+ const blk=(t,chip,w,txt)=>`<div class="card barc ev-wind"><div class="row" style="display:flex;justify-content:space-between;align-items:center"><h3>${t}</h3>${chip}</div>${bar(w)}<p style="margin:0;font-size:14px;line-height:1.35;color:var(--sec);text-align:center">${txt}</p></div>`;
+ const wchip=`<span class="rest-chip" style="background:color-mix(in srgb,var(--ev) 30%,var(--surface))"><span style="display:grid;width:16px;height:16px">${IC.wind}</span>Windswept</span>`;
+ const mchip=`<span class="rest-chip"><span style="display:grid;width:16px;height:16px">${IC.check}</span>Mended</span>`;
+ return `<div class="phone"><div class="status"><span>9:41</span><span>100%</span></div>
+ <div class="nav"><span class="back">${IC.back}Garden</span><span class="navt">Growth</span><span class="navr"></span></div>
+ <div class="cap" style="padding-top:6px"><p style="margin:0">Growth keeps going on every kind of day. Care helps a plant shake off the weather.</p></div>
+ ${blk('Sunny day','',false,'The green is what you have grown.')}
+ ${blk('Weathered','' ,true,'The same green. A soft tint and the word Windswept show the weather.').replace('<h3>Weathered</h3>','<h3>Weathered</h3>'+wchip).replace('<h3>Weathered</h3>'+wchip,'<h3>Weathered</h3>'+wchip)}
+ ${blk('Mended',mchip,false,'One drink or hello, and the tint is gone. The green never changed.')}
+ <div class="dn"><b>Design note, not in app.</b> Earned fill is identical in all three. Two states: weathered (tint, weather word, tinted plant art) and mended. The tint has help: the pill carries a word and an icon. Stage names are Tiny, Sprout, Bud, Bloom, Full bloom.</div>
+ </div>`}
+
+const SCR={
+ 'warn-wind':()=>home('wind'),'warn-wind-set':()=>home('wind','set'),'warn-dry':()=>home('dry'),kit:()=>home('wind','kit'),'banner-wind':()=>home('wind','banner'),
+ chips,bar:barScreen,shed:()=>shed(false),'shed-out':()=>shed(true),snug:snugPage,
+ dry:()=>plantPage('dry'),'dry-mild':()=>plantPage('dry-mild'),bugs:()=>plantPage('bugs'),wind:()=>plantPage('wind'),frost:()=>plantPage('frost'),heat:()=>plantPage('heat'),hail:()=>plantPage('hail'),flood:()=>plantPage('flood'),shrug:()=>plantPage('shrug')
+};
+document.getElementById('root').innerHTML=SCR[S]();
+document.body.classList.add(q.get('static')==='1'?'static':'anim');if(AX)document.body.classList.add('ax');
+</script></body></html>

@@ -73,3 +73,6 @@ Device-only unverified: Siri phrases, Control Center control, speech voice/silen
 
 ## Release gate (owner, 2026-11-04)
 No App Store submission until ALL of the following are done and reviewed by the owner: logo redesign (v3, then icon and in-app wordmark), petal-bloom intro and celebration confetti/badge moments, rest and break cards (Dusk card), plants earned by progress (3 words per plant), hearts fix, level map, Shed/visitors/butterfly game review, pot earning ladder, onboarding guide (backlog), endgame and weather events decision, app-vs-mockup fidelity fixes, then device checks and App Store Connect items.
+
+## Endgame and garden weather (design only, 2026-11-04, awaiting owner decision)
+Spec `docs/pm/endgame-and-events-spec.md` (decisions in section 9); research `docs/research/endgame-disasters-{design,tech}.md`; audio plan `docs/pm/endgame-events-audio-plan.md` with prototypes from `tools/make_weather_sounds.py`; mockups `design-preview/events/` and `design-preview/endgame/` (critic notes and Revision 1 in each). Recommendation: "Weather, not loss" for everyone (looks only, mended by care), and Wild Weather (shown-stage dip on up to 4 plants, word level never drops) as a 13+ opt-in. No Swift changed.

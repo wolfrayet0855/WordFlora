@@ -1,0 +1,81 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Grand Garden</title>
+<link rel="stylesheet" href="../theme.css"><script src="../theme.js"></script>
+<style>
+.wrap{max-width:1360px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:28px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 18px;max-width:900px;line-height:1.45}
+h2.sec{font-size:21px;margin:34px 0 4px}.secsub{color:var(--muted);margin:0 0 14px;max-width:900px;line-height:1.45;font-size:15px}
+.bar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:var(--surface);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow);margin-bottom:10px;position:sticky;top:8px;z-index:2}
+.bar label{font-weight:700;font-size:14px;display:flex;gap:6px;align-items:center}
+.bar select{font:inherit;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.col h3{font-size:17px;margin:0 0 2px}.col p{margin:0 0 10px;color:var(--muted);font-size:14px;line-height:1.4;min-height:3.9em}
+.frame{width:295px;height:639px;border-radius:34px;overflow:hidden;box-shadow:var(--shadow);border:6px solid #111;background:#111}
+.frame iframe{width:393px;height:852px;border:0;transform:scale(.7353);transform-origin:0 0}
+.pick{display:inline-block;background:var(--accent);color:var(--accent-ink);font-weight:800;border-radius:8px;padding:1px 8px;font-size:12px;margin-left:6px;vertical-align:2px}
+.notes{margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.note{background:var(--surface);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);font-size:14px;line-height:1.5}
+.note h3{margin:0 0 6px;font-size:16px}.note ul{margin:0;padding-left:18px}
+.ok{color:var(--success);font-weight:700}.bad{color:var(--danger);font-weight:700}
+.shots{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px}
+a{color:inherit}
+</style></head><body>
+<div class="wrap">
+<h1>Grand Garden + garden weather <span class="pick">Revision 1</span></h1>
+<p class="sub">The endgame moment when all 50 plants are found (the Gardener's Crown), the "What grows next" card, and the grown-up Wild Weather rescue flow (harder wake puzzle, skip path, success). Frames are 393 x 852. Controls update every phone. PNGs live in <a href="shots/">shots/</a> (<code>sh render.sh</code>, which also checks copy). Rationale and pick: <a href="notes.md">notes.md</a>.</p>
+<div class="bar">
+ <label>Theme <select id="theme"><option>light</option><option>dark</option></select></label>
+ <label>Motion <select id="rm"><option value="0">Default</option><option value="1">Reduce Motion</option></select></label>
+ <label>Text <select id="scale"><option value="1">Default</option><option value="1.3">Larger</option></select></label>
+</div>
+
+<h2 class="sec">1. Grand Garden</h2>
+<p class="secsub">A is the ceremony. B's crown-on-wordmark became the Home beat, C became the share sheet. Soft petals only (5 at most, none under Reduce Motion). No Plus, ads or prices anywhere in the ending. Revision 0 (A, B, C side by side) is in <a href="shots/v1/">shots/v1/</a> and <a href="screens-v1.html?s=b">screens-v1.html</a>.</p>
+<div class="grid" id="g1"></div>
+
+<h2 class="sec">2. Weather puzzle</h2>
+<p class="secsub">One puzzle per weather event mends the whole garden. The reward is fixed and named before play. Harder tier: 7-14 letter names, one decoy tile, no given letters. Part 2 (butterflies) is shown in Wild Weather. No timer, Skip on every screen, at most 3 puzzles a day.</p>
+<div class="grid" id="g2"></div>
+
+<div class="notes">
+ <div class="note"><h3>All shots</h3><div class="shots" id="shots"></div></div>
+ <div class="note"><h3>Copy check (CopySafety.banned, spec avoid list, "Plus")</h3><div id="copy">Checking the frames...</div></div>
+ <div class="note"><h3>Motion</h3><ul>
+  <li>Celebration: plants sway 1.4 degrees over 6 s, up to 7 petals fall slowly (9 s), title rises in 0.6 s.</li>
+  <li>Reduce Motion: a 0.3 s fade. No petals, no sway, no drifting butterflies, sparkles kept as still marks only.</li>
+ </ul></div>
+</div>
+</div>
+<script>
+const G1=[['a','A. Grand Garden (pick)','Fires on allFound. Plants drawn at their earned stage. "Every plant found!" Crown floats over a glow.'],
+          ['gold','Gold crown','Fires on allFullBloom. Crown petals turn gold. "Your whole garden is in full bloom."'],
+          ['home','Home beat (from B)','After A closes: the crown sits on the wordmark. Home features the plant nearest golden.'],
+          ['share','Share sheet (from C)','The garden postcard, stamp on the white border. "Keep in my album". Add &kid=1 for the under-13 gated state.'],
+          ['next','What grows next','Golden blooms, Bloom ranks (Seedling to Evergreen), Visitors\' book, Garden weather.']];
+const G2=[['intro','Weather puzzle card','Fixed reward named up front. "A harder one" chip. Start and Skip the same size.'],
+          ['puzzle','Weather puzzle, harder','Two-word answer in two slot groups, one decoy tile, no given letters, New puzzle, peek ladder.'],
+          ['part2','Wild Weather part 2','Short butterfly catch. "Try a word instead" swap. Skip the same size.'],
+          ['cap','Daily cap','After 3 puzzles: "That is plenty for today."'],
+          ['mended','Solved','Sticker, +1 word, Weathered badge step. Dawn sky in dark.'],
+          ['settings','Settings','Garden weather (on), forecast notice (off), Wild Weather (13 and up, off) with honest text.']];
+const ids=['theme','rm','scale'];
+function qs(){return ids.map(i=>i+'='+document.getElementById(i).value).join('&')+(document.getElementById('scale').value!=='1'?'&tall=1':'');}
+function col([s,t,d]){return `<div class="col"><h3>${t}${s===window.PICK?'<span class="pick">Pick</span>':''}</h3><p>${d}</p><div class="frame"><iframe title="${t}" src="screens.html?s=${s}&${qs()}"></iframe></div></div>`;}
+function draw(){document.getElementById('g1').innerHTML=G1.map(col).join('');document.getElementById('g2').innerHTML=G2.map(col).join('');setTimeout(check,900);}
+ids.forEach(i=>document.getElementById(i).addEventListener('change',draw));
+window.PICK='a';
+document.getElementById('theme').value=document.documentElement.dataset.theme||'light';
+draw();
+const SH=['a','gold','home','share','next','intro','puzzle','part2','cap','mended','settings'].flatMap(s=>[s+'-light',s+'-dark']).concat(['share-kid-light','a-rm-dark','mended-rm-light','puzzle-large-light','next-large-dark']);
+document.getElementById('shots').innerHTML=SH.map(n=>`<a href="shots/${n}.png">${n}</a>`).join('');
+// copy check over every frame's visible text + aria-label + alt (mirror of CopySafety.banned)
+const banned=["miss","lonely","alone","waiting","abandon","neglect","forgot","forget","die","dies","died","dying","dead","lost","empty","left","broken","lose streak","broken streak","last chance","hurry","now or never","expires","only","last","smart","genius","talented","best gardener","better than","beat","plus","save","rescue","danger","destroy","warning","alert","too late","hearts","heart"];
+function check(){
+  const hits=[];let n=0;
+  document.querySelectorAll('iframe').forEach(f=>{try{const d=f.contentDocument;if(!d||!d.body)return;n++;
+    const txt=[d.body.innerText,...[...d.querySelectorAll('[aria-label],[alt]')].map(e=>(e.getAttribute('aria-label')||'')+' '+(e.getAttribute('alt')||''))].join(' ');
+    banned.forEach(b=>{if(new RegExp('\\b'+b.replace(/ /g,'\\s')+'\\b','i').test(txt))hits.push(f.title+': '+b)});}catch(e){}});
+  document.getElementById('copy').innerHTML=n?(hits.length?'<span class="bad">'+hits.join('<br>')+'</span>':`<span class="ok">ok</span> ${n} frames, no banned words in text, labels or alt.`):'Open over http (localhost:8765) to run the live check.';
+}
+</script>
+</body></html>
