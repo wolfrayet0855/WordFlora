@@ -186,3 +186,92 @@ final class RulesBatch2Tests: XCTestCase {
         XCTAssertTrue(f.isComplete); XCTAssertEqual(f.step, .home)
     }
 }
+
+/// Garden Path level map: copy safety and the per-level state table (design-preview/level-map/README.md).
+final class LevelMapTests: XCTestCase {
+    /// 50 plants, 10 per level. `found[i]` plants of level i+1 are earned; `bloom[i]` of those are at stage 4.
+    private func garden(found: [Int], bloom: [Int] = [0, 0, 0, 0, 0]) -> [PlantProgress] {
+        (1...5).flatMap { level in
+            (0..<10).map { i in
+                PlantProgress(level: level, earned: i < found[level - 1], stage: i < bloom[level - 1] ? 4 : (i < found[level - 1] ? 1 : 0))
+            }
+        }
+    }
+
+    func testEveryStringPassesCopySafetyAndNeverSaysLock() {
+        var all = LevelMapCopy.allStrings
+        let mid = LevelMapCopy.stops(plants: garden(found: [10, 4, 0, 0, 0], bloom: [7, 0, 0, 0, 0]), currentLevel: 2)
+        let done = LevelMapCopy.stops(plants: garden(found: [10, 10, 10, 10, 10], bloom: [10, 10, 10, 6, 2]), currentLevel: 5)
+        let new = LevelMapCopy.stops(plants: garden(found: [0, 0, 0, 0, 0]), currentLevel: 1)
+        for s in mid + done + new { all += s.rows + [s.accessibilityLabel] + [s.allFoundLine, s.fullBloomLine, s.nextStep].compactMap { $0 } }
+        XCTAssertGreaterThan(all.count, 100)
+        for t in all {
+            XCTAssertEqual(CopySafety.check(t), [], t)
+            XCTAssertFalse(t.lowercased().contains("lock"), t)
+        }
+        for word in ["left", "only", "last", "miss", "waiting", "lost", "empty"] {
+            XCTAssertFalse(CopySafety.check("x \(word) x").isEmpty, "CopySafety still bans \(word)")
+        }
+    }
+
+    func testNewGardenLevelOneIsCurrentAndTheRestAreComingSoon() {
+        let stops = LevelMapCopy.stops(plants: garden(found: [0, 0, 0, 0, 0]), currentLevel: 1)
+        XCTAssertEqual(stops.map(\.level), [1, 2, 3, 4, 5])
+        XCTAssertEqual(stops.map(\.name), ["Seedling", "Sprout", "Bloom", "Grove", "Ancient"])
+        XCTAssertEqual(stops.map(\.isCurrent), [true, false, false, false, false])
+        XCTAssertEqual(stops.map(\.isSoon), [false, true, true, true, true])
+        let one = stops[0]
+        XCTAssertEqual(one.rows, ["Find your first plant!"])
+        XCTAssertEqual(one.nextStep, "Find 10 plants to open Level 2.")
+        XCTAssertNil(one.allFoundLine); XCTAssertNil(one.fullBloomLine)
+        XCTAssertEqual(one.accessibilityLabel, "Level 1, Seedling. Garden friends. You are here. Find your first plant! Find 10 plants to open Level 2.")
+        XCTAssertEqual(stops[2].rows, [])
+        XCTAssertNil(stops[2].nextStep)
+        XCTAssertEqual(stops[2].accessibilityLabel,
+                       "Level 3, Bloom. Strange and wild plants. Coming soon in your garden. Opens when Level 2 has 10 plants.")
+        XCTAssertEqual(LevelMapCopy.subLine(totalFound: 0), "Every 10 plants opens a new level.")
+        XCTAssertEqual(stops.map(\.heroImage), ["plant_daisy", "plant_lotus", "plant_venus_flytrap", "plant_giant_water_lily", "plant_wollemi_pine"])
+    }
+
+    func testMidGardenWithFourteenFound() {
+        let plants = garden(found: [10, 4, 0, 0, 0], bloom: [7, 0, 0, 0, 0])
+        XCTAssertEqual(ProgressionPolicy.wordLevel(plants: plants, economy: Economy()), 2)
+        let stops = LevelMapCopy.stops(plants: plants, currentLevel: 2)
+        XCTAssertEqual(stops.map(\.found).reduce(0, +), 14)
+        XCTAssertEqual(LevelMapCopy.subLine(totalFound: 14), "14 plants found. Every 10 plants opens a new level.")
+        let one = stops[0], two = stops[1]
+        XCTAssertFalse(one.isCurrent); XCTAssertTrue(one.isOpen)
+        XCTAssertEqual(one.rows, ["10 of 10 plants found", "7 of 10 in full bloom"])
+        XCTAssertEqual(one.allFoundLine, "All 10 found! Level 2 is open.")
+        XCTAssertNil(one.nextStep); XCTAssertFalse(one.fullBloom)
+        XCTAssertTrue(two.isCurrent)
+        XCTAssertEqual(two.rows, ["4 of 10 plants found", "0 of 10 in full bloom"])
+        XCTAssertEqual(two.nextStep, "Find 6 more to open Level 3.")
+        XCTAssertEqual(two.accessibilityLabel,
+                       "Level 2, Sprout. Plants from far away. You are here. 4 of 10 plants found. 0 of 10 in full bloom. Find 6 more to open Level 3.")
+        XCTAssertEqual(stops.map(\.isSoon), [false, false, true, true, true])
+    }
+
+    func testAllFoundLevelFiveIsCurrentAndEveryLevelIsOpen() {
+        let plants = garden(found: [10, 10, 10, 10, 10], bloom: [10, 10, 10, 6, 2])
+        XCTAssertEqual(ProgressionPolicy.wordLevel(plants: plants, economy: Economy()), 5)
+        let stops = LevelMapCopy.stops(plants: plants, currentLevel: 5)
+        XCTAssertEqual(stops.map(\.isSoon), [false, false, false, false, false])
+        XCTAssertEqual(stops.map(\.fullBloom), [true, true, true, false, false])
+        XCTAssertEqual(stops[0].fullBloomLine, "Full bloom garden!")
+        XCTAssertEqual(stops[3].allFoundLine, "All 10 found! Level 5 is open.")
+        let five = stops[4]
+        XCTAssertTrue(five.isCurrent)
+        XCTAssertEqual(five.allFoundLine, "All 10 found! Every level is open.")
+        XCTAssertNil(five.nextStep)
+        XCTAssertEqual(LevelMapCopy.subLine(totalFound: 50), "All 50 plants found! Grow them all to full bloom.")
+        XCTAssertTrue(stops[0].accessibilityLabel.hasSuffix("All 10 found! Level 2 is open. Full bloom garden!"))
+    }
+
+    func testLevelFiveNextStepNeverPointsPastTheLastLevel() {
+        XCTAssertEqual(LevelMapCopy.nextStep(level: 5, found: 0), "Find 10 plants for Level 5.")
+        XCTAssertEqual(LevelMapCopy.nextStep(level: 5, found: 3), "Find 7 more for Level 5.")
+        XCTAssertEqual(LevelMapCopy.nextStep(level: 4, found: 9), "Find 1 more to open Level 5.")
+        XCTAssertEqual(LevelMapCopy.stops(plants: [], currentLevel: 9).last?.isCurrent, true)
+    }
+}

@@ -1,61 +1,487 @@
 import SwiftUI
 import SwiftData
 
-/// Two tracks per level (spec section 19, P-01): Word (10 plants earned) and Garden (all 10 flourishing).
+/// Garden Path: the five levels as stops on a winding dirt path (design-preview/level-map/README.md).
+/// Two tracks per level (spec section 19, P-01): plants found (Word) and plants in full bloom (Garden).
+/// No padlocks anywhere: levels not open yet are "Coming soon in your garden". No prices, ads or Plus here.
 struct LevelMapView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
+    @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query private var plants: [PlantCollectible]
 
-    private let names = ["Seedling", "Sprout", "Bloom", "Grove", "Ancient"]
+    private var oneColumn: Bool { typeSize.isAccessibilitySize }
 
     var body: some View {
-        let wordLevel = app.profile?.currentLevel ?? 1
-        ScrollView {
-            VStack(spacing: 14) {
-                ForEach(1...5, id: \.self) { level in card(level: level, unlocked: level <= wordLevel, current: level == wordLevel) }
-            }.padding(20)
-        }
-        .background(Color.appBackground.ignoresSafeArea())
-        .navigationTitle("Levels")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-
-    private func card(level: Int, unlocked: Bool, current: Bool) -> some View {
-        let inLevel = plants.filter { $0.level == level }
-        let earned = inLevel.filter { $0.earnedCount > 0 }.count
-        let flourishing = inLevel.filter { $0.stage >= 4 }.count
-        return Card {
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    Text("Level \(level) · \(names[level - 1])").font(Theme.font(.headline))
-                    Spacer()
-                    Image(systemName: unlocked ? (current ? "star.fill" : "checkmark.seal.fill") : "lock.fill")
-                        .foregroundStyle(unlocked ? Color.appAccent : Color.appPrimaryText.opacity(0.35))
+        let current = app.profile?.currentLevel ?? 1
+        let stops = LevelMapCopy.stops(plants: plants.map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) },
+                                       currentLevel: current)
+        let totalFound = plants.filter { $0.earnedCount > 0 }.count
+        ScrollViewReader { proxy in
+            ScrollView {
+                VStack(alignment: .leading, spacing: 0) {
+                    header(totalFound: totalFound)
+                    MapKeyCard(oneColumn: oneColumn)
+                        .padding(.horizontal, 16).padding(.top, 14)
+                    trail(stops)
+                        .padding(.horizontal, 16).padding(.top, 22)
+                    end
+                        .padding(.top, 28).padding(.bottom, 120)
                 }
-                track("Words", value: earned, icon: "textformat.abc")
-                track("Garden", value: flourishing, icon: "leaf.fill")
-                if unlocked {
-                    Button { router.go(.game(daily: false, level: level)) } label: { Label("Play level \(level)", systemImage: "play.fill") }
-                        .buttonStyle(SecondaryButtonStyle())
-                } else {
-                    Text("Earn all 10 plants in level \(level - 1) to open this one.").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
+            }
+            .onAppear {
+                let target = stops.first(where: \.isCurrent)?.level ?? 1
+                DispatchQueue.main.async {
+                    withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.5)) { proxy.scrollTo(target, anchor: .center) }
                 }
             }
         }
+        .background(Color.appBackground.ignoresSafeArea())
+        // Our own bar, so the "Home" back button shows its word and grows with Dynamic Type (the system bar caps its text).
+        .toolbar(.hidden, for: .navigationBar)
+        .safeAreaInset(edge: .top, spacing: 0) { navBar }
+    }
+
+    private var navBar: some View {
+        ZStack {
+            // Decorative: the "Garden Path" header below is the screen's title for VoiceOver. Fixed size, not scaled.
+            Image("Wordmark").resizable().scaledToFit().frame(height: 24).accessibilityHidden(true)
+            HStack {
+                Button { dismiss() } label: {
+                    HStack(spacing: 3) {
+                        Image(systemName: "chevron.left").font(Theme.font(.body, weight: .bold))
+                        Text(LevelMapCopy.back).font(Theme.font(.body, weight: .bold))
+                    }
+                    .foregroundStyle(Color.accentText)
+                    .padding(.horizontal, 4)
+                    .tapTarget()
+                }
+                .accessibilityLabel(LevelMapCopy.back)
+                Spacer(minLength: 0)
+            }
+        }
+        .padding(.horizontal, 12).padding(.vertical, 2)
+        .frame(maxWidth: .infinity)
+        .background(Color.appBackground.opacity(0.96).ignoresSafeArea(edges: .top))
+    }
+
+    // MARK: header
+
+    private func header(totalFound: Int) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(LevelMapCopy.title)
+                .font(Theme.font(.largeTitle, weight: .black))
+                .foregroundStyle(Color.appPrimaryText)
+                .accessibilityAddTraits(.isHeader)
+            Text(LevelMapCopy.subLine(totalFound: totalFound))
+                .font(Theme.font(.body))
+                .foregroundStyle(Color.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 20).padding(.top, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    // MARK: trail
+
+    private func trail(_ stops: [LevelStop]) -> some View {
+        VStack(spacing: 26) {
+            ForEach(stops, id: \.level) { stop in
+                MapStopView(stop: stop, heroImage: heroImage(for: stop), medalLeading: stop.level % 2 == 1, oneColumn: oneColumn) {
+                    router.go(.game(daily: false, level: stop.level))
+                }
+                .id(stop.level)
+            }
+        }
+        .backgroundPreferenceValue(MapMedalCentreKey.self) { anchors in
+            GeometryReader { geo in
+                let points = anchors.sorted { $0.key < $1.key }.map { geo[$0.value] }
+                ZStack {
+                    MapTrailShape(points: points).stroke(Color.pathEdge, style: StrokeStyle(lineWidth: 26, lineCap: .round))
+                    MapTrailShape(points: points).stroke(Color.path, style: StrokeStyle(lineWidth: 20, lineCap: .round))
+                    MapTrailShape(points: points).stroke(Color.pathEdge, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, dash: [1, 14]))
+                }
+            }
+            .accessibilityHidden(true)
+        }
+    }
+
+    /// The level's hero plant, or the first plant in the level when that art is not in the catalog.
+    private func heroImage(for stop: LevelStop) -> String {
+        if plants.isEmpty || plants.contains(where: { $0.imageName == stop.heroImage }) { return stop.heroImage }
+        return plants.filter { $0.level == stop.level }.min { $0.plantId < $1.plantId }?.imageName ?? stop.heroImage
+    }
+
+    private var end: some View {
+        VStack(spacing: 8) {
+            MapBenchShape()
+                .fill(Color.soil)
+                .frame(width: 48, height: 22)
+                .accessibilityHidden(true)
+            Text(LevelMapCopy.end)
+                .font(Theme.font(.subheadline, weight: .bold))
+                .foregroundStyle(Color.secondaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 20)
+        .frame(maxWidth: .infinity)
+    }
+}
+
+// MARK: - Medal centres for the path
+
+private struct MapMedalCentreKey: PreferenceKey {
+    static let defaultValue: [Int: Anchor<CGPoint>] = [:]
+    static func reduce(value: inout [Int: Anchor<CGPoint>], nextValue: () -> [Int: Anchor<CGPoint>]) {
+        value.merge(nextValue()) { $1 }
+    }
+}
+
+/// Cubic curves through the medal centres, control points at the vertical midpoint (straight when the centres line up).
+private struct MapTrailShape: Shape {
+    var points: [CGPoint]
+    func path(in rect: CGRect) -> Path {
+        var p = Path()
+        guard let first = points.first else { return p }
+        p.move(to: first)
+        for (a, c) in zip(points, points.dropFirst()) {
+            let midY = (a.y + c.y) / 2
+            p.addCurve(to: c, control1: CGPoint(x: a.x, y: midY), control2: CGPoint(x: c.x, y: midY))
+        }
+        return p
+    }
+}
+
+// MARK: - Key card
+
+private struct MapKeyCard: View {
+    let oneColumn: Bool
+    @ScaledMetric(relativeTo: .footnote) private var icon: CGFloat = 13
+
+    var body: some View {
+        let layout = oneColumn ? AnyLayout(VStackLayout(alignment: .leading, spacing: 10)) : AnyLayout(HStackLayout(spacing: 16))
+        layout {
+            item(LevelMapCopy.keyPetal) { MapPetalGlyph(size: icon) }
+            item(LevelMapCopy.keyRing) {
+                Circle().strokeBorder(Color.appAccent, lineWidth: max(2.5, icon * 0.22)).frame(width: icon, height: icon)
+            }
+        }
+        .padding(.vertical, 12).padding(.horizontal, 14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.appSurface.opacity(0.6), in: RoundedRectangle(cornerRadius: 16))
+        .background(Color.appBackground, in: RoundedRectangle(cornerRadius: 16))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(LevelMapCopy.keyAccessibility)
+    }
+
+    private func item<G: View>(_ text: String, @ViewBuilder glyph: () -> G) -> some View {
+        HStack(spacing: 6) {
+            glyph()
+            Text(text)
+                .font(Theme.font(.footnote, weight: .bold))
+                .foregroundStyle(Color.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+}
+
+/// The small petal used in the key and the card rows.
+private struct MapPetalGlyph: View {
+    var size: CGFloat
+    var body: some View {
+        MapPetalShape().fill(Color.petal).frame(width: size * 0.7, height: size)
+    }
+}
+
+/// A pointed petal (two arcs meeting top and bottom), drawn upright in its rect.
+private struct MapPetalShape: Shape {
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: r.midX, y: r.minY))
+        p.addQuadCurve(to: CGPoint(x: r.midX, y: r.maxY), control: CGPoint(x: r.maxX + r.width * 0.25, y: r.midY + r.height * 0.1))
+        p.addQuadCurve(to: CGPoint(x: r.midX, y: r.minY), control: CGPoint(x: r.minX - r.width * 0.25, y: r.midY + r.height * 0.1))
+        return p
+    }
+}
+
+/// A park bench: backrest, seat and two legs.
+private struct MapBenchShape: Shape {
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        let w = r.width, h = r.height
+        p.addRoundedRect(in: CGRect(x: r.minX, y: r.minY, width: w, height: h * 0.18), cornerSize: CGSize(width: 1.5, height: 1.5))
+        p.addRoundedRect(in: CGRect(x: r.minX, y: r.minY + h * 0.36, width: w, height: h * 0.18), cornerSize: CGSize(width: 1.5, height: 1.5))
+        p.addRect(CGRect(x: r.minX + w * 0.1, y: r.minY + h * 0.18, width: w * 0.07, height: h * 0.82))
+        p.addRect(CGRect(x: r.maxX - w * 0.17, y: r.minY + h * 0.18, width: w * 0.07, height: h * 0.82))
+        return p
+    }
+}
+
+// MARK: - Stop (medal + card)
+
+private struct MapStopView: View {
+    let stop: LevelStop
+    let heroImage: String
+    let medalLeading: Bool
+    let oneColumn: Bool
+    let play: () -> Void
+
+    var body: some View {
+        if oneColumn {
+            VStack(spacing: 12) {
+                medal(size: 96)
+                MapStopCard(stop: stop, play: play)
+            }
+        } else {
+            HStack(alignment: .center, spacing: 12) {
+                if medalLeading { medal(size: 128) }
+                MapStopCard(stop: stop, play: play)
+                if !medalLeading { medal(size: 128) }
+            }
+        }
+    }
+
+    private func medal(size: CGFloat) -> some View {
+        LevelMedal(stop: stop, heroImage: heroImage, size: size)
+            .anchorPreference(key: MapMedalCentreKey.self, value: .center) { [stop.level: $0] }
+    }
+}
+
+/// The round medal for a level: tinted disc, hero plant, a petal per plant found and a gold arc per plant in full bloom.
+/// Decorative (hidden from VoiceOver); the card's label says the same in words.
+private struct LevelMedal: View {
+    let stop: LevelStop
+    let heroImage: String
+    let size: CGFloat
+    @Environment(\.colorScheme) private var scheme
+
+    private static let tints: [Color] = [.levelTint1, .levelTint2, .levelTint3, .levelTint4, .levelTint5]
+
+    var body: some View {
+        ZStack {
+            Canvas { ctx, _ in draw(&ctx) }
+            if stop.isSoon {
+                sprout
+            } else {
+                Image(heroImage)
+                    .resizable().scaledToFit()
+                    .frame(width: 68, height: 68)
+                    .offset(y: -4)
+            }
+            badge.offset(x: 42, y: -46)
+        }
+        .frame(width: 128, height: 128)
+        .scaleEffect(size / 128)
+        .frame(width: size, height: size)
+        .accessibilityHidden(true)
+    }
+
+    private func draw(_ ctx: inout GraphicsContext) {
+        let c = CGPoint(x: 64, y: 64)
+        let tint = Self.tints[(stop.level - 1) % Self.tints.count]
+        let off = Color.appPrimaryText.opacity(scheme == .dark ? 0.18 : 0.13)
+        let disc = Path(ellipseIn: CGRect(x: c.x - 40, y: c.y - 40, width: 80, height: 80))
+        ctx.fill(disc, with: .color(tint))
+        ctx.stroke(disc, with: .color(Color.appPrimaryText.opacity(0.14)), lineWidth: 1)
+        guard stop.isOpen else { return }   // soon levels: no rings, so no blank slots
+
+        if stop.isCurrent {
+            ctx.stroke(Path(ellipseIn: CGRect(x: c.x - 43, y: c.y - 43, width: 86, height: 86)), with: .color(.appAccent), lineWidth: 3)
+        }
+        // Petal ring: one petal per plant, filled when found.
+        for i in 0..<LevelMapCopy.perLevel {
+            let angle = Angle.degrees(Double(i) * 36)
+            let t = CGAffineTransform(translationX: c.x, y: c.y).rotated(by: angle.radians).translatedBy(x: 0, y: -50)
+            let petal = Path(ellipseIn: CGRect(x: -4.6, y: -7.2, width: 9.2, height: 14.4)).applying(t)
+            if i < stop.found { ctx.fill(petal, with: .color(.petal)) } else { ctx.stroke(petal, with: .color(off), lineWidth: 1.6) }
+        }
+        // Bloom ring: one arc per plant in full bloom; a solid ring when the whole level is in full bloom.
+        if stop.fullBloom {
+            ctx.stroke(Path(ellipseIn: CGRect(x: c.x - 60, y: c.y - 60, width: 120, height: 120)), with: .color(.appAccent), lineWidth: 5)
+        } else {
+            for i in 0..<LevelMapCopy.perLevel {
+                let start = Double(i) * 36 - 90 + 1.5
+                var arc = Path()
+                arc.addArc(center: c, radius: 60, startAngle: .degrees(start), endAngle: .degrees(start + 33), clockwise: false)
+                if i < stop.bloom {
+                    ctx.stroke(arc, with: .color(.appAccent), lineWidth: 4.5)
+                } else {
+                    ctx.stroke(arc, with: .color(off), lineWidth: 2)
+                }
+            }
+        }
+    }
+
+    /// Soon levels: a soil mound with a two-leaf sprout.
+    private var sprout: some View {
+        ZStack {
+            Ellipse().fill(Color.soil.opacity(0.85)).frame(width: 44, height: 16).offset(y: 14)
+            Capsule().fill(Color.successText).frame(width: 3, height: 20).offset(y: 0)
+            MapLeafShape().fill(Color.successText).frame(width: 14, height: 8).rotationEffect(.degrees(-25)).offset(x: -7, y: -9)
+            MapLeafShape().fill(Color.successText).frame(width: 14, height: 8).rotationEffect(.degrees(25)).scaleEffect(x: -1).offset(x: 7, y: -9)
+        }
+        .offset(y: 4)
+    }
+
+    @ViewBuilder private var badge: some View {
+        if stop.isOpen && stop.fullBloom {
+            Circle().fill(Color.appAccent).frame(width: 26, height: 26)
+                .overlay(Image(systemName: "sun.max.fill").font(.system(size: 14, weight: .bold)).foregroundStyle(Color.ink))
+        } else if stop.isOpen && stop.allFound {
+            Circle().fill(Color.successText).frame(width: 26, height: 26)
+                .overlay(Image(systemName: "checkmark").font(.system(size: 13, weight: .heavy)).foregroundStyle(.white))
+        }
+    }
+}
+
+/// A simple leaf: pointed at the left tip, round at the stem end.
+private struct MapLeafShape: Shape {
+    func path(in r: CGRect) -> Path {
+        var p = Path()
+        p.move(to: CGPoint(x: r.maxX, y: r.midY))
+        p.addQuadCurve(to: CGPoint(x: r.minX, y: r.midY), control: CGPoint(x: r.midX, y: r.minY - r.height * 0.4))
+        p.addQuadCurve(to: CGPoint(x: r.maxX, y: r.midY), control: CGPoint(x: r.midX, y: r.maxY + r.height * 0.4))
+        return p
+    }
+}
+
+// MARK: - Card
+
+private struct MapStopCard: View {
+    let stop: LevelStop
+    let play: () -> Void
+    @ScaledMetric(relativeTo: .subheadline) private var rowIcon: CGFloat = 14
+
+    private let shape = RoundedRectangle(cornerRadius: 18)
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            info
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(stop.accessibilityLabel)
+                .accessibilityAddTraits(stop.isCurrent ? .isSelected : [])
+            if stop.isOpen { playButton }
+        }
+        .padding(.top, 12).padding(.horizontal, 14).padding(.bottom, 13)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background { cardFill }
+        .overlay { cardBorder }
         .accessibilityElement(children: .contain)
     }
 
-    private func track(_ title: String, value: Int, icon: String) -> some View {
-        HStack(spacing: 10) {
-            Image(systemName: icon).foregroundStyle(Color.successText).frame(width: 22)
-            Text(title).font(Theme.font(.subheadline)).frame(width: 60, alignment: .leading)
-            ProgressView(value: Double(value), total: 10).tint(Color.successText)
-            Text("\(value)/10").font(Theme.font(.caption, weight: .semibold)).frame(width: 40, alignment: .trailing)
+    private var info: some View {
+        VStack(alignment: .leading, spacing: 3) {
+            if stop.isCurrent {
+                HStack(spacing: 4) {
+                    Image(systemName: "mappin").font(.system(size: 11, weight: .bold)).foregroundStyle(Color.accentText)
+                    Text(LevelMapCopy.chip).font(Theme.font(.footnote, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                }
+                .padding(.horizontal, 9).padding(.vertical, 3)
+                .background(Color.appAccent.opacity(0.24), in: Capsule())
+                .padding(.bottom, 4)
+            }
+            Text(LevelMapCopy.eyebrow(stop.level).uppercased())
+                .font(Theme.font(.footnote, weight: .heavy))
+                .tracking(0.8)
+                .foregroundStyle(Color.secondaryText)
+            Text(stop.name)
+                .font(Theme.font(.title3, weight: .black))
+                .foregroundStyle(stop.isSoon ? Color.secondaryText : Color.appPrimaryText)
+            Text(stop.theme)
+                .font(Theme.font(.subheadline))
+                .foregroundStyle(Color.secondaryText)
+            VStack(alignment: .leading, spacing: 4) {
+                if stop.isSoon {
+                    line(LevelMapCopy.soonTag, weight: .heavy, color: .successText)
+                    line(LevelMapCopy.soonLine(level: stop.level), weight: .regular, color: .secondaryText)
+                } else {
+                    if stop.found == 0 {
+                        line(LevelMapCopy.firstPlant, weight: .bold, color: .appPrimaryText).frame(minHeight: 24)
+                    } else {
+                        row(LevelMapCopy.foundRow(stop.found)) { MapPetalGlyph(size: rowIcon) }
+                        row(LevelMapCopy.bloomRow(stop.bloom)) {
+                            Circle().strokeBorder(Color.appAccent, lineWidth: 2.5).frame(width: rowIcon, height: rowIcon)
+                        }
+                    }
+                    if let all = stop.allFoundLine { line(all, weight: .heavy, color: .successText) }
+                    if let bloom = stop.fullBloomLine {
+                        HStack(spacing: 4) {
+                            Image(systemName: "sun.max.fill").font(.system(size: rowIcon * 0.9, weight: .bold))
+                            Text(bloom).font(Theme.font(.subheadline, weight: .heavy))
+                        }
+                        .foregroundStyle(Color.accentText)
+                    }
+                    if let next = stop.nextStep { line(next, weight: .regular, color: .secondaryText) }
+                }
+            }
+            .padding(.top, 6)
         }
-        .frame(minHeight: Theme.minTap)
-        .contentShape(Rectangle())
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(title): \(value) of 10")
+    }
+
+    private func line(_ text: String, weight: Font.Weight, color: Color) -> some View {
+        Text(text).font(Theme.font(.subheadline, weight: weight)).foregroundStyle(color)
+            .fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func row<G: View>(_ text: String, @ViewBuilder glyph: () -> G) -> some View {
+        HStack(spacing: 6) {
+            glyph().frame(width: rowIcon + 2)
+            Text(text).font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .frame(minHeight: 24)
+    }
+
+    private var playButton: some View {
+        let button = RoundedRectangle(cornerRadius: 14)
+        return Button(action: play) {
+            HStack(spacing: 8) {
+                Image(systemName: "play.fill").font(.system(size: 14, weight: .heavy))
+                Text(LevelMapCopy.play(stop.level)).font(Theme.font(.body, weight: .heavy))
+            }
+            .foregroundStyle(stop.isCurrent ? Color.ink : Color.appPrimaryText)
+            .frame(maxWidth: .infinity, minHeight: 48)
+            .background(stop.isCurrent ? Color.appAccent : Color.appSurface, in: button)
+            .overlay { if !stop.isCurrent { button.strokeBorder(Color.appPrimaryText.opacity(0.14), lineWidth: 1.5) } }
+            .contentShape(button)
+        }
+        .buttonStyle(MapPressStyle())
+        .accessibilityLabel(LevelMapCopy.play(stop.level))
+    }
+
+    @ViewBuilder private var cardFill: some View {
+        if stop.isSoon {
+            ZStack { Color.appBackground; Color.appSurface.opacity(0.55) }.clipShape(shape)
+        } else {
+            shape.fill(Color.appSurface)
+                .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
+                .background {
+                    if stop.isCurrent { shape.fill(Color.appAccent.opacity(0.18)).padding(-5) }
+                }
+        }
+    }
+
+    @ViewBuilder private var cardBorder: some View {
+        if stop.isSoon {
+            shape.strokeBorder(Color.appPrimaryText.opacity(0.22), style: StrokeStyle(lineWidth: 1, dash: [4, 3]))
+        } else if stop.isCurrent {
+            shape.strokeBorder(Color.appAccent, lineWidth: 2)
+        } else {
+            shape.strokeBorder(Color.appPrimaryText.opacity(0.14), lineWidth: 1)
+        }
+    }
+}
+
+/// A gentle press for the Play buttons (no motion under Reduce Motion).
+private struct MapPressStyle: ButtonStyle {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .opacity(configuration.isPressed ? 0.85 : 1)
+            .scaleEffect(configuration.isPressed && !reduceMotion ? 0.97 : 1)
     }
 }

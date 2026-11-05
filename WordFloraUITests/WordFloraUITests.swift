@@ -410,9 +410,32 @@ final class WordFloraUITests: XCTestCase {
         app.navigationBars.buttons.firstMatch.tap()
         app.buttons["Badges"].tap(); XCTAssertTrue(app.staticTexts["Green Thumb"].waitForExistence(timeout: 5)); audit("badges")
         app.navigationBars.buttons.firstMatch.tap()
-        app.buttons["Levels"].tap(); XCTAssertTrue(app.staticTexts["Level 1 · Seedling"].waitForExistence(timeout: 5)); audit("levels")
-        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons["Levels"].tap(); XCTAssertTrue(app.staticTexts["Garden Path"].waitForExistence(timeout: 5)); audit("levels")
+        app.buttons["Home"].tap()
         app.buttons["Settings"].tap(); XCTAssertTrue(app.switches["Haptics"].waitForExistence(timeout: 5)); audit("settings", ignoring: [.dynamicType, .contrast, .textClipped])
+    }
+
+    /// Garden Path level map: header, "You are here" on the current stop, its Play button, no padlock wording, and a clean audit.
+    /// `-uitest-everything` opens the Levels tile on Home (it is not open yet in a one-plant garden).
+    func testLevelMapGardenPath() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything"]; app.launch()
+        XCTAssertTrue(app.buttons["Levels"].waitForExistence(timeout: 5))
+        app.buttons["Levels"].tap()
+        let header = app.staticTexts["Garden Path"]
+        XCTAssertTrue(header.waitForExistence(timeout: 5))
+        XCTAssertTrue(header.isHittable)
+        XCTAssertTrue(app.buttons["Home"].exists, "the back button reads Home")
+        let here = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS 'You are here'")).firstMatch
+        XCTAssertTrue(here.waitForExistence(timeout: 3), "a You are here stop")
+        XCTAssertTrue(here.label.hasPrefix("Level 1, Seedling."), here.label)
+        XCTAssertTrue(app.buttons["Play Level 1"].exists)
+        XCTAssertFalse(app.buttons["Play Level 2"].exists, "Level 2 is coming soon, so it has no Play button")
+        let lock = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS[c] 'lock'"))
+        XCTAssertEqual(lock.count, 0, "no padlock wording or icons")
+        shot("level-map")
+        audit("level-map")
+        app.buttons["Play Level 1"].tap()
+        XCTAssertTrue(app.buttons["Z"].waitForExistence(timeout: 5), "Play Level 1 opens a game")
     }
 
     func testAuditPaywallAndOnboarding() {

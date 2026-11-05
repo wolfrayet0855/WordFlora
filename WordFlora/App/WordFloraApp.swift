@@ -76,6 +76,16 @@ struct WordFloraApp: App {
             model.profile?.gardenDays = 3; model.profile?.water = 5; model.profile?.soil = 3
             try? model.context.save()
         }
+        if uiTesting && args.contains("-uitest-allfound") {
+            // Every plant found; levels 1-3 all in full bloom, a few more in levels 4 and 5 (the Garden Path "all found" state).
+            var bloomed = [Int: Int]()
+            for p in model.plants().sorted(by: { $0.plantId < $1.plantId }) {
+                p.earnedCount = 1
+                let goal = p.level <= 3 ? 10 : (p.level == 4 ? 6 : 2)
+                if bloomed[p.level, default: 0] < goal { p.stage = 4; bloomed[p.level, default: 0] += 1 }
+            }
+            try? model.context.save()
+        }
         if uiTesting && args.contains("-uitest-plus") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
