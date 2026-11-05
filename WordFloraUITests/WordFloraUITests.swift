@@ -146,7 +146,8 @@ final class WordFloraUITests: XCTestCase {
         app.buttons["Water"].tap()
         XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label CONTAINS %@", "+3 growth")).firstMatch.waitForExistence(timeout: 3))
         app.buttons["Repot"].tap()
-        XCTAssertTrue(app.staticTexts["Choose a soil"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Repot Clover"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["repot-soil-loam"].exists, "the soil choices are in the sheet")
         shot("repot")
     }
 
