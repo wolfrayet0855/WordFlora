@@ -18,6 +18,9 @@ final class PlayerProfile {
     var streakFreezes: Int = 0
     var lastPlayedDay: Date?
     var seenIds: [String] = []
+    /// Pots recorded as earned (PotCatalog.recordEarned). Only ever grows; merged as a set union on sync and restore.
+    /// Defaulted, so older stores and CloudKit records read as none recorded.
+    var earnedPotIds: [String] = []
     var roundsSinceAd: Int = 0
     var ageBand: String?
     var roseSeedProgress: Int = 0

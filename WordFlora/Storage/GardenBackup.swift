@@ -20,6 +20,8 @@ struct GardenBackup: Codable, Equatable {
         var toolsJSON = "", badgesJSON = "", albumJSON = ""
         // Words toward the next plant (added 2026-11-04). Optional, so backups saved before then still read (as 0).
         var wordsTowardPlant: Int?
+        // Pots recorded as earned (added 2026-11-04). Optional, so backups saved before then still read (as none).
+        var earnedPotIds: [String]?
     }
 
     struct Plant: Codable, Equatable {
@@ -76,6 +78,7 @@ struct GardenBackup: Codable, Equatable {
                            gardenDays: p.gardenDays, shedPoints: p.shedPoints, glowLanterns: p.glowLanterns, widgetPlantID: p.widgetPlantID,
                            toolsJSON: p.toolsJSON, badgesJSON: p.badgesJSON, albumJSON: p.albumJSON, wordsTowardPlant: p.wordsTowardPlant)
         }
+        if let p { snap.earnedPotIds = p.earnedPotIds }
         let plants = ((try? context.fetch(FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.plantId)]))) ?? []).map {
             Plant(plantId: $0.plantId, earnedCount: $0.earnedCount, growthPoints: $0.growthPoints, stage: $0.stage, hydration: $0.hydration,
                   soilRichness: $0.soilRichness, soilType: $0.soilType, nickname: $0.nickname, lastTendedAt: $0.lastTendedAt,
@@ -114,6 +117,8 @@ struct GardenBackup: Codable, Equatable {
     /// Checked before anything is touched, so a damaged file changes nothing.
     var isPlausible: Bool {
         let p = profile
+        let pots = p.earnedPotIds ?? []
+        guard pots.count <= 200, pots.allSatisfy({ !$0.isEmpty && $0.count <= 40 }) else { return false }
         let counts = [p.currentLevel, p.plantsEarnedThisLevel, p.roseOfJerichoCount, p.gamesPlayed, p.water, p.soil, p.streak,
                       p.bestStreak, p.streakFreezes, p.roseSeedProgress, p.gardenDays, p.shedPoints, p.glowLanterns, p.wordsTowardPlant ?? 0, gamesRecorded]
         guard counts.allSatisfy({ $0 >= 0 }), (1...100).contains(p.currentLevel) else { return false }
@@ -132,6 +137,7 @@ struct GardenBackup: Codable, Equatable {
             keeper = PlayerProfile(); context.insert(keeper)
         }
         let o = PlayerProfile()          // never inserted: a carrier for the reconciler's merge rules
+        o.earnedPotIds = profile.earnedPotIds ?? []
         o.currentLevel = profile.currentLevel; o.plantsEarnedThisLevel = profile.plantsEarnedThisLevel
         o.roseOfJerichoCount = profile.roseOfJerichoCount; o.gamesPlayed = profile.gamesPlayed
         o.water = profile.water; o.soil = profile.soil; o.streak = profile.streak; o.bestStreak = profile.bestStreak

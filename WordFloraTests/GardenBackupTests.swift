@@ -185,6 +185,37 @@ final class GardenBackupTests: XCTestCase {
         XCTAssertFalse(bad.isPlausible)
     }
 
+    func testEarnedPotsRoundTripMergeAsAUnionAndOldBackupsReadAsNone() throws {
+        growSomething()
+        profile().earnedPotIds = ["mint", "terracotta"]; try ctx.save()
+        let data = try GardenBackup.make(context: ctx, now: .now).encoded()
+        XCTAssertTrue(String(data: data, encoding: .utf8)!.contains("\"earnedPotIds\""))
+
+        let fresh = try SharedContainer.make(inMemory: true)
+        try PlantCatalog.seedIfNeeded(context: fresh.mainContext)
+        guard case .success = GardenBackup.restore(data, into: fresh.mainContext, badgeDefs: defs) else { return XCTFail("restore failed") }
+        XCTAssertEqual(try fresh.mainContext.fetch(FetchDescriptor<PlayerProfile>()).first?.earnedPotIds, ["mint", "terracotta"])
+
+        // Restoring into a garden that recorded other pots keeps both sets.
+        profile().earnedPotIds = ["dewdrop"]; try ctx.save()
+        guard case .success = GardenBackup.restore(data, into: ctx, badgeDefs: defs) else { return XCTFail("restore failed") }
+        XCTAssertEqual(profile().earnedPotIds, ["dewdrop", "mint", "terracotta"], "nothing earned is removed")
+
+        // A backup saved before earned pots were recorded has no earnedPotIds key; it still reads, as none.
+        var json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        var prof = json["profile"] as! [String: Any]; prof.removeValue(forKey: "earnedPotIds"); json["profile"] = prof
+        let old = try JSONSerialization.data(withJSONObject: json)
+        guard case .success(let decoded) = GardenBackup.decode(old) else { return XCTFail("old backup should read") }
+        XCTAssertNil(decoded.profile.earnedPotIds)
+        guard case .success = GardenBackup.restore(old, into: ctx, badgeDefs: defs) else { return XCTFail("old backup should restore") }
+        XCTAssertEqual(profile().earnedPotIds, ["dewdrop", "mint", "terracotta"], "an older backup never takes a pot away")
+
+        var bad = GardenBackup.make(context: ctx, now: .now); bad.profile.earnedPotIds = [""]
+        XCTAssertFalse(bad.isPlausible)
+        bad.profile.earnedPotIds = [String(repeating: "x", count: 41)]
+        XCTAssertFalse(bad.isPlausible)
+    }
+
     func testFilenameAndCopy() {
         var cal = Calendar(identifier: .gregorian); cal.timeZone = TimeZone(identifier: "UTC")!
         let d = cal.date(from: DateComponents(year: 2026, month: 3, day: 7, hour: 12))!

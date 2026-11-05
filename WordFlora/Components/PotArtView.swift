@@ -41,6 +41,15 @@ enum PotPainter {
         q.closeSubpath()
     }
 
+    /// The dewdrop, from (0, -9) down to a round bottom of radius 6 centred at (0, 3).
+    private static let teardrop = Path { q in
+        q.move(to: CGPoint(x: 0, y: -9))
+        q.addCurve(to: CGPoint(x: 6, y: 3), control1: CGPoint(x: 4, y: -3), control2: CGPoint(x: 6, y: 0))
+        q.addArc(center: CGPoint(x: 0, y: 3), radius: 6, startAngle: .degrees(0), endAngle: .degrees(180), clockwise: false)
+        q.addCurve(to: CGPoint(x: 0, y: -9), control1: CGPoint(x: -6, y: 0), control2: CGPoint(x: -4, y: -3))
+        q.closeSubpath()
+    }
+
     static func color(_ hex: UInt32) -> Color { Color(UIColor(hex: hex)) }
     static func toEarnFill(dark: Bool) -> Color { color(dark ? 0x3A4C3A : 0xE4DFD2) }
     static func toEarnInk(dark: Bool) -> Color { color(dark ? 0x8FA48F : 0x746F5E) }
@@ -60,6 +69,12 @@ enum PotPainter {
             return sparkle.applying(CGAffineTransform(translationX: cx, y: cy).scaledBy(x: s, y: s))
         case let .heart(cx, cy, s):
             return heart.applying(CGAffineTransform(translationX: cx, y: cy).scaledBy(x: s, y: s))
+        case let .triangle(x1, y1, x2, y2, x3, y3):
+            return Path { q in
+                q.move(to: CGPoint(x: x1, y: y1)); q.addLine(to: CGPoint(x: x2, y: y2)); q.addLine(to: CGPoint(x: x3, y: y3)); q.closeSubpath()
+            }
+        case let .teardrop(cx, cy, s):
+            return teardrop.applying(CGAffineTransform(translationX: cx, y: cy).scaledBy(x: s, y: s))
         case let .crescent(cx, cy, r, ox, oy, or):
             return Path(ellipseIn: CGRect(x: cx - r, y: cy - r, width: 2 * r, height: 2 * r))
                 .subtracting(Path(ellipseIn: CGRect(x: ox - or, y: oy - or, width: 2 * or, height: 2 * or)))
@@ -84,10 +99,11 @@ enum PotPainter {
         if !marks.isEmpty {
             if ghost { inside.opacity = 0.55 }
             inside.drawLayer { layer in
-                for m in marks {
+                for m in marks where !(ghost && m.ghost == .hidden) {
                     var l = layer
                     l.opacity = m.opacity
-                    let c = ghost ? ink : color(pot.decoration.colors.indices.contains(m.color) ? pot.decoration.colors[m.color] : pot.rim)
+                    let c = ghost ? (m.ghost == .fill ? toEarnFill(dark: dark) : ink)
+                        : color(pot.decoration.colors.indices.contains(m.color) ? pot.decoration.colors[m.color] : pot.rim)
                     l.fill(path(m.shape), with: .color(c))
                 }
             }

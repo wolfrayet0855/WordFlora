@@ -45,6 +45,7 @@ enum DataReconciler {
         if k.ageBand == nil { k.ageBand = o.ageBand }
         if k.widgetPlantID == nil { k.widgetPlantID = o.widgetPlantID }
         var seen = k.seenIds; for id in o.seenIds where !seen.contains(id) { seen.append(id) }; k.seenIds = seen
+        k.earnedPotIds = Set(k.earnedPotIds).union(o.earnedPotIds).sorted()      // earned pots are never removed
         k.badgesJSON = BadgeState(json: k.badgesJSON, defs: defs).merged(with: BadgeState(json: o.badgesJSON, defs: defs)).json
         k.toolsJSON = ToolInventory(json: k.toolsJSON).merged(with: ToolInventory(json: o.toolsJSON)).json
         k.albumJSON = StickerAlbum(json: k.albumJSON).merged(with: StickerAlbum(json: o.albumJSON)).json

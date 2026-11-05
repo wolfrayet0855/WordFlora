@@ -1,22 +1,34 @@
 import Foundation
 
-/// The pot collection (T-D). Unlocks are computed from play every time (found plants, finished levels, Plus),
-/// so nothing new is stored on the profile and nothing earned can be taken away.
+/// The pot collection (T-D, docs/pm/pot-earning-review.md). Unlocks are worked out from play (found plants, finished
+/// levels, Garden Days, Plus), and every pot earned by play is also recorded in `PlayerProfile.earnedPotIds`, which
+/// only ever grows, so a restored older backup or a moved goal never takes a pot away.
 extension AppModel {
     var potStats: PotCatalog.Stats {
-        PotCatalog.stats(plants: plants().map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) })
+        PotCatalog.stats(plants: plants().map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) },
+                         gardenDays: profile?.gardenDays ?? 0, earnedPotIds: profile?.earnedPotIds ?? [])
     }
 
     var hasPlusForPots: Bool { entitlements.state.hasPlus }
 
     func potState(_ pot: Pot, stats: PotCatalog.Stats? = nil) -> PotState {
-        let s = stats ?? potStats
-        return PotCatalog.state(of: pot, plantsGrown: s.plantsGrown, finishedLevels: s.finishedLevels, hasPlus: hasPlusForPots)
+        PotCatalog.state(of: pot, stats: stats ?? potStats, hasPlus: hasPlusForPots)
     }
 
     func canChoose(_ pot: Pot, for plant: PlantCollectible, stats: PotCatalog.Stats? = nil) -> Bool {
-        let s = stats ?? potStats
-        return PotCatalog.canChoose(pot, currentId: plant.potId, plantsGrown: s.plantsGrown, finishedLevels: s.finishedLevels, hasPlus: hasPlusForPots)
+        PotCatalog.canChoose(pot, currentId: plant.potId, stats: stats ?? potStats, hasPlus: hasPlusForPots)
+    }
+
+    /// Adds every pot earned by play now to the stored record (called when the pot picker or the Shed opens).
+    /// Returns true when some were new, so that one opening can say "New pots in your shed!". Plus pots are never recorded.
+    @discardableResult
+    func recordEarnedPots() -> Bool {
+        guard let profile else { return false }
+        let merged = PotCatalog.recordEarned(profile.earnedPotIds, stats: potStats)
+        guard Set(merged) != Set(profile.earnedPotIds) else { return false }
+        profile.earnedPotIds = merged
+        try? context.save()
+        return true
     }
 
     /// Puts the plant in `pot` (part of a repot; changing pots costs nothing). A Plus pot needs Plus to be chosen,

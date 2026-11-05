@@ -42,30 +42,45 @@ struct PotCheckBadge: View {
     }
 }
 
+/// "New pots in your shed!": one calm line, shown on the one opening that recorded newly earned pots.
+struct PotNewLine: View {
+    var body: some View {
+        Label(PotCatalog.Copy.newPots, systemImage: "sparkles")
+            .font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(PotPalette.ok)
+            .fixedSize(horizontal: false, vertical: true)
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("pot-new-line")
+            .onAppear { AccessibilityNotification.Announcement(PotCatalog.Copy.newPots).post() }
+    }
+}
+
 // MARK: Repot sheet: Pick a pot
 
-/// "Pick a pot" (design-preview/pots, section 2): all ten pots in a 5 x 2 grid (4 columns at accessibility text
-/// sizes), above the soil choices. The picked pot has a ring and a check. Pots to earn are soft outlines and say how
+/// "Pick a pot" (design-preview/pots, sections 2 and 6): all sixteen pots in a 4 x 4 grid at every text size, above
+/// the soil choices. The picked pot has a ring and a check. Pots to earn are soft outlines and say how
 /// to earn them when tapped; Plus pots are in full colour with a "Plus" tag and say where Plus lives.
 struct PotPickGrid: View {
     let currentId: String
     @Binding var picked: String
     let stats: PotCatalog.Stats
     let hasPlus: Bool
+    /// Records the pots earned by play; true when some were new, which shows "New pots in your shed!" this once.
+    var record: () -> Bool = { false }
 
     @State private var hinted: String?
-    @Environment(\.dynamicTypeSize) private var typeSize
+    @State private var newPots = false
 
     private func state(_ pot: Pot) -> PotState {
-        PotCatalog.state(of: pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels, hasPlus: hasPlus)
+        PotCatalog.state(of: pot, stats: stats, hasPlus: hasPlus)
     }
 
     var body: some View {
-        let columns = Array(repeating: GridItem(.flexible(), spacing: 6, alignment: .top), count: typeSize.isAccessibilitySize ? 4 : 5)
+        let columns = Array(repeating: GridItem(.flexible(), spacing: 6, alignment: .top), count: PotCatalog.gridColumns)
         VStack(alignment: .leading, spacing: 8) {
             Text(PotCatalog.Copy.pickTitle).font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                 .accessibilityAddTraits(.isHeader)
             Text(PotCatalog.Copy.pickSub).font(Theme.font(.callout)).foregroundStyle(Color.secondaryText)
+            if newPots { PotNewLine() }
             LazyVGrid(columns: columns, spacing: 10) {
                 ForEach(PotCatalog.all) { tile($0) }
             }
@@ -73,14 +88,14 @@ struct PotPickGrid: View {
             if let hinted { hint(PotCatalog.pot(id: hinted)).transition(.opacity) }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .onAppear { if record() { newPots = true } }
     }
 
     private func tile(_ pot: Pot) -> some View {
         let s = state(pot)
         let isCurrent = pot.id == PotCatalog.pot(id: currentId).id
         let isPicked = pot.id == PotCatalog.pot(id: picked).id
-        let choosable = PotCatalog.canChoose(pot, currentId: currentId, plantsGrown: stats.plantsGrown,
-                                             finishedLevels: stats.finishedLevels, hasPlus: hasPlus)
+        let choosable = PotCatalog.canChoose(pot, currentId: currentId, stats: stats, hasPlus: hasPlus)
         let toEarn: Bool = { if case .toEarn = s { return !isCurrent }; return false }()
         let plusTag: Bool = { if case .plus = s { return !isCurrent }; return false }()
         return Button {
@@ -123,7 +138,7 @@ struct PotPickGrid: View {
         let lines: (String, String) = {
             switch s {
             case .plus: return (PotCatalog.plusLine(pot), PotCatalog.Copy.plusSettings)
-            case .toEarn(let h): return (h, PotCatalog.tipLine(pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels))
+            case .toEarn(let h): return (h, PotCatalog.tipLine(pot, stats: stats))
             case .owned: return (PotCatalog.Copy.earned, "")
             }
         }()
@@ -152,26 +167,29 @@ struct PotPickGrid: View {
 
 // MARK: Shed: Pots
 
-/// The Shed's "Pots" grid below Tools (design-preview/pots, section 3): three columns of cards (two at accessibility
-/// text sizes). Earned pots carry a check and "Yours to use" or who uses them; pots to earn show the goal and a
+/// The Shed's "Pots" grid below Tools (design-preview/pots, sections 3 and 6): sixteen cards, 4 x 4 at every text
+/// size (the text stops growing at xxxLarge so a card stays readable; VoiceOver reads it all). Earned pots carry a check and "Yours to use" or who uses them; pots to earn show the goal and a
 /// gentle progress bar; Plus pots show the tag. Nothing is locked or for sale here.
 struct ShedPotsSection: View {
     let stats: PotCatalog.Stats
     let hasPlus: Bool
     /// The names of found plants sitting in a pot.
     let users: (Pot) -> [String]
+    /// Records the pots earned by play; true when some were new, which shows "New pots in your shed!" this once.
+    var record: () -> Bool = { false }
 
     @State private var message: String?
-    @Environment(\.dynamicTypeSize) private var typeSize
+    @State private var newPots = false
 
     var body: some View {
-        let columns = Array(repeating: GridItem(.flexible(), spacing: 8, alignment: .top), count: typeSize.isAccessibilitySize ? 2 : 3)
+        let columns = Array(repeating: GridItem(.flexible(), spacing: 6, alignment: .top), count: PotCatalog.gridColumns)
         VStack(alignment: .leading, spacing: 8) {
             ViewThatFits(in: .horizontal) {
                 HStack(alignment: .firstTextBaseline) { title; Spacer(minLength: 8); sub }
                 VStack(alignment: .leading, spacing: 2) { title; sub }
             }
             .padding(.top, 8)
+            if newPots { PotNewLine() }
             LazyVGrid(columns: columns, spacing: 8) {
                 ForEach(PotCatalog.all) { card($0) }
             }
@@ -185,6 +203,7 @@ struct ShedPotsSection: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .onChange(of: message) { _, new in if let new { AccessibilityNotification.Announcement(new).post() } }
+        .onAppear { if record() { newPots = true } }
     }
 
     private var title: some View {
@@ -205,41 +224,43 @@ struct ShedPotsSection: View {
     }
 
     private func card(_ pot: Pot) -> some View {
-        let s = PotCatalog.state(of: pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels, hasPlus: hasPlus)
-        let progress = PotCatalog.progress(pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels)
-        let progressText = PotCatalog.progressLine(pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels)
+        let s = PotCatalog.state(of: pot, stats: stats, hasPlus: hasPlus)
+        let progress = PotCatalog.progress(pot, stats: stats)
+        let progressText = PotCatalog.progressLine(pot, stats: stats)
         let toEarn: Bool = { if case .toEarn = s { return true }; return false }()
         let names = users(pot)
         let label: String = {
             switch s {
-            case .owned: return "\(pot.name) pot. \(useLine(names))"
-            case .plus: return "\(pot.name) pot, Plus. \(PotCatalog.Copy.plusCard)"
-            case .toEarn: return "\(pot.name) pot, not earned yet. \(PotCatalog.goalLine(pot)). \(progressText)"
+            case .owned: return "\(pot.voiceName) pot. \(useLine(names))"
+            case .plus: return "\(pot.voiceName) pot, Plus. \(PotCatalog.Copy.plusCard)"
+            case .toEarn: return "\(pot.voiceName) pot, not earned yet. \(PotCatalog.goalLine(pot)). \(progressText)"
             }
         }()
         return Button { message = tapLine(pot, s) } label: {
-            VStack(spacing: 4) {
-                PotArtView(pot: pot, style: toEarn ? .toEarn : .full, width: 76)
-                    .padding(.top, 12)         // clears the check badge and Plus tag in the corner
-                Text(pot.name).font(Theme.font(.subheadline, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
-                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                switch s {
-                case .owned:
-                    Text(useLine(names)).font(Theme.font(.caption, weight: .bold)).foregroundStyle(PotPalette.ok)
-                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                case .plus:
-                    Text(PotCatalog.Copy.plusCard).font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.secondaryText)
-                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                case .toEarn:
-                    Text(PotCatalog.goalLine(pot)).font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.secondaryText)
-                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                    ProgressView(value: progress?.fraction ?? 0).tint(PotPalette.ok).frame(maxWidth: 90)
-                    Text(progressText).font(Theme.font(.caption2, weight: .bold)).foregroundStyle(Color.secondaryText)
-                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+            VStack(spacing: 3) {
+                PotArtView(pot: pot, style: toEarn ? .toEarn : .full, width: 60)
+                    .padding(.top, 10)         // clears the check badge and Plus tag in the corner
+                Text(pot.name).font(Theme.font(.footnote, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                    // As on the pick tiles: a one-word name shrinks to fit instead of breaking inside the word.
+                    .multilineTextAlignment(.center).lineLimit(pot.name.contains(" ") ? 2 : 1).minimumScaleFactor(0.5)
+                    .fixedSize(horizontal: false, vertical: true)
+                Group {
+                    switch s {
+                    case .owned:
+                        cardLine(useLine(names), color: PotPalette.ok)
+                    case .plus:
+                        cardLine(PotCatalog.Copy.plusCard, color: Color.secondaryText)
+                    case .toEarn:
+                        cardLine(PotCatalog.goalLine(pot), color: Color.secondaryText)
+                        ProgressView(value: progress?.fraction ?? 0).tint(PotPalette.ok).frame(maxWidth: 70)
+                        cardLine(progressText, color: Color.secondaryText, small: true)
+                    }
                 }
             }
-            .padding(.horizontal, 6).padding(.top, 10).padding(.bottom, 9)
-            .frame(maxWidth: .infinity, minHeight: 150, alignment: .top)
+            // Four cards a row: the words stop growing at xxxLarge so they stay whole; VoiceOver reads the full card.
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
+            .padding(.horizontal, 4).padding(.top, 8).padding(.bottom, 8)
+            .frame(maxWidth: .infinity, minHeight: 132, alignment: .top)
             .background(toEarn ? Color.appSurface.opacity(0.55) : Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
             .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appPrimaryText.opacity(toEarn ? 0.14 : 0.08), lineWidth: toEarn ? 1.5 : 1))
             .overlay(alignment: .topTrailing) {
@@ -258,11 +279,16 @@ struct ShedPotsSection: View {
         .accessibilityIdentifier("shed-pot-\(pot.id)")
     }
 
+    private func cardLine(_ text: String, color: Color, small: Bool = false) -> some View {
+        Text(text).font(Theme.font(small ? .caption2 : .caption, weight: .bold)).foregroundStyle(color)
+            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+    }
+
     private func tapLine(_ pot: Pot, _ s: PotState) -> String {
         switch s {
         case .owned: return pot.unlock == .free ? pot.hint : PotCatalog.Copy.earned
         case .plus: return "\(PotCatalog.plusLine(pot)) \(PotCatalog.Copy.plusSettings)"
-        case .toEarn(let h): return "\(h) \(PotCatalog.tipLine(pot, plantsGrown: stats.plantsGrown, finishedLevels: stats.finishedLevels))"
+        case .toEarn(let h): return "\(h) \(PotCatalog.tipLine(pot, stats: stats))"
         }
     }
 }

@@ -458,7 +458,8 @@ struct PlantDetailView: View {
             VStack(alignment: .leading, spacing: 14) {
                 Text("Repot \(displayName(plant))").font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                     .accessibilityAddTraits(.isHeader)
-                PotPickGrid(currentId: plant.potId, picked: $pickedPot, stats: app.potStats, hasPlus: app.hasPlusForPots)
+                PotPickGrid(currentId: plant.potId, picked: $pickedPot, stats: app.potStats, hasPlus: app.hasPlusForPots,
+                            record: { app.recordEarnedPots() })
                 VStack(alignment: .leading, spacing: 6) {
                     Text("Choose a soil").font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                         .accessibilityAddTraits(.isHeader)

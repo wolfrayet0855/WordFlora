@@ -38,6 +38,17 @@ final class TendingUITests: XCTestCase {
 
     private func element(_ id: String) -> XCUIElement { app.descendants(matching: .any)[id].firstMatch }
 
+    /// The sixteen pots sit in a 4 x 4 grid: four column positions, four row positions, every name whole.
+    private func assertFourByFour(_ prefix: String, _ context: String) {
+        let tiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", prefix)).allElementsBoundByIndex
+        XCTAssertEqual(tiles.count, 16, "\(context): sixteen pots")
+        let xs = Set(tiles.map { Int($0.frame.minX.rounded()) }), ys = Set(tiles.map { Int($0.frame.minY.rounded()) })
+        XCTAssertEqual(xs.count, 4, "\(context): four columns, got x \(xs.sorted())")
+        XCTAssertEqual(ys.count, 4, "\(context): four rows, got y \(ys.sorted())")
+        let width = app.windows.firstMatch.frame.width
+        for t in tiles { XCTAssertLessThanOrEqual(t.frame.maxX, width + 0.5, "\(context): \(t.identifier) stays on screen") }
+    }
+
     private var toast: XCUIElement { element("tend-toast") }
 
     // MARK: Effects and states
@@ -97,7 +108,8 @@ final class TendingUITests: XCTestCase {
         XCTAssertEqual(starlight.label, "Starlight pot, not earned yet")
         starlight.tap()
         XCTAssertTrue(element("pot-hint").waitForExistence(timeout: 2))
-        XCTAssertTrue(element("pot-hint").label.contains("Finish level 5"), element("pot-hint").label)
+        XCTAssertTrue(element("pot-hint").label.contains("Finish level 4"), element("pot-hint").label)
+        XCTAssertTrue(element("pot-hint").label.contains("Ten more plants to go!"), element("pot-hint").label)
         XCTAssertEqual(app.buttons["repot-go"].label, "Repot with fresh soil")
         // A Plus pot says where Plus lives, with no price.
         app.buttons["pot-tile-moonlit"].tap()
@@ -252,6 +264,7 @@ final class TendingUITests: XCTestCase {
             let terracotta = app.buttons["pot-tile-terracotta"]
             XCTAssertTrue(terracotta.waitForExistence(timeout: 3))
             sleep(1); shot("pot-pick-\(size)")
+            assertFourByFour("pot-tile-", "pick \(size)")
             // Two checks are excused on pot tiles only; clipped text, hit regions, labels and traits are still judged on
             // them, and every check on the rest of the sheet. Contrast: the check samples the whole tile with its pot art
             // (ghost outlines for pots to earn, a cream pot on cream for Meadow); the names are primary ink at 0.88
@@ -268,9 +281,84 @@ final class TendingUITests: XCTestCase {
         }
     }
 
+    /// Picker and Shed part way up the ladder (levels 1 and 2 finished, 6 plants in level 3, 3 Garden Days), in light,
+    /// dark and an accessibility size, to compare with design-preview/pots section 6.
+    func testPotScreensPartWayUpTheLadder() {
+        let looks: [(String, XCUIDevice.Appearance, [String])] = [
+            ("light", .light, []), ("dark", .dark, []),
+            ("axl", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]),
+        ]
+        for (name, look, extra) in looks {
+            XCUIDevice.shared.appearance = look
+            open("Daisy", plantId: "daisy", extra: ["-uitest-pots"] + extra)
+            app.buttons["tend-repot"].tap()
+            XCTAssertTrue(app.buttons["pot-tile-blossom"].waitForExistence(timeout: 3))
+            XCTAssertEqual(app.buttons["pot-tile-blossom"].label, "Blossom pot", "level 2 finished earns Blossom")
+            XCTAssertEqual(app.buttons["pot-tile-flytrap"].label, "Fly-trap pot, not earned yet")
+            sleep(1); shot("pots-pick-\(name)")
+            app.buttons["pot-tile-livingStones"].tap()
+            XCTAssertTrue(element("pot-hint").waitForExistence(timeout: 2))
+            XCTAssertTrue(element("pot-hint").label.contains("Four more plants to go!"), element("pot-hint").label)
+            shot("pots-pick-hint-\(name)")
+            app.terminate()
+
+            app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-everything", "-uitest-pots"] + extra
+            app.launch()
+            app.buttons["Shed"].tap()
+            let stones = app.buttons["shed-pot-livingStones"].firstMatch
+            _ = app.staticTexts["Watering can"].waitForExistence(timeout: 5)
+            for _ in 0..<14 where !(stones.exists && stones.isHittable) { app.swipeUp() }
+            XCTAssertTrue(stones.label.contains("6 of 10 plants in level 3"), stones.label)
+            XCTAssertTrue(app.buttons["shed-pot-dewdrop"].firstMatch.label.contains("3 of 7 garden days"))
+            sleep(1); shot("pots-shed-\(name)")
+            app.swipeUp(); sleep(1); shot("pots-shed-\(name)-end")
+            app.terminate()
+        }
+    }
+
+    /// Newly earned pots are recorded when the picker opens, with one calm line that time only.
+    func testNewPotsLineShowsOnceWhenPotsAreFirstRecorded() {
+        open("Daisy", plantId: "daisy")
+        app.buttons["tend-repot"].tap()
+        XCTAssertTrue(app.staticTexts["Pick a pot"].waitForExistence(timeout: 3))
+        let line = element("pot-new-line")
+        XCTAssertTrue(line.waitForExistence(timeout: 2), "Terracotta was just recorded")
+        XCTAssertEqual(line.label, "New pots in your shed!")
+        shot("pot-pick-new-line")
+        app.swipeDown(velocity: .fast)
+        XCTAssertTrue(app.buttons["tend-repot"].waitForExistence(timeout: 3))
+        sleep(1)
+        app.buttons["tend-repot"].tap()
+        XCTAssertTrue(app.staticTexts["Pick a pot"].waitForExistence(timeout: 3))
+        sleep(1)
+        XCTAssertFalse(line.exists, "nothing new the second time")
+    }
+
+    /// The Shed's 4 x 4 pot cards at accessibility sizes. As on the pick tiles, contrast (the check samples the pot art
+    /// with the text) and Dynamic Type (the card words stop growing at xxxLarge so four fit a row) are excused on pot
+    /// cards only; clipped text, hit regions, labels and traits are judged, and every check elsewhere.
+    func testTheShedPotsPassTheAuditAtAccessibilityTextSizes() {
+        for size in ["AccessibilityL", "AccessibilityXXXL"] {
+            app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything",
+                                   "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategory\(size)"]
+            app.launch()
+            app.buttons["Shed"].tap()
+            let card = app.buttons["shed-pot-terracotta"].firstMatch
+            _ = app.staticTexts["Watering can"].waitForExistence(timeout: 5)
+            for _ in 0..<14 where !(card.exists && card.isHittable) { app.swipeUp() }
+            app.swipeUp(); sleep(1)
+            let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'shed-pot-'")).allElementsBoundByIndex.map(\.frame)
+            XCTAssertFalse(cards.isEmpty)
+            audit("shed-pots-\(size)", excuse: { issue, e in
+                [.contrast, .dynamicType].contains(issue.auditType) && cards.contains { $0.intersects(e.frame) }
+            })
+            app.terminate()
+        }
+    }
+
     /// The Shed's pot cards: the check badge and Plus tag sit in the corner, clear of the pot's rim.
     func testShedPotScreens() {
-        for size in ["Large", "AccessibilityXXXL"] {
+        for size in ["Large", "AccessibilityL", "AccessibilityXXXL"] {
             app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything",
                                    "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategory\(size)"]
             app.launch()
@@ -280,6 +368,8 @@ final class TendingUITests: XCTestCase {
             for _ in 0..<12 where !(card.exists && card.isHittable) { app.swipeUp() }
             XCTAssertTrue(card.isHittable, "the pots grid is in the Shed")
             app.swipeUp(); sleep(1); shot("shed-pots-\(size)")
+            assertFourByFour("shed-pot-", "shed \(size)")
+            app.swipeUp(); sleep(1); shot("shed-pots-\(size)-end")
             app.terminate()
         }
     }

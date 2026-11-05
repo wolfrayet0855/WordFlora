@@ -66,6 +66,16 @@ struct WordFloraApp: App {
             if let p = model.plants().first { p.earnedCount = 1; p.lastLovedAt = Date.now.addingTimeInterval(-(n * 86_400 + 3_600)) }
             try? model.context.save()
         }
+        if uiTesting && args.contains("-uitest-pots") {
+            // A pot collection part way up the ladder: levels 1 and 2 finished, 6 plants in level 3, 3 Garden Days.
+            var inLevel = [Int: Int]()
+            for p in model.plants().sorted(by: { $0.plantId < $1.plantId }) {
+                let goal = p.level <= 2 ? 10 : (p.level == 3 ? 6 : 0)
+                if inLevel[p.level, default: 0] < goal { p.earnedCount = 1; inLevel[p.level, default: 0] += 1 }
+            }
+            model.profile?.gardenDays = 3; model.profile?.water = 5; model.profile?.soil = 3
+            try? model.context.save()
+        }
         if uiTesting && args.contains("-uitest-plus") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
