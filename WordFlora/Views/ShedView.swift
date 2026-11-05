@@ -28,7 +28,7 @@ struct ShedView: View {
                 }
                 ShedPotsSection(stats: app.potStats, hasPlus: app.hasPlusForPots, users: { pot in
                     app.plantsUsing(pot).map { $0.nickname.isEmpty ? $0.name : $0.nickname }
-                }, record: { app.recordEarnedPots() })
+                }, record: { !app.recordEarnedPots().isEmpty })
                 .padding(.top, 6)
             }
             .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 40)

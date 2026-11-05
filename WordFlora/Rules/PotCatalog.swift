@@ -247,9 +247,16 @@ enum PotCatalog {
         /// VoiceOver hints on pick tiles that are not chosen on tap.
         static let hintToEarn = "Shows how to earn it"
         static let hintPlus = "Shows where to find Plus"
+        // The repot sheet v2 (design-preview/repot-sheet/notes.md).
+        /// The one line under "Repot Daisy" in the sheet's header.
+        static let repotSub = "Pick a pot. Changing pots is free."
+        /// The tiny tag on a pot that is new on this opening (cleared with the "New pots" pill).
+        static let newTag = "New"
+        static let soilTitle = "Soil"
+        static let soilSub = "Plants have favorite soils."
         static var all: [String] {
             [earned, current, pickTitle, pickSub, plusTag, plusKeep, plusSettings, progressFirst, yours, plusCard,
-             shedTitle, shedSub, shedFooter, freshSoil, newPots, hintToEarn, hintPlus]
+             shedTitle, shedSub, shedFooter, freshSoil, newPots, hintToEarn, hintPlus, repotSub, newTag, soilTitle, soilSub]
         }
     }
 
@@ -297,15 +304,32 @@ enum PotCatalog {
         picked.id == pot(id: currentId).id ? Copy.freshSoil : "Repot into \(picked.name)"
     }
 
-    /// VoiceOver label for a pot tile: "Sage glaze pot, in use", "Starlight pot, not earned yet", "Moonlit pot, Plus".
-    static func tileLabel(_ pot: Pot, state: PotState, inUse: Bool) -> String {
-        let name = pot.voiceName
-        if inUse { return "\(name) pot, in use" }
+    /// The repot sheet's footer line: "Rose pink pot, fresh loam soil".
+    static func summaryLine(pot: Pot, soil: SoilType) -> String { "\(pot.name) pot, fresh \(soil.rawValue) soil" }
+
+    /// The footer hint when a pot that cannot be picked is tapped. To earn: "Finish level 3 to earn Living stones." and
+    /// "Four more plants to go!". Plus: "Moonlit is part of WordFlora Plus." and where a grown-up finds Plus.
+    static func hintLines(_ pot: Pot, state: PotState, stats: Stats) -> (title: String, detail: String) {
         switch state {
-        case .owned: return "\(name) pot"
-        case .toEarn: return "\(name) pot, not earned yet"
-        case .plus: return "\(name) pot, Plus"
+        case .plus: return (plusLine(pot), Copy.plusSettings)
+        case .toEarn: return ("\(goalLine(pot)) to earn \(pot.name).", tipLine(pot, stats: stats))
+        case .owned: return (Copy.earned, "")
         }
+    }
+
+    /// VoiceOver label for a pot tile: "Sage glaze pot, in use", "Starlight pot, not earned yet", "Moonlit pot, Plus".
+    /// A pot new on this opening adds ", new" ("Rose pink pot, new").
+    static func tileLabel(_ pot: Pot, state: PotState, inUse: Bool, isNew: Bool = false) -> String {
+        let name = pot.voiceName
+        let base: String
+        if inUse { base = "\(name) pot, in use" } else {
+            switch state {
+            case .owned: base = "\(name) pot"
+            case .toEarn: base = "\(name) pot, not earned yet"
+            case .plus: base = "\(name) pot, Plus"
+            }
+        }
+        return isNew ? base + ", new" : base
     }
 
     // MARK: Pattern geometry (pots.json `geometry.decorations`, 120 x 100 box)

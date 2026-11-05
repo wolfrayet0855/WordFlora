@@ -396,11 +396,17 @@ final class PotCatalogTests: XCTestCase {
         for pot in PotCatalog.all {
             lines += [pot.name, pot.hint, pot.a11y, PotCatalog.goalLine(pot), PotCatalog.plusLine(pot)]
             lines += [PotCatalog.repotTitle(picked: pot, currentId: "")]
+            lines += SoilType.allCases.map { PotCatalog.summaryLine(pot: pot, soil: $0) }
+            lines += [PotCatalog.tileLabel(pot, state: .owned, inUse: false, isNew: true)]
             lines += [PotCatalog.tileLabel(pot, state: .owned, inUse: true), PotCatalog.tileLabel(pot, state: .toEarn(hint: pot.hint), inUse: false),
                       PotCatalog.tileLabel(pot, state: .plus(hint: pot.hint), inUse: false)]
             for (plants, levels, inLevel, days) in [(0, 0, 0, 0), (1, 0, 1, 1), (12, 1, 2, 3), (34, 3, 4, 6), (49, 4, 9, 7), (50, 5, 10, 12)] {
                 let s = stats(plants: plants, levels: levels, inLevel: [levels + 1: inLevel], days: days)
                 lines += [PotCatalog.tipLine(pot, stats: s), PotCatalog.progressLine(pot, stats: s)]
+                for hasPlus in [false, true] {
+                    let h = PotCatalog.hintLines(pot, state: PotCatalog.state(of: pot, stats: s, hasPlus: hasPlus), stats: s)
+                    lines += [h.title, h.detail]
+                }
             }
         }
         let extra = ["only", "last", "left", "waiting", "lost", "empty", "locked", "buy", "price"]
@@ -469,25 +475,65 @@ final class PotCatalogTests: XCTestCase {
         let app = AppModel(container: container, settings: settings, bank: bank, notifications: ReminderTests.FakeCenter())
         let profile = try XCTUnwrap(app.profile)
         XCTAssertEqual(profile.earnedPotIds, [], "a new garden has nothing recorded")
-        XCTAssertFalse(app.recordEarnedPots(), "plain blue alone is nothing new")
+        XCTAssertEqual(app.recordEarnedPots(), [], "plain blue alone is nothing new")
 
         for p in app.plants().prefix(5) { p.earnedCount = 1 }
         profile.gardenDays = 7
-        XCTAssertTrue(app.recordEarnedPots(), "new pots: the picker or Shed says so once")
+        XCTAssertEqual(app.recordEarnedPots(), ["terracotta", "sageGlaze", "dewdrop"],
+                       "new pots, in catalog order: the picker tags them and says so once")
         XCTAssertEqual(Set(profile.earnedPotIds), ["terracotta", "sageGlaze", "dewdrop"])
-        XCTAssertFalse(app.recordEarnedPots(), "the second opening has nothing new to say")
+        XCTAssertEqual(app.recordEarnedPots(), [], "the second opening has nothing new to say")
 
         // Fewer plants and days (an older backup restored): the recorded pots stay owned.
         for p in app.plants() { p.earnedCount = 0 }
         profile.gardenDays = 1
         XCTAssertEqual(app.potState(PotCatalog.pot(id: "sageGlaze")), .owned)
         XCTAssertEqual(app.potState(PotCatalog.pot(id: "dewdrop")), .owned)
-        XCTAssertFalse(app.recordEarnedPots())
+        XCTAssertEqual(app.recordEarnedPots(), [])
         XCTAssertEqual(Set(profile.earnedPotIds), ["terracotta", "sageGlaze", "dewdrop"], "nothing earned is removed")
         // A Plus pot is never recorded, so choosing one still needs Plus.
         app.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
-        XCTAssertFalse(app.recordEarnedPots())
+        XCTAssertEqual(app.recordEarnedPots(), [])
         XCTAssertFalse(profile.earnedPotIds.contains("moonlit"))
+    }
+
+    // MARK: Repot sheet v2 (design-preview/repot-sheet)
+
+    func testTheRepotSheetCopy() {
+        XCTAssertEqual(PotCatalog.Copy.repotSub, "Pick a pot. Changing pots is free.")
+        XCTAssertEqual(PotCatalog.Copy.newTag, "New")
+        XCTAssertEqual(PotCatalog.Copy.soilTitle, "Soil")
+        XCTAssertEqual(PotCatalog.Copy.soilSub, "Plants have favorite soils.")
+        for line in [PotCatalog.Copy.repotSub, PotCatalog.Copy.newTag, PotCatalog.Copy.soilTitle, PotCatalog.Copy.soilSub] {
+            XCTAssertTrue(PotCatalog.Copy.all.contains(line), "\(line) is in the copy sweep")
+        }
+    }
+
+    func testTheSummaryLineNamesThePotAndTheSoil() {
+        XCTAssertEqual(PotCatalog.summaryLine(pot: PotCatalog.pot(id: "rosePink"), soil: .loam), "Rose pink pot, fresh loam soil")
+        XCTAssertEqual(PotCatalog.summaryLine(pot: PotCatalog.plainBlue, soil: .peaty), "Plain blue pot, fresh peaty soil")
+    }
+
+    func testANewPotsTileLabelEndsWithNewAndKeepsTheRest() {
+        let rose = PotCatalog.pot(id: "rosePink")
+        XCTAssertEqual(PotCatalog.tileLabel(rose, state: .owned, inUse: false, isNew: true), "Rose pink pot, new")
+        XCTAssertEqual(PotCatalog.tileLabel(rose, state: .owned, inUse: false), "Rose pink pot")
+        XCTAssertEqual(PotCatalog.tileLabel(rose, state: .owned, inUse: true, isNew: true), "Rose pink pot, in use, new")
+    }
+
+    func testTheFooterHintGivesTheGoalAndHowFarAlong() {
+        let stones = PotCatalog.pot(id: "livingStones")
+        let s = stats(plants: 26, levels: 2, inLevel: [3: 6], days: 3)
+        let h = PotCatalog.hintLines(stones, state: PotCatalog.state(of: stones, stats: s, hasPlus: false), stats: s)
+        XCTAssertEqual(h.title, "Finish level 3 to earn Living stones.")
+        XCTAssertEqual(h.detail, "Four more plants to go!")
+        let dew = PotCatalog.pot(id: "dewdrop")
+        XCTAssertEqual(PotCatalog.hintLines(dew, state: PotCatalog.state(of: dew, stats: s, hasPlus: false), stats: s).title,
+                       "Play on 7 days to earn Dewdrop.")
+        let moon = PotCatalog.pot(id: "moonlit")
+        let p = PotCatalog.hintLines(moon, state: PotCatalog.state(of: moon, stats: s, hasPlus: false), stats: s)
+        XCTAssertEqual(p.title, "Moonlit is part of WordFlora Plus.")
+        XCTAssertEqual(p.detail, "A grown-up can find Plus in Settings.")
     }
 
     func testPlusHintPointsToSettings() {

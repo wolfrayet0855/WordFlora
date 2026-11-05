@@ -20,15 +20,18 @@ extension AppModel {
     }
 
     /// Adds every pot earned by play now to the stored record (called when the pot picker or the Shed opens).
-    /// Returns true when some were new, so that one opening can say "New pots in your shed!". Plus pots are never recorded.
+    /// Returns the newly recorded ids in catalog order (empty when nothing was new), so that one opening can say
+    /// "New pots in your shed!" and tag those pots "New". Plus pots are never recorded.
     @discardableResult
-    func recordEarnedPots() -> Bool {
-        guard let profile else { return false }
+    func recordEarnedPots() -> [String] {
+        guard let profile else { return [] }
+        let before = Set(profile.earnedPotIds)
         let merged = PotCatalog.recordEarned(profile.earnedPotIds, stats: potStats)
-        guard Set(merged) != Set(profile.earnedPotIds) else { return false }
+        let added = Set(merged).subtracting(before)
+        guard !added.isEmpty else { return [] }
         profile.earnedPotIds = merged
         try? context.save()
-        return true
+        return PotCatalog.all.map(\.id).filter(added.contains)
     }
 
     /// Puts the plant in `pot` (part of a repot; changing pots costs nothing). A Plus pot needs Plus to be chosen,
