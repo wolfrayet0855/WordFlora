@@ -56,18 +56,21 @@
 		4893251B6742C018C90A9E01 /* BreakPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8B9B774A2FBD3D010315D9DD /* BreakPolicy.swift */; };
 		49C9AEE30C6B929F87BAB3EF /* KeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73101B54140F34289C21BFD /* KeyboardView.swift */; };
 		49FAB31C34389B1250039A76 /* GameRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */; };
+		4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */; };
 		4B412E233E82E83F1C3BA7B8 /* ButterflyGameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED2AA84626C61A605393776 /* ButterflyGameModel.swift */; };
 		4B856F4F9F8367620D4C30F0 /* FlowerRainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 817BDFFB914DD9808C9046EE /* FlowerRainView.swift */; };
 		5000EF3A884C020D4BA90F09 /* ReminderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCA6D160865CEBA2AA66E39 /* ReminderTests.swift */; };
 		5141753B3BD93463C3BA567A /* SplitMix64.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */; };
 		54A55D75B18066AED5586050 /* WordBankValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507CD36D0F85A153026420C3 /* WordBankValidator.swift */; };
 		54ACC3979C866A48FFB28F86 /* PetalPipRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67E4139D96BE75310B27031 /* PetalPipRow.swift */; };
+		54C470839654E5464D7662F7 /* RestCardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A01BCA86B388E2D94431DD /* RestCardTests.swift */; };
 		5731534192B9E4F7B8B0B453 /* GardenAI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA11973C4913D16F50F3654D /* GardenAI.swift */; };
 		579A86FB03D91481C075214E /* WaterControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 83712C10C30A4B3A1C6FB841 /* WaterControl.swift */; };
 		597D0D97668D3B3901F9F7FA /* ProgressionPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1A188B4F331705EAF0FD7F2 /* ProgressionPolicy.swift */; };
 		59896F4A896FCF2AAA27E877 /* Words.json in Resources */ = {isa = PBXBuildFile; fileRef = 9D91134EF7A4DA4C11EB9E23 /* Words.json */; };
 		5A7C1E2F9B3D4A6E8C0F1A01 /* StatsActionRuleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A7C1E2F9B3D4A6E8C0F1A02 /* StatsActionRuleTests.swift */; };
 		5AC90C63AFA3930519F129FF /* WordFloraWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96DC5D77A1287D3DF73CD43 /* WordFloraWidgetBundle.swift */; };
+		5C79C89D5D157B3BC8D2F263 /* RestScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC7DA43D02448392F8774BC /* RestScene.swift */; };
 		5E0A335D5FF8885586260FAB /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99940443AEBC1F94C00E15D2 /* StreakEngine.swift */; };
 		617E6838EBE8B27619FA5225 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */; };
 		62DF6A94C532BAA7B67A1EC7 /* TapBurst.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9550E7376E237963E1CA789 /* TapBurst.swift */; };
@@ -87,6 +90,7 @@
 		73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */; };
 		7414B32D8EE9EB1450BE77C1 /* wf-badgeSilver.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ACF0034A28D0F546B9B9DB9 /* wf-badgeSilver.m4a */; };
 		77DC9100629457266EDDA0DB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1AAA9FCAE4CF29BBA16A8 /* SettingsView.swift */; };
+		7B821C6FCAD64E3AF76503B9 /* RestCardCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */; };
 		7DD477E02162F248269BFF98 /* PotCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E72C046D44E8C67ECE69705 /* PotCatalog.swift */; };
 		802F6E198FE55EE761BBF216 /* Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045A383C28CF63B7AA1690E5 /* Economy.swift */; };
 		80C6C5F5EDC6DB0C83563F51 /* LayeredPlantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52107D98E6FA3FE503D0BDC7 /* LayeredPlantView.swift */; };
@@ -257,6 +261,7 @@
 		2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoseMeter.swift; sourceTree = "<group>"; };
 		2F738E93544B38467408EB43 /* TendAnimationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendAnimationView.swift; sourceTree = "<group>"; };
 		307B6C22876E273992182CE6 /* AdsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AdsService.swift; sourceTree = "<group>"; };
+		31A01BCA86B388E2D94431DD /* RestCardTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestCardTests.swift; sourceTree = "<group>"; };
 		33F34A41B64213EA36BFAD0A /* WordFlora.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = WordFlora.entitlements; sourceTree = "<group>"; };
 		354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ToolEngine.swift; sourceTree = "<group>"; };
 		36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedDefaults.swift; sourceTree = "<group>"; };
@@ -273,6 +278,7 @@
 		47E8902884C3E17F900EC5BC /* PlantThinning.json */ = {isa = PBXFileReference; includeInIndex = 1; path = PlantThinning.json; sourceTree = "<group>"; };
 		494B19877C303C1C4B6F6D08 /* AppModelTendingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppModelTendingTests.swift; sourceTree = "<group>"; };
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
+		4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestCardUITests.swift; sourceTree = "<group>"; };
 		4DA662141FB5A76A22AE6D6E /* PlusOfferPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlusOfferPolicy.swift; sourceTree = "<group>"; };
 		4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PotCatalogTests.swift; sourceTree = "<group>"; };
 		500B058D92EC73FD924DC8CE /* Reminders.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Reminders.swift; sourceTree = "<group>"; };
@@ -315,6 +321,7 @@
 		81A738D4825EDE5CDE9AA4F4 /* LifePalette.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifePalette.swift; sourceTree = "<group>"; };
 		81CCEFF6C6318E96F5F6BA88 /* wf-ambient.caf */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-ambient.caf"; sourceTree = "<group>"; };
 		83712C10C30A4B3A1C6FB841 /* WaterControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WaterControl.swift; sourceTree = "<group>"; };
+		8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestCardCopy.swift; sourceTree = "<group>"; };
 		8B9B774A2FBD3D010315D9DD /* BreakPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BreakPolicy.swift; sourceTree = "<group>"; };
 		8CDEF4F1B5B37025007C3FB4 /* wf-water.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-water.m4a"; sourceTree = "<group>"; };
 		9075581718316A5EDE6C92FD /* GameViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
@@ -370,6 +377,7 @@
 		C95EE8F83CC87F157461F447 /* SeedPotView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SeedPotView.swift; sourceTree = "<group>"; };
 		CA11973C4913D16F50F3654D /* GardenAI.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenAI.swift; sourceTree = "<group>"; };
 		CA4FB003E686D225F4D94B47 /* StoreResolveTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StoreResolveTests.swift; sourceTree = "<group>"; };
+		CFC7DA43D02448392F8774BC /* RestScene.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestScene.swift; sourceTree = "<group>"; };
 		D1A934E0013AAE5EB7DE9896 /* TendingEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendingEngineTests.swift; sourceTree = "<group>"; };
 		D34AFDFFEBD739E2F6A94842 /* GardenIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenIntents.swift; sourceTree = "<group>"; };
 		D4518C576DB5D58EC7724F97 /* ReadAloudTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReadAloudTests.swift; sourceTree = "<group>"; };
@@ -489,6 +497,7 @@
 				E0F27137167AD56F3C378B56 /* PlantThinning.swift */,
 				3E9482B7E7B497DE1F68D020 /* LifeStats.swift */,
 				1E72C046D44E8C67ECE69705 /* PotCatalog.swift */,
+				8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */,
 			);
 			name = Rules;
 			path = Rules;
@@ -588,6 +597,7 @@
 				C95EE8F83CC87F157461F447 /* SeedPotView.swift */,
 				2F738E93544B38467408EB43 /* TendAnimationView.swift */,
 				5937A430C3FA390AF941B091 /* PotArtView.swift */,
+				CFC7DA43D02448392F8774BC /* RestScene.swift */,
 			);
 			name = Components;
 			path = Components;
@@ -632,6 +642,7 @@
 				0A17B66E1750BA0EC6874EED /* LifeStatsTests.swift */,
 				2BEEF2341BC08BF94A6BDA7B /* TendAnimationTests.swift */,
 				4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */,
+				31A01BCA86B388E2D94431DD /* RestCardTests.swift */,
 			);
 			name = WordFloraTests;
 			path = WordFloraTests;
@@ -804,6 +815,7 @@
 				395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */,
 				394854942795553C29283849 /* HomeLayoutUITests.swift */,
 				F787992B59617103496CEE38 /* TendingUITests.swift */,
+				4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */,
 			);
 			name = WordFloraUITests;
 			path = WordFloraUITests;
@@ -1009,6 +1021,7 @@
 				D107E764254121AC6777295F /* WordFloraUITests.swift in Sources */,
 				8E6670903E6120DF66036EBF /* HomeLayoutUITests.swift in Sources */,
 				33BA691BF1E87DE5BB43E0B0 /* TendingUITests.swift in Sources */,
+				4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1052,6 +1065,7 @@
 				C0A400B31989FDA16B29412C /* LifeStatsTests.swift in Sources */,
 				C84708A999B2ED2665D94F0A /* TendAnimationTests.swift in Sources */,
 				73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */,
+				54C470839654E5464D7662F7 /* RestCardTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1173,6 +1187,8 @@
 				1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */,
 				347A410A75615F9238BE8729 /* PotArtView.swift in Sources */,
 				EDC9869F995C67A16F2AB495 /* PotPickerViews.swift in Sources */,
+				5C79C89D5D157B3BC8D2F263 /* RestScene.swift in Sources */,
+				7B821C6FCAD64E3AF76503B9 /* RestCardCopy.swift in Sources */,
 				1355711493BE367E7DC6B3D7 /* ShedTools.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

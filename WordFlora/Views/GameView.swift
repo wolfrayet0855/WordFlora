@@ -15,6 +15,12 @@ struct GameView: View {
     @State private var showRestCard = false
     @State private var badgeToast: String?
     @State private var showBreak = false
+    /// Whether "One more" may lead to an ad, captured once as the resting card opens so its note never flickers.
+    @State private var adNoteOnOneMore = false
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    private var reduceMotion: Bool { systemReduceMotion || app.settings.reduceMotionOverride }
+    /// UI tests open the break card straight away (`-uitest-break-card`) instead of after 20 minutes.
+    private static let uiTestBreakCard = ProcessInfo.processInfo.arguments.contains("-uitest-break-card")
     private let breakTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
     @State private var speaker = AVSpeechSynthesizer()
 
@@ -51,7 +57,7 @@ struct GameView: View {
         .navigationBarBackButtonHidden(true)
         .modifier(GameHaptics(enabled: app.settings.hapticsOn, correctCount: correctCount, petals: vm.petalsRemaining, won: vm.phase == .won))
         .onReceive(breakTimer) { _ in
-            if app.shouldSuggestBreak && vm.phase != .restingOffer { app.markBreakSuggested(); showBreak = true }
+            if app.shouldSuggestBreak && vm.phase != .restingOffer { app.markBreakSuggested(); openCard { showBreak = true } }
         }
         .onAppear {
             app.beginSitting()
@@ -60,6 +66,7 @@ struct GameView: View {
             vm.soundEnabled = app.settings.soundOn
             if tutorial { vm.startTutorial(entry: Self.tutorialEntry(in: app.bank)) }
             else if daily { vm.startDaily() } else { vm.startRound(level: level) }
+            if Self.uiTestBreakCard { showBreak = true }
         }
         .onDisappear { ReadAloud.shared.stop() }
         .onChange(of: vm.phase) { _, phase in
@@ -228,44 +235,145 @@ struct GameView: View {
     }
 
     private var breakCard: some View {
-        dimmed {
-            VStack(spacing: 14) {
-                FlowerView(petals: 8, sway: false).frame(height: 100)
-                Text("Time for a little break").font(Theme.font(.title2, weight: .bold)).multilineTextAlignment(.center)
-                Text(BreakPolicy.message).font(Theme.font(.callout)).multilineTextAlignment(.center)
-                Button("Take a break") { showBreak = false; router.home() }.buttonStyle(PrimaryButtonStyle())
-                Button("Keep playing") { showBreak = false }.buttonStyle(SecondaryButtonStyle())
+        dimmed(padding: 0, centered: true) {
+            VStack(spacing: 0) {
+                RestScene(kind: .day)
+                VStack(spacing: 12) {
+                    cardTitle(RestCardCopy.breakTitle)
+                    cardBody(RestCardCopy.breakBody)
+                    // The three things to look at, as pictures; the line above already says them.
+                    HStack(alignment: .top, spacing: 22) {
+                        look(RestCardCopy.looks[0], systemImage: "square.split.2x2", color: .tileLevelsIcon)
+                        look(RestCardCopy.looks[1], systemImage: "leaf", color: .successText)
+                        look(RestCardCopy.looks[2], systemImage: "cloud.sun", color: .tileLevelsIcon)
+                    }
+                    .accessibilityHidden(true)
+                    VStack(spacing: 10) {
+                        Button(RestCardCopy.takeBreak) { showBreak = false; router.home() }
+                            .buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("breakCard.takeBreak")
+                        Button(RestCardCopy.keepPlaying) { closeCard { showBreak = false } }
+                            .buttonStyle(SecondaryButtonStyle()).accessibilityIdentifier("breakCard.keepPlaying")
+                    }
+                    .padding(.top, 6)
+                }
+                .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityAddTraits(.isModal)
         }
     }
 
     private var restCard: some View {
-        dimmed {
-            VStack(spacing: 14) {
-                FlowerView(petals: 8, sway: false).frame(height: 110)
-                Text("The garden is resting").font(Theme.font(.title2, weight: .bold))
-                Text("Take a breath. Come back whenever you like.").font(Theme.font(.callout)).multilineTextAlignment(.center)
-                HStack(spacing: 12) {
-                    Button("One more") { showRestCard = false; Task { await app.adBeforeNextRound(); vm.startRound() } }.buttonStyle(PrimaryButtonStyle())
-                    Button("That's enough for now") { showRestCard = false; router.home() }.buttonStyle(SecondaryButtonStyle())
+        dimmed(padding: 0, centered: true) {
+            VStack(spacing: 0) {
+                RestScene(kind: .night)
+                VStack(spacing: 12) {
+                    cardTitle(RestCardCopy.restTitle)
+                    cardBody(RestCardCopy.restBody)
+                    Label {
+                        Text(RestCardCopy.reward(isDaily: vm.isDaily, wordsPlayed: vm.roundsThisSitting))
+                    } icon: {
+                        Image(systemName: "leaf.fill").foregroundStyle(Color.successText)
+                    }
+                    .font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .padding(.vertical, 6).padding(.horizontal, 14)
+                    .background(Color.tileGardenFill, in: Capsule())
+                    .accessibilityElement(children: .combine)
+                    VStack(spacing: 10) {
+                        Button(RestCardCopy.oneMore) { showRestCard = false; Task { await app.adBeforeNextRound(); vm.startRound() } }
+                            .buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("restCard.oneMore")
+                        if adNoteOnOneMore {
+                            // Said beside the choice that can lead to an ad, never hidden away.
+                            Label(RestCardCopy.adNote, systemImage: "info.circle")
+                                .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                                .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                                .accessibilityElement(children: .combine)
+                                .accessibilityIdentifier("restCard.adNote")
+                        }
+                        Button(RestCardCopy.enough) { showRestCard = false; router.home() }
+                            .buttonStyle(SecondaryButtonStyle()).accessibilityIdentifier("restCard.enough")
+                    }
+                    .padding(.top, 6)
+                    if app.showBanner { goAdFreeRow.padding(.top, 2) }
                 }
-                if app.showBanner {
-                    Button("Go ad-free") { showRestCard = false; router.home(); router.go(.plus) }
-                        .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText).frame(minHeight: Theme.minTap)
-                }
+                .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
             }
+            .accessibilityElement(children: .contain)
+            .accessibilityAddTraits(.isModal)
         }
     }
 
+    /// A quiet, full-width way to Plus: no price, no timer.
+    private var goAdFreeRow: some View {
+        Button { showRestCard = false; router.home(); router.go(.plus) } label: {
+            HStack(spacing: 12) {
+                Image(systemName: "sparkles").font(.system(size: 17, weight: .semibold)).foregroundStyle(Color.tileVisitorsIcon)
+                    .frame(width: 32, height: 32).background(Color.tileVisitorsFill, in: Circle())
+                    .accessibilityHidden(true)
+                Text(RestCardCopy.goAdFree).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                    .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Image(systemName: "chevron.right").font(Theme.font(.footnote, weight: .semibold)).foregroundStyle(Color.secondaryText)
+                    .accessibilityHidden(true)
+            }
+            .padding(.horizontal, 12).padding(.vertical, 8)
+            .frame(maxWidth: .infinity, minHeight: 52)
+            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.appPrimaryText.opacity(0.12)))
+            .contentShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        }
+        .buttonStyle(.plain)
+        .accessibilityHint(RestCardCopy.goAdFreeHint)
+        .accessibilityIdentifier("restCard.goAdFree")
+    }
+
+    private func cardTitle(_ text: String) -> some View {
+        Text(text).font(Theme.font(.title2, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+            .accessibilityAddTraits(.isHeader)
+    }
+
+    private func cardBody(_ text: String) -> some View {
+        Text(text).font(Theme.font(.callout)).foregroundStyle(Color.secondaryText)
+            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+    }
+
+    private func look(_ title: String, systemImage: String, color: Color) -> some View {
+        VStack(spacing: 4) {
+            Image(systemName: systemImage).font(.system(size: 36)).foregroundStyle(color)
+            Text(title).font(Theme.font(.footnote, weight: .semibold)).foregroundStyle(Color.secondaryText)
+        }
+    }
+
+    /// The resting and break cards fade in (and rise a little, unless Reduce Motion is on).
+    private func openCard(_ change: () -> Void) {
+        withAnimation(reduceMotion ? .easeOut(duration: 0.3) : .timingCurve(0.2, 0.8, 0.2, 1, duration: 0.45)) { change() }
+    }
+
+    private func closeCard(_ change: () -> Void) {
+        withAnimation(.easeOut(duration: 0.3)) { change() }
+    }
+
     /// Dim, then (optionally) the flower rain, then the card on top so text is never covered.
-    private func dimmed<C: View>(rain: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
-        ZStack {
+    /// `padding` is the card's inner padding (the resting and break cards bring their own, under a full-bleed header);
+    /// `centered` keeps a short card in the middle of the screen while a tall one still scrolls.
+    private func dimmed<C: View>(rain: Bool = false, padding: CGFloat = 20, centered: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
+        let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
+        let card = content().padding(padding).background(Color.appBackground, in: shape).clipShape(shape).padding(24)
+        return ZStack {
             Color.black.opacity(0.45).ignoresSafeArea()
             if rain { FlowerRainView(onFinish: { showRain = false }).ignoresSafeArea() }
-            ScrollView { content().padding(20).background(Color.appBackground, in: RoundedRectangle(cornerRadius: 24)).padding(24) }
-                .scrollBounceBehavior(.basedOnSize)
+            if centered {
+                GeometryReader { geo in
+                    ScrollView { card.frame(maxWidth: .infinity, minHeight: geo.size.height) }
+                        .scrollBounceBehavior(.basedOnSize)
+                }
+            } else {
+                ScrollView { card }
+                    .scrollBounceBehavior(.basedOnSize)
+            }
         }
-        .transition(.opacity.combined(with: .scale(scale: 0.96)))
+        .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.96)))
     }
 
     private func badgeBanner(_ text: String) -> some View {
@@ -304,7 +412,10 @@ struct GameView: View {
 
     private func afterRound() {
         if tutorial { onTutorialFinished(); return }
-        if vm.sessionBeat { showRestCard = true } else if daily { router.home() } else { vm.startRound() }
+        if vm.sessionBeat {
+            adNoteOnOneMore = app.adWouldPlayOnOneMore
+            openCard { showRestCard = true }
+        } else if daily { router.home() } else { vm.startRound() }
     }
 
     private func speak(_ text: String) {

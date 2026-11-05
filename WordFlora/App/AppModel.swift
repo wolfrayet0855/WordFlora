@@ -387,6 +387,16 @@ final class AppModel {
         if await ads.showInterstitial() { recordAdShown() }
     }
 
+    /// True when tapping "One more" on the resting card would try an ad, so the card can say so beside the button.
+    /// The same rules as `adBeforeNextRound`, judged as of the end of the celebration's quiet window: the card opens
+    /// the moment a celebration is dismissed, and the earliest deliberate tap comes after that window.
+    var adWouldPlayOnOneMore: Bool {
+        guard adsEnabled else { return false }
+        var ctx = adContext(choice: .oneMore)
+        ctx.now = ctx.now.addingTimeInterval(ctx.peakWindowSeconds)
+        return AdGate.shouldShowInterstitial(ctx)
+    }
+
     func prepareBannerIfAllowed() async {
         guard showBanner else { return }
         await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })

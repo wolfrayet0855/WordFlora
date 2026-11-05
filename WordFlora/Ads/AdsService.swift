@@ -12,6 +12,8 @@ final class AdsService {
     enum Unit: String { case banner = "AdMobBannerUnitID", interstitial = "AdMobInterstitialUnitID", rewarded = "AdMobRewardedUnitID" }
 
     private(set) var started = false
+    /// UI tests switch the SDK off while keeping every ad rule live, so screens that depend on those rules can be checked.
+    var offline = false
     private var preparing = false
     private var loadingInterstitial = false
     private var loadingRewarded = false
@@ -27,7 +29,7 @@ final class AdsService {
     /// Call only when `AdGate.mayLoadAnyAd` is true. Shows the consent form on first use, then starts the SDK.
     /// `isStillAllowed` is re-checked after every await, so a subscription or age change mid-setup stops everything.
     func prepare(ageBand: AgeBand?, isStillAllowed: () -> Bool) async {
-        guard !started, !preparing, isStillAllowed() else { return }
+        guard !offline, !started, !preparing, isStillAllowed() else { return }
         preparing = true
         defer { preparing = false }
         let config = MobileAds.shared.requestConfiguration

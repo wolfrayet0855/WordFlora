@@ -93,7 +93,12 @@ struct WordFloraApp: App {
         }
         if uiTesting && args.contains("-uitest-calm") { model.settings.calmMode = true }
         if uiTesting && args.contains("-uitest-quiet") { model.settings.quietGarden = true }
-        if uiTesting && !args.contains("-uitest-ads") { model.adsEnabled = false }
+        if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-sessions=") }).flatMap({ Int($0.dropFirst("-uitest-sessions=".count)) }) {
+            model.settings.completedSessions = n            // past the first sessions, so the ad rules can say yes
+        }
+        // `-uitest-ads-offline`: ad rules stay live but the ad SDK never starts (no consent prompt, no real ad).
+        if uiTesting && args.contains("-uitest-ads-offline") { model.ads.offline = true }
+        if uiTesting && !args.contains("-uitest-ads") && !args.contains("-uitest-ads-offline") { model.adsEnabled = false }
         if uiTesting { model.plusOfferEnabled = false }
         if !uiTesting { try? Tips.configure([.displayFrequency(.daily)]) }
         _app = State(initialValue: model)
