@@ -1,0 +1,852 @@
+{
+ "direction": "unified",
+ "title": "Unified, with the smile",
+ "geometry": {
+  "shape": "round",
+  "dc": 295,
+  "rc": 200,
+  "rot": -8,
+  "slits": 30
+ },
+ "sizes": {
+  "twin": {
+   "gap": 52,
+   "nb": 40,
+   "track": 0,
+   "round": 12
+  },
+  "solo": {
+   "gap": 62,
+   "nb": 50,
+   "track": 10,
+   "round": 14
+  }
+ },
+ "space": {
+  "lo": 0.86,
+  "hi": 1.14,
+  "min_fl": 60,
+  "flora_o": 1.1,
+  "ra": 1.0
+ },
+ "kerns": [
+  -32.0,
+  93.0,
+  42.0,
+  101.0,
+  -29.0,
+  117.0,
+  145.0,
+  4.5
+ ],
+ "marks": {
+  "twin": {
+   "vb": [
+    20,
+    21,
+    5708,
+    993
+   ],
+   "o_centre": [
+    4303.5,
+    534.0
+   ],
+   "xs": [
+    0.0,
+    1096.0,
+    1791.0,
+    2267.0,
+    2988.0,
+    3538.0,
+    4003.0,
+    4750.0,
+    5188.5
+   ],
+   "aspect": 5.748,
+   "h172": 29.9,
+   "h262": 45.6,
+   "units_per_px_29": 34.2,
+   "gap_units": 52,
+   "gap_px_29": 1.52,
+   "nb_units": 40,
+   "R": 250.8,
+   "R_o": 256.5,
+   "pairs": [
+    {
+     "pair": "W-o",
+     "mean": 215.8,
+     "min": 154,
+     "dev": -14.0
+    },
+    {
+     "pair": "o-r",
+     "mean": 216.1,
+     "min": 176,
+     "dev": -13.8
+    },
+    {
+     "pair": "r-d",
+     "mean": 250.8,
+     "min": 114,
+     "dev": 0.0
+    },
+    {
+     "pair": "d-F",
+     "mean": 219.3,
+     "min": 216,
+     "dev": -12.5
+    },
+    {
+     "pair": "F-l",
+     "mean": 276.3,
+     "min": 60,
+     "dev": 10.2
+    },
+    {
+     "pair": "l-o",
+     "mean": 271.5,
+     "min": 183,
+     "dev": 8.3
+    },
+    {
+     "pair": "o-r",
+     "mean": 268.1,
+     "min": 228,
+     "dev": 6.9
+    },
+    {
+     "pair": "r-a",
+     "mean": 250.7,
+     "min": 75,
+     "dev": -0.0
+    }
+   ],
+   "pairs_o": [
+    {
+     "pair": "W-o",
+     "mean": 226.6,
+     "min": 154,
+     "dev": -11.6
+    },
+    {
+     "pair": "o-r",
+     "mean": 240.7,
+     "min": 176,
+     "dev": -6.1
+    },
+    {
+     "pair": "r-d",
+     "mean": 256.5,
+     "min": 113,
+     "dev": 0.0
+    },
+    {
+     "pair": "d-F",
+     "mean": 220.9,
+     "min": 216,
+     "dev": -13.9
+    },
+    {
+     "pair": "F-l",
+     "mean": 291.2,
+     "min": 60,
+     "dev": 13.6
+    },
+    {
+     "pair": "l-o",
+     "mean": 292.8,
+     "min": 183,
+     "dev": 14.2
+    },
+    {
+     "pair": "o-r",
+     "mean": 292.7,
+     "min": 228,
+     "dev": 14.1
+    },
+    {
+     "pair": "r-a",
+     "mean": 251.0,
+     "min": 75,
+     "dev": -2.1
+    }
+   ],
+   "worst_dev": 14.0,
+   "worst_dev_o": 14.2,
+   "fl_min": 60,
+   "petal_visible": [
+    1.0,
+    0.992,
+    1.0,
+    1.0,
+    0.98
+   ],
+   "petal_scale": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "petal_width_px29": [
+    11.7,
+    11.7,
+    11.7,
+    11.7,
+    11.7
+   ],
+   "petal_sep_px60": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "notch_px60": [
+    9.4,
+    29.8,
+    9.4,
+    29.8,
+    29.8
+   ],
+   "notch_px29": [
+    4.6,
+    14.4,
+    4.6,
+    14.4,
+    14.4
+   ],
+   "straight_px320": 27.8,
+   "kerning": [
+    -32.0,
+    93.0,
+    42.0,
+    101.0,
+    -29.0,
+    117.0,
+    145.0,
+    4.5
+   ],
+   "width_units": 5756
+  },
+  "solo": {
+   "vb": [
+    20,
+    21,
+    5788,
+    993
+   ],
+   "o_centre": [
+    4363.5,
+    534.0
+   ],
+   "xs": [
+    0.0,
+    1106.0,
+    1811.0,
+    2297.0,
+    3028.0,
+    3588.0,
+    4063.0,
+    4820.0,
+    5268.5
+   ],
+   "aspect": 5.829,
+   "h172": 29.5,
+   "h262": 44.9,
+   "units_per_px_29": 34.2,
+   "gap_units": 62,
+   "gap_px_29": 1.81,
+   "nb_units": 50,
+   "R": 260.8,
+   "R_o": 266.5,
+   "pairs": [
+    {
+     "pair": "W-o",
+     "mean": 225.8,
+     "min": 164,
+     "dev": -13.4
+    },
+    {
+     "pair": "o-r",
+     "mean": 226.1,
+     "min": 186,
+     "dev": -13.3
+    },
+    {
+     "pair": "r-d",
+     "mean": 260.8,
+     "min": 124,
+     "dev": 0.0
+    },
+    {
+     "pair": "d-F",
+     "mean": 229.3,
+     "min": 226,
+     "dev": -12.1
+    },
+    {
+     "pair": "F-l",
+     "mean": 286.3,
+     "min": 70,
+     "dev": 9.8
+    },
+    {
+     "pair": "l-o",
+     "mean": 281.5,
+     "min": 193,
+     "dev": 8.0
+    },
+    {
+     "pair": "o-r",
+     "mean": 278.1,
+     "min": 238,
+     "dev": 6.6
+    },
+    {
+     "pair": "r-a",
+     "mean": 260.7,
+     "min": 85,
+     "dev": -0.0
+    }
+   ],
+   "pairs_o": [
+    {
+     "pair": "W-o",
+     "mean": 236.6,
+     "min": 164,
+     "dev": -11.2
+    },
+    {
+     "pair": "o-r",
+     "mean": 250.7,
+     "min": 186,
+     "dev": -5.9
+    },
+    {
+     "pair": "r-d",
+     "mean": 266.5,
+     "min": 123,
+     "dev": 0.0
+    },
+    {
+     "pair": "d-F",
+     "mean": 230.9,
+     "min": 226,
+     "dev": -13.3
+    },
+    {
+     "pair": "F-l",
+     "mean": 301.2,
+     "min": 70,
+     "dev": 13.0
+    },
+    {
+     "pair": "l-o",
+     "mean": 302.8,
+     "min": 193,
+     "dev": 13.6
+    },
+    {
+     "pair": "o-r",
+     "mean": 302.7,
+     "min": 238,
+     "dev": 13.6
+    },
+    {
+     "pair": "r-a",
+     "mean": 261.0,
+     "min": 85,
+     "dev": -2.1
+    }
+   ],
+   "worst_dev": 13.4,
+   "worst_dev_o": 13.6,
+   "fl_min": 70,
+   "petal_visible": [
+    1.0,
+    0.992,
+    1.0,
+    1.0,
+    0.971
+   ],
+   "petal_scale": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "petal_width_px29": [
+    11.7,
+    11.7,
+    11.7,
+    11.7,
+    11.7
+   ],
+   "petal_sep_px60": [
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+   ],
+   "notch_px60": [
+    29.8,
+    29.8,
+    9.5,
+    29.8,
+    29.8
+   ],
+   "notch_px29": [
+    14.4,
+    14.4,
+    4.6,
+    14.4,
+    14.4
+   ],
+   "straight_px320": 27.8,
+   "kerning": [
+    -22.0,
+    103.0,
+    52.0,
+    111.0,
+    -19.0,
+    127.0,
+    155.0,
+    14.5
+   ],
+   "width_units": 5836
+  },
+  "mono-solid": {
+   "vb": [
+    20,
+    21,
+    5708,
+    993
+   ],
+   "o_centre": [
+    4303.5,
+    534.0
+   ],
+   "xs": [
+    0.0,
+    1096.0,
+    1791.0,
+    2267.0,
+    2988.0,
+    3538.0,
+    4003.0,
+    4750.0,
+    5188.5
+   ],
+   "aspect": 5.748,
+   "h172": 29.9,
+   "h262": 45.6,
+   "units_per_px_29": 34.2,
+   "gap_units": 60,
+   "gap_px_29": 1.75,
+   "nb_units": 40,
+   "R": 250.8,
+   "R_o": 256.5,
+   "pairs": [
+    {
+     "pair": "W-o",
+     "mean": 215.8,
+     "min": 154,
+     "dev": -14.0
+    },
+    {
+     "pair": "o-r",
+     "mean": 216.1,
+     "min": 176,
+     "dev": -13.8
+    },
+    {
+     "pair": "r-d",
+     "mean": 250.8,
+     "min": 114,
+     "dev": 0.0
+    },
+    {
+     "pair": "d-F",
+     "mean": 219.3,
+     "min": 216,
+     "dev": -12.5
+    },
+    {
+     "pair": "F-l",
+     "mean": 276.3,
+     "min": 60,
+     "dev": 10.2
+    },
+    {
+     "pair": "l-o",
+     "mean": 271.5,
+     "min": 183,
+     "dev": 8.3
+    },
+    {
+     "pair": "o-r",
+     "mean": 268.1,
+     "min": 228,
+     "dev": 6.9
+    },
+    {
+     "pair": "r-a",
+     "mean": 250.7,
+     "min": 75,
+     "dev": -0.0
+    }
+   ],
+   "pairs_o": [
+    {
+     "pair": "W-o",
+     "mean": 226.6,
+     "min": 154,
+     "dev": -11.6
+    },
+    {
+     "pair": "o-r",
+     "mean": 240.7,
+     "min": 176,
+     "dev": -6.1
+    },
+    {
+     "pair": "r-d",
+     "mean": 256.5,
+     "min": 113,
+     "dev": 0.0
+    },
+    {
+     "pair": "d-F",
+     "mean": 220.9,
+     "min": 216,
+     "dev": -13.9
+    },
+    {
+     "pair": "F-l",
+     "mean": 291.2,
+     "min": 60,
+     "dev": 13.6
+    },
+    {
+     "pair": "l-o",
+     "mean": 292.8,
+     "min": 183,
+     "dev": 14.2
+    },
+    {
+     "pair": "o-r",
+     "mean": 292.7,
+     "min": 228,
+     "dev": 14.1
+    },
+    {
+     "pair": "r-a",
+     "mean": 251.0,
+     "min": 75,
+     "dev": -2.1
+    }
+   ],
+   "worst_dev": 14.0,
+   "worst_dev_o": 14.2,
+   "fl_min": 60,
+   "petal_visible": [
+    0.988,
+    0.98,
+    0.985,
+    0.986,
+    0.97
+   ],
+   "petal_scale": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "petal_width_px29": [
+    11.7,
+    11.7,
+    11.7,
+    11.7,
+    11.7
+   ],
+   "petal_sep_px60": [
+    1.8,
+    1.8,
+    1.8,
+    1.8,
+    1.8
+   ],
+   "notch_px60": [
+    29.8,
+    29.8,
+    29.8,
+    29.8,
+    29.8
+   ],
+   "notch_px29": [
+    14.4,
+    14.4,
+    14.4,
+    14.4,
+    14.4
+   ],
+   "straight_px320": 27.8,
+   "kerning": [
+    -32.0,
+    93.0,
+    42.0,
+    101.0,
+    -29.0,
+    117.0,
+    145.0,
+    4.5
+   ],
+   "width_units": 5756
+  }
+ },
+ "contrast": [
+  {
+   "name": "Word on cream (light)",
+   "a": "#182818",
+   "b": "#FAF7F0",
+   "ratio": 14.48,
+   "target": 4.5
+  },
+  {
+   "name": "Flora on cream (light)",
+   "a": "#2E803F",
+   "b": "#FAF7F0",
+   "ratio": 4.59,
+   "target": 4.5
+  },
+  {
+   "name": "Word vs Flora (light)",
+   "a": "#182818",
+   "b": "#2E803F",
+   "ratio": 3.15,
+   "target": 3.0
+  },
+  {
+   "name": "Petals on cream (light)",
+   "a": "#C86800",
+   "b": "#FAF7F0",
+   "ratio": 3.61,
+   "target": 3.0
+  },
+  {
+   "name": "Petals vs ring (light)",
+   "a": "#C86800",
+   "b": "#2E803F",
+   "ratio": 1.27,
+   "target": null
+  },
+  {
+   "name": "Word on dark",
+   "a": "#DCEEDC",
+   "b": "#1A2E1A",
+   "ratio": 11.94,
+   "target": 4.5
+  },
+  {
+   "name": "Flora on dark",
+   "a": "#8FCB8F",
+   "b": "#1A2E1A",
+   "ratio": 7.66,
+   "target": 4.5
+  },
+  {
+   "name": "Word vs Flora (dark)",
+   "a": "#DCEEDC",
+   "b": "#8FCB8F",
+   "ratio": 1.56,
+   "target": 1.3
+  },
+  {
+   "name": "Petals on dark",
+   "a": "#E59A2E",
+   "b": "#1A2E1A",
+   "ratio": 6.2,
+   "target": 3.0
+  },
+  {
+   "name": "Petals vs ring (dark)",
+   "a": "#E59A2E",
+   "b": "#8FCB8F",
+   "ratio": 1.24,
+   "target": null
+  },
+  {
+   "name": "Mono ink on white",
+   "a": "#182818",
+   "b": "#FFFFFF",
+   "ratio": 15.49,
+   "target": 4.5
+  },
+  {
+   "name": "Mono petals (ink at 0.60 = #747E74) on white",
+   "a": "#747E74",
+   "b": "#FFFFFF",
+   "ratio": 4.22,
+   "target": 3.0
+  }
+ ],
+ "cvd": [
+  {
+   "kind": "deuteranopia",
+   "petal_bg": 3.25,
+   "petal_bg_dark": 6.76,
+   "split": 3.04,
+   "word_bg": 14.64,
+   "flora_bg": 4.82
+  },
+  {
+   "kind": "protanopia",
+   "petal_bg": 4.35,
+   "petal_bg_dark": 5.37,
+   "split": 3.31,
+   "word_bg": 14.24,
+   "flora_bg": 4.3
+  },
+  {
+   "kind": "tritanopia",
+   "petal_bg": 3.65,
+   "petal_bg_dark": 6.15,
+   "split": 3.12,
+   "word_bg": 14.5,
+   "flora_bg": 4.64
+  }
+ ],
+ "icon": [
+  {
+   "style": "light",
+   "part": "petal",
+   "hex": "#FBF4E4",
+   "ref": "bg",
+   "ratio": 5.84,
+   "cvd_min": 5.54
+  },
+  {
+   "style": "light",
+   "part": "disc",
+   "hex": "#F5BC48",
+   "ref": "bg",
+   "ratio": 3.71,
+   "cvd_min": 3.24
+  },
+  {
+   "style": "light",
+   "part": "face",
+   "hex": "#1F321F",
+   "ref": "disc",
+   "ratio": 7.93,
+   "cvd_min": 7.11
+  },
+  {
+   "style": "dark",
+   "part": "petal",
+   "hex": "#EFE6C8",
+   "ref": "bg",
+   "ratio": 11.6,
+   "cvd_min": 11.24
+  },
+  {
+   "style": "dark",
+   "part": "disc",
+   "hex": "#E59A2E",
+   "ref": "bg",
+   "ratio": 6.2,
+   "cvd_min": 5.37
+  },
+  {
+   "style": "dark",
+   "part": "face",
+   "hex": "#0F1C0F",
+   "ref": "disc",
+   "ratio": 7.54,
+   "cvd_min": 6.57
+  },
+  {
+   "style": "tinted",
+   "part": "petal",
+   "hex": "#E8E8E8",
+   "ref": "bg",
+   "ratio": 17.14,
+   "cvd_min": 17.14
+  },
+  {
+   "style": "tinted",
+   "part": "disc",
+   "hex": "#8C8C8C",
+   "ref": "bg",
+   "ratio": 6.25,
+   "cvd_min": 6.25
+  },
+  {
+   "style": "tinted",
+   "part": "face",
+   "hex": "#000000",
+   "ref": "disc",
+   "ratio": 6.25,
+   "cvd_min": 6.25
+  }
+ ],
+ "icon_scale": 0.8572,
+ "icon_files": {
+  "light": [
+   "icon",
+   [
+    1024,
+    180,
+    60,
+    29
+   ]
+  ],
+  "dark": [
+   "icon-dark",
+   [
+    1024,
+    180,
+    60,
+    29
+   ]
+  ],
+  "tinted": [
+   "icon-tinted",
+   [
+    1024,
+    180,
+    60,
+    29
+   ]
+  ]
+ },
+ "counter_px_29": {
+  "w": 5.3,
+  "h": 7.3
+ },
+ "palette": {
+  "light": {
+   "bg": "#FAF7F0",
+   "word": "#182818",
+   "flora": "#2E803F",
+   "ring": "#2E803F",
+   "petal": "#C86800"
+  },
+  "dark": {
+   "bg": "#1A2E1A",
+   "word": "#DCEEDC",
+   "flora": "#8FCB8F",
+   "ring": "#8FCB8F",
+   "petal": "#E59A2E"
+  },
+  "mono": {
+   "bg": "#FFFFFF",
+   "ink": "#182818"
+  },
+  "mono_opacity": 0.6
+ }
+}
