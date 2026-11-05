@@ -163,10 +163,13 @@ final class SoundTests: XCTestCase {
         guess(vm, "Z"); XCTAssertEqual(s.played.count, 2)                  // a repeated letter is ignored: no sound
     }
 
-    func testWinningPlaysTheWordSound() throws {
+    /// One sound for the win: level up, else a plant arriving (the very first word brings one), else the word.
+    func testWinningPlaysOneWinSound() throws {
         let s = RecordingSound(); let vm = try makeVM(s); vm.start(entry: entry())
         guess(vm, "LOTUS")
-        XCTAssertEqual(s.played.last, .word); XCTAssertFalse(s.played.contains(.rest))
+        XCTAssertNotNil(vm.earnedPlantName)
+        XCTAssertEqual(s.played.last, vm.leveledUp ? .levelUp : .earned); XCTAssertFalse(s.played.contains(.rest))
+        XCTAssertEqual(s.played.filter { [.word, .earned, .levelUp].contains($0) }.count, 1)
     }
 
     func testLosingPlaysTheGentleRestSoundNotAnErrorSound() throws {
