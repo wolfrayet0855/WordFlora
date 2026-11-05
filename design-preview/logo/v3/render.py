@@ -82,9 +82,10 @@ def path_xs(svg_path, fill):
     """min and max x of the path with this fill (SVGPathPen output: absolute coordinate pairs)"""
     s = open(svg_path).read()
     m = re.search(r'<path fill="%s"[^>]* d="([^"]+)"' % re.escape(fill), s)
-    nums = [float(v) for v in re.findall(r'-?\d+(?:\.\d+)?', m.group(1))]
-    xs = nums[0::2]
-    return min(xs), max(xs)
+    from fontTools.svgLib.path import parse_path
+    from fontTools.pens.boundsPen import BoundsPen
+    bp = BoundsPen(None); parse_path(m.group(1), bp)
+    return bp.bounds[0], bp.bounds[2]
 
 def word_crop(svg_path, word_fill, flora_fill, k):
     """html for "Word" alone, cut halfway between the d and the F, at k px per font unit"""
@@ -195,9 +196,11 @@ def check(d):
         rot = M['geometry']['rot']
         for i in range(5):
             a = math.radians(rot + i * 72 + 36); best = 0
-            for rr in range(300, 520, 4):
-                xx = cx + math.sin(a) * rr * k; yy = cy - math.cos(a) * rr * k
-                best = max(best, p[int(round(xx)), int(round(yy))])
+            r0 = 264 + T['gap_units']              # just outside the ring gap, where the lobes would otherwise fuse
+            for rr in range(int(r0), int(r0) + 70, 2):
+                xx = min(max(int(round(cx + math.sin(a) * rr * k)), 0), s29.width - 1)
+                yy = min(max(int(round(cy - math.cos(a) * rr * k)), 0), s29.height - 1)
+                best = max(best, p[xx, yy])
             good = best >= 224; ok &= good
             lines.append('U3 bisector %d brightest pixel between lobes at 29 px: %d (>= 224): %s' % (i + 1, best, good))
     print('\n'.join('  ' + l for l in lines)); print('  %s checks: %s' % (d, 'ALL PASS' if ok else 'SOME FAIL'))

@@ -1,0 +1,18 @@
+{
+ "ok": true,
+ "lines": [
+  "P1 flora #2E803F exact in wordmark-h320: True",
+  "P1 petal #C9506C exact in wordmark-h320: True",
+  "P1 word #182818 exact in wordmark-h320: True",
+  "P1 bg #FAF7F0 exact in wordmark-h320: True",
+  "P1 icc_profile: none",
+  "P2 before-after-light.png last ink column 3963 of 4003: True",
+  "P2 before-after-dark.png last ink column 3963 of 4003: True",
+  "P2 icon-before-after.png last ink column 609 of 649: True",
+  "P2 word-alone-320.png last ink column 1158 of 1197: True",
+  "P4 mono-solid-h29 row 15 left of ring: brightest gap pixel 255 (>= 224): True",
+  "P4 mono-solid-h29 row 15 right of ring: brightest gap pixel 255 (>= 224): True",
+  "P4 mono-solid-h29 row 16 left of ring: brightest gap pixel 255 (>= 224): True",
+  "P4 mono-solid-h29 row 16 right of ring: brightest gap pixel 255 (>= 224): True"
+ ]
+}
