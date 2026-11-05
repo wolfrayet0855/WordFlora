@@ -49,8 +49,9 @@ struct BadgeMomentHost: View {
 }
 
 /// The badge moment (design-preview/celebrate, confetti "badge"): the badge art pops in (scale 0.3 to 1, ease-out back)
-/// inside a soft halo while petals spiral out around it, and its name sits on a scrim above the petals. A tap closes it;
-/// otherwise it goes after 2.6 s. No haptic. Calm and Quiet: the pop stays, the petals become a still arc.
+/// inside a soft halo while petals spiral out around it, and its name sits on a scrim above the petals. A tap on the badge
+/// closes it, otherwise it goes after 2.6 s; taps elsewhere reach the screen behind, so the next word never loses a
+/// letter to it. No haptic. Calm and Quiet: the pop stays, the petals become a still arc.
 /// Reduce Motion: the badge only fades in, with the still arc.
 struct BadgeMomentView: View {
     let unlock: BadgeUnlock
@@ -66,13 +67,14 @@ struct BadgeMomentView: View {
         GeometryReader { geo in
             let centre = CGPoint(x: geo.size.width / 2, y: geo.size.height * 0.42)
             ZStack(alignment: .top) {
-                Color.black.opacity(0.62)
+                Color.black.opacity(0.62).allowsHitTesting(false)
                 RadialGradient(colors: [Color(hex: 0xFFE896).opacity(0.55), Color(hex: 0xFFE896).opacity(0)], center: .center,
                                startRadius: 0, endRadius: 130)
                     .frame(width: 260, height: 260)
                     .position(centre)
                     .opacity(shown ? 1 : 0)
                     .animation(.easeOut(duration: 0.6).delay(0.2), value: shown)
+                    .allowsHitTesting(false)
                 PetalConfettiView(level: level, origin: .point(centre), seed: UInt64(unlock.tier) &+ 13, arcRadius: 110,
                                   freezeAt: hold ? 0.9 : nil)      // UI tests hold one frame of the spiral
                 VStack(spacing: 18) {
@@ -97,13 +99,13 @@ struct BadgeMomentView: View {
                     .opacity(shown ? 1 : 0)
                     .animation(.easeOut(duration: 0.4).delay(0.4), value: shown)
                 }
+                .contentShape(Rectangle())
+                .onTapGesture { onDismiss() }
                 .padding(.top, max(0, centre.y - 75))
                 .frame(maxWidth: .infinity)
             }
         }
         .ignoresSafeArea()
-        .contentShape(Rectangle())
-        .onTapGesture { onDismiss() }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("\(title). \(BadgeMomentCopy.earned)")
         .accessibilityAddTraits([.isModal, .isButton])
