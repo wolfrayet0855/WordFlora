@@ -1,0 +1,195 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resting card</title>
+<!--
+  Params:
+    v=a|b|c          a = Dusk card, b = Night garden (full screen), c = Garden tally
+    card=rest|break  rest = "The garden is resting" (after every 3rd round / Daily Bloom), break = under-13 20-minute break
+    plan=ad|free|plus|kid
+                     ad   = free player, AdGate says an interstitial will be tried after "One more" -> ad line shown
+                     free = free player, AdGate says no ad this time (gap, daily cap, grace...) -> no ad line, Go ad-free row
+                     plus = subscriber -> no ad line, no Go ad-free row
+                     kid  = under-13 -> never any ad, never a Plus row
+    words=3          rounds this sitting (rest card reward line); daily=1 shows the Daily Bloom line instead
+    theme=light|dark  scale=1|1.65 (Dynamic Type AX1: body/callout ~1.65x)  rm=1 (Reduce Motion: fade only)  tall=1 (grow frame to fit)
+-->
+<style>
+:root,[data-theme=light]{
+  --bg:#FAF7F0;--surface:#FFFFFF;--text:#2C3E2C;--accent:#E8A838;--ink:#1F3320;--accent-text:#8A5A00;--ok:#2E7D32;
+  --sec:color-mix(in srgb,var(--text) 88%,transparent);--line:color-mix(in srgb,var(--text) 12%,transparent);
+  --visit:#ECE5F6;--bloom:#FDE9EE;--levels:#DFEDF8;--garden:#E3F1DD;--visit-ink:#6A4A9C;--levels-ink:#1F5F8F;
+  --dim:rgba(0,0,0,.45);--shadow:0 10px 30px rgba(44,62,44,.18);
+  --sky1:var(--levels);--sky2:var(--visit);--sky3:var(--bloom);--moon:var(--accent);--star:color-mix(in srgb,var(--visit-ink) 40%,transparent);--fly:var(--accent)}
+[data-theme=dark]{
+  --bg:#1A2E1A;--surface:#2C3E2C;--text:#D4EDD4;--accent:#F0C060;--ink:#1A2E1A;--accent-text:#F0C060;--ok:#81C784;
+  --visit:#40395A;--bloom:#4D3039;--levels:#2A4358;--garden:#2F4F30;--visit-ink:#CDB8F2;--levels-ink:#8CC4EC;
+  --dim:rgba(0,0,0,.55);--shadow:0 10px 30px rgba(0,0,0,.45);
+  --sky1:var(--levels);--sky2:var(--visit);--sky3:var(--bloom);--moon:var(--accent);--star:color-mix(in srgb,var(--accent) 60%,transparent);--fly:var(--accent)}
+/* break card: daytime sky (tileLevelsFill -> appBackground), sun = appAccent, no stars */
+.day{--sky2:var(--levels);--sky3:color-mix(in srgb,var(--levels) 50%,var(--bg))}
+*{box-sizing:border-box}
+html{font-size:calc(16px*var(--scale,1))}
+body{margin:0;background:#888;font-family:ui-rounded,"SF Pro Rounded","Nunito",system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;color:var(--text)}
+.phone{width:393px;height:852px;position:relative;overflow:hidden;background:var(--bg)}
+.tall .phone{height:auto;min-height:852px}
+.status{height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 8px;font:600 15px system-ui;position:relative;z-index:5;pointer-events:none}
+/* faux game behind the dim */
+.game{position:absolute;inset:54px 0 0;display:flex;flex-direction:column;align-items:center;padding-top:30px;gap:24px}
+.game img{width:150px}.tiles{display:flex;gap:6px}.tiles i{width:38px;height:46px;border-radius:10px;background:var(--surface);border:1px solid var(--line)}
+.keys{display:grid;grid-template-columns:repeat(7,40px);gap:6px}.keys i{height:46px;border-radius:9px;background:var(--surface);border:1px solid var(--line)}
+.dim{position:absolute;inset:0;background:var(--dim);z-index:2}
+.scroll{position:absolute;inset:0;z-index:4;overflow:auto;display:flex;flex-direction:column;justify-content:center;padding:54px 24px 34px}
+.tall .scroll{position:relative;inset:auto;min-height:852px;margin-top:-54px}
+.tall .game,.tall .dim{position:absolute}
+
+h1{font-size:1.75rem;line-height:1.15;font-weight:800;margin:0;letter-spacing:-.01em;text-align:center}
+p.body{font-size:1rem;line-height:1.35;margin:0;text-align:center;color:var(--sec);text-wrap:balance}
+h1,.plus .t{text-wrap:balance}
+.btn{display:flex;align-items:center;justify-content:center;width:100%;border:0;font-family:inherit;cursor:pointer;text-align:center;padding:10px 16px}
+.btn.primary{min-height:56px;border-radius:18px;background:var(--accent);color:var(--ink);font-size:1.25rem;font-weight:800}
+.btn.secondary{min-height:52px;border-radius:18px;background:var(--surface);color:var(--text);font-size:1.0625rem;font-weight:650;box-shadow:inset 0 0 0 1px var(--line)}
+.btn.quiet{min-height:44px;background:none;color:var(--text);font-size:1.0625rem;font-weight:650;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}
+.adnote{display:flex;align-items:center;justify-content:center;gap:6px;font-size:.875rem;line-height:1.3;color:var(--sec);margin:-2px 0 2px;text-align:center}
+.adnote svg{width:1rem;height:1rem;flex:none}
+.reward{display:inline-flex;align-items:center;gap:8px;padding:6px 14px 6px 10px;border-radius:999px;background:var(--garden);color:var(--text);font-size:.9375rem;font-weight:700}
+.reward svg{width:1.125rem;height:1.125rem;color:var(--ok);flex:none}
+.plus{display:flex;align-items:center;gap:12px;width:100%;min-height:52px;padding:8px 12px;border-radius:16px;background:none;box-shadow:inset 0 0 0 1px var(--line);color:var(--text);text-decoration:none;font-size:.875rem;font-weight:600;text-align:left;margin-top:2px}
+.plus .ic{width:2rem;height:2rem;border-radius:50%;display:grid;place-items:center;background:var(--visit);color:var(--visit-ink);flex:none}
+.plus .ic svg{width:1.125rem;height:1.125rem}.plus .t{flex:1;min-width:0}.plus .chev{width:1rem;height:1rem;color:var(--sec);flex:none}
+.stack{display:flex;flex-direction:column;align-items:center;gap:12px;width:100%}
+.btns{display:flex;flex-direction:column;gap:10px;width:100%;margin-top:6px}
+.looks{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.looks{gap:22px}.looks span{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:.875rem;font-weight:600;color:var(--sec)}
+.looks svg{width:2.25rem;height:2.25rem}
+
+/* ---------- A: Dusk card ---------- */
+.va .card{background:var(--bg);border-radius:24px;overflow:hidden;box-shadow:var(--shadow);width:100%}
+.va .scene{position:relative;height:176px;background:linear-gradient(180deg,var(--sky1),var(--sky2) 52%,var(--sky3) 78%,color-mix(in srgb,var(--sky3) 50%,var(--bg)) 92%,var(--bg));overflow:hidden}
+.va .scene .plant{position:absolute;left:50%;bottom:4px;width:136px;transform:translateX(-50%)}
+.va .day .scene .plant{width:112px}
+.va .inner{padding:4px 20px 20px}
+.moon{position:absolute;width:40px;height:40px;border-radius:50%;box-shadow:-9px 3px 0 0 var(--moon);top:18px;right:42px;transform:rotate(-20deg)}
+.sun{position:absolute;width:40px;height:40px;border-radius:50%;background:var(--moon);top:20px;right:44px}
+.star{position:absolute;width:6px;height:6px;border-radius:50%;background:var(--star)}
+.z{position:absolute;font-weight:800;color:var(--visit-ink);font-size:16px;line-height:1}
+
+/* ---------- B: Night garden (full screen) ---------- */
+.vb .scroll{padding:0;justify-content:flex-start}
+.vb .sky{position:relative;overflow:hidden;flex:1;min-height:30rem;background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 45%,var(--sky3) 80%,var(--bg) 100%);display:flex;flex-direction:column;align-items:center;padding:84px 24px 0}
+.vb .dim,.vb .game{display:none}
+.vb .meadow{position:absolute;left:0;right:0;bottom:1.25rem;height:9rem;display:flex;justify-content:center;align-items:flex-end;gap:0}
+.vb .meadow img{width:7rem;margin:0 -.75rem}.vb .meadow img.mid{width:8.5rem;z-index:1}
+.vb .hill{position:absolute;left:-10%;right:-10%;bottom:-2.75rem;height:5.5rem;border-radius:50%;background:var(--garden)}
+.vb .bottom{background:var(--bg);padding:8px 24px 34px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.vb .moon{top:72px;right:40px;width:3rem;height:3rem;box-shadow:-.7rem .25rem 0 0 var(--moon)}
+.fly{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--fly);box-shadow:0 0 8px 2px color-mix(in srgb,var(--fly) 60%,transparent)}
+
+/* ---------- C: Garden tally ---------- */
+.vc .card{background:var(--bg);border-radius:24px;padding:24px 20px 18px;box-shadow:var(--shadow);width:100%}
+.vc .flower{position:relative;width:7rem;height:8.4rem;margin:0 auto}
+.vc .flower img{width:100%}
+.vc .halo{position:absolute;inset:-.5rem -2rem 1.5rem;border-radius:50%;background:radial-gradient(closest-side,var(--visit) 55%,transparent);z-index:-1}
+.vc .flower{z-index:0;isolation:isolate}
+.vc .sprouts{display:flex;gap:8px;justify-content:center}
+.vc .sprouts i{width:2.25rem;height:2.25rem;border-radius:12px;background:var(--garden);display:grid;place-items:center;color:var(--ok)}
+.vc .sprouts svg{width:1.25rem;height:1.25rem}
+.vc .tally{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:.9375rem;font-weight:700}
+.vc .plus{background:none;box-shadow:inset 0 0 0 1px var(--line)}
+
+/* motion (all off under rm=1: the only motion left is the card's fade in) */
+@keyframes breathe{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.025) translateY(-1px)}}
+@keyframes twinkle{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes zfloat{0%{opacity:0;transform:translate(0,6px)}30%{opacity:.8}100%{opacity:0;transform:translate(8px,-18px)}}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(10px,-12px)}}
+@keyframes sway{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+@keyframes enter{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.anim .va .scene .plant{animation:breathe 4.8s ease-in-out infinite}
+.anim .star{animation:twinkle 3.4s ease-in-out infinite}
+.anim .z{animation:zfloat 3.6s ease-out infinite}
+.anim .fly{animation:drift 6s ease-in-out infinite}
+.anim .vb .meadow img,.anim .vc .flower img{transform-origin:50% 100%;animation:sway 5s ease-in-out infinite}
+.anim .enter{animation:enter .45s cubic-bezier(.2,.8,.2,1) both}
+.rm .enter{animation:fade .3s ease-out both}
+.static *{animation:none!important}
+</style></head><body>
+<div id="root"></div>
+<script>
+const q=new URLSearchParams(location.search);
+const v=q.get('v')||'a', card=q.get('card')||'rest', plan=q.get('plan')||'ad', words=+(q.get('words')||3), daily=q.get('daily')==='1';
+const theme=q.get('theme')||'light', scale=q.get('scale')||'1', rm=q.get('rm')==='1';
+document.documentElement.dataset.theme=theme;document.documentElement.style.setProperty('--scale',scale);
+document.body.classList.add(rm?'rm':'anim'); if(q.get('tall')==='1')document.body.classList.add('tall'); if(q.get('static')==='1')document.body.classList.add('static');
+const isRest=card==='rest';
+const showAd=isRest && plan==='ad';
+const showPlus=isRest && (plan==='ad'||plan==='free');
+
+const I={
+ info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5"/></svg>',
+ leaf:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4c-8 0-14 3.5-14 10 0 1.6.5 3 1.3 4.1C9 14 12 11 16 9c-3.4 2.4-6 5.6-7.4 9.6.9.3 1.8.4 2.8.4C17 19 20 12 20 4z"/></svg>',
+ sprout:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21v-9"/><path d="M12 12c0-4-3-6-7-6 0 4 3 6 7 6z" fill="currentColor"/><path d="M12 14c0-3.5 2.5-5.5 6.5-5.5 0 3.5-2.5 5.5-6.5 5.5z" fill="currentColor"/></svg>',
+ sparkle:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.8 5.6L19.5 9l-5.7 1.6L12 16l-1.8-5.4L4.5 9l5.7-1.4z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></svg>',
+ chev:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+ window:'<svg viewBox="0 0 32 32" fill="none" stroke-width="2.2" stroke-linejoin="round"><rect x="5" y="4" width="22" height="24" rx="3" fill="var(--levels)" stroke="var(--levels-ink)"/><path d="M16 4v24M5 16h22" stroke="var(--levels-ink)"/></svg>',
+ plant:'<svg viewBox="0 0 32 32"><path d="M9 20h14l-2 8H11z" fill="#F2788A"/><path d="M16 20V10" stroke="var(--ok)" stroke-width="2.4" stroke-linecap="round"/><path d="M16 13c0-4-3-6-7-6 0 4 3 6 7 6zM16 15c0-4 3-6 7-6 0 4-3 6-7 6z" fill="var(--ok)"/></svg>',
+ sky:'<svg viewBox="0 0 32 32"><circle cx="12" cy="12" r="5" fill="var(--accent)"/><path d="M10 25h13a4.5 4.5 0 0 0-1-8.9A6 6 0 0 0 10.5 18 3.5 3.5 0 0 0 10 25z" fill="var(--levels)" stroke="var(--levels-ink)" stroke-width="1.8"/></svg>'
+};
+
+// Copy (all checked against CopySafety.banned in index.html)
+const T={
+ rest:{h:'The garden is resting', b:'Take a breath. Come back whenever you like.', reward: daily?'Daily Bloom done':`You played ${words} ${words===1?'word':'words'}`,
+       primary:'One more', ad:'A short ad may play first.', secondary:"That's enough for now", plus:'Go ad-free with WordFlora Plus'},
+ brk:{h:'Time for a little break', b:'Time to look at something real: a window, a plant, a sky.', primary:'Take a break', secondary:'Keep playing'}
+};
+const c=isRest?T.rest:T.brk;
+
+function adLine(){return showAd?`<div class="adnote" role="note">${I.info}<span>${c.ad}</span></div>`:'';}
+function plusRow(){return showPlus?`<a class="plus" href="#" aria-label="Go ad-free with WordFlora Plus. Opens WordFlora Plus.">`+
+  `<span class="ic">${I.sparkle}</span><span class="t">${c.plus}</span><span class="chev">${I.chev}</span></a>`:'';}
+function looks(){return `<div class="looks" aria-hidden="true"><span>${I.window}Window</span><span>${I.plant}Plant</span><span>${I.sky}Sky</span></div>`;}
+function buttons(secondaryClass='secondary'){
+  return `<div class="btns"><button class="btn primary">${c.primary}</button>${isRest?adLine():''}<button class="btn ${secondaryClass}">${c.secondary}</button></div>`;}
+const stars=(n,box)=>Array.from({length:n},(_,i)=>{const x=(i*37+11)%box[0],y=(i*53+7)%box[1];return `<i class="star" style="left:${x}px;top:${y}px;animation-delay:${(i*.7)%3}s;${i%3?'width:4px;height:4px':''}"></i>`}).join('');
+
+const game=`<div class="game" aria-hidden="true"><img src="../flowers/flower_8.svg" alt=""><div class="tiles">${'<i></i>'.repeat(6)}</div><div class="keys">${'<i></i>'.repeat(21)}</div></div><div class="dim"></div>`;
+
+const starsA=[[34,26],[78,70],[120,22],[64,118],[268,104]].map(([x,y],i)=>`<i class="star" style="left:${x}px;top:${y}px;animation-delay:${i*.7}s;${i%2?'width:4px;height:4px':''}"></i>`).join('');
+let inner='';
+if(v==='a'){
+  const art=isRest?'../plants/plant_lavender.svg':'../plants/plant_sunflower.svg';
+  inner=`<div class="va ${isRest?'':'day'}"><div class="card enter" role="dialog" aria-modal="true" aria-labelledby="h">
+    <div class="scene" aria-hidden="true">${isRest?'<span class="moon"></span>'+starsA:'<span class="sun"></span>'}
+      <img class="plant" src="${art}" alt="">
+      ${isRest?'<span class="z" style="left:calc(50% + 52px);top:64px">z</span><span class="z" style="left:calc(50% + 64px);top:46px;font-size:12px;animation-delay:1.2s">z</span>':''}
+    </div>
+    <div class="inner stack">
+      <h1 id="h">${c.h}</h1>
+      <p class="body">${c.b}</p>
+      ${isRest?`<span class="reward" role="text" aria-label="${c.reward}">${I.sprout}${c.reward}</span>`:looks()}
+      ${buttons()}
+      ${plusRow()}
+    </div></div></div>`;
+}else if(v==='b'){
+  const plants=isRest?['plant_daisy','plant_lavender','plant_tulip']:['plant_clover','plant_sunflower','plant_marigold'];
+  inner=`<div class="vb ${isRest?'':'day'}" style="display:flex;flex-direction:column;min-height:100%">
+   <div class="sky enter" aria-hidden="false">
+     ${isRest?'<span class="moon" aria-hidden="true"></span>':'<span class="sun" aria-hidden="true" style="top:72px;right:40px"></span>'}
+     <div aria-hidden="true">${isRest?stars(8,[360,240]):''}${isRest?[1,2,3,4,5].map(i=>`<i class="fly" style="left:${40+i*62}px;top:${300+(i%2)*40}px;animation-delay:${i*.9}s"></i>`).join(''):''}</div>
+     <div class="stack" style="position:relative;z-index:1;margin-top:40px">
+       <h1 id="h">${c.h}</h1><p class="body">${c.b}</p>
+       ${isRest?`<span class="reward" role="text" aria-label="${c.reward}">${I.sprout}${c.reward}</span>`:looks()}
+     </div>
+     <div class="meadow" aria-hidden="true"><span class="hill"></span>${plants.map((p,i)=>`<img class="${i==1?'mid':''}" style="animation-delay:${i*.8}s" src="../plants/${p}.svg" alt="">`).join('')}</div>
+   </div>
+   <div class="bottom">${buttons()}${plusRow()}</div></div>`;
+}else{
+  inner=`<div class="vc"><div class="card enter stack" role="dialog" aria-modal="true" aria-labelledby="h">
+    <div class="flower" aria-hidden="true"><span class="halo"></span><img src="../flowers/flower_8.svg" alt=""></div>
+    <h1 id="h">${c.h}</h1><p class="body">${c.b}</p>
+    ${isRest?`<span class="reward" role="text" aria-label="${c.reward}">${I.sprout}${c.reward}</span>`:looks()}
+    ${buttons()}
+    ${plusRow()}
+  </div></div>`;
+}
+document.getElementById('root').innerHTML=`<div class="phone v${v}"><div class="status"><span>9:41</span><span>&#9679;&#9679;&#9679;</span></div>${v==='b'?'':game}<div class="scroll">${inner}</div></div>`;
+</script>
+</body></html>

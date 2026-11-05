@@ -1,0 +1,65 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Resting card</title>
+<link rel="stylesheet" href="../theme.css"><script src="../theme.js"></script>
+<style>
+.wrap{max-width:1320px;margin:0 auto;padding:28px 16px 60px}
+h1{font-size:28px;margin:0 0 4px}.sub{color:var(--muted);margin:0 0 18px;max-width:900px;line-height:1.45}
+.bar{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;background:var(--surface);border-radius:16px;padding:12px 16px;box-shadow:var(--shadow);margin-bottom:20px;position:sticky;top:8px;z-index:2}
+.bar label{font-weight:700;font-size:14px;display:flex;gap:6px;align-items:center}
+.bar select,.bar input{font:inherit;font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.col h2{font-size:18px;margin:0 0 2px}.col p{margin:0 0 10px;color:var(--muted);font-size:14px;line-height:1.4;min-height:3.9em}
+.frame{width:295px;height:639px;border-radius:34px;overflow:hidden;box-shadow:var(--shadow);border:6px solid #111;background:#111}
+.frame iframe{width:393px;height:852px;border:0;transform:scale(.7353);transform-origin:0 0}
+.frame.big{height:auto}
+.notes{margin-top:36px;display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:18px}
+.note{background:var(--surface);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow);font-size:14px;line-height:1.5}
+.note h3{margin:0 0 6px;font-size:16px}.note ul{margin:0;padding-left:18px}
+.ok{color:var(--success);font-weight:700}.bad{color:var(--danger);font-weight:700}
+.shots{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}.shots a{font-size:13px}
+.pick{display:inline-block;background:var(--accent);color:var(--accent-ink);font-weight:800;border-radius:8px;padding:1px 8px;font-size:12px;margin-left:6px;vertical-align:2px}
+</style></head><body>
+<div class="wrap">
+<h1>Resting card + break card</h1>
+<p class="sub">Three directions for <code>GameView.restCard</code> (after every 3rd regular round or the Daily Bloom) and <code>breakCard</code> (under-13, after 20 minutes). The ad line appears only for a free player when <code>AdGate.shouldShowInterstitial</code> would say yes for "One more"; Plus and under-13 players never see it, and never see the Plus row. Use the controls; all three phones update together. PNGs live in <code>shots/</code> (<code>sh render.sh</code>).</p>
+<div class="bar">
+ <label>Card <select id="card"><option value="rest">Garden is resting</option><option value="break">Little break (under 13)</option></select></label>
+ <label>Player <select id="plan"><option value="ad">Free, ad will be tried</option><option value="free">Free, no ad this time</option><option value="plus">Plus</option><option value="kid">Under 13</option></select></label>
+ <label>Theme <select id="theme"><option>light</option><option>dark</option></select></label>
+ <label>Text <select id="scale"><option value="1">Default</option><option value="1.65">Large (AX1)</option><option value="2.2">Largest (AX3)</option></select></label>
+ <label>Words <input id="words" type="number" min="1" max="12" value="3" style="width:50px"></label>
+ <label><input id="daily" type="checkbox"> Daily Bloom</label>
+ <label><input id="rm" type="checkbox"> Reduce Motion</label>
+</div>
+<div class="grid" id="grid"></div>
+
+<div class="notes">
+ <div class="note"><h3>Honest about ads</h3><ul>
+  <li>"A short ad may play first." sits right under "One more", the choice that can lead to an ad. It is never hidden in a footnote.</li>
+  <li>Shown only when <code>AdGate.shouldShowInterstitial(adContext(choice: .oneMore))</code> is true right now. "may" covers the case where no ad loads.</li>
+  <li>"That's enough for now" never shows an ad, so it gets no line.</li>
+  <li>Plus row: only when <code>app.showBanner</code> (free, 13+, past first session). No price, no timer. Opens the existing parental-gated Plus screen.</li>
+ </ul></div>
+ <div class="note"><h3>Copy check (CopySafety.banned)</h3><div id="copy"></div></div>
+ <div class="note"><h3>Motion</h3><ul>
+  <li>Default: card rises and fades in (0.45 s), plant breathes (4.8 s), stars twinkle, two "z"s float. All slow, nothing flashes.</li>
+  <li>Reduce Motion: a 0.3 s fade only. Nothing loops.</li>
+ </ul></div>
+</div>
+</div>
+<script>
+const V=[['a','A. Dusk card','Card on the dim, as today, with an evening-sky header and the lavender plant asleep under a moon. Warm and familiar.'],
+         ['b','B. Night garden','Full-screen evening sky with three real plants on a hill and fireflies. The most magical; replaces the dim with a whole scene.'],
+         ['c','C. Garden tally','The app flower with a soft halo, plus one sprout tile per word played. The plainest and most compact.']];
+const ids=['card','plan','theme','scale','words','daily','rm'];
+function q(){const o={};ids.forEach(i=>{const e=document.getElementById(i);o[i]=e.type==='checkbox'?(e.checked?'1':'0'):e.value});return new URLSearchParams(o).toString();}
+function draw(){document.getElementById('grid').innerHTML=V.map(([v,t,d])=>`<div class="col"><h2>${t}${v===window.PICK?'<span class="pick">Chosen</span>':''}</h2><p>${d}</p><div class="frame"><iframe title="${t}" src="card.html?v=${v}&${q()}"></iframe></div></div>`).join('');}
+ids.forEach(i=>document.getElementById(i).addEventListener('change',draw));
+window.PICK="a";draw();
+
+// copy safety (mirror of WordFlora/Rules/CopySafety.swift)
+const banned=["miss","lonely","alone","waiting","abandon","neglect","forgot","forget","die","dies","died","dying","dead","lost","empty","left","broken","lose streak","broken streak","last chance","hurry","now or never","expires","only","last","smart","genius","talented","best gardener","better than","beat"];
+const strings=["The garden is resting","Take a breath. Come back whenever you like.","You played 3 words","Daily Bloom done","One more","A short ad may play first.","That's enough for now","Go ad-free with WordFlora Plus","Time for a little break","Time to look at something real: a window, a plant, a sky.","Window","Plant","Sky","Take a break","Keep playing"];
+document.getElementById('copy').innerHTML='<ul>'+strings.map(s=>{const hit=banned.filter(b=>new RegExp('\\b'+b.replace(/ /g,'\\s')+'\\b','i').test(s));return `<li>${hit.length?'<span class="bad">'+hit.join(', ')+'</span>':'<span class="ok">ok</span>'} "${s}"</li>`}).join('')+'</ul>';
+</script>
+</body></html>
