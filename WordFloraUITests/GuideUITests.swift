@@ -31,8 +31,6 @@ final class GuideUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.buttons[age].waitForExistence(timeout: 12))                  // after the petal intro
         app.buttons[age].tap()
-        // The age question can still be fading in from the intro; a tap that landed too early is tried once more.
-        if !next.waitForExistence(timeout: 5), app.buttons[age].exists { app.buttons[age].tap() }
         XCTAssertTrue(next.waitForExistence(timeout: 5), "the guide follows the age question")
         XCTAssertEqual(pageValue, "Page 1 of 8")
     }
@@ -48,6 +46,33 @@ final class GuideUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Tap a letter to guess"].waitForExistence(timeout: 6), "the tutorial word", file: file, line: line)
         XCTAssertFalse(app.buttons["Play"].exists, file: file, line: line)
         XCTAssertFalse(next.exists, file: file, line: line)
+    }
+
+    // MARK: The first age tap
+
+    /// A fast player taps an age the moment it appears, while the age question is still fading in from the intro.
+    /// One tap, no second try: it must count.
+    /// `-uitest-handoff=4` stretches the 0.4 s cross-fade so the tap surely lands inside it.
+    func testTheFirstAgeTapCountsWhileTheQuestionFadesIn() {
+        app.launchArguments = ["-uitest", "-uitest-word=SEED", "-uitest-handoff=4"]
+        app.launch()
+        let age = app.buttons["18 or older"]
+        XCTAssertTrue(age.waitForExistence(timeout: 12))
+        age.tap()
+        XCTAssertTrue(next.waitForExistence(timeout: 2), "the first age tap leads to the guide")
+    }
+
+    /// The same after tapping the intro to skip it: the skip tap is not carried over and the next tap picks the age.
+    func testTheFirstAgeTapCountsRightAfterSkippingTheIntro() {
+        app.launchArguments = ["-uitest", "-uitest-word=SEED", "-uitest-intro-hold", "-uitest-handoff=4"]
+        app.launch()
+        let intro = element("intro")
+        XCTAssertTrue(intro.waitForExistence(timeout: 6))
+        intro.tap()
+        let age = app.buttons["Under 13"]
+        XCTAssertTrue(age.waitForExistence(timeout: 3))
+        age.tap()
+        XCTAssertTrue(app.buttons["Yes, keep it quiet"].waitForExistence(timeout: 2), "the first age tap opens the quiet offer")
     }
 
     // MARK: First run
@@ -104,8 +129,6 @@ final class GuideUITests: XCTestCase {
         app.launch()
         XCTAssertTrue(app.buttons["Under 13"].waitForExistence(timeout: 12))
         app.buttons["Under 13"].tap()
-        // As in openGuide: a tap while the age question is still fading in from the intro is tried once more.
-        if !app.buttons["Yes, keep it quiet"].waitForExistence(timeout: 4) { app.buttons["Under 13"].tap() }
         XCTAssertTrue(app.buttons["Yes, keep it quiet"].waitForExistence(timeout: 4))
         app.buttons["Yes, keep it quiet"].tap()
         XCTAssertTrue(next.waitForExistence(timeout: 5))

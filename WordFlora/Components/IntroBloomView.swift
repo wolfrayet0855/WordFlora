@@ -45,6 +45,8 @@ struct IntroBloomView: View {
         .coordinateSpace(name: "intro")
         .contentShape(Rectangle())
         .onTapGesture { skip() }
+        // Once handed off the intro only fades out: it must not take the player's first tap on the age question under it.
+        .allowsHitTesting(!handedOff)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("WordFlora")
         .accessibilityValue(Self.tagline)

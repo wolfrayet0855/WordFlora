@@ -10,7 +10,9 @@ struct OnboardingView: View {
         ZStack {
             Color.appBackground.ignoresSafeArea()
             switch app.onboarding.step {
-            case .intro: IntroView()
+            // The intro leaves at once as the age question starts to fade in: a removal still running under the
+            // player's first tap would take that tap (its tap-to-skip) or reset it as it finishes (the dead first tap).
+            case .intro: IntroView().transition(.identity)
             case .age: AgeQuestionView()
             case .guide: GuideView(mode: .firstRun).transition(.opacity)
             case .tutorialWord:
@@ -32,8 +34,13 @@ private struct IntroView: View {
     @Environment(AppModel.self) private var app
 
     var body: some View {
-        IntroBloomView { withAnimation(.easeInOut(duration: IntroTimeline.handoff)) { app.onboarding.introFinished() } }
+        IntroBloomView { withAnimation(.easeInOut(duration: Self.handoff)) { app.onboarding.introFinished() } }
     }
+
+    /// UI tests (`-uitest-handoff=3`) stretch the cross-fade to the age question, to prove a tap during it counts.
+    private static let handoff: Double = ProcessInfo.processInfo.arguments
+        .first { $0.hasPrefix("-uitest-handoff=") }.flatMap { Double($0.dropFirst("-uitest-handoff=".count)) }
+        ?? IntroTimeline.handoff
 }
 
 private struct AgeQuestionView: View {
@@ -53,6 +60,11 @@ private struct AgeQuestionView: View {
                     ageButton("13 to 17", .thirteenPlus)
                     ageButton("18 or older", .eighteenPlus)
                 }
+                // One dialog for the one question (not one per button, which all shared the same flag).
+                .confirmationDialog("Would you like a quieter garden?", isPresented: $offerQuiet, titleVisibility: .visible) {
+                    Button("Yes, keep it quiet") { app.settings.quietGarden = true; app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
+                    Button("No thanks") { app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
+                } message: { Text("Quiet Garden hides numbers and timers so tending is just relaxing. You can change it any time in Settings.") }
             }
             .padding(24).frame(maxWidth: .infinity)
         }
@@ -65,10 +77,6 @@ private struct AgeQuestionView: View {
             if band == .under13 { offerQuiet = true } else { app.onboarding.selectAge(band, guideSeen: app.profile?.guideSeen ?? false) }
         } label: { Text(title) }
         .buttonStyle(SecondaryButtonStyle())
-        .confirmationDialog("Would you like a quieter garden?", isPresented: $offerQuiet, titleVisibility: .visible) {
-            Button("Yes, keep it quiet") { app.settings.quietGarden = true; app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
-            Button("No thanks") { app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
-        } message: { Text("Quiet Garden hides numbers and timers so tending is just relaxing. You can change it any time in Settings.") }
     }
 }
 
