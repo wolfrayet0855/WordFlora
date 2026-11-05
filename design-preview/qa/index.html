@@ -1,0 +1,30 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>App vs Mockups</title><link rel="stylesheet" href="../theme.css"><script src="../theme.js"></script>
+<style>.wrap{max-width:1300px;margin:0 auto;padding:24px 16px 60px}h1{margin:0 0 4px}p{color:var(--muted);margin:0 0 18px}
+h2{margin:36px 0 10px;font-size:20px}.pair{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+figure{margin:0;background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:10px;max-width:300px}figure img{width:280px;display:block;border-radius:12px}figcaption{font-size:13px;font-weight:800;margin-top:8px}figcaption small{display:block;color:var(--muted);font-weight:600}
+.tg{font-family:inherit;font-weight:800;border:0;border-radius:999px;padding:10px 18px;background:var(--accent);color:var(--accent-ink);cursor:pointer;min-height:44px}
+a{color:var(--text)}</style></head><body><div class="wrap">
+<h1>App vs mockups</h1><p>Screenshots of the current build (iPhone 17 simulator) next to the mockup each screen should match. Findings: <code>docs/pm/app-vs-mockups.md</code>. <a href="../">Back to the preview</a> · <button class="tg" onclick="wfToggle()">Toggle page theme</button></p>
+<div id="out"></div></div>
+<script>
+const S=[
+ ['Home','home-light','home-dark','../home-v2/shots/unlocked-light-c0.png','../home-v2/shots/unlocked-dark-c0.png'],
+ ['Home, early (tiles closed)','home-early-light','home-early-dark','../home-v2/shots/early-light-c0.png','../home-v2/shots/early-dark-c0.png'],
+ ['Home, accessibility text','home-large-light',null,'../home-v2/shots/large-light-c0.png',null],
+ ['Level map','levelmap-light','levelmap-dark','../level-map/shots/mid-light.png','../level-map/shots/mid-dark.png'],
+ ['Level map, accessibility text','levelmap-large-light',null,'../level-map/shots/large-light.png',null],
+ ['Plant detail (Daisy)','daisy-light','daisy-dark','../fact-card/shots/b-daisy-light.png','../fact-card/shots/b-daisy-dark.png'],
+ ['Plant detail, scrolled','daisy-light-scrolled','daisy-dark-scrolled','../tending/parts/shots/optB-light-01.png','../tending/parts/shots/optB-dark-01.png'],
+ ['Plant detail, scrolled more','daisy-light-scrolled2','daisy-dark-scrolled2','../fact-card/shots/b-daisy-open.png',null],
+ ['Pot picker sheet','potpicker-light','potpicker-dark','../pots/shots/s2-pick-light.png','../pots/shots/s2-pick-dark.png'],
+ ['Shed','shed-light','shed-dark','../pots/shots/s3-shed-light.png','../pots/shots/s3-shed-dark.png'],
+ ['Garden','garden-light','garden-dark','mock/screens-garden-light.png',null],
+ ['Game','game-light','game-dark','mock/screens-game-light.png',null],
+ ['Rest card (redesign owned elsewhere)','restcard-light','restcard-dark','mock/screens-game_dead-light.png',null],
+ ['Plus','plus-light','plus-dark','mock/subscriptions-light.png',null],
+ ['Settings','settings-light','settings-dark',null,null],
+ ['Onboarding','onboarding-1','onboarding-2','../logo/final/shots/app-onboarding.png',null],
+];
+const f=(src,cap,sub)=>src?`<figure><a href="${src}"><img loading="lazy" src="${src}" alt="${cap}" onerror="this.closest('figure').style.display='none'"></a><figcaption>${cap}<small>${sub}</small></figcaption></figure>`:'';
+document.getElementById('out').innerHTML=S.map(([t,a,b,m,md])=>`<h2>${t}</h2><div class="pair">${f(a&&'shots/'+a+'.png','App','light')}${f(m,'Mockup','light')}${f(b&&'shots/'+b+'.png','App','dark')}${f(md,'Mockup','dark')}</div>`).join('');
+</script></body></html>
