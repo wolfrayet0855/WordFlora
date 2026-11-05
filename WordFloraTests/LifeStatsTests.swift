@@ -70,15 +70,30 @@ final class LifeStatsTests: XCTestCase {
         XCTAssertEqual(LifeStats.snapshot(inputs(stage: 9)).stage, 4)
     }
 
+    /// Hearts: a hello, a drink, sun, soil and one finishing touch (the second drink or a prune), so every player can fill
+    /// all five on one day without any Shed tool.
     func testHeartsShowTodaysLove() {
-        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, pruned: 1, loved: 1)).hearts, 5)
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, loved: 1)).hearts, 5, "no shears needed")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 1, sunny: 1, fed: 1, loved: 1)).hearts, 4, "the second drink is the finishing touch")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 1, sunny: 1, fed: 1, pruned: 1, loved: 1)).hearts, 5, "a prune also finishes the day")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, pruned: 1, loved: 1)).hearts, 5, "never more than five")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, pruned: 1, loved: 1)).hearts, 2)
         XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 1)).hearts, 1)       // a hello today is one heart
         XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 30)).hearts, 0)
-        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, loved: 1)).hearts, 3)
-        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: nil, loved: 1, waterDay: hours(-200))).hearts, 1)   // yesterday's care does not count
-        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, pruned: 1, loved: 1)).loveLine, "Loved")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, loved: 1)).hearts, 4)
+        // Yesterday's care does not count.
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: nil, loved: 1, waterDay: hours(-200))).hearts, 1)
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 30, fed: 30, pruned: 30, loved: 1, waterDay: hours(-200))).hearts, 1)
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, loved: 1)).loveLine, "Loved")
         XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 30)).loveLine, "Ready for a hello")
         XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 1)).heartsLabel, "Love, 1 of 5 hearts. Hellos help")
+    }
+
+    func testASeedShowsNoHeartsAndCalmCountsHeartsTheSameWay() {
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, pruned: 1, loved: 24 * 6)).hearts, 0)
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, loved: 1, exempt: true)).hearts, 5)
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 1, sunny: 1, fed: 1, loved: 1, exempt: true)).hearts, 4)
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, loved: 24 * 9, exempt: true)).hearts, 0, "a hello today starts the hearts")
     }
 
     // MARK: Pips and labels

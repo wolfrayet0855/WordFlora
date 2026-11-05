@@ -122,16 +122,37 @@ final class StatsActionRuleTests: XCTestCase {
         XCTAssertEqual(meters(p, noon).sunshine.word, "Bright")
     }
 
-    func testHeartsAreAHelloPlusOnePerKindOfCareToday() {
+    /// Hearts: a hello, a drink, sun, soil, and a finishing touch (the second drink or a prune). Every player can fill
+    /// all five on one day with the free actions alone.
+    func testEveryPlayerCanFillAllFiveHeartsWithoutTools() {
         let p = plant(), pr = profile()
         p.lastLovedAt = noon
         XCTAssertEqual(meters(p, noon).hearts, 1)
         _ = water(p, pr, noon); XCTAssertEqual(meters(p, noon).hearts, 2)
-        _ = water(p, pr, noon); XCTAssertEqual(meters(p, noon).hearts, 2, "a second drink is the same kind of care")
-        _ = feed(p, pr, noon); _ = sun(p, pr, noon); XCTAssertEqual(meters(p, noon).hearts, 4)
-        var inv = ToolInventory(); inv.unlock(.shears)
-        _ = ToolEngine.prune(p, inventory: inv, now: noon, calendar: utc, economy: eco)
+        _ = water(p, pr, noon); XCTAssertEqual(meters(p, noon).hearts, 3, "the second drink is the finishing touch")
+        _ = feed(p, pr, noon); _ = sun(p, pr, noon)
         XCTAssertEqual(meters(p, noon).hearts, 5); XCTAssertEqual(meters(p, noon).loveLine, "Loved")
+        XCTAssertEqual(ToolEngine.prune(p, inventory: ToolInventory(), now: noon, calendar: utc, economy: eco).reason, .notOwned)
+    }
+
+    func testAPruneCanBeTheFinishingTouchInsteadOfTheSecondDrink() {
+        let p = plant(), pr = profile()
+        p.lastLovedAt = noon
+        _ = water(p, pr, noon); _ = feed(p, pr, noon); _ = sun(p, pr, noon)
+        XCTAssertEqual(meters(p, noon).hearts, 4)
+        var inv = ToolInventory(); inv.unlock(.shears)
+        XCTAssertTrue(ToolEngine.prune(p, inventory: inv, now: noon, calendar: utc, economy: eco).applied)
+        XCTAssertEqual(meters(p, noon).hearts, 5)
+        _ = water(p, pr, noon); XCTAssertEqual(meters(p, noon).hearts, 5, "both touches still make five")
+    }
+
+    func testHeartsStartAgainEachDay() {
+        let p = plant(), pr = profile()
+        p.lastLovedAt = noon
+        _ = water(p, pr, noon); _ = water(p, pr, noon); _ = feed(p, pr, noon); _ = sun(p, pr, noon)
+        let tomorrow = utc.startOfDay(for: noon).addingTimeInterval(86_400 + 3600)
+        p.lastLovedAt = tomorrow
+        XCTAssertEqual(meters(p, tomorrow).hearts, 1, "yesterday's care does not count")
     }
 
     /// Property: across many random days of play, before every tap the meter (and the button state) predicts exactly
