@@ -28,6 +28,16 @@ final class ReconcileTests: XCTestCase {
         XCTAssertEqual(Set(m.seenIds), ["x", "y", "z"])
     }
 
+    func testWordsTowardTheNextPlantMergeToTheHigherCount() {
+        let a = PlayerProfile(); a.gamesPlayed = 10; a.wordsTowardPlant = 2
+        let b = PlayerProfile(); b.gamesPlayed = 30; b.wordsTowardPlant = 1
+        ctx.insert(a); ctx.insert(b); try! ctx.save()
+        DataReconciler.reconcile(context: ctx, badgeDefs: defs)
+        XCTAssertEqual(profiles().count, 1)
+        XCTAssertEqual(profiles()[0].wordsTowardPlant, 2)
+        XCTAssertEqual(PlayerProfile().wordsTowardPlant, 0, "existing players start at 0")
+    }
+
     func testBadgesToolsAndAlbumsAreMergedNotOverwritten() {
         var ba = BadgeState(defs: defs); ba.record(.feeds, amount: 30, now: Date(timeIntervalSince1970: 100))
         var bb = BadgeState(defs: defs); bb.record(.waterings, amount: 30, now: Date(timeIntervalSince1970: 200))

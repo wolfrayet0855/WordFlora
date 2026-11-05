@@ -65,11 +65,14 @@ struct GameView: View {
         .onChange(of: vm.phase) { _, phase in
             if phase == .won || phase == .rested { showBadges(app.roundFinished()) }
             if phase == .won {
-                app.play(vm.leveledUp ? .levelUp : .earned)
-                showRain = !app.settings.calmMode
+                // The big celebration (sound, flower rain, lub-dub) is for a plant arriving. A word that only moves
+                // toward the next plant keeps the round's own win sound and gets the calm card.
+                let arrived = vm.earnedPlantName != nil
+                if arrived { app.play(vm.leveledUp ? .levelUp : .earned) }
+                showRain = arrived && !app.settings.calmMode
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
                     showEarned = true
-                    if app.settings.hapticsOn {      // a soft lub-dub as the new plant appears
+                    if arrived && app.settings.hapticsOn {      // a soft lub-dub as the new plant appears
                         let g = UIImpactFeedbackGenerator(style: .soft); g.impactOccurred(intensity: 0.6)
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) { g.impactOccurred(intensity: 0.9) }
                     }
@@ -185,10 +188,23 @@ struct GameView: View {
         dimmed(rain: showRain) {
             VStack(spacing: 12) {
                 if vm.leveledUp { Label("Level up! New plants to find", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.accentText) }
-                Text(vm.earnedPlantIsNew ? "New plant found!" : "Your garden grew").font(Theme.font(.title2, weight: .bold))
-                if let name = vm.earnedPlantName, let plant = app.plants().first(where: { $0.name == name }) {
-                    PlantCard(plant: plant).frame(maxWidth: 220)
-                    Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
+                if let name = vm.earnedPlantName {
+                    Text(vm.earnedPlantIsNew ? "New plant found!" : "Your garden grew").font(Theme.font(.title2, weight: .bold))
+                    if let plant = app.plants().first(where: { $0.name == name }) {
+                        PlantCard(plant: plant).frame(maxWidth: 220)
+                        Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
+                    }
+                } else {
+                    // No plant this round: the word counts toward the next one.
+                    Text(PlantProgressCopy.winTitle).font(Theme.font(.title2, weight: .bold))
+                    // HOOK (progress meter): the visual words-toward-plant meter (mocked separately) goes here.
+                    Text(PlantProgressCopy.winLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant))
+                        .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if let fact = vm.factAfterRound {
+                        Text(fact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 shareButton
                 if vm.roseDropped { Label("A Rose of Jericho is in your satchel", systemImage: "leaf.circle.fill").font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.successText) }

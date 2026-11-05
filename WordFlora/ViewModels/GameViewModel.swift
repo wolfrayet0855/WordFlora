@@ -50,6 +50,8 @@ final class GameViewModel {
     // Round result
     private(set) var earnedPlantName: String?
     private(set) var earnedPlantIsNew = false
+    /// True when this round's win moved toward the next plant and no plant arrived.
+    private(set) var progressMade = false
     private(set) var leveledUp = false
     private(set) var roseDropped = false
     private(set) var sessionBeat = false
@@ -63,6 +65,9 @@ final class GameViewModel {
     var factAfterRound: String? { currentEntry?.fact }
     var roseOfJerichoCount: Int { playerProfile?.roseOfJerichoCount ?? 0 }
     var currentLevel: Int { playerProfile?.currentLevel ?? 1 }
+    /// Words won toward the next plant, and how many bring it.
+    var wordsTowardPlant: Int { playerProfile?.wordsTowardPlant ?? 0 }
+    var wordsPerPlant: Int { max(1, economy.wordsPerPlant) }
     /// Shown on the resting card when no Rose of Jericho is held, so players know how to earn one.
     var roseHint: String? {
         guard roseOfJerichoCount == 0 else { return nil }
@@ -149,6 +154,7 @@ final class GameViewModel {
         reviveUsedThisRound = false
         earnedPlantName = nil
         earnedPlantIsNew = false
+        progressMade = false
         leveledUp = false
         roseDropped = false
         sessionBeat = false
@@ -353,6 +359,8 @@ final class GameViewModel {
         1 + (misses <= 2 ? 1 : 0) + (isDaily ? 1 : 0)
     }
 
+    /// Owner decision 2026-11-04: the very first plant ever and a hero word's unfound plant arrive at once; otherwise each
+    /// win moves one word toward the next plant, which arrives on every `wordsPerPlant`-th word. Nil = no plant this round.
     private func awardPlant(for e: WordEntry) -> (name: String, isNew: Bool)? {
         let plants = allPlants()
         let level = playerProfile?.currentLevel ?? 1
@@ -360,6 +368,11 @@ final class GameViewModel {
         if e.kind == .hero, let pid = e.plantId, let hero = plants.first(where: { $0.plantId == pid }), hero.earnedCount == 0 {
             hero.earnedCount += 1; hero.lastLovedAt = now()
             return (hero.name, true)
+        }
+        if let profile = playerProfile, plants.contains(where: { $0.earnedCount > 0 }) {
+            profile.wordsTowardPlant = max(0, profile.wordsTowardPlant) + 1
+            guard profile.wordsTowardPlant >= wordsPerPlant else { progressMade = true; return nil }
+            profile.wordsTowardPlant = 0
         }
         let inLevel = plants.filter { $0.level == level }
         if let pick = inLevel.filter({ $0.earnedCount == 0 }).randomElement(using: &rng) {

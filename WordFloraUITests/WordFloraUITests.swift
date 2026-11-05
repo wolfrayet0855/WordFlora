@@ -51,6 +51,30 @@ final class WordFloraUITests: XCTestCase {
         app.buttons["Continue"].tap()
     }
 
+    /// After the first plant, each word moves toward the next one and every third word brings it (owner decision 2026-11-04).
+    func testAfterTheFirstPlantEveryThirdWordBringsTheNext() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-word=LOTUS"]
+        app.launch()
+        let homeLine = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS %@", "0 of 3 words to your next plant")).firstMatch
+        XCTAssertTrue(homeLine.waitForExistence(timeout: 5), "Home shows the words toward the next plant")
+        app.buttons["Play"].tap()
+        for n in 1...2 {
+            XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
+            tapLetters("LOTUS")
+            XCTAssertTrue(app.staticTexts["Great word!"].waitForExistence(timeout: 6), "word \(n)")
+            XCTAssertTrue(app.staticTexts["\(n) of 3 words to your next plant."].exists, "word \(n)")
+            XCTAssertFalse(app.staticTexts["New plant found!"].exists, "no plant on word \(n)")
+            XCTAssertFalse(app.buttons["Share this plant"].exists, "nothing to share without a plant")
+            if n == 1 { shot("word-toward-plant") }
+            app.buttons["Continue"].tap()
+        }
+        XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
+        tapLetters("LOTUS")
+        XCTAssertTrue(app.staticTexts["New plant found!"].waitForExistence(timeout: 6), "the third word brings the plant")
+        XCTAssertFalse(app.staticTexts["Great word!"].exists)
+        shot("third-word-plant")
+    }
+
     func testWrongGuessesEndWithARestingReveal() {
         launch(word: "LOTUS")
         app.buttons["Play"].tap()

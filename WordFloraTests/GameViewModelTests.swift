@@ -18,10 +18,10 @@ final class GameViewModelTests: XCTestCase {
     func bank(_ entries: [WordEntry]) -> WordBank {
         WordBank(schemaVersion: 1, bankVersion: "t", entries: entries, daily: DailyConfig(epoch: "2026-01-01", seed: 9))
     }
-    func makeVM(_ entries: [WordEntry]? = nil) throws -> GameViewModel {
+    func makeVM(_ entries: [WordEntry]? = nil, economy: Economy = .default) throws -> GameViewModel {
         let vm = GameViewModel(modelContext: container.mainContext,
                                bank: bank(entries ?? [entry("a", "LOTUS"), entry("b", "SEED"), entry("c", "LEAF")]),
-                               now: { [unowned self] in self.now }, calendar: cal, seed: 1)
+                               economy: economy, now: { [unowned self] in self.now }, calendar: cal, seed: 1)
         vm.soundEnabled = false
         vm.seedPlantsIfNeeded()
         return vm
@@ -30,6 +30,11 @@ final class GameViewModelTests: XCTestCase {
         for ch in letters { vm.guessInput = String(ch); vm.submitGuess() }
     }
     func plants() throws -> [PlantCollectible] { try container.mainContext.fetch(FetchDescriptor<PlantCollectible>()) }
+    func ownedCount() throws -> Int { try plants().filter { $0.earnedCount > 0 }.count }
+    /// One win of the fixture word LOTUS.
+    func win(_ vm: GameViewModel, _ id: String = "a") { vm.start(entry: entry(id, "LOTUS")); guess(vm, "LOTUS") }
+    /// A garden that already has its first plant (daisy), so wins count toward the next one.
+    func giveFirstPlant() throws { try plants().first { $0.plantId == "daisy" }?.earnedCount = 1 }
 
     override func setUp() async throws {
         container = try ModelContainer(
@@ -82,37 +87,168 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(try plants().first { $0.plantId == "rose" }?.earnedCount, 1)
     }
 
-    func testHeroForAlreadyOwnedPlantFallsBackToAnotherUnowned() throws {
+    func testHeroForAlreadyOwnedPlantCountsTowardTheNextPlant() throws {
         let vm = try makeVM()
         try plants().first { $0.plantId == "rose" }?.earnedCount = 1
         vm.start(entry: entry("r", "ROSE", kind: .hero, plantId: "rose")); guess(vm, "ROSE")
-        XCTAssertNotEqual(vm.earnedPlantName, "Rose")
-        XCTAssertTrue(vm.earnedPlantIsNew)
+        XCTAssertNil(vm.earnedPlantName)
+        XCTAssertFalse(vm.earnedPlantIsNew)
+        XCTAssertTrue(vm.progressMade)
+        XCTAssertEqual(vm.wordsTowardPlant, 1)
+        XCTAssertEqual(try ownedCount(), 1)
     }
 
     func testDuplicatesOnlyWhenLevelSetIsComplete() throws {
+        // Every plant found, so the word level is the top one and its set is complete. (A complete level 1 set alone
+        // is not a real state: the win that finishes it moves the player to level 2, where new plants wait.)
         let vm = try makeVM()
-        for p in try plants() where p.level == 1 { p.earnedCount = 1 }
-        vm.start(entry: entry("a", "LOTUS")); guess(vm, "LOTUS")
+        for p in try plants() { p.earnedCount = 1 }
+        let total = try plants().count
+        win(vm); win(vm, "b")
+        XCTAssertEqual(try plants().map(\.earnedCount).reduce(0, +), total, "no plant on words 1 and 2")
+        win(vm, "c")
+        XCTAssertNotNil(vm.earnedPlantName)
         XCTAssertFalse(vm.earnedPlantIsNew)
-        XCTAssertEqual(try plants().filter { $0.level == 1 }.map(\.earnedCount).reduce(0, +), 11)
+        XCTAssertEqual(try plants().map(\.earnedCount).reduce(0, +), total + 1)
     }
 
     func testTenthUniquePlantAdvancesWordLevel() throws {
         let vm = try makeVM()
         let l1 = try plants().filter { $0.level == 1 }
         for p in l1.prefix(9) { p.earnedCount = 1 }
-        vm.start(entry: entry("a", "LOTUS")); guess(vm, "LOTUS")
+        win(vm); win(vm, "b")
+        XCTAssertEqual(vm.playerProfile?.currentLevel, 1)
+        XCTAssertFalse(vm.leveledUp)
+        win(vm, "c")
         XCTAssertEqual(vm.playerProfile?.currentLevel, 2)
         XCTAssertTrue(vm.leveledUp)
+        XCTAssertTrue(vm.earnedPlantIsNew)
     }
 
     func testNinthUniquePlantDoesNotAdvance() throws {
         let vm = try makeVM()
         for p in try plants().filter({ $0.level == 1 }).prefix(8) { p.earnedCount = 1 }
-        vm.start(entry: entry("a", "LOTUS")); guess(vm, "LOTUS")
+        win(vm); win(vm, "b"); win(vm, "c")
+        XCTAssertTrue(vm.earnedPlantIsNew)
+        XCTAssertEqual(try plants().filter { $0.level == 1 && $0.earnedCount > 0 }.count, 9)
         XCTAssertEqual(vm.playerProfile?.currentLevel, 1)
         XCTAssertFalse(vm.leveledUp)
+    }
+
+    func testALevelTakesThirtyWordsAfterItsFirstPlant() throws {
+        let vm = try makeVM()
+        win(vm)                                               // the very first plant arrives on the first word
+        XCTAssertEqual(try ownedCount(), 1)
+        var words = 1
+        while vm.playerProfile?.currentLevel == 1 && words < 100 { win(vm, "w\(words)"); words += 1 }
+        XCTAssertEqual(vm.playerProfile?.currentLevel, 2)
+        XCTAssertEqual(words, 1 + 9 * 3, "first plant at once, then 3 words for each of the other 9")
+        XCTAssertTrue(vm.leveledUp)
+    }
+
+    // MARK: words toward the next plant (owner decision 2026-11-04)
+    func testTheVeryFirstPlantArrivesOnTheFirstWin() throws {
+        let vm = try makeVM()
+        win(vm)
+        XCTAssertNotNil(vm.earnedPlantName)
+        XCTAssertTrue(vm.earnedPlantIsNew)
+        XCTAssertFalse(vm.progressMade)
+        XCTAssertEqual(vm.wordsTowardPlant, 0)
+        XCTAssertEqual(vm.playerProfile?.soil, 2)
+    }
+
+    func testAfterTheFirstPlantAWinMovesTowardTheNextPlant() throws {
+        let vm = try makeVM(); try giveFirstPlant()
+        let soil = vm.playerProfile?.soil ?? 0
+        win(vm)
+        XCTAssertEqual(vm.phase, .won)
+        XCTAssertNil(vm.earnedPlantName)
+        XCTAssertFalse(vm.earnedPlantIsNew)
+        XCTAssertTrue(vm.progressMade)
+        XCTAssertEqual(vm.wordsTowardPlant, 1)
+        XCTAssertEqual(vm.wordsPerPlant, 3)
+        XCTAssertEqual(vm.playerProfile?.wordsTowardPlant, 1)
+        XCTAssertEqual(try ownedCount(), 1)
+        XCTAssertEqual(vm.playerProfile?.soil, soil, "soil comes with a new plant")
+        XCTAssertGreaterThanOrEqual(vm.playerProfile?.water ?? 0, 1, "water is unchanged: every win pays")
+        let rec = try container.mainContext.fetch(FetchDescriptor<GameRecord>()).first
+        XCTAssertNil(rec?.plantEarned)
+    }
+
+    func testEveryThirdWordBringsTheNextPlant() throws {
+        let vm = try makeVM(); try giveFirstPlant()
+        win(vm); win(vm, "b")
+        XCTAssertEqual(vm.wordsTowardPlant, 2)
+        XCTAssertEqual(try ownedCount(), 1)
+        let soil = vm.playerProfile?.soil ?? 0
+        win(vm, "c")
+        XCTAssertNotNil(vm.earnedPlantName)
+        XCTAssertTrue(vm.earnedPlantIsNew)
+        XCTAssertFalse(vm.progressMade)
+        XCTAssertEqual(vm.wordsTowardPlant, 0, "progress starts again after a plant arrives")
+        XCTAssertEqual(try ownedCount(), 2)
+        XCTAssertEqual(vm.playerProfile?.soil, soil + 2)
+        win(vm, "d")
+        XCTAssertNil(vm.earnedPlantName, "the round after an arrival starts the next count")
+        XCTAssertEqual(vm.wordsTowardPlant, 1)
+    }
+
+    func testAHeroWordForAnUnfoundPlantArrivesRightAwayAndKeepsProgress() throws {
+        let vm = try makeVM(); try giveFirstPlant()
+        win(vm)
+        XCTAssertEqual(vm.wordsTowardPlant, 1)
+        vm.start(entry: entry("r", "ROSE", kind: .hero, plantId: "rose")); guess(vm, "ROSE")
+        XCTAssertEqual(vm.earnedPlantName, "Rose")
+        XCTAssertTrue(vm.earnedPlantIsNew)
+        XCTAssertFalse(vm.progressMade)
+        XCTAssertEqual(vm.wordsTowardPlant, 1, "a hero plant does not change the count")
+    }
+
+    func testLossesNeverLowerProgressAndNothingIsTakenAway() throws {
+        let vm = try makeVM(); try giveFirstPlant()
+        win(vm); win(vm, "b")
+        vm.start(entry: entry("x", "LOTUS")); guess(vm, "ABCDEFGH")
+        XCTAssertEqual(vm.phase, .rested)
+        XCTAssertFalse(vm.progressMade)
+        XCTAssertEqual(vm.wordsTowardPlant, 2)
+        XCTAssertEqual(try ownedCount(), 1)
+        win(vm, "c")
+        XCTAssertNotNil(vm.earnedPlantName)
+    }
+
+    func testADailyBloomWinCountsAsOneWord() throws {
+        let vm = try makeVM(); try giveFirstPlant()
+        vm.startDaily()
+        guess(vm, String(vm.currentEntry!.word.filter { $0.isLetter }))
+        XCTAssertEqual(vm.phase, .won)
+        XCTAssertNil(vm.earnedPlantName)
+        XCTAssertEqual(vm.wordsTowardPlant, 1)
+    }
+
+    func testWordsPerPlantIsTunable() throws {
+        var econ = Economy.default; econ.wordsPerPlant = 1
+        let vm = try makeVM(economy: econ); try giveFirstPlant()
+        win(vm)
+        XCTAssertNotNil(vm.earnedPlantName)
+        XCTAssertEqual(vm.wordsTowardPlant, 0)
+        XCTAssertEqual(Economy.default.wordsPerPlant, 3)
+    }
+
+    func testAStoredCountAtOrAboveTheTargetBringsAPlantOnTheNextWin() throws {
+        let vm = try makeVM(); try giveFirstPlant()
+        vm.playerProfile?.wordsTowardPlant = 5        // e.g. after the target is tuned down
+        win(vm)
+        XCTAssertNotNil(vm.earnedPlantName)
+        XCTAssertEqual(vm.wordsTowardPlant, 0)
+    }
+
+    func testProgressCopyIsWarmAndSafe() {
+        XCTAssertEqual(PlantProgressCopy.winTitle, "Great word!")
+        XCTAssertEqual(PlantProgressCopy.winLine(toward: 2, per: 3), "2 of 3 words to your next plant.")
+        XCTAssertEqual(PlantProgressCopy.homeLine(toward: 2, per: 3), "2 of 3 words to your next plant")
+        XCTAssertEqual(PlantProgressCopy.homeLine(toward: 0, per: 3), "0 of 3 words to your next plant")
+        let all = [PlantProgressCopy.winTitle] + (0...3).flatMap { [PlantProgressCopy.winLine(toward: $0, per: 3), PlantProgressCopy.homeLine(toward: $0, per: 3)] }
+        for line in all { XCTAssertEqual(CopySafety.check(line), [], line) }
     }
 
     // MARK: resting (loss)

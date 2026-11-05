@@ -6,6 +6,9 @@ struct Economy: Codable, Equatable {
     var roseThreshold = 8          // completed rounds per Rose
     var roseCap = 3
     var plantsPerLevel = 10
+    // Owner decision 2026-11-04: after the very first plant, a correct word moves toward the next plant and every
+    // `wordsPerPlant`-th word brings it (hero words for an unfound plant still bring theirs at once).
+    var wordsPerPlant = 3
     var freezeCap = 2
     var freezeEarnDays = [5, 14]
     var freezeEveryDays = 14       // after the last earn day

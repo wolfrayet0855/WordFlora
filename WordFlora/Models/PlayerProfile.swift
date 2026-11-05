@@ -21,6 +21,8 @@ final class PlayerProfile {
     var roundsSinceAd: Int = 0
     var ageBand: String?
     var roseSeedProgress: Int = 0
+    /// Correct words toward the next plant (0 ..< Economy.wordsPerPlant). Defaulted, so older stores and CloudKit records read as 0.
+    var wordsTowardPlant: Int = 0
     var lastRoundId: String?
     var gardenDays: Int = 0
     var lastGraceDay: Date?

@@ -21,3 +21,12 @@ enum ProgressionPolicy {
 
     static func selectableLevels(wordLevel: Int) -> [Int] { Array(1...max(1, wordLevel)) }
 }
+
+/// Words for the "words toward your next plant" lines (win card and Home). Positive only; checked by CopySafety in tests.
+enum PlantProgressCopy {
+    static let winTitle = "Great word!"
+    /// Under the win card title when no plant arrived, e.g. "2 of 3 words to your next plant."
+    static func winLine(toward: Int, per: Int) -> String { homeLine(toward: toward, per: per) + "." }
+    /// Home, under the Garden Days line, e.g. "2 of 3 words to your next plant".
+    static func homeLine(toward: Int, per: Int) -> String { "\(toward) of \(per) words to your next plant" }
+}

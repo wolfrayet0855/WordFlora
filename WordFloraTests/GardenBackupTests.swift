@@ -161,6 +161,30 @@ final class GardenBackupTests: XCTestCase {
         XCTAssertEqual(plant("rose").potId, "sunflower")
     }
 
+    func testWordsTowardTheNextPlantRoundTripAndOldBackupsReadAsZero() throws {
+        growSomething()
+        profile().wordsTowardPlant = 2; try ctx.save()
+        let data = try GardenBackup.make(context: ctx, now: .now).encoded()
+        XCTAssertTrue(String(data: data, encoding: .utf8)!.contains("\"wordsTowardPlant\" : 2"))
+
+        let fresh = try SharedContainer.make(inMemory: true)
+        try PlantCatalog.seedIfNeeded(context: fresh.mainContext)
+        guard case .success = GardenBackup.restore(data, into: fresh.mainContext, badgeDefs: defs) else { return XCTFail("restore failed") }
+        XCTAssertEqual(try fresh.mainContext.fetch(FetchDescriptor<PlayerProfile>()).first?.wordsTowardPlant, 2)
+
+        // A backup saved before words-per-plant existed has no wordsTowardPlant key; it still reads, as 0.
+        var json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        var prof = json["profile"] as! [String: Any]; prof.removeValue(forKey: "wordsTowardPlant"); json["profile"] = prof
+        let old = try JSONSerialization.data(withJSONObject: json)
+        guard case .success(let decoded) = GardenBackup.decode(old) else { return XCTFail("old backup should read") }
+        XCTAssertEqual(decoded.profile.wordsTowardPlant ?? 0, 0)
+        guard case .success = GardenBackup.restore(old, into: ctx, badgeDefs: defs) else { return XCTFail("old backup should restore") }
+        XCTAssertEqual(profile().wordsTowardPlant, 2, "restoring never lowers progress")
+
+        var bad = GardenBackup.make(context: ctx, now: .now); bad.profile.wordsTowardPlant = -1
+        XCTAssertFalse(bad.isPlausible)
+    }
+
     func testFilenameAndCopy() {
         var cal = Calendar(identifier: .gregorian); cal.timeZone = TimeZone(identifier: "UTC")!
         let d = cal.date(from: DateComponents(year: 2026, month: 3, day: 7, hour: 12))!

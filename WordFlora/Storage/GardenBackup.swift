@@ -18,6 +18,8 @@ struct GardenBackup: Codable, Equatable {
         var roseSeedProgress = 0, gardenDays = 0, shedPoints = 0, glowLanterns = 0
         var widgetPlantID: String?
         var toolsJSON = "", badgesJSON = "", albumJSON = ""
+        // Words toward the next plant (added 2026-11-04). Optional, so backups saved before then still read (as 0).
+        var wordsTowardPlant: Int?
     }
 
     struct Plant: Codable, Equatable {
@@ -72,7 +74,7 @@ struct GardenBackup: Codable, Equatable {
                            gamesPlayed: p.gamesPlayed, water: p.water, soil: p.soil, streak: p.streak, bestStreak: p.bestStreak,
                            streakFreezes: p.streakFreezes, lastPlayedDay: p.lastPlayedDay, seenIds: p.seenIds, roseSeedProgress: p.roseSeedProgress,
                            gardenDays: p.gardenDays, shedPoints: p.shedPoints, glowLanterns: p.glowLanterns, widgetPlantID: p.widgetPlantID,
-                           toolsJSON: p.toolsJSON, badgesJSON: p.badgesJSON, albumJSON: p.albumJSON)
+                           toolsJSON: p.toolsJSON, badgesJSON: p.badgesJSON, albumJSON: p.albumJSON, wordsTowardPlant: p.wordsTowardPlant)
         }
         let plants = ((try? context.fetch(FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.plantId)]))) ?? []).map {
             Plant(plantId: $0.plantId, earnedCount: $0.earnedCount, growthPoints: $0.growthPoints, stage: $0.stage, hydration: $0.hydration,
@@ -113,7 +115,7 @@ struct GardenBackup: Codable, Equatable {
     var isPlausible: Bool {
         let p = profile
         let counts = [p.currentLevel, p.plantsEarnedThisLevel, p.roseOfJerichoCount, p.gamesPlayed, p.water, p.soil, p.streak,
-                      p.bestStreak, p.streakFreezes, p.roseSeedProgress, p.gardenDays, p.shedPoints, p.glowLanterns, gamesRecorded]
+                      p.bestStreak, p.streakFreezes, p.roseSeedProgress, p.gardenDays, p.shedPoints, p.glowLanterns, p.wordsTowardPlant ?? 0, gamesRecorded]
         guard counts.allSatisfy({ $0 >= 0 }), (1...100).contains(p.currentLevel) else { return false }
         return plants.allSatisfy { !$0.plantId.isEmpty && $0.earnedCount >= 0 && $0.growthPoints >= 0 && (0...4).contains($0.stage)
             && $0.hydration.isFinite && $0.soilRichness.isFinite && $0.nickname.count <= 60 && ($0.potId ?? "").count <= 40 }
@@ -137,6 +139,7 @@ struct GardenBackup: Codable, Equatable {
         o.roseSeedProgress = profile.roseSeedProgress; o.gardenDays = profile.gardenDays; o.shedPoints = profile.shedPoints
         o.glowLanterns = profile.glowLanterns; o.widgetPlantID = profile.widgetPlantID
         o.toolsJSON = profile.toolsJSON; o.badgesJSON = profile.badgesJSON; o.albumJSON = profile.albumJSON
+        o.wordsTowardPlant = profile.wordsTowardPlant ?? 0
         DataReconciler.merge(o, into: keeper, defs: badgeDefs)
 
         var report = RestoreReport()

@@ -95,7 +95,9 @@ struct HomeView: View {
             VStack(alignment: .leading, spacing: 12) {
                 topBar
                 hero(days: profile?.gardenDays ?? 0, roseStock: profile?.roseOfJerichoCount ?? 0, roseProgress: profile?.roseSeedProgress ?? 0,
-                     showRose: unlocked.contains(.rose))
+                     showRose: unlocked.contains(.rose),
+                     // Before the first plant the next word brings one at once, so the count only shows after it (and not in Quiet Garden).
+                     wordsTowardPlant: stats.plantsEarned > 0 && !app.settings.quietGarden ? app.game.wordsTowardPlant : nil)
 
                 if app.showWelcomeBack || app.plusOffer != nil {
                     VStack(spacing: 10) {
@@ -140,7 +142,7 @@ struct HomeView: View {
         }
     }
 
-    private func hero(days: Int, roseStock: Int, roseProgress: Int, showRose: Bool) -> some View {
+    private func hero(days: Int, roseStock: Int, roseProgress: Int, showRose: Bool, wordsTowardPlant: Int?) -> some View {
         HStack(alignment: singleColumn ? .top : .center, spacing: 14) {
             FlowerView(petals: 8, sway: false)
                 .frame(width: singleColumn ? 64 : 92, height: singleColumn ? 76 : 110)
@@ -156,10 +158,16 @@ struct HomeView: View {
                         .font(Theme.font(.body, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
+                if let wordsTowardPlant {
+                    // HOOK (progress meter): the visual words-toward-plant meter (mocked separately) goes here.
+                    Text(PlantProgressCopy.homeLine(toward: wordsTowardPlant, per: app.game.wordsPerPlant))
+                        .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 if showRose {
                     let threshold = Economy.default.roseThreshold
                     let full = roseStock >= Economy.default.roseCap
-                    Text("Rose of Jericho ×\(roseStock) · \(full ? "satchel full" : "\(roseProgress) of \(threshold)")")
+                    Text(HomeRoseLine.text(stock: roseStock, progress: roseProgress, threshold: threshold, full: full))
                         .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }

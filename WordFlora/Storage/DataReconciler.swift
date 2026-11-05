@@ -36,6 +36,7 @@ enum DataReconciler {
         k.streak = max(k.streak, o.streak); k.bestStreak = max(k.bestStreak, o.bestStreak)
         k.streakFreezes = max(k.streakFreezes, o.streakFreezes)
         k.roseSeedProgress = max(k.roseSeedProgress, o.roseSeedProgress)
+        k.wordsTowardPlant = max(k.wordsTowardPlant, o.wordsTowardPlant)
         k.gardenDays = max(k.gardenDays, o.gardenDays)
         k.shedPoints = max(k.shedPoints, o.shedPoints)
         k.glowLanterns = max(k.glowLanterns, o.glowLanterns)
