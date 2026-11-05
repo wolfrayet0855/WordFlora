@@ -1,0 +1,208 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Repot Sheet v2</title>
+<link rel="stylesheet" href="../theme.css">
+<script src="../theme.js"></script>
+<script>
+/* ?frame=<id>&theme=light|dark renders one phone on a plain page (for screenshots). */
+const Q=new URLSearchParams(location.search);
+if(Q.get('theme'))document.documentElement.setAttribute('data-theme',Q.get('theme'));
+if(Q.get('frame'))document.documentElement.classList.add('only');
+const BODY='M18 20 H102 L92 88 Q91 96 82 96 H38 Q29 96 28 88Z';
+</script>
+<script src="../shed-visitors/shed-v2/pots-lib.js"></script>
+<style>
+/* Colour tokens: existing colorsets only (Assets.xcassets), plus PotPalette.ring and the Shed v2 lock tokens. */
+[data-theme=light]{--txt2:color-mix(in srgb,var(--text) 88%,transparent);--ink:#1F3320;--ring:#3E7A22;--okText:#2E7D32;
+ --gardenFill:#E3F1DD;--badgesFill:#FBEFCB;--accentText:#8A5A00;--lockfill:#F1EEE6;--lock:#E4DFD2;--lockink:#746F5E;--dim:#C9C7C0;--hair:color-mix(in srgb,var(--text) 12%,transparent)}
+[data-theme=dark]{--txt2:color-mix(in srgb,var(--text) 88%,transparent);--ink:#1A2E1A;--ring:#A8D84A;--okText:#81C784;
+ --gardenFill:#2F4F30;--badgesFill:#4A4122;--accentText:#F0C060;--lockfill:#233823;--lock:#3A4C3A;--lockink:#8FA48F;--dim:#0E180E;--hair:color-mix(in srgb,var(--text) 16%,transparent)}
+body{line-height:1.35}
+.doc{max-width:1500px;margin:0 auto;padding:20px 20px 80px}
+.doc h1{font-size:26px;margin:0 0 4px}.doc h2{font-size:21px;margin:34px 0 4px}
+.doc .sub{color:var(--txt2);max-width:85ch;margin:4px 0 12px}
+.doc ul{max-width:95ch}
+.tbar{display:flex;gap:8px;margin:10px 0}
+.tbar button{font:inherit;font-weight:800;border:0;border-radius:999px;min-height:44px;padding:8px 18px;background:var(--surface);color:var(--text);box-shadow:inset 0 0 0 2px var(--hair);cursor:pointer}
+.row{display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start}
+.fig{width:415px;flex:none}
+.cap{margin:8px 4px 0;font-weight:700;font-size:14px}.cap small{display:block;font-weight:500;color:var(--txt2);margin-top:2px}
+
+/* ---------- phone ---------- */
+.phone{--s:1;--n:1;width:393px;height:852px;border-radius:44px;background:var(--dim);color:var(--text);position:relative;overflow:hidden;
+ box-shadow:0 0 0 10px #111,0 0 0 11px #333,var(--shadow);margin:11px;font-size:16px}
+.sb{height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 30px 6px 36px;font-size:16px;font-weight:700;position:relative;z-index:5;color:#1b1b1b}
+[data-theme=dark] .sb{color:#eee}
+.sb i{position:absolute;left:50%;top:11px;width:124px;height:36px;border-radius:20px;background:#000;transform:translateX(-50%)}
+.homebar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:var(--text);opacity:.85;z-index:20}
+
+/* sheet at .large */
+.sheet{position:absolute;top:62px;left:0;right:0;bottom:0;background:var(--bg);border-radius:38px 38px 0 0;overflow:hidden}
+.grab{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:36px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--text) 30%,transparent);z-index:4}
+.scroll{position:absolute;inset:0;overflow:hidden}
+.content{padding:24px 20px 0}
+/* header */
+.hdr{display:flex;align-items:center;gap:12px}
+.thumb{flex:none;background:var(--gardenFill) !important;width:calc(60px*var(--s2,1));height:calc(60px*var(--s2,1));border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--hair);position:relative;overflow:hidden}
+.thumb img{position:absolute;left:50%;transform:translateX(-50%);width:80%;top:-12%}
+.thumb .tp{position:absolute;left:50%;bottom:5%;transform:translateX(-50%);width:56%}
+.thumb .tp svg{width:100%;height:auto;display:block}
+.hdr h2{margin:0;font-size:calc(20px*var(--h,1));font-weight:800;line-height:1.15}
+.hdr p{margin:2px 0 0;font-size:calc(15px*var(--h,1));color:var(--txt2);font-weight:500;line-height:1.25}
+.newpill{display:inline-flex;align-items:center;gap:6px;margin-top:12px;background:var(--gardenFill);border-radius:999px;padding:0 4px 0 12px;min-height:34px;font-weight:800;font-size:calc(14px*var(--n));white-space:nowrap}
+.newpill svg{width:15px;height:15px;color:var(--okText);flex:none}
+.newpill .x{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:color-mix(in srgb,var(--text) 10%,transparent);margin-left:2px;position:relative}
+.newpill .x::after{content:"";position:absolute;inset:-8px}
+.newpill .x svg{width:11px;height:11px;color:var(--text)}
+
+/* grid */
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
+.tile{position:relative;height:var(--th,108px);border-radius:16px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--hair);display:flex;flex-direction:column;align-items:center;padding:13px 4px 0;overflow:hidden}
+.tile .art{height:42px;display:flex;align-items:flex-end}
+.tile .art svg{display:block}
+.tile .nm{margin-top:7px;font-weight:800;font-size:calc(12px*var(--n));line-height:1.25;white-space:nowrap;max-width:100%;text-align:center}
+.tile .l2{margin-top:3px;font-size:calc(11px*var(--n));font-weight:700;line-height:1.25;white-space:nowrap;color:var(--txt2);max-width:100%}
+.tile.earn{background:var(--lockfill);box-shadow:none;border:1.5px dashed color-mix(in srgb,var(--text) 32%,var(--lockfill))}
+.tile .use{display:inline-flex;align-items:center;gap:3px;color:var(--okText);font-weight:800;font-size:11px;border-radius:999px;padding:0 7px 0 5px;box-shadow:inset 0 0 0 1.2px currentColor}.tile .use svg{width:10px;height:10px}
+.plus{display:inline-flex;align-items:center;gap:3px;background:var(--badgesFill);color:var(--accentText);border-radius:999px;padding:1px 7px;font-size:11px;font-weight:800;box-shadow:inset 0 0 0 1.2px color-mix(in srgb,var(--accentText) 55%,transparent)}
+.plus svg{width:9px;height:9px}
+.tile.sel::after{content:"";position:absolute;inset:0;border-radius:16px;box-shadow:inset 0 0 0 3px var(--ring)}
+.tile.hint{background:var(--surface)}.tile.hint::after{content:"";position:absolute;inset:0;border-radius:16px;box-shadow:inset 0 0 0 2px var(--text),inset 0 0 0 4px var(--surface),inset 0 0 0 5px color-mix(in srgb,var(--text) 35%,transparent)}
+.check{position:absolute;top:4px;right:4px;width:22px;height:22px;border-radius:50%;background:var(--ring);display:grid;place-items:center;box-shadow:0 0 0 2px var(--surface);z-index:2}
+.check svg{width:12px;height:12px;color:var(--surface)}
+.newtag{position:absolute;top:5px;left:5px;background:var(--gardenFill);color:var(--text);font-size:10px;font-weight:900;border-radius:999px;padding:1px 6px;letter-spacing:.02em}
+
+/* soil */
+.soilh{display:flex;align-items:baseline;gap:8px;margin:20px 2px 8px;flex-wrap:wrap}
+.soilh b{font-size:calc(17px*var(--s));font-weight:800}.soilh span{font-size:calc(14px*var(--s));color:var(--txt2);font-weight:500}
+.soils{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.chip{min-height:44px;border-radius:14px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--hair);display:flex;align-items:center;justify-content:center;gap:5px;font-weight:700;font-size:calc(15px*var(--s));padding:4px 6px;text-align:center}
+.chip i{width:10px;height:10px;border-radius:50%;flex:none;box-shadow:0 0 0 1.5px color-mix(in srgb,var(--text) 35%,transparent)}
+.chip.on{box-shadow:inset 0 0 0 3px var(--ring);font-weight:800}
+
+/* pinned footer */
+.foot{position:absolute;left:0;right:0;bottom:0;padding:8px 20px 34px;background:var(--bg);z-index:3}
+.foot::before{content:"";position:absolute;left:0;right:0;top:-28px;height:28px;background:linear-gradient(to bottom,color-mix(in srgb,var(--bg) 0%,transparent),var(--bg));pointer-events:none}
+.foot::after{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:var(--hair)}
+.info{display:flex;align-items:center;gap:10px;min-height:44px;margin-bottom:10px}
+.info .mp{flex:none;width:30px}.info .mp svg{width:30px;height:auto;display:block}
+.info .t{font-size:calc(15px*var(--h,1));line-height:1.25}.info .t b{font-weight:800}.info .t span{color:var(--txt2);font-weight:600}
+.hcard{display:flex;align-items:center;gap:10px;background:var(--surface);box-shadow:inset 0 0 0 1px var(--hair);border-radius:14px;padding:9px 12px;margin-bottom:10px}
+.hcard .lf{width:26px;flex:none}.hcard .lf svg{width:26px;height:auto;display:block}
+.hcard .t{font-size:calc(15px*var(--s));line-height:1.25}.hcard .t b{display:block;font-weight:800}.hcard .t span{color:var(--txt2);font-weight:600;font-size:calc(14px*var(--s))}
+.go{display:flex;align-items:center;justify-content:center;min-height:52px;border-radius:16px;background:var(--accent);color:var(--ink);font-weight:800;font-size:calc(17px*var(--s));padding:6px 16px;white-space:nowrap;overflow:hidden}
+
+/* accessibility text size (AccessibilityL): unbounded text x1.9, pot names capped at xxxLarge (x1.33), line 2 hidden */
+.phone.ax{--s:1.9;--h:1.6;--n:1.33;--th:104px;--s2:1.25}
+.phone.ax .tile .l2:not(.keep){display:none}
+.phone.ax .soils{grid-template-columns:1fr 1fr}
+.phone.ax .hdr{align-items:flex-start}
+
+.rmtag{position:absolute;bottom:18px;left:16px;z-index:9;background:var(--text);color:var(--bg);font-size:11px;font-weight:800;border-radius:999px;padding:2px 8px}
+
+/* single-frame mode */
+html.only body{background:var(--dim)}
+html.only .doc{padding:0}
+html.only .doc>*:not(.row){display:none}
+html.only .fig{display:none}html.only .fig.pick{display:block;width:393px}
+html.only .phone{margin:0;border-radius:0;box-shadow:none}
+html.only .cap{display:none}html.only .row{gap:0}
+.verdict li{margin:3px 0}
+code{font-size:.92em}
+</style></head><body>
+<div class="doc">
+<h1>Repot sheet v2</h1>
+<p class="sub">One calm header with Daisy in the picked pot, a 4 x 4 grid of fixed-height tiles that all fit above the pinned button, goals on the pots to earn, and a smaller button that names the pot and the soil. Sheet opens at <code>.large</code>. iPhone 17 frames, 393 x 852.</p>
+<div class="tbar"><button onclick="wfSetTheme('light')">Light</button><button onclick="wfSetTheme('dark')">Dark</button></div>
+
+<h2>What changes</h2>
+<ul>
+<li><b>Header:</b> four stacked headings become one row. The 60pt thumb shows Daisy in the picked pot, so it is also the preview. Title "Repot Daisy", one subline "Pick a pot. Changing pots is free."</li>
+<li><b>New pots:</b> "New pots in your shed!" is a small pill with a close button, shown once, and the new pots carry a tiny "New" tag.</li>
+<li><b>Tiles:</b> every tile is 108pt high. The name is one line and shrinks to fit. Line 2 shows the state: the goal ("Finish level 3"), a Plus pill, or "In use". The picked pot has a 3pt ring and a check.</li>
+<li><b>Pots to earn:</b> a soft ghost pot on a soft dashed tile, with its goal. No lock, no grey wash on the name.</li>
+<li><b>Footer:</b> one line names the pick ("Rose pink pot, fresh loam soil"). A tap on a pot to earn or a Plus pot shows its hint there instead, so it is never off screen. The button is 52pt, one line, and names the pot.</li>
+<li><b>Scroll:</b> the grid ends above the footer at default size. Soil chips scroll in under a 28pt fade. The scroll view's bottom inset is the footer's height, so nothing hides under it.</li>
+</ul>
+
+<h2>Frames</h2>
+<div class="row" id="frames"></div>
+
+<h2>Critic round</h2>
+<div id="verdict" class="verdict"><p class="sub"><b>Verdict: ship with fixes.</b> Taken: a distinct tapped outline plus matching art in the footer hint; "In use" as a pill; the header, pill and summary capped at AX1; 10pt footer gap; distinct soil colours. Declined: the contrast flags (computed values are all at least 5.1:1, see notes.md), two-line names at AX (they cause uneven rows), and a solid header when scrolled (standard sheet behaviour).</p></div>
+</div>
+
+<script>
+const ICON={
+ check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+ spark:'<svg viewBox="-8 -8 16 16" fill="currentColor"><path d="M0 -7 Q1 -1.5 7 0 Q1 1.5 0 7 Q-1 1.5 -7 0 Q-1 -1.5 0 -7Z"/></svg>',
+ sparkles:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3 Q11 9 17 10 Q11 11 10 17 Q9 11 3 10 Q9 9 10 3Z"/><path d="M18 13 Q18.5 16 21 16.5 Q18.5 17 18 20 Q17.5 17 15 16.5 Q17.5 16 18 13Z"/></svg>',
+ x:'<svg viewBox="0 0 12 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M2 2l8 8M10 2l-8 8"/></svg>',
+ leaf:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4C11 4 5 8 5 15c0 1.3.3 2.5.8 3.5L4 20.3l1.4 1.4 1.8-1.8c1 .6 2.3.9 3.8.9 7 0 9-7 9-16.8zM8.6 16.8C10 13 13 10 16 8.5 13.4 11 11.4 13.5 10 17l-1.4-.2z"/></svg>'
+};
+/* -uitest-pots fixture: levels 1 and 2 done, 6 plants in level 3 (26 grown), 3 garden days. */
+const STATS={grown:26,levels:[1,2],days:3};
+const GOAL=p=>{const u=p.unlock;return u.kind==='plants'?(u.value===1?'Grow one plant':`Grow ${u.value} plants`):u.kind==='level'?`Finish level ${u.value}`:u.kind==='gardenDays'?`Play on ${u.value} days`:''};
+const owned=p=>{const u=p.unlock;return u.kind==='free'||(u.kind==='plants'&&STATS.grown>=u.value)||(u.kind==='level'&&STATS.levels.includes(u.value))||(u.kind==='gardenDays'&&STATS.days>=u.value)};
+const state=p=>p.unlock.kind==='plus'?'plus':owned(p)?'owned':'earn';
+const P=id=>POTS16.find(p=>p.id===id);
+const SOILS=[['loam','Loam','#9A6B43'],['sandy','Sandy','#E6CB8E'],['peaty','Peaty','#2E211A'],['compost','Compost','#6E8A3E']];
+
+function tile(p,o){
+ const s=state(p),cur=p.id===o.current,sel=p.id===o.picked,hint=p.id===o.hinted,isNew=o.newIds.includes(p.id)&&!o.dismissed;
+ let l2='';
+ if(cur)l2=`<div class="l2 keep"><span class="use">${ICON.check}In use</span></div>`;
+ else if(s==='earn')l2=`<div class="l2 fit">${GOAL(p)}</div>`;
+ else if(s==='plus')l2=`<div class="l2 keep"><span class="plus">${ICON.spark}Plus</span></div>`;
+ return `<div class="tile ${s==='earn'?'earn':''} ${sel?'sel':''} ${hint?'hint':''}" data-id="pot-tile-${p.id}">
+  ${isNew?'<span class="newtag">New</span>':''}${sel?`<span class="check">${ICON.check}</span>`:''}
+  <div class="art">${potSVG16(p,48,s==='earn'?'ghost':'full')}</div>
+  <div class="nm fit">${p.name}</div>${l2}</div>`;
+}
+function phone(o){
+ const pk=P(o.picked),soil=SOILS.find(x=>x[0]===o.soil);
+ const hp=o.hinted&&P(o.hinted);
+ let info;
+ if(hp){const s=state(hp);
+  const a=s==='plus'?`${hp.name} is part of WordFlora Plus.`:`${GOAL(hp)} to earn ${hp.name}.`;
+  const b=s==='plus'?'A grown-up can find Plus in Settings.':o.tip;
+  info=`<div class="hcard" data-id="pot-hint"><span class="lf">${potSVG16(hp,24,s==='earn'?'ghost':'full')}</span><div class="t"><b>${a}</b><span>${b}</span></div></div>`;
+ } else info=`<div class="info" data-id="repot-summary"><span class="mp">${potSVG16(pk,30)}</span><div class="t"><b>${pk.name} pot</b><span>, fresh ${soil[1].toLowerCase()} soil</span></div></div>`;
+ const title=o.picked===o.current?'Repot with fresh soil':`Repot into ${pk.name}`;
+ return `<div class="phone ${o.ax?'ax':''}">
+ <div class="sb"><span>2:22</span><i></i><b>100%</b></div>${o.rm?'<span class="rmtag">Reduce Motion</span>':''}
+ <div class="sheet"><div class="grab"></div>
+  <div class="scroll"><div class="content" data-scroll="${o.scroll||0}">
+   <div class="hdr"><div class="thumb"><img src="../plants/plant_daisy.svg" alt=""><span class="tp">${potSVG16(pk,40)}</span></div>
+    <div><h2>Repot Daisy</h2><p>Pick a pot. Changing pots is free.</p></div></div>
+   ${o.newIds.length&&!o.dismissed?`<div class="newpill" data-id="pot-new-line">${ICON.sparkles}New pots in your shed!<span class="x" aria-label="Close">${ICON.x}</span></div>`:''}
+   <div class="grid">${POTS16.map(p=>tile(p,o)).join('')}</div>
+   <div class="soilh"><b>Soil</b><span>Plants have favorite soils.</span></div>
+   <div class="soils">${SOILS.map(([id,n,c])=>`<div class="chip ${id===o.soil?'on':''}"><i style="background:${c}"></i>${n}</div>`).join('')}</div>
+  </div></div>
+  <div class="foot">${info}<div class="go fit" data-id="repot-go"><span>${title}</span></div></div>
+ </div><div class="homebar"></div></div>`;
+}
+const BASE={current:'terracotta',picked:'rosePink',soil:'loam',newIds:['blossom','rosePink'],dismissed:false,hinted:null,tip:''};
+const FRAMES=[
+ ['a','Light, default text','Opens at .large. Rose pink picked (ring + check), Terracotta in use, Blossom and Rose pink tagged New. All 16 tiles sit above the footer.',{}],
+ ['b','Light, a pot to earn tapped','Living stones gets a 2pt outline; its hint replaces the summary line in the footer. The button still names Rose pink. New pill closed.',{hinted:'livingStones',tip:'Four more plants to go!',dismissed:true}],
+ ['c','Dark, default text','Same state as A. Ghost pots use the dark lock tokens; Plus pill on badges fill.',{},'dark'],
+ ['d','Light, AccessibilityL','Header, footer and soil grow freely; pot names stop at xxxLarge and shrink to one line; goal lines hide (the footer hint shows them). Still 4 x 4; the grid scrolls under the fade.',{ax:true}],
+ ['e','Dark, Reduce Motion, scrolled to soil','Plus pot tapped: the footer hint names Plus and Settings, no price. With Reduce Motion the ring, check, hint and pill just cross-fade.',{scroll:'end',hinted:'moonlit',dismissed:true,soil:'peaty',rm:true},'dark'],
+ ['f','Light, AccessibilityL, scrolled','Bottom of the grid and the soil chips (2 x 2 at AX sizes) clear the footer.',{ax:true,scroll:'end',dismissed:true}],
+];
+const only=Q.get('frame');
+document.getElementById('frames').innerHTML=FRAMES.map(([id,t,c,o,th])=>`<div class="fig ${only===id?'pick':''}" data-theme-frame="${th||''}">${phone({...BASE,...o})}<p class="cap">${id.toUpperCase()}. ${t}${th?' (dark)':''}<small>${c}</small></p></div>`).join('');
+/* the dark frames on the overview page: scope dark tokens to the frame */
+if(!only)document.querySelectorAll('[data-theme-frame=dark] .phone').forEach(e=>e.closest('.fig').setAttribute('data-theme','dark'));
+/* scroll position: content gets a bottom inset of the footer height + 16 (safeAreaInset); 'end' = scrolled to the bottom */
+document.querySelectorAll('.content').forEach(c=>{const sh=c.closest('.sheet'),f=sh.querySelector('.foot');
+ c.style.paddingBottom=(f.offsetHeight+16)+'px';const v=c.dataset.scroll;
+ const y=v==='end'?Math.max(0,c.scrollHeight-sh.clientHeight):+v;c.style.transform=`translateY(${-y}px)`});
+/* single-line text that shrinks to fit (SwiftUI lineLimit(1) + minimumScaleFactor) */
+requestAnimationFrame(()=>document.querySelectorAll('.fit').forEach(e=>{
+ const box=e.parentElement.clientWidth-(e.classList.contains('go')?0:8);const inner=e.querySelector('span')||e;
+ let w=inner.scrollWidth,lim=e.classList.contains('go')?e.clientWidth-32:box;
+ if(w>lim){const f=Math.max(lim/w,e.classList.contains('nm')?0.6:0.7);inner.style.display='inline-block';inner.style.transform=`scale(${f})`;inner.style.transformOrigin='center';if(e.classList.contains('go'))return;e.style.letterSpacing='0';e.style.fontSize=`calc(${getComputedStyle(e).fontSize} * ${f})`;inner.style.transform='none'}
+}));
+</script></body></html>
