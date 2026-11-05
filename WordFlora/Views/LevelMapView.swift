@@ -47,7 +47,10 @@ struct LevelMapView: View {
     private var navBar: some View {
         ZStack {
             // Decorative: the "Garden Path" header below is the screen's title for VoiceOver. Fixed size, not scaled.
-            Image("Wordmark").resizable().scaledToFit().frame(height: 24).accessibilityHidden(true)
+            // At accessibility text sizes the large "Home" button would run into it, so the bar shows the button only.
+            if !oneColumn {
+                Image("Wordmark").resizable().scaledToFit().frame(height: 24).accessibilityHidden(true)
+            }
             HStack {
                 Button { dismiss() } label: {
                     HStack(spacing: 3) {
@@ -64,7 +67,7 @@ struct LevelMapView: View {
         }
         .padding(.horizontal, 12).padding(.vertical, 2)
         .frame(maxWidth: .infinity)
-        .background(Color.appBackground.opacity(0.96).ignoresSafeArea(edges: .top))
+        .background(Color.appBackground.ignoresSafeArea(edges: .top))   // opaque, so scrolled text never shows through
     }
 
     // MARK: header
