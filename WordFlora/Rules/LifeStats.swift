@@ -78,6 +78,8 @@ enum LifeStats {
     static let rainAndThunder = "Rain and soft thunder"
 
     static func plantLabel(name: String, pips: Int) -> String { "\(name), \(pips) of 5 love petals" }
+    /// Beside the love petal row: "3 love petals".
+    static func pipCaption(pips: Int) -> String { pips == 1 ? "1 love petal" : "\(pips) love petals" }
     static func seedLabel(name: String) -> String { "\(name), resting as a seed in its pot" }
     static func keyLabel(pips: Int) -> String { "\(pips) of 5 love petals. \(keyLine)" }
     static func hint(name: String) -> String { "Tap \(name) to give love" }

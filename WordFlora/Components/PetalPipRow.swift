@@ -90,12 +90,23 @@ struct PetalPipRow: View {
     var large = false
 
     var body: some View {
-        PetalPips(count: count, pipWidth: large ? 17 : 13)
-            .padding(.vertical, large ? 7 : 5).padding(.leading, large ? 10 : 8).padding(.trailing, large ? 13 : 11)
-            .background(LifePalette.glass, in: Capsule())
-            .overlay(Capsule().stroke(LifePalette.line))
-            .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
-            .allowsHitTesting(false)
-            .accessibilityHidden(true)
+        // Standard sizes: the caption under the pill names the row ("3 love petals", design-preview/fact-card), so the
+        // pips never read as lives; it sits under the pill so the row stays clear of the open Life panel. At
+        // accessibility sizes the Life sheet right below says it already, and the stage has no room for it.
+        VStack(spacing: 4) {
+            PetalPips(count: count, pipWidth: large ? 17 : 13)
+                .padding(.vertical, large ? 7 : 5).padding(.leading, large ? 10 : 8).padding(.trailing, large ? 13 : 11)
+                .background(LifePalette.glass, in: Capsule())
+                .overlay(Capsule().stroke(LifePalette.line))
+                .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
+                .accessibilityHidden(true)
+            if !large {
+                Text(LifeStats.pipCaption(pips: count))
+                    .font(Theme.font(.footnote, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("love-petal-caption")
+            }
+        }
+        .allowsHitTesting(false)
     }
 }

@@ -190,7 +190,7 @@ struct PlantDetailView: View {
                 if showPot {
                     Color.clear.frame(height: rowHeight)
                 } else {
-                    PetalPipRow(count: snap.pips, large: large).frame(height: rowHeight)
+                    PetalPipRow(count: snap.pips, large: large).frame(minHeight: rowHeight)
                 }
                 if raining && reduceMotion {
                     Label(LifeStats.badge(thunder: weather.thunder), systemImage: "drop.fill")

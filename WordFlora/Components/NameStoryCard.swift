@@ -11,7 +11,10 @@ struct NameStoryCard: View {
             let symbol: String
         }
 
+        /// What VoiceOver and the speaker say ("How Daisy got its name").
         let title: String
+        /// The small caps line over the big name ("How it got its name"); the name is right under it.
+        let eyebrow: String
         let name: String
         let botanicalName: String
         let chip: Chip?
@@ -23,11 +26,13 @@ struct NameStoryCard: View {
             self.botanicalName = botanicalName
             if let story {
                 title = "How \(name) got its name"
+                eyebrow = "How it got its name"
                 chip = Chip(meaning: story.meaning, name: name, symbol: story.symbol ?? "text.book.closed.fill")
                 lines = [story.line, story.funFact]
                 more = "In \(story.language), it was \u{201C}\(story.origin).\u{201D} That means \u{201C}\(story.meaning).\u{201D}"
             } else {
                 title = "Did you know?"
+                eyebrow = title
                 chip = nil
                 lines = [fact]
                 more = nil
@@ -58,10 +63,11 @@ struct NameStoryCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .center) {
-                Text(content.title)
+                Text(content.eyebrow)
                     .textCase(.uppercase).kerning(0.8)
                     .font(Theme.font(.caption, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityLabel(content.title)
                     .accessibilityAddTraits(.isHeader)
                 Spacer(minLength: 8)
                 if ReadAloud.shouldOffer(voiceOverRunning: voiceOver) {

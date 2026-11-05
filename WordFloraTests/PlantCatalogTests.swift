@@ -80,6 +80,9 @@ final class NameStoryCatalogTests: XCTestCase {
         XCTAssertEqual(story.language, "Old English")
         XCTAssertEqual(story.meaning, "day's eye")
         XCTAssertEqual(NameStoryCard.Content(plant: daisy).title, "How Daisy got its name")
+        // The card's eyebrow sits over the big name, so it reads "it" (design-preview/fact-card); speech keeps the name.
+        XCTAssertEqual(NameStoryCard.Content(plant: daisy).eyebrow, "How it got its name")
+        XCTAssertEqual(NameStoryCard.Content(name: "Poppy", botanicalName: "Papaver", fact: "A fact.", story: nil).eyebrow, "Did you know?")
     }
 
     /// Garden cards never speak of locks (no lock icons or words anywhere): a plant to find is "not found yet".

@@ -18,6 +18,14 @@ final class LifeStatsTests: XCTestCase {
 
     // MARK: Meters
 
+    /// The caption beside the love petal row (design-preview/fact-card: "3 love petals"), so the row reads as love.
+    func testLovePetalCaptionCountsThePetals() {
+        XCTAssertEqual(LifeStats.pipCaption(pips: 5), "5 love petals")
+        XCTAssertEqual(LifeStats.pipCaption(pips: 3), "3 love petals")
+        XCTAssertEqual(LifeStats.pipCaption(pips: 1), "1 love petal")
+        for n in 0...5 { XCTAssertEqual(CopySafety.check(LifeStats.pipCaption(pips: n)), []) }
+    }
+
     func testFreshlyCaredForPlantShowsFullBrightHappy() {
         let s = LifeStats.snapshot(inputs())
         XCTAssertEqual(s.water.word, "Full"); XCTAssertEqual(s.sunshine.word, "Bright"); XCTAssertEqual(s.happiness.word, "Happy")
