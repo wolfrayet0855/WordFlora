@@ -82,6 +82,14 @@ final class NameStoryCatalogTests: XCTestCase {
         XCTAssertEqual(NameStoryCard.Content(plant: daisy).title, "How Daisy got its name")
     }
 
+    /// Garden cards never speak of locks (no lock icons or words anywhere): a plant to find is "not found yet".
+    func testGardenCardLabelsNeverSayLocked() {
+        XCTAssertEqual(PlantCard.label(name: "Daisy", botanicalName: "Bellis perennis", level: 1, earned: true), "Daisy, Bellis perennis")
+        let unfound = PlantCard.label(name: "Lotus", botanicalName: "Nelumbo", level: 2, earned: false)
+        XCTAssertEqual(unfound, "Not found yet, level 2")
+        XCTAssertFalse(unfound.lowercased().contains("lock"))
+    }
+
     func testEveryPlantHasAStoryOrIsAReviewedFallback() throws {
         let plants = try PlantCatalog.load()
         let ids = Set(plants.map(\.plantId))

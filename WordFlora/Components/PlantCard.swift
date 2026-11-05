@@ -17,7 +17,8 @@ struct PlantCard: View {
                     .opacity(earned ? 1 : 0.55)
                     .accessibilityHidden(true)
                 if !earned {
-                    Image(systemName: "lock.fill").font(.caption2).foregroundStyle(Color.appPrimaryText.opacity(0.5)).padding(4)
+                    // A soft "on its way" sparkle, never a lock (no lock icons anywhere in the app).
+                    Image(systemName: "sparkles").font(.caption2).foregroundStyle(Color.appPrimaryText.opacity(0.5)).padding(4)
                 }
             }
             Text(earned ? plant.name : "Not found yet")
@@ -37,6 +38,10 @@ struct PlantCard: View {
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(earned ? Color.appAccent.opacity(0.45) : Color.appPrimaryText.opacity(0.08)))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(earned ? "\(plant.name), \(plant.botanicalName)" : "Locked plant, level \(plant.level)")
+        .accessibilityLabel(Self.label(name: plant.name, botanicalName: plant.botanicalName, level: plant.level, earned: earned))
+    }
+
+    static func label(name: String, botanicalName: String, level: Int, earned: Bool) -> String {
+        earned ? "\(name), \(botanicalName)" : "Not found yet, level \(level)"
     }
 }
