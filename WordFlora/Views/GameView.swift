@@ -46,6 +46,8 @@ struct GameView: View {
                     .padding(.bottom, 8)
             }
             .padding(.horizontal, 12)
+            // The resting and break cards are modal: the dimmed round behind them is hidden from VoiceOver.
+            .accessibilityHidden(showBreak || showRestCard)
             .focusable()
             .onKeyPress { press in
                 guard let ch = press.characters.uppercased().first, ch.isLetter, vm.phase == .playing else { return .ignored }
@@ -260,6 +262,7 @@ struct GameView: View {
             }
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
+            .accessibilityIdentifier("breakCard")
         }
     }
 
@@ -301,6 +304,7 @@ struct GameView: View {
             }
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
+            .accessibilityIdentifier("restCard")
         }
     }
 
