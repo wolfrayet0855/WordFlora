@@ -18,6 +18,8 @@ final class GameViewModel {
     private var reviveUsedThisRound = false
     private var roundId = UUID().uuidString
     private var regularRoundsThisSitting = 0
+    /// Regular rounds played this sitting (the resting card's "You played 3 words").
+    var roundsThisSitting: Int { regularRoundsThisSitting }
 
     var soundEnabled: Bool {
         get { sounds.enabled }

@@ -121,10 +121,13 @@ enum LifeStats {
             return Meter(name: meterNames.happiness, word: score >= 0.65 ? happyWords[0] : happyWords[1], fill: 0.35 + 0.55 * score)
         }()
 
-        // One heart for a hello, plus one for each kind of care today, up to five.
+        // Five hearts, all reachable by every player on one day: a hello, a drink, sun, soil, and a finishing touch
+        // (the second drink of the day, or a prune). Pruning needs shears and rests two days, so it is never the only way.
+        // A repot does not count: no timestamp records an ordinary repot (lastRepotGrowthAt is the happy-match growth only).
         let lovedToday = i.lastLovedAt.map { i.calendar.isDate($0, inSameDayAs: i.now) && $0 <= i.now } ?? false
+        let finishingTouch = drinks >= perDay || TendingEngine.isToday(i.lastPrunedAt, now: i.now, calendar: i.calendar)
         let kinds = [drinks > 0, sunnedToday, TendingEngine.isToday(i.lastFedAt, now: i.now, calendar: i.calendar),
-                     TendingEngine.isToday(i.lastPrunedAt, now: i.now, calendar: i.calendar)].filter { $0 }.count
+                     finishingTouch].filter { $0 }.count
         let hearts = lovedToday ? min(5, 1 + kinds) : 0
         let line: String = {
             switch hearts {
