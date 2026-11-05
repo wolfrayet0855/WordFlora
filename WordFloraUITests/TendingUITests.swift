@@ -219,8 +219,21 @@ final class TendingUITests: XCTestCase {
     /// Text the scroll view clips at its edge (under the navigation bar, or above the pinned tend buttons) is measured
     /// against whatever covers it, so only text fully inside the scroll view is judged for contrast.
     /// `excuse` lets a test pass over one named kind of issue on chosen elements; each one excused is printed.
-    private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = [],
+    /// `dynamicTypeApart`: run the Dynamic Type check on its own, after every other check. It grows the text, so a
+    /// long page reflows under its scroll offset and the page is somewhere else when it is done; run together, the
+    /// other checks could look at whatever had scrolled into view mid-check. Every check still runs on this screen.
+    private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = [], dynamicTypeApart: Bool = false,
                        excuse: @escaping (XCUIAccessibilityAuditIssue, XCUIElement) -> Bool = { _, _ in false }) {
+        if dynamicTypeApart {
+            auditOnce(name, types: XCUIAccessibilityAuditType.all.subtracting(ignoring).subtracting(.dynamicType), excuse: excuse)
+            if !ignoring.contains(.dynamicType) { auditOnce(name + "-dynamicType", types: .dynamicType, excuse: excuse) }
+            return
+        }
+        auditOnce(name, types: XCUIAccessibilityAuditType.all.subtracting(ignoring), excuse: excuse)
+    }
+
+    private func auditOnce(_ name: String, types: XCUIAccessibilityAuditType,
+                           excuse: @escaping (XCUIAccessibilityAuditIssue, XCUIElement) -> Bool) {
         var findings = [String]()
         let scroll = app.scrollViews.firstMatch
         let nav = app.navigationBars.firstMatch
@@ -234,7 +247,7 @@ final class TendingUITests: XCTestCase {
         }() : nil
         var skipped = [String]()
         do {
-            try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
+            try app.performAccessibilityAudit(for: types) { issue in
                 if issue.auditType == .contrast, let v = visible {
                     // A clipped element often comes back unresolved (nil); it cannot be judged, so it is noted, not failed.
                     guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
@@ -346,17 +359,31 @@ final class TendingUITests: XCTestCase {
                                    "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategory\(size)"]
             app.launch()
             app.buttons["Shed"].tap()
-            let card = app.buttons["shed-pot-terracotta"].firstMatch
             _ = app.buttons["shed.tool.can"].waitForExistence(timeout: 5)
-            for _ in 0..<14 where !(card.exists && card.isHittable) { app.swipeUp() }
-            app.swipeUp(); sleep(1)
-            let cards = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'shed-pot-'")).allElementsBoundByIndex.map(\.frame)
-            XCTAssertFalse(cards.isEmpty)
-            audit("shed-pots-\(size)", excuse: { issue, e in
-                [.contrast, .dynamicType].contains(issue.auditType) && cards.contains { $0.intersects(e.frame) }
+            // The same place every run: the very end of the Shed, settled. The audit's Dynamic Type check grows the
+            // text and the page reflows under a fixed scroll offset, so where the run stops decides what then comes
+            // into view; stopping wherever a swipe's momentum ended made the result change from run to run.
+            scrollToEnd(app.staticTexts["shed-pots-footer"])
+            XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'shed-pot-'")).firstMatch.exists)
+            // Excused by what the element is (a pot card), not where it was: the Dynamic Type check reflows the page,
+            // so frames taken before the audit could match a tool tile that had moved into a card's old place.
+            audit("shed-pots-\(size)", dynamicTypeApart: true, excuse: { issue, e in
+                [.contrast, .dynamicType].contains(issue.auditType) && e.identifier.hasPrefix("shed-pot-") && e.identifier != "shed-pot-hint"
             })
             app.terminate()
         }
+    }
+
+    /// Swipes until the page's last element is on screen and stops moving (no momentum left), then lets it settle.
+    private func scrollToEnd(_ last: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
+        var previous = CGRect.null
+        for _ in 0..<24 {
+            if last.exists, last.isHittable, last.frame == previous { break }
+            previous = last.exists ? last.frame : .null
+            app.swipeUp()
+            sleep(1)
+        }
+        XCTAssertTrue(last.exists && last.isHittable, "reached the end of the page", file: file, line: line)
     }
 
     /// The Shed's pot cards: the check badge and Plus tag sit in the corner, clear of the pot's rim.

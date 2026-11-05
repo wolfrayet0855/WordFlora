@@ -200,6 +200,7 @@ struct ShedPotsSection: View {
             }
             Text(PotCatalog.Copy.shedFooter).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("shed-pots-footer")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .onChange(of: message) { _, new in if let new { AccessibilityNotification.Announcement(new).post() } }
