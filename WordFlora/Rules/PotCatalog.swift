@@ -238,6 +238,8 @@ enum PotCatalog {
         static let progressFirst = "Grow one plant to earn this pot."
         static let yours = "Yours to use"
         static let plusCard = "Part of WordFlora Plus"
+        /// The Shed card's Plus line at accessibility sizes, where "WordFlora" would break mid-word on a narrow card.
+        static let plusCardShort = "A Plus pot"
         static let shedTitle = "Pots"
         static let shedSub = "Tap a pot to see how to earn it"
         static let shedFooter = "Pots you earn stay yours. " + plusKeep
@@ -255,7 +257,7 @@ enum PotCatalog {
         static let soilTitle = "Soil"
         static let soilSub = "Plants have favorite soils."
         static var all: [String] {
-            [earned, current, pickTitle, pickSub, plusTag, plusKeep, plusSettings, progressFirst, yours, plusCard,
+            [earned, current, pickTitle, pickSub, plusTag, plusKeep, plusSettings, progressFirst, yours, plusCard, plusCardShort,
              shedTitle, shedSub, shedFooter, freshSoil, newPots, hintToEarn, hintPlus, repotSub, newTag, soilTitle, soilSub]
         }
     }

@@ -589,6 +589,7 @@ struct ShedPotsSection: View {
 
     @State private var message: String?
     @State private var newPots = false
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         let columns = Array(repeating: GridItem(.flexible(), spacing: 6, alignment: .top), count: PotCatalog.gridColumns)
@@ -659,7 +660,8 @@ struct ShedPotsSection: View {
                     case .owned:
                         cardLine(useLine(names), color: PotPalette.ok)
                     case .plus:
-                        cardLine(PotCatalog.Copy.plusCard, color: Color.secondaryText)
+                        cardLine(typeSize.isAccessibilitySize ? PotCatalog.Copy.plusCardShort : PotCatalog.Copy.plusCard,
+                                 color: Color.secondaryText)
                     case .toEarn:
                         cardLine(PotCatalog.goalLine(pot), color: Color.secondaryText)
                         ProgressView(value: progress?.fraction ?? 0).tint(PotPalette.ok).frame(maxWidth: 70)

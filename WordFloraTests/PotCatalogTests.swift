@@ -25,6 +25,15 @@ final class PotCatalogTests: XCTestCase {
     static let order = ["plainBlue", "terracotta", "sageGlaze", "sunflower", "mint", "blossom", "rosePink", "livingStones",
                         "flytrap", "starlight", "jadeVine", "rainbowBark", "dewdrop", "honeyStripe", "moonlit", "meadow"]
 
+    /// At accessibility sizes a Shed pot card is narrow (four a row, words held at xxxLarge): its Plus line uses only
+    /// short words so none breaks mid-word ("Word-Flora"); it is in the CopySafety sweep.
+    func testTheShortPlusCardLineHasOnlyShortWords() {
+        let line = PotCatalog.Copy.plusCardShort
+        XCTAssertEqual(line, "A Plus pot")
+        XCTAssertTrue(line.split(separator: " ").allSatisfy { $0.count <= 6 }, line)
+        XCTAssertTrue(PotCatalog.Copy.all.contains(line))
+    }
+
     func testSixteenPotsInClimbOrderWithUniqueIds() {
         XCTAssertEqual(PotCatalog.all.map(\.id), Self.order)
         XCTAssertEqual(Set(PotCatalog.all.map(\.id)).count, 16)
