@@ -5,6 +5,8 @@ struct WordTilesView: View {
     let word: String
     let guessed: Set<Character>
     var revealAll = false
+    /// The letter just found: its tiles pop 1.1x with a marigold wash and a small puff of petals.
+    var pop: TilePop? = nil
 
     var body: some View {
         FlowLayout(spacing: 14, lineSpacing: 10) {
@@ -21,17 +23,30 @@ struct WordTilesView: View {
 
     private func tile(_ ch: Character) -> some View {
         let shown = revealAll || guessed.contains(ch)
-        return ZStack {
-            RoundedRectangle(cornerRadius: 10)
-                .fill(shown ? Color.appAccent.opacity(0.22) : Color.appSurface)
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(shown ? Color.appAccent : Color.appPrimaryText.opacity(0.18), lineWidth: 2)
-            Text(shown ? String(ch) : "")
-                .font(Theme.font(.title2, weight: .heavy))
-                .foregroundStyle(Color.appPrimaryText)
-                .transition(.scale.combined(with: .opacity))
+        let hot = pop.flatMap { $0.letter == ch ? $0 : nil }
+        let fresh = hot.map { Date.now.timeIntervalSince($0.at) < 0.9 } ?? false
+        return TilePopFrame(pop: hot) { wash, scale in
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(shown ? Color.appAccent.opacity(0.22) : Color.appSurface)
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color(hex: PetalKit.marigold).opacity(wash))
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(shown ? Color.appAccent : Color.appPrimaryText.opacity(0.18), lineWidth: 2)
+                Text(shown ? String(ch) : "")
+                    .font(Theme.font(.title2, weight: .heavy))
+                    .foregroundStyle(Color.appPrimaryText)
+                    .transition(.scale.combined(with: .opacity))
+            }
+            .frame(width: 30, height: 42)
+            .scaleEffect(scale)
         }
-        .frame(width: 30, height: 42)
+        .overlay {
+            if let hot, fresh {
+                PetalPuff(trigger: hot.id, level: hot.level, arcRadius: 34).frame(width: 220, height: 220)
+            }
+        }
+        .zIndex(fresh ? 1 : 0)
         .animation(.spring(response: 0.3, dampingFraction: 0.6), value: shown)
     }
 

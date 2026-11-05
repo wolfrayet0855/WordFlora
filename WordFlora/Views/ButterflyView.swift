@@ -38,6 +38,7 @@ struct ButterflyView: View {
             }
         }
         .onAppear { if game == nil && summary == nil { start() } }
+        .sensoryFeedback(.success, trigger: summary != nil) { _, ended in ended && app.settings.hapticsOn }
         .onReceive(ticker) { now in
             guard var g = game, summary == nil else { lastTick = now; return }
             // Real elapsed time, so a busy screen can never slow the game down; capped so a long pause isn't a jump.
@@ -150,6 +151,7 @@ struct ButterflyView: View {
     private func summaryCard(_ s: ButterflyRewards.Summary) -> some View {
         ZStack {
             Color.black.opacity(0.45).ignoresSafeArea()
+            CelebrationBurst(requested: [.medium], origin: .fromTop(ScreenInsets.top + 80))     // petals behind the card
             ScrollView {
                 VStack(spacing: 12) {
                     Text(VisitorsCopy.summaryTitle(friends: s.newStickerIds.count))

@@ -11,9 +11,12 @@ struct GameView: View {
     @Environment(GameRouter.self) private var router
     @State private var started = false
     @State private var showEarned = false
-    @State private var showRain = false
+    /// The win: a dim at once, petals over it, the card at 0.7 s above them (design-preview/celebrate, confetti "large").
+    @State private var winDim = false
+    @State private var winBurst: [CelebrationLevel]?
+    /// The letter just found: its tiles pop with a small puff of petals.
+    @State private var tilePop: TilePop?
     @State private var showRestCard = false
-    @State private var badgeToast: String?
     @State private var showBreak = false
     /// Whether "One more" may lead to an ad, captured once as the resting card opens so its note never flickers.
     @State private var adNoteOnOneMore = false
@@ -42,7 +45,7 @@ struct GameView: View {
                     .frame(height: 170)
                 VStack(spacing: 10) {
                     hintCard
-                    WordTilesView(word: vm.currentWord, guessed: vm.guessedLetters, revealAll: vm.phase == .rested)
+                    WordTilesView(word: vm.currentWord, guessed: vm.guessedLetters, revealAll: vm.phase == .rested, pop: tilePop)
                         .padding(.horizontal, 8)
                     if tutorial && vm.guessedLetters.isEmpty {
                         Text("Tap a letter to guess").font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText)
@@ -80,16 +83,24 @@ struct GameView: View {
             else if daily { vm.startDaily() } else { vm.startRound(level: level) }
             if Self.uiTestBreakCard { showBreak = true }
         }
-        .onDisappear { ReadAloud.shared.stop() }
+        .onDisappear { ReadAloud.shared.stop(); app.pauseBadgeMoments(.round, false) }
         .onChange(of: vm.phase) { _, phase in
-            if phase == .won || phase == .rested { showBadges(app.roundFinished()) }
+            if phase == .won || phase == .rested {
+                // Badges earned this round wait for the round's card to close, then pop at the root.
+                app.pauseBadgeMoments(.round, true)
+                if !app.roundFinished().isEmpty { app.markPeakDismissed() }
+            }
             if phase == .won {
-                // The big celebration (sound, flower rain, lub-dub) is for a plant arriving. A word that only moves
-                // toward the next plant keeps the round's own win sound and gets the calm card.
+                // The round already played its one win sound (GameViewModel). The big petal burst is for a plant
+                // arriving or the Daily Bloom, with a level up layered over it; a word that only moves toward the next
+                // plant has had its puff from the last tile. Calm mode gets the gentle drift (CelebrationStyle).
                 let arrived = vm.earnedPlantName != nil
-                if arrived { app.play(vm.leveledUp ? .levelUp : .earned) }
-                showRain = arrived && !app.settings.calmMode
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
+                var levels = [CelebrationLevel]()
+                if vm.leveledUp { levels.append(.medium) }
+                if arrived || vm.isDaily { levels.append(.large) }
+                winBurst = levels.isEmpty ? nil : levels
+                withAnimation(.easeOut(duration: reduceMotion ? 0.15 : 0.3)) { winDim = true }
+                DispatchQueue.main.asyncAfter(deadline: .now() + (reduceMotion ? 0.15 : 0.7)) {
                     showEarned = true
                     if arrived && app.settings.hapticsOn {      // a soft lub-dub as the new plant appears
                         let g = UIImpactFeedbackGenerator(style: .soft); g.impactOccurred(intensity: 0.6)
@@ -167,9 +178,12 @@ struct GameView: View {
     @ViewBuilder private var overlays: some View {
         if vm.phase == .restingOffer { restingOffer }
         if vm.phase == .rested { restedCard }
+        if winDim { Color.black.opacity(0.45).ignoresSafeArea().transition(.opacity) }
+        if winDim, let winBurst {
+            CelebrationBurst(requested: winBurst, origin: .fromTop(ScreenInsets.top + 36)).accessibilityIdentifier("petalConfetti")
+        }
         if showEarned { earnedCard }
         if showRestCard { restCard }
-        if let badgeToast { badgeBanner(badgeToast) }
         if showBreak { breakCard }
     }
 
@@ -204,7 +218,7 @@ struct GameView: View {
     }
 
     private var earnedCard: some View {
-        dimmed(rain: showRain) {
+        dimmed(dim: false) {
             VStack(spacing: 12) {
                 if vm.leveledUp { Label("Level up! New plants to find", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.accentText) }
                 if let name = vm.earnedPlantName {
@@ -227,7 +241,7 @@ struct GameView: View {
                 }
                 shareButton
                 if vm.roseDropped { Label("A Rose of Jericho is in your satchel", systemImage: "leaf.circle.fill").font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.successText) }
-                Button("Continue") { showEarned = false; app.markPeakDismissed(); afterRound() }.buttonStyle(PrimaryButtonStyle())
+                Button("Continue") { showEarned = false; winDim = false; winBurst = nil; app.markPeakDismissed(); afterRound() }.buttonStyle(PrimaryButtonStyle())
             }
         }
     }
@@ -373,15 +387,14 @@ struct GameView: View {
         withAnimation(.easeOut(duration: 0.3)) { change() }
     }
 
-    /// Dim, then (optionally) the flower rain, then the card on top so text is never covered.
+    /// Dim (unless the win's own dim is already up), then the card on top so text is never covered.
     /// `padding` is the card's inner padding (the resting and break cards bring their own, under a full-bleed header);
     /// `centered` keeps a short card in the middle of the screen while a tall one still scrolls.
-    private func dimmed<C: View>(rain: Bool = false, padding: CGFloat = 20, centered: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
+    private func dimmed<C: View>(dim: Bool = true, padding: CGFloat = 20, centered: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
         let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
         let card = content().padding(padding).background(Color.appBackground, in: shape).clipShape(shape).padding(24)
         return ZStack {
-            Color.black.opacity(0.45).ignoresSafeArea()
-            if rain { FlowerRainView(onFinish: { showRain = false }).ignoresSafeArea() }
+            if dim { Color.black.opacity(0.45).ignoresSafeArea() }
             if centered {
                 GeometryReader { geo in
                     ScrollView { card.frame(maxWidth: .infinity, minHeight: geo.size.height) }
@@ -395,34 +408,16 @@ struct GameView: View {
         .transition(reduceMotion ? .opacity : .opacity.combined(with: .scale(scale: 0.96)))
     }
 
-    private func badgeBanner(_ text: String) -> some View {
-        VStack {
-            Label(text, systemImage: "rosette").font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                .padding(.horizontal, 16).padding(.vertical, 10).background(Color.appSurface, in: Capsule()).shadow(radius: 6, y: 2)
-                .transition(.move(edge: .top).combined(with: .opacity))
-            Spacer()
-        }.padding(.top, 8).allowsHitTesting(false)
-    }
-
-    /// One badge toast at a time, shown after the round's own celebration so it never stacks with it.
-    private func showBadges(_ unlocks: [BadgeUnlock]) {
-        guard let u = unlocks.max(by: { $0.tier < $1.tier }) else { return }
-        let defs = (try? BadgeCatalog.load()) ?? []
-        let title = defs.first { $0.id == u.badgeId }?.title ?? "Badge"
-        let tier = ["Bronze", "Silver", "Gold"][max(0, min(2, u.tier - 1))]
-        app.markPeakDismissed()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-            app.play(.badge(tier: u.tier))
-            withAnimation { badgeToast = "\(tier) \(title)" }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) { withAnimation { badgeToast = nil } }
-        }
-    }
-
     // MARK: Actions
 
     private func tap(_ ch: Character) {
+        let fresh = vm.phase == .playing && !vm.guessedLetters.contains(ch)
         vm.guessInput = String(ch)
         withAnimation { vm.submitGuess() }
+        if fresh && vm.currentWord.contains(ch) {
+            tilePop = TilePop(letter: ch, id: (tilePop?.id ?? 0) + 1,
+                              level: app.celebrationLevel(.small, systemReduceMotion: systemReduceMotion), at: .now)
+        }
     }
 
     static func tutorialEntry(in bank: WordBank) -> WordEntry {
@@ -430,6 +425,7 @@ struct GameView: View {
     }
 
     private func afterRound() {
+        app.pauseBadgeMoments(.round, false)
         if tutorial { onTutorialFinished(); return }
         if vm.sessionBeat {
             adNoteOnOneMore = app.adWouldPlayOnOneMore

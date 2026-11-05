@@ -60,7 +60,8 @@ struct WakeSheet: View {
         .background(Color.appBackground.ignoresSafeArea())
         .presentationDetents([.medium, .large], selection: $detent)
         .presentationDragIndicator(.visible)
-        .onAppear { detent = needsLarge(.choose) ? .large : .medium }
+        .onAppear { detent = needsLarge(.choose) ? .large : .medium; app.pauseBadgeMoments(.sheet, true) }
+        .onDisappear { app.pauseBadgeMoments(.sheet, false) }      // badges from the wake game pop once the sheet is closed
         .onChange(of: step) { _, s in withAnimation { detent = needsLarge(s) ? .large : .medium } }
     }
 
@@ -336,6 +337,7 @@ struct WakeSuccessView: View {
             .onTapGesture { showAll() }
         }
         .scrollBounceBehavior(.basedOnSize)
+        .background { CelebrationBurst(requested: [.medium], origin: .fromTop(36 + 100)) }     // petals from behind the plant
         .modifier(PetalHaptics(enabled: app.settings.hapticsOn, shown: shown, total: total))
         .task { await run() }
     }

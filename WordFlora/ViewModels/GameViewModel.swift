@@ -351,7 +351,8 @@ final class GameViewModel {
         sessionBeat = !isTutorial && (isDaily || (regularRoundsThisSitting > 0 && regularRoundsThisSitting % 3 == 0))
 
         try? modelContext.save()
-        sounds.play(won ? .word : .rest)
+        // Exactly one sound for the round's end: level up, else a plant arriving, else the word itself.
+        sounds.play(won ? CelebrationStyle.winSound(leveledUp: leveledUp, plantArrived: earnedPlantName != nil) : .rest)
     }
 
     /// One water for a win, +1 for a clean round (<= 2 misses), +1 on the Daily Bloom. Help never reduces it below 1.

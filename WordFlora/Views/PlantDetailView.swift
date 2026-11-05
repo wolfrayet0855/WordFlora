@@ -26,6 +26,7 @@ struct PlantDetailView: View {
     @State private var renaming = false
     @State private var draftName = ""
     @State private var bump = false
+    @State private var stagePuff = 0          // a small puff of petals at the plant's head when it grows a stage
     @State private var aiText: String?
     @State private var aiBusy = false
     @State private var showWake = false      // Wake the seed (see the marked block below)
@@ -256,6 +257,9 @@ struct PlantDetailView: View {
         .scaleEffect(bump ? 1.06 : 1)
         .animation(.spring(response: 0.4, dampingFraction: 0.45), value: bump)
         .overlay { TapBurst(trigger: hellos) }
+        .overlay(alignment: .top) {
+            PetalPuff(trigger: stagePuff, level: app.celebrationLevel(.small, systemReduceMotion: reduceMotion)).frame(width: 240, height: 240).offset(y: -80)
+        }
         .overlay(alignment: .topTrailing) {
             if thirsty {
                 Image(systemName: "drop.fill").foregroundStyle(Color.successText).padding(10)
@@ -541,7 +545,7 @@ struct PlantDetailView: View {
             app.play(.snip)
         }
         let delay = TendEffect(action) == nil ? 0 : (calm ? 0.4 : 0.9)
-        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { if outcome.stageUp { bump.toggle() } }
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { if outcome.stageUp { bump.toggle(); stagePuff += 1 } }
         show(outcome.message, ok: true, after: delay)
     }
 
