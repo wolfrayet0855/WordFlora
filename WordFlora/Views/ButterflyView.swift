@@ -252,8 +252,12 @@ struct VisitorsView: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     @State private var detail: VisitorSpecies?
 
-    private var columns: [GridItem] {
-        typeSize.isAccessibilitySize ? [GridItem(.flexible())] : [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)]
+    /// Two cards a row, one at accessibility text sizes.
+    private var albumColumns: Int { typeSize.isAccessibilitySize ? 1 : 2 }
+    private var albumRows: [[VisitorSpecies]] {
+        stride(from: 0, to: VisitorCatalog.all.count, by: albumColumns).map {
+            Array(VisitorCatalog.all[$0 ..< min($0 + albumColumns, VisitorCatalog.all.count)])
+        }
     }
 
     var body: some View {
@@ -267,8 +271,15 @@ struct VisitorsView: View {
                 Text(VisitorsCopy.album.uppercased()).font(Theme.font(.footnote, weight: .heavy)).tracking(1.5)
                     .foregroundStyle(Color.secondaryText).padding(.top, 4).accessibilityAddTraits(.isHeader)
                     .accessibilityLabel(VisitorsCopy.album)
-                LazyVGrid(columns: columns, spacing: 12) {
-                    ForEach(VisitorCatalog.all, id: \.id) { v in albumCard(v, album: album) }
+                // Twelve cards, laid out eagerly (not a lazy grid): every card stays measurable when large text pushes
+                // it below the fold, which the Dynamic Type audit relies on.
+                VStack(spacing: 12) {
+                    ForEach(albumRows, id: \.first!.id) { row in
+                        HStack(spacing: 12) {
+                            ForEach(row, id: \.id) { v in albumCard(v, album: album) }
+                            if row.count < albumColumns { Color.clear.frame(maxWidth: .infinity) }
+                        }
+                    }
                 }
             }
             .padding(20)
@@ -285,9 +296,11 @@ struct VisitorsView: View {
                 Circle().stroke(Color.tileVisitorsIcon.opacity(0.25), lineWidth: 9)
                 Circle().trim(from: 0, to: CGFloat(met) / CGFloat(max(1, total)))
                     .stroke(Color.tileVisitorsIcon, style: StrokeStyle(lineWidth: 9, lineCap: .round)).rotationEffect(.degrees(-90))
-                Text("\(met)").font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
             }
-            .frame(width: 62, height: 62).accessibilityHidden(true)
+            .frame(width: 62, height: 62)
+            // The number sits over the ring as its own text, so its contrast is judged against the card behind it,
+            // not against the ring. The line beside it says the same, so VoiceOver skips it.
+            .overlay { Text("\(met)").font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText).accessibilityHidden(true) }
             VStack(alignment: .leading, spacing: 4) {
                 Text(VisitorsCopy.friendsMet(met, of: total)).font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                 Text(VisitorsCopy.moreFlowers).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
@@ -452,7 +465,9 @@ struct VisitorDetailSheet: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .background(Color.appBackground.ignoresSafeArea())
-        .presentationDetents([.medium, .large])
+        // Full height: a medium sheet floats and is drawn about 4% smaller, which shrinks its text below the size the
+        // reader chose (the accessibility audit reports it as clipped).
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
 }

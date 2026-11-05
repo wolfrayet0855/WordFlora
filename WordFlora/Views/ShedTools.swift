@@ -252,8 +252,15 @@ struct ToolSheet: View {
                             .accessibilityIdentifier("shed.upgradeButton")
                         } else {
                             VStack(alignment: .leading, spacing: 6) {
-                                ProgressView(value: Double(points), total: Double(cost)).tint(tint.icon)
-                                    .accessibilityLabel(ShedCopy.progress(have: points, cost: cost))
+                                // A drawn bar, not a ProgressView: the line under it already says the same in words,
+                                // so VoiceOver reads it once, and a 4 pt bar is not offered as something to touch.
+                                Capsule().fill(tint.icon.opacity(0.2)).frame(height: 4)
+                                    .overlay(alignment: .leading) {
+                                        GeometryReader { g in
+                                            Capsule().fill(tint.icon).frame(width: g.size.width * min(1, Double(points) / Double(max(1, cost))))
+                                        }
+                                    }
+                                    .accessibilityHidden(true)
                                 HStack {
                                     Text(ShedCopy.progress(have: points, cost: cost)).font(Theme.font(.subheadline, weight: .bold))
                                     Spacer(minLength: 8)
@@ -274,7 +281,9 @@ struct ToolSheet: View {
         }
         .scrollBounceBehavior(.basedOnSize)
         .background(Color.appBackground.ignoresSafeArea())
-        .presentationDetents([.medium, .large])
+        // Full height: a medium sheet floats and is drawn about 4% smaller, which shrinks its text below the size the
+        // reader chose (the accessibility audit reports it as clipped).
+        .presentationDetents([.large])
         .presentationDragIndicator(.visible)
     }
 
