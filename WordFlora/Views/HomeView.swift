@@ -426,3 +426,15 @@ private struct PressScaleStyle: ButtonStyle {
             .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
     }
 }
+/// The small Rose of Jericho line on Home. Plain words, no symbols that read like a sum
+/// (an earlier "x1 · 0 of 8" read as "1 0x8").
+enum HomeRoseLine {
+    static func text(stock: Int, progress: Int, threshold: Int, full: Bool) -> String {
+        let have = stock == 1 ? "1 Rose of Jericho in your satchel" : "\(stock) Roses of Jericho in your satchel"
+        if full { return "\(have). Your satchel is full." }
+        let toGo = max(0, threshold - progress)
+        let more = toGo == 1 ? "1 more word" : "\(toGo) more words"
+        if stock == 0 { return "Finish \(more) to earn a Rose of Jericho." }
+        return "\(have). Finish \(more) for another."
+    }
+}
