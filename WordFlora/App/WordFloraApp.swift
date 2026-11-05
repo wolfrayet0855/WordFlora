@@ -92,6 +92,10 @@ struct WordFloraApp: App {
             try? model.context.save()
         }
         if uiTesting && args.contains("-uitest-calm") { model.settings.calmMode = true }
+        if uiTesting && args.contains("-uitest-celebrate=badge") {
+            // A badge moment on Home that stays until tapped (BadgeMomentHost), for its UI test and audit.
+            model.enqueueBadgeMoments([BadgeUnlock(badgeId: "perfect_bloom", tier: 1, at: .now)])
+        }
         if uiTesting && args.contains("-uitest-quiet") { model.settings.quietGarden = true }
         if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-sessions=") }).flatMap({ Int($0.dropFirst("-uitest-sessions=".count)) }) {
             model.settings.completedSessions = n            // past the first sessions, so the ad rules can say yes

@@ -213,7 +213,7 @@ final class AppModel {
 
         plant.lastLovedAt = date
         let counter: BadgeCounter? = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return nil } }()
-        if let counter { badges.record(counter, now: date, quiet: quiet); p.badgesJSON = badges.json }
+        if let counter { enqueueBadgeMoments(badges.record(counter, now: date, quiet: quiet), after: 1.0); p.badgesJSON = badges.json }
         try? context.save()
 
         let name = plant.nickname.isEmpty ? plant.name : plant.nickname
@@ -491,6 +491,7 @@ final class AppModel {
             if game.isDaily { unlocks += badges.record(.dailyBloomsDone, now: t, quiet: quiet) }
         }
         unlocks += badges.record(.streak, value: p.streak, now: t, quiet: quiet)
+        enqueueBadgeMoments(unlocks)                // shown when the round's card closes (GameView pauses them until then)
         p.badgesJSON = badges.json
         try? context.save()
         syncToolUnlocks()
@@ -503,7 +504,7 @@ final class AppModel {
         game.wakeUp()
         guard (profile?.roseOfJerichoCount ?? 0) < before else { return }
         play(.wake)
-        badges.record(.revives, now: now(), quiet: settings.quietGarden)
+        enqueueBadgeMoments(badges.record(.revives, now: now(), quiet: settings.quietGarden), after: 0.6)
         profile?.badgesJSON = badges.json
         try? context.save()
     }
@@ -554,8 +555,8 @@ final class AppModel {
             p.butterflyPlaysJSON = (try? JSONEncoder().encode(counter)).flatMap { String(data: $0, encoding: .utf8) } ?? ""
         }
 
-        badges.record(.visitorSpecies, value: a.species, now: t, quiet: quiet)
-        badges.record(.butterflyPlays, now: t, quiet: quiet)
+        let unlocks = badges.record(.visitorSpecies, value: a.species, now: t, quiet: quiet) + badges.record(.butterflyPlays, now: t, quiet: quiet)
+        enqueueBadgeMoments(unlocks, after: wake ? 0.6 : 1.9)     // after the summary's petals (a wake waits for its sheet to close)
         p.badgesJSON = badges.json
         try? context.save()
         syncToolUnlocks()
@@ -583,6 +584,61 @@ final class AppModel {
     func refreshReminders() {
         guard settings.remindMe else { return }
         reminders.refresh(now: now(), hour: settings.reminderHour, minute: settings.reminderMinute, lastOpened: now(), dailyBloomDoneToday: dailyBloomDoneToday)
+    }
+
+    // MARK: Badge moments
+
+    /// Badges earned and not yet shown, oldest first. Every unlock site feeds this (rounds, tending, revives, butterflies).
+    private(set) var pendingBadges: [BadgeUnlock] = []
+    var pendingBadge: BadgeUnlock? { pendingBadges.first }
+    /// The badge moment on screen now (BadgeMomentView at the root).
+    private(set) var shownBadge: BadgeUnlock?
+    /// How long the next moment waits, so it follows the moment's own celebration instead of covering it.
+    private(set) var badgeMomentDelay: Double = 0
+
+    /// Screens with their own celebration card hold badge moments until it closes; a sheet holds them because the
+    /// root overlay would sit under it.
+    enum BadgePause: Hashable { case round, sheet }
+    private(set) var badgePauses: Set<BadgePause> = []
+    var badgeMomentsPaused: Bool { !badgePauses.isEmpty }
+
+    func pauseBadgeMoments(_ reason: BadgePause, _ paused: Bool) {
+        if paused { badgePauses.insert(reason) } else { badgePauses.remove(reason) }
+    }
+
+    /// One moment per badge (its highest new tier), in the order they were earned. Quiet Garden never unlocks badges,
+    /// so nothing arrives here.
+    func enqueueBadgeMoments(_ unlocks: [BadgeUnlock], after delay: Double = 0) {
+        guard !unlocks.isEmpty else { return }
+        var best = [String: BadgeUnlock](), order = [String]()
+        for u in unlocks {
+            if let b = best[u.badgeId] { if u.tier > b.tier { best[u.badgeId] = u } } else { best[u.badgeId] = u; order.append(u.badgeId) }
+        }
+        pendingBadges += order.compactMap { best[$0] }
+        badgeMomentDelay = delay
+    }
+
+    /// Moves the next badge on screen (with its tier sound; no haptic). Nil while paused or while one is showing.
+    @discardableResult
+    func presentNextBadge() -> BadgeUnlock? {
+        guard shownBadge == nil, !badgeMomentsPaused, !pendingBadges.isEmpty else { return nil }
+        let next = pendingBadges.removeFirst()
+        shownBadge = next
+        play(.badge(tier: next.tier))
+        return next
+    }
+
+    func dismissBadgeMoment() {
+        shownBadge = nil
+        badgeMomentDelay = 0.3
+    }
+
+    // MARK: Celebrations
+
+    /// The celebration a moment plays here and now (CelebrationStyle: Reduce Motion, Calm, Quiet Garden, Low Power).
+    func celebrationLevel(_ requested: CelebrationLevel, systemReduceMotion: Bool) -> CelebrationLevel {
+        CelebrationStyle.resolve(requested: requested, settings: settings, systemReduceMotion: systemReduceMotion,
+                                 lowPower: ProcessInfo.processInfo.isLowPowerModeEnabled)
     }
 
     // MARK: Sound
