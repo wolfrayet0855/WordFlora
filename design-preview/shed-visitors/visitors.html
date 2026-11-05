@@ -1,0 +1,114 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Garden Visitors mockup</title>
+<link rel="stylesheet" href="../theme.css"><link rel="stylesheet" href="common.css">
+<script src="../theme.js"></script><script src="common.js"></script>
+<style>
+/* sheet chrome */
+.sheetwrap{position:absolute;inset:0;background:#000;z-index:4}
+.sheetwrap .under{position:absolute;left:10px;right:10px;top:50px;height:40px;border-radius:12px 12px 0 0;background:color-mix(in srgb,var(--bg) 70%,#000)}
+.sht{position:absolute;top:62px;left:0;right:0;bottom:0;background:var(--bg);border-radius:12px 12px 0 0;overflow:hidden}
+.sht .nav2{background:var(--bg);z-index:2;height:56px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;position:relative}
+.sht .nav2 .done{position:absolute;right:16px;color:var(--accent-text);font-weight:700}
+.sht .in{padding:4px 20px 40px}
+.alb{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ax .alb.p{grid-template-columns:1fr}
+.phone.sheetp .sb{color:#fff}
+.ac{background:var(--surface);border-radius:18px;padding:12px;min-height:150px;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center}
+.ac img{height:80px;width:80px}
+.ac.un img{filter:grayscale(1) brightness(.5);opacity:.5}
+.ac b{font-size:.9375em}
+.ac .f{font-size:.75em;color:var(--txt2)}
+/* proposed */
+.rch{display:inline-block;font-size:.6875em;font-weight:800;padding:2px 8px;border-radius:999px}
+.r-common{background:var(--com);color:var(--com-ink)}.r-uncommon{background:var(--unc);color:var(--unc-ink)}.r-rare{background:var(--rare);color:var(--rare-ink)}
+.ac.p{position:relative;border:1px solid var(--card-line)}
+.ac.p .cnt{font-size:.75em;font-weight:700;color:var(--ok)}
+.ac.p.un{background:color-mix(in srgb,var(--surface) 55%,transparent);border:1.5px dashed color-mix(in srgb,var(--text) 26%,transparent)}
+.ac.p.un img{filter:grayscale(1) contrast(.6) brightness(1.15);opacity:.45}
+[data-theme=dark] .ac.p.un img{filter:grayscale(1) brightness(.9);opacity:.4}
+.ac.p.un b{color:var(--txt2)}
+.ac.p .tap{font-size:.6875em;color:var(--txt2)}
+.hero2{display:flex;gap:12px;align-items:center;padding:14px;margin:4px 0 12px;background:var(--vis-bg);border-color:color-mix(in srgb,var(--vis-ic) 28%,transparent)}
+.hero2 .ringp{width:64px;height:64px;flex:none}
+.hero2 h3{margin:0;font-size:1.125em}.hero2 p{margin:2px 0 0;font-size:.8125em;color:var(--txt2)}
+.playc{padding:14px;margin-bottom:12px;display:flex;flex-direction:column;gap:10px}
+.playc .top{display:flex;gap:12px;align-items:center}.playc .top img{width:56px;height:56px}
+.playc h3{margin:0;font-size:1.0625em}.playc p{margin:0;font-size:.8125em;color:var(--txt2)}
+.sec{font-size:.75em;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:var(--txt2);margin:4px 4px 8px}
+.row3{display:flex;gap:8px;margin-bottom:12px}
+.mini{flex:1;padding:4px 6px;display:flex;gap:8px;align-items:center;font-size:.75em}
+.mini img{width:34px;height:34px;flex:none}.mini b{display:block;font-size:1.05em}
+.det{position:absolute;left:0;right:0;bottom:0;top:250px;background:var(--bg);border-radius:22px 22px 0 0;box-shadow:0 -8px 30px rgba(0,0,0,.25);padding:10px 22px 40px;text-align:center;z-index:7}
+.det .grab{width:36px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--text) 30%,transparent);margin:0 auto 10px}
+.det img.big{width:140px;height:140px}
+.det h2{margin:4px 0 6px;font-size:1.5em}
+.det .met{font-weight:700;color:var(--ok);margin:8px 0}
+.det .fact{background:var(--surface);border-radius:16px;padding:12px 14px;text-align:left;font-size:.9375em;margin:10px 0}
+.det .fact b{display:block;font-size:.75em;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-text);margin-bottom:2px}
+.det .pet{display:flex;align-items:center;gap:8px;border:1.5px dashed color-mix(in srgb,var(--text) 30%,transparent);border-radius:14px;padding:10px 12px;text-align:left;font-size:.875em;color:var(--txt2);margin:8px 0 14px}
+.det .pet svg{width:18px;height:18px;color:var(--accent-text)}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:6}
+/* intro reuse */
+.gbg{position:absolute;inset:0;background:linear-gradient(#BFE6F5,#E9F6E0)}
+.gbg.eve{background:linear-gradient(#1F2A4A,#3A3F6B)}
+.bed{position:absolute;left:0;right:0;bottom:0;height:120px;background:rgba(78,154,85,.85)}
+.bedp{position:absolute;bottom:30px;left:0;right:0;display:flex;justify-content:center}.bedp img{height:74px;margin:0 -3px}
+.intro{position:absolute;left:0;right:0;top:98px;bottom:34px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center;z-index:3}
+.intro img.net{height:110px}.intro h2{margin:0;font-size:1.375em;color:#1F3320}.intro p{margin:0;color:rgba(31,51,32,.8)}
+.eve .intro h2{color:#fff}.eve .intro p{color:rgba(255,255,255,.85)}
+.phone.g .sb,.phone.g .nav{color:#1F3320}.phone.g .nav .back{color:#8A5A00}
+.phone.g.eve .sb,.phone.g.eve .nav{color:#fff}.phone.g.eve .nav .back{color:#F0C060}
+.tog{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;color:#fff;font-size:.9375em;text-align:left}
+.tog i{width:51px;height:31px;border-radius:16px;background:#E8A838;position:relative;flex:none}.tog i::after{content:"";position:absolute;right:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff}
+</style></head><body><div class="doc">
+<header>WM_HERE<h1>Garden Visitors</h1><button class="btn" id="th"></button></header>
+<nav class="links"><a href="index.html">Hub</a><a href="shed.html">Shed</a><a href="butterfly-game.html">Butterfly game</a></nav>
+<p class="sub">Twelve real visitors (<code>Butterfly.swift:15</code>): five often seen, four sometimes seen, three rare. Fireflies and luna moths come in the evening (17:30 to 21:30). You meet them in the butterfly game; each hello adds a sticker to the album. Example player: 7 of 12 met.</p>
+
+<section><h2>1. App today <span class="tagp tag-now">App today</span></h2>
+<p class="sub">There is no Visitors screen of its own: the Home "Visitors" tile opens the butterfly game intro, and the album is a sheet from there (<code>AlbumView</code>, <code>ButterflyView.swift:182</code>). The album shows name and fact for visitors you met; the rest are dark grey shapes with "Not met yet". Rarity and how many times you met each one are stored but never shown.</p>
+<div class="row" id="today"></div></section>
+
+<section><h2>2. Proposed <span class="tagp tag-prop">Proposed</span></h2>
+<p class="sub">A real Visitors page: how many friends you have met, a big "Say hello" card that starts the game, and the album right there. Album cards show how often a visitor comes (Often seen, Sometimes seen, Rare visitor) and how many times you met it. Visitors not met yet are soft outlines, not dark shapes. A tap opens a card with the fact. An optional pet name lets a child name a visitor, like plants have nicknames.</p>
+<div class="row" id="prop"></div></section>
+</div>
+<script>
+document.querySelector('header').innerHTML=document.querySelector('header').innerHTML.replace('WM_HERE',WM);themeButton('#th');
+const MET={monarch:3,cabbagewhite:5,honeybee:4,ladybug:2,bumblebee:1,dragonfly:1,paintedlady:2};
+const nMet=Object.keys(MET).length;
+const BED=['daisy','sunflower','lavender','rose','tulip','marigold'];
+const bed=`<div class="bed"></div><div class="bedp">${BED.map(p=>`<img src="../plants/plant_${p}.svg" alt="">`).join('')}</div>`;
+function introPhone(o){const inner=`<div class="gbg${o.eve?' eve':''}"></div>${bed}<div class="intro"><img class="net" src="${tool('net',1)}" alt=""><h2>Meet your garden visitors</h2><p>Swipe the net across the visitors to say hello. Every visit is a good one.</p>${o.lantern?'<div class="tog">Use a Glow Lantern for night visitors<i></i></div>':''}<button class="pbtn">Start</button><button class="sbtn">${IC.book}Visitor album</button></div>`;
+ return phone('',{title:'Butterfly game',tag:o.tag,theme:o.theme,ax:o.ax,bodyStyle:'display:none'}).replace('<div class="body" style="display:none"></div>',inner).replace('class="phone','class="phone g'+(o.eve?' eve':''))}
+function albumToday(){return `<div class="alb">${VISITORS.map(v=>{const m=MET[v.id];return `<div class="ac${m?'':' un'}"><img src="${vis(v.id,'sticker')}" alt=""><b>${m?v.name:'Not met yet'}</b>${m&&v.fact?`<span class="f">${v.fact}</span>`:''}${!m&&v.night?'<span class="f">Comes out in the evening</span>':''}</div>`}).join('')}</div>`}
+function sheet(inner,o){const s=`<div class="sheetwrap"><div class="under"></div><div class="sht"><div class="nav2">${o.title}<span class="done">Done</span></div><div class="in" style="${o.scroll?`transform:translateY(-${o.scroll}px)`:''}">${inner}</div></div></div>`;
+ return phone(s,{raw:true,tag:o.tag,theme:o.theme,ax:o.ax}).replace('class="phone','class="phone sheetp')}
+document.getElementById('today').innerHTML=[
+ fig('t-intro','Home "Visitors" tile opens the game intro','The page is titled "Butterfly game". The album is the second button.',introPhone({tag:'now'})),
+ fig('t-alb','Visitor album sheet, light','Two columns. Met: colour sticker, name, and a fact when one has been checked (4 of the 7 met here have one). Not met: a dark grey shape and "Not met yet".',sheet(albumToday(),{title:'Visitor album',tag:'now'})),
+ fig('t-alb2','Album, scrolled','The evening visitors say "Comes out in the evening". No rarity, no count.',sheet(albumToday(),{title:'Visitor album',tag:'now',scroll:560})),
+ fig('t-dark','Album, dark','The darkened "not met" shapes almost vanish on the dark card.',sheet(albumToday(),{title:'Visitor album',tag:'now',theme:'dark'})),
+ fig('t-ax','Album, large text','Still two columns (the grid has a 150 pt minimum), so names and facts wrap into tall, narrow cards.',sheet(albumToday(),{title:'Visitor album',tag:'now',ax:true})),
+ fig('t-eve','Evening intro, with a Glow Lantern','The lantern toggle appears with a lantern in hand during the day. In the code nothing ever gives a lantern, so no player sees this today.',introPhone({tag:'now',eve:true,lantern:true})),
+].join('');
+
+/* proposed */
+const ring=(n,t)=>{const r=26,c=2*Math.PI*r;return `<svg class="ringp" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="${r}" fill="none" stroke="color-mix(in srgb,var(--vis-ic) 20%,transparent)" stroke-width="7"/><circle cx="32" cy="32" r="${r}" fill="none" stroke="var(--vis-ic)" stroke-width="7" stroke-linecap="round" stroke-dasharray="${c*n/t} ${c}" transform="rotate(-90 32 32)"/><text x="32" y="37" text-anchor="middle" font-size="15" font-weight="800" fill="var(--text)">${n}</text></svg>`};
+function albumProp(){return `<div class="alb p">${VISITORS.map(v=>{const m=MET[v.id];
+ return `<div class="ac p${m?'':' un'}"><img src="${vis(v.id,'sticker')}" alt=""><b>${m?v.name:'Not met yet'}</b><span class="rch r-${v.rarity}">${RARITY_WORD[v.rarity]}</span>${m?`<span class="cnt">Met ${m===1?'once':m+' times'}</span>`:v.night?'<span class="tap">Comes out in the evening</span>':'<span class="tap">Say hello in the game</span>'}</div>`}).join('')}</div>`}
+const visHome=()=>`<div class="card hero2">${ring(nMet,12)}<div><h3>${nMet} of 12 friends met</h3><p>More flowers in bloom bring more visitors.</p></div></div>
+<div class="card playc"><div class="top"><img src="${vis('monarch','a')}" alt=""><div><h3>Say hello to visitors</h3><p>About half a minute. Swipe or tap. Every visit is a good one.</p></div></div><button class="pbtn">Start</button></div>
+<div class="row3"><div class="mini"><img src="${vis('firefly','idle')}" alt=""><div><b>Evening friends</b>5:30 to 9:30 pm</div></div><div class="mini"><img src="${tool('net',1)}" alt=""><div><b>Your net: small</b>It grows in the Shed</div></div></div>
+<p class="sec">Album</p>${albumProp()}`;
+const mphone=(inner,o)=>phone(inner,{title:'Visitors',tag:'proposed',...o});
+function detail(id){const v=V(id),m=MET[id];return `<div class="dim"></div><div class="det"><div class="grab"></div><img class="big" src="${vis(id,'sticker')}" alt=""><h2>${v.name}</h2><span class="rch r-${v.rarity}">${RARITY_WORD[v.rarity]}</span><p class="met">You met ${v.name==='Monarch'?'this butterfly':'it'} ${m===1?'once':m+' times'}.</p><div class="fact"><b>Fun fact</b>${v.fact||'A fun fact is on its way.'}</div><div class="pet">${IC.heart}Give it a pet name (you can skip this)</div><button class="pbtn">Done</button></div>`}
+document.getElementById('prop').innerHTML=[
+ fig('p-home','Visitors page, light','Home "Visitors" opens this page. Progress ring, the play card, two plain info lines (not buttons), then the album.',mphone(visHome(),{})),
+ fig('p-alb','Scrolled to the album','Each card: sticker, name, how often it comes, how many times met. Not met yet: a soft outline and where to find it.',mphone(`<div style="transform:translateY(-330px)">${visHome()}</div>`,{})),
+ fig('p-det','Tap a visitor','A card rises with the fact. Visitors with no checked fact yet say "A fun fact is on its way." Pet name is optional (owner call).',mphone(visHome(),{over:detail('monarch')})),
+ fig('p-dark','Dark','Not-met outlines stay readable in dark mode.',mphone(`<div style="transform:translateY(-330px)">${visHome()}</div>`,{theme:'dark'})),
+ fig('p-ax','Large text','The album drops to one column; the play card stays at the top.',mphone(visHome(),{ax:true})),
+ fig('p-det2','Rare visitor, no fact yet','Blue Morpho, not met in this example, shown as if met once.',mphone(visHome(),{theme:'dark',over:detail('morpho').replace('You met it undefined times','You met it once')})),
+].join('');
+</script></body></html>

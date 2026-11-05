@@ -1,0 +1,27 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Shed and Visitors</title>
+<link rel="stylesheet" href="../theme.css"><link rel="stylesheet" href="common.css">
+<script src="../theme.js"></script><script src="common.js"></script>
+<style>
+.hub{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr));gap:18px;margin-top:18px}
+.hc{display:flex;flex-direction:column;gap:10px;padding:16px;text-decoration:none;color:var(--text)}
+.hc .th{display:flex;gap:8px;justify-content:center;background:var(--stage);border-radius:14px;padding:12px 8px}
+.hc .th img{width:46%;max-width:150px;border-radius:14px;aspect-ratio:420/880;object-fit:cover;object-position:top}
+.hc h2{margin:0;font-size:20px}
+.hc p{margin:0;font-size:14px;color:var(--txt2)}
+.hc ul{margin:0;padding-left:18px;font-size:14px}
+.hc .go{font-weight:800;color:var(--accent-text)}
+.key{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px;margin-top:6px}
+</style></head><body><div class="doc">
+<header>WM_HERE<h1>Shed and Visitors</h1><button class="btn" id="th"></button></header>
+<p class="sub">Screen mockups for three parts of WordFlora that had no screen page yet: the Garden Shed, Garden Visitors, and the Butterfly game. Each page shows the app as it is built today, then a proposed version. iPhone frames are 393 by 852, in light, dark and large text.</p>
+<div class="key"><span class="tagp tag-now">App today</span> drawn from the Swift code on this branch <span class="tagp tag-prop">Proposed</span> a change for the owner to judge</div>
+<div class="hub">
+ <a class="card hc" href="shed.html"><div class="th"><img src="shots/shed-t-light.png" alt="Shed today"><img src="shots/shed-p-light.png" alt="Shed proposed"></div><h2>Garden Shed</h2><p>Shed points, six tools with three tiers each, and the Pots grid.</p><ul><li>Proposed: say where points come from</li><li>Each tool says what it does now and next</li><li>A calm upgrade moment</li></ul><span class="go">Open shed.html &rsaquo;</span></a>
+ <a class="card hc" href="visitors.html"><div class="th"><img src="shots/visitors-t-alb.png" alt="Album today"><img src="shots/visitors-p-home.png" alt="Visitors proposed"></div><h2>Garden Visitors</h2><p>Twelve real visitors and the sticker album.</p><ul><li>Today the album is a sheet inside the game</li><li>Proposed: a Visitors page with friends met, how often each comes, and times met</li><li>Tap a visitor for its fact; optional pet name</li></ul><span class="go">Open visitors.html &rsaquo;</span></a>
+ <a class="card hc" href="butterfly-game.html"><div class="th"><img src="shots/butterfly-game-f-name.png" alt="Naming moment"><img src="shots/butterfly-game-f-awake.png" alt="Seed wakes"></div><h2>Butterfly game</h2><p>Playable in the browser: drag the net or tap. Free play and "Wake Daisy".</p><ul><li>Reduce Motion, evening, large text, dark</li><li>Proposed: name under each catch, "New friend" card, Calm mode game</li><li>A frame strip of 19 stills</li></ul><span class="go">Open butterfly-game.html &rsaquo;</span></a>
+</div>
+<p class="sub" style="margin-top:22px">Differences between the app and these mockups, with file and line: <code>docs/pm/shed-visitors-notes.md</code>. Art: <code>brand/v4/svg/</code> (visitors, tools), <code>pots/pots.json</code>, <code>plants/</code>.</p>
+</div>
+<script>document.querySelector('header').innerHTML=document.querySelector('header').innerHTML.replace('WM_HERE',WM);themeButton('#th');</script>
+</body></html>

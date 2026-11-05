@@ -1,0 +1,120 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Garden Shed mockup</title>
+<link rel="stylesheet" href="../theme.css"><link rel="stylesheet" href="common.css">
+<script src="../theme.js"></script><script src="common.js"></script>
+<style>
+.pts{display:flex;align-items:center;gap:8px;font-weight:700;font-size:1.0625em;color:var(--accent-text);margin:6px 0 12px}
+.pts svg{width:1.1em;height:1.1em}
+.tool{display:flex;gap:14px;align-items:flex-start;padding:14px 16px;margin-bottom:12px}
+.tool img{width:64px;height:64px;flex:none}
+.tool.off img{filter:grayscale(1);opacity:.4}
+.tool .t{flex:1;min-width:0}
+.tool h3{margin:0;font-size:1.0625em}
+.tier{display:inline-block;font-size:.75em;font-weight:800;padding:2px 8px;border-radius:999px;background:color-mix(in srgb,var(--accent) 25%,transparent);margin:3px 0 2px}
+.blurb{font-size:.78em;color:var(--txt2);margin:2px 0 0}
+.upg{font-size:.8125em;font-weight:700;margin-top:4px;min-height:28px;display:flex;align-items:center}
+.upg.can{color:var(--ok)}.upg.no{color:var(--txt2)}
+.full{font-size:.75em;font-weight:700;color:var(--ok);margin-top:4px}
+.pots h3{font-size:1.25em;margin:14px 0 0}.pots .ps{font-size:.8125em;font-weight:700;color:var(--txt2);margin:2px 0 8px}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ax .pgrid{grid-template-columns:repeat(2,1fr)}
+.pcard{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:22px 6px 9px;min-height:150px;background:var(--surface);border:1px solid var(--card-line);border-radius:18px;text-align:center}
+.pcard.ear{background:color-mix(in srgb,var(--surface) 55%,transparent);border:1.5px solid color-mix(in srgb,var(--text) 14%,transparent)}
+.pcard b{font-size:.875em;font-weight:900}
+.pcard .u{font-size:.75em;font-weight:700;color:var(--ok)}
+.pcard .g{font-size:.75em;font-weight:700;color:var(--txt2)}
+.pcard .bar{width:80%;max-width:90px;height:4px;border-radius:2px;background:var(--line);overflow:hidden}.pcard .bar i{display:block;height:100%;background:var(--ok)}
+.pcard .pr{font-size:.6875em;font-weight:700;color:var(--txt2)}
+.pcard .ckb{position:absolute;top:5px;right:5px;width:20px;height:20px;border-radius:50%;background:var(--ok);color:var(--surface);display:grid;place-items:center}.pcard .ckb svg{width:12px;height:12px}
+.pcard .plus{position:absolute;top:5px;right:5px;font-size:10px;font-weight:800;padding:1px 7px;border-radius:999px;background:var(--accent);color:var(--accent-ink)}
+.foot{font-size:.8125em;color:var(--txt2);margin:8px 0 0}
+.msg{font-weight:700;color:var(--ok);margin:4px 0 10px}
+/* proposed */
+.where{display:flex;gap:10px;align-items:center;padding:10px 12px;margin:0 0 12px;background:var(--vis-bg);border-color:color-mix(in srgb,var(--vis-ic) 30%,transparent)}
+.where img{width:40px;height:40px;flex:none}
+.where p{margin:0;font-size:.875em;flex:1}.where p b{display:block;font-size:1em}
+.where .go{color:var(--vis-ic);font-weight:800;font-size:.875em;white-space:nowrap}
+.pips{display:inline-flex;gap:4px;vertical-align:middle;margin-left:6px}
+.pips i{width:.65em;height:.65em;border-radius:50%;background:var(--line);box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ok) 60%,transparent)}
+.pips i.on{background:var(--ok);box-shadow:none}
+.does{font-size:.8125em;margin:4px 0 0}.does b{font-weight:800}
+.next{margin-top:8px;padding:8px 10px;border-radius:12px;background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.next p{margin:0;font-size:.78em}
+.next .bar2{height:6px;border-radius:3px;background:var(--line);margin:6px 0 4px;overflow:hidden}.next .bar2 i{display:block;height:100%;background:var(--accent)}
+.next .row2{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.next .go2{border:0;border-radius:12px;background:var(--accent);color:var(--accent-ink);font:inherit;font-weight:800;font-size:.8125em;min-height:44px;padding:6px 14px}
+.next .togo{font-size:.75em;font-weight:700;color:var(--txt2)}
+.tool.find{background:color-mix(in srgb,var(--surface) 55%,transparent);border:1.5px dashed color-mix(in srgb,var(--text) 30%,transparent)}
+.tool.find img{opacity:.75}
+.cele{position:absolute;left:16px;right:16px;bottom:70px;padding:16px;text-align:center;box-shadow:0 12px 30px rgba(0,0,0,.22);z-index:7}
+.cele img{width:84px;height:84px}
+.cele h3{margin:4px 0 2px;font-size:1.25em}.cele p{margin:0 0 12px;font-size:.9375em;color:var(--txt2)}
+.dim{position:absolute;inset:0;background:rgba(0,0,0,.35);z-index:6}
+.spark{position:absolute;width:10px;height:10px;color:var(--accent)}
+</style></head><body><div class="doc">
+<header>WM_HERE<h1>Garden Shed</h1><button class="btn" id="th"></button></header>
+<nav class="links"><a href="index.html">Hub</a><a href="visitors.html">Visitors</a><a href="butterfly-game.html">Butterfly game</a></nav>
+<p class="sub">Home &rarr; Shed. Opens at the second word level up (<code>FeatureUnlockPolicy.swift:27</code>); before that the Home tile shows "Opens at your second level up." Example player: 44 shed points, 12 plants grown, garden level 1 finished, no Plus. Can at tier 2; trowel, net and mister at tier 1; shears and lamp still to find.</p>
+
+<section><h2>1. App today <span class="tagp tag-now">App today</span></h2>
+<p class="sub">Drawn from <code>ShedView.swift</code> and <code>ShedPotsSection</code> (<code>PotPickerViews.swift:158</code>). One scrolling page: points, six tool cards, then the Pots grid.</p>
+<div class="row" id="today"></div></section>
+
+<section><h2>2. Proposed <span class="tagp tag-prop">Proposed</span></h2>
+<p class="sub">Same screen, three fixes. (a) Say where shed points come from: the butterfly game is the one source today, and the Shed never says so. (b) Each card says what the tool does now and what the next tier adds, with a bar toward the next upgrade instead of a grey "Upgrade for 30 points" that cannot be tapped. (c) Tools still to find use the same soft dashed card as pots to earn. The upgrade gets a small, calm moment.</p>
+<div class="row" id="prop"></div>
+<p class="note">The mister does nothing at any tier in the code, and the net tier changes the picture on the butterfly intro and nothing else. The proposed lines for those two ("Catch circle grows", "Gives a plant a drink of mist") need code before they can ship. Owner call: wire them, or hide upgrades for those two for now.</p>
+</section>
+</div>
+<script>
+document.querySelector('header').innerHTML=document.querySelector('header').innerHTML.replace('WM_HERE',WM);themeButton('#th');
+const TOOLS=[
+ {id:'can',name:'Watering can',tier:2,blurb:'Waters your plants. Better cans water more plants at once.',does:['Waters 1 plant per tap','Waters 2 plants per tap','Waters 3 plants per tap']},
+ {id:'trowel',name:'Trowel',tier:1,blurb:'Digs in soil for stronger growth.',does:['Soil helps plants grow','Soil helps a bit more','Soil helps the most']},
+ {id:'net',name:'Butterfly net',tier:1,blurb:'For catching garden visitors.',does:['Catch circle: small','Catch circle grows','Catch circle: big'],todo:true},
+ {id:'mister',name:'Mister',tier:1,blurb:'Finish all of level 1 in your garden to find it.',does:['A soft drink of mist','More mist','The most mist'],todo:true},
+ {id:'shears',name:'Shears',tier:0,blurb:'Finish level 2 in your garden to find them.',does:['A trim helps growth','A trim helps more','A trim helps the most'],find:'Finish level 2 in your garden to find them.'},
+ {id:'lamp',name:'Sun lamp',tier:0,blurb:'Finish level 3 in your garden to find it.',does:['Sun helps a little more','Sun helps more','Sun helps the most'],find:'Finish level 3 in your garden to find it.'},
+];
+const cost=t=>({2:30,3:120})[t];
+const PTS=44;
+function todayCard(t,quiet){const owned=t.tier>0,c=cost(t.tier+1);
+ return `<div class="card tool${owned?'':' off'}"><img src="${tool(t.id,t.tier)}" alt=""><div class="t"><h3>${t.name}</h3>${owned?`<span class="tier">Tier ${t.tier} of 3</span>`:''}<p class="blurb">${t.blurb}</p>${owned&&c?`<div class="upg ${PTS>=c?'can':'no'}">Upgrade for ${c} points</div>`:owned?'<div class="full">Fully upgraded</div>':''}</div></div>`}
+function potsToday(){const plants=12,levels=1;
+ const card=p=>{const k=p.unlock.kind;let st='own';if(k==='plus')st='plus';else if(k==='plants'&&plants<p.unlock.value)st='ear';else if(k==='level'&&levels<p.unlock.value)st='ear';
+  const now=k==='plants'?Math.min(plants,p.unlock.value):levels,goal=p.unlock.value;
+  const goalLine=k==='plants'?`Grow ${goal} plants`:`Finish level ${goal}`;
+  const prog=k==='level'?`${now} of ${goal} levels finished`:`${now} of ${goal} plants grown`;
+  return `<div class="pcard${st==='ear'?' ear':''}">${st==='own'?`<span class="ckb">${IC.ck}</span>`:st==='plus'?'<span class="plus">Plus</span>':''}${potSVG(p,76,st==='ear'?'ghost':'full')}<b>${p.name}</b>${st==='own'?`<span class="u">${p.id==='sageGlaze'?'In use by Daisy':p.id==='plainBlue'?'In use by 11 plants':'Yours to use'}</span>`:st==='plus'?'<span class="g">Part of WordFlora Plus</span>':`<span class="g">${goalLine}</span><span class="bar"><i style="width:${now/goal*100}%"></i></span><span class="pr">${prog}</span>`}</div>`};
+ return `<div class="pots"><h3>Pots</h3><p class="ps">Tap a pot to see how to earn it</p><div class="pgrid">${POTS.map(card).join('')}</div><p class="foot">Pots you earn stay yours. A pot already on a plant stays on it.</p></div>`}
+function shedToday(o={}){
+ return `${o.quiet?'':`<div class="pts">${IC.star}${PTS} shed points</div>`}${o.msg?`<div class="msg">${o.msg}</div>`:''}${TOOLS.map(t=>todayCard(t,o.quiet)).join('')}${potsToday()}`}
+const scrolled=(html,y)=>`<div style="transform:translateY(-${y}px)">${html}</div>`;
+const T=document.getElementById('today');
+T.innerHTML=[
+ fig('t-light','Top of the Shed, light','Points line, then tool cards. The can (tier 2) can go to tier 3 for 120; the others can go to tier 2 for 30 (green, tappable). Unfound tools are grey at 40% with how to find them. No lock icon. The mister is found, but its card still says how to find it (the blurb never changes).',phone(shedToday(),{title:'Garden Shed',tag:'now'})),
+ fig('t-pots','Scrolled to Pots','Ten pots, 3 columns. Earned: check badge and "In use by ...". To earn: soft dashed art, goal, bar, progress. Plus: full colour with a Plus tag.',phone(scrolled(shedToday(),730),{title:'Garden Shed',tag:'now'})),
+ fig('t-dark','Dark','Same screen in dark mode.',phone(shedToday(),{title:'Garden Shed',tag:'now',theme:'dark'})),
+ fig('t-ax','Large text (accessibility size)','Cards grow tall and wrap; at accessibility sizes the pots grid drops to 2 columns. About two tools fit on screen.',phone(shedToday(),{title:'Garden Shed',tag:'now',ax:true})),
+ fig('t-quiet','Quiet Garden on','The points line hides (ShedView.swift:21), but the cards still say "Upgrade for 30 points". Mixed message: numbers are hidden in one place and shown in another.',phone(shedToday({quiet:true}),{title:'Garden Shed',tag:'now'})),
+].join('');
+
+/* proposed */
+function propCard(t){
+ if(!t.tier)return `<div class="card tool find"><img src="${tool(t.id,1,true)}" alt=""><div class="t"><h3>${t.name}</h3><p class="blurb">${t.find}</p><p class="does">Then: <b>${t.does[0]}</b></p></div></div>`;
+ const c=cost(t.tier+1);
+ const pips=`<span class="pips" aria-label="Tier ${t.tier} of 3">${[1,2,3].map(i=>`<i class="${i<=t.tier?'on':''}"></i>`).join('')}</span>`;
+ const next=c?`<div class="next"><p>Next: <b>${t.does[t.tier]}</b></p><div class="bar2"><i style="width:${Math.min(1,PTS/c)*100}%"></i></div><div class="row2">${PTS>=c?`<span class="togo">You have enough points!</span><button class="go2">Upgrade for ${c}</button>`:`<span class="togo">${PTS} of ${c} points</span>`}</div></div>`:`<div class="full">All three tiers. Nice work!</div>`;
+ return `<div class="card tool"><img src="${tool(t.id,t.tier)}" alt=""><div class="t"><h3>${t.name}</h3><p class="does">Now: <b>${t.does[t.tier-1]}</b></p>${next}</div></div>`}
+const where=`<div class="card where"><img src="${vis('monarch','sticker')}" alt=""><p><b>${PTS} shed points</b>Get points by playing with visitors.</p><span class="go">Visitors &rsaquo;</span></div>`;
+const whereQuiet=`<div class="card where"><img src="${vis('monarch','sticker')}" alt=""><p><b>Quiet Garden is on</b>Your tools grow as your garden grows.</p></div>`;
+const shedProp=()=>where+TOOLS.map(propCard).join('');
+const cele=`<div class="dim"></div><div class="card cele"><img src="${tool('trowel',2)}" alt=""><h3>Your trowel got better!</h3><p>Now soil helps your plants a bit more.</p><button class="pbtn">Yay!</button></div>`;
+document.getElementById('prop').innerHTML=[
+ fig('p-light','Proposed, light','Where points come from, sits at the top and links to Visitors. Each card: "Now" and the next tier, with a bar. Enough points shows the button; not enough shows "44 of 120 points" with a bar, instead of a grey button that cannot be tapped.',phone(shedProp(),{title:'Garden Shed',tag:'proposed'})),
+ fig('p-dark','Proposed, dark','Same in dark mode. "Next" says what the next upgrade adds, with no tier numbers.',phone(shedProp(),{title:'Garden Shed',tag:'proposed',theme:'dark'})),
+ fig('p-ax','Proposed, large text','The card stacks: name, "Now", then the "Next" box and its button.',phone(shedProp(),{title:'Garden Shed',tag:'proposed',ax:true})),
+ fig('p-up','Proposed: upgrade moment','A small card over the Shed after an upgrade. One line on what changed, one button. No confetti burst; Reduce Motion shows it with a fade.',phone(shedProp(),{title:'Garden Shed',tag:'proposed',over:cele})),
+ fig('p-quiet','Proposed: Quiet Garden','No numbers anywhere. Tools level up on their own as the garden grows (needs a rule from the owner), so nothing on screen asks for points.',phone(whereQuiet+TOOLS.map(t=>t.tier?`<div class="card tool"><img src="${tool(t.id,t.tier)}" alt=""><div class="t"><h3>${t.name}</h3><p class="does">Now: <b>${t.does[t.tier-1]}</b></p></div></div>`:propCard(t)).join(''),{title:'Garden Shed',tag:'proposed'})),
+].join('');
+</script></body></html>

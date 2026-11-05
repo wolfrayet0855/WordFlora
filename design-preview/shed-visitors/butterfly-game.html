@@ -1,0 +1,275 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Butterfly game mockup</title>
+<link rel="stylesheet" href="../theme.css"><link rel="stylesheet" href="common.css">
+<script src="../theme.js"></script><script src="common.js"></script>
+<style>
+.play-wrap{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.ctrl{max-width:420px;display:flex;flex-direction:column;gap:12px}
+.ctrl .grp{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.ctrl .grp>span{font-weight:800;min-width:90px;font-size:14px}
+.ctrl p{margin:0;font-size:14px;color:var(--txt2)}
+.ctrl .btn{min-height:40px;padding:6px 14px;font-size:14px}
+.ctrl .btn.prop[aria-pressed=true]{background:#F7D58A;color:#3C2A00}
+#log{font-size:13px;color:var(--txt2);min-height:3em}
+/* scene */
+.phone .bg{position:absolute;inset:0;background:linear-gradient(#BFE6F5,#E9F6E0);z-index:0}
+.phone.eve .bg{background:linear-gradient(#1F2A4A,#3A3F6B)}
+.phone.eve .nav,.phone.eve .sb{color:#fff}.phone.eve .nav .back{color:#F0C060}
+.phone.game .nav,.phone.game .sb{color:#1F3320}.phone.game .nav .back{color:#8A5A00}
+.phone.game.eve .nav,.phone.game.eve .sb{color:#fff}.phone.game.eve .nav .back{color:#F0C060}
+.bed{position:absolute;left:0;right:0;bottom:0;height:120px;background:rgba(78,154,85,.85);z-index:1}
+.bedp{position:absolute;bottom:30px;left:0;right:0;display:flex;justify-content:center;z-index:1}
+.bedp img{height:74px;margin:0 -3px}
+.scene{position:absolute;left:0;right:0;top:98px;bottom:34px;z-index:3;touch-action:none;cursor:crosshair;user-select:none;-webkit-user-select:none}
+.v{position:absolute;width:64px;height:64px;margin:-32px 0 0 -32px;border:0;background:none;padding:0;cursor:pointer}
+.v img{width:100%;height:100%;display:block;pointer-events:none}
+.v.flip img{transform:scaleX(-1)}
+.ring .v.rest::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px dashed rgba(255,255,255,.85)}
+.v:focus-visible{outline:3px solid #1F3320;border-radius:50%}
+.pop{position:absolute;width:72px;margin:-36px 0 0 -36px;pointer-events:none;animation:pop .9s ease-out forwards;text-align:center}
+.pop img{width:72px;height:72px;display:block}
+.pop .nm{display:inline-block;margin-top:2px;padding:3px 10px;border-radius:999px;background:#fff;color:#1F3320;font-weight:800;font-size:14px;white-space:nowrap;box-shadow:0 2px 6px rgba(0,0,0,.15);transform:translateX(-50%);margin-left:36px}
+.pop.long{animation-duration:1.5s}
+@keyframes pop{0%{transform:scale(.3);opacity:0}25%{transform:scale(1.12);opacity:1}40%{transform:scale(1)}80%{opacity:1}100%{opacity:0}}
+.rm .pop{animation-name:popfade}@keyframes popfade{0%{opacity:0}15%{opacity:1}80%{opacity:1}100%{opacity:0}}
+.trail{position:absolute;inset:0;pointer-events:none}
+.trail polyline{fill:none;stroke:rgba(255,255,255,.75);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;transition:opacity .25s}
+.prog{position:absolute;top:8px;left:24px;right:24px;height:4px;border-radius:2px;background:rgba(120,120,128,.2);overflow:hidden}
+.prog i{display:block;height:100%;background:#E8A838}
+.chip{position:absolute;bottom:128px;right:20px;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.85);color:#1F3320;border-radius:999px;padding:4px 10px 4px 6px;font-weight:800;font-size:14px}
+.chip img{width:22px;height:22px}
+.toast{position:absolute;left:16px;right:16px;bottom:190px;display:flex;align-items:center;gap:12px;background:var(--surface);color:var(--text);border-radius:18px;padding:10px 14px;box-shadow:0 10px 24px rgba(0,0,0,.2);z-index:6;animation:toast 2.6s ease forwards;pointer-events:none}
+.toast img{width:52px;height:52px;flex:none}.toast b{display:block;font-size:1em}.toast span{font-size:.8125em;color:var(--txt2)}
+@keyframes toast{0%{transform:translateY(20px);opacity:0}12%{transform:none;opacity:1}85%{opacity:1}100%{opacity:0}}
+.rm .toast{animation-name:popfade}
+/* intro */
+.intro{position:absolute;left:0;right:0;top:98px;bottom:34px;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;text-align:center}
+.intro img.net{height:110px}
+.intro h2{margin:0;font-size:1.375em;color:#1F3320}.intro p{margin:0;font-size:1em;color:rgba(31,51,32,.8)}
+.eve .intro h2{color:#fff}.eve .intro p{color:rgba(255,255,255,.85)}
+.intro .pbtn,.intro .sbtn{max-width:345px}
+.intro .tog{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;color:#fff;font-size:.9375em;text-align:left}
+.intro .tog i{width:51px;height:31px;border-radius:16px;background:#E8A838;position:relative;flex:none}.intro .tog i::after{content:"";position:absolute;right:2px;top:2px;width:27px;height:27px;border-radius:50%;background:#fff}
+.calmline{font-size:.8125em!important;font-weight:700}
+/* summary */
+.ov{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:7;display:flex;align-items:center;justify-content:center}
+.sum{width:calc(100% - 48px);background:var(--bg);color:var(--text);border-radius:24px;padding:20px;display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;position:relative;overflow-y:auto;max-height:calc(100% - 120px)}
+.sum h2{margin:0;font-size:1.375em}
+.stk{display:flex;gap:8px;justify-content:center;white-space:nowrap}
+.stk.wrap{flex-wrap:wrap;white-space:normal}
+.stk figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:.75em;flex:none;width:64px}
+.stk figure img{width:64px;height:64px}
+.stk figure .nw{font-size:13px;font-weight:900;color:var(--accent-text)}
+.sum .fact{margin:0;font-size:.9375em;color:color-mix(in srgb,var(--text) 85%,transparent)}
+.rew{display:flex;flex-wrap:wrap;justify-content:center;gap:14px;font-weight:700;font-size:1.0625em}.rew span{display:flex;align-items:center;gap:5px}.rew svg{width:1em;height:1em}
+.sum>*:not(.petals){position:relative;z-index:2}
+.sum.ax{overflow:auto}
+/* petals */
+.petals{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.petals i{position:absolute;top:-20px;width:12px;height:18px;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:#F6A6BE;opacity:.55;animation:fall linear infinite}
+.petals i:nth-child(3n){background:#FFD27A}.petals i:nth-child(4n){background:#FFFFFF;box-shadow:inset 0 0 0 1px #F2B6C6}
+@keyframes fall{0%{transform:translate(0,0) rotate(0)}50%{transform:translate(18px,280px) rotate(160deg)}100%{transform:translate(-10px,620px) rotate(320deg);opacity:.2}}
+.rm .petals i,.static .petals i{animation:none}
+/* wake */
+.pagebg{position:absolute;inset:0;background:var(--bg);z-index:0}
+.pagebg .ghostplant{position:absolute;left:50%;top:120px;transform:translateX(-50%);width:160px;opacity:.6}
+.dimbg{position:absolute;inset:0;background:rgba(0,0,0,.3);z-index:6}
+.sheet{position:absolute;top:62px;left:0;right:0;bottom:0;background:var(--bg);border-radius:12px 12px 0 0;z-index:7;display:flex;flex-direction:column}
+.sheet .grab{width:36px;height:5px;border-radius:3px;background:color-mix(in srgb,var(--text) 30%,transparent);margin:6px auto 0}
+.sheet .x{position:absolute;top:8px;right:8px;width:44px;height:44px;display:grid;place-items:center;z-index:5}
+.sheet .x span{width:32px;height:32px;border-radius:50%;background:var(--surface);display:grid;place-items:center;color:var(--txt2);font-weight:700}
+.whead{text-align:center;font-weight:800;font-size:1.0625em;padding-top:20px;color:#1A2E1A}
+.whead.fixed{color:var(--text)}
+.wfield{position:relative;margin:8px 16px 50px;flex:1;border-radius:18px;overflow:hidden;background:linear-gradient(#BFE6F5,#E9F6E0)}
+.wfield .scene{top:0;bottom:0}
+.wake-intro,.wake-end{padding:36px 24px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;position:relative}
+.wake-intro h2,.wake-end h2{margin:0;font-size:1.375em}.wake-intro p,.wake-end p{margin:0;color:var(--txt2)}
+.chips2{display:flex;gap:6px}.chips2 span{font-size:.75em;font-weight:800;padding:3px 10px;border-radius:999px;background:var(--com);color:var(--com-ink)}
+.wake-end .plant{height:120px;position:relative}
+.wake-end .glow{position:absolute;left:50%;top:40px;width:160px;height:160px;margin-left:-80px;border-radius:50%;background:rgba(232,168,56,.35);filter:blur(18px)}
+.pips2{display:flex;gap:10px;align-items:center}
+.pips2 i{width:18px;height:18px;border-radius:50%;background:rgba(231,111,154,.08);box-shadow:inset 0 0 0 1.5px rgba(231,111,154,.6)}
+.pips2 i.on{background:#E76F9A;box-shadow:none;animation:pip .3s ease-out}
+.pips2 svg{width:22px;height:22px;color:#E76F9A}
+@keyframes pip{0%{transform:scale(.2);opacity:0}100%{transform:none;opacity:1}}
+.seed{width:120px}
+.strip .phone{margin:11px}
+.strip .pop,.strip .toast,.strip .pips2 i.on{animation:none}
+</style></head><body><div class="doc">
+<header>WM_HERE<h1>Butterfly game</h1><button class="btn" id="th"></button></header>
+<nav class="links"><a href="index.html">Hub</a><a href="shed.html">Shed</a><a href="visitors.html">Visitors</a></nav>
+<p class="sub">Home &rarr; Visitors opens this game (<code>RootView.swift:32</code>). It opens after 3 garden days or the first word level up. One round is 35 seconds. Visitors drift in from the sides; swipe the net (or tap) to say hello. A swing that catches nothing costs nothing, there are no lives and every round ends with a thank-you. The same game wakes a resting seed: catch 3 (2 after two "still dreaming" tries) and the petals come back.</p>
+
+<section><h2>1. Play it</h2>
+<div class="play-wrap"><div id="live"></div>
+<div class="ctrl">
+ <div class="grp"><span>Game</span><button class="btn" data-set="mode" data-v="free">Visitors</button><button class="btn" data-set="mode" data-v="wake">Wake Daisy</button></div>
+ <div class="grp"><span>Settings</span><button class="btn" data-tog="rm">Reduce Motion</button><button class="btn" data-tog="eve">Evening (17:30 to 21:30)</button><button class="btn" data-tog="ax">Large text</button><button class="btn" data-tog="dark">Dark mode</button></div>
+ <div class="grp"><span>Proposed</span><button class="btn prop" data-tog="prop">Name moment, counter, wrap</button><button class="btn prop" data-tog="calm">Calm mode game</button></div>
+ <p>Press and drag across a visitor to swing the net, or just tap one. Keyboard: Tab to a visitor, then Enter (the same as the VoiceOver action in the app).</p>
+ <p><b>App today</b> is what <code>ButterflyView.swift</code> and <code>WakeSheet.swift</code> do: a sticker pops for 0.9 s and the name is spoken to VoiceOver but not shown on screen. <b>Proposed</b> adds the name under the sticker, a "New friend!" card the first time you meet a visitor, a friends counter, and a summary that wraps. <b>Calm mode game</b> (proposed) hides the time bar and slows the drift.</p>
+ <div id="log" aria-live="polite"></div>
+ <button class="btn" id="restart">Back to start</button>
+</div></div></section>
+
+<section><h2>2. Frame strip</h2>
+<p class="sub">Each phone is a still of the same engine at a set moment. Tags say which is the app today and which is proposed.</p>
+<div class="row strip" id="strip"></div></section>
+</div>
+<script>
+document.querySelector('header').innerHTML=document.querySelector('header').innerHTML.replace('WM_HERE',WM);themeButton('#th');
+/* ===== engine: a port of ButterflyGameModel (Rules/ButterflyGameModel.swift) ===== */
+const DURATION=35,REST_LIFE=8;
+function rngOf(seed){let a=seed>>>0;return()=>{a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^t>>>15,t|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296}}
+const W={common:6,uncommon:3,rare:1};
+function poolOf(eve){const day=VISITORS.filter(v=>!v.night).map(v=>v.id),night=VISITORS.filter(v=>v.night).map(v=>v.id);return eve?day.concat(night,night):day}
+function newGame(o){return{t:0,vs:[],caught:[],next:.4,id:1,rnd:rngOf(o.seed||7),max:Math.min(8,2+Math.floor((o.flowering??6)/2)),pool:poolOf(o.eve),rm:!!o.rm,speed:o.calm?.65:1}}
+function pick(g){const w=g.pool.map(id=>[id,W[V(id).rarity]]);let tot=w.reduce((s,x)=>s+x[1],0),r=Math.floor(g.rnd()*tot);for(const[id,k]of w){if(r<k)return id;r-=k}return w[w.length-1][0]}
+function spawn(g){const sp=pick(g);
+ if(g.rm)g.vs.push({id:g.id,sp,x:.15+g.rnd()*.7,y:.2+g.rnd()*.55,vx:0,vy:0,born:g.t,rest:true});
+ else{const L=g.rnd()<.5,s=(.06+g.rnd()*.08)*g.speed;g.vs.push({id:g.id,sp,x:L?-.05:1.05,y:.15+g.rnd()*.6,vx:L?s:-s,vy:(g.rnd()-.5)*.04,born:g.t,rest:false})}
+ g.id++}
+function tick(g,dt){if(g.t>=DURATION||dt<=0)return;g.t+=dt;
+ while(g.t>=g.next&&g.vs.length<g.max){spawn(g);g.next+=1.2}
+ if(g.vs.length>=g.max)g.next=Math.max(g.next,g.t+.3);
+ for(const v of g.vs)if(!v.rest){v.x+=v.vx*dt;v.y+=(v.vy+Math.sin((g.t+v.id)*2.2)*.04)*dt;v.y=Math.min(.85,Math.max(.1,v.y))}
+ g.vs=g.vs.filter(v=>v.rest?g.t-v.born<=REST_LIFE:(v.x>=-.12&&v.x<=1.12))}
+function catchAt(g,x,y,r){if(g.t>=DURATION)return null;let best=null;
+ g.vs.forEach((v,i)=>{const d=Math.hypot(v.x-x,v.y-y);if(d<=r&&(!best||d<best.d))best={i,d}});
+ if(!best)return null;const v=g.vs.splice(best.i,1)[0];g.caught.push(v.sp);return v}
+function rewards(caught,playsToday,rnd){const s={water:0,pts:0,scoops:0,ids:[...new Set(caught)]};if(playsToday>=3)return s;
+ s.water=1;s.pts=2+Math.min(6,caught.reduce((b,id)=>b+({uncommon:1,rare:2}[V(id).rarity]||0),0));s.scoops=rnd()<.3?1:0;return s}
+
+/* ===== drawing ===== */
+const BED=['daisy','sunflower','lavender','rose','tulip','marigold'];
+const bedHTML=`<div class="bed"></div><div class="bedp">${BED.map(p=>`<img src="../plants/plant_${p}.svg" alt="">`).join('')}</div>`;
+const frameOf=(v,t)=>v.rest?vis(v.sp,'idle'):vis(v.sp,Math.floor(t*4)%2===0?'a':'b');
+function visitorHTML(v,t,w,h){return `<button class="v${v.vx<0?' flip':''}${v.rest?' rest':''}" data-id="${v.id}" aria-label="${V(v.sp).name}" style="left:${v.x*w}px;top:${v.y*h}px"><img src="${frameOf(v,t)}" alt=""></button>`}
+function popHTML(sp,x,y,o){const name=o.prop?`<span class="nm">${V(sp).name}!</span>`:'';return `<div class="pop${o.prop?' long':''}" style="left:${x}px;top:${y}px"><img src="${vis(sp,'sticker')}" alt="">${name}</div>`}
+const toastHTML=sp=>`<div class="toast"><img src="${vis(sp,'sticker')}" alt=""><div><b>New friend: ${V(sp).name}</b><span>${RARITY_WORD[V(sp).rarity]}. Added to your album.</span></div></div>`;
+const petalsHTML=(n=18)=>`<div class="petals" aria-hidden="true">${Array.from({length:n},(_,i)=>`<i style="left:${(i*53)%100}%;animation-duration:${6+(i%5)}s;animation-delay:-${(i*0.7)%6}s;${''}"></i>`).join('')}</div>`;
+const staticPetals=(n=14)=>`<div class="petals" aria-hidden="true">${Array.from({length:n},(_,i)=>`<i style="left:${(i*53)%100}%;top:${(i*97)%90}%;transform:rotate(${i*40}deg)"></i>`).join('')}</div>`;
+function introHTML(o){const eve=o.eve;
+ return `<div class="intro"><img class="net" src="${tool('net',1)}" alt=""><h2>Meet your garden visitors</h2><p>${o.rm?'Tap the visitors resting on the flowers. Every visit is a good one.':'Swipe the net across the visitors to say hello. Every visit is a good one.'}</p>${o.calm&&o.prop!==undefined?'<p class="calmline">Calm mode: no clock, slow visitors.</p>':''}<button class="pbtn" data-act="start">Start</button><button class="sbtn" data-act="album">${IC.book}Visitor album</button></div>`}
+function sumHTML(s,o){const nm=s.ids.length;const title=nm?`You met ${nm} visitor${nm===1?'':'s'}`:'Thanks for visiting the garden';
+ const fact=[...(o.prop&&s.fresh?s.fresh:[]),...s.ids].map(id=>V(id).fact).find(Boolean);
+ const stk=nm?`<div class="stk${o.prop?' wrap':''}">${s.ids.map(id=>`<figure><img src="${vis(id,'sticker')}" alt="">${V(id).name}${o.prop&&s.fresh&&s.fresh.includes(id)?'<span class="nw">New friend!</span>':''}</figure>`).join('')}</div>`:'';
+ const rew=(s.water+s.pts+s.scoops)>0?`<div class="rew">${s.water?`<span>${IC.drop}${s.water}${o.prop?' water':''}</span>`:''}${s.pts?`<span>${IC.star}${s.pts}${o.prop?' points':''}</span>`:''}${s.scoops?`<span>${IC.box}${s.scoops}${o.prop?' soil':''}</span>`:''}</div>`:'';
+ return `<div class="ov"><div class="sum">${o.prop?(o.static?staticPetals():petalsHTML()):''}<h2>${title}</h2>${stk}${fact?`<p class="fact">${fact}</p>`:''}${rew}<button class="pbtn" data-act="again">Play again</button><button class="sbtn" data-act="album">${IC.book}Visitor album</button><button class="tbtn" data-act="done">Done</button></div></div>`}
+const pagebg=`<div class="pagebg"><img class="ghostplant" src="../tending/parts/seed-pot.svg" alt=""></div><div class="dimbg"></div>`;
+const xBtn=`<span class="x" aria-label="Close"><span>&#x2715;</span></span>`;
+function wakeIntroHTML(o){return `<div class="wake-intro"><span class="chips2"><span>Quick</span><span>Gentle</span></span><img src="${vis('monarch','sticker')}" alt="" style="width:72px;height:72px"><h2>Catch butterflies</h2><p>Tap ${o.goal||3} butterflies. Take your time.</p><button class="pbtn" data-act="start">Start</button></div>`}
+function wakeAwakeHTML(shown,o){return `<div class="wake-end">${o.static?staticPetals(10):(o.rm?'':petalsHTML(14))}<div class="glow"></div><img class="plant" src="../plants/plant_daisy.svg" alt=""><h2>Daisy is awake!</h2><p>Here come the petals.</p><div class="pips2"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor"/>${[0,72,144,216,288].map(a=>`<ellipse cx="12" cy="5" rx="3" ry="4.5" transform="rotate(${a} 12 12)" fill="currentColor" opacity=".7"/>`).join('')}</svg>${[0,1,2,3,4].map(i=>`<i class="${i<shown?'on':''}"></i>`).join('')}</div>${shown<5?'<p style="font-size:.8125em">Tap to see them all.</p>':''}<button class="pbtn" data-act="done">Done</button></div>`}
+function wakeDreamHTML(){return `<div class="wake-end"><img class="seed" src="../tending/parts/seed-pot.svg" alt=""><h2 style="font-size:1.25em">Daisy is still dreaming.</h2><p>You can try again any time. It is free.</p><button class="pbtn" data-act="again">Try again</button><button class="sbtn" data-act="puzzle">Word puzzle</button></div>`}
+
+/* ===== static frames ===== */
+function sim(o,until,catches=[]){const g=newGame(o);let ci=0;const out={pops:[]};
+ while(g.t<until){tick(g,1/30);while(ci<catches.length&&g.t>=catches[ci]){const v=g.vs[0];if(v){catchAt(g,v.x,v.y,.01);out.pops.push({sp:v.sp,x:v.x,y:v.y,t:g.t})}ci++}}
+ out.g=g;return out}
+function scenePhone(o,until,catches,extra=''){const W0=393,H0=720;const r=sim(o,until,catches);const g=r.g;
+ const last=r.pops[r.pops.length-1];
+ const pops=o.showPop&&last?popHTML(last.sp,last.x*W0,last.y*H0,o):'';
+ if(o.toast&&last)extra+=toastHTML(last.sp);
+ const trail=o.trail?`<svg class="trail" viewBox="0 0 393 720"><polyline points="${o.trail}"/></svg>`:'';
+ const bar=o.calm?'':`<div class="prog"><i style="width:${g.t/DURATION*100}%"></i></div>`;
+ const chip=o.prop?`<div class="chip"><img src="${tool('net',1)}" alt="">${g.caught.length} said hello</div>`:'';
+ const inner=`<div class="bg"></div>${bedHTML}<div class="scene${o.rm?' rm':''}${o.prop?' ring':''}">${g.vs.map(v=>visitorHTML(v,g.t,W0,H0)).join('')}${trail}${pops}${bar}${chip}</div>${extra}`;
+ return phone('',{title:'Butterfly game',theme:o.theme,tag:o.tag,ax:o.ax,bodyStyle:'display:none'}).replace('class="phone','class="phone game'+(o.eve?' eve':'')).replace('<div class="body" style="display:none"></div>',inner)}
+function introPhone(o){const inner=`<div class="bg"></div>${bedHTML}${introHTML(o)}`;return phone('',{title:'Butterfly game',theme:o.theme,tag:o.tag,ax:o.ax,bodyStyle:'display:none'}).replace('class="phone','class="phone game'+(o.eve?' eve':'')).replace('<div class="body" style="display:none"></div>',inner)}
+function sumPhone(o,ids,rew,fresh){const s={ids,water:rew[0],pts:rew[1],scoops:rew[2],fresh};const inner=`<div class="bg"></div>${bedHTML}${sumHTML(s,{...o,static:true})}`;
+ return phone('',{title:'Butterfly game',theme:o.theme,tag:o.tag,ax:o.ax,bodyStyle:'display:none'}).replace('class="phone','class="phone game static').replace('<div class="body" style="display:none"></div>',inner)}
+function sheetPhone(o,body){const inner=`${pagebg}<div class="sheet"><div class="grab"></div>${xBtn}${body}</div>`;
+ return phone('',{title:'Daisy',back:'Garden',theme:o.theme,tag:o.tag,ax:o.ax,bodyStyle:'display:none'}).replace('class="phone','class="phone static').replace('<div class="body" style="display:none"></div>',inner)}
+function wakePlayPhone(o,until,catches){const r=sim({...o,seed:11},until,catches);const g=r.g;const W0=361,H0=600;
+ const last=r.pops[r.pops.length-1];const pops=o.showPop&&last?popHTML(last.sp,last.x*W0,last.y*H0,o):'';
+ const head=o.prop?`${g.caught.length} of 3 friends`:`${g.caught.length} of 3 butterflies`;
+ return sheetPhone(o,`<div class="whead${o.prop?' fixed':''}">${head}</div><div class="wfield"><div class="scene">${g.vs.map(v=>visitorHTML(v,g.t,W0,H0)).join('')}${pops}</div></div>`)}
+
+const strip=[
+ fig('f-intro','1. Intro, day','"Meet your garden visitors". Start, and the album. Text is dark on the sky in both light and dark mode.',introPhone({tag:'now'})),
+ fig('f-play','2. Play','Visitors drift in from both sides with a small bob. A white trail follows the finger. The bar fills over 35 s.',scenePhone({tag:'now',trail:'40,520 90,470 150,430 210,400 270,390'},12,[4,7])),
+ fig('f-catch','3. A catch, app today','A sticker pops where the net touched and fades in 0.9 s. The name is spoken to VoiceOver ("Monarch says hello") but never shown.',scenePhone({tag:'now',showPop:true},9.2,[4,9.1])),
+ fig('f-name','4. Naming moment','The name sits under the sticker for 1.5 s. The first time you meet a visitor, a soft card says "New friend" and adds it to the album. The game keeps going.',scenePhone({tag:'proposed',prop:true,showPop:true,toast:true},9.2,[4,9.1])),
+ fig('f-rm','5. Reduce Motion','Visitors rest on the sky, still, for 8 s each; you tap them. No trail, no drift. The app shows the plain idle pose.',scenePhone({tag:'now',rm:true},10,[3])),
+ fig('f-rm2','5b. Reduce Motion, proposed','A soft dashed ring (from the v4 design) shows what to tap. The sticker and name fade in place of the pop.',scenePhone({tag:'proposed',rm:true,prop:true,showPop:true,seed:28},6.1,[3,6])),
+ fig('f-eve','6. Evening, 17:30 to 21:30','Night sky. Fireflies and luna moths join the day visitors, drawn twice as often.',scenePhone({tag:'now',eve:true,seed:5},14,[])),
+ fig('f-sum','7. Summary, app today','A thank-you, the visitors met, one fact, and what was earned (1 drop, shed points, sometimes a soil scoop). Five or more visitors run past the card edge because the row does not wrap.',sumPhone({tag:'now'},['monarch','cabbagewhite','honeybee','ladybug','dragonfly'],[1,4,1])),
+ fig('f-sum2','8. Summary, proposed','The row wraps and marks new friends. Petals drift down for a calm win (still, under Reduce Motion).',sumPhone({tag:'proposed',prop:true},['monarch','cabbagewhite','honeybee','ladybug','dragonfly'],[1,4,1],['dragonfly'])),
+ fig('f-sumd','9. Summary, dark','The card follows dark mode; the sky stays a day sky.',sumPhone({tag:'now',theme:'dark'},['monarch','paintedlady','bumblebee'],[1,3,0])),
+ fig('f-calm','10. Calm mode game','No time bar and slower drift. The round still ends on its own with the same thank-you. (Calm mode does not change the game today.)',scenePhone({tag:'proposed',calm:true,prop:true,seed:53},12,[5])),
+ fig('f-ax','11. Large text, intro','The intro grows and still fits; buttons wrap their labels.',introPhone({tag:'now',ax:true})),
+ fig('f-axs','12. Large text, summary','The card scrolls inside itself at accessibility sizes.',sumPhone({tag:'now',ax:true},['monarch','honeybee'],[1,3,0])),
+ fig('f-wi','13. Wake a seed: intro','From the seed card: "Catch butterflies", Quick and Gentle. One line, one button.',sheetPhone({tag:'now'},wakeIntroHTML({}))),
+ fig('f-wp','14. Wake: playing','"1 of 3 butterflies". Bees and ladybugs count too. No trail and no sticker pop in this version.',wakePlayPhone({tag:'now'},9,[5])),
+ fig('f-wpd','15. Wake: playing, dark','The count uses a dark ink colour in both modes, so in dark mode it is very hard to read.',wakePlayPhone({tag:'now',theme:'dark'},9,[5])),
+ fig('f-wpp','16. Wake: playing, proposed','The count says "friends", follows the theme, and catches pop with the name, like the main game.',wakePlayPhone({tag:'proposed',prop:true,showPop:true,theme:'dark'},9.3,[5,9.2])),
+ fig('f-awake','17. Wake: awake!','The plant glows and the five love pips come back one at a time (0.3 s apart). Tap to see them all.',sheetPhone({tag:'now',static:true},wakeAwakeHTML(3,{static:true}))),
+ fig('f-dream','18. Wake: still dreaming','Time ran out before 3. Never a fail: "You can try again any time. It is free."',sheetPhone({tag:'now'},wakeDreamHTML())),
+];
+document.getElementById('strip').innerHTML=strip.join('');
+
+/* ===== live phone ===== */
+const S={mode:'free',rm:false,eve:false,ax:false,dark:false,prop:true,calm:false};
+let L={screen:'intro',g:null,raf:0,last:0,plays:0,met:new Set(['monarch','cabbagewhite','honeybee']),pts:[],down:false,shown:0};
+const live=document.getElementById('live');
+const sched=f=>Q.get('demo')?setTimeout(()=>f(performance.now()),33):requestAnimationFrame(f);
+const unsched=id=>{cancelAnimationFrame(id);clearTimeout(id)};const log=m=>document.getElementById('log').textContent=m;
+function syncButtons(){document.querySelectorAll('[data-set]').forEach(b=>b.setAttribute('aria-pressed',S[b.dataset.set]===b.dataset.v));document.querySelectorAll('[data-tog]').forEach(b=>b.setAttribute('aria-pressed',!!S[b.dataset.tog]))}
+document.querySelectorAll('[data-set]').forEach(b=>b.onclick=()=>{S[b.dataset.set]=b.dataset.v;reset()});
+document.querySelectorAll('[data-tog]').forEach(b=>b.onclick=()=>{S[b.dataset.tog]=!S[b.dataset.tog];reset()});
+document.getElementById('restart').onclick=()=>reset();
+function shell(inner,o={}){const th=S.dark?'dark':'light';
+ if(S.mode==='wake'){live.innerHTML=phone('',{title:'Daisy',back:'Garden',theme:th,ax:S.ax,tag:S.prop||S.calm?'proposed':'now',bodyStyle:'display:none'}).replace('<div class="body" style="display:none"></div>',`${pagebg}<div class="sheet"><div class="grab"></div>${xBtn}${inner}</div>`).replace('class="phone','class="phone'+(S.rm?' rm':''));}
+ else live.innerHTML=phone('',{title:'Butterfly game',theme:th,ax:S.ax,tag:S.prop||S.calm?'proposed':'now',bodyStyle:'display:none'}).replace('<div class="body" style="display:none"></div>',`<div class="bg"></div>${bedHTML}${inner}`).replace('class="phone','class="phone game'+(S.eve?' eve':'')+(S.rm?' rm':''));
+ live.querySelectorAll('[data-act]').forEach(b=>b.onclick=e=>{e.stopPropagation();act(b.dataset.act)});
+}
+function act(a){if(a==='start'||a==='again')start();else if(a==='album')log('The Visitor album opens as a sheet. See visitors.html.');else if(a==='puzzle')log('The word puzzle is the other way to wake a seed (not in this mockup).');else if(a==='done')reset();}
+function reset(){unsched(L.raf);syncButtons();L.screen='intro';
+ if(S.mode==='wake')shell(wakeIntroHTML({}));else shell(introHTML({rm:S.rm,eve:S.eve,calm:S.calm,prop:S.prop}));
+ log(S.mode==='wake'?'Daisy is a seed. Catch 3 to wake her.':'Press Start.')}
+function start(){L.g=newGame({seed:(Math.random()*1e9)|0,rm:S.rm,eve:S.eve&&S.mode==='free',calm:S.calm,flowering:6});L.screen='play';L.fresh=[];
+ if(S.mode==='wake')shell(`<div class="whead${S.prop?' fixed':''}" id="whead"></div><div class="wfield"><div class="scene${S.rm?' rm':''}${S.prop?' ring':''}" id="sc"></div></div>`);
+ else shell(`<div class="scene${S.rm?' rm':''}${S.prop?' ring':''}" id="sc">${S.calm?'':'<div class="prog"><i id="bar"></i></div>'}${S.prop?`<div class="chip"><img src="${tool('net',1)}" alt=""><span id="cnt">0</span> said hello</div>`:''}<svg class="trail" id="tr"><polyline points=""/></svg></div>`);
+ const sc=document.getElementById('sc');L.els=new Map();
+ sc.addEventListener('pointerdown',e=>{L.down=true;L.pts=[];sc.setPointerCapture(e.pointerId);move(e)});
+ sc.addEventListener('pointermove',e=>{if(L.down)move(e)});
+ const up=()=>{L.down=false;const pl=sc.querySelector('.trail polyline');if(pl){pl.style.opacity=0;setTimeout(()=>{if(!L.down){L.pts=[];pl.setAttribute('points','');pl.style.opacity=1}},250)}};
+ sc.addEventListener('pointerup',up);sc.addEventListener('pointercancel',up);
+ sc.addEventListener('click',e=>{const b=e.target.closest('.v');if(b&&e.detail===0){const v=L.g.vs.find(v=>v.id==b.dataset.id);if(v)doCatch(v.x,v.y,.001)}});
+ L.last=performance.now();L.raf=sched(loop);updateHead()}
+function move(e){const sc=document.getElementById('sc');const r=sc.getBoundingClientRect();const k=r.width/sc.offsetWidth;const x=(e.clientX-r.left)/k,y=(e.clientY-r.top)/k;
+ if(S.mode==='free'&&!S.rm){L.pts.push([x,y]);if(L.pts.length>14)L.pts.shift();const pl=sc.querySelector('.trail polyline');if(pl){pl.style.opacity=1;pl.setAttribute('points',L.pts.map(p=>p.join(',')).join(' '))}}
+ doCatch(x/sc.offsetWidth,y/sc.offsetHeight,Math.max(.08,48/sc.offsetWidth))}
+function doCatch(x,y,r){const g=L.g;if(!g||L.screen!=='play')return;const v=catchAt(g,x,y,r);if(!v)return;
+ const sc=document.getElementById('sc');const w=sc.offsetWidth,h=sc.offsetHeight;
+ const showPop=S.mode==='free'||S.prop;
+ if(showPop){sc.insertAdjacentHTML('beforeend',popHTML(v.sp,v.x*w,v.y*h,{prop:S.prop}));const p=sc.lastElementChild;setTimeout(()=>p.remove(),S.prop?1500:900)}
+ const isNew=!L.met.has(v.sp);if(isNew){L.met.add(v.sp);L.fresh.push(v.sp);if(S.prop&&S.mode==='free'){const ph=live.querySelector('.phone');ph.insertAdjacentHTML('beforeend',toastHTML(v.sp));const t=ph.lastElementChild;setTimeout(()=>t&&t.remove(),2600)}}
+ log(`${V(v.sp).name} says hello`+(isNew?' (new friend)':''));
+ const c=document.getElementById('cnt');if(c)c.textContent=g.caught.length;updateHead();
+ if(S.mode==='wake'&&g.caught.length>=3)endWake(true)}
+function updateHead(){const h=document.getElementById('whead');if(h&&L.g)h.textContent=S.prop?`${L.g.caught.length} of 3 friends`:`${L.g.caught.length} of 3 butterflies`}
+function loop(now){const g=L.g;if(L.screen!=='play')return;const dt=Math.min(.1,Math.max(0,(now-L.last)/1000));L.last=now;tick(g,dt);draw();
+ if(g.t>=DURATION){if(S.mode==='wake')endWake(g.caught.length>=3);else endFree();return}
+ L.raf=sched(loop)}
+function draw(){const sc=document.getElementById('sc');if(!sc)return;const w=sc.offsetWidth,h=sc.offsetHeight,g=L.g;const seen=new Set();
+ for(const v of g.vs){seen.add(v.id);let el=L.els.get(v.id);
+  if(!el){sc.insertAdjacentHTML('afterbegin',visitorHTML(v,g.t,w,h));el=sc.firstElementChild;L.els.set(v.id,el)}
+  el.style.left=v.x*w+'px';el.style.top=v.y*h+'px';const src=frameOf(v,g.t),img=el.firstElementChild;if(!img.src.endsWith(src.replace('..','')))img.src=src}
+ for(const[id,el]of L.els)if(!seen.has(id)){el.remove();L.els.delete(id)}
+ const bar=document.getElementById('bar');if(bar)bar.style.width=(g.t/DURATION*100)+'%'}
+function endFree(){L.screen='sum';const s=rewards(L.g.caught,L.plays,Math.random);L.plays++;s.fresh=L.fresh;
+ const sc=document.getElementById('sc');sc.insertAdjacentHTML('afterend',sumHTML(s,{prop:S.prop}));
+ if(S.ax)live.querySelector('.sum').classList.add('ax');
+ live.querySelectorAll('[data-act]').forEach(b=>b.onclick=e=>{e.stopPropagation();act(b.dataset.act)});
+ log(L.plays>3?'Plays after the third today still add stickers, with no drops or points.':`Rewarded play ${L.plays} of 3 today.`)}
+function endWake(woke){L.screen='end';unsched(L.raf);
+ if(!woke){shell(wakeDreamHTML());log('Still dreaming. Try again is free.');return}
+ L.shown=S.rm?5:0;const render=()=>{shell(wakeAwakeHTML(L.shown,{rm:S.rm}));live.querySelector('.wake-end').onclick=()=>{L.shown=5;render()};live.querySelectorAll('[data-act]').forEach(b=>b.onclick=e=>{e.stopPropagation();act(b.dataset.act)})};
+ render();log('Daisy is awake.');
+ const stepPip=()=>{if(L.shown>=5||L.screen!=='end')return;L.shown++;const pips=live.querySelectorAll('.pips2 i');pips.forEach((p,i)=>p.className=i<L.shown?'on':'');if(L.shown>=5){const t=live.querySelector('.wake-end p[style]');t&&t.remove()}else setTimeout(stepPip,300)};
+ if(!S.rm)setTimeout(stepPip,500)}
+reset();
+/* ?demo=free|wake[&t=seconds] plays itself (for headless checks): catches a visitor every 1.4 s */
+if(Q.get('demo')){S.mode=Q.get('demo')==='wake'?'wake':'free';if(Q.get('rm'))S.rm=true;reset();start();setInterval(()=>{const v=L.g&&L.g.vs.find(v=>v.x>.1&&v.x<.9);if(v)doCatch(v.x,v.y,.001)},1400)}
+</script></body></html>
