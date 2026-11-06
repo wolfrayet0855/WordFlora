@@ -19,6 +19,7 @@ enum EndgameUITestFixtures {
     /// `-uitest-weather-today[=kind]`: weather came today; `-uitest-weather-tomorrow[=kind]`: tomorrow's forecast shows.
     /// Both give six found plants and enough tends so the gate is open, and the weather kit.
     /// `-uitest-weather-rewarded`: a few Garden Days so the puzzle's reward is not held back by the anti-farm cap.
+    /// `-uitest-weather-plantready`: one word short of the next plant, so the puzzle's bonus word brings one.
     /// `-uitest-crown` / `-uitest-goldcrown`: every plant found (and all in full bloom), ceremony not yet seen.
     /// `-uitest-golden`: every plant found and in full bloom, the ceremonies seen, Daisy 4 of 7 golden days, Rose golden.
     static func apply(args: [String], to model: AppModel) {
@@ -37,6 +38,7 @@ enum EndgameUITestFixtures {
             model.profile?.weatherSeenAt = .now
             model.profile?.water = 5; model.profile?.soil = 3
             if args.contains("-uitest-weather-rewarded") { model.profile?.gardenDays = 3 }
+            if args.contains("-uitest-weather-plantready") { model.profile?.wordsTowardPlant = Economy.default.wordsPerPlant - 1 }
             try? model.context.save()
         }
         if args.contains("-uitest-crown") || args.contains("-uitest-goldcrown") || args.contains("-uitest-golden") {

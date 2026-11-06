@@ -58,7 +58,7 @@ struct WeatherPuzzleSheet: View {
     @State private var catchMisses = 0
     @State private var catchRound = 0
 
-    enum Stage { case intro, playing, catchFriends, plenty, solved }
+    enum Stage { case intro, playing, catchFriends, plenty, plantFound, solved }
 
     private var tier: WeatherPuzzleTier { WeatherPuzzlePolicy.tier(wild: app.weatherNow.wild, pickedHarder: harder) }
 
@@ -77,6 +77,7 @@ struct WeatherPuzzleSheet: View {
                 }
             case .catchFriends: catchPart.transition(.opacity)
             case .plenty: plenty.transition(.opacity)
+            case .plantFound: plantFound.transition(.opacity)
             case .solved: solvedView.transition(.opacity)
             }
         }
@@ -171,8 +172,49 @@ struct WeatherPuzzleSheet: View {
 
     private func record() {
         solved = app.solveWeatherPuzzle()
+        if solved?.plantArrived != nil {
+            // A plant came with the bonus word: the same "New plant found!" moment as a won word, then the solved card.
+            stage = .plantFound
+            AccessibilityNotification.Announcement(WeatherPuzzleCopy.plantFoundTitle).post()
+            if app.settings.hapticsOn {                    // the soft lub-dub of a new plant (GameView)
+                let g = UIImpactFeedbackGenerator(style: .soft); g.impactOccurred(intensity: 0.6)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.14) { g.impactOccurred(intensity: 0.9) }
+            }
+            return
+        }
         stage = .solved
         AccessibilityNotification.Announcement(WeatherPuzzleCopy.solvedTitle).post()
+    }
+
+    // MARK: A plant arrived with the word
+
+    private var plantFound: some View {
+        ZStack {
+            if let s = solved, !s.celebration.isEmpty {
+                CelebrationBurst(requested: s.celebration, origin: .fromTop(ScreenInsets.top + 36)).accessibilityHidden(true)
+            }
+            ScrollView {
+                VStack(spacing: 12) {
+                    if solved?.leveledUp == true {
+                        Label(WeatherPuzzleCopy.levelUp, systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.accentText)
+                    }
+                    Text(WeatherPuzzleCopy.plantFoundTitle).font(Theme.font(.title2, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                        .accessibilityAddTraits(.isHeader).accessibilityIdentifier("weatherPuzzle.plantFound")
+                    if let name = solved?.plantArrived, let plant = app.plants().first(where: { $0.name == name }) {
+                        PlantCard(plant: plant).frame(maxWidth: 220)
+                        Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center)
+                            .foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
+                    }
+                    Button(WeatherPuzzleCopy.continueOn) { stage = .solved }.buttonStyle(PrimaryButtonStyle())
+                        .accessibilityIdentifier("weatherPuzzle.plantFound.continue")
+                }
+                .padding(20)
+                .background(Color.appBackground, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+                .padding(24)
+                .frame(maxWidth: .infinity)
+            }
+            .scrollBounceBehavior(.basedOnSize)
+        }
     }
 
     // MARK: Wild Weather part 2
@@ -296,6 +338,8 @@ struct WeatherPuzzleBoardView: View {
     @State private var notQuite = false
     @State private var done = false
     @State private var order: [Int] = []
+    @State private var clueShown = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let clock = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     init(puzzle: WakePuzzle, tier: WeatherPuzzleTier, names: [String], newPuzzle: @escaping () -> Void, skip: @escaping () -> Void,
@@ -340,6 +384,7 @@ struct WeatherPuzzleBoardView: View {
                     let row = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 10)) : AnyLayout(HStackLayout(spacing: 10))
                     row { clearButton; takeBackButton }
                     peekButton
+                    pictureClueRung
                 }
             }
             .padding(.horizontal, 20).padding(.vertical, 16)
@@ -365,6 +410,54 @@ struct WeatherPuzzleBoardView: View {
         .buttonStyle(SecondaryButtonStyle())
         .disabled(!board.canPeek(at: elapsed))
         .accessibilityIdentifier("weatherPuzzle.peek")
+    }
+
+    private static let catalog = (try? PlantCatalog.load()) ?? []
+    private var clue: PictureClue? { PictureClue.make(answer: puzzle.answer, catalog: Self.catalog) }
+
+    /// The storm tier's last rung (critic note): always there, ready after the second peek, with no time word. It
+    /// shows the plant's own picture and a clue in words that says what the picture shows.
+    @ViewBuilder private var pictureClueRung: some View {
+        if let clue, let rung = WeatherPuzzlePolicy.pictureClue(tier: tier, peeks: board.peeks, shown: clueShown) {
+            if rung == .shown {
+                pictureClueCard(clue)
+            } else {
+                Button {
+                    withAnimation(reduceMotion || app.settings.reduceMotionOverride ? nil : .easeOut(duration: 0.25)) { clueShown = true }
+                    AccessibilityNotification.Announcement(WeatherPuzzleCopy.pictureClueLabel(clue.text)).post()
+                } label: {
+                    Label(rung == .ready ? WeatherPuzzleCopy.pictureClue : WeatherPuzzleCopy.pictureClueLater, systemImage: "photo")
+                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                }
+                .buttonStyle(SecondaryButtonStyle())
+                .disabled(rung == .later)
+                .accessibilityHint(WeatherPuzzleCopy.pictureClueHint)
+                .accessibilityIdentifier("weatherPuzzle.pictureClue")
+            }
+        }
+    }
+
+    private func pictureClueCard(_ clue: PictureClue) -> some View {
+        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 10)) : AnyLayout(HStackLayout(spacing: 14))
+        return layout {
+            Image(clue.imageName).resizable().scaledToFit().frame(width: 84, height: 84)
+                .padding(6).background(Color.tileGardenFill, in: RoundedRectangle(cornerRadius: 14))
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(WeatherPuzzleCopy.pictureClue).font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                Text(clue.text).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
+        .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appAccent.opacity(0.6)))
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(WeatherPuzzleCopy.pictureClueLabel(clue.text))
+        .accessibilityAddTraits(.isImage)
+        .accessibilityIdentifier("weatherPuzzle.pictureClueCard")
     }
 
     /// Keeps every target at least 44 pt: up to 7 a row, more rows for long words.

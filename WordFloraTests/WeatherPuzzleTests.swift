@@ -184,6 +184,77 @@ final class WeatherPuzzleTests: XCTestCase {
         XCTAssertEqual(s.record(.weathered, now: .now, quiet: true), [], "Quiet Garden never advances badges")
     }
 
+    // MARK: A plant that arrives with the bonus word
+
+    func testAPlantFromThePuzzleGetsTheSameCelebrationAsAWonWord() {
+        XCTAssertEqual(WeatherPuzzlePolicy.celebration(plantArrived: true, leveledUp: false), [.large])
+        XCTAssertEqual(WeatherPuzzlePolicy.celebration(plantArrived: true, leveledUp: true), [.medium, .large])
+        XCTAssertEqual(WeatherPuzzlePolicy.celebration(plantArrived: false, leveledUp: false), [])
+        XCTAssertEqual(WeatherPuzzlePolicy.solveSound(plantArrived: true, leveledUp: false), CelebrationStyle.winSound(leveledUp: false, plantArrived: true))
+        XCTAssertEqual(WeatherPuzzlePolicy.solveSound(plantArrived: true, leveledUp: true), .levelUp)
+        XCTAssertEqual(WeatherPuzzlePolicy.solveSound(plantArrived: false, leveledUp: false), .wake)
+    }
+
+    // MARK: Picture clue (the storm tier's last rung, after two peeks)
+
+    func testTheBoardCountsItsPeeks() {
+        let p = WakePuzzle.weather(tier: .storm, eventDay: 9, attempt: 0, names: names)!
+        var b = WakePuzzleBoard(puzzle: p, firstPeekFree: true)
+        XCTAssertEqual(b.peeks, 0)
+        XCTAssertTrue(b.peek(at: 0))
+        XCTAssertEqual(b.peeks, 1)
+        XCTAssertFalse(b.peek(at: 10), "the next peek comes 30 s later")
+        XCTAssertEqual(b.peeks, 1)
+        XCTAssertTrue(b.peek(at: 30))
+        XCTAssertEqual(b.peeks, 2)
+    }
+
+    func testThePictureClueRungIsReadyAfterTwoPeeksOnTheStormTierAlone() {
+        XCTAssertNil(WeatherPuzzlePolicy.pictureClue(tier: .gentle, peeks: 5, shown: false), "the gentle tier has no picture rung")
+        XCTAssertEqual(WeatherPuzzlePolicy.pictureClue(tier: .storm, peeks: 0, shown: false), .later)
+        XCTAssertEqual(WeatherPuzzlePolicy.pictureClue(tier: .storm, peeks: 1, shown: false), .later)
+        XCTAssertEqual(WeatherPuzzlePolicy.pictureClue(tier: .storm, peeks: 2, shown: false), .ready)
+        XCTAssertEqual(WeatherPuzzlePolicy.pictureClue(tier: .storm, peeks: 3, shown: false), .ready)
+        XCTAssertEqual(WeatherPuzzlePolicy.pictureClue(tier: .storm, peeks: 2, shown: true), .shown)
+    }
+
+    func testEveryStormAnswerHasAPictureAndAWordClueThatKeepsTheNameHidden() throws {
+        let catalog = try PlantCatalog.load()
+        for spaced in WakePuzzle.stormCandidates(from: names) {
+            let answer = spaced.replacingOccurrences(of: " ", with: "")
+            let clue = try XCTUnwrap(PictureClue.make(answer: answer, catalog: catalog), spaced)
+            let plant = try XCTUnwrap(catalog.first { $0.name.uppercased() == spaced })
+            XCTAssertEqual(clue.imageName, plant.imageName)
+            XCTAssertFalse(clue.text.isEmpty)
+            let words = Set(clue.text.lowercased().split { !$0.isLetter }.map(String.init))
+            for part in spaced.lowercased().split(separator: " ") where part.count >= 3 {
+                XCTAssertFalse(words.contains(String(part)) || words.contains(part + "s"), "\(part) in the clue for \(spaced)")
+                XCTAssertNil(clue.text.lowercased().range(of: String(part)), "\(part) inside the clue for \(spaced)")
+            }
+            XCTAssertEqual(CopySafety.check(clue.text), [], clue.text)
+            XCTAssertEqual(WeatherCopyTests.avoided(clue.text), [], clue.text)
+            for word in ["heart", "hearts", "storm", "poison", "poisonous", "flesh", "rotting", "drown", "drowns"] {
+                XCTAssertNil(clue.text.range(of: "\\b\(word)\\b", options: [.regularExpression, .caseInsensitive]), "\(word) in \(clue.text)")
+            }
+            XCTAssertLessThanOrEqual(clue.text.count, 90, clue.text)
+        }
+        XCTAssertNil(PictureClue.make(answer: "NOTAPLANT", catalog: catalog))
+    }
+
+    func testThePictureCluesReadAtGradeThree() {
+        let catalog = (try? PlantCatalog.load()) ?? []
+        let texts = WakePuzzle.stormCandidates(from: names).compactMap {
+            PictureClue.make(answer: $0.replacingOccurrences(of: " ", with: ""), catalog: catalog)?.text
+        }
+        XCTAssertLessThanOrEqual(ReadingLevel.grade(texts.joined(separator: " ")), 3.9)
+        for line in [WeatherPuzzleCopy.pictureClue, WeatherPuzzleCopy.pictureClueLater, WeatherPuzzleCopy.pictureClueLabel(texts[0])] {
+            XCTAssertEqual(CopySafety.check(line), [], line)
+            XCTAssertEqual(WeatherCopyTests.avoided(line), [], line)
+        }
+        XCTAssertNil(WeatherPuzzleCopy.pictureClueLater.range(of: "\\b(soon|seconds?|minutes?|wait)\\b", options: .regularExpression),
+                     "no time word on the rung")
+    }
+
     // MARK: Copy
 
     func testEveryPuzzleLineIsSafeAndGentle() {

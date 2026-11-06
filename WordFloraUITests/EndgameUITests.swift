@@ -155,6 +155,88 @@ final class EndgameUITests: XCTestCase {
         audit("weather-puzzle-board-ax")
     }
 
+    /// The storm tier's last rung (critic note): "Picture clue after 2 peeks" from the start, ready after the second
+    /// peek (the first is free at once, the second 30 s later), then the plant's picture with its clue in words.
+    func testTheHarderPuzzlesPictureClueIsReadyAfterTwoPeeks() {
+        openPuzzle()
+        app.buttons["weatherPuzzle.harder"].tap()
+        app.buttons["weatherPuzzle.start"].tap()
+        let peek = app.buttons["weatherPuzzle.peek"], clue = app.buttons["weatherPuzzle.pictureClue"]
+        XCTAssertTrue(peek.waitForExistence(timeout: 5))
+        scrollTo(clue)
+        XCTAssertTrue(clue.exists)
+        XCTAssertEqual(clue.label, "Picture clue after 2 peeks")
+        XCTAssertFalse(clue.isEnabled)
+        peek.tap()
+        XCTAssertFalse(clue.isEnabled, "one peek is not enough yet")
+        let ready = NSPredicate(format: "isEnabled == true")
+        expectation(for: ready, evaluatedWith: peek)
+        waitForExpectations(timeout: 40)               // the next free peek, 30 s after the first
+        peek.tap()
+        XCTAssertTrue(clue.isEnabled)
+        XCTAssertEqual(clue.label, "Picture clue")
+        clue.tap()
+        let card = element("weatherPuzzle.pictureClueCard")
+        XCTAssertTrue(card.waitForExistence(timeout: 3))
+        XCTAssertTrue(card.label.hasPrefix("Picture clue. "), card.label)
+        XCTAssertGreaterThan(card.label.count, "Picture clue. ".count + 10, "the picture has its words")
+        scrollTo(card)
+        audit("weather-puzzle-picture-clue")
+        shot("weather-puzzle-picture-clue")
+    }
+
+    /// Plays the gentle puzzle to the end, reading its spots and letters and matching them to a catalog plant name.
+    private func solveTheGentlePuzzle() {
+        let url = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
+            .appendingPathComponent("WordFlora/Resources/Plants.json")
+        let names = ((try? JSONSerialization.jsonObject(with: Data(contentsOf: url))) as? [[String: Any]] ?? [])
+            .compactMap { ($0["name"] as? String)?.uppercased().filter { $0.isLetter && $0.isASCII } }
+        XCTAssertFalse(names.isEmpty, "the catalog is readable from the test")
+        XCTAssertTrue(app.buttons["weatherPuzzle.tile.0"].waitForExistence(timeout: 5))
+        let spots = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Spot '")).allElementsBoundByIndex.map(\.label)
+        let given: [Character?] = spots.map { l in
+            let tail = l.components(separatedBy: ", ").dropFirst().first ?? "open"
+            return tail == "open" ? nil : tail.first
+        }
+        var tiles: [Character] = []
+        while app.buttons["weatherPuzzle.tile.\(tiles.count)"].exists {
+            tiles.append(app.buttons["weatherPuzzle.tile.\(tiles.count)"].label.last ?? " ")
+        }
+        let answer = names.first { n in
+            guard n.count == given.count else { return false }
+            let open = zip(n, given).filter { $0.1 == nil }.map(\.0)
+            return zip(n, given).allSatisfy { $0.1 == nil || $0.1 == $0.0 } && open.sorted() == tiles.sorted()
+        }
+        guard let answer else { return XCTFail("no plant fits \(spots) / \(tiles)") }
+        var used = Set<Int>()
+        for (ch, g) in zip(answer, given) where g == nil {
+            guard let i = tiles.indices.first(where: { tiles[$0] == ch && !used.contains($0) }) else { return XCTFail("no tile \(ch)") }
+            used.insert(i)
+            let tile = app.buttons["weatherPuzzle.tile.\(i)"]
+            scrollTo(tile)
+            tile.tap()
+        }
+    }
+
+    /// A plant that comes with the puzzle's bonus word gets the same "New plant found!" moment as a won word.
+    func testAPlantFromThePuzzleWordGetsTheNewPlantMoment() {
+        openPuzzle(["-uitest-weather-plantready"])
+        XCTAssertTrue(element("weatherPuzzle.reward").label.contains("a word toward your next plant"))
+        app.buttons["weatherPuzzle.start"].tap()
+        solveTheGentlePuzzle()
+        let title = element("weatherPuzzle.plantFound")
+        XCTAssertTrue(title.waitForExistence(timeout: 5))
+        XCTAssertEqual(title.label, "New plant found!")
+        sleep(4)                                    // the petal burst has drifted off
+        audit("weather-puzzle-plant-found")
+        shot("weather-puzzle-plant-found")
+        let next = app.buttons["weatherPuzzle.plantFound.continue"]
+        scrollTo(next)
+        next.tap()
+        XCTAssertTrue(element("weatherPuzzle.solved").waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts.containing(NSPredicate(format: "label ENDSWITH 'came to your garden!'")).firstMatch.exists)
+    }
+
     // MARK: Grand Garden
 
     func testTheGrandGardenPlaysOnceThenWhatGrowsNext() {

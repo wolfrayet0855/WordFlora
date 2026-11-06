@@ -129,6 +129,12 @@ extension AppModel {
         var goldenPlant: String?
         /// Weathered badge progress after the solve.
         var weathered: Int
+        /// The arriving plant moved the word level up.
+        var leveledUp = false
+        /// The petal bursts to play (as for a won word's new plant; empty without a plant).
+        var celebration: [CelebrationLevel] = []
+        /// The one sound the solve played.
+        var sound: SoundEvent = .wake
     }
 
     /// Records a solve: the event's whole garden mends (its day joins `weatherRescuedDays`), then the named bonus. A
@@ -145,7 +151,11 @@ extension AppModel {
             a.add([s.id], on: t)
             p.albumJSON = a.json
         }
-        if reward.word { solve.plantArrived = game.grantBonusWord() }
+        if reward.word {
+            let level = p.currentLevel
+            solve.plantArrived = game.grantBonusWord()
+            solve.leveledUp = solve.plantArrived != nil && p.currentLevel > level
+        }
         if reward.goldenDay, let plant = goldenDayPlant() {
             let g = EndgamePolicy.goldenDays(current: plant.goldenDays, lastKey: plant.goldenDayKey, careKey: w.today)
             plant.goldenDays = g.days; plant.goldenDayKey = g.key
@@ -156,7 +166,9 @@ extension AppModel {
             solve.weathered = badges.progress(of: .weathered)
         }
         try? context.save()
-        play(.wake)
+        solve.celebration = WeatherPuzzlePolicy.celebration(plantArrived: solve.plantArrived != nil, leveledUp: solve.leveledUp)
+        solve.sound = WeatherPuzzlePolicy.solveSound(plantArrived: solve.plantArrived != nil, leveledUp: solve.leveledUp)
+        play(solve.sound)
         return solve
     }
 

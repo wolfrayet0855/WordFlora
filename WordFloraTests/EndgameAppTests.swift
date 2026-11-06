@@ -123,6 +123,19 @@ final class EndgameAppTests: XCTestCase {
         XCTAssertNotNil(solve.plantArrived)
         XCTAssertEqual(app.plants().filter { $0.earnedCount > 0 }.count, found + 1)
         XCTAssertEqual(app.profile?.wordsTowardPlant, 0)
+        // The same "New plant found!" moment as a won word: the big petal burst and the plant-arrival sound.
+        XCTAssertEqual(solve.celebration, [.large])
+        XCTAssertEqual(solve.sound, .earned)
+    }
+
+    func testASolveWithoutAPlantKeepsItsQuietWakeSound() throws {
+        let app = try makeApp()
+        weather(app, eventIn: 0)
+        app.profile?.wordsTowardPlant = 0
+        let solve = try XCTUnwrap(app.solveWeatherPuzzle())
+        XCTAssertNil(solve.plantArrived)
+        XCTAssertEqual(solve.celebration, [])
+        XCTAssertEqual(solve.sound, .wake)
     }
 
     func testTheAntiFarmCapHoldsTheBonusButStillMends() throws {

@@ -104,6 +104,8 @@ struct WakePuzzleBoard: Equatable {
     /// Given or peeked letters, which cannot be taken back.
     private(set) var locked: [Character?]
     private(set) var consumed = Set<Int>()
+    /// Peeks used so far (the weather puzzle's picture clue is ready after two).
+    private(set) var peeks = 0
     private var lastPeekAt = 0.0
     private let answer: [Character]
 
@@ -155,6 +157,7 @@ struct WakePuzzleBoard: Equatable {
         consumed.insert(tile)
         locked[slot] = ch
         lastPeekAt = elapsed
+        peeks += 1
         return true
     }
 }

@@ -167,6 +167,18 @@ enum WeatherPuzzlePolicy {
                       goldenDay: allFound, badgeStep: true)
     }
 
+    /// A plant that arrives with the bonus word gets the same moment as a won word's plant (GameView): the big petal
+    /// burst, with a level up's burst under it; CelebrationStyle then softens it for Reduce Motion, Calm and Quiet Garden.
+    static func celebration(plantArrived: Bool, leveledUp: Bool) -> [CelebrationLevel] {
+        guard plantArrived else { return [] }
+        return leveledUp ? [.medium, .large] : [.large]
+    }
+
+    /// Exactly one sound for a solve: the win's sound when a plant arrives (or a level up), else the gentle wake chime.
+    static func solveSound(plantArrived: Bool, leveledUp: Bool) -> SoundEvent {
+        plantArrived ? CelebrationStyle.winSound(leveledUp: leveledUp, plantArrived: true) : .wake
+    }
+
     /// The solved days after this solve: union, trimmed like the merge.
     static func rescued(_ days: [Int], adding day: Int) -> [Int] { WeatherEngine.mergedRescuedDays(days, [day]) }
 
@@ -254,4 +266,79 @@ enum WeatherPuzzleCopy {
                slotLabel(0, letter: "V", peeked: true), slotLabel(1, letter: nil, peeked: false), bannerButton,
                catchTitle, catchLine(goal: 3), catchLine(goal: 2), catchAgain]
     }
+}
+
+// MARK: - Picture clue (design-preview/endgame critic: the storm tier's last rung, ready after the second peek)
+
+extension WeatherPuzzlePolicy {
+    /// The storm tier's last rung: "Picture clue after 2 peeks" until two peeks are used, then "Picture clue". Every
+    /// rung is free and there is no time word. The gentle tier has no picture rung (nil).
+    enum PictureClueRung: Equatable { case later, ready, shown }
+    static let pictureCluePeeks = 2
+
+    static func pictureClue(tier: WeatherPuzzleTier, peeks: Int, shown: Bool) -> PictureClueRung? {
+        guard tier == .storm else { return nil }
+        if shown { return .shown }
+        return peeks >= pictureCluePeeks ? .ready : .later
+    }
+}
+
+/// The answer's own plant picture plus a clue in words that says what the picture shows (its text equivalent, for
+/// VoiceOver and for anyone who reads it). The words never use the plant's name.
+struct PictureClue: Equatable {
+    let imageName: String
+    let text: String
+
+    /// Nil when the answer is not a catalog plant or has no written clue (the rung then stays away).
+    static func make(answer: String, catalog: [PlantInfo]) -> PictureClue? {
+        guard let plant = catalog.first(where: { WakePuzzle.normalized($0.name) == WakePuzzle.normalized(answer) }),
+              let text = looks[plant.plantId] else { return nil }
+        return PictureClue(imageName: plant.imageName, text: text)
+    }
+
+    /// What each storm answer's picture shows, grade 2-3, without the name.
+    static let looks: [String: String] = [
+        "dandelion": "A fluffy white seed ball on a thin stem. The leaves have jagged edges.",
+        "marigold": "A round flower packed with ruffled orange petals.",
+        "sunflower": "A very tall stem with a big yellow face. The middle is brown.",
+        "strawberry": "A low plant with small white flowers and red berries dotted with seeds.",
+        "lavender": "Thin stems with tiny purple flowers at the top. They smell sweet.",
+        "jasmine": "A climbing vine with small white flowers shaped like stars.",
+        "snapdragon": "Tall spikes of bright flowers. Each one looks like a little mouth.",
+        "saguaro_cactus": "A giant green desert plant with spines. Its arms point up to the sky.",
+        "aloe_vera": "Thick, pointy green leaves with soft teeth on the sides.",
+        "hibiscus": "A big bright flower with five wide petals and a long stick in the middle.",
+        "cherry_blossom": "A tree covered in soft pink flowers in spring.",
+        "venus_flytrap": "Green leaves that look like little jaws with spiky edges.",
+        "corpse_flower": "One giant spike that rises out of a huge, frilly purple cup.",
+        "welwitschia": "Two long, wide leaves that curl and spread out over the sand.",
+        "pitcher_plant": "Leaves shaped like tall jugs, each with a little lid on top.",
+        "sensitive_plant": "Soft, feathery leaves and fluffy pink puffball flowers.",
+        "joshua_tree": "A spiky desert giant with twisty arms and tufts of sharp leaves.",
+        "lithops": "Small, plump leaves that look just like little stones.",
+        "rafflesia": "A huge red flower with white spots and a deep bowl in the middle.",
+        "sago_palm": "Stiff, feathery green fronds that fan out from a short, rough trunk.",
+        "ghost_pipe": "A small, waxy white stem that bends over at the top like a hook.",
+        "passionflower": "A fancy flower with a ring of thin purple threads, like a crown.",
+        "king_protea": "A huge pink flower shaped like a bowl, with pointed petals.",
+        "bleeding_heart": "Pink flowers that hang in a row from a curved stem, like tiny lockets.",
+        "wollemi_pine": "A tall evergreen with bumpy bark and flat, dark green needles.",
+        "jade_vine": "Long hanging bunches of blue-green flowers shaped like claws.",
+        "franklin_tree": "White flowers with yellow middles among shiny green leaves.",
+        "ghost_orchid": "A white flower with long curly tails. It seems to float with no leaves.",
+        "silversword": "A round ball of shiny, pale, pointy leaves, like a spiky globe.",
+        "puya_raimondii": "A giant spike covered in tiny flowers, over a ball of spiky leaves.",
+    ]
+}
+
+extension WeatherPuzzleCopy {
+    /// The same words as a won word's new plant (GameView).
+    static let plantFoundTitle = "New plant found!"
+    static let levelUp = "Level up! New plants to find"
+    static let continueOn = "Continue"
+    static let pictureClue = "Picture clue"
+    static let pictureClueLater = "Picture clue after 2 peeks"
+    static let pictureClueHint = "Shows a picture of the plant, with a clue in words."
+    /// VoiceOver for the clue card: the picture's text equivalent.
+    static func pictureClueLabel(_ text: String) -> String { "Picture clue. \(text)" }
 }
