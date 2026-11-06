@@ -224,6 +224,20 @@ final class WeatherUITests: XCTestCase {
         settleHomeArt(); audit("weather-card-helper-out")
     }
 
+    /// The schedule override (`-uitest-forecast=`) reaches the helpers too, so the card's step works without a real seed.
+    func testTheForecastOverrideCardSetsOutTheHelper() {
+        launch(["-uitest-forecast=frostyNight"])
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        let setOut = app.buttons["weather-setout"]
+        XCTAssertTrue(setOut.waitForExistence(timeout: 3))
+        XCTAssertEqual(setOut.label, "Set out the frost cloth")
+        setOut.tap()
+        let done = app.descendants(matching: .any)["weather-helper-done"]
+        XCTAssertTrue(done.waitForExistence(timeout: 3))
+        XCTAssertTrue(done.label.contains("The frost cloth is out for your whole garden."))
+        XCTAssertFalse(setOut.exists)
+    }
+
     func testCalmShowsNoHelperStep() {
         launch(["-uitest-calm", "-uitest-weather-tomorrow=bigWind"])
         XCTAssertFalse(card.waitForExistence(timeout: 2))

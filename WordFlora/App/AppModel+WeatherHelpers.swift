@@ -17,7 +17,8 @@ extension AppModel {
 
     // Today's day key for weather is `weatherToday` (AppModel+Weather.swift).
 
-    /// The weather now, from the stored fields and settings through the pure engine. Writes nothing.
+    /// The weather now, from the stored fields and settings through the pure engine. Writes nothing. The UI tests'
+    /// schedule override (`-uitest-forecast=`, `-uitest-weather=`) applies here too, so the card's helper step shows.
     var weatherNow: GardenWeatherNow {
         guard let p = profile else { return .none }
         let found = plants().filter { $0.earnedCount > 0 }.count
@@ -26,7 +27,7 @@ extension AppModel {
         return GardenWeatherNow.compute(seed: p.weatherSeed, startDay: p.weatherStartDay, today: weatherToday,
                                         highWater: p.weatherHighWaterDay, gatedFromDay: p.weatherGatedFromDay, found: found, tends: tends,
                                         quietGarden: settings.quietGarden, weatherOn: gardenWeatherSettingOn, calm: settings.calmMode,
-                                        wild: wild)
+                                        wild: wild, override: weatherTestOverride)
     }
 
     // MARK: Weather helpers (E-7)

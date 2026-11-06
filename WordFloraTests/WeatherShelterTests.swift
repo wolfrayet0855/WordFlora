@@ -107,4 +107,40 @@ final class WeatherShelterTests: XCTestCase {
         }
         XCTAssertLessThanOrEqual(ReadingLevel.grade(lines.filter { $0.hasSuffix(".") }.joined(separator: " ")), 3.9)
     }
+
+    // MARK: The UI test schedule override (`-uitest-forecast=`, `-uitest-weather=`)
+
+    func overridden(_ o: GardenWeather.Override, calm: Bool = false, quiet: Bool = false, found: Int = 6, seed s: Int64 = 424_242) -> GardenWeatherNow {
+        GardenWeatherNow.compute(seed: s, startDay: start, today: 500, highWater: 500, gatedFromDay: 0, found: found, tends: 3,
+                                 quietGarden: quiet, weatherOn: true, calm: calm, wild: false, override: o)
+    }
+
+    func testTheForecastOverrideGivesTheHelperStep() {
+        let w = overridden(.init(forecast: .bigWind))
+        XCTAssertEqual(w.forecast, .bigWind)
+        XCTAssertNil(w.event)
+        XCTAssertEqual(ShelterPolicy.coverable(w)?.kind, .bigWind)
+        XCTAssertEqual(ShelterPolicy.coverable(w)?.day, 501)
+        XCTAssertEqual(ShelterPolicy.state(.windNet, weather: w, shelterDay: 0), .canSetOut)
+        XCTAssertEqual(ShelterPolicy.setOut(weather: w, shelterDay: 0), 501)
+        XCTAssertTrue(ShelterPolicy.kitDue(kitAt: nil, weather: w))
+    }
+
+    func testTheEventOverrideIsTodaysEvent() {
+        let w = overridden(.init(event: .hailShower))
+        XCTAssertNil(w.forecast)
+        XCTAssertEqual(w.event, .hailShower)
+        XCTAssertEqual(w.eventDay, 500)
+        XCTAssertTrue(WeatherPuzzlePolicy.isOpen(weather: w, rescuedDays: []))
+    }
+
+    func testTheOverrideKeepsEveryGate() {
+        for w in [overridden(.init(forecast: .bigWind), quiet: true), overridden(.init(forecast: .bigWind), found: 2)] {
+            XCTAssertFalse(w.gated); XCTAssertNil(w.forecast); XCTAssertNil(ShelterPolicy.coverable(w))
+        }
+        let calm = overridden(.init(forecast: .bigWind), calm: true)
+        XCTAssertFalse(calm.showsMechanics)
+        XCTAssertNil(ShelterPolicy.coverable(calm))
+        XCTAssertNil(overridden(.init(forecast: .bigWind), seed: 0).forecast, "no seed means no weather, as without the override")
+    }
 }

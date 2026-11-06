@@ -27,15 +27,21 @@ struct GardenWeatherNow: Equatable {
 
     static let none = GardenWeatherNow(today: 0, gated: false, calm: false, wild: false, forecast: nil, event: nil, eventDay: 0)
 
-    /// Everything from the stored fields and settings; never writes.
+    /// Everything from the stored fields and settings; never writes. `override` (UI tests: `-uitest-forecast=`,
+    /// `-uitest-weather=`) replaces the schedule the way `GardenWeather.home` does: its forecast is tomorrow's weather and
+    /// its event came today. Every gate still applies.
     static func compute(seed: Int64, startDay: Int, today: Int, highWater: Int, gatedFromDay: Int, found: Int, tends: Int,
-                        quietGarden: Bool, weatherOn: Bool, calm: Bool, wild: Bool,
+                        quietGarden: Bool, weatherOn: Bool, calm: Bool, wild: Bool, override: GardenWeather.Override? = nil,
                         economy: Economy = .default) -> GardenWeatherNow {
         let gated = WeatherEngine.isGated(found: found, tends: tends, quietGarden: quietGarden, weatherOn: weatherOn, today: today,
                                           highWater: highWater, gatedFromDay: gatedFromDay, economy: economy)
         guard gated, seed != 0, startDay != 0 else {
             return GardenWeatherNow(today: today, gated: gated && seed != 0 && startDay != 0, calm: calm, wild: false,
                                     forecast: nil, event: nil, eventDay: 0)
+        }
+        if let o = override {
+            return GardenWeatherNow(today: today, gated: true, calm: calm, wild: wild && !calm, forecast: o.forecast,
+                                    event: o.event, eventDay: o.event == nil ? 0 : today)
         }
         let forecast = WeatherEngine.forecast(day: today, seed: seed, startDay: startDay, economy: economy)
         let latest = WeatherEngine.latestEvent(onOrBefore: today, within: max(1, economy.weatherPuzzleDays), seed: seed,
