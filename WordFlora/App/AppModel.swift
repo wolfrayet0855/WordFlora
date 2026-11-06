@@ -27,6 +27,10 @@ final class AppModel {
     static let degradedStoreMessage = "We couldn't open your saved garden just now. Please close and reopen the app. Your saved garden is safe."
     private var lastBadgedRoundId: String?
     private let now: () -> Date
+    /// The model's clock (tests pass a fixed one).
+    var nowDate: Date { now() }
+    /// UI tests only (`-uitest-forecast=`, `-uitest-weather=`): replaces the weather schedule; every gate still applies.
+    var weatherTestOverride: GardenWeather.Override?
 
     var context: ModelContext { container.mainContext }
 
@@ -79,6 +83,7 @@ final class AppModel {
         game.reloadProfile()
         game.refreshLevel()
         badges = BadgeState(json: game.playerProfile?.badgesJSON ?? "", defs: defs)
+        refreshWeather()          // a seed for a new garden, the clock high-water mark and the gate day
     }
 
     /// Merges a garden backup file best-of-each, then reloads what depends on the profile.
@@ -475,7 +480,7 @@ final class AppModel {
 
     /// Called when Home appears. Records the offer as soon as it shows, so it appears once per milestone.
     func checkPlusOffer() {
-        guard plusOfferEnabled, plusOffer == nil else { return }
+        guard plusOfferEnabled, plusOffer == nil, !homeWeather.quietsOffers else { return }   // never beside the weather
         var c = PlusOfferPolicy.Context(now: now())
         c.ageBand = settings.ageBand
         c.hasPlus = entitlements.state.hasPlus
@@ -623,7 +628,7 @@ final class AppModel {
     /// Asks for permission only now, because the player just turned reminders on.
     func enableReminders() async -> Bool {
         let ok = await reminders.enable(now: now(), hour: settings.reminderHour, minute: settings.reminderMinute,
-                                        lastOpened: now(), dailyBloomDoneToday: dailyBloomDoneToday)
+                                        lastOpened: now(), dailyBloomDoneToday: dailyBloomDoneToday, forecast: reminderForecast)
         settings.remindMe = ok
         return ok
     }
@@ -636,7 +641,8 @@ final class AppModel {
     /// Re-plans from "now" every time the player leaves the app, so the 3-days-without-a-visit rule always holds.
     func refreshReminders() {
         guard settings.remindMe else { return }
-        reminders.refresh(now: now(), hour: settings.reminderHour, minute: settings.reminderMinute, lastOpened: now(), dailyBloomDoneToday: dailyBloomDoneToday)
+        reminders.refresh(now: now(), hour: settings.reminderHour, minute: settings.reminderMinute, lastOpened: now(), dailyBloomDoneToday: dailyBloomDoneToday,
+                           forecast: reminderForecast)      // the opt-in forecast shares this one daily slot
     }
 
     // MARK: Badge moments

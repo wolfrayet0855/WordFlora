@@ -30,6 +30,9 @@ struct GardenEntry: TimelineEntry {
     let snapshot: WidgetActions.GardenSnapshot
     let quiet: Bool
     var unavailable = false
+    /// Tomorrow's garden weather in plain words (GardenWeather.widgetLine), or nil. Never in Calm or Quiet Garden.
+    var weatherLine: String? = nil
+    var weatherChip: String? = nil
 }
 
 struct GardenProvider: TimelineProvider {
@@ -45,16 +48,29 @@ struct GardenProvider: TimelineProvider {
         Task { @MainActor in
             // One entry; the thirsty look is computed when the widget draws, so a slow refresh is enough (spec section 4).
             let entry = load()
-            completion(Timeline(entries: [entry], policy: .after(Date().addingTimeInterval(entry.unavailable ? 15 * 60 : 6 * 3600))))
+            // A second entry at midnight, so the weather line follows the day (the forecast is a pure function of it).
+            var entries = [entry]
+            let midnight = Calendar.current.startOfDay(for: Date()).addingTimeInterval(86_400 + 60)
+            if !entry.unavailable && midnight < Date().addingTimeInterval(6 * 3600) { entries.append(load(at: midnight)) }
+            completion(Timeline(entries: entries, policy: .after(Date().addingTimeInterval(entry.unavailable ? 15 * 60 : 6 * 3600))))
         }
     }
 
-    @MainActor private func load() -> GardenEntry {
+    @MainActor private func load(at date: Date = .now) -> GardenEntry {
         let calm = true /* never the thirsty look in a widget */, quiet = SharedDefaults.quietGarden
         guard let container = try? SharedContainer.make(role: .appExtension) else {
-            return GardenEntry(date: .now, snapshot: .init(hero: nil, others: [], water: 0), quiet: quiet, unavailable: true)
+            return GardenEntry(date: date, snapshot: .init(hero: nil, others: [], water: 0), quiet: quiet, unavailable: true)
         }
-        return GardenEntry(date: .now, snapshot: WidgetActions.snapshot(context: container.mainContext, now: .now, calm: calm), quiet: quiet)
+        let context = container.mainContext
+        var entry = GardenEntry(date: date, snapshot: WidgetActions.snapshot(context: context, now: date, calm: calm), quiet: quiet)
+        if let p = (try? context.fetch(FetchDescriptor<PlayerProfile>()))?.first {
+            let d = SharedDefaults.store
+            let c = GardenWeather.widgetContext(profile: p, today: WeatherDay.key(date), quietGarden: quiet,
+                                                calmMode: SharedDefaults.calmMode(in: d), weatherOn: SharedDefaults.gardenWeather(in: d))
+            entry.weatherLine = GardenWeather.widgetLine(c)
+            entry.weatherChip = GardenWeather.widgetChip(c)
+        }
+        return entry
     }
 }
 
@@ -116,7 +132,7 @@ struct GardenWidgetView: View {
                 VStack(spacing: 4) {
                     plantImage(s, height: 74)
                     Text(s.name).font(.system(.subheadline, design: .rounded, weight: .bold)).foregroundStyle(Color("appPrimaryText")).lineLimit(1)
-                    Text("Growing nicely").font(.system(.caption2, design: .rounded)).foregroundStyle(Color("appPrimaryText").opacity(0.7))
+                    Text(entry.weatherChip ?? "Growing nicely").font(.system(.caption2, design: .rounded)).foregroundStyle(Color("appPrimaryText").opacity(0.7))
                     waterButton(s)
                 }
                 .widgetURL(URL(string: "wordflora://plant/\(s.plantId)"))
@@ -134,7 +150,7 @@ struct GardenWidgetView: View {
                     }.frame(maxWidth: .infinity)
                     VStack(spacing: 8) {
                         HStack(spacing: 6) { ForEach(entry.snapshot.others, id: \.plantId) { o in plantImage(o, height: 44) } }
-                        Text("Your garden says hello").font(.system(.caption, design: .rounded)).foregroundStyle(Color("appPrimaryText").opacity(0.75)).multilineTextAlignment(.center)
+                        Text(entry.weatherLine ?? "Your garden says hello").font(.system(.caption, design: .rounded)).foregroundStyle(Color("appPrimaryText").opacity(0.75)).multilineTextAlignment(.center)
                         waterButton(s)
                     }.frame(maxWidth: .infinity)
                 }
@@ -157,7 +173,7 @@ struct GardenWidgetView: View {
             if let s = hero {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(s.name).font(.headline).lineLimit(1)
-                    Text("Growing nicely").font(.caption)
+                    Text(entry.weatherChip ?? "Growing nicely").font(.caption)
                     Gauge(value: s.growthFraction) { EmptyView() }.gaugeStyle(.accessoryLinearCapacity)
                 }
             } else { Text(entry.unavailable ? GardenFallback.widgetLine : "Play a word to find your first plant").font(.caption) }

@@ -4,7 +4,7 @@ import Foundation
 /// display time and never written back.
 /// - Variant 1, "Weather, not loss" (everyone with Garden weather on): only the look changes. Care after the player has
 ///   seen the weather mends a plant at once; otherwise the look fades after `weatherLingerDays` (Calm: `calmLingerDays`).
-/// - Variant 2, "Wild Weather" (13+ opt-in, Calm off, never under 13): on big events up to `wildMaxPlants` full-effect
+/// - Variant 2, "Wild Weather" (opt-in at any age, Calm and Quiet Garden off): on big events up to `wildMaxPlants` full-effect
 ///   plants (half that when sheltered) also show one stage lower. Care stands a plant tall the next day, the puzzle
 ///   restores all at once, and everything mends by itself after `wildLingerDays`. The stored stage never changes.
 enum WeatherLook {
@@ -105,15 +105,15 @@ enum WeatherLook {
         return Output(look: i.effect, setback: 0, shownStage: stage, line: line, mending: mending)
     }
 
-    // MARK: Who may have Wild Weather (spec 4.2, owner decision 2026-11-04)
+    // MARK: Who may have Wild Weather (spec 4.2; owner ruling 2026-11-05 replaces the 13+ gate)
 
-    /// 13+ (age band set and not under 13), Calm off, Quiet Garden off. Never under 13 or for an unknown age, gate or not.
+    /// Any age may opt in, with Calm off and Quiet Garden off (the one Calm toggle decides; under 13 starts in Calm).
+    /// `ageBand` is kept so callers stay unchanged; it no longer gates anything.
     static func wildAvailable(ageBand: AgeBand?, calmMode: Bool, quietGarden: Bool) -> Bool {
-        guard let ageBand, ageBand != .under13 else { return false }
-        return !calmMode && !quietGarden
+        !calmMode && !quietGarden
     }
 
-    /// Wild Weather applies only when the player opted in and still may have it; a stored opt-in never applies under 13.
+    /// Wild Weather applies only when the player opted in and still may have it (Calm or Quiet Garden hide it at once).
     static func wildActive(optedIn: Bool, ageBand: AgeBand?, calmMode: Bool, quietGarden: Bool) -> Bool {
         optedIn && wildAvailable(ageBand: ageBand, calmMode: calmMode, quietGarden: quietGarden)
     }

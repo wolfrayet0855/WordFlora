@@ -35,6 +35,19 @@ final class AppSettings {
     var lastWakeChallenge: WakeChallenge? { didSet { defaults.set(lastWakeChallenge?.rawValue, forKey: "lastWakeChallenge") } }
     var lastWakeResult: WakeResult? { didSet { defaults.set(lastWakeResult?.rawValue, forKey: "lastWakeResult") } }
     var wakeDreamsInARow: Int { didSet { defaults.set(wakeDreamsInARow, forKey: "wakeDreamsInARow") } }
+    /// The player's Garden weather choice (nil = never changed). Device-local, like Calm mode.
+    var gardenWeatherChoice: Bool? { didSet { defaults.set(gardenWeatherChoice, forKey: "gardenWeather") } }
+    /// Opt-in: the daily reminder mentions tomorrow's garden weather (off by default; never under 13).
+    var weatherNotify: Bool { didSet { defaults.set(weatherNotify, forKey: "weatherNotify") } }
+    /// The weather day key on which "Got it" hid the forecast card.
+    var weatherCardDismissedDay: Int { didSet { defaults.set(weatherCardDismissedDay, forKey: "weatherCardDismissedDay") } }
+
+    /// Garden weather: off in Calm mode (the one Calm toggle decides, owner 2026-11-05), else the choice, on by default.
+    /// The widget reads the same rule (SharedDefaults.gardenWeather).
+    var gardenWeather: Bool {
+        get { !calmMode && (gardenWeatherChoice ?? GardenWeather.defaultOn(calmMode: false)) }
+        set { gardenWeatherChoice = newValue }
+    }
 
     var isUnderThirteen: Bool { ageBand == .under13 }
     var colorScheme: ColorScheme? {
@@ -70,6 +83,9 @@ final class AppSettings {
         lastWakeChallenge = defaults.string(forKey: "lastWakeChallenge").flatMap(WakeChallenge.init(rawValue:))
         lastWakeResult = defaults.string(forKey: "lastWakeResult").flatMap(WakeResult.init(rawValue:))
         wakeDreamsInARow = defaults.integer(forKey: "wakeDreamsInARow")
+        gardenWeatherChoice = defaults.object(forKey: "gardenWeather") == nil ? nil : defaults.bool(forKey: "gardenWeather")
+        weatherNotify = bool("weatherNotify", false)
+        weatherCardDismissedDay = defaults.integer(forKey: "weatherCardDismissedDay")
     }
 
     /// Applies the defaults that depend on the age answer (called once, when the player answers).

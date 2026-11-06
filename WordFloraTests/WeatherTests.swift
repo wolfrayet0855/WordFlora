@@ -618,15 +618,16 @@ final class WeatherLookTests: XCTestCase {
         XCTAssertTrue(WeatherLook.compute(input(kind: nil)).isEmpty)
     }
 
-    func testWildWeatherIsThirteenPlusCalmOffOptInOnly() {
-        XCTAssertFalse(WeatherLook.wildAvailable(ageBand: .under13, calmMode: false, quietGarden: false), "never under 13")
-        XCTAssertFalse(WeatherLook.wildAvailable(ageBand: nil, calmMode: false, quietGarden: false), "never for unknown age")
-        XCTAssertFalse(WeatherLook.wildAvailable(ageBand: .thirteenPlus, calmMode: true, quietGarden: false))
-        XCTAssertFalse(WeatherLook.wildAvailable(ageBand: .eighteenPlus, calmMode: false, quietGarden: true))
-        XCTAssertTrue(WeatherLook.wildAvailable(ageBand: .thirteenPlus, calmMode: false, quietGarden: false))
-        XCTAssertFalse(WeatherLook.wildActive(optedIn: false, ageBand: .eighteenPlus, calmMode: false, quietGarden: false), "off until opted in")
-        XCTAssertTrue(WeatherLook.wildActive(optedIn: true, ageBand: .eighteenPlus, calmMode: false, quietGarden: false))
-        XCTAssertFalse(WeatherLook.wildActive(optedIn: true, ageBand: .under13, calmMode: false, quietGarden: false), "a stored opt-in never applies under 13")
+    /// Owner ruling 2026-11-05 (overrides the 13+ gate): any age may opt in; Calm and Quiet Garden still hide it.
+    func testWildWeatherIsAnOptInForAnyAgeWithCalmAndQuietGardenOff() {
+        for band in [AgeBand.under13, .thirteenPlus, .eighteenPlus, nil] {
+            XCTAssertTrue(WeatherLook.wildAvailable(ageBand: band, calmMode: false, quietGarden: false), "\(String(describing: band))")
+            XCTAssertFalse(WeatherLook.wildAvailable(ageBand: band, calmMode: true, quietGarden: false))
+            XCTAssertFalse(WeatherLook.wildAvailable(ageBand: band, calmMode: false, quietGarden: true))
+            XCTAssertFalse(WeatherLook.wildActive(optedIn: false, ageBand: band, calmMode: false, quietGarden: false), "off until opted in")
+            XCTAssertTrue(WeatherLook.wildActive(optedIn: true, ageBand: band, calmMode: false, quietGarden: false))
+            XCTAssertFalse(WeatherLook.wildActive(optedIn: true, ageBand: band, calmMode: true, quietGarden: false), "Calm still hides it")
+        }
         XCTAssertFalse(PlayerProfile().wildWeather)
     }
 

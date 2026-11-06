@@ -483,6 +483,13 @@ Min 1, max 10 per size. Because the project targets iPad, you need iPad screensh
 4. Reserve the name in App Store Connect by creating the app record (A4); the reservation holds for a period while you do not submit **(verify in UI)**.
 Not legal advice. Note there is a Duolingo-like colour concern in the spec (icon), which is separate.
 
+### D6. Description line for garden weather and Wild Weather (spec section 4.2)
+Wild Weather must be explained in the App Store description, not only in Settings. Add this paragraph to the description:
+```
+Garden weather: now and then a big wind, a dry spell or a frosty night visits your garden. Plants look a little different for a few days, and a drink or a hello helps them perk up. Nothing you grow goes away. Want a bigger challenge? Turn on Wild Weather in Settings: a big storm can make up to 4 plants look one step smaller for up to 4 days, until care, a weather puzzle or time brings them back. Your level never goes down. Calm mode and Quiet Garden keep the weather away.
+```
+Re-answer the age-rating questionnaire with weather in mind (spec Q-1): cartoon-gentle, infrequent, no fear or peril.
+
 ### D: send back
 ```
 Privacy policy URL: https://...
