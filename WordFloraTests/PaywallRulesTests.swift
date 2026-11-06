@@ -103,6 +103,22 @@ final class PaywallRulesTests: XCTestCase {
         }
     }
 
+    // MARK: Settings entry (owner ruling: young or unknown ages see "For grown-ups" and one calm line on Plus)
+    func testPlusEntryIsForGrownUpsForYoungOrUnknownAgesOnly() {
+        for band: AgeBand? in [.under13, nil] {
+            XCTAssertEqual(PlusEntry.sectionTitle(ageBand: band), "For grown-ups")
+            XCTAssertEqual(PlusEntry.rowTitle(ageBand: band), "WordFlora Plus")
+            XCTAssertEqual(PlusEntry.intro(ageBand: band),
+                           "WordFlora is complete without Plus. Plus removes ads for grown-up players and syncs the garden with iCloud. Family Sharing covers up to six people.")
+        }
+        for band: AgeBand? in [.thirteenPlus, .eighteenPlus] {
+            XCTAssertEqual(PlusEntry.sectionTitle(ageBand: band), "WordFlora Plus")
+            XCTAssertEqual(PlusEntry.rowTitle(ageBand: band), "Remove ads and sync with iCloud")
+            XCTAssertNil(PlusEntry.intro(ageBand: band))
+        }
+        for line in [PlusEntry.grownUps, PlusEntry.introLine] { XCTAssertEqual(CopySafety.check(line), [], line) }
+    }
+
     func testGateCopyIsGentle() {
         for line in [ParentalGate.Copy.title, ParentalGate.Copy.prompt, ParentalGate.Copy.wrong] {
             XCTAssertEqual(CopySafety.check(line), [], line)

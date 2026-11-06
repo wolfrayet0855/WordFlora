@@ -13,6 +13,13 @@ struct PlusView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 18) {
+                // Young players and unknown ages: one calm line first, so the page reads as information for a grown-up.
+                if let intro = PlusEntry.intro(ageBand: app.settings.ageBand) {
+                    Text(intro).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText)
+                        .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityIdentifier("plus.grownUpsIntro")
+                }
                 FlowerView(petals: 8).frame(height: 120)
                 Text("WordFlora Plus").font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
 

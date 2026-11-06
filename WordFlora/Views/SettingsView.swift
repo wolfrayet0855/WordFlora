@@ -64,8 +64,9 @@ struct SettingsView: View {
                 }.pickerStyle(.segmented)
                 Toggle("Show everything", isOn: $s.showEverything)
             }
-            Section("WordFlora Plus") {
-                Button { router.go(.plus) } label: { Label("Remove ads and sync with iCloud", systemImage: "sparkles") }
+            Section(PlusEntry.sectionTitle(ageBand: s.ageBand)) {
+                Button { router.go(.plus) } label: { Label(PlusEntry.rowTitle(ageBand: s.ageBand), systemImage: "sparkles") }
+                    .accessibilityIdentifier("settings.plus")
                 if app.entitlements.state.hasCloudSync {
                     Label(app.syncNeedsRestart ? "iCloud sync starts the next time you open WordFlora" : "iCloud sync is on", systemImage: "icloud.fill")
                         .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
