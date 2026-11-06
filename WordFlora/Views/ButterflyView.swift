@@ -294,6 +294,7 @@ struct VisitorsView: View {
         .navigationTitle(VisitorsCopy.title)
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $detail) { v in VisitorDetailSheet(visitor: v).environment(app) }
+        .onAppear { app.recordQuest(.visitedVisitors) }
     }
 
     private func metCard(met: Int, total: Int) -> some View {

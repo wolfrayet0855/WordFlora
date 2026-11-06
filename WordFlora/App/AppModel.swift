@@ -31,6 +31,10 @@ final class AppModel {
     var nowDate: Date { now() }
     /// UI tests only (`-uitest-forecast=`, `-uitest-weather=`): replaces the weather schedule; every gate still applies.
     var weatherTestOverride: GardenWeather.Override?
+    /// Tests and `-uitest-quest=<kind>`: today's quest kind (every other quest rule still applies).
+    var questTestOverride: QuestKind?
+    /// UI tests leave the quest card off unless they ask for it with `-uitest-quest`, so older layouts stay as tested.
+    var questHiddenForUITests = false
     /// This visit showed an ending ceremony or the weather puzzle: no Plus card and no ads for the rest of it
     /// (endgame-and-events spec 2.4 and 8). Set by `markQuietVisit()`; a new launch starts clear.
     private(set) var quietVisit = false
@@ -167,6 +171,7 @@ final class AppModel {
     func love(_ plant: PlantCollectible) {
         guard !loveState(plant).isSeed else { return }
         plant.lastLovedAt = now(); try? context.save()
+        recordQuestCare(nil)
     }
 
     /// The plant's short answer to a tap hello (PlantVoice), seeded like the tend lines; `tap` moves to the next line.
@@ -238,6 +243,7 @@ final class AppModel {
         let counter: BadgeCounter? = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return nil } }()
         if let counter { enqueueBadgeMoments(badges.record(counter, now: date, quiet: quiet), after: 1.0); p.badgesJSON = badges.json }
         try? context.save()
+        recordQuestCare(action)
 
         let name = plant.nickname.isEmpty ? plant.name : plant.nickname
         if turnedGolden { return TendOutcome(applied: true, message: EndgameCopy.goldenLine(name: name)) }
@@ -560,6 +566,7 @@ final class AppModel {
             unlocks += badges.record(.levelSets, value: levelsDone, now: t, quiet: quiet)
             if game.missesThisRound == 0 { unlocks += badges.record(.perfectBlooms, now: t, quiet: quiet) }
             if game.isDaily { unlocks += badges.record(.dailyBloomsDone, now: t, quiet: quiet) }
+            recordQuest(.wordFound(letters: game.currentWord.filter(\.isLetter).count))
         }
         unlocks += badges.record(.streak, value: p.streak, now: t, quiet: quiet)
         enqueueBadgeMoments(unlocks)                // shown when the round's card closes (GameView pauses them until then)

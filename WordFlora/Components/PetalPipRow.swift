@@ -46,6 +46,8 @@ struct LoveFlower: View {
 struct PetalPips: View {
     let count: Int
     var pipWidth: CGFloat = 13
+    /// The petal sound toy: the petal that just played gives a small hop (none under Reduce Motion).
+    var hop: (index: Int, id: Int)? = nil
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var shown: Int?
 
@@ -63,6 +65,8 @@ struct PetalPips: View {
                         .opacity(i < n ? 1 : 0)
                 }
                 .frame(width: pipWidth, height: pipWidth * 18 / 13)
+                .offset(y: !reduceMotion && hop?.index == i ? -pipWidth * 0.3 : 0)
+                .animation(reduceMotion ? nil : .spring(response: 0.22, dampingFraction: 0.5), value: hop?.id)
             }
         }
         .accessibilityHidden(true)
@@ -84,29 +88,53 @@ struct PetalPips: View {
     }
 }
 
-/// The glass pill under the plant. It never takes taps, so a tap anywhere on the plant reaches it.
+/// The glass pill under the plant. Without `onPetal` it never takes taps, so a tap anywhere on the plant reaches it.
+/// With `onPetal` it is the petal sound toy: a tap on a petal gives its index, a tap on the love flower gives nil, and
+/// VoiceOver reads it as a "Play petal notes" button (the whole row).
 struct PetalPipRow: View {
     let count: Int
     var large = false
+    var onPetal: ((Int?) -> Void)? = nil
+    @State private var hop: (index: Int, id: Int)?
+    @State private var hops = 0
 
     var body: some View {
         // Standard sizes: the caption under the pill names the row ("3 love petals", design-preview/fact-card), so the
         // pips never read as lives; it sits under the pill so the row stays clear of the open Life panel. At
         // accessibility sizes the Life sheet right below says it already, and the stage has no room for it.
         VStack(spacing: 4) {
-            PetalPips(count: count, pipWidth: large ? 17 : 13)
-                .padding(.vertical, large ? 7 : 5).padding(.leading, large ? 10 : 8).padding(.trailing, large ? 13 : 11)
+            let pipWidth: CGFloat = large ? 17 : 13, leading: CGFloat = large ? 10 : 8
+            let pill = PetalPips(count: count, pipWidth: pipWidth, hop: hop)
+                .padding(.vertical, large ? 7 : 5).padding(.leading, leading).padding(.trailing, large ? 13 : 11)
                 .background(LifePalette.glass, in: Capsule())
                 .overlay(Capsule().stroke(LifePalette.line))
                 .shadow(color: .black.opacity(0.08), radius: 4, y: 2)
-                .accessibilityHidden(true)
+            if let onPetal {
+                pill
+                    .contentShape(Capsule())
+                    .onTapGesture(coordinateSpace: .local) { p in
+                        let i = PetalNotes.petalIndex(x: p.x, pipWidth: pipWidth, leading: leading)
+                        hops += 1
+                        let id = hops
+                        hop = i.map { ($0, id) }
+                        onPetal(i)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.16) { if hop?.id == id { hop = nil } }
+                    }
+                    .accessibilityElement(children: .ignore)
+                    .accessibilityLabel(PetalNotesCopy.button)
+                    .accessibilityAddTraits(.isButton)
+                    .accessibilityAction { onPetal(nil) }
+                    .accessibilityIdentifier("petal-notes")
+            } else {
+                pill.accessibilityHidden(true).allowsHitTesting(false)
+            }
             if !large {
                 Text(LifeStats.pipCaption(pips: count))
                     .font(Theme.font(.footnote, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityIdentifier("love-petal-caption")
+                    .allowsHitTesting(false)
             }
         }
-        .allowsHitTesting(false)
     }
 }

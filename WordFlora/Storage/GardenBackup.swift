@@ -32,6 +32,8 @@ struct GardenBackup: Codable, Equatable {
         var weatherSeenAt: Date?, weatherKitAt: Date?, crownSeenAt: Date?, goldCrownSeenAt: Date?
         // The onboarding guide was seen (added 2026-11-05). Optional, so older backups read as not seen; merged by OR.
         var guideSeen: Bool?
+        // The daily tiny quest (added 2026-11-06). Optional, so older backups read as no quest; merged best-of-day.
+        var questDay: Int?, questProgress: Int?, questDone: Bool?
     }
 
     struct Plant: Codable, Equatable {
@@ -100,6 +102,7 @@ struct GardenBackup: Codable, Equatable {
             snap.weatherGatedFromDay = p.weatherGatedFromDay; snap.weatherSeenAt = p.weatherSeenAt; snap.weatherKitAt = p.weatherKitAt
             snap.crownSeenAt = p.crownSeenAt; snap.goldCrownSeenAt = p.goldCrownSeenAt
             snap.guideSeen = p.guideSeen
+            snap.questDay = p.questDay; snap.questProgress = p.questProgress; snap.questDone = p.questDone
         }
         let plants = ((try? context.fetch(FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.plantId)]))) ?? []).map {
             Plant(plantId: $0.plantId, earnedCount: $0.earnedCount, growthPoints: $0.growthPoints, stage: $0.stage, hydration: $0.hydration,
@@ -147,7 +150,8 @@ struct GardenBackup: Codable, Equatable {
         let counts = [p.currentLevel, p.plantsEarnedThisLevel, p.roseOfJerichoCount, p.gamesPlayed, p.water, p.soil, p.streak,
                       p.bestStreak, p.streakFreezes, p.roseSeedProgress, p.gardenDays, p.shedPoints, p.glowLanterns, p.wordsTowardPlant ?? 0, gamesRecorded]
         guard counts.allSatisfy({ $0 >= 0 }), (1...100).contains(p.currentLevel) else { return false }
-        let weatherCounts = [p.weatherHighWaterDay, p.weatherShelterDay, p.weatherPuzzleDay, p.weatherPuzzleCount, p.weatherGatedFromDay]
+        let weatherCounts = [p.weatherHighWaterDay, p.weatherShelterDay, p.weatherPuzzleDay, p.weatherPuzzleCount, p.weatherGatedFromDay,
+                             p.questDay, p.questProgress]
         guard weatherCounts.allSatisfy({ ($0 ?? 0) >= 0 }), (p.weatherRescuedDays ?? []).count <= 200 else { return false }
         return plants.allSatisfy { !$0.plantId.isEmpty && $0.earnedCount >= 0 && $0.growthPoints >= 0 && (0...4).contains($0.stage)
             && $0.hydration.isFinite && $0.soilRichness.isFinite && $0.nickname.count <= 60 && ($0.potId ?? "").count <= 40
@@ -185,6 +189,7 @@ struct GardenBackup: Codable, Equatable {
         o.weatherSeenAt = profile.weatherSeenAt; o.weatherKitAt = profile.weatherKitAt
         o.crownSeenAt = profile.crownSeenAt; o.goldCrownSeenAt = profile.goldCrownSeenAt
         o.guideSeen = profile.guideSeen ?? false
+        o.questDay = profile.questDay ?? 0; o.questProgress = min(profile.questProgress ?? 0, 10); o.questDone = profile.questDone ?? false
         DataReconciler.merge(o, into: keeper, defs: badgeDefs)
 
         var report = RestoreReport()

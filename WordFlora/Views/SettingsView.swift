@@ -67,6 +67,7 @@ struct SettingsView: View {
             Section(PlusEntry.sectionTitle(ageBand: s.ageBand)) {
                 Button { router.go(.plus) } label: { Label(PlusEntry.rowTitle(ageBand: s.ageBand), systemImage: "sparkles") }
                     .accessibilityIdentifier("settings.plus")
+                FamilyShareNudgeRow()
                 if app.entitlements.state.hasCloudSync {
                     Label(app.syncNeedsRestart ? "iCloud sync starts the next time you open WordFlora" : "iCloud sync is on", systemImage: "icloud.fill")
                         .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)

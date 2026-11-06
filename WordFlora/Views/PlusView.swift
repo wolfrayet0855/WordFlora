@@ -33,6 +33,7 @@ struct PlusView: View {
                 }.frame(maxWidth: .infinity, alignment: .leading)
 
                 if store.state.hasPlus { activeCard } else { plans }
+                FamilyShareNudgeRow()
 
                 VStack(spacing: 2) {
                     Button("Restore purchases") { Task { await store.restore(); app.updateSyncFlag() } }.tapTarget()
