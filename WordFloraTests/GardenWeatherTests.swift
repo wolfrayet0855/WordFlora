@@ -506,3 +506,71 @@ final class WeatherUICopyTests: XCTestCase {
         XCTAssertTrue(WeatherUICopy.wildConfirmMessage.contains("4 days"))
     }
 }
+
+// MARK: The plant page's weather art and sound (mounted only behind the weather gate)
+
+@MainActor
+final class PlantWeatherMountTests: XCTestCase {
+    final class Clock { var date: Date; init(_ d: Date) { date = d } }
+
+    func makeApp(clock: Clock, calm: Bool = false, quiet: Bool = false, weatherOn: Bool = true) throws -> (AppModel, PlantCollectible) {
+        let container = try SharedContainer.make(inMemory: true)
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "wf-pwm-\(UUID().uuidString)")!)
+        settings.applyAgeDefaults(.eighteenPlus)
+        settings.onboardingComplete = true
+        let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
+        let app = AppModel(container: container, settings: settings, bank: bank, now: { clock.date },
+                           notifications: ReminderTests.FakeCenter())
+        let plant = try XCTUnwrap(app.plants().first)
+        plant.earnedCount = 1
+        plant.lastLovedAt = clock.date.addingTimeInterval(-3_600)     // loved an hour ago: no love rain
+        app.weatherTestOverride = GardenWeather.Override(forecast: nil, event: .bigWind)
+        app.profile?.weatherGatedFromDay = app.weatherToday
+        try? app.context.save()
+        app.markWeatherSeen()                                         // Home was opened on the weather day
+        settings.calmMode = calm
+        settings.quietGarden = quiet
+        settings.gardenWeather = weatherOn
+        return (app, plant)
+    }
+
+    func testAWeatherDayMountsTheArtWithTheKindItsLookAndAPageLine() throws {
+        let clock = Clock(weatherDate(day: 330, hour: 10))
+        let (app, plant) = try makeApp(clock: clock)
+        let scene = try XCTUnwrap(app.plantWeather(plant))
+        XCTAssertEqual(scene.kind, .bigWind)
+        XCTAssertFalse(scene.line.isEmpty, "VoiceOver hears the weather in words")
+        XCTAssertTrue(WeatherSoundGate.allows(.windBed, app.weatherSoundContext(systemReduceMotion: false)))
+    }
+
+    func testCalmModeShowsNoWeatherArtAndPlaysNoWeatherSound() throws {
+        let clock = Clock(weatherDate(day: 330, hour: 10))
+        let (app, plant) = try makeApp(clock: clock, calm: true)
+        XCTAssertNil(app.plantWeather(plant))
+        let ctx = app.weatherSoundContext(systemReduceMotion: false)
+        for s in WeatherSound.allCases { XCTAssertFalse(WeatherSoundGate.allows(s, ctx), "\(s) in Calm") }
+    }
+
+    func testQuietGardenShowsNoWeatherArtAndPlaysNoWeatherSound() throws {
+        let clock = Clock(weatherDate(day: 330, hour: 10))
+        let (app, plant) = try makeApp(clock: clock, quiet: true)
+        XCTAssertNil(app.plantWeather(plant))
+        let ctx = app.weatherSoundContext(systemReduceMotion: false)
+        for s in WeatherSound.allCases { XCTAssertFalse(WeatherSoundGate.allows(s, ctx), "\(s) in Quiet Garden") }
+    }
+
+    func testGardenWeatherOffShowsNoWeatherArt() throws {
+        let clock = Clock(weatherDate(day: 330, hour: 10))
+        let (app, plant) = try makeApp(clock: clock, weatherOn: false)
+        XCTAssertNil(app.plantWeather(plant))
+    }
+
+    func testAHelloMendsTheLookSoTheArtGoes() throws {
+        let clock = Clock(weatherDate(day: 330, hour: 10))
+        let (app, plant) = try makeApp(clock: clock)
+        XCTAssertNotNil(app.plantWeather(plant))
+        clock.date = clock.date.addingTimeInterval(60)
+        app.love(plant)
+        XCTAssertNil(app.plantWeather(plant), "care after the first look mends at once (the relief chime's moment)")
+    }
+}

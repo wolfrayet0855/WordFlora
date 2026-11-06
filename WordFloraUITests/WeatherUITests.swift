@@ -203,4 +203,104 @@ final class WeatherUITests: XCTestCase {
         // No dark audit here: dark Home without any weather already gets a contrast finding on the Daily Bloom line
         // ("One word for everyone today", D4EDD4 on 4D3039, about 10:1 by the colour values); see docs/STATUS.md.
     }
+
+    // MARK: Plant page weather art and sound (mounted only behind the weather gate)
+
+    /// Opens Daisy's page from the garden (Home opens first, so the weather day counts as seen).
+    private func openDaisy(_ extra: [String]) -> XCUIElement {
+        executionTimeAllowance = max(executionTimeAllowance, 300)    // launch, Home, Garden, page: slow under machine load
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-plant=daisy"] + extra
+        app.launch()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 10))
+        app.buttons["Garden"].tap()
+        let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Daisy")).firstMatch
+        _ = tile.waitForExistence(timeout: 5)
+        for _ in 0..<10 where !(tile.exists && tile.isHittable) { app.swipeUp() }
+        tile.tap()
+        let plant = app.buttons["plant-love"]
+        XCTAssertTrue(plant.waitForExistence(timeout: 5))
+        return plant
+    }
+
+    private func weatherValue(_ plant: XCUIElement) -> String { (plant.value as? String) ?? "" }
+
+    func testTheWeatherDayDrawsItsArtOnThePlantPage() {
+        let plant = openDaisy(["-uitest-weather=bigWind"])
+        XCTAssertFalse(weatherValue(plant).isEmpty, "the weather line is read with the plant")
+        XCTAssertTrue(weatherValue(plant).contains("Daisy"), weatherValue(plant))
+        XCTAssertTrue(plant.isHittable, "the art never takes the plant's taps")
+        shot("weather-plant-wind")
+    }
+
+    func testTheWeatherArtHoldsStillWithReduceMotion() {
+        let plant = openDaisy(["-uitest-weather=hailShower", "-uitest-reduce-motion"])
+        XCTAssertFalse(weatherValue(plant).isEmpty)
+        shot("weather-plant-hail-still")
+    }
+
+    func testCalmModeShowsNoWeatherArtOnThePlantPage() {
+        let plant = openDaisy(["-uitest-calm", "-uitest-weather=bigWind"])
+        XCTAssertEqual(weatherValue(plant), "", "no weather in Calm mode")
+    }
+
+    func testQuietGardenShowsNoWeatherArtOnThePlantPage() {
+        let plant = openDaisy(["-uitest-quiet", "-uitest-weather=bigWind"])
+        XCTAssertEqual(weatherValue(plant), "", "no weather in Quiet Garden")
+    }
+
+    func testAHelloMendsTheWeatherOnThePlantPage() {
+        let plant = openDaisy(["-uitest-weather=bigPuddles"])
+        XCTAssertFalse(weatherValue(plant).isEmpty)
+        plant.tap()
+        let mended = NSPredicate(format: "value == nil OR value == ''")
+        expectation(for: mended, evaluatedWith: plant); waitForExpectations(timeout: 5)
+    }
+
+    /// Each kind is audited once: four held still, three moving (seven launches in one test was too slow under load).
+    private static let stillKinds = ["drySpell", "frostyNight", "hailShower", "bigPuddles"]
+    private static let movingKinds = ["busyBugs", "bigWind", "hotDay"]
+
+    /// Kinds with the art held still (the app's Reduce Motion switch).
+    func testAuditThePlantPageOnWeatherDaysHeldStill() {
+        auditKinds(Self.stillKinds, extra: ["-uitest-reduce-motion"], prefix: "weather-plant-still")
+    }
+
+    /// Kinds with the art moving.
+    func testAuditThePlantPageOnWeatherDaysMoving() {
+        auditKinds(Self.movingKinds, extra: [], prefix: "weather-plant-audit")
+    }
+
+    /// The full audit on each weather day's plant page. Every finding fails the test, except contrast findings outside the
+    /// weather scene (the art cannot reach there; the audit flags the fact card's lines that sit under the pinned tend
+    /// buttons, which TendingUITests' plant audit also leaves out) or with no element at all; those are printed. The scene is the art's own rectangle around the plant box (WeatherOverlay.sceneRect).
+    private func auditKinds(_ kinds: [String], extra: [String], prefix: String) {
+        executionTimeAllowance = 600
+        var findings = [String]()
+        for kind in kinds {
+            let plant = openDaisy(["-uitest-weather=\(kind)"] + extra)
+            let box = plant.frame, k = box.width / 220
+            let scene = CGRect(x: box.minX - 70 * k, y: box.minY - 26 * k, width: 361 * k, height: 340 * k)
+            shot("\(prefix)-\(kind)")
+            findings += auditFindings("\(prefix)-\(kind)", scene: scene)
+            app.terminate()
+        }
+        XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
+    }
+
+    private func auditFindings(_ name: String, scene: CGRect) -> [String] {
+        var findings = [String]()
+        do {
+            try app.performAccessibilityAudit { issue in
+                let frame = issue.element?.frame
+                let line = "\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(frame.map { "\($0)" } ?? "no element")"
+                if issue.auditType == .contrast && !(frame.map { $0.intersects(scene) } ?? false) {
+                    print("Excused (contrast outside the weather scene \(scene) or unresolved): \(line)")
+                } else {
+                    findings.append(line)
+                }
+                return true
+            }
+        } catch { findings.append("\(name): audit failed to run: \(error)") }
+        return findings
+    }
 }

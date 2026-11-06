@@ -67,8 +67,17 @@ struct PlantDetailView: View {
 
     @ViewBuilder private func content(_ plant: PlantCollectible) -> some View {
         let snap = snapshot(plant)
+        let wx = app.plantWeather(plant)
         Group {
-            if large { largeLayout(plant, snap) } else { standardLayout(plant, snap) }
+            if large { largeLayout(plant, snap, wx) } else { standardLayout(plant, snap, wx) }
+        }
+        // Garden weather: the day's bed and arrival sound while the stage is on screen (silent with Sound off, Calm,
+        // Quiet Garden; see WeatherSoundGate). When care mends the look on this page, the relief chime ends the bed.
+        .weatherSoundscape(wx?.kind, active: stageVisible)
+        .onChange(of: wx?.kind) { old, new in
+            if old != nil && new == nil && stageVisible {
+                app.playWeather(.reliefChime, systemReduceMotion: reduceMotion, stopsBed: true)
+            }
         }
         .overlay {
             Color.white.opacity(flash).ignoresSafeArea().allowsHitTesting(false).accessibilityHidden(true)
@@ -99,12 +108,12 @@ struct PlantDetailView: View {
     // MARK: Layouts
 
     /// The tend buttons sit below the scroll view (not over it), so nothing scrolls behind them.
-    private func standardLayout(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot) -> some View {
+    private func standardLayout(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot, _ wx: PlantWeatherScene?) -> some View {
         VStack(spacing: 0) {
             ScrollView {
                 VStack(spacing: 16) {
                     ZStack(alignment: .topLeading) {
-                        stage(plant, snap, plantSize: 220, plantTop: 92, cloudTop: 4)
+                        stage(plant, snap, wx, plantSize: 220, plantTop: 92, cloudTop: 4)
                         panel(snap)
                     }
                     VStack(spacing: 16) {
@@ -118,9 +127,9 @@ struct PlantDetailView: View {
         }
     }
 
-    private func largeLayout(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot) -> some View {
+    private func largeLayout(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot, _ wx: PlantWeatherScene?) -> some View {
         VStack(spacing: 0) {
-            stage(plant, snap, plantSize: 132, plantTop: 52, cloudTop: 0)
+            stage(plant, snap, wx, plantSize: 132, plantTop: 52, cloudTop: 0)
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
                     LifeSheet(snapshot: snap, collapsed: panelHidden) { togglePanel() }
@@ -136,7 +145,7 @@ struct PlantDetailView: View {
 
     // MARK: Stage: weather, plant, love petal row
 
-    private func stage(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot, plantSize s: CGFloat, plantTop: CGFloat, cloudTop: CGFloat) -> some View {
+    private func stage(_ plant: PlantCollectible, _ snap: LifeStats.Snapshot, _ wx: PlantWeatherScene?, plantSize s: CGFloat, plantTop: CGFloat, cloudTop: CGFloat) -> some View {
         let raining = snap.rainDay > 0
         let weather = LifeStats.weather(day: snap.rainDay)
         let k = s / 220
@@ -150,6 +159,9 @@ struct PlantDetailView: View {
         let thirsty = TendingEngine.isThirsty(plant, now: .now, calm: app.settings.calmMode)
         let name = displayName(plant)
         let height = rowTop + rowHeight + (large ? 34 : 44)
+        // Garden weather art: Reduce Motion (system or the app's switch) and Low Power hold one still frame.
+        let weatherStill = reduceMotion || app.settings.reduceMotionOverride || lowPower.isOn
+        let weatherSpec = wx.map { WeatherArt.spec($0.kind, look: $0.look) }
 
         return ZStack(alignment: .top) {
             if raining {
@@ -165,6 +177,11 @@ struct PlantDetailView: View {
                 RainCanvas(drops: weather.drops, layers: [0], geometry: geo, paused: paused).frame(height: rowTop)
             }
 
+            if let wx {
+                WeatherOverlay(kind: wx.kind, look: wx.look, layer: .back, size: s, still: weatherStill, paused: paused)
+                    .padding(.top, plantTop)
+            }
+
             // The plant's pot stands behind it (the seed pot draws its own). The repot effect brings its own pots.
             if !showPot {
                 stagePot(plant, size: s)
@@ -172,12 +189,26 @@ struct PlantDetailView: View {
                     .padding(.top, plantTop)
             }
 
-            plantView(plant, snap, size: s, showPot: showPot, thirsty: thirsty, name: name)
-                .padding(.top, plantTop)
+            if let weatherSpec, let wx {
+                // The weather poses the plant only (never the pot); its line is the plant's VoiceOver value.
+                plantView(plant, snap, size: s, showPot: showPot, thirsty: thirsty, name: name)
+                    .accessibilityValue(wx.line)
+                    .weatherPose(weatherSpec, still: weatherStill, paused: paused)
+                    .frame(width: s, height: s)
+                    .padding(.top, plantTop)
+            } else {
+                plantView(plant, snap, size: s, showPot: showPot, thirsty: thirsty, name: name)
+                    .padding(.top, plantTop)
+            }
 
             // The tend effect plays over the plant; taps pass through to it.
             TendAnimationView(play: tends.current, size: s, calm: calm)
                 .padding(.top, plantTop)
+
+            if let wx {
+                WeatherOverlay(kind: wx.kind, look: wx.look, layer: .front, size: s, still: weatherStill, paused: paused)
+                    .padding(.top, plantTop)
+            }
 
             if raining && !reduceMotion {
                 RainCanvas(drops: weather.drops, layers: [1, 2], geometry: geo, paused: paused).frame(height: rowTop)

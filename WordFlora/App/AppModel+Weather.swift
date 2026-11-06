@@ -19,6 +19,14 @@ extension GardenWeather {
     }
 }
 
+/// The plant page's weather: what `WeatherOverlay`, `.weatherPose` and `.weatherSoundscape` are given.
+struct PlantWeatherScene: Equatable {
+    var kind: WeatherKind
+    var look: WeatherEffect
+    /// The page line (read by VoiceOver as the plant's value; the art itself is hidden from VoiceOver).
+    var line: String
+}
+
 extension AppModel {
     var weatherToday: Int { WeatherDay.key(nowDate) }
 
@@ -121,6 +129,17 @@ extension AppModel {
                 loveRaining: love.raining, name: plant.nickname.isEmpty ? plant.name : plant.nickname)
         }
         return out
+    }
+
+    /// What the plant page draws and plays for this plant today: the kind, its look and the page line. nil whenever weather
+    /// is hidden (Calm, Quiet Garden, Garden weather off, the gate), there is no event in reach, the look has mended, the
+    /// plant rests as a seed or love rain shows. The art and the sounds mount only when this is non-nil.
+    func plantWeather(_ plant: PlantCollectible) -> PlantWeatherScene? {
+        guard !settings.calmMode, !settings.quietGarden, settings.gardenWeather,
+              let input = weatherInputs()[plant.plantId], let kind = input.kind else { return nil }
+        let out = WeatherLook.compute(input)
+        guard let look = out.look else { return nil }
+        return PlantWeatherScene(kind: kind, look: look, line: out.line)
     }
 
     func weatherLooks() -> [String: WeatherLook.Output] {
