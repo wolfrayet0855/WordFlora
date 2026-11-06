@@ -23,6 +23,27 @@ struct WaterPlantIntent: AppIntent {
     }
 }
 
+/// The medium widget's Say hello button: the same hello as a tap on the plant in the app (love, so it keeps its petals
+/// and the daily quest's "say hello" counts it). Allowed in Quiet Garden and Calm, like the tap hello.
+struct HelloPlantIntent: AppIntent {
+    static var title: LocalizedStringResource = "Say hello to a plant"
+    static var isDiscoverable: Bool { false }
+
+    @Parameter(title: "Plant") var plantId: String
+
+    init() { plantId = "" }
+    init(plantId: String) { self.plantId = plantId }
+
+    @MainActor
+    func perform() async throws -> some IntentResult {
+        if let container = try? SharedContainer.make(role: .appExtension) {
+            WidgetActions.hello(plantId: plantId, context: container.mainContext, now: .now,
+                                exempt: SharedDefaults.loveExempt(in: SharedDefaults.store))
+        }
+        return .result()
+    }
+}
+
 // MARK: Timeline
 
 struct GardenEntry: TimelineEntry {
@@ -126,6 +147,16 @@ struct GardenWidgetView: View {
         }
     }
 
+    private func helloButton(_ s: WidgetActions.PlantSnapshot) -> some View {
+        Button(intent: HelloPlantIntent(plantId: s.plantId)) {
+            Label("Say hello", systemImage: "heart.fill")
+                .font(.system(.footnote, design: .rounded, weight: .bold)).foregroundStyle(Color("appPrimaryText"))
+                .padding(.horizontal, 10).padding(.vertical, 6).background(Color("appSurface"), in: Capsule())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Say hello to \(s.name)")
+    }
+
     private var small: some View {
         Group {
             if let s = hero {
@@ -151,7 +182,10 @@ struct GardenWidgetView: View {
                     VStack(spacing: 8) {
                         HStack(spacing: 6) { ForEach(entry.snapshot.others, id: \.plantId) { o in plantImage(o, height: 44) } }
                         Text(entry.weatherLine ?? "Your garden says hello").font(.system(.caption, design: .rounded)).foregroundStyle(Color("appPrimaryText").opacity(0.75)).multilineTextAlignment(.center)
-                        waterButton(s)
+                        ViewThatFits(in: .horizontal) {
+                            HStack(spacing: 6) { waterButton(s); helloButton(s) }
+                            VStack(spacing: 4) { waterButton(s); helloButton(s) }
+                        }
                     }.frame(maxWidth: .infinity)
                 }
                 .widgetURL(URL(string: "wordflora://plant/\(s.plantId)"))

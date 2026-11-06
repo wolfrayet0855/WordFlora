@@ -47,4 +47,17 @@ extension AppModel {
         if case .sun? = action { recordQuest(.sunned) }
         recordQuest(.greeted(plantsToday: found.filter { TendingEngine.isToday($0.lastLovedAt, now: date, calendar: cal) }.count))
     }
+
+    /// Hellos and drinks given from the widget (another process) are counted when the app comes back to the front: the
+    /// plants greeted and watered today, read from the garden. Counts only ever go up, so repeating it is safe.
+    func refreshQuestFromGarden() {
+        guard let quest = todaysQuest else { return }
+        let date = now(), cal = Calendar.current
+        let found = plants().filter { $0.earnedCount > 0 }
+        switch quest.kind {
+        case .waterPlants: recordQuest(.watered(plantsToday: found.filter { TendingEngine.waterings($0, now: date, calendar: cal) > 0 }.count))
+        case .helloPlants: recordQuest(.greeted(plantsToday: found.filter { TendingEngine.isToday($0.lastLovedAt, now: date, calendar: cal) }.count))
+        default: break
+        }
+    }
 }

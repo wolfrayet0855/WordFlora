@@ -231,6 +231,27 @@ final class DailyQuestTests: XCTestCase {
         XCTAssertEqual(app.profile?.shedPoints, before + 1, "one point a day at most")
     }
 
+    /// A hello or a drink from the widget (another process) is counted when the app comes back to the front.
+    @MainActor
+    func testWidgetHellosAndDrinksCountWhenTheAppComesBack() throws {
+        let app = try makeApp()
+        app.questTestOverride = .helloPlants
+        let plants = app.plants().filter { $0.earnedCount > 0 }
+        for p in plants { XCTAssertTrue(WidgetActions.hello(plantId: p.plantId, context: app.context, now: app.nowDate, exempt: false)) }
+        XCTAssertEqual(app.questState.progress, 0)
+        app.refreshQuestFromGarden()
+        XCTAssertTrue(app.questState.done)
+
+        let other = try makeApp()
+        other.questTestOverride = .waterPlants
+        other.profile?.water = 9
+        for p in other.plants().filter({ $0.earnedCount > 0 }).prefix(2) {
+            XCTAssertTrue(WidgetActions.water(plantId: p.plantId, context: other.context, now: other.nowDate, calendar: .current, quiet: false).applied)
+        }
+        other.refreshQuestFromGarden()
+        XCTAssertTrue(other.questState.done)
+    }
+
     @MainActor
     func testHellosCountPlantsGreetedToday() throws {
         let app = try makeApp()

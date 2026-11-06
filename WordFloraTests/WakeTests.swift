@@ -282,6 +282,25 @@ final class WakeInAppTests: XCTestCase {
         XCTAssertFalse(app.loveState(p).isSeed)
         XCTAssertFalse(app.showsWakeCard(p))
     }
+    /// Owner ruling: a player under 13 never loses petals (no rain, no seed). 13 and up keep rain, seed and wake.
+    func testUnderThirteenNeverLosesPetalsButThirteenAndUpStillDo() throws {
+        var clock = Date(timeIntervalSince1970: 1_780_000_000)
+        let app = try makeApp(now: { clock })
+        app.settings.ageBand = .under13
+        let p = app.plants().first!; p.earnedCount = 1; app.love(p)
+        clock = clock.addingTimeInterval(30 * 86_400)
+        XCTAssertEqual(app.loveState(p).petalsLeft, LoveEngine.maxPetals)
+        XCTAssertFalse(app.loveState(p).isSeed)
+        XCTAssertFalse(app.showsWakeCard(p))
+        XCTAssertTrue(app.loveExempt)
+
+        for band in [AgeBand.thirteenPlus, .eighteenPlus] {
+            app.settings.ageBand = band
+            XCTAssertFalse(app.loveExempt, "\(band)")
+            XCTAssertTrue(app.loveState(p).isSeed, "\(band)")
+            XCTAssertTrue(app.showsWakeCard(p), "\(band)")
+        }
+    }
     func testASeedShowsTheWakeCard() throws {
         var clock = Date(timeIntervalSince1970: 1_780_000_000)
         let app = try makeApp(now: { clock })

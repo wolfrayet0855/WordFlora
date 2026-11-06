@@ -91,6 +91,22 @@ final class TendingUITests: XCTestCase {
         shot("tend-hello")
     }
 
+    /// Living Touch: stroking the plant sideways makes it lean; the third stroke is one hello (the tap hello's answer).
+    func testTheThirdStrokeOnThePlantSaysHello() {
+        open("Daisy", plantId: "daisy")
+        let plant = app.buttons["plant-love"]
+        XCTAssertTrue(plant.waitForExistence(timeout: 5))
+        func stroke() {
+            plant.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.45))
+                .press(forDuration: 0.05, thenDragTo: plant.coordinate(withNormalizedOffset: CGVector(dx: 0.75, dy: 0.45)))
+        }
+        stroke(); stroke()
+        XCTAssertFalse(toast.waitForExistence(timeout: 1), "two strokes are not a hello yet")
+        stroke()
+        XCTAssertTrue(toast.waitForExistence(timeout: 3), "the third stroke says hello")
+        XCTAssertFalse(toast.label.isEmpty)
+    }
+
     func testFeedSunAndRepotEachPlayTheirEffect() {
         open("Daisy", plantId: "daisy", extra: ["-uitest-tend-hold"])
         app.buttons["tend-feed"].tap()

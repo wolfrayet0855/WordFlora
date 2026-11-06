@@ -165,6 +165,7 @@ enum GuideLook {
     static func still(systemReduceMotion: Bool, reduceMotionOverride: Bool, calm: Bool) -> Bool {
         systemReduceMotion || reduceMotionOverride || calm
     }
-    static func quietCopy(calm: Bool, quiet: Bool) -> Bool { calm || quiet }
+    /// The "never naps" lines whenever plants never rain or nap: Calm, Quiet Garden, and under 13 (`AppModel.loveExempt`).
+    static func quietCopy(calm: Bool, quiet: Bool, underThirteen: Bool = false) -> Bool { calm || quiet || underThirteen }
     static func showsPoints(quiet: Bool) -> Bool { !quiet }
 }

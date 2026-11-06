@@ -13,6 +13,14 @@ final class DailyQuestUITests: XCTestCase {
 
     private func element(_ id: String) -> XCUIElement { app.descendants(matching: .any)[id].firstMatch }
 
+    private func shot(_ name: String) {
+        let data = XCUIScreen.main.screenshot().pngRepresentation
+        if let dir = ProcessInfo.processInfo.environment["SCREENSHOT_DIR"] {
+            try? data.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+        }
+        let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
+    }
+
     private func scrollTo(_ e: XCUIElement) {
         for _ in 0..<8 where !(e.exists && e.isHittable) { app.swipeUp() }
     }
@@ -41,6 +49,7 @@ final class DailyQuestUITests: XCTestCase {
         XCTAssertTrue(card.label.contains("Visit the Visitors page"), card.label)
         XCTAssertEqual(card.value as? String, "0 of 1")
         audit("quest-card", within: card)
+        shot("quest-card")
 
         let tile = app.buttons["tile-Visitors"]
         scrollTo(tile)
@@ -51,6 +60,7 @@ final class DailyQuestUITests: XCTestCase {
         let done = NSPredicate(format: "value == %@", "Quest done")
         wait(for: [expectation(for: done, evaluatedWith: card)], timeout: 5)
         audit("quest-card-done", within: card)
+        shot("quest-card-done")
     }
 
     func testCalmShowsTheSameCardWithAStillCheckMark() {

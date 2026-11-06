@@ -27,6 +27,10 @@ struct PlantDetailView: View {
     @State private var sway = 0.0
     @State private var hellos = 0
     @State private var petalNotes = 0
+    @State private var lean = 0.0                         // Living Touch: the plant leans with a stroking finger
+    @State private var strokes = LivingTouch.Strokes()
+    @State private var lastTouchTap: Date?
+    @State private var touchTaps = 0
     @State private var showRepot = false
     @State private var renaming = false
     @State private var draftName = ""
@@ -67,7 +71,7 @@ struct PlantDetailView: View {
     private func displayName(_ plant: PlantCollectible) -> String { plant.nickname.isEmpty ? plant.name : plant.nickname }
 
     private func snapshot(_ plant: PlantCollectible) -> LifeStats.Snapshot {
-        var inputs = LifeStats.Inputs(plant: plant, now: .now, calendar: .current, exempt: app.settings.quietGarden || app.settings.calmMode)
+        var inputs = LifeStats.Inputs(plant: plant, now: .now, calendar: .current, exempt: app.loveExempt)
         inputs.weather = app.weatherInputs()[plant.plantId]       // empty in Calm, Quiet Garden or with weather off
         return LifeStats.snapshot(inputs)
     }
@@ -293,7 +297,7 @@ struct PlantDetailView: View {
                 .goldenBloom(app.isGolden(plant))
                 // Wild Weather's shown-stage dip: the plant looks one stage smaller for now (display only).
                 .scaleEffect(Self.dipScale(snap), anchor: UnitPoint(x: 0.5, y: 188.0 / 220))
-                .rotationEffect(.degrees(thirsty ? 5 : sway), anchor: .bottom)
+                .rotationEffect(.degrees(thirsty ? 5 : sway + lean), anchor: .bottom)
                 .transition(.opacity)
             }
         }
@@ -302,7 +306,11 @@ struct PlantDetailView: View {
         .animation(.easeInOut(duration: reduceMotion ? 0.3 : 1.2), value: showPot)
         .contentShape(Rectangle())
         .onTapGesture { hello(plant) }
+        // Living Touch: stroke the plant (not the petal row, which plays notes) and it leans with the finger; a seed in
+        // its pot keeps the tap only. Simultaneous, so the page still scrolls.
+        .simultaneousGesture(livingTouch(plant, width: s), including: showPot ? .subviews : .all)
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.5), trigger: hellos)
+        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.3), trigger: touchTaps) { _, _ in app.settings.hapticsOn }
         .modifier(HelloTipModifier())
         .scaleEffect(bump ? 1.06 : 1)
         .animation(.spring(response: 0.4, dampingFraction: 0.45), value: bump)
@@ -335,6 +343,29 @@ struct PlantDetailView: View {
     private func playPetal(_ petal: Int?) {
         PetalSynth.shared.play(tap: petal, volume: PetalNotes.volume(soundOn: app.settings.soundOn, calm: app.settings.calmMode))
         if PetalNotes.haptic(hapticsOn: app.settings.hapticsOn) { petalNotes += 1 }
+    }
+
+    /// Living Touch (light): the plant leans with the finger (none under Reduce Motion, half as far in Calm), a soft tap
+    /// at most every 0.3 s, and every third stroke is one hello (the tap hello's path: its line, love, hearts).
+    /// VoiceOver keeps the plant's own action (a hello).
+    private func livingTouch(_ plant: PlantCollectible, width: CGFloat) -> some Gesture {
+        DragGesture(minimumDistance: 12)
+            .onChanged { v in
+                let dx = v.translation.width, dy = v.translation.height
+                guard abs(dx) > abs(dy) else { return }
+                let motion = LivingTouch.motion(reduceMotion: reduceMotion, appReduceMotion: app.settings.reduceMotionOverride,
+                                                calm: app.settings.calmMode)
+                withAnimation(.interactiveSpring(response: 0.25, dampingFraction: 0.7)) {
+                    lean = LivingTouch.lean(translationX: dx, width: width, motion: motion)
+                }
+                let now = Date()
+                if LivingTouch.mayTap(last: lastTouchTap, now: now) { lastTouchTap = now; touchTaps += 1 }
+            }
+            .onEnded { v in
+                withAnimation(.interpolatingSpring(stiffness: 90, damping: 6)) { lean = 0 }
+                guard LivingTouch.isStroke(dx: v.translation.width, dy: v.translation.height) else { return }
+                if strokes.stroke(at: Date()) { hello(plant) }
+            }
     }
 
     /// A small hello: the plant sways back and settles, hearts float up, it counts as love, and the plant answers

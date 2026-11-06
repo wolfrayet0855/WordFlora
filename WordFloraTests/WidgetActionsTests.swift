@@ -91,6 +91,33 @@ final class WidgetActionsTests: XCTestCase {
         XCTAssertEqual(profile.water, 7)                              // only two drops were actually spent
     }
 
+    // MARK: hello (the widget's Say hello button)
+    func testAHelloFromTheWidgetIsLoveLikeATapHello() {
+        let ps = plants(["rose"]); ps[0].lastLovedAt = t0.addingTimeInterval(-30 * 3600)
+        XCTAssertTrue(WidgetActions.hello(plantId: "rose", context: ctx, now: t0, exempt: false))
+        XCTAssertEqual(ps[0].lastLovedAt, t0)
+        XCTAssertEqual(LoveEngine.state(lastLoved: ps[0].lastLovedAt, now: t0, exempt: false).petalsLeft, LoveEngine.maxPetals)
+        XCTAssertTrue(WidgetActions.hello(plantId: "rose", context: ctx, now: t0, exempt: false), "safe to repeat")
+    }
+
+    func testAWidgetHelloNeverWakesASeedAndNeedsAFoundPlant() {
+        let ps = plants(["rose"]); let long = t0.addingTimeInterval(-30 * 86_400); ps[0].lastLovedAt = long
+        XCTAssertFalse(WidgetActions.hello(plantId: "rose", context: ctx, now: t0, exempt: false), "a seed wakes in the app")
+        XCTAssertEqual(ps[0].lastLovedAt, long)
+        XCTAssertTrue(WidgetActions.hello(plantId: "rose", context: ctx, now: t0, exempt: true), "exempt players never have seeds")
+        XCTAssertFalse(WidgetActions.hello(plantId: "tulip", context: ctx, now: t0, exempt: false), "not found yet")
+    }
+
+    func testTheWidgetReadsTheSameLoveExemptionAsTheApp() {
+        let d = UserDefaults(suiteName: "wf-widget-love-\(UUID().uuidString)")!
+        d.set("eighteenPlus", forKey: "ageBand")
+        XCTAssertFalse(SharedDefaults.loveExempt(in: d))
+        d.set(true, forKey: "calmMode"); XCTAssertTrue(SharedDefaults.loveExempt(in: d))
+        d.set(false, forKey: "calmMode"); d.set(true, forKey: "quietGarden"); XCTAssertTrue(SharedDefaults.loveExempt(in: d))
+        d.set(false, forKey: "quietGarden"); d.set("under13", forKey: "ageBand"); XCTAssertTrue(SharedDefaults.loveExempt(in: d))
+        d.set("thirteenPlus", forKey: "ageBand"); XCTAssertFalse(SharedDefaults.loveExempt(in: d))
+    }
+
     // MARK: deep links
     func testWidgetLinksOpenTheRightScreens() {
         let r = GameRouter()

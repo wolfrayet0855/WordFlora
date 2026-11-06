@@ -31,7 +31,7 @@ struct GuideView: View {
         GuideLook.still(systemReduceMotion: systemReduceMotion, reduceMotionOverride: app.settings.reduceMotionOverride,
                         calm: app.settings.calmMode)
     }
-    private var quiet: Bool { GuideLook.quietCopy(calm: app.settings.calmMode, quiet: app.settings.quietGarden) }
+    private var quiet: Bool { GuideLook.quietCopy(calm: app.settings.calmMode, quiet: app.settings.quietGarden, underThirteen: app.settings.isUnderThirteen) }
     private var large: Bool { typeSize.isAccessibilitySize }
 
     var body: some View {

@@ -208,6 +208,7 @@ final class GuideLookTests: XCTestCase {
         XCTAssertFalse(GuideLook.quietCopy(calm: false, quiet: false))
         XCTAssertTrue(GuideLook.quietCopy(calm: true, quiet: false))
         XCTAssertTrue(GuideLook.quietCopy(calm: false, quiet: true))
+        XCTAssertTrue(GuideLook.quietCopy(calm: false, quiet: false, underThirteen: true), "under 13 never loses petals")
     }
 
     func testPointsChipHidesInQuietGardenOnly() {

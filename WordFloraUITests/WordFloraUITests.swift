@@ -686,6 +686,14 @@ final class ParentalGateLinkUITests: XCTestCase {
         for _ in 0..<8 where !(element.exists && element.isHittable) { app.swipeUp() }
     }
 
+    private func shot(_ name: String) {
+        let data = XCUIScreen.main.screenshot().pngRepresentation
+        if let dir = ProcessInfo.processInfo.environment["SCREENSHOT_DIR"] {
+            try? data.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+        }
+        let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
+    }
+
     private func expectGateThenCancel(after tapping: XCUIElement) {
         scrollTo(tapping)
         tapping.tap()
@@ -717,6 +725,7 @@ final class ParentalGateLinkUITests: XCTestCase {
         row.tap()
         XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].label.hasPrefix("WordFlora is complete without Plus."))
+        shot("plus-grown-ups")
         expectGateThenCancel(after: app.buttons["Terms of Use"])
         expectGateThenCancel(after: app.buttons["Manage subscription"])
     }

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		89CE39ED0692C9262C029212 /* DailyQuestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEDEF414772D98FFF426E11 /* DailyQuestUITests.swift */; };
 		7064F8E27F339CDC045E8101 /* PetalNotesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBDDE6A731F2B904C2CB598 /* PetalNotesTests.swift */; };
+		00B09BCDB3D7D7FB1B3AB22F /* LivingTouchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F725B7EC73EBDA9867091EBF /* LivingTouchTests.swift */; };
 		5C752B59DF1F73D729FC9A2D /* FamilyShareNudgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69A7ED5DBA0DE0EC9D1EAA81 /* FamilyShareNudgeTests.swift */; };
 		06151EF2B6DD311A979131A9 /* DailyQuestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E13FEBF3056C53807192151B /* DailyQuestTests.swift */; };
 		767A546D144992BF608B7CFC /* PetalSynth.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9778583226E4F1D8C7483904 /* PetalSynth.swift */; };
@@ -16,6 +17,7 @@
 		30C8E6D7D84C0EC62DCE513D /* DailyQuestCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F61981CE3FB95C3FE7BF95AA /* DailyQuestCard.swift */; };
 		67853049B0C6DF252C4F2ABF /* AppModel+Quest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3FB4F2CEFEB0BD939997F9E4 /* AppModel+Quest.swift */; };
 		CB990639F1FCBF7ADA55A4DD /* PetalNotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 775F4A36E8702D537A139B4E /* PetalNotes.swift */; };
+		BB1AB463A5262C7F2BAE63B9 /* LivingTouch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 57A2E5EB1009A8F98F65937E /* LivingTouch.swift */; };
 		EC8F3E9045AEE241BE154438 /* FamilyShareNudge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D8ECC886D94AA5EE1EB5702 /* FamilyShareNudge.swift */; };
 		D6F9BFB6268A91936268E317 /* DailyQuest.swift in Sources */ = {isa = PBXBuildFile; fileRef = AEB47088A3C13FE5FA358997 /* DailyQuest.swift */; };
 		5E1A7C0D2B3F4A6E8C9D0A12 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5E1A7C0D2B3F4A6E8C9D0A11 /* PrivacyInfo.xcprivacy */; };
@@ -230,6 +232,7 @@
 		D107E764254121AC6777295F /* WordFloraUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */; };
 		D3A2B4BA77495A79674750BD /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6305635D642316CCE8610F /* GameRecord.swift */; };
 		D51839FD5EE99D7181E304F0 /* LoveEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2004661176B5B7000630E9F /* LoveEngine.swift */; };
+		5E1D0A11C0FFEE0000000001 /* LoveEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2004661176B5B7000630E9F /* LoveEngine.swift */; };
 		D61844C609FE7631DFFBF7CF /* Plants.json in Resources */ = {isa = PBXBuildFile; fileRef = 437318BFC10E7CDE04AF1603 /* Plants.json */; };
 		D6E3215F0B7EB9ED5C2DD218 /* WordDifficulty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909E3EE9D33E5BC4BBD0BBE2 /* WordDifficulty.swift */; };
 		D7CEF9FF813CBF12C7375099 /* wf-badgeBronze.m4a in Resources */ = {isa = PBXBuildFile; fileRef = FBB3484DBA881E17BA5D174F /* wf-badgeBronze.m4a */; };
@@ -319,6 +322,7 @@
 /* Begin PBXFileReference section */
 		3AEDEF414772D98FFF426E11 /* DailyQuestUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyQuestUITests.swift; sourceTree = "<group>"; };
 		FEBDDE6A731F2B904C2CB598 /* PetalNotesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PetalNotesTests.swift; sourceTree = "<group>"; };
+		F725B7EC73EBDA9867091EBF /* LivingTouchTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LivingTouchTests.swift; sourceTree = "<group>"; };
 		69A7ED5DBA0DE0EC9D1EAA81 /* FamilyShareNudgeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FamilyShareNudgeTests.swift; sourceTree = "<group>"; };
 		E13FEBF3056C53807192151B /* DailyQuestTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyQuestTests.swift; sourceTree = "<group>"; };
 		9778583226E4F1D8C7483904 /* PetalSynth.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PetalSynth.swift; sourceTree = "<group>"; };
@@ -326,6 +330,7 @@
 		F61981CE3FB95C3FE7BF95AA /* DailyQuestCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyQuestCard.swift; sourceTree = "<group>"; };
 		3FB4F2CEFEB0BD939997F9E4 /* AppModel+Quest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+Quest.swift"; sourceTree = "<group>"; };
 		775F4A36E8702D537A139B4E /* PetalNotes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PetalNotes.swift; sourceTree = "<group>"; };
+		57A2E5EB1009A8F98F65937E /* LivingTouch.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LivingTouch.swift; sourceTree = "<group>"; };
 		1D8ECC886D94AA5EE1EB5702 /* FamilyShareNudge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FamilyShareNudge.swift; sourceTree = "<group>"; };
 		AEB47088A3C13FE5FA358997 /* DailyQuest.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyQuest.swift; sourceTree = "<group>"; };
 		5E1A7C0D2B3F4A6E8C9D0A11 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
@@ -640,6 +645,7 @@
 			isa = PBXGroup;
 			children = (
 				775F4A36E8702D537A139B4E /* PetalNotes.swift */,
+				57A2E5EB1009A8F98F65937E /* LivingTouch.swift */,
 				1D8ECC886D94AA5EE1EB5702 /* FamilyShareNudge.swift */,
 				AEB47088A3C13FE5FA358997 /* DailyQuest.swift */,
 				0CEAB3460F19775C8484231B /* WeatherPuzzle.swift */,
@@ -809,6 +815,7 @@
 			isa = PBXGroup;
 			children = (
 				FEBDDE6A731F2B904C2CB598 /* PetalNotesTests.swift */,
+				F725B7EC73EBDA9867091EBF /* LivingTouchTests.swift */,
 				69A7ED5DBA0DE0EC9D1EAA81 /* FamilyShareNudgeTests.swift */,
 				E13FEBF3056C53807192151B /* DailyQuestTests.swift */,
 				0AF5D23A6281D4A815A10399 /* EndgameAppTests.swift */,
@@ -1300,6 +1307,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7064F8E27F339CDC045E8101 /* PetalNotesTests.swift in Sources */,
+				00B09BCDB3D7D7FB1B3AB22F /* LivingTouchTests.swift in Sources */,
 				5C752B59DF1F73D729FC9A2D /* FamilyShareNudgeTests.swift in Sources */,
 				06151EF2B6DD311A979131A9 /* DailyQuestTests.swift in Sources */,
 				038399A18E57EC5DAEACB3F8 /* EndgameAppTests.swift in Sources */,
@@ -1378,6 +1386,7 @@
 				7E10B1C316D5701BEDBA3CFD /* SplitMix64.swift in Sources */,
 				53C1F3AF73A761947FD0F913 /* Weather.swift in Sources */,
 				D55C44CB05C3419C83BA8983 /* GardenWeather.swift in Sources */,
+				5E1D0A11C0FFEE0000000001 /* LoveEngine.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1390,6 +1399,7 @@
 				30C8E6D7D84C0EC62DCE513D /* DailyQuestCard.swift in Sources */,
 				67853049B0C6DF252C4F2ABF /* AppModel+Quest.swift in Sources */,
 				CB990639F1FCBF7ADA55A4DD /* PetalNotes.swift in Sources */,
+				BB1AB463A5262C7F2BAE63B9 /* LivingTouch.swift in Sources */,
 				EC8F3E9045AEE241BE154438 /* FamilyShareNudge.swift in Sources */,
 				D6F9BFB6268A91936268E317 /* DailyQuest.swift in Sources */,
 				338556715280368164F2204B /* EndgameUITestFixtures.swift in Sources */,

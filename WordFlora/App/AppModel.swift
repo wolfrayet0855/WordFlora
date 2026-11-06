@@ -176,7 +176,9 @@ final class AppModel {
 
     // MARK: Love (petals, rain, seed)
 
-    private var loveExempt: Bool { settings.quietGarden || settings.calmMode }
+    /// No rain and no seeds: Quiet Garden, Calm, and every player under 13 (owner ruling). The widget reads the same rule
+    /// from the shared defaults (`SharedDefaults.loveExempt`).
+    var loveExempt: Bool { settings.quietGarden || settings.calmMode || settings.isUnderThirteen }
 
     func loveState(_ plant: PlantCollectible) -> LoveEngine.State {
         LoveEngine.state(lastLoved: plant.lastLovedAt, now: now(), exempt: loveExempt)

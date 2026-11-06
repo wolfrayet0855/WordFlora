@@ -16,4 +16,8 @@ enum SharedDefaults {
         return d.object(forKey: "gardenWeather") == nil ? true : d.bool(forKey: "gardenWeather")
     }
     static var gardenWeather: Bool { gardenWeather(in: store) }
+    /// The love exemption as the app reads it (`AppModel.loveExempt`): Quiet Garden, Calm, or under 13.
+    static func loveExempt(in d: UserDefaults) -> Bool {
+        d.bool(forKey: "quietGarden") || calmMode(in: d) || d.string(forKey: "ageBand") == "under13"
+    }
 }

@@ -73,4 +73,17 @@ enum WidgetActions {
         default: return "Your garden is ready when you are."
         }
     }
+
+    /// The widget's Say hello button: the same love as a tap hello in the app (sets `lastLovedAt`, so the daily quest's
+    /// "say hello" counts it when the app comes back). A seed is woken in the app, never from the widget. Safe to repeat.
+    @MainActor
+    @discardableResult
+    static func hello(plantId: String, context: ModelContext, now: Date, exempt: Bool) -> Bool {
+        guard let plant = (try? context.fetch(FetchDescriptor<PlantCollectible>()))?.first(where: { $0.plantId == plantId && $0.earnedCount > 0 }),
+              !LoveEngine.state(lastLoved: plant.lastLovedAt, now: now, exempt: exempt).isSeed
+        else { return false }
+        plant.lastLovedAt = now
+        try? context.save()
+        return true
+    }
 }
