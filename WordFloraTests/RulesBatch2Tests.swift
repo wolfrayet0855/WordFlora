@@ -60,6 +60,15 @@ final class RulesBatch2Tests: XCTestCase {
         XCTAssertFalse(AdGate.mayAskConsent(adRequestImminent: true, isUnderThirteen: true, hasRemoveAds: false))
     }
 
+    /// The App Tracking Transparency prompt is for adults only: 13 to 17 already get non-personalised ads,
+    /// and under 13 or an unknown age never load an ad at all.
+    func testTrackingPromptOnlyForAdults() {
+        XCTAssertTrue(AdGate.mayAskTracking(ageBand: .eighteenPlus))
+        XCTAssertFalse(AdGate.mayAskTracking(ageBand: .thirteenPlus))
+        XCTAssertFalse(AdGate.mayAskTracking(ageBand: .under13))
+        XCTAssertFalse(AdGate.mayAskTracking(ageBand: nil))
+    }
+
     // MARK: FeatureUnlockPolicy
     func testSessionOneShowsOnlyPlayGardenAndDaily() {
         let s = UnlockStats()

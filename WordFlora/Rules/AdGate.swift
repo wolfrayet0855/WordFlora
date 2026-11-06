@@ -99,4 +99,8 @@ enum AdGate {
     static func mayAskConsent(adRequestImminent: Bool, isUnderThirteen: Bool, hasRemoveAds: Bool) -> Bool {
         adRequestImminent && mayLoadAnyAd(isUnderThirteen: isUnderThirteen, hasRemoveAds: hasRemoveAds)
     }
+
+    /// The App Tracking Transparency prompt is shown to adults only. 13 to 17 get non-personalised ads with no
+    /// tracking prompt; under 13 and an unknown age never load an ad, so they never reach it either.
+    static func mayAskTracking(ageBand: AgeBand?) -> Bool { ageBand == .eighteenPlus }
 }
