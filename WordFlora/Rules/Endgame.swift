@@ -209,3 +209,83 @@ enum EndgameCopy {
             + ranks.map(\.name) + ranks.map(rankLine) + BloomRank.allCases.map(youAre)
     }
 }
+
+/// G-3: the per-level bloom wave on the level map (spec section 2.2, "Level fully grown"). When every plant in an open
+/// level is in full bloom, small blooms pop open one after another along that level's stretch of the garden path, then
+/// rest there as a still garland. Computed from earned stages (nothing stored); the wave plays once per app session.
+/// Reduce Motion shows the still garland at once; Calm, Quiet Garden and Low Power play it slower and without the pop.
+enum BloomWave {
+    enum Mode: Equatable { case wave, still }
+
+    /// Blooms on each half-stretch of path next to a medal.
+    static let perHalf = 4
+    /// How far the blooms sit from the path's middle line, alternating sides (points).
+    static let offset: CGFloat = 13
+
+    /// Levels whose garland shows: open, every plant in full bloom, and none resting after Wild Weather.
+    static func levels(_ stops: [LevelStop]) -> [Int] {
+        stops.filter { $0.isOpen && $0.fullBloom && $0.mending == 0 }.map(\.level)
+    }
+
+    /// The wave plays the first time the map shows a level's garland in a session; after that, and under Reduce
+    /// Motion, the garland is a still frame.
+    static func mode(level: Int, played: Set<Int>, reduceMotion: Bool) -> Mode {
+        reduceMotion || played.contains(level) ? .still : .wave
+    }
+
+    /// Bloom spots along the level's own stretch: the half of the path coming in from the level before and the half
+    /// going out to the next, so neighbouring levels never share a spot. In path order, alternating sides.
+    /// `medals` are the medal centres in level order (index 0 = level 1).
+    static func points(level: Int, medals: [CGPoint]) -> [CGPoint] {
+        let i = level - 1
+        guard medals.indices.contains(i) else { return [] }
+        var spots: [(point: CGPoint, normal: CGVector)] = []
+        let steps: [Double] = (0..<perHalf).map { Double($0) / Double(max(1, perHalf - 1)) }
+        if i > 0 {          // coming in: the second half of the stretch from the level before
+            for s in steps { spots.append(spot(medals[i - 1], medals[i], 0.55 + 0.37 * s)) }
+        }
+        if i + 1 < medals.count {   // going out: the first half of the stretch to the next level
+            for s in steps { spots.append(spot(medals[i], medals[i + 1], 0.08 + 0.37 * s)) }
+        }
+        var out: [CGPoint] = []
+        for (n, p) in spots.enumerated() {
+            let side: CGFloat = n.isMultiple(of: 2) ? offset : -offset
+            out.append(CGPoint(x: p.point.x + p.normal.dx * side, y: p.point.y + p.normal.dy * side))
+        }
+        return out
+    }
+
+    /// A point on the map's path curve between two medal centres (the same cubic as the drawn path) and its normal.
+    private static func spot(_ a: CGPoint, _ c: CGPoint, _ t: Double) -> (point: CGPoint, normal: CGVector) {
+        let midY = (a.y + c.y) / 2
+        let p1 = CGPoint(x: a.x, y: midY), p2 = CGPoint(x: c.x, y: midY)
+        let u = 1 - t
+        func bez(_ a: CGFloat, _ b: CGFloat, _ cc: CGFloat, _ d: CGFloat) -> CGFloat {
+            CGFloat(u * u * u) * a + CGFloat(3 * u * u * t) * b + CGFloat(3 * u * t * t) * cc + CGFloat(t * t * t) * d
+        }
+        func der(_ a: CGFloat, _ b: CGFloat, _ cc: CGFloat, _ d: CGFloat) -> CGFloat {
+            CGFloat(3 * u * u) * (b - a) + CGFloat(6 * u * t) * (cc - b) + CGFloat(3 * t * t) * (d - cc)
+        }
+        let point = CGPoint(x: bez(a.x, p1.x, p2.x, c.x), y: bez(a.y, p1.y, p2.y, c.y))
+        let dx = der(a.x, p1.x, p2.x, c.x), dy = der(a.y, p1.y, p2.y, c.y)
+        let len = max(0.0001, (dx * dx + dy * dy).squareRoot())
+        return (point, CGVector(dx: -dy / len, dy: dx / len))
+    }
+
+    /// Seconds between one bloom and the next.
+    static func stagger(calm: Bool) -> Double { calm ? 0.26 : 0.14 }
+    /// Seconds one bloom takes to open.
+    static func bloomTime(calm: Bool) -> Double { calm ? 0.9 : 0.5 }
+    /// The whole wave, first bloom to last.
+    static func duration(of count: Int, calm: Bool) -> Double { Double(max(0, count - 1)) * stagger(calm: calm) + bloomTime(calm: calm) }
+
+    /// How open bloom `index` is at `t` seconds: 0 closed, 1 open. A soft pop (at most 12% over) or, in Calm, a plain ease.
+    static func scale(index: Int, of count: Int, t: Double, calm: Bool) -> Double {
+        guard t.isFinite else { return 1 }
+        let p = min(1, max(0, (t - Double(index) * stagger(calm: calm)) / bloomTime(calm: calm)))
+        if calm { return 1 - pow(1 - p, 3) }
+        // easeOutBack with a small overshoot (peaks near 1.1)
+        let c1 = 1.1, c3 = c1 + 1
+        return 1 + c3 * pow(p - 1, 3) + c1 * pow(p - 1, 2)
+    }
+}

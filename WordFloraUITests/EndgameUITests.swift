@@ -244,6 +244,33 @@ final class EndgameUITests: XCTestCase {
         shot("visitors-book")
     }
 
+    /// G-3: a level whose plants are all in full bloom gets a bloom wave along its path, then a still garland. The art
+    /// is decorative (hidden from VoiceOver; the card says "Full bloom garden!"), so this checks the page around it.
+    func testTheLevelMapBloomsAlongFullBloomLevels() {
+        launch(["-uitest-golden"])
+        let levels = app.buttons["tile-Levels"]
+        XCTAssertTrue(levels.waitForExistence(timeout: 8))
+        levels.tap()
+        XCTAssertTrue(app.staticTexts["Garden Path"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Full bloom garden!"].waitForExistence(timeout: 3))
+        shot("level-map-bloom-wave-playing")
+        sleep(3)                                    // the wave has opened and holds still
+        shot("level-map-bloom-garland")
+        audit("level-map-bloom-garland")
+    }
+
+    func testTheLevelMapGarlandIsStillWithReduceMotionInDark() {
+        XCUIDevice.shared.appearance = .dark
+        launch(["-uitest-golden", "-uitest-reduce-motion", "-uitest-dark"])
+        let levels = app.buttons["tile-Levels"]
+        XCTAssertTrue(levels.waitForExistence(timeout: 8))
+        levels.tap()
+        XCTAssertTrue(app.staticTexts["Full bloom garden!"].waitForExistence(timeout: 5))
+        sleep(1)
+        shot("level-map-bloom-garland-still-dark")
+        audit("level-map-bloom-garland-dark")
+    }
+
     func testTheGoldenPlantPage() {
         launch(["-uitest-golden"])
         XCTAssertTrue(element("home.golden").waitForExistence(timeout: 8))

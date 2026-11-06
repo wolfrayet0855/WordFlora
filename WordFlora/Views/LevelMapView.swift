@@ -108,6 +108,8 @@ struct LevelMapView: View {
                     MapTrailShape(points: points).stroke(Color.pathEdge, style: StrokeStyle(lineWidth: 26, lineCap: .round))
                     MapTrailShape(points: points).stroke(Color.path, style: StrokeStyle(lineWidth: 20, lineCap: .round))
                     MapTrailShape(points: points).stroke(Color.pathEdge, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, dash: [1, 14]))
+                    let waveLevels = BloomWave.levels(stops)
+                    if !waveLevels.isEmpty { MapBloomWave(levels: waveLevels, medals: points) }
                 }
             }
             .accessibilityHidden(true)
@@ -158,6 +160,80 @@ private struct MapTrailShape: Shape {
             p.addCurve(to: c, control1: CGPoint(x: a.x, y: midY), control2: CGPoint(x: c.x, y: midY))
         }
         return p
+    }
+}
+
+// MARK: - Bloom wave (G-3)
+
+/// Small blooms open one after another along a full-bloom level's stretch of path, then rest there as a still garland.
+/// Decorative (the path is hidden from VoiceOver; the card already says "Full bloom garden!"). Plays once per session;
+/// Reduce Motion (system or the app's switch) shows the still garland; Calm, Quiet Garden and Low Power open it slowly.
+private struct MapBloomWave: View {
+    let levels: [Int]
+    let medals: [CGPoint]
+    @Environment(AppModel.self) private var app
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @State private var start: Date?
+    @State private var waving: Set<Int> = []
+    /// Levels whose wave has played this session (computed rule, nothing stored).
+    @MainActor private static var played: Set<Int> = []
+
+    private var calm: Bool { app.settings.calmMode || app.settings.quietGarden || ProcessInfo.processInfo.isLowPowerModeEnabled }
+
+    var body: some View {
+        Group {
+            if let start, !waving.isEmpty {
+                TimelineView(.animation(minimumInterval: 1 / 30)) { tl in garland(t: tl.date.timeIntervalSince(start)) }
+            } else {
+                garland(t: .infinity)
+            }
+        }
+        .allowsHitTesting(false)
+        .onAppear(perform: begin)
+    }
+
+    private func begin() {
+        let reduceMotion = systemReduceMotion || app.settings.reduceMotionOverride
+        let fresh = Set(levels.filter { BloomWave.mode(level: $0, played: Self.played, reduceMotion: reduceMotion) == .wave })
+        Self.played.formUnion(levels)
+        guard !fresh.isEmpty else { return }
+        waving = fresh
+        start = Date().addingTimeInterval(0.6)          // after the map has scrolled to the current level
+        let end = 0.6 + BloomWave.duration(of: 2 * BloomWave.perHalf, calm: calm) + 0.2
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(end))
+            waving = []                                 // then one still frame, no timeline left running
+        }
+    }
+
+    private func garland(t: Double) -> some View {
+        Canvas { g, _ in
+            for level in levels {
+                let spots = BloomWave.points(level: level, medals: medals)
+                for (i, p) in spots.enumerated() {
+                    let s = waving.contains(level) ? BloomWave.scale(index: i, of: spots.count, t: t, calm: calm) : 1
+                    if s > 0.01 { bloom(g, at: p, scale: s, tilt: Double(i * 37 % 72)) }
+                }
+            }
+        }
+    }
+
+    /// A five-petal bloom in the map's petal colour with a gold middle (the key's "petal" and "gold ring").
+    private func bloom(_ g: GraphicsContext, at p: CGPoint, scale s: Double, tilt: Double) {
+        var c = g
+        c.translateBy(x: p.x, y: p.y)
+        c.rotate(by: .degrees(tilt + (1 - min(1, s)) * 40))
+        c.scaleBy(x: s, y: s)
+        for k in 0..<5 {
+            var petal = c
+            petal.rotate(by: .degrees(Double(k) * 72))
+            let shape = Path(ellipseIn: CGRect(x: -3.6, y: -10, width: 7.2, height: 9.5))
+            petal.fill(shape, with: .color(.petal))
+            petal.stroke(shape, with: .color(Color.appPrimaryText.opacity(0.22)), lineWidth: 0.8)
+        }
+        let middle = Path(ellipseIn: CGRect(x: -3.2, y: -3.2, width: 6.4, height: 6.4))
+        c.fill(middle, with: .color(.appAccent))
+        c.stroke(middle, with: .color(Color.appPrimaryText.opacity(0.25)), lineWidth: 0.6)
     }
 }
 

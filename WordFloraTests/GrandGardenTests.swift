@@ -65,4 +65,61 @@ final class GrandGardenTests: XCTestCase {
             XCTAssertEqual(WeatherCopyTests.avoided(line), [], line)
         }
     }
+
+    // MARK: G-3 per-level bloom wave on the level map
+
+    func stops(fullBloom: Set<Int>, mending: [Int: Int] = [:]) -> [LevelStop] {
+        let plants = (1...5).flatMap { l in (0..<10).map { _ in PlantProgress(level: l, earned: true, stage: fullBloom.contains(l) ? 4 : 2) } }
+        return LevelMapCopy.stops(plants: plants, currentLevel: 5, mending: mending)
+    }
+
+    func testTheWaveBloomsOnLevelsWhosePlantsAreAllInFullBloom() {
+        XCTAssertEqual(BloomWave.levels(stops(fullBloom: [1, 3])), [1, 3])
+        XCTAssertEqual(BloomWave.levels(stops(fullBloom: [])), [])
+        XCTAssertEqual(BloomWave.levels(stops(fullBloom: [2], mending: [2: 1])), [], "a level resting after Wild Weather waits")
+        let soon = LevelMapCopy.stops(plants: (0..<10).map { _ in PlantProgress(level: 2, earned: true, stage: 4) }, currentLevel: 1)
+        XCTAssertEqual(BloomWave.levels(soon), [], "a level not open yet has no wave")
+    }
+
+    func testTheWavePlaysOncePerVisitThenRestsAsAStillGarland() {
+        XCTAssertEqual(BloomWave.mode(level: 2, played: [], reduceMotion: false), .wave)
+        XCTAssertEqual(BloomWave.mode(level: 2, played: [2], reduceMotion: false), .still, "already played this session")
+        XCTAssertEqual(BloomWave.mode(level: 2, played: [], reduceMotion: true), .still, "Reduce Motion: the still frame")
+    }
+
+    func testTheBloomsRunAlongTheLevelsOwnStretchOfPath() {
+        let medals = [CGPoint(x: 80, y: 100), CGPoint(x: 300, y: 400), CGPoint(x: 80, y: 700), CGPoint(x: 300, y: 1000), CGPoint(x: 80, y: 1300)]
+        let first = BloomWave.points(level: 1, medals: medals)
+        let middle = BloomWave.points(level: 3, medals: medals)
+        let last = BloomWave.points(level: 5, medals: medals)
+        XCTAssertEqual(first.count, BloomWave.perHalf, "the first level has only the path after it")
+        XCTAssertEqual(last.count, BloomWave.perHalf, "the last level has only the path before it")
+        XCTAssertEqual(middle.count, 2 * BloomWave.perHalf)
+        // Each level keeps to its own half of each stretch, so neighbours never overlap.
+        XCTAssertTrue(first.allSatisfy { $0.y > 100 && $0.y < 250 + BloomWave.offset }, "\(first)")
+        XCTAssertTrue(middle.allSatisfy { $0.y > 550 - BloomWave.offset && $0.y < 850 + BloomWave.offset }, "\(middle)")
+        XCTAssertTrue(last.allSatisfy { $0.y > 1150 - BloomWave.offset && $0.y < 1300 }, "\(last)")
+        XCTAssertEqual(middle, middle.sorted { $0.y < $1.y }, "in order along the path, so the wave travels")
+        XCTAssertEqual(BloomWave.points(level: 3, medals: Array(medals.prefix(2))), [], "no medal, no wave")
+    }
+
+    func testTheWaveIsGentleAndShort() {
+        for calm in [false, true] {
+            let n = 2 * BloomWave.perHalf
+            XCTAssertEqual(BloomWave.scale(index: 0, of: n, t: 0, calm: calm), 0, accuracy: 0.001)
+            XCTAssertEqual(BloomWave.scale(index: n - 1, of: n, t: BloomWave.duration(of: n, calm: calm), calm: calm), 1, accuracy: 0.001)
+            XCTAssertLessThan(BloomWave.scale(index: n - 1, of: n, t: 0.2, calm: calm), BloomWave.scale(index: 0, of: n, t: 0.2, calm: calm) + 0.001,
+                              "the wave travels from the first bloom to the last")
+            for step in 0...120 {
+                let t = Double(step) * 0.03
+                for i in 0..<n {
+                    let s = BloomWave.scale(index: i, of: n, t: t, calm: calm)
+                    XCTAssertTrue(s >= 0 && s <= (calm ? 1.0001 : 1.12), "a soft pop, no flash: \(s)")
+                }
+            }
+            XCTAssertLessThanOrEqual(BloomWave.duration(of: n, calm: calm), calm ? 3.5 : 2.5)
+        }
+        XCTAssertGreaterThan(BloomWave.duration(of: 8, calm: true), BloomWave.duration(of: 8, calm: false), "Calm is slower")
+        XCTAssertEqual(BloomWave.scale(index: 3, of: 8, t: .infinity, calm: false), 1, "the still frame shows every bloom")
+    }
 }
