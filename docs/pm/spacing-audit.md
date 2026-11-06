@@ -62,7 +62,7 @@ first layer pins the drawing area's top-left corner (the same fix inside the two
 | Settings | System form (16 gutter) | No change | ok |
 | Plus | Gutter 20; plan rows 14 inside | 16 / 16 | fixed |
 | Daily Bloom (game) | Same as the game screen | No change | ok |
-| Age question | Gutter 24; content pinned to the top with the lower half empty | 16 gutter; content centred in the screen | fixed |
+| Age question | Gutter 24; content pinned to the top with the lower half empty | 16 gutter. Centring was tried and dropped: it moved the buttons while the question fades in from the intro, and the first-tap tests failed | fixed (gutter); centring open |
 | Grand Garden / what grows next | Gutter 20; cards 14 inside | 16 / 16 (hills still full-bleed) | fixed |
 | Weather puzzle, weather helpers | 20 gutter, 14 inside | 16 / 16 | fixed |
 
