@@ -187,11 +187,14 @@ final class EndgameUITests: XCTestCase {
 
     /// Plays the gentle puzzle to the end, reading its spots and letters and matching them to a catalog plant name.
     private func solveTheGentlePuzzle() {
-        let url = URL(fileURLWithPath: #filePath).deletingLastPathComponent().deletingLastPathComponent()
-            .appendingPathComponent("WordFlora/Resources/Plants.json")
-        let names = ((try? JSONSerialization.jsonObject(with: Data(contentsOf: url))) as? [[String: Any]] ?? [])
-            .compactMap { ($0["name"] as? String)?.uppercased().filter { $0.isLetter && $0.isASCII } }
-        XCTAssertFalse(names.isEmpty, "the catalog is readable from the test")
+        // The catalog's names (Plants.json; the UI test runner cannot read the app's bundle).
+        let names = ["Dandelion", "Daisy", "Clover", "Marigold", "Sunflower", "Tulip", "Rose", "Poppy", "Fern", "Strawberry", "Orchid",
+                     "Lavender", "Lotus", "Jasmine", "Snapdragon", "Saguaro Cactus", "Aloe Vera", "Bamboo", "Hibiscus", "Cherry Blossom",
+                     "Venus Flytrap", "Baobab", "Corpse Flower", "Welwitschia", "Dragon Blood Tree", "Pitcher Plant", "Sensitive Plant",
+                     "Bird of Paradise", "Joshua Tree", "Lithops", "Rafflesia", "Monkey Puzzle Tree", "Sago Palm", "Ghost Pipe",
+                     "Passionflower", "King Protea", "Bleeding Heart", "Giant Water Lily", "Sundew", "Lady's Slipper Orchid", "Wollemi Pine",
+                     "Jade Vine", "Coco de Mer", "Black Bat Flower", "Franklin Tree", "Chocolate Cosmos", "Ghost Orchid", "Silversword",
+                     "Rainbow Eucalyptus", "Puya raimondii"].map { $0.uppercased().filter { $0.isLetter && $0.isASCII } }
         XCTAssertTrue(app.buttons["weatherPuzzle.tile.0"].waitForExistence(timeout: 5))
         let spots = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Spot '")).allElementsBoundByIndex.map(\.label)
         let given: [Character?] = spots.map { l in
@@ -338,6 +341,10 @@ final class EndgameUITests: XCTestCase {
         shot("level-map-bloom-wave-playing")
         sleep(3)                                    // the wave has opened and holds still
         shot("level-map-bloom-garland")
+        // The map opens scrolled to the current level, with cards above it under the map's own top bar (no system
+        // navigation bar, so the audit helper cannot leave that strip out). Back at the top nothing sits under the bar.
+        for _ in 0..<4 { app.swipeDown() }
+        sleep(1)
         audit("level-map-bloom-garland")
     }
 
@@ -350,6 +357,8 @@ final class EndgameUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Full bloom garden!"].waitForExistence(timeout: 5))
         sleep(1)
         shot("level-map-bloom-garland-still-dark")
+        for _ in 0..<4 { app.swipeDown() }          // nothing under the map's own top bar (see above)
+        sleep(1)
         audit("level-map-bloom-garland-dark")
     }
 
