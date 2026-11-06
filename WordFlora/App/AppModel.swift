@@ -54,6 +54,7 @@ final class AppModel {
         self.onboarding = OnboardingFlow(restoredComplete: settings.onboardingComplete, ageBand: settings.ageBand)
         game.soundEnabled = settings.soundOn
         game.ai = GardenAIProvider.current(); game.aiIsModelBacked = GardenAIProvider.isModelBacked()
+        game.speedBloomPrefs = { [weak settings] in settings?.speedBloomPrefs ?? .off }
         game.seedPlantsIfNeeded()
         reconcileSyncedData()
         SoundPlayer.configureSession()
@@ -554,6 +555,7 @@ final class AppModel {
             unlocks += badges.record(.levelSets, value: levelsDone, now: t, quiet: quiet)
             if game.missesThisRound == 0 { unlocks += badges.record(.perfectBlooms, now: t, quiet: quiet) }
             if game.isDaily { unlocks += badges.record(.dailyBloomsDone, now: t, quiet: quiet) }
+            if game.quickBloom { unlocks += badges.record(.quickBlooms, now: t, quiet: quiet) }
         }
         unlocks += badges.record(.streak, value: p.streak, now: t, quiet: quiet)
         enqueueBadgeMoments(unlocks)                // shown when the round's card closes (GameView pauses them until then)

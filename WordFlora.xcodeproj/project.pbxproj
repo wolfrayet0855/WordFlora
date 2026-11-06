@@ -78,6 +78,7 @@
 		49C9AEE30C6B929F87BAB3EF /* KeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73101B54140F34289C21BFD /* KeyboardView.swift */; };
 		49FAB31C34389B1250039A76 /* GameRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */; };
 		4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */; };
+		DB95FCF40B0D4F70AA2976FD /* SpeedBloomUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295580642BF641C3BDA83AE3 /* SpeedBloomUITests.swift */; };
 		A9BC1C319B4BDB047932E1DA /* CelebrationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */; };
 		4B412E233E82E83F1C3BA7B8 /* ButterflyGameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED2AA84626C61A605393776 /* ButterflyGameModel.swift */; };
 		5000EF3A884C020D4BA90F09 /* ReminderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCA6D160865CEBA2AA66E39 /* ReminderTests.swift */; };
@@ -85,6 +86,7 @@
 		54A55D75B18066AED5586050 /* WordBankValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 507CD36D0F85A153026420C3 /* WordBankValidator.swift */; };
 		54ACC3979C866A48FFB28F86 /* PetalPipRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = B67E4139D96BE75310B27031 /* PetalPipRow.swift */; };
 		54C470839654E5464D7662F7 /* RestCardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31A01BCA86B388E2D94431DD /* RestCardTests.swift */; };
+		4AAAA4BD0C544D608F6E3218 /* SpeedBloomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 992A9B4D57314E9CA00E02F4 /* SpeedBloomTests.swift */; };
 		35282ADD9C51A8171A4AAB3B /* ReturnNudgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90DC766F91AA9703F8E25487 /* ReturnNudgeTests.swift */; };
 		08A9BBC309E50A7990922ED1 /* CelebrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F70EB58E222988AA85D5FD80 /* CelebrationTests.swift */; };
 		5731534192B9E4F7B8B0B453 /* GardenAI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA11973C4913D16F50F3654D /* GardenAI.swift */; };
@@ -115,6 +117,7 @@
 		7414B32D8EE9EB1450BE77C1 /* wf-badgeSilver.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ACF0034A28D0F546B9B9DB9 /* wf-badgeSilver.m4a */; };
 		77DC9100629457266EDDA0DB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1AAA9FCAE4CF29BBA16A8 /* SettingsView.swift */; };
 		7B821C6FCAD64E3AF76503B9 /* RestCardCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */; };
+		034B011803214D91BC60121D /* SpeedBloom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44AE174360904A32A8196B81 /* SpeedBloom.swift */; };
 		7DD477E02162F248269BFF98 /* PotCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E72C046D44E8C67ECE69705 /* PotCatalog.swift */; };
 		802F6E198FE55EE761BBF216 /* Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045A383C28CF63B7AA1690E5 /* Economy.swift */; };
 		80C6C5F5EDC6DB0C83563F51 /* LayeredPlantView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52107D98E6FA3FE503D0BDC7 /* LayeredPlantView.swift */; };
@@ -338,6 +341,7 @@
 		2F738E93544B38467408EB43 /* TendAnimationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendAnimationView.swift; sourceTree = "<group>"; };
 		307B6C22876E273992182CE6 /* AdsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AdsService.swift; sourceTree = "<group>"; };
 		31A01BCA86B388E2D94431DD /* RestCardTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestCardTests.swift; sourceTree = "<group>"; };
+		992A9B4D57314E9CA00E02F4 /* SpeedBloomTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeedBloomTests.swift; sourceTree = "<group>"; };
 		90DC766F91AA9703F8E25487 /* ReturnNudgeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReturnNudgeTests.swift; sourceTree = "<group>"; };
 		F70EB58E222988AA85D5FD80 /* CelebrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CelebrationTests.swift; sourceTree = "<group>"; };
 		33F34A41B64213EA36BFAD0A /* WordFlora.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = WordFlora.entitlements; sourceTree = "<group>"; };
@@ -358,6 +362,7 @@
 		494B19877C303C1C4B6F6D08 /* AppModelTendingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppModelTendingTests.swift; sourceTree = "<group>"; };
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
 		4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestCardUITests.swift; sourceTree = "<group>"; };
+		295580642BF641C3BDA83AE3 /* SpeedBloomUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeedBloomUITests.swift; sourceTree = "<group>"; };
 		9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CelebrationUITests.swift; sourceTree = "<group>"; };
 		4DA662141FB5A76A22AE6D6E /* PlusOfferPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlusOfferPolicy.swift; sourceTree = "<group>"; };
 		4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PotCatalogTests.swift; sourceTree = "<group>"; };
@@ -408,6 +413,7 @@
 		81CCEFF6C6318E96F5F6BA88 /* wf-ambient.caf */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-ambient.caf"; sourceTree = "<group>"; };
 		83712C10C30A4B3A1C6FB841 /* WaterControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WaterControl.swift; sourceTree = "<group>"; };
 		8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestCardCopy.swift; sourceTree = "<group>"; };
+		44AE174360904A32A8196B81 /* SpeedBloom.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeedBloom.swift; sourceTree = "<group>"; };
 		8B9B774A2FBD3D010315D9DD /* BreakPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BreakPolicy.swift; sourceTree = "<group>"; };
 		8CDEF4F1B5B37025007C3FB4 /* wf-water.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-water.m4a"; sourceTree = "<group>"; };
 		9075581718316A5EDE6C92FD /* GameViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameViewModel.swift; sourceTree = "<group>"; };
@@ -634,6 +640,7 @@
 				3E9482B7E7B497DE1F68D020 /* LifeStats.swift */,
 				1E72C046D44E8C67ECE69705 /* PotCatalog.swift */,
 				8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */,
+				44AE174360904A32A8196B81 /* SpeedBloom.swift */,
 				8FDAD053638CA18F19E93110 /* Weather.swift */,
 				7C3B488094FA775D4B1BEC38 /* GardenWeather.swift */,
 				D11EE6155AE83E8642FBA80A /* WeatherLook.swift */,
@@ -808,6 +815,7 @@
 				2BEEF2341BC08BF94A6BDA7B /* TendAnimationTests.swift */,
 				4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */,
 				31A01BCA86B388E2D94431DD /* RestCardTests.swift */,
+				992A9B4D57314E9CA00E02F4 /* SpeedBloomTests.swift */,
 				90DC766F91AA9703F8E25487 /* ReturnNudgeTests.swift */,
 				F70EB58E222988AA85D5FD80 /* CelebrationTests.swift */,
 				40E2B4BA7F79178D9473B616 /* WeatherTests.swift */,
@@ -1010,6 +1018,7 @@
 				F787992B59617103496CEE38 /* TendingUITests.swift */,
 				1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */,
 				4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */,
+				295580642BF641C3BDA83AE3 /* SpeedBloomUITests.swift */,
 				9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */,
 			);
 			name = WordFloraUITests;
@@ -1231,6 +1240,7 @@
 				33BA691BF1E87DE5BB43E0B0 /* TendingUITests.swift in Sources */,
 				67D33D3868BCC5E3E36ABA02 /* WeatherUITests.swift in Sources */,
 				4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */,
+				DB95FCF40B0D4F70AA2976FD /* SpeedBloomUITests.swift in Sources */,
 				A9BC1C319B4BDB047932E1DA /* CelebrationUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1284,6 +1294,7 @@
 				C84708A999B2ED2665D94F0A /* TendAnimationTests.swift in Sources */,
 				73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */,
 				54C470839654E5464D7662F7 /* RestCardTests.swift in Sources */,
+				4AAAA4BD0C544D608F6E3218 /* SpeedBloomTests.swift in Sources */,
 				35282ADD9C51A8171A4AAB3B /* ReturnNudgeTests.swift in Sources */,
 				08A9BBC309E50A7990922ED1 /* CelebrationTests.swift in Sources */,
 				79EAC747CBAC36831FB4CA85 /* WeatherTests.swift in Sources */,
@@ -1448,6 +1459,7 @@
 				5C79C89D5D157B3BC8D2F263 /* RestScene.swift in Sources */,
 				5A7413E2F7CB9911B34CFF74 /* NudgeCard.swift in Sources */,
 				7B821C6FCAD64E3AF76503B9 /* RestCardCopy.swift in Sources */,
+				034B011803214D91BC60121D /* SpeedBloom.swift in Sources */,
 				1355711493BE367E7DC6B3D7 /* ShedTools.swift in Sources */,
 				604D4730FA07745402D9F3A2 /* Weather.swift in Sources */,
 				C8709A468B9511BE3FDCBD99 /* WeatherLook.swift in Sources */,

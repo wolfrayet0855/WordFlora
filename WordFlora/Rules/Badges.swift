@@ -5,6 +5,8 @@ enum BadgeCounter: String, CaseIterable, Codable {
     case perfectBlooms, revives, dailyBloomsDone, visitorSpecies, butterflyPlays
     /// Weather puzzles solved (one step per solve that earned a reward). Accumulates; never goes down.
     case weathered
+    /// Speed bloom words solved before the gold ring closed (opt-in, 13+). Accumulates; never goes down.
+    case quickBlooms
 
     /// High-water counters only ever go up to the best value seen; the rest accumulate.
     var isHighWater: Bool {
