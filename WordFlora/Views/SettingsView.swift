@@ -22,6 +22,17 @@ struct SettingsView: View {
                     Text("Tricky").tag(AppSettings.Difficulty.tricky)
                 }
                 Toggle("Show streak", isOn: $s.showStreak)
+                // Speed bloom: 13+ only, Calm and Quiet Garden off; off by default and never suggested anywhere else.
+                if SpeedBloom.isOffered(ageBand: s.ageBand, calmMode: s.calmMode, quietGarden: s.quietGarden) {
+                    Toggle(SpeedBloomCopy.toggle, isOn: $s.speedBloomOn).accessibilityIdentifier("settings.speedBloom")
+                    if s.speedBloomOn {
+                        Toggle(SpeedBloomCopy.extraTime, isOn: $s.speedBloomExtraTime)
+                            .accessibilityHint(SpeedBloomCopy.extraTimeHint)
+                            .accessibilityIdentifier("settings.speedBloomExtraTime")
+                    }
+                    Text(SpeedBloomCopy.footnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                        .accessibilityIdentifier("settings.speedBloomNote")
+                }
             }
             Section(GuideCopy.UI.settingsHeader) {
                 Button { showGuide = true } label: { Label(GuideCopy.UI.settingsRow, systemImage: "book.pages") }
@@ -34,7 +45,7 @@ struct SettingsView: View {
                 Toggle("Haptics", isOn: $s.hapticsOn)
                 Toggle("Calm mode", isOn: $s.calmMode)
                 Toggle("Quiet Garden", isOn: $s.quietGarden)
-                Text("Calm mode removes the thirsty look and halves celebrations. Quiet Garden hides counters and timers so tending is just relaxing.")
+                Text("Calm mode removes the thirsty look and halves celebrations. Quiet Garden hides counters and wait times so tending is just relaxing.")
                     .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
             GardenWeatherSettingsSection()

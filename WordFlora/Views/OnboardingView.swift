@@ -64,7 +64,7 @@ private struct AgeQuestionView: View {
                 .confirmationDialog("Would you like a quieter garden?", isPresented: $offerQuiet, titleVisibility: .visible) {
                     Button("Yes, keep it quiet") { app.settings.quietGarden = true; app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
                     Button("No thanks") { app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
-                } message: { Text("Quiet Garden hides numbers and timers so tending is just relaxing. You can change it any time in Settings.") }
+                } message: { Text("Quiet Garden hides numbers and wait times so tending is just relaxing. You can change it any time in Settings.") }
             }
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.section).frame(maxWidth: .infinity)
         }

@@ -6,6 +6,8 @@ struct FlowerView: View {
     var petals: Int                      // 0...8
     var resting = false                  // folded bud (round ended without a solve)
     var sway = true
+    /// Speed bloom's soft gold arc around the petal ring, 0...1 (nil = no ring). Decorative: no numbers, no sound.
+    var bloomRing: Double? = nil
 
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     @State private var falling: [Int: FallingPetal] = [:]
@@ -20,6 +22,7 @@ struct FlowerView: View {
             let scale = min(geo.size.width / 200, geo.size.height / 240)
             ZStack {
                 stem
+                if let fill = bloomRing, !resting { goldRing(fill).transition(.opacity) }
                 ForEach(0..<8, id: \.self) { i in petal(i) }
                 ForEach(falling.keys.sorted(), id: \.self) { i in fallingPetal(i) }
                 if resting { bud }
@@ -100,6 +103,22 @@ struct FlowerView: View {
         .animation(.spring(response: 0.45, dampingFraction: 0.7), value: isPresent)
     }
 
+    /// A faint track and a soft gold arc that fills clockwise from the top, just outside the petal tips.
+    private func goldRing(_ fill: Double) -> some View {
+        let gold = Color(hex: 0xE8A838)
+        return ZStack {
+            Circle().stroke(Color(hex: 0xF5C858).opacity(0.28), lineWidth: 5)
+            Circle().trim(from: 0, to: max(0, min(1, fill)))
+                .stroke(gold.opacity(0.9), style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .animation(systemReduceMotion ? nil : .linear(duration: 0.5), value: fill)
+        }
+        .frame(width: 152, height: 152)
+        .position(x: 100, y: 88)
+        .frame(width: 200, height: 240)
+        .accessibilityHidden(true)
+    }
+
     private var bud: some View {
         ZStack {
             ForEach([-14.0, 0.0, 14.0], id: \.self) { a in
@@ -172,6 +191,6 @@ extension Color {
 }
 
 #Preview("Petals") {
-    HStack { FlowerView(petals: 8); FlowerView(petals: 4); FlowerView(petals: 0, resting: true) }
+    HStack { FlowerView(petals: 8, bloomRing: 0.6); FlowerView(petals: 4); FlowerView(petals: 0, resting: true) }
         .padding().background(Color.appBackground)
 }

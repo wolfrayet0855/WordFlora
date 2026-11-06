@@ -3,7 +3,14 @@ import SwiftUI
 struct BadgesView: View {
     @Environment(AppModel.self) private var app
 
-    private var defs: [BadgeDef] { (try? BadgeCatalog.load()) ?? [] }
+    /// Quick Bloom shows only once Speed bloom is on or the badge is earned, so the shelf never suggests the toggle.
+    private var defs: [BadgeDef] {
+        let state = app.badges
+        return ((try? BadgeCatalog.load()) ?? []).filter { def in
+            def.id != SpeedBloom.badgeId
+                || SpeedBloom.showsBadge(app.settings.speedBloomPrefs, earnedAnyTier: state.unlockedDate(badge: def.id, tier: 1) != nil)
+        }
+    }
     var body: some View {
         let all = defs
         ScrollView {

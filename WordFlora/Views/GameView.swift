@@ -30,6 +30,12 @@ struct GameView: View {
     private static let uiTestBreakCard = ProcessInfo.processInfo.arguments.contains("-uitest-break-card")
     private let breakTimer = Timer.publish(every: 30, on: .main, in: .common).autoconnect()
     @State private var speaker = AVSpeechSynthesizer()
+    /// Speed bloom: the gold ring moves on in half-second steps of play (held still behind cards and in the background).
+    private let speedTicker = Timer.publish(every: 0.5, on: .main, in: .common).autoconnect()
+    @State private var lastSpeedTick: Date?
+    /// VoiceOver hears "Speed bloom is on" once per visit to the game, never a running count.
+    @State private var announcedSpeedBloom = false
+    @Environment(\.scenePhase) private var scenePhase
 
     private var vm: GameViewModel { app.game }
     /// The resting and break cards are modal: only the flower shows, dimmed, behind them (as in the mockup).
@@ -43,8 +49,11 @@ struct GameView: View {
                 topBar.modifier(BehindModalCard(active: cardIsModal, minHeight: Theme.minTap))
                 // Still behind the resting and break cards: a sway that never ends kept the app from going idle
                 // while a card sat open, and the accessibility audit then measured the card's text mid-layout.
-                FlowerView(petals: vm.petalsRemaining, resting: vm.phase == .restingOffer || vm.phase == .rested, sway: !cardIsModal)
+                FlowerView(petals: vm.petalsRemaining, resting: vm.phase == .restingOffer || vm.phase == .rested, sway: !cardIsModal,
+                           bloomRing: vm.speedRing?.fill)
                     .frame(height: 170)
+                    .overlay(alignment: .bottom) { if showTakeYourTime { takeYourTime.transition(.opacity) } }
+                    .animation(.easeInOut(duration: 0.6), value: vm.speedRing?.outcome)
                 VStack(spacing: 10) {
                     hintCard
                     WordTilesView(word: vm.currentWord, guessed: vm.guessedLetters, revealAll: vm.phase == .rested, pop: tilePop)
@@ -86,6 +95,19 @@ struct GameView: View {
             if Self.uiTestBreakCard { showBreak = true }
         }
         .onDisappear { ReadAloud.shared.stop(); app.pauseBadgeMoments(.round, false) }
+        .onReceive(speedTicker) { now in
+            guard vm.speedRing?.isFilling == true else { lastSpeedTick = nil; return }
+            let held = cardIsModal || app.shownBadge != nil || scenePhase != .active || vm.phase != .playing
+            defer { lastSpeedTick = held ? nil : now }
+            // A step never counts more than a second, so time away from the screen is never charged to the ring.
+            guard !held, let last = lastSpeedTick else { return }
+            vm.advanceSpeedRing(by: min(1, now.timeIntervalSince(last)))
+        }
+        .onChange(of: vm.speedRing == nil, initial: true) { _, none in
+            guard !none, !announcedSpeedBloom else { return }
+            announcedSpeedBloom = true
+            AccessibilityNotification.Announcement(SpeedBloomCopy.voiceOverOn).post()
+        }
         .onChange(of: vm.phase) { _, phase in
             if phase == .won || phase == .rested {
                 // Badges earned this round wait for the round's card to close, then pop at the root.
@@ -142,6 +164,18 @@ struct GameView: View {
             .accessibilityHint("Gives a free clue")
         }
         .foregroundStyle(Color.appPrimaryText)
+    }
+
+    /// The ring closed first: the word carries on at its own pace, with the same reward.
+    private var showTakeYourTime: Bool { vm.speedRing?.outcome == .relaxed && vm.phase == .playing && !cardIsModal }
+
+    private var takeYourTime: some View {
+        Label(SpeedBloomCopy.takeYourTime, systemImage: "leaf.fill")
+            .font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+            .padding(.vertical, 6).padding(.horizontal, 14)
+            .background(Color.tileGardenFill, in: Capsule())
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("speedBloom.takeYourTime")
     }
 
     private var helpPulse: Bool {

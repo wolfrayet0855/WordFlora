@@ -37,8 +37,10 @@ struct WordFloraApp: App {
             settings = AppSettings()
             if args.contains("-uitest-onboarded") { settings.onboardingComplete = true; settings.ageBand = .eighteenPlus }
             if let w = args.first(where: { $0.hasPrefix("-uitest-word=") })?.dropFirst("-uitest-word=".count) {
+                // `-uitest-word-level=N` gives the fixed word a level (Speed bloom applies to levels 4 and 5).
+                let wordLevel = args.first(where: { $0.hasPrefix("-uitest-word-level=") }).flatMap { Int($0.dropFirst("-uitest-word-level=".count)) } ?? 1
                 let entry = WordEntry(id: "ui-\(w)", word: String(w).uppercased(), display: String(w).capitalized, hint: "A test hint", hint2: "Second clue",
-                                      fact: "A test fact.", level: 1, kind: .vocab, plantId: nil, tags: [], minAge: 6, dailyEligible: true,
+                                      fact: "A test fact.", level: wordLevel, kind: .vocab, plantId: nil, tags: [], minAge: 6, dailyEligible: true,
                                       source: "test", license: "test", reviewedBy: "ui")
                 bank = WordBank(schemaVersion: 1, bankVersion: "ui", entries: [entry], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
             }
@@ -119,6 +121,18 @@ struct WordFloraApp: App {
         // and the Garden weather switch still apply.
         if uiTesting, let a = args.first(where: { $0.hasPrefix("-uitest-age=") }).flatMap({ AgeBand(rawValue: String($0.dropFirst("-uitest-age=".count))) }) {
             model.settings.applyAgeDefaults(a)
+        }
+        // Speed bloom: the toggle on (Extra time with `-uitest-speedbloom-extra`), levels 1-3 found so the word level is 4,
+        // and `-uitest-speedbloom-seconds=N` for a short ring. The age, Calm and Quiet Garden flags still gate it.
+        if uiTesting && args.contains("-uitest-speedbloom") {
+            model.settings.speedBloomOn = true
+            model.settings.speedBloomExtraTime = args.contains("-uitest-speedbloom-extra")
+            for p in model.plants() where p.level <= 3 { p.earnedCount = 1 }
+            model.game.refreshLevel()
+            try? model.context.save()
+        }
+        if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-speedbloom-seconds=") }).flatMap({ Double($0.dropFirst("-uitest-speedbloom-seconds=".count)) }) {
+            model.game.speedBloomBudgetOverride = n
         }
         if uiTesting && args.contains("-uitest-remind") { model.settings.remindMe = true; model.reminders.restore() }
         let forecastArg = args.first(where: { $0.hasPrefix("-uitest-forecast=") }).flatMap { WeatherKind(rawValue: String($0.dropFirst("-uitest-forecast=".count))) }
