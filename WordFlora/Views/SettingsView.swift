@@ -66,6 +66,7 @@ struct SettingsView: View {
             }
             Section("WordFlora Plus") {
                 Button { router.go(.plus) } label: { Label("Remove ads and sync with iCloud", systemImage: "sparkles") }
+                FamilyShareNudgeRow()
                 if app.entitlements.state.hasCloudSync {
                     Label(app.syncNeedsRestart ? "iCloud sync starts the next time you open WordFlora" : "iCloud sync is on", systemImage: "icloud.fill")
                         .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
