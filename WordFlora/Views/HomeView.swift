@@ -206,8 +206,9 @@ struct HomeView: View {
                 }
                 if let wordsTowardPlant {
                     // HOOK (progress meter): the visual words-toward-plant meter (mocked separately) goes here.
+                    // Full ink: the audit reports the 88% secondary text as low contrast over the hero's gradient.
                     Text(PlantProgressCopy.homeLine(toward: wordsTowardPlant, per: app.game.wordsPerPlant))
-                        .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
+                        .font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 if showRose {

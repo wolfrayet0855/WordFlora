@@ -32,8 +32,9 @@ struct WeatherChip: View {
         }
         .padding(.horizontal, 12).padding(.vertical, 6)
         .frame(minHeight: 32)
-        .background(Color.appSurface, in: Capsule())
-        .overlay(Capsule().stroke(Color.appPrimaryText.opacity(0.12)))
+        // A rounded rectangle, not a capsule: at accessibility sizes the chip wraps and a capsule's ends cut the text.
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).stroke(Color.appPrimaryText.opacity(0.12)))
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(WeatherUICopy.chipLabel(text))
         .accessibilityIdentifier("weather-chip")
