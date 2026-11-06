@@ -85,6 +85,8 @@ struct HomeView: View {
     @State private var playStarting = false
     /// This visit showed a forecast or the weather, so the ad banner stays away (spec section 8).
     @State private var weatherVisit = false
+    @State private var weatherPuzzle = false
+    @State private var weatherPuzzleClosed = 0
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     private let reportsLayout = LineProbe.enabled
 
@@ -121,7 +123,7 @@ struct HomeView: View {
 
                         if app.showWelcomeBack || app.plusOffer != nil || weather.card != nil || weather.banner != nil {
                             VStack(spacing: 10) {
-                                if let k = weather.banner { WeatherBanner(kind: k).transition(.opacity) }
+                                if let k = weather.banner { WeatherBanner(kind: k, onPuzzle: { weatherPuzzle = true }, refreshToken: weatherPuzzleClosed).transition(.opacity) }
                                 if let k = weather.card {
                                     ForecastCard(kind: k) { animate { app.dismissForecastCard() } }.transition(.opacity)
                                 }
@@ -169,6 +171,7 @@ struct HomeView: View {
             app.checkPlusOffer(); playAdNote = app.returnVisit == .adMayPlay
         }
         .grandGardenCeremony()
+        .fullScreenCover(isPresented: $weatherPuzzle, onDismiss: { weatherPuzzleClosed += 1 }) { WeatherPuzzleSheet { weatherPuzzle = false }.environment(app) }
         .navigationBarHidden(true)
         .overlay(alignment: .bottomLeading) { layoutReport }
     }

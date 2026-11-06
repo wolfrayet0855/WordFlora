@@ -28,6 +28,10 @@ final class WeatherUITests: XCTestCase {
         }
     }
 
+    /// Home's weather art plays for 5 s, then holds (WeatherCardArt.playSeconds); audits judge the settled Home
+    /// (at accessibility sizes, after Home's weather refresh and the card's first read have redrawn it).
+    private func settleHomeArt() { Thread.sleep(forTimeInterval: 6) }
+
     private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = []) {
         var findings = [String]()
         do {
@@ -68,7 +72,7 @@ final class WeatherUITests: XCTestCase {
     func testTheWeatherDayShowsASoftBanner() {
         launch(["-uitest-weather=busyBugs"])
         XCTAssertTrue(banner.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.descendants(matching: .any)["weather-banner-text"].label.contains("Busy bugs came to the garden."))
+        XCTAssertEqual(app.staticTexts["weather-banner-text"].label, "Busy bugs came to the garden.")
         XCTAssertFalse(card.exists)
         shot("weather-banner")
     }
@@ -171,20 +175,20 @@ final class WeatherUITests: XCTestCase {
     func testTheForecastCardPassesTheAudit() {
         launch(["-uitest-forecast=bigWind"])
         XCTAssertTrue(card.waitForExistence(timeout: 5))
-        audit("weather-card")
+        settleHomeArt(); audit("weather-card")
     }
 
     func testTheBannerPassesTheAudit() {
         launch(["-uitest-weather=hailShower"])
         XCTAssertTrue(banner.waitForExistence(timeout: 5))
-        audit("weather-banner")
+        settleHomeArt(); audit("weather-banner")
     }
 
     func testTheCardReadsWholeAtTheLargestTextSize() {
         launch(["-uitest-forecast=bigPuddles"], size: "UICTContentSizeCategoryAccessibilityXXXL")
         XCTAssertTrue(card.waitForExistence(timeout: 5))
         Thread.sleep(forTimeInterval: 1)            // the large-text layout settles before the audit
-        audit("weather-card-ax")
+        settleHomeArt(); audit("weather-card-ax")
         let gotIt = app.buttons["weather-gotit"]
         for _ in 0..<4 where !gotIt.isHittable { app.swipeUp() }
         XCTAssertTrue(gotIt.isHittable)
@@ -212,12 +216,12 @@ final class WeatherUITests: XCTestCase {
         let setOut = app.buttons["weather-setout"]
         XCTAssertTrue(setOut.waitForExistence(timeout: 3))
         XCTAssertEqual(setOut.label, "Set out the wind net")
-        audit("weather-card-helper")
+        settleHomeArt(); audit("weather-card-helper")
         setOut.tap()
         XCTAssertTrue(app.descendants(matching: .any)["weather-helper-done"].waitForExistence(timeout: 3))
         XCTAssertFalse(setOut.exists)
         shot("weather-card-helper-out")
-        audit("weather-card-helper-out")
+        settleHomeArt(); audit("weather-card-helper-out")
     }
 
     func testCalmShowsNoHelperStep() {
@@ -232,7 +236,7 @@ final class WeatherUITests: XCTestCase {
         let play = app.buttons["weather-puzzle"]
         XCTAssertTrue(play.exists)
         shot("weather-banner-puzzle")
-        audit("weather-banner-puzzle")
+        settleHomeArt(); audit("weather-banner-puzzle")
         play.tap()
         XCTAssertTrue(app.descendants(matching: .any)["weatherPuzzle.title"].waitForExistence(timeout: 5))
         app.buttons["weatherPuzzle.skip"].tap()
@@ -243,7 +247,7 @@ final class WeatherUITests: XCTestCase {
         launch(["-uitest-weather-today=hailShower"], size: "UICTContentSizeCategoryAccessibilityXXXL")
         XCTAssertTrue(banner.waitForExistence(timeout: 5))
         Thread.sleep(forTimeInterval: 1)
-        audit("weather-banner-ax")
+        settleHomeArt(); audit("weather-banner-ax")
     }
 
     func testAWeatheredPlantsPageOpensTheWeatherPuzzle() {

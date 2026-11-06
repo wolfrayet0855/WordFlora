@@ -47,28 +47,36 @@ struct WeatherChip: View {
 struct WeatherCardArt: View {
     let kind: WeatherKind
     var look: WeatherEffect = .full
+    let imageName: String
     @Environment(AppModel.self) private var app
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var scheme
     @State private var lowPower = LowPowerWatch()
+    /// Home is a hub: the weather plays for a few seconds as the card shows, then holds one frame.
+    @State private var settled = false
     static let plantSize: CGFloat = 80
+    static let playSeconds = 5.0
 
     var body: some View {
         let r = WeatherOverlay.sceneRect(plantSize: Self.plantSize)
-        let still = reduceMotion || app.settings.reduceMotionOverride || lowPower.isOn
+        let still = reduceMotion || app.settings.reduceMotionOverride || lowPower.isOn || settled
         ZStack(alignment: .bottom) {
             WeatherSky(kind: kind, look: look)
             Color(hex: scheme == .dark ? 0x3A503A : 0xE3D9C0)
                 .frame(height: (WeatherOverlay.sceneHeight - WeatherOverlay.floorY) * r.height / WeatherOverlay.sceneHeight)
             WeatherStage(kind: kind, look: look, plantSize: Self.plantSize, still: still, paused: scenePhase != .active) {
-                WeatherPreviewPlant(imageName: app.weatherCardPlantImage, size: Self.plantSize)
+                WeatherPreviewPlant(imageName: imageName, size: Self.plantSize)
             }
         }
         .frame(maxWidth: .infinity).frame(height: r.height)
         .clipped()
         .accessibilityHidden(true)
         .accessibilityIdentifier("weather-card-art")
+        .task {
+            try? await Task.sleep(for: .seconds(Self.playSeconds))
+            settled = true
+        }
     }
 }
 
@@ -79,12 +87,17 @@ struct ForecastCard: View {
     @Environment(AppModel.self) private var app
     @Environment(\.dynamicTypeSize) private var typeSize
     @State private var kitNew = false
+    /// Read once as the card opens and after a tap, not live: a card that re-reads the garden on every pass redraws
+    /// Home, and the Dynamic Type audit then reports the texts around it (as found with the rest card's ad note).
+    @State private var helperState: ShelterPolicy.HelperState = .ready
+    @State private var plantImage: String?
+    private var helper: WeatherHelper { WeatherHelper.helper(for: kind) }
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 20, style: .continuous) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             // Accessibility sizes drop the picture so the words get the room.
-            if !typeSize.isAccessibilitySize { WeatherCardArt(kind: kind, look: .light) }
+            if !typeSize.isAccessibilitySize, let plantImage { WeatherCardArt(kind: kind, look: .light, imageName: plantImage) }
             VStack(alignment: .leading, spacing: 8) {
                 Text(WeatherCopy.forecastTitle(kind))
                     .font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
@@ -112,13 +125,16 @@ struct ForecastCard: View {
         .overlay(shape.stroke(Color.appPrimaryText.opacity(0.12)))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("weather-forecast-card")
-        .onAppear { if app.receiveWeatherKitIfDue() { kitNew = true } }
+        .onAppear {
+            if app.receiveWeatherKitIfDue() { kitNew = true }
+            helperState = app.helperState(helper)
+            plantImage = app.weatherCardPlantImage
+        }
     }
 
     /// E-7: one tap sets out tomorrow's helper (free, nothing used up); then it reads as done. Hidden in Calm (looks only).
     @ViewBuilder private var helperStep: some View {
-        let helper = WeatherHelper.helper(for: kind)
-        switch app.helperState(helper) {
+        switch helperState {
         case .setOut:
             Label {
                 Text(ShelterCopy.cardDone(helper)).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
@@ -133,7 +149,7 @@ struct ForecastCard: View {
                 Text(WeatherCopy.kitLine).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
-            Button { app.setOutHelper() } label: {
+            Button { app.setOutHelper(); helperState = app.helperState(helper) } label: {
                 Label(ShelterCopy.cardStep(helper), systemImage: helper.symbol)
                     .font(Theme.font(.callout, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                     .padding(.horizontal, 16).frame(minHeight: Theme.minTap)
@@ -151,28 +167,36 @@ struct ForecastCard: View {
 /// The soft banner on the weather day itself, with the weather puzzle's entry while it is open (never in Calm).
 struct WeatherBanner: View {
     let kind: WeatherKind
+    /// Opens the weather puzzle (Home presents it, so the cover does not live inside the scrolling content).
+    let onPuzzle: () -> Void
+    /// Changes when the puzzle closes, so the entry and the look are read again (a solve removes the entry).
+    var refreshToken = 0
     @Environment(AppModel.self) private var app
     @Environment(\.dynamicTypeSize) private var typeSize
-    @State private var puzzle = false
+    /// Read as the banner opens and when the puzzle closes, not live (see `ForecastCard`).
+    @State private var open = false
+    @State private var reward = WeatherPuzzlePolicy.Reward.none
+    @State private var sheltered = false
+    @State private var plantImage: String?
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 20, style: .continuous) }
 
     var body: some View {
-        let open = app.weatherPuzzleOpen
         VStack(alignment: .leading, spacing: 0) {
-            if !typeSize.isAccessibilitySize { WeatherCardArt(kind: kind, look: app.weatherSheltered ? .snug : .full) }
+            if !typeSize.isAccessibilitySize, let plantImage {
+                WeatherCardArt(kind: kind, look: sheltered ? .snug : .full, imageName: plantImage)
+            }
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(WeatherCopy.eventLine(kind)).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("weather-banner-text")
                     Text(WeatherUICopy.bannerLine).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                .accessibilityElement(children: .combine)
-                .accessibilityIdentifier("weather-banner-text")
                 if open {
-                    Text(WeatherPuzzleCopy.rewardLine(app.weatherPuzzleReward)).font(Theme.font(.subheadline))
+                    Text(WeatherPuzzleCopy.rewardLine(reward)).font(Theme.font(.subheadline))
                         .foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
-                    Button { puzzle = true } label: {
+                    Button(action: onPuzzle) {
                         Text(WeatherPuzzleCopy.bannerButton).font(Theme.font(.callout, weight: .bold)).foregroundStyle(Color.ink)
                             .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                             .padding(.horizontal, 18).padding(.vertical, 6).frame(maxWidth: .infinity, minHeight: Theme.minTap)
@@ -190,7 +214,15 @@ struct WeatherBanner: View {
         .overlay(shape.stroke(Color.appPrimaryText.opacity(0.12)))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("weather-banner")
-        .fullScreenCover(isPresented: $puzzle) { WeatherPuzzleSheet { puzzle = false }.environment(app) }
+        .onAppear(perform: refresh)
+        .onChange(of: refreshToken) { _, _ in refresh() }
+    }
+
+    private func refresh() {
+        open = app.weatherPuzzleOpen
+        reward = app.weatherPuzzleReward
+        sheltered = app.weatherSheltered
+        plantImage = app.weatherCardPlantImage
     }
 }
 
