@@ -4,16 +4,21 @@ struct BadgesView: View {
     @Environment(AppModel.self) private var app
 
     private var defs: [BadgeDef] { (try? BadgeCatalog.load()) ?? [] }
-    private let columns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
-
     var body: some View {
+        let all = defs
         ScrollView {
-            LazyVGrid(columns: columns, spacing: 12) {
-                ForEach(defs, id: \.id) { def in card(def) }
+            // Two columns in a Grid (not a lazy grid), so both cards in a row share the row's height and line up.
+            Grid(horizontalSpacing: Space.m, verticalSpacing: Space.m) {
+                ForEach(Array(stride(from: 0, to: all.count, by: 2)), id: \.self) { i in
+                    GridRow {
+                        card(all[i])
+                        if i + 1 < all.count { card(all[i + 1]) } else { Color.clear.gridCellUnsizedAxes([.horizontal, .vertical]) }
+                    }
+                }
             }
-            .padding(20)
+            .padding(.horizontal, Space.gutter).padding(.vertical, Space.card)
             // The bloom rank and the Grand Garden replay sit under the badges, so the badge grid keeps its place.
-            EndgameBadgesHeader().padding(.horizontal, 20).padding(.bottom, 24)
+            EndgameBadgesHeader().padding(.horizontal, Space.gutter).padding(.bottom, Space.section)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Badges")
@@ -36,7 +41,7 @@ struct BadgesView: View {
                 Text(tier == 3 ? "Gold!" : "\(progress) of \(nextThreshold)").font(Theme.font(.caption, weight: .semibold)).foregroundStyle(Color.secondaryText)
             }
         }
-        .padding(12).frame(maxWidth: .infinity)
+        .padding(Space.m).frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(tier > 0 ? Color.appAccent.opacity(0.5) : Color.appPrimaryText.opacity(0.08)))
         .accessibilityElement(children: .ignore)

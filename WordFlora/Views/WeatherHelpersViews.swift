@@ -73,7 +73,7 @@ struct ShedWeatherSection: View {
             Spacer(minLength: 0)
             trailing(h, state)
         }
-        .padding(14)
+        .padding(Space.card)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(state == .setOut ? Color.successText : Color.appPrimaryText.opacity(0.08),

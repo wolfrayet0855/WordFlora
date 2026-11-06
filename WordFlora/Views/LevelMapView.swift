@@ -24,11 +24,11 @@ struct LevelMapView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     header(totalFound: totalFound)
                     MapKeyCard(oneColumn: oneColumn)
-                        .padding(.horizontal, 16).padding(.top, 14)
+                        .padding(.horizontal, Space.gutter).padding(.top, Space.card)
                     trail(stops)
-                        .padding(.horizontal, 16).padding(.top, 22)
+                        .padding(.horizontal, Space.gutter).padding(.top, Space.section)
                     end
-                        .padding(.top, 28).padding(.bottom, 120)
+                        .padding(.top, Space.section).padding(.bottom, 120)
                 }
             }
             .onAppear {
@@ -68,7 +68,7 @@ struct LevelMapView: View {
                 }
             }
         }
-        .padding(.horizontal, 12).padding(.vertical, 2)
+        .padding(.horizontal, Space.gutter - 4).padding(.vertical, 2)
         .frame(maxWidth: .infinity)
         .background(Color.appBackground.ignoresSafeArea(edges: .top))   // opaque, so scrolled text never shows through
     }
@@ -86,7 +86,7 @@ struct LevelMapView: View {
                 .foregroundStyle(Color.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.horizontal, 20).padding(.top, 8)
+        .padding(.horizontal, Space.gutter).padding(.top, Space.s)
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -132,7 +132,7 @@ struct LevelMapView: View {
                 .multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, Space.gutter)
         .frame(maxWidth: .infinity)
     }
 }
@@ -175,7 +175,7 @@ private struct MapKeyCard: View {
                 Circle().strokeBorder(Color.appAccent, lineWidth: max(2.5, icon * 0.22)).frame(width: icon, height: icon)
             }
         }
-        .padding(.vertical, 12).padding(.horizontal, 14)
+        .padding(.vertical, Space.m).padding(.horizontal, Space.card)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.appSurface.opacity(0.6), in: RoundedRectangle(cornerRadius: 16))
         .background(Color.appBackground, in: RoundedRectangle(cornerRadius: 16))
@@ -375,7 +375,7 @@ private struct MapStopCard: View {
                 .accessibilityAddTraits(stop.isCurrent ? .isSelected : [])
             if stop.isOpen { playButton }
         }
-        .padding(.top, 12).padding(.horizontal, 14).padding(.bottom, 13)
+        .padding(Space.card)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background { cardFill }
         .overlay { cardBorder }

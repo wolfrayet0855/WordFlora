@@ -134,7 +134,7 @@ struct PlantDetailView: View {
                     VStack(spacing: 16) {
                         below(plant, snap)
                     }
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, Space.gutter)
                 }
                 .padding(.bottom, 20)
             }
@@ -150,7 +150,7 @@ struct PlantDetailView: View {
                     LifeSheet(snapshot: snap, collapsed: panelHidden) { togglePanel() }
                     below(plant, snap)
                 }
-                .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 20)
+                .padding(.horizontal, Space.gutter).padding(.top, 8).padding(.bottom, 20)
             }
             .background(LifePalette.glass, in: UnevenRoundedRectangle(topLeadingRadius: 30, topTrailingRadius: 30))
             .overlay(UnevenRoundedRectangle(topLeadingRadius: 30, topTrailingRadius: 30).stroke(LifePalette.line))
@@ -355,7 +355,7 @@ struct PlantDetailView: View {
                     .transition(transition)
             }
         }
-        .padding(.leading, 12)
+        .padding(.leading, Space.gutter)
     }
 
     private func togglePanel() {
@@ -485,11 +485,11 @@ struct PlantDetailView: View {
                 .fixedSize(horizontal: false, vertical: true)       // every tile as tall as the tallest
             }
         }
-        .padding(.horizontal, 14).padding(.top, 10).padding(.bottom, 6)
+        .padding(.horizontal, Space.gutter).padding(.top, 10).padding(.bottom, 6)
         .background(Color.appBackground.ignoresSafeArea(edges: .bottom))
         .overlay(alignment: .top) { Rectangle().fill(LifePalette.line).frame(height: 1) }
         .overlay(alignment: .top) {
-            toastView.padding(.horizontal, 16)
+            toastView.padding(.horizontal, Space.gutter)
                 .alignmentGuide(.top) { d in d[.bottom] + 10 }
         }
     }

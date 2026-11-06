@@ -177,6 +177,8 @@ struct GameView: View {
                         Label("Simpler clue", systemImage: "sparkles").font(Theme.font(.subheadline, weight: .semibold)).frame(minHeight: Theme.minTap)
                     }
                     .accessibilityHint("Asks the on-device assistant to say the clue more simply. Free.")
+                    // The 44 point hit area may reach into the card's padding, so the space under the words matches the top.
+                    .padding(.bottom, -12)
                 }
             }
         }
@@ -401,7 +403,7 @@ struct GameView: View {
     /// `centered` keeps a short card in the middle of the screen while a tall one still scrolls.
     private func dimmed<C: View>(dim: Bool = true, padding: CGFloat = 20, centered: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
         let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
-        let card = content().padding(padding).background(Color.appBackground, in: shape).clipShape(shape).padding(24)
+        let card = content().padding(padding).background(Color.appBackground, in: shape).clipShape(shape).padding(Space.section)
         return ZStack {
             if dim { Color.black.opacity(0.45).ignoresSafeArea() }
             if centered {

@@ -40,7 +40,7 @@ struct PlusView: View {
                 }
                 .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
-            .padding(20).padding(.bottom, 24)
+            .padding(.horizontal, Space.gutter).padding(.vertical, Space.card).padding(.bottom, Space.section)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Plus")
@@ -96,7 +96,7 @@ struct PlusView: View {
                 Image(systemName: isSelected ? "largecircle.fill.circle" : "circle").foregroundStyle(isSelected ? Color.successText : Color.appPrimaryText.opacity(0.3))
             }
             .foregroundStyle(Color.appPrimaryText)
-            .padding(14).frame(maxWidth: .infinity)
+            .padding(Space.card).frame(maxWidth: .infinity)
             .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
             .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(isSelected ? Color.successText : Color.appPrimaryText.opacity(0.1), lineWidth: isSelected ? 2 : 1))
         }

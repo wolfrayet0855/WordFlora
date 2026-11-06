@@ -209,7 +209,7 @@ private struct GrandGardenPage: View {
                     .padding(.horizontal, 12).padding(.vertical, 8)
                     .background(Color.appBackground, in: RoundedRectangle(cornerRadius: 18))
                     GardenHills(plants: app.plants(), compact: typeSize.isAccessibilitySize)
-                        .padding(.horizontal, -20)
+                        .padding(.horizontal, -Space.gutter)
                     legend
                     Button(EndgameCopy.seeWhatsNext, action: next).buttonStyle(PrimaryButtonStyle())
                         .accessibilityIdentifier("grandGarden.next")
@@ -217,7 +217,7 @@ private struct GrandGardenPage: View {
                         .accessibilityIdentifier("grandGarden.walk")
                 }
                 .fixedSize(horizontal: false, vertical: true)
-                .padding(.horizontal, 20).padding(.bottom, 24)
+                .padding(.horizontal, Space.gutter).padding(.bottom, Space.section)
             }
         }
     }
@@ -309,7 +309,7 @@ private struct WhatGrowsNextPage: View {
                 Button(EndgameCopy.backToGarden, action: done).buttonStyle(PrimaryButtonStyle())
                     .accessibilityIdentifier("whatsNext.done")
             }
-            .padding(.horizontal, 20).padding(.bottom, 24)
+            .padding(.horizontal, Space.gutter).padding(.bottom, Space.section)
         }
         .background(Color.appBackground.ignoresSafeArea())
     }
@@ -434,10 +434,10 @@ private struct GoldCrownPage: View {
                     }
                     .padding(.horizontal, 12).padding(.vertical, 8)
                     .background(Color.appBackground, in: RoundedRectangle(cornerRadius: 18))
-                    GardenHills(plants: app.plants(), compact: true).padding(.horizontal, -20)
+                    GardenHills(plants: app.plants(), compact: true).padding(.horizontal, -Space.gutter)
                     Button(EndgameCopy.lovely, action: done).buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("goldCrown.done")
                 }
-                .padding(.horizontal, 20).padding(.bottom, 24)
+                .padding(.horizontal, Space.gutter).padding(.bottom, Space.section)
             }
         }
     }
@@ -469,7 +469,7 @@ struct EndgameHomeCard: View {
             Text(line).font(Theme.font(.body, weight: .semibold)).foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
             if let days { GoldenPips(days: days, label: "").accessibilityHidden(true) }
         }
-        .padding(14).frame(maxWidth: .infinity, alignment: .leading)
+        .padding(Space.card).frame(maxWidth: .infinity, alignment: .leading)
         .background(crownGold.opacity(0.18), in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(crownGold.opacity(0.6)))
         .accessibilityElement(children: .combine)
@@ -522,7 +522,7 @@ struct EndgameBadgesHeader: View {
                     }
                     Spacer(minLength: 0)
                 }
-                .padding(14)
+                .padding(Space.card)
                 .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
             }
             if !app.settings.quietGarden {
@@ -536,7 +536,7 @@ struct EndgameBadgesHeader: View {
                         Text(EndgameCopy.topRank).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                     }
                 }
-                .padding(14).frame(maxWidth: .infinity, alignment: .leading)
+                .padding(Space.card).frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
                 .accessibilityIdentifier("badges.bloomRank")
             }

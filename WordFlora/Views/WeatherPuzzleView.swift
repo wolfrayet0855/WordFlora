@@ -108,7 +108,7 @@ struct WeatherPuzzleSheet: View {
                         .accessibilityIdentifier("weatherPuzzle.reward")
                     Spacer(minLength: 0)
                 }
-                .padding(14)
+                .padding(Space.card)
                 .background(Color.appAccent.opacity(0.14), in: RoundedRectangle(cornerRadius: Theme.cardRadius))
                 .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appAccent.opacity(0.6)))
                 if app.weatherPuzzleOffersHarder {
@@ -239,7 +239,7 @@ struct WeatherPuzzleSheet: View {
                 }
                 Button(WeatherPuzzleCopy.done, action: close).buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("weatherPuzzle.done")
             }
-            .padding(.horizontal, 20).padding(.bottom, 24)
+            .padding(.horizontal, Space.gutter).padding(.bottom, Space.section)
         }
     }
 

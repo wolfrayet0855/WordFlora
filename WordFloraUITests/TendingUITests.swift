@@ -259,7 +259,9 @@ final class TendingUITests: XCTestCase {
         var findings = [String]()
         let scroll = app.scrollViews.firstMatch
         let nav = app.navigationBars.firstMatch
-        let top = nav.exists ? nav.frame.maxY : 0
+        // Text scrolled up under iOS 26's soft scroll-edge fade below the bar is measured against the fade, so the
+        // visible area starts 64 pt below the bar (as in EndgameUITests).
+        let top = nav.exists ? nav.frame.maxY + 64 : 0
         // The repot sheet's footer is pinned over the bottom of its scroll view, with a 28pt fade above it: text under
         // the footer or the fade is clipped or faded on purpose, so the visible area ends at the footer's top minus the fade.
         // At accessibility sizes the summary scrolls with the sheet instead, so only a summary or hint sitting right

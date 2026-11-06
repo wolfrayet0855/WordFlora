@@ -83,7 +83,8 @@ struct GuideView: View {
                 Spacer(minLength: 0).frame(width: Theme.minTap, height: Theme.minTap)
             }
         }
-        .padding(.leading, 18).padding(.trailing, 8)
+        // The wordmark and the Skip text both sit on the screen gutter (Skip carries 12 points of its own tap padding).
+        .padding(.leading, Space.gutter).padding(.trailing, Space.gutter - 12)
         .frame(minHeight: 52)
     }
 
@@ -99,12 +100,13 @@ struct GuideView: View {
                 }
             } else {
                 HStack(spacing: 10) {
-                    if pager.showsBack { backButton.frame(width: 104) }
+                    // Page one keeps Back's place, so Next is the same width on every page.
+                    if pager.showsBack { backButton.frame(width: 104) } else { Color.clear.frame(width: 104, height: 1) }
                     nextButton
                 }
             }
         }
-        .padding(.horizontal, 16).padding(.top, 0).padding(.bottom, 8)
+        .padding(.horizontal, Space.gutter).padding(.top, 0).padding(.bottom, Space.s)
     }
 
     private var backButton: some View {
@@ -198,7 +200,7 @@ private struct GuideDots: View {
         // A full-width, 44 point tall strip, so the adjustable element has a proper hit area.
         Color.clear
             .frame(maxWidth: .infinity, minHeight: Theme.minTap, maxHeight: Theme.minTap)
-            .overlay {
+            .overlay(alignment: .bottom) {
                 HStack(spacing: 8) {
                     ForEach(0..<pager.count, id: \.self) { i in
                         Capsule()
@@ -206,6 +208,7 @@ private struct GuideDots: View {
                             .frame(width: i == pager.page ? 24 : 8, height: 8)
                     }
                 }
+                .padding(.bottom, Space.m)          // dots to buttons: 12
             }
             .contentShape(Rectangle())
             .accessibilityElement(children: .ignore)
@@ -242,36 +245,39 @@ private struct GuidePageView: View {
     var titleFocused: AccessibilityFocusState<Bool>.Binding
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 0) {
-                GuideArtCard(page: page.id, still: still, quiet: quiet, showsPoints: showsPoints, large: large)
-                    .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(page.art)
-                    .accessibilityAddTraits(.isImage)
-                    .accessibilityIdentifier("onboardingGuide.art")
-                VStack(alignment: large ? .leading : .center, spacing: 8) {
-                    Text(page.title)
-                        .font(Theme.font(.title, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
-                        .multilineTextAlignment(large ? .leading : .center)
-                        .fixedSize(horizontal: false, vertical: true)
-                        .padding(.bottom, 2)
-                        .accessibilityAddTraits(.isHeader)
-                        .accessibilityFocused(titleFocused)
-                        .accessibilityIdentifier("onboardingGuide.title")
-                    ForEach(page.lines(quiet: quiet), id: \.self) { line in
-                        Text(line)
-                            .font(Theme.font(.body, weight: .medium)).foregroundStyle(Color.secondaryText)
+        GeometryReader { geo in
+            ScrollView {
+                VStack(spacing: 0) {
+                    GuideArtCard(page: page.id, still: still, quiet: quiet, showsPoints: showsPoints, large: large)
+                        .accessibilityElement(children: .ignore)
+                        .accessibilityLabel(page.art)
+                        .accessibilityAddTraits(.isImage)
+                        .accessibilityIdentifier("onboardingGuide.art")
+                    VStack(alignment: large ? .leading : .center, spacing: Space.s) {
+                        Text(page.title)
+                            .font(Theme.font(.title, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
                             .multilineTextAlignment(large ? .leading : .center)
                             .fixedSize(horizontal: false, vertical: true)
+                            .accessibilityAddTraits(.isHeader)
+                            .accessibilityFocused(titleFocused)
+                            .accessibilityIdentifier("onboardingGuide.title")
+                        ForEach(page.lines(quiet: quiet), id: \.self) { line in
+                            Text(line)
+                                .font(Theme.font(.body, weight: .medium)).foregroundStyle(Color.secondaryText)
+                                .multilineTextAlignment(large ? .leading : .center)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
                     }
+                    .frame(maxWidth: large ? .infinity : 330, alignment: large ? .leading : .center)
+                    .frame(maxWidth: .infinity, alignment: large ? .leading : .center)
+                    .padding(.top, large ? Space.card : Space.section).padding(.horizontal, large ? 4 : 8)
                 }
-                .frame(maxWidth: large ? .infinity : 330, alignment: large ? .leading : .center)
-                .frame(maxWidth: .infinity, alignment: large ? .leading : .center)
-                .padding(.top, large ? 16 : 22).padding(.horizontal, large ? 4 : 8)
+                .padding(.horizontal, Space.gutter).padding(.top, Space.xs).padding(.bottom, Space.section)
+                // The picture and its words sit in the middle of the free space, not pinned to the top over a gap.
+                .frame(minHeight: geo.size.height)
             }
-            .padding(.horizontal, 16).padding(.top, 4).padding(.bottom, 12)
+            .scrollBounceBehavior(.basedOnSize)
         }
-        .scrollBounceBehavior(.basedOnSize)
     }
 }
 
@@ -343,6 +349,9 @@ private struct GuideArt: View {
     let quiet: Bool
     let showsPoints: Bool
 
+    /// Space between the box edge and the nearest drawing, the same on all four sides.
+    private let inset = Space.card
+
     /// The frame the mockup shots freeze on (0.7 s into every loop).
     static let stillTime = 0.7
 
@@ -384,14 +393,14 @@ private struct GuideArt: View {
     // MARK: 1. Guess the word
 
     private var guess: some View {
-        ZStack(alignment: .topLeading) {
+        ArtCanvas {
             (Text(GuideCopy.Art.clue).foregroundStyle(Color.appPrimaryText).fontWeight(.heavy)
              + Text(" · " + GuideCopy.Art.clueText).foregroundStyle(Color.secondaryText))
                 .font(.system(size: 14, weight: .semibold, design: .rounded))
                 .padding(.vertical, 10).padding(.horizontal, 14)
-                .frame(width: 329, alignment: .leading)
+                .frame(width: 361 - 2 * inset, alignment: .leading)
                 .background(ArtCard())
-                .at(16, 16)
+                .at(inset, inset)
             FlowerView(petals: 6, sway: false).frame(width: 150, height: 180)
                 .rotationEffect(sway, anchor: .bottom).at(22, 74)
             ArtChip(text: GuideCopy.Art.petalsTries, size: 12) { Spark().fill(Color.bloomIcon).frame(width: 14, height: 14) }.at(34, 250)
@@ -406,21 +415,21 @@ private struct GuideArt: View {
             HStack(spacing: 5) {
                 ForEach(Array(["D", "A", "", "S", ""].enumerated()), id: \.offset) { _, ch in ArtTile(letter: ch, width: 30) }
             }
-            .frame(width: 176).at(361 - 14 - 176, 150)
+            .frame(width: 176).at(361 - inset - 176, 150)
             HStack(spacing: 5) {
                 ForEach(Array("ABCDEIOSY".enumerated()), id: \.offset) { _, ch in
                     ArtKey(letter: String(ch), state: "ADS".contains(ch) ? .hit : ("CO".contains(ch) ? .out : .plain))
                         .scaleEffect(ch == "Y" ? pulse() : 1)
                 }
             }
-            .frame(width: 361).at(0, 372 - 16 - 38)
+            .frame(width: 361).at(0, 372 - inset - 38)
         }
     }
 
     // MARK: 2. Three words, one plant
 
     private var plants: some View {
-        ZStack(alignment: .topLeading) {
+        ArtCanvas {
             HStack(spacing: 10) {
                 ForEach(GuideCopy.Art.sampleWords, id: \.self) { w in
                     VStack(spacing: 4) {
@@ -430,7 +439,7 @@ private struct GuideArt: View {
                     .padding(.vertical, 8).frame(width: 92).background(ArtCard())
                 }
             }
-            .frame(width: 361).at(0, 22)
+            .frame(width: 361).at(0, inset)
             Path { p in
                 p.move(to: CGPoint(x: 70, y: 4)); p.addCurve(to: CGPoint(x: 172, y: 44), control1: CGPoint(x: 90, y: 34), control2: CGPoint(x: 150, y: 30))
                 p.move(to: CGPoint(x: 180, y: 4)); p.addLine(to: CGPoint(x: 180, y: 44))
@@ -442,7 +451,7 @@ private struct GuideArt: View {
                 .rotationEffect(sway, anchor: .bottom).at(180.5 - 70 + 10, 132)
             PotArtView(pot: PotCatalog.pot(id: "terracotta"), width: 108, soil: true).at(180.5 - 70 + 16, 132 + 98)
             ArtChip(text: GuideCopy.Art.newPlant) { Spark().fill(LifePalette.gold).frame(width: 14, height: 14).opacity(twinkle()) }
-                .frame(width: 361).at(0, 372 - 16 - 30)
+                .frame(width: 361).at(0, 372 - inset - 30)
             Spark().fill(LifePalette.gold).frame(width: 20, height: 20).opacity(twinkle()).at(96, 170)
             Spark().fill(LifePalette.petal).frame(width: 16, height: 16).opacity(twinkle(-1.1)).at(361 - 92 - 16, 200)
         }
@@ -451,8 +460,8 @@ private struct GuideArt: View {
     // MARK: 3. Help your plant grow
 
     private var tend: some View {
-        ZStack(alignment: .topLeading) {
-            StageTrack(names: GuideCopy.Art.stageNames, current: 2).frame(width: 317).at(22, 20)
+        ArtCanvas {
+            StageTrack(names: GuideCopy.Art.stageNames, current: 2).frame(width: 291).at(35, inset)
             HStack(alignment: .bottom) {
                 SproutArt().frame(width: 84, height: 84)
                 Spacer(minLength: 0)
@@ -477,16 +486,16 @@ private struct GuideArt: View {
                     .frame(width: 58)
                 }
             }
-            .frame(width: 361).at(0, 372 - 16 - 66)
+            .frame(width: 361).at(0, 372 - inset - 66)
         }
     }
 
     // MARK: 4. Hearts and hellos
 
     private var love: some View {
-        ZStack(alignment: .topLeading) {
+        ArtCanvas {
             Image("plant_rose").resizable().scaledToFit().frame(width: 140, height: 140)
-                .rotationEffect(sway, anchor: .bottom).at(24, 14)
+                .rotationEffect(sway, anchor: .bottom).at(24, inset)
             Text(GuideCopy.Art.hello).font(.system(size: 16, weight: .black, design: .rounded)).foregroundStyle(Color.appPrimaryText)
                 .padding(.vertical, 8).padding(.horizontal, 14)
                 .background(UnevenRoundedRectangle(topLeadingRadius: 18, bottomLeadingRadius: 4, bottomTrailingRadius: 18, topTrailingRadius: 18, style: .continuous)
@@ -506,7 +515,7 @@ private struct GuideArt: View {
             HStack(spacing: 0) {
                 Spacer(minLength: 0)
                 VStack(spacing: 4) {
-                    ZStack(alignment: .topLeading) {
+                    ArtCanvas(width: 96, height: 114) {
                         SeedPotView(pot: PotCatalog.pot(id: "terracotta"), width: 76).at(10, 24)
                         if !quiet {
                             ArtCloud().fill(LifePalette.cloud).frame(width: 46, height: 22).at(28, 0)
@@ -517,7 +526,6 @@ private struct GuideArt: View {
                             }
                         }
                     }
-                    .frame(width: 96, height: 114, alignment: .topLeading)
                     Text(GuideCopy.Art.naps).font(.system(size: 12, weight: .heavy, design: .rounded)).foregroundStyle(Color.secondaryText)
                         .fixedSize()
                 }
@@ -526,28 +534,27 @@ private struct GuideArt: View {
                     .padding(.bottom, 18)
                 Spacer(minLength: 0)
                 VStack(spacing: 4) {
-                    ZStack(alignment: .topLeading) {
+                    ArtCanvas(width: 96, height: 114) {
                         SproutArt().frame(width: 80, height: 80).at(8, -4)
                         PotArtView(pot: PotCatalog.pot(id: "terracotta"), width: 80, soil: true).at(8, 48)
                         Spark().fill(LifePalette.gold).frame(width: 18, height: 18).opacity(twinkle()).at(80, 12)
                     }
-                    .frame(width: 96, height: 114, alignment: .topLeading)
                     Text(GuideCopy.Art.wakes).font(.system(size: 12, weight: .heavy, design: .rounded)).foregroundStyle(Color.secondaryText)
                         .fixedSize()
                 }
                 Spacer(minLength: 0)
             }
             .padding(.horizontal, 6)
-            .frame(width: 333, height: 170)
+            .frame(width: 361 - 2 * inset, height: 170)
             .background(ArtCard())
-            .at(14, 372 - 14 - 170)
+            .at(inset, 372 - inset - 170)
         }
     }
 
     // MARK: 5. Your garden and friends
 
     private var garden: some View {
-        ZStack(alignment: .topLeading) {
+        ArtCanvas {
             ArtTile5(label: GuideCopy.Art.garden, icon: "leaf.fill", fill: .tileGardenFill, ink: .successText) {
                 HStack(alignment: .bottom, spacing: 0) {
                     ForEach([("tulip", 62.0), ("daisy", 70), ("sunflower", 66), ("lavender", 60)], id: \.0) { id, w in
@@ -555,24 +562,24 @@ private struct GuideArt: View {
                     }
                 }
             }
-            .frame(width: 329, height: 124).at(16, 16)
+            .frame(width: 361 - 2 * inset, height: 124).at(inset, inset)
             ArtTile5(label: GuideCopy.Art.visitors, icon: "ladybug.fill", fill: .tileVisitorsFill, ink: .tileVisitorsIcon) {
                 Image("visitor_ladybug_sticker").resizable().scaledToFit().frame(width: 62, height: 62)
             }
-            .frame(width: 156, height: 150).at(16, 200)
+            .frame(width: 156, height: 150).at(inset, 372 - inset - 150)
             ArtTile5(label: GuideCopy.Art.shed, icon: "wrench.and.screwdriver.fill", fill: .tileShedFill, ink: .tileShedIcon) {
                 Image("tool_can_t1").resizable().scaledToFit().frame(width: 62, height: 67)
             }
-            .frame(width: 156, height: 150).at(189, 200)
+            .frame(width: 156, height: 150).at(361 - inset - 156, 372 - inset - 150)
             Path { p in
                 p.move(to: CGPoint(x: 8, y: 62)); p.addCurve(to: CGPoint(x: 162, y: 62), control1: CGPoint(x: 40, y: 6), control2: CGPoint(x: 130, y: 6))
             }
             .stroke(Color.tileVisitorsIcon, style: StrokeStyle(lineWidth: 2.5, lineCap: .round, dash: [2, 7]))
-            .frame(width: 170, height: 70).at(96, 150)
+            .frame(width: 170, height: 70).at(96, 156)
             Image("visitor_monarch_a").resizable().scaledToFit().frame(width: 48, height: 48)
-                .scaleEffect(x: flutter, y: 1).offset(drift).at(156, 140)
+                .scaleEffect(x: flutter, y: 1).offset(drift).at(156, 150)
             if showsPoints {
-                ArtChip(text: GuideCopy.Art.points, size: 12, padH: 9, padV: 4) { EmptyView() }.at(250, 214)
+                ArtChip(text: GuideCopy.Art.points, size: 12, padH: 9, padV: 4) { EmptyView() }.at(262, 372 - inset - 150 + 8)
             }
         }
     }
@@ -580,7 +587,7 @@ private struct GuideArt: View {
     // MARK: 6. One word for everyone
 
     private var daily: some View {
-        ZStack(alignment: .topLeading) {
+        ArtCanvas {
             ZStack {
                 ForEach(0..<12, id: \.self) { i in
                     RoundedRectangle(cornerRadius: 4).fill(LifePalette.gold.opacity(0.55)).frame(width: 8, height: 18)
@@ -601,14 +608,14 @@ private struct GuideArt: View {
                 Image(systemName: "chevron.right").font(.system(size: 14, weight: .bold)).foregroundStyle(Color.bloomIcon)
             }
             .padding(.horizontal, 14).padding(.vertical, 12)
-            .frame(width: 329)
+            .frame(width: 361 - 2 * inset)
             .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(Color.bloomFill).shadow(color: .black.opacity(0.08), radius: 6, y: 3))
             .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).strokeBorder(Color.petalRose.opacity(0.4)))
-            .at(16, 186)
+            .at(inset, 186)
             HStack(spacing: 6) {
                 ForEach(0..<5, id: \.self) { _ in ArtTile(letter: "?", width: 40, ink: .bloomIcon) }
             }
-            .frame(width: 361).at(0, 372 - 18 - 48)
+            .frame(width: 361).at(0, 372 - inset - 48)
         }
     }
 
@@ -625,7 +632,7 @@ private struct GuideArt: View {
             p.addCurve(to: CGPoint(x: 248, y: 214), control1: CGPoint(x: 345, y: 64), control2: CGPoint(x: 340, y: 214))
             p.addCurve(to: CGPoint(x: 112, y: 214), control1: CGPoint(x: 200, y: 214), control2: CGPoint(x: 160, y: 214))
         }
-        return ZStack(alignment: .topLeading) {
+        return ArtCanvas {
             path.stroke(Color.path, style: StrokeStyle(lineWidth: 16, lineCap: .round))
             path.stroke(Color.appPrimaryText.opacity(0.22), style: StrokeStyle(lineWidth: 2, lineCap: .round, dash: [1, 9]))
             ForEach(0..<5, id: \.self) { i in
@@ -659,14 +666,14 @@ private struct GuideArt: View {
                     Image(systemName: "leaf.fill").font(.system(size: 12)).foregroundStyle(Color.successText)
                 }
             }
-            .frame(width: 361).at(0, 372 - 14 - 62)
+            .frame(width: 361).at(0, 372 - inset - 62)
         }
     }
 
     // MARK: 8. Coming soon in your garden
 
     private var peeks: some View {
-        ZStack(alignment: .topLeading) {
+        ArtCanvas {
             Spark().fill(LifePalette.gold).frame(width: 18, height: 18).opacity(twinkle()).at(30, 22)
             Spark().fill(LifePalette.petal).frame(width: 14, height: 14).opacity(twinkle(-0.9)).at(361 - 36 - 14, 30)
             Spark().fill(LifePalette.gold).frame(width: 16, height: 16).opacity(twinkle(-1.5)).at(361 - 60 - 16, 372 - 96 - 16)
@@ -690,7 +697,7 @@ private struct GuideArt: View {
             }
             .padding(.vertical, 10).padding(.leading, 10).padding(.trailing, 16)
             .background(ArtCard())
-            .frame(width: 361).at(0, 372 - 22 - 64)
+            .frame(width: 361).at(0, 372 - inset - 64)
         }
     }
 }
@@ -701,6 +708,23 @@ private extension View {
     /// Places a view by its top-left corner, as the mockup's absolute positions do.
     func at(_ x: CGFloat, _ y: CGFloat) -> some View {
         fixedSize().alignmentGuide(.leading) { _ in -x }.alignmentGuide(.top) { _ in -y }
+    }
+}
+
+/// A fixed drawing area for `.at(x, y)` placements. The clear first layer pins the area's top-left corner, so the
+/// placements are measured from the box edge (without it the stack shrinks to its children and the smallest offset
+/// collapses to zero, pushing the drawing against the edge).
+private struct ArtCanvas<Content: View>: View {
+    var width: CGFloat = 361
+    var height: CGFloat = 372
+    @ViewBuilder var content: Content
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            Color.clear.frame(width: width, height: height)
+            content
+        }
+        .frame(width: width, height: height, alignment: .topLeading)
     }
 }
 
@@ -794,7 +818,7 @@ private struct StageTrack: View {
                 ForEach(names.indices, id: \.self) { i in
                     if i > 0 { Spacer(minLength: 0) }
                     Text(names[i]).font(.system(size: 11, weight: .heavy, design: .rounded)).foregroundStyle(Color.secondaryText)
-                        .multilineTextAlignment(.center).frame(width: 40).padding(.horizontal, -9)
+                        .lineLimit(1).fixedSize().frame(width: 22)
                 }
             }
         }

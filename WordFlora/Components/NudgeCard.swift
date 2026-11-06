@@ -19,7 +19,7 @@ struct NudgeCard: View {
                 ScrollView {
                     card
                         .background(Color.appBackground, in: shape).clipShape(shape)
-                        .padding(24)
+                        .padding(Space.section)
                         .frame(maxWidth: .infinity, minHeight: geo.size.height)
                 }
                 .scrollBounceBehavior(.basedOnSize)

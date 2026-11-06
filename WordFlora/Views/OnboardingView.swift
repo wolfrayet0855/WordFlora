@@ -49,7 +49,7 @@ private struct AgeQuestionView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
+            VStack(spacing: Space.section) {
                 FlowerView(petals: 8).frame(height: 140)
                 Text("How old are you?").font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
@@ -66,7 +66,7 @@ private struct AgeQuestionView: View {
                     Button("No thanks") { app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
                 } message: { Text("Quiet Garden hides numbers and timers so tending is just relaxing. You can change it any time in Settings.") }
             }
-            .padding(24).frame(maxWidth: .infinity)
+            .padding(.horizontal, Space.gutter).padding(.vertical, Space.section).frame(maxWidth: .infinity)
         }
         .scrollBounceBehavior(.basedOnSize)
     }

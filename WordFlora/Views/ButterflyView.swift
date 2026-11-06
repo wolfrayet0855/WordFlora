@@ -131,7 +131,7 @@ struct ButterflyView: View {
             .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
-        .padding(14)
+        .padding(Space.card)
         .background(Color.white, in: RoundedRectangle(cornerRadius: 22))
         .shadow(color: .black.opacity(0.12), radius: 6, y: 2)
         .padding(.horizontal, 16)
@@ -284,10 +284,11 @@ struct VisitorsView: View {
                             ForEach(row, id: \.id) { v in albumCard(v, album: album) }
                             if row.count < albumColumns { Color.clear.frame(maxWidth: .infinity) }
                         }
+                        .fixedSize(horizontal: false, vertical: true)     // both cards take the taller one's height
                     }
                 }
             }
-            .padding(20)
+            .padding(.horizontal, Space.gutter).padding(.vertical, Space.card)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle(VisitorsCopy.title)
@@ -313,7 +314,7 @@ struct VisitorsView: View {
             .fixedSize(horizontal: false, vertical: true)
             Spacer(minLength: 0)
         }
-        .padding(16)
+        .padding(Space.card)
         .background(Color.tileVisitorsFill, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.tileVisitorsIcon.opacity(0.3)))
         .accessibilityElement(children: .combine)
@@ -378,7 +379,7 @@ struct VisitorsView: View {
                 }
             }
             .fixedSize(horizontal: false, vertical: true)
-            .padding(12).frame(maxWidth: .infinity, minHeight: 190)
+            .padding(Space.m).frame(maxWidth: .infinity, minHeight: 190, maxHeight: .infinity, alignment: .top)
             .background(met ? Color.appSurface : Color.appSurface.opacity(0.5), in: shape)
             .overlay {
                 if met { shape.stroke(Color.appPrimaryText.opacity(0.08)) }
