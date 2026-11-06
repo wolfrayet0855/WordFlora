@@ -145,6 +145,14 @@ struct WordFloraApp: App {
         if uiTesting && args.contains("-uitest-daytime") { model.uiTestDaytime = true }
         if uiTesting && !args.contains("-uitest-ads") && !args.contains("-uitest-ads-offline") { model.adsEnabled = false }
         if uiTesting { model.plusOfferEnabled = false }
+        if uiTesting && args.contains("-uitest-badges") {
+            // Badges page tests: a gold, a silver and a bronze badge already earned (no moments).
+            model.updateBadges(announce: false) { state, _, t in
+                state.record(.waterings, amount: 300, now: t) + state.record(.feeds, amount: 75, now: t) + state.record(.suns, amount: 10, now: t)
+            }
+        }
+        // Badges the fixtures above already earned arrive quietly, as they do for a real garden at launch.
+        if uiTesting { model.refreshBadgeFacts(announce: false) }
         if !uiTesting { try? Tips.configure([.displayFrequency(.daily)]) }
         _app = State(initialValue: model)
     }

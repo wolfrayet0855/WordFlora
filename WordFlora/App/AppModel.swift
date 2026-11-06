@@ -66,6 +66,7 @@ final class AppModel {
         let defs = (try? BadgeCatalog.load()) ?? []
         badges = BadgeState(json: game.playerProfile?.badgesJSON ?? "", defs: defs)
         refreshFreeDrops()
+        refreshBadgeFacts(announce: false)       // badges added in an update arrive quietly for what is already done
         checkWelcomeBack()
         GardenIntentHost.container = container
     }
@@ -98,7 +99,7 @@ final class AppModel {
     func restoreGarden(from data: Data) -> Result<GardenBackup.RestoreReport, GardenBackup.ImportError> {
         let defs = (try? BadgeCatalog.load()) ?? []
         let result = GardenBackup.restore(data, into: context, badgeDefs: defs)
-        if case .success = result { reconcileSyncedData(); syncToolUnlocks() }
+        if case .success = result { reconcileSyncedData(); syncToolUnlocks(); refreshBadgeFacts(announce: false) }
         return result
     }
 
@@ -155,7 +156,13 @@ final class AppModel {
 
     func refreshFreeDrops() {
         guard let p = profile else { return }
-        ToolEngine.applyTrickle(p, inventory: inventory, now: now(), economy: .default)   // the mister speeds the drops
+        let inv = inventory, before = p.water
+        ToolEngine.applyTrickle(p, inventory: inv, now: now(), economy: .default)   // the mister speeds the drops
+        // Mist Maker: the free drops that come while the mister is in the Shed.
+        if inv.tier(of: .mister) > 0, p.water > before {
+            enqueueBadgeMoments(badges.record(.mists, amount: p.water - before, now: now(), quiet: settings.quietGarden))
+            p.badgesJSON = badges.json
+        }
         try? context.save()
     }
 
@@ -240,8 +247,12 @@ final class AppModel {
 
         plant.lastLovedAt = date
         let turnedGolden = recordGoldenDay(plant, tending: action, at: date)
-        let counter: BadgeCounter? = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return nil } }()
-        if let counter { enqueueBadgeMoments(badges.record(counter, now: date, quiet: quiet), after: 1.0); p.badgesJSON = badges.json }
+        let counter: BadgeCounter = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return .suns } }()
+        var unlocks = badges.record(counter, now: date, quiet: quiet)
+        if repotOutcome == .happy { unlocks += badges.recordMark(.soilMatches, item: plant.plantId, now: date, quiet: quiet) }   // each plant once
+        unlocks += badges.recordDay(.tendDays, day: BadgeFacts.dayNumber(date, calendar: cal), now: date, quiet: quiet)
+        if result.stageUp { unlocks += recordCollectionFacts(now: date, quiet: quiet) }     // in flower, full bloom
+        enqueueBadgeMoments(unlocks, after: 1.0); p.badgesJSON = badges.json
         try? context.save()
         recordQuestCare(action)
 
@@ -548,6 +559,7 @@ final class AppModel {
         guard inv.upgrade(tool, shedPoints: &points) else { return false }
         p.shedPoints = points
         inventory = inv
+        recordBadgeValue(.shedUpgrades, BadgeFacts.shedUpgrades(inv))
         return true
     }
 
@@ -567,12 +579,31 @@ final class AppModel {
             if game.missesThisRound == 0 { unlocks += badges.record(.perfectBlooms, now: t, quiet: quiet) }
             if game.isDaily { unlocks += badges.record(.dailyBloomsDone, now: t, quiet: quiet) }
             recordQuest(.wordFound(letters: game.currentWord.filter(\.isLetter).count))
+            unlocks += badges.record(.wordsSolved, now: t, quiet: quiet)
+            if BadgeFacts.isSteady(misses: game.missesThisRound) { unlocks += badges.record(.steadySolves, now: t, quiet: quiet) }
+            if BadgeFacts.isLongWord(game.currentWord) { unlocks += badges.record(.longWords, now: t, quiet: quiet) }
+            unlocks += recordCollectionFacts(now: t, quiet: quiet)       // the plant that arrived, the level reached
+        }
+        if !game.isTutorial && BadgeFacts.isMorning(t, calendar: .current) {
+            unlocks += badges.recordDay(.morningDays, day: BadgeFacts.dayNumber(t, calendar: .current), now: t, quiet: quiet)
         }
         unlocks += badges.record(.streak, value: p.streak, now: t, quiet: quiet)
         enqueueBadgeMoments(unlocks)                // shown when the round's card closes (GameView pauses them until then)
         p.badgesJSON = badges.json
         try? context.save()
         syncToolUnlocks()
+        return unlocks
+    }
+
+    /// Changes the badge state through `change` (handed Quiet Garden and the time), queues the moments (or not, for a
+    /// quiet catch-up) and saves. The badge helpers in `AppModel+Badges` go through here.
+    @discardableResult
+    func updateBadges(announce: Bool = true, after delay: Double = 0,
+                      _ change: (inout BadgeState, _ quiet: Bool, _ now: Date) -> [BadgeUnlock]) -> [BadgeUnlock] {
+        let unlocks = change(&badges, settings.quietGarden, now())
+        if announce { enqueueBadgeMoments(unlocks, after: delay) }
+        profile?.badgesJSON = badges.json
+        try? context.save()
         return unlocks
     }
 
@@ -643,7 +674,13 @@ final class AppModel {
             p.butterflyPlaysJSON = (try? JSONEncoder().encode(counter)).flatMap { String(data: $0, encoding: .utf8) } ?? ""
         }
 
-        let unlocks = badges.record(.visitorSpecies, value: a.species, now: t, quiet: quiet) + badges.record(.butterflyPlays, now: t, quiet: quiet)
+        var unlocks = badges.record(.visitorSpecies, value: a.species, now: t, quiet: quiet) + badges.record(.butterflyPlays, now: t, quiet: quiet)
+        for (counter, n) in BadgeFacts.catches(game.caught).sorted(by: { $0.key.rawValue < $1.key.rawValue }) where n > 0 {
+            unlocks += badges.record(counter, amount: n, now: t, quiet: quiet)
+        }
+        for (counter, n) in BadgeFacts.album(a).sorted(by: { $0.key.rawValue < $1.key.rawValue }) {
+            unlocks += badges.record(counter, value: n, now: t, quiet: quiet)
+        }
         enqueueBadgeMoments(unlocks, after: wake ? 0.6 : 1.9)     // after the summary's petals (a wake waits for its sheet to close)
         p.badgesJSON = badges.json
         try? context.save()

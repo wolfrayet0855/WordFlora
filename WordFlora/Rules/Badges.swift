@@ -1,18 +1,40 @@
 import Foundation
 
+/// What a badge counts. Every count lives in `PlayerProfile.badgesJSON` (max-merged by `BadgeState.merged`, carried by
+/// `GardenBackup`), so a new counter needs no new stored field.
+///
+/// Extension point (for example the game's "Quick bloom" badge): add a case here (mark it in `isHighWater` if it is a
+/// best-so-far value), add an entry to `Resources/Badges.json` with three ascending thresholds and CopySafety-clean
+/// words, ship art `badge_<id>_t1...t3` (or register a drawn view in `BadgeArtView.drawn`), and record it where it
+/// happens with `AppModel.recordBadgeStep(.yourCounter)`. Quiet Garden is handled inside `BadgeState.record`.
 enum BadgeCounter: String, CaseIterable, Codable {
     case levelSets, plantsOwned, feeds, waterings, repots, prunes, streak
     case perfectBlooms, revives, dailyBloomsDone, visitorSpecies, butterflyPlays
     /// Weather puzzles solved (one step per solve that earned a reward). Accumulates; never goes down.
     case weathered
 
+    // Collection: worked out from the garden and the album each time (`BadgeFacts`), kept as best-so-far values.
+    case rarePlants, desertPlants, waterPlants, treePlants, floweringPlants, stickers
+    // Play
+    case wordsSolved, steadySolves, levelReached, longWords, morningDays
+    // Tending
+    case fullBlooms, mists, suns, soilMatches, tendDays
+    // Explorer
+    case catches, duskCatches, rareSpecies, storiesRead, factsRead, beeCatches, shedUpgrades, badgeShares
+
     /// High-water counters only ever go up to the best value seen; the rest accumulate.
     var isHighWater: Bool {
-        switch self { case .levelSets, .plantsOwned, .streak, .visitorSpecies: return true; default: return false }
+        switch self {
+        case .levelSets, .plantsOwned, .streak, .visitorSpecies,
+             .rarePlants, .desertPlants, .waterPlants, .treePlants, .floweringPlants, .stickers,
+             .levelReached, .fullBlooms, .soilMatches, .rareSpecies, .storiesRead, .factsRead, .shedUpgrades, .badgeShares:
+            return true
+        default: return false
+        }
     }
 }
 
-struct BadgeDef: Codable, Equatable {
+struct BadgeDef: Codable, Equatable, Identifiable {
     var id: String
     var family: String
     var counter: String
@@ -81,6 +103,35 @@ struct BadgeState: Equatable {
         }
         return events
     }
+
+    /// Counts one step for a new day only (days played in the morning, days with tending). `day` is a local day number
+    /// (`BadgeFacts.dayNumber`). The last day counted is kept beside the counts under "day.<counter>", so it merges
+    /// by max like them: two devices on the same day count it once.
+    @discardableResult
+    mutating func recordDay(_ counter: BadgeCounter, day: Int, now: Date, quiet: Bool = false) -> [BadgeUnlock] {
+        guard !quiet else { return [] }
+        let key = "day.\(counter.rawValue)"
+        if let last = progressByCounter[key], day <= last { return [] }
+        progressByCounter[key] = day
+        return record(counter, now: now)
+    }
+
+    /// Counts a thing once, however often it happens again (a plant's story read, a badge card shared): the counter is
+    /// how many different things are marked. Marks are kept as "mark.<counter>.<item>" beside the counts, so the
+    /// max merge is a union and an older app that does not know them keeps them untouched.
+    @discardableResult
+    mutating func recordMark(_ counter: BadgeCounter, item: String, now: Date, quiet: Bool = false) -> [BadgeUnlock] {
+        guard !quiet else { return [] }
+        progressByCounter[Self.markKey(counter, item)] = 1
+        return record(counter, value: marks(of: counter), now: now)
+    }
+
+    func isMarked(_ counter: BadgeCounter, item: String) -> Bool { progressByCounter[Self.markKey(counter, item)] != nil }
+    func marks(of counter: BadgeCounter) -> Int { progressByCounter.keys.filter { $0.hasPrefix("mark.\(counter.rawValue).") }.count }
+    private static func markKey(_ c: BadgeCounter, _ item: String) -> String { "mark.\(c.rawValue).\(item)" }
+
+    /// The highest tier earned for a badge (0 when none yet).
+    func tier(of badgeId: String) -> Int { (1...3).filter { unlockedDate(badge: badgeId, tier: $0) != nil }.max() ?? 0 }
 
     /// CloudKit-style merge: max progress, earliest unlock dates.
     func merged(with other: BadgeState) -> BadgeState {

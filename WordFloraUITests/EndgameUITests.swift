@@ -303,7 +303,10 @@ final class EndgameUITests: XCTestCase {
         XCTAssertTrue(element("badges.bloomRank").waitForExistence(timeout: 5))
         // The rank and replay cards sit at the end of the page: scroll to the very end and let it settle, so the badge
         // grid above does not reflow under the audit (the pattern found for the Shed audit).
-        for _ in 0..<8 { app.swipeUp() }
+        // The grid holds every badge (37), so swipe until the replay button at the very end is on screen, then once more.
+        let replay = app.buttons["badges.replayGrandGarden"]
+        for _ in 0..<30 where !(replay.exists && replay.isHittable) { app.swipeUp() }
+        app.swipeUp()
         sleep(2)
         // The badge grid above is the existing Badges page (audited on its own in WordFloraUITests.testAuditMoreScreens);
         // after a long scroll its lazy cards reflow under the Dynamic Type check, so here only Dynamic Type on grid

@@ -1,17 +1,5 @@
 [
   {
-    "id": "level_sets",
-    "family": "collection",
-    "counter": "levelSets",
-    "thresholds": [
-      1,
-      3,
-      5
-    ],
-    "title": "Level Sets",
-    "blurb": "Find every plant in a level"
-  },
-  {
     "id": "plant_collector",
     "family": "collection",
     "counter": "plantsOwned",
@@ -24,52 +12,88 @@
     "blurb": "Grow your garden collection"
   },
   {
-    "id": "feeder",
-    "family": "tending",
-    "counter": "feeds",
+    "id": "level_sets",
+    "family": "collection",
+    "counter": "levelSets",
     "thresholds": [
-      25,
-      75,
-      150
+      1,
+      3,
+      5
     ],
-    "title": "Good Feeder",
-    "blurb": "Feed your plants so they grow"
+    "title": "Level Sets",
+    "blurb": "Find every plant in a level"
   },
   {
-    "id": "green_thumb",
-    "family": "tending",
-    "counter": "waterings",
+    "id": "rare_finds",
+    "family": "collection",
+    "counter": "rarePlants",
     "thresholds": [
-      25,
-      100,
-      300
+      1,
+      3,
+      6
     ],
-    "title": "Green Thumb",
-    "blurb": "Water your plants with care"
+    "title": "Rare Finds",
+    "blurb": "Find rare plants from far away"
   },
   {
-    "id": "master_repotter",
-    "family": "tending",
-    "counter": "repots",
+    "id": "desert_dweller",
+    "family": "collection",
+    "counter": "desertPlants",
+    "thresholds": [
+      2,
+      4,
+      6
+    ],
+    "title": "Desert Dweller",
+    "blurb": "Find cactus and desert plants"
+  },
+  {
+    "id": "water_lover",
+    "family": "collection",
+    "counter": "waterPlants",
+    "thresholds": [
+      1,
+      2,
+      3
+    ],
+    "title": "Water Lover",
+    "blurb": "Find plants that grow in water and bogs"
+  },
+  {
+    "id": "tree_hugger",
+    "family": "collection",
+    "counter": "treePlants",
+    "thresholds": [
+      2,
+      4,
+      6
+    ],
+    "title": "Tree Hugger",
+    "blurb": "Find trees for your garden"
+  },
+  {
+    "id": "flower_power",
+    "family": "collection",
+    "counter": "floweringPlants",
     "thresholds": [
       5,
       15,
       30
     ],
-    "title": "Master Repotter",
-    "blurb": "Give plants new homes"
+    "title": "Flower Power",
+    "blurb": "Help your plants grow flowers"
   },
   {
-    "id": "pruning_pro",
-    "family": "tending",
-    "counter": "prunes",
+    "id": "sticker_book",
+    "family": "collection",
+    "counter": "stickers",
     "thresholds": [
-      5,
-      25,
-      75
+      10,
+      30,
+      60
     ],
-    "title": "Pruning Pro",
-    "blurb": "Trim plants with the shears"
+    "title": "Sticker Book",
+    "blurb": "Fill your book with visitor stickers"
   },
   {
     "id": "streak",
@@ -120,6 +144,186 @@
     "blurb": "Solve the Daily Bloom"
   },
   {
+    "id": "word_whiz",
+    "family": "play",
+    "counter": "wordsSolved",
+    "thresholds": [
+      10,
+      100,
+      500
+    ],
+    "title": "Word Whiz",
+    "blurb": "Solve words"
+  },
+  {
+    "id": "steady_hands",
+    "family": "play",
+    "counter": "steadySolves",
+    "thresholds": [
+      5,
+      25,
+      100
+    ],
+    "title": "Steady Hands",
+    "blurb": "Solve a word with two wrong letters or fewer"
+  },
+  {
+    "id": "level_up",
+    "family": "play",
+    "counter": "levelReached",
+    "thresholds": [
+      2,
+      4,
+      5
+    ],
+    "title": "Level Up",
+    "blurb": "Reach new garden levels"
+  },
+  {
+    "id": "long_word",
+    "family": "play",
+    "counter": "longWords",
+    "thresholds": [
+      3,
+      15,
+      50
+    ],
+    "title": "Long Word",
+    "blurb": "Solve a word with 9 letters or more"
+  },
+  {
+    "id": "morning_garden",
+    "family": "play",
+    "counter": "morningDays",
+    "thresholds": [
+      3,
+      15,
+      50
+    ],
+    "title": "Morning Garden",
+    "blurb": "Play in the morning on different days"
+  },
+  {
+    "id": "weathered",
+    "family": "play",
+    "counter": "weathered",
+    "thresholds": [
+      1,
+      3,
+      7
+    ],
+    "title": "Weathered",
+    "blurb": "Solve weather puzzles"
+  },
+  {
+    "id": "first_bloom",
+    "family": "tending",
+    "counter": "fullBlooms",
+    "thresholds": [
+      1,
+      5,
+      20
+    ],
+    "title": "First Bloom",
+    "blurb": "Grow a plant to full bloom"
+  },
+  {
+    "id": "feeder",
+    "family": "tending",
+    "counter": "feeds",
+    "thresholds": [
+      25,
+      75,
+      150
+    ],
+    "title": "Good Feeder",
+    "blurb": "Feed your plants so they grow"
+  },
+  {
+    "id": "green_thumb",
+    "family": "tending",
+    "counter": "waterings",
+    "thresholds": [
+      25,
+      100,
+      300
+    ],
+    "title": "Green Thumb",
+    "blurb": "Water your plants with care"
+  },
+  {
+    "id": "master_repotter",
+    "family": "tending",
+    "counter": "repots",
+    "thresholds": [
+      5,
+      15,
+      30
+    ],
+    "title": "Master Repotter",
+    "blurb": "Give plants new homes"
+  },
+  {
+    "id": "pruning_pro",
+    "family": "tending",
+    "counter": "prunes",
+    "thresholds": [
+      5,
+      25,
+      75
+    ],
+    "title": "Pruning Pro",
+    "blurb": "Trim plants with the shears"
+  },
+  {
+    "id": "mist_maker",
+    "family": "tending",
+    "counter": "mists",
+    "thresholds": [
+      10,
+      40,
+      100
+    ],
+    "title": "Mist Maker",
+    "blurb": "Gather free drops with the mister"
+  },
+  {
+    "id": "sun_seeker",
+    "family": "tending",
+    "counter": "suns",
+    "thresholds": [
+      10,
+      40,
+      100
+    ],
+    "title": "Sun Seeker",
+    "blurb": "Give your plants some sun"
+  },
+  {
+    "id": "soil_scientist",
+    "family": "tending",
+    "counter": "soilMatches",
+    "thresholds": [
+      3,
+      10,
+      30
+    ],
+    "title": "Soil Scientist",
+    "blurb": "Repot a plant into the soil it loves"
+  },
+  {
+    "id": "steady_gardener",
+    "family": "tending",
+    "counter": "tendDays",
+    "thresholds": [
+      7,
+      30,
+      100
+    ],
+    "title": "Steady Gardener",
+    "blurb": "Tend your plants on different days"
+  },
+  {
     "id": "visitor_friend",
     "family": "explorer",
     "counter": "visitorSpecies",
@@ -144,15 +348,99 @@
     "blurb": "Play the butterfly game"
   },
   {
-    "id": "weathered",
-    "family": "play",
-    "counter": "weathered",
+    "id": "first_butterfly",
+    "family": "explorer",
+    "counter": "catches",
+    "thresholds": [
+      1,
+      10,
+      50
+    ],
+    "title": "First Catch",
+    "blurb": "Catch visitors in the butterfly game"
+  },
+  {
+    "id": "dusk_visitor",
+    "family": "explorer",
+    "counter": "duskCatches",
     "thresholds": [
       1,
       3,
-      7
+      5
     ],
-    "title": "Weathered",
-    "blurb": "Solve weather puzzles"
+    "title": "Dusk Visitor",
+    "blurb": "Meet evening friends in the butterfly game"
+  },
+  {
+    "id": "rare_visitor",
+    "family": "explorer",
+    "counter": "rareSpecies",
+    "thresholds": [
+      1,
+      2,
+      3
+    ],
+    "title": "Rare Visitor",
+    "blurb": "Meet the rare visitors"
+  },
+  {
+    "id": "wild_discovery",
+    "family": "explorer",
+    "counter": "storiesRead",
+    "thresholds": [
+      1,
+      5,
+      15
+    ],
+    "title": "Wild Discovery",
+    "blurb": "Read the fact card for your plants"
+  },
+  {
+    "id": "field_notes",
+    "family": "explorer",
+    "counter": "factsRead",
+    "thresholds": [
+      4,
+      8,
+      12
+    ],
+    "title": "Field Notes",
+    "blurb": "Read friend facts in the Visitors' book"
+  },
+  {
+    "id": "bee_friend",
+    "family": "explorer",
+    "counter": "beeCatches",
+    "thresholds": [
+      5,
+      20,
+      60
+    ],
+    "title": "Bee Friend",
+    "blurb": "Say hello to bees in the butterfly game"
+  },
+  {
+    "id": "shed_keeper",
+    "family": "explorer",
+    "counter": "shedUpgrades",
+    "thresholds": [
+      3,
+      6,
+      12
+    ],
+    "title": "Shed Keeper",
+    "blurb": "Upgrade tools in the Shed"
+  },
+  {
+    "id": "sharer",
+    "family": "explorer",
+    "counter": "badgeShares",
+    "thresholds": [
+      1,
+      5,
+      20
+    ],
+    "title": "Sharer",
+    "blurb": "Share your badge cards"
   }
 ]

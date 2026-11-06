@@ -49,6 +49,7 @@ struct VisitorsBookView: View {
         .navigationTitle(EndgameCopy.visitorsBook)
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("visitorsBook")
+        .onAppear { app.noteVisitorFactsRead() }        // Field Notes badge
     }
 
     private func header(_ title: String, _ line: String) -> some View {
