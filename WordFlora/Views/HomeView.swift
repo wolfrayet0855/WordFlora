@@ -83,7 +83,15 @@ struct HomeView: View {
     @State private var playAdNote = false
     @State private var showNudge = false
     @State private var playStarting = false
+    /// This visit showed a forecast or the weather, so the ad banner stays away (spec section 8).
+    @State private var weatherVisit = false
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     private let reportsLayout = LineProbe.enabled
+
+    /// Card changes cross-fade, or switch at once under Reduce Motion (the system's or the app's own switch).
+    private func animate(_ change: () -> Void) {
+        if systemReduceMotion || app.settings.reduceMotionOverride { change() } else { withAnimation(.easeOut(duration: 0.25), change) }
+    }
 
     /// Accessibility text sizes switch the Explore grid to one column of list rows.
     private var singleColumn: Bool { typeSize.isAccessibilitySize }
@@ -95,6 +103,7 @@ struct HomeView: View {
         // One look at the unlock stats per render (each look fetches the garden), shared by every tile.
         let stats = app.unlockStats, showAll = app.settings.showEverything
         let unlocked = Set(Feature.allCases.filter { FeatureUnlockPolicy.isUnlocked($0, stats: stats, showEverything: showAll) })
+        let weather = app.homeWeather
         ZStack {
             // While the nudge card shows, Home's own content leaves the hierarchy (the audit still measures hidden text).
             if !showNudge {
@@ -106,8 +115,15 @@ struct HomeView: View {
                              // Before the first plant the next word brings one at once, so the count only shows after it (and not in Quiet Garden).
                              wordsTowardPlant: stats.plantsEarned > 0 && !app.settings.quietGarden ? app.game.wordsTowardPlant : nil)
 
-                        if app.showWelcomeBack || app.plusOffer != nil {
+                        // Garden weather (empty in Calm mode and Quiet Garden): a chip, then the card or the banner.
+                        if let chip = weather.chip { WeatherChip(text: chip, kind: weather.chipKind) }
+
+                        if app.showWelcomeBack || app.plusOffer != nil || weather.card != nil || weather.banner != nil {
                             VStack(spacing: 10) {
+                                if let k = weather.banner { WeatherBanner(kind: k).transition(.opacity) }
+                                if let k = weather.card {
+                                    ForecastCard(kind: k) { animate { app.dismissForecastCard() } }.transition(.opacity)
+                                }
                                 if app.showWelcomeBack { welcomeCard.transition(.opacity) }
                                 if app.plusOffer != nil { plusOfferCard.transition(.opacity) }
                             }
@@ -146,7 +162,11 @@ struct HomeView: View {
         .safeAreaInset(edge: .bottom) { if !showNudge { bannerArea } }
         .task(id: app.restExitAt) { await followReturnWindow() }
         .task { await app.prepareBannerIfAllowed() }
-        .onAppear { app.checkPlusOffer(); playAdNote = app.returnVisit == .adMayPlay }
+        .onAppear {
+            app.refreshWeather(); app.markWeatherSeen()
+            if app.homeWeather.quietsOffers { weatherVisit = true }      // no ad banner in a visit with the weather
+            app.checkPlusOffer(); playAdNote = app.returnVisit == .adMayPlay
+        }
         .navigationBarHidden(true)
         .overlay(alignment: .bottomLeading) { layoutReport }
     }
@@ -467,7 +487,7 @@ struct HomeView: View {
 
     /// Reserved, fixed-height slot so the page never jumps when an ad loads.
     @ViewBuilder private var bannerArea: some View {
-        if app.showBanner {
+        if app.showBanner && !weatherVisit {
             VStack(spacing: 2) {
                 Group {
                     if app.ads.started { AdBannerView() } else { Color.clear }

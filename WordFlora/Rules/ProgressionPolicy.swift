@@ -44,7 +44,12 @@ struct LevelStop: Equatable {
     var isCurrent: Bool
     /// Not open yet. Shown as "Coming soon in your garden", never with a closed sign.
     var isSoon: Bool
+    /// Wild Weather only: full-bloom plants that show a stage lower for now (the bloom ring's dashed "mending" arcs).
+    /// Shown, never stored: `bloom` and `fullBloom` keep reading earned stages.
+    var mending: Int = 0
     var isOpen: Bool { !isSoon }
+    /// The mending line under the counts, when Wild Weather has dipped a plant here.
+    var mendingLine: String? { isOpen && mending > 0 ? LevelMapCopy.mendingRow(mending) : nil }
     var allFound: Bool { found >= LevelMapCopy.perLevel }
 
     /// Rows under the theme line: the two counts, or "Find your first plant!" when nothing is found yet. None on soon levels.
@@ -67,7 +72,7 @@ struct LevelStop: Equatable {
         } else {
             if isCurrent { parts.append(LevelMapCopy.sentence(LevelMapCopy.chip)) }
             parts += rows.map(LevelMapCopy.sentence)
-            parts += [allFoundLine, fullBloomLine, nextStep].compactMap { $0 }
+            parts += [mendingLine, allFoundLine, fullBloomLine, nextStep].compactMap { $0 }
         }
         return parts.joined(separator: " ")
     }
@@ -108,6 +113,10 @@ enum LevelMapCopy {
     static func play(_ level: Int) -> String { "Play Level \(level)" }
     static func foundRow(_ n: Int) -> String { "\(n) of \(perLevel) plants found" }
     static func bloomRow(_ n: Int) -> String { "\(n) of \(perLevel) in full bloom" }
+    /// Wild Weather's dashed arcs, in words.
+    static func mendingRow(_ n: Int) -> String {
+        n == 1 ? "1 plant is resting after the weather. Care helps it stand tall." : "\(n) plants are resting after the weather. Care helps them stand tall."
+    }
     static func allFoundLine(level: Int) -> String {
         level < levels ? "All 10 found! Level \(level + 1) is open." : "All 10 found! Every level is open."
     }
@@ -124,15 +133,18 @@ enum LevelMapCopy {
     static func sentence(_ s: String) -> String { s.hasSuffix(".") || s.hasSuffix("!") ? s : s + "." }
 
     /// The five stops. `currentLevel` is the word level (`app.profile?.currentLevel`): lower levels are open, higher ones are soon.
-    static func stops(plants: [PlantProgress], currentLevel: Int) -> [LevelStop] {
+    /// `mending`: Wild Weather's shown dips per level (`AppModel.levelMending`), capped at the level's bloom count.
+    static func stops(plants: [PlantProgress], currentLevel: Int, mending: [Int: Int] = [:]) -> [LevelStop] {
         let current = min(max(currentLevel, 1), levels)
         return (1...levels).map { level in
             let inLevel = plants.filter { $0.level == level }
+            let bloom = inLevel.filter { $0.stage >= 4 }.count
             return LevelStop(level: level, name: names[level - 1], theme: themes[level - 1], heroImage: heroImages[level - 1],
                              found: inLevel.filter(\.earned).count,
-                             bloom: inLevel.filter { $0.stage >= 4 }.count,
+                             bloom: bloom,
                              fullBloom: ProgressionPolicy.gardenLevelComplete(level, plants: plants),
-                             isCurrent: level == current, isSoon: level > current)
+                             isCurrent: level == current, isSoon: level > current,
+                             mending: min(max(0, mending[level] ?? 0), bloom))
         }
     }
 
@@ -143,6 +155,7 @@ enum LevelMapCopy {
         for level in 1...levels {
             all += [eyebrow(level), play(level), allFoundLine(level: level), soonLine(level: level)]
             for found in 0...perLevel { all += [foundRow(found), bloomRow(found), nextStep(level: level, found: found)] }
+            for n in 1...4 { all.append(mendingRow(n)) }
         }
         return all
     }

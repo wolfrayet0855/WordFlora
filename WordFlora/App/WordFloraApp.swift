@@ -107,6 +107,20 @@ struct WordFloraApp: App {
             model.enqueueBadgeMoments([BadgeUnlock(badgeId: "perfect_bloom", tier: 1, at: .now)])
         }
         if uiTesting && args.contains("-uitest-quiet") { model.settings.quietGarden = true }
+        // Garden weather tests: an age answer, the daily reminder on (no permission prompt), and a forecast or a weather
+        // day in place of the schedule. The gate is opened as if 5 plants and 2 tends had happened; Calm, Quiet Garden
+        // and the Garden weather switch still apply.
+        if uiTesting, let a = args.first(where: { $0.hasPrefix("-uitest-age=") }).flatMap({ AgeBand(rawValue: String($0.dropFirst("-uitest-age=".count))) }) {
+            model.settings.applyAgeDefaults(a)
+        }
+        if uiTesting && args.contains("-uitest-remind") { model.settings.remindMe = true; model.reminders.restore() }
+        let forecastArg = args.first(where: { $0.hasPrefix("-uitest-forecast=") }).flatMap { WeatherKind(rawValue: String($0.dropFirst("-uitest-forecast=".count))) }
+        let weatherArg = args.first(where: { $0.hasPrefix("-uitest-weather=") }).flatMap { WeatherKind(rawValue: String($0.dropFirst("-uitest-weather=".count))) }
+        if uiTesting && (forecastArg != nil || weatherArg != nil) {
+            model.weatherTestOverride = GardenWeather.Override(forecast: forecastArg, event: weatherArg)
+            model.profile?.weatherGatedFromDay = model.weatherToday
+            try? model.context.save()
+        }
         // The in-app Reduce Motion switch and a fixed theme, for the guide's still and dark screenshots.
         if uiTesting && args.contains("-uitest-reduce-motion") { model.settings.reduceMotionOverride = true }
         if uiTesting && args.contains("-uitest-dark") { model.settings.appearance = .dark }

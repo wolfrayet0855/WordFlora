@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		7E10B1C316D5701BEDBA3CFD /* SplitMix64.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */; };
+		53C1F3AF73A761947FD0F913 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FDAD053638CA18F19E93110 /* Weather.swift */; };
+		67D33D3868BCC5E3E36ABA02 /* WeatherUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */; };
+		74EDB37598CC4AAB0C42D1F3 /* GardenWeatherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C40D198A32674A4B82B5E6DA /* GardenWeatherTests.swift */; };
+		8268EE14C8E89B8569354755 /* WeatherViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 30CEA55B59A2D4DBB58757C6 /* WeatherViews.swift */; };
+		00306C0B86191F5D34F816C8 /* AppModel+Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = ABF1212A4E968C83B4FDC5D4 /* AppModel+Weather.swift */; };
+		D55C44CB05C3419C83BA8983 /* GardenWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3B488094FA775D4B1BEC38 /* GardenWeather.swift */; };
+		96F140C05B70252AE40031B6 /* GardenWeather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3B488094FA775D4B1BEC38 /* GardenWeather.swift */; };
 		04E5A44ECFDDDE6A353BEE52 /* wf-correct.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B1B0A69A8B11B55F0BD37713 /* wf-correct.m4a */; };
 		05B7E3F9F4DC0094781F5022 /* GameViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */; };
 		06A793E2BE60065077304675 /* PlantDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41DC0A749A7EEA71E7F67108 /* PlantDetailView.swift */; };
@@ -249,6 +257,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherUITests.swift; sourceTree = "<group>"; };
+		C40D198A32674A4B82B5E6DA /* GardenWeatherTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWeatherTests.swift; sourceTree = "<group>"; };
+		30CEA55B59A2D4DBB58757C6 /* WeatherViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherViews.swift; sourceTree = "<group>"; };
+		ABF1212A4E968C83B4FDC5D4 /* AppModel+Weather.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+Weather.swift"; sourceTree = "<group>"; };
+		7C3B488094FA775D4B1BEC38 /* GardenWeather.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWeather.swift; sourceTree = "<group>"; };
 		025558730A17C81DFFB5A5C3 /* LevelMapView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LevelMapView.swift; sourceTree = "<group>"; };
 		03162041D3ADF3CEE1CCF23B /* CoreRulesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CoreRulesTests.swift; sourceTree = "<group>"; };
 		03B08CBCAEE1D5A24848BAF8 /* WakeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WakeTests.swift; sourceTree = "<group>"; };
@@ -537,6 +550,7 @@
 				1E72C046D44E8C67ECE69705 /* PotCatalog.swift */,
 				8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */,
 				8FDAD053638CA18F19E93110 /* Weather.swift */,
+				7C3B488094FA775D4B1BEC38 /* GardenWeather.swift */,
 				D11EE6155AE83E8642FBA80A /* WeatherLook.swift */,
 				1CCA3DFFA37FA255F780D53F /* Endgame.swift */,
 			);
@@ -692,6 +706,7 @@
 				90DC766F91AA9703F8E25487 /* ReturnNudgeTests.swift */,
 				F70EB58E222988AA85D5FD80 /* CelebrationTests.swift */,
 				40E2B4BA7F79178D9473B616 /* WeatherTests.swift */,
+				C40D198A32674A4B82B5E6DA /* GardenWeatherTests.swift */,
 				883A6BAC468814CB14620178 /* EndgameTests.swift */,
 			);
 			name = WordFloraTests;
@@ -778,6 +793,7 @@
 				3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */,
 				C8CFA5BED25190317B98E622 /* GardenShortcuts.swift */,
 				F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */,
+				ABF1212A4E968C83B4FDC5D4 /* AppModel+Weather.swift */,
 			);
 			name = App;
 			path = App;
@@ -804,6 +820,7 @@
 				EF01514127063E580BD3F0E2 /* WakePuzzleView.swift */,
 				2A7721B11B88B81E56630C05 /* PotPickerViews.swift */,
 				AA8D41F1F986145B3482846F /* ShedTools.swift */,
+				30CEA55B59A2D4DBB58757C6 /* WeatherViews.swift */,
 			);
 			name = Views;
 			path = Views;
@@ -868,6 +885,7 @@
 				394854942795553C29283849 /* HomeLayoutUITests.swift */,
 				7D65EE66A938417ADBD5C554 /* GuideUITests.swift */,
 				F787992B59617103496CEE38 /* TendingUITests.swift */,
+				1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */,
 				4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */,
 				9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */,
 			);
@@ -1077,6 +1095,7 @@
 				8E6670903E6120DF66036EBF /* HomeLayoutUITests.swift in Sources */,
 				15E39A57FDD379D5CBBB32E0 /* GuideUITests.swift in Sources */,
 				33BA691BF1E87DE5BB43E0B0 /* TendingUITests.swift in Sources */,
+				67D33D3868BCC5E3E36ABA02 /* WeatherUITests.swift in Sources */,
 				4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */,
 				A9BC1C319B4BDB047932E1DA /* CelebrationUITests.swift in Sources */,
 			);
@@ -1127,6 +1146,7 @@
 				35282ADD9C51A8171A4AAB3B /* ReturnNudgeTests.swift in Sources */,
 				08A9BBC309E50A7990922ED1 /* CelebrationTests.swift in Sources */,
 				79EAC747CBAC36831FB4CA85 /* WeatherTests.swift in Sources */,
+				74EDB37598CC4AAB0C42D1F3 /* GardenWeatherTests.swift in Sources */,
 				DE7AA3C310999E655FB4FAE4 /* EndgameTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1149,6 +1169,9 @@
 				27DE73638621154797E3BDFE /* GardenIntents.swift in Sources */,
 				579A86FB03D91481C075214E /* WaterControl.swift in Sources */,
 				91FC2D3DEAB36F45F4159DF9 /* ToolEngine.swift in Sources */,
+				7E10B1C316D5701BEDBA3CFD /* SplitMix64.swift in Sources */,
+				53C1F3AF73A761947FD0F913 /* Weather.swift in Sources */,
+				D55C44CB05C3419C83BA8983 /* GardenWeather.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1253,6 +1276,9 @@
 				F4C0D43C87AF2524BB79A1A1 /* TendAnimationView.swift in Sources */,
 				7DD477E02162F248269BFF98 /* PotCatalog.swift in Sources */,
 				1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */,
+				8268EE14C8E89B8569354755 /* WeatherViews.swift in Sources */,
+				00306C0B86191F5D34F816C8 /* AppModel+Weather.swift in Sources */,
+				96F140C05B70252AE40031B6 /* GardenWeather.swift in Sources */,
 				347A410A75615F9238BE8729 /* PotArtView.swift in Sources */,
 				EDC9869F995C67A16F2AB495 /* PotPickerViews.swift in Sources */,
 				5C79C89D5D157B3BC8D2F263 /* RestScene.swift in Sources */,

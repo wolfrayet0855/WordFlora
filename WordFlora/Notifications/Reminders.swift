@@ -66,19 +66,21 @@ final class ReminderScheduler {
     }
 
     /// Permission is requested here and only here: when the player turns reminders on.
-    func enable(now: Date, hour: Int, minute: Int, lastOpened: Date, dailyBloomDoneToday: Bool) async -> Bool {
+    func enable(now: Date, hour: Int, minute: Int, lastOpened: Date, dailyBloomDoneToday: Bool,
+                forecast: (Date) -> WeatherKind? = { _ in nil }) async -> Bool {
         guard await center.requestAuthorization() else { return false }
         enabled = true
-        plan(now: now, hour: hour, minute: minute, lastOpened: lastOpened, dailyBloomDoneToday: dailyBloomDoneToday)
+        plan(now: now, hour: hour, minute: minute, lastOpened: lastOpened, dailyBloomDoneToday: dailyBloomDoneToday, forecast: forecast)
         return true
     }
 
     /// Called at launch when the player already opted in earlier: permission was granted then, so no prompt appears.
     func restore() { enabled = true }
 
-    func refresh(now: Date, hour: Int, minute: Int, lastOpened: Date, dailyBloomDoneToday: Bool) {
+    func refresh(now: Date, hour: Int, minute: Int, lastOpened: Date, dailyBloomDoneToday: Bool,
+                 forecast: (Date) -> WeatherKind? = { _ in nil }) {
         guard enabled else { return }
-        plan(now: now, hour: hour, minute: minute, lastOpened: lastOpened, dailyBloomDoneToday: dailyBloomDoneToday)
+        plan(now: now, hour: hour, minute: minute, lastOpened: lastOpened, dailyBloomDoneToday: dailyBloomDoneToday, forecast: forecast)
     }
 
     func disable() {
@@ -86,12 +88,16 @@ final class ReminderScheduler {
         center.removeAllPending()
     }
 
-    private func plan(now: Date, hour: Int, minute: Int, lastOpened: Date, dailyBloomDoneToday: Bool) {
+    /// `forecast`: the garden weather a reminder on that date should mention (opt-in). It replaces that day's content
+    /// in the same slot: never an extra request, still passive, still outside quiet hours.
+    private func plan(now: Date, hour: Int, minute: Int, lastOpened: Date, dailyBloomDoneToday: Bool,
+                      forecast: (Date) -> WeatherKind?) {
         center.removeAllPending()
         for (i, date) in ReminderPolicy.nextDates(now: now, calendar: calendar, hour: hour, minute: minute, lastOpened: lastOpened).enumerated() {
             // The first reminder reflects today's Daily Bloom; later days always have a fresh one.
             let kind: ReminderCopy.Kind = i == 0 ? ReminderCopy.kind(dailyBloomDoneToday: dailyBloomDoneToday) : .dailyBloom
-            let m = ReminderCopy.message(kind: kind, variant: i)
+            var m = ReminderCopy.message(kind: kind, variant: i)
+            if let k = forecast(date) { m = (WeatherCopy.notificationTitle(k), WeatherUICopy.notificationBody) }
             center.schedule(id: "reminder-\(i)", title: m.title, body: m.body, at: date)
         }
     }

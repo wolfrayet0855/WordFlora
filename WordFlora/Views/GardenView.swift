@@ -37,6 +37,7 @@ struct GardenView: View {
             if app.showBanner && app.ads.started { AdBannerView().frame(height: 60).frame(maxWidth: .infinity).background(Color.appBackground) }
         }
         .task { await app.prepareBannerIfAllowed() }
+        .onAppear { app.markWeatherSeen() }      // witnessed first: opening the garden on a weather day starts its look
         .navigationTitle("My Garden")
         .navigationBarTitleDisplayMode(.inline)
     }

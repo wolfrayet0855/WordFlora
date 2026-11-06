@@ -37,6 +37,7 @@ struct SettingsView: View {
                 Text("Calm mode removes the thirsty look and halves celebrations. Quiet Garden hides counters and timers so tending is just relaxing.")
                     .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
+            GardenWeatherSettingsSection()
             Section("Reminders") {
                 Toggle("Gentle daily reminder", isOn: Binding(
                     get: { s.remindMe },

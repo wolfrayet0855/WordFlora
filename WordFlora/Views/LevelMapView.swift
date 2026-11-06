@@ -17,7 +17,7 @@ struct LevelMapView: View {
     var body: some View {
         let current = app.profile?.currentLevel ?? 1
         let stops = LevelMapCopy.stops(plants: plants.map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) },
-                                       currentLevel: current)
+                                       currentLevel: current, mending: app.levelMending())
         let totalFound = plants.filter { $0.earnedCount > 0 }.count
         ScrollViewReader { proxy in
             ScrollView {
@@ -305,14 +305,17 @@ private struct LevelMedal: View {
             if i < stop.found { ctx.fill(petal, with: .color(.petal)) } else { ctx.stroke(petal, with: .color(off), lineWidth: 1.6) }
         }
         // Bloom ring: one arc per plant in full bloom; a solid ring when the whole level is in full bloom.
-        if stop.fullBloom {
+        if stop.fullBloom && stop.mending == 0 {
             ctx.stroke(Path(ellipseIn: CGRect(x: c.x - 60, y: c.y - 60, width: 120, height: 120)), with: .color(.appAccent), lineWidth: 5)
         } else {
             for i in 0..<LevelMapCopy.perLevel {
                 let start = Double(i) * 36 - 90 + 1.5
                 var arc = Path()
                 arc.addArc(center: c, radius: 60, startAngle: .degrees(start), endAngle: .degrees(start + 33), clockwise: false)
-                if i < stop.bloom {
+                if i >= stop.bloom - stop.mending && i < stop.bloom {
+                    // Wild Weather: a plant resting after the weather. Dashed gold, never grey or red; it mends by care or time.
+                    ctx.stroke(arc, with: .color(.appAccent), style: StrokeStyle(lineWidth: 3, lineCap: .round, dash: [4, 5]))
+                } else if i < stop.bloom {
                     ctx.stroke(arc, with: .color(.appAccent), lineWidth: 4.5)
                 } else {
                     ctx.stroke(arc, with: .color(off), lineWidth: 2)
@@ -412,6 +415,9 @@ private struct MapStopCard: View {
                         row(LevelMapCopy.bloomRow(stop.bloom)) {
                             Circle().strokeBorder(Color.appAccent, lineWidth: 2.5).frame(width: rowIcon, height: rowIcon)
                         }
+                    }
+                    if let mend = stop.mendingLine {
+                        line(mend, weight: .regular, color: .secondaryText).accessibilityIdentifier("levelMap.mending.\(stop.level)")
                     }
                     if let all = stop.allFoundLine { line(all, weight: .heavy, color: .successText) }
                     if let bloom = stop.fullBloomLine {
