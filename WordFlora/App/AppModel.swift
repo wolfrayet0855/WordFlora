@@ -133,6 +133,13 @@ final class AppModel {
         onboarding.skip()
     }
 
+    /// The Quiet Garden offer after "Under 13" (age defaults already applied): Yes also turns Quiet Garden on; either
+    /// answer picks under 13 and moves on, keeping a guide already seen on another device.
+    func answerQuietOffer(keepQuiet: Bool) {
+        if keepQuiet { settings.quietGarden = true }
+        onboarding.selectAge(.under13, guideSeen: profile?.guideSeen ?? false)
+    }
+
     /// The guide closed (Skip, Start playing, Close or Done). Records it on the synced profile and, in the first
     /// session, moves on to the tutorial word. Writes nothing else: nothing earned changes.
     func finishGuide() {

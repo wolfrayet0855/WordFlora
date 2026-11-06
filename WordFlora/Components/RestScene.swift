@@ -1,11 +1,12 @@
 import SwiftUI
 
-/// The sky header on the resting card (night: lavender asleep under a moon) and the break card (day: a sunflower
-/// under the sun). Decorative only, so it is hidden from VoiceOver. Fixed height; it does not grow with text size.
+/// The sky header on the resting card (night: lavender asleep under a moon), the break card (day: a sunflower
+/// under the sun) and the Quiet Garden offer (garden: a daisy, lavender and clover on a hill at sundown, fireflies).
+/// Decorative only, so it is hidden from VoiceOver. Fixed height; it does not grow with text size.
 /// Loops (breathing plant, twinkling stars, floating z's) play for `playSeconds`, then hold; under the system or the
 /// app's own Reduce Motion they never start.
 struct RestScene: View {
-    enum Kind { case night, day }
+    enum Kind { case night, day, garden }
     var kind: Kind
 
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
@@ -40,7 +41,15 @@ struct RestScene: View {
                         Circle().fill(Color.appAccent).frame(width: 40, height: 40)
                             .position(x: geo.size.width - 44 - 20, y: 20 + 20)
                     }
-                    plant(t: t).frame(width: geo.size.width, height: geo.size.height, alignment: .bottom)
+                    if kind == .garden {
+                        Ellipse().fill(Color.tileGardenFill)
+                            .frame(width: geo.size.width * 1.2, height: 120)
+                            .position(x: geo.size.width / 2, y: geo.size.height + 10)
+                        ForEach(Self.fireflies.indices, id: \.self) { i in firefly(i, width: geo.size.width, t: t) }
+                        meadow(t: t).frame(width: geo.size.width, height: geo.size.height, alignment: .bottom)
+                    } else {
+                        plant(t: t).frame(width: geo.size.width, height: geo.size.height, alignment: .bottom)
+                    }
                     if kind == .night {
                         zee(size: 16, x: geo.size.width / 2 + 52, top: 64, delay: 0, t: t)
                         zee(size: 12, x: geo.size.width / 2 + 64, top: 46, delay: 1.2, t: t)
@@ -68,6 +77,9 @@ struct RestScene: View {
                      .init(color: .appBackground, location: 1)]
         case .day:
             stops = [.init(color: .tileLevelsFill, location: 0), .init(color: .appBackground, location: 1)]
+        case .garden:
+            stops = [.init(color: .tileLevelsFill, location: 0), .init(color: .tileVisitorsFill, location: 0.5),
+                     .init(color: .bloomFill, location: 0.82), .init(color: halfBloom, location: 1)]
         }
         return LinearGradient(stops: stops, startPoint: .top, endPoint: .bottom)
     }
@@ -108,6 +120,33 @@ struct RestScene: View {
             .scaleEffect(1 + 0.025 * breathe, anchor: .bottom)
             .offset(y: -breathe)
             .padding(.bottom, 4)
+    }
+
+    /// Firefly centres as fractions of a 361pt-wide scene, with their twinkle delays. None near the sun.
+    private static let fireflies: [(x: CGFloat, y: CGFloat, delay: Double)] = [(58, 40, 0), (120, 78, 1.2), (236, 64, 2.3)]
+
+    private func firefly(_ i: Int, width: CGFloat, t: Double) -> some View {
+        let f = Self.fireflies[i]
+        let glow = reduceMotion ? 1 : 0.35 + 0.65 * wave(t + f.delay, period: 3.4)
+        return Circle().fill(Color.appAccent).frame(width: 6, height: 6)
+            .shadow(color: Color.appAccent.opacity(0.6), radius: 4)
+            .opacity(glow)
+            .position(x: f.x / 361 * width + 3, y: f.y + 3)
+    }
+
+    /// Three plants side by side, each breathing a little out of step with the next.
+    private func meadow(t: Double) -> some View {
+        HStack(alignment: .bottom, spacing: -10) {
+            ForEach(Array(["plant_daisy", "plant_lavender", "plant_clover"].enumerated()), id: \.offset) { i, name in
+                let breathe = reduceMotion ? 0 : wave(t + Double(i) * 1.6, period: 4.8)
+                Image(name).resizable().scaledToFit()
+                    .frame(width: i == 1 ? 116 : 96)
+                    .scaleEffect(1 + 0.025 * breathe, anchor: .bottom)
+                    .offset(y: -breathe)
+                    .zIndex(i == 1 ? 1 : 0)
+            }
+        }
+        .padding(.bottom, 10)
     }
 
     /// A "z" that rises 18pt and fades, then starts again.

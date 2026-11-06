@@ -36,3 +36,24 @@ struct OnboardingFlow: Equatable {
     mutating func skip() { step = .home }
     mutating func startNextSession() { sessionIndex += 1 }
 }
+
+/// The words on the Quiet Garden offer (design-preview/quiet-garden), shown after "Under 13" on the age question.
+/// Grade 2 reading, positive only, checked by CopySafety in tests. It says "no points or counting" rather than
+/// "no timers": the one on-screen time bar (the butterfly game's) is hidden by Calm mode, not by Quiet Garden
+/// (docs/pm/quiet-garden.md).
+enum QuietGardenCopy {
+    static let title = "Would you like a quiet garden?"
+    /// What changes, then what stays, each with its picture (an SF Symbol).
+    static let rows: [(symbol: String, text: String)] = [
+        ("leaf.fill", "No points or counting. Just tending."),
+        ("drop.fill", "Water and tools are always ready."),
+        ("heart.fill", "You still guess words and grow plants."),
+    ]
+    static let yes = "Yes, keep it quiet"
+    static let no = "No thanks, show everything"
+    static let note = "You can change this any time in Settings."
+    static let back = "Back"
+    static let backHint = "Goes back to the age question."
+
+    static var allStrings: [String] { [title] + rows.map(\.text) + [yes, no, note, back, backHint] }
+}

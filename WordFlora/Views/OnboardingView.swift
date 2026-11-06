@@ -48,6 +48,22 @@ private struct AgeQuestionView: View {
     @State private var offerQuiet = false
 
     var body: some View {
+        // While the Quiet Garden offer shows, the age question leaves the hierarchy rather than sitting hidden under it
+        // (on iOS 26 the accessibility audit still measures covered or hidden text).
+        ZStack {
+            if offerQuiet {
+                QuietGardenOfferView(
+                    keepQuiet: { app.answerQuietOffer(keepQuiet: true) },
+                    showEverything: { app.answerQuietOffer(keepQuiet: false) },
+                    back: { withAnimation(.easeInOut(duration: 0.25)) { offerQuiet = false } })
+                .transition(.opacity)
+            } else {
+                question.transition(.opacity)
+            }
+        }
+    }
+
+    private var question: some View {
         ScrollView {
             VStack(spacing: Space.section) {
                 FlowerView(petals: 8).frame(height: 140)
@@ -60,11 +76,6 @@ private struct AgeQuestionView: View {
                     ageButton("13 to 17", .thirteenPlus)
                     ageButton("18 or older", .eighteenPlus)
                 }
-                // One dialog for the one question (not one per button, which all shared the same flag).
-                .confirmationDialog("Would you like a quieter garden?", isPresented: $offerQuiet, titleVisibility: .visible) {
-                    Button("Yes, keep it quiet") { app.settings.quietGarden = true; app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
-                    Button("No thanks") { app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
-                } message: { Text("Quiet Garden hides numbers and wait times so tending is just relaxing. You can change it any time in Settings.") }
             }
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.section).frame(maxWidth: .infinity)
         }
@@ -74,9 +85,114 @@ private struct AgeQuestionView: View {
     private func ageButton(_ title: String, _ band: AgeBand) -> some View {
         Button {
             app.settings.applyAgeDefaults(band)
-            if band == .under13 { offerQuiet = true } else { app.onboarding.selectAge(band, guideSeen: app.profile?.guideSeen ?? false) }
+            if band == .under13 { withAnimation(.easeInOut(duration: 0.25)) { offerQuiet = true } }
+            else { app.onboarding.selectAge(band, guideSeen: app.profile?.guideSeen ?? false) }
         } label: { Text(title) }
         .buttonStyle(SecondaryButtonStyle())
+    }
+}
+
+/// "Would you like a quiet garden?" (design-preview/quiet-garden): a full screen after "Under 13", with a calm garden
+/// scene, what changes and what stays, two big choices of the same size and a note that Settings can change it.
+/// Back returns to the age question, as the old dialog's Cancel did.
+struct QuietGardenOfferView: View {
+    var keepQuiet: () -> Void
+    var showEverything: () -> Void
+    var back: () -> Void
+
+    @Environment(\.dynamicTypeSize) private var typeSize
+    @ScaledMetric(relativeTo: .body) private var iconSize: CGFloat = 36
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: Space.section) {
+                Button(action: back) {
+                    Label(QuietGardenCopy.back, systemImage: "chevron.left")
+                        .font(Theme.font(.body, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                        .tapTarget()
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint(QuietGardenCopy.backHint)
+                .accessibilityIdentifier("quietOffer.back")
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, -Space.card)
+
+                RestScene(kind: .garden)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+
+                Text(QuietGardenCopy.title)
+                    .font(Theme.font(.largeTitle, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
+
+                rows.padding(.top, -Space.s)
+
+                VStack(spacing: Space.m) {
+                    Button(QuietGardenCopy.yes, action: keepQuiet)
+                        .buttonStyle(QuietChoiceStyle(filled: true)).accessibilityIdentifier("quietOffer.yes")
+                    Button(QuietGardenCopy.no, action: showEverything)
+                        .buttonStyle(QuietChoiceStyle(filled: false)).accessibilityIdentifier("quietOffer.no")
+                }
+
+                Label(QuietGardenCopy.note, systemImage: "gearshape")
+                    .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .padding(.top, -Space.m)
+                    .accessibilityElement(children: .combine)
+                    .accessibilityIdentifier("quietOffer.note")
+            }
+            .padding(.horizontal, Space.gutter).padding(.bottom, Space.section)
+            .frame(maxWidth: .infinity)
+        }
+        .scrollBounceBehavior(.basedOnSize)
+    }
+
+    private static let tints: [(fill: Color, icon: Color)] = [
+        (.tileGardenFill, .successText), (.tileLevelsFill, .tileLevelsIcon), (.bloomFill, .bloomIcon),
+    ]
+
+    private var rows: some View {
+        let icon = min(iconSize, 52)
+        return VStack(alignment: .leading, spacing: Space.m) {
+            ForEach(Array(QuietGardenCopy.rows.enumerated()), id: \.offset) { i, row in
+                HStack(alignment: typeSize.isAccessibilitySize ? .top : .center, spacing: Space.m) {
+                    Image(systemName: row.symbol)
+                        .font(.system(size: icon * 0.5, weight: .semibold))
+                        .foregroundStyle(Self.tints[i].icon)
+                        .frame(width: icon, height: icon)
+                        .background(Self.tints[i].fill, in: Circle())
+                        .accessibilityHidden(true)
+                    Text(row.text)
+                        .font(Theme.font(.body, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                .accessibilityElement(children: .combine)
+            }
+        }
+        .padding(Space.card)
+        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
+        .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appPrimaryText.opacity(0.12)))
+    }
+}
+
+/// The two choices on the Quiet Garden offer: the same size, font and shape; Yes filled, No outlined. Long labels at
+/// accessibility sizes wrap inside the button instead of being cut off.
+private struct QuietChoiceStyle: ButtonStyle {
+    var filled: Bool
+
+    func makeBody(configuration: Configuration) -> some View {
+        let shape = RoundedRectangle(cornerRadius: Theme.cornerRadius, style: .continuous)
+        return configuration.label
+            .font(Theme.font(.title3, weight: .bold))
+            .foregroundStyle(filled ? Color.ink : Color.appPrimaryText)
+            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+            .padding(.horizontal, Space.card).padding(.vertical, Space.m)
+            .frame(maxWidth: .infinity, minHeight: 56)
+            .background(filled ? Color.appAccent : Color.appSurface, in: shape)
+            .overlay(shape.stroke(Color.appPrimaryText.opacity(filled ? 0 : 0.22), lineWidth: 1.5))
+            .contentShape(shape)
+            .opacity(configuration.isPressed ? 0.8 : 1)
     }
 }
 

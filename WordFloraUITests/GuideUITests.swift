@@ -233,3 +233,140 @@ final class GuideUITests: XCTestCase {
     func testScreenshotsReduceMotion() { shootAll("guide-rm", ["-uitest-reduce-motion"]) }
     func testScreenshotsAccessibilityText() { shootAll("guide-ax", Self.axText) }
 }
+
+/// The Quiet Garden offer after "Under 13" (design-preview/quiet-garden): a full screen in place of the age question,
+/// both choices work, Back returns, and Apple's audit passes at default and accessibility text sizes, light and dark.
+final class QuietGardenOfferUITests: XCTestCase {
+    var app: XCUIApplication!
+
+    override func setUpWithError() throws {
+        continueAfterFailure = false
+        app = XCUIApplication()
+    }
+
+    private var yes: XCUIElement { app.buttons["quietOffer.yes"] }
+    private var no: XCUIElement { app.buttons["quietOffer.no"] }
+    private var next: XCUIElement { app.buttons["onboardingGuide.next"] }
+    private static let axText = ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+
+    private func shot(_ name: String) {
+        let data = XCUIScreen.main.screenshot().pngRepresentation
+        if let dir = ProcessInfo.processInfo.environment["SCREENSHOT_DIR"] {
+            try? data.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+        }
+        let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
+    }
+
+    private func openOffer(_ extra: [String] = []) {
+        app.launchArguments = ["-uitest", "-uitest-word=SEED"] + extra
+        app.launch()
+        let under13 = app.buttons["Under 13"]
+        XCTAssertTrue(under13.waitForExistence(timeout: 12))
+        // These tests are about the offer, not the first tap during the intro's cross-fade (GuideUITests covers that),
+        // so wait for the question to settle before tapping.
+        expectation(for: NSPredicate(format: "isHittable == true"), evaluatedWith: under13)
+        waitForExpectations(timeout: 6)
+        sleep(1)
+        under13.tap()
+        XCTAssertTrue(yes.waitForExistence(timeout: 6), "Under 13 opens the Quiet Garden offer")
+    }
+
+    func testUnder13OpensTheOfferInPlaceOfTheAgeQuestion() {
+        openOffer()
+        XCTAssertTrue(app.staticTexts["Would you like a quiet garden?"].exists)
+        XCTAssertTrue(app.staticTexts["No points or counting. Just tending."].exists)
+        XCTAssertTrue(app.staticTexts["You still guess words and grow plants."].exists)
+        XCTAssertTrue(app.descendants(matching: .any)["quietOffer.note"].exists)
+        XCTAssertEqual(yes.label, "Yes, keep it quiet")
+        XCTAssertEqual(no.label, "No thanks, show everything")
+        XCTAssertFalse(app.buttons["18 or older"].exists, "the age question leaves while the offer shows")
+        XCTAssertFalse(app.sheets.firstMatch.exists, "no system dialog")
+        XCTAssertGreaterThanOrEqual(yes.frame.height, 44)
+        XCTAssertGreaterThanOrEqual(no.frame.height, 44)
+        XCTAssertEqual(yes.frame.width, no.frame.width, accuracy: 1, "two choices of the same size")
+        XCTAssertEqual(yes.frame.height, no.frame.height, accuracy: 1)
+        XCTAssertTrue(yes.isHittable && no.isHittable)
+    }
+
+    func testYesKeepsItQuietAndGoesOnToTheGuide() {
+        openOffer()
+        yes.tap()
+        XCTAssertTrue(next.waitForExistence(timeout: 5), "the guide follows")
+        XCTAssertEqual(app.descendants(matching: .any)["onboardingGuide.page"].value as? String, "Page 1 of 8")
+        XCTAssertFalse(yes.exists)
+    }
+
+    func testNoThanksGoesOnToTheGuide() {
+        openOffer()
+        no.tap()
+        XCTAssertTrue(next.waitForExistence(timeout: 5), "the guide follows")
+        XCTAssertFalse(no.exists)
+    }
+
+    func testBackReturnsToTheAgeQuestion() {
+        openOffer()
+        app.buttons["quietOffer.back"].tap()
+        XCTAssertTrue(app.buttons["18 or older"].waitForExistence(timeout: 3))
+        XCTAssertFalse(yes.exists)
+        app.buttons["Under 13"].tap()
+        XCTAssertTrue(yes.waitForExistence(timeout: 3), "the offer opens again")
+    }
+
+    /// At the largest text everything wraps (nothing cut off) and the page scrolls to the note.
+    func testAccessibilityTextWrapsAndScrolls() {
+        openOffer(Self.axText)
+        let note = app.descendants(matching: .any)["quietOffer.note"]
+        for _ in 0..<6 where !note.isHittable { app.scrollViews.firstMatch.swipeUp() }
+        XCTAssertTrue(note.isHittable, "the page scrolls to its note")
+        XCTAssertTrue(no.isHittable)
+        XCTAssertEqual(yes.frame.width, no.frame.width, accuracy: 1)
+        XCTAssertGreaterThanOrEqual(no.frame.height, 44)
+        no.tap()
+        XCTAssertTrue(next.waitForExistence(timeout: 5))
+    }
+
+    // MARK: Accessibility audits
+
+    /// Apple's audit, collecting every finding. Only text fully inside the scroll view is judged for contrast (text a
+    /// scroll view clips at its edge is measured against whatever covers it), as in GuideUITests.
+    private func audit(_ name: String) {
+        var findings = [String]()
+        let scroll = app.scrollViews.firstMatch
+        let visible: CGRect? = scroll.exists ? scroll.frame : nil
+        do {
+            try app.performAccessibilityAudit(for: .all) { issue in
+                if issue.auditType == .contrast, let v = visible {
+                    guard let e = issue.element else { return true }
+                    if !v.contains(e.frame) { return true }
+                }
+                findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
+                return true
+            }
+        } catch { findings.append("\(name): audit failed to run: \(error)") }
+        XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
+    }
+
+    func testAuditAtDefaultSize() { openOffer(["-uitest-reduce-motion"]); sleep(1); audit("quiet-offer") }
+    func testAuditInDark() { openOffer(["-uitest-reduce-motion", "-uitest-dark"]); sleep(1); audit("quiet-offer-dark") }
+    func testAuditAtAccessibilitySize() {
+        openOffer(Self.axText + ["-uitest-reduce-motion"])
+        sleep(1)
+        audit("quiet-offer-ax-top")
+        app.scrollViews.firstMatch.swipeUp(); app.scrollViews.firstMatch.swipeUp()
+        sleep(1)
+        audit("quiet-offer-ax-bottom")
+    }
+
+    // MARK: Screenshots (compared by eye with design-preview/quiet-garden/shots; run with TEST_RUNNER_SCREENSHOT_DIR=<dir>)
+
+    func testScreenshots() {
+        for (name, extra) in [("quiet-offer-light", []), ("quiet-offer-dark", ["-uitest-dark"]),
+                              ("quiet-offer-rm", ["-uitest-reduce-motion"]), ("quiet-offer-ax", Self.axText)] {
+            openOffer(extra)
+            sleep(1)
+            shot(name)
+            if name == "quiet-offer-ax" { app.scrollViews.firstMatch.swipeUp(); sleep(1); shot("quiet-offer-ax-bottom") }
+            app.terminate()
+        }
+    }
+}
