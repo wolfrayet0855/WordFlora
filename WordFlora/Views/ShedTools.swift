@@ -139,13 +139,7 @@ struct ToolTile: View {
         let shape = RoundedRectangle(cornerRadius: 20, style: .continuous)
         Button(action: open) {
             Group {
-                if typeSize >= .accessibility3 {
-                    // The largest sizes: the art sits above the words, which then get the whole row, so names stay
-                    // whole ("Mis-ter" and "Butter-fly" broke beside the art).
-                    VStack(alignment: .leading, spacing: 6) { art; text(alignment: .leading) }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .padding(.horizontal, 6)
-                } else if typeSize.isAccessibilitySize {
+                if typeSize.isAccessibilitySize {
                     HStack(alignment: .center, spacing: 12) { art; text(alignment: .leading) }
                         .frame(maxWidth: .infinity, alignment: .leading)
                 } else {
@@ -174,13 +168,8 @@ struct ToolTile: View {
         tint.fill.opacity(0.45)
     }
 
-    /// The art grows with the text, but stops at 84pt (it sits above the words at the largest sizes).
-    private var circleSide: CGFloat { typeSize >= .accessibility3 ? min(circle, 84) : circle }
-    private var artSide: CGFloat { typeSize >= .accessibility3 ? min(artW, 74) : artW }
-
     private var art: some View {
-        let circle = circleSide, artW = artSide
-        return ZStack {
+        ZStack {
             Circle().fill(Color.appSurface.opacity(0.72)).frame(width: circle, height: circle)
             if owned {
                 Image("tool_\(tool.rawValue)_t\(tier)").resizable().scaledToFit().frame(width: artW, height: artW * 62 / 58)
