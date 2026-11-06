@@ -266,7 +266,9 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Clover, resting as a seed in its pot"].exists)
         shot("plant-seed")
         app.terminate()
-        openClover(["-uitest-rain=2", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
+        // The Life panel starts closed and opens itself on a visit after a change (owner ruling 2026-11-06), so the
+        // large-text shots ask for a changed visit to show it open, then close it.
+        openClover(["-uitest-rain=2", "-uitest-life-changed", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
         XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5))
         XCTAssertGreaterThanOrEqual(app.buttons["Water"].frame.height, 64)
         sleep(4); shot("plant-large")
