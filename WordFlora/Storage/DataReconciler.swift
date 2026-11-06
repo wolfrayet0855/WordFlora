@@ -51,6 +51,9 @@ enum DataReconciler {
         k.toolsJSON = ToolInventory(json: k.toolsJSON).merged(with: ToolInventory(json: o.toolsJSON)).json
         k.albumJSON = StickerAlbum(json: k.albumJSON).merged(with: StickerAlbum(json: o.albumJSON)).json
         mergeWeather(o, into: k)
+        let quest = DailyQuest.merged(QuestState(day: k.questDay, progress: k.questProgress, done: k.questDone),
+                                      QuestState(day: o.questDay, progress: o.questProgress, done: o.questDone))
+        k.questDay = quest.day; k.questProgress = quest.progress; k.questDone = quest.done
     }
 
     /// Garden weather and endgame fields (endgame-and-events spec section 7). Every rule is commutative and idempotent.

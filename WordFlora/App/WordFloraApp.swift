@@ -114,6 +114,12 @@ struct WordFloraApp: App {
             model.enqueueBadgeMoments([BadgeUnlock(badgeId: "perfect_bloom", tier: 1, at: .now)])
         }
         if uiTesting && args.contains("-uitest-quiet") { model.settings.quietGarden = true }
+        // The daily quest card: off in UI tests unless asked for; `-uitest-quest=<kind>` picks today's kind.
+        if uiTesting {
+            model.questHiddenForUITests = !args.contains { $0.hasPrefix("-uitest-quest") }
+            model.questTestOverride = args.first { $0.hasPrefix("-uitest-quest=") }
+                .flatMap { QuestKind(rawValue: String($0.dropFirst("-uitest-quest=".count))) }
+        }
         // Garden weather tests: an age answer, the daily reminder on (no permission prompt), and a forecast or a weather
         // day in place of the schedule. The gate is opened as if 5 plants and 2 tends had happened; Calm, Quiet Garden
         // and the Garden weather switch still apply.

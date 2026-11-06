@@ -135,6 +135,12 @@ struct HomeView: View {
                         playButton
                         playAdNoteLabel
                         if unlocked.contains(.dailyBloom) { dailyBloom.padding(.bottom, 4) }
+                        // The daily tiny quest (never in Quiet Garden or the first session; AppModel+Quest).
+                        if let quest = app.dailyQuest(stats: stats) {
+                            DailyQuestCard(quest: quest, state: app.questState, calm: app.settings.calmMode,
+                                           reduceMotion: systemReduceMotion || app.settings.reduceMotionOverride)
+                                .padding(.bottom, 4)
+                        }
 
                         Text("Explore")
                             .textCase(.uppercase).kerning(1.4)

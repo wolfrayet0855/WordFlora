@@ -74,6 +74,12 @@ final class PlayerProfile {
     /// records read as not seen. Merge: OR, so once seen it stays seen.
     var guideSeen: Bool = false
 
+    /// The daily tiny quest (Rules/DailyQuest.swift): its day key, the count so far and whether it is done. Defaulted,
+    /// so older stores and CloudKit records read as no quest yet. Merge: the later day wins; same day, max count and OR.
+    var questDay: Int = 0
+    var questProgress: Int = 0
+    var questDone: Bool = false
+
     var createdAt: Date = Date.now
 
     init() {}

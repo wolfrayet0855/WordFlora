@@ -15,7 +15,7 @@ SwiftData's CloudKit mirroring stores a model `X` as record type `CD_X` and a pr
 | `lifeSeenKey` | `String` | `CD_lifeSeenKey` | String | `""` |
 | `lifeSeenAt` | `Date` | `CD_lifeSeenAt` | Date/Time | `distantPast` |
 
-## Record type `CD_PlayerProfile` (16 new fields)
+## Record type `CD_PlayerProfile` (19 new fields)
 
 | Swift property | Swift type | CloudKit field | CloudKit type | Default |
 |---|---|---|---|---|
@@ -35,6 +35,9 @@ SwiftData's CloudKit mirroring stores a model `X` as record type `CD_X` and a pr
 | `crownSeenAt` | `Date?` | `CD_crownSeenAt` | Date/Time | nil |
 | `goldCrownSeenAt` | `Date?` | `CD_goldCrownSeenAt` | Date/Time | nil |
 | `guideSeen` | `Bool` | `CD_guideSeen` | Int(64) | `false` (0) |
+| `questDay` | `Int` | `CD_questDay` | Int(64) | `0` |
+| `questProgress` | `Int` | `CD_questProgress` | Int(64) | `0` |
+| `questDone` | `Bool` | `CD_questDone` | Int(64) | `false` (0) |
 
 SwiftData may store arrays of value types as encoded data (Bytes) instead of a list, depending on the OS version; whatever the development schema shows after step 1 below is the truth, so deploy what it generated rather than creating fields by hand.
 
