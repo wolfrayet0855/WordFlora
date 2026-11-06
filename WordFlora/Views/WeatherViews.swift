@@ -249,6 +249,10 @@ struct GardenWeatherSettingsSection: View {
                                                                        set: { on in if on { confirmWild = true } else { app.setWildWeather(false) } }))
                             .accessibilityIdentifier("settings.wildWeather")
                         Text(WeatherUICopy.wildFootnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                        if WeatherUICopy.showsWildGrownUpNote(ageBand: s.ageBand) {
+                            Text(WeatherUICopy.wildGrownUpNote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                                .accessibilityIdentifier("settings.wildGrownUpNote")
+                        }
                     }
                     if app.weatherNotifyAvailable {
                         Toggle(WeatherUICopy.notifyToggle, isOn: Binding(get: { s.weatherNotify },
