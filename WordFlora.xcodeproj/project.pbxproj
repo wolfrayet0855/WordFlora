@@ -43,6 +43,7 @@
 		1A1EF2246D18FBC822B23F43 /* wf-butterfly.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B3C67B3F3D18A565BC91069D /* wf-butterfly.m4a */; };
 		1B1F6E25CDDEF290B4E2EDA4 /* VoicePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673807997651A94A74A50735 /* VoicePickerTests.swift */; };
 		1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */; };
+		A66072D8C1AD1347B9133BA9 /* AppModel+Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 56EA5C0B0F1AD4C2B9EB6E96 /* AppModel+Badges.swift */; };
 		E80F615F00CD303B26AE7EC8 /* AppModel+WeatherSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857F2189635F58CB6E66E8D1 /* AppModel+WeatherSound.swift */; };
 		1CE9AE24116B633B3AF3403A /* WakePuzzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60BDD5B19B690060D44B813 /* WakePuzzle.swift */; };
 		1CEC41D7155EFBA55139F8BF /* ButterflyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F887962950E79A156ED26A3F /* ButterflyView.swift */; };
@@ -67,6 +68,7 @@
 		B9D06F221ED1DB553336F356 /* GuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF69C9F1A9610F2E91FD0AE2 /* GuideView.swift */; };
 		3A604584883B42745568A096 /* SharedContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9888DEE09FE8404AD2E6B806 /* SharedContainer.swift */; };
 		3B0ACB4FD72E0B1901B947AA /* BadgesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7DA8F2D5FF4FD7D8DEFF8E5 /* BadgesView.swift */; };
+		3EA22E9E7557EA275FC34574 /* BadgeDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0F9C06D6D14965C171C2F0EF /* BadgeDetailView.swift */; };
 		D6B2379EB638D8BEBF8BA2D1 /* BadgeMomentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73F25F4250DCA311CA4395EB /* BadgeMomentView.swift */; };
 		3BE600FC34C69EEF9EDACA75 /* WelcomeBack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7E67B085EBE6FF23F4D631 /* WelcomeBack.swift */; };
 		3E4D8C4B5FD7B1BA5171F2A2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E6F2C922C06007E28B8 /* Assets.xcassets */; };
@@ -79,6 +81,7 @@
 		49FAB31C34389B1250039A76 /* GameRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */; };
 		4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */; };
 		A9BC1C319B4BDB047932E1DA /* CelebrationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */; };
+		38A1261D135A45B95FC980BA /* BadgesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8AB8C1CF6CE1E78960EB79CB /* BadgesUITests.swift */; };
 		4B412E233E82E83F1C3BA7B8 /* ButterflyGameModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED2AA84626C61A605393776 /* ButterflyGameModel.swift */; };
 		5000EF3A884C020D4BA90F09 /* ReminderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BCCA6D160865CEBA2AA66E39 /* ReminderTests.swift */; };
 		5141753B3BD93463C3BA567A /* SplitMix64.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */; };
@@ -163,6 +166,7 @@
 		A3860B5AF44F5DF4BC8E92A4 /* PlantVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2732222DBF50FDA29A7C62BE /* PlantVoice.swift */; };
 		AA4693D64441616078B1A314 /* GardenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED57CCECFEDB2A2033A60F12 /* GardenView.swift */; };
 		AA753988BC83E23E320FFC56 /* Badges.swift in Sources */ = {isa = PBXBuildFile; fileRef = F53AF4373CF0983348711216 /* Badges.swift */; };
+		92F80F91C0372B4EA186BB19 /* BadgeFacts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FADE11C66FC9CA2303BBAEE /* BadgeFacts.swift */; };
 		AC0534FE4A3F995C8A301AB0 /* RulesBatch2Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 188352F473E5A34955BC4F03 /* RulesBatch2Tests.swift */; };
 		0EA82FA809041B116AE99574 /* GuideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD753381B4C2E51903D6369D /* GuideTests.swift */; };
 		ACC9581C7D1D2D18374CEEFE /* PaywallRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 93D0D46981E2EFDF577D4AE4 /* PaywallRulesTests.swift */; };
@@ -247,6 +251,7 @@
 		04C602C60D26F2F7423838DC /* WeatherPuzzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEAB3460F19775C8484231B /* WeatherPuzzle.swift */; };
 		7B4B6ED41E093D452AEA2A3E /* WeatherShelterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E240339C0865E6293BBF24 /* WeatherShelterTests.swift */; };
 		0D762E777185B8438D3CB760 /* WeatherPuzzleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7FB88B27E4975EF58299E27 /* WeatherPuzzleTests.swift */; };
+		A06184D6A71D83CBD49E5005 /* BadgeCatalogueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BA49C5140C40B823EDAC41E /* BadgeCatalogueTests.swift */; };
 		A8F0B75EF1640A9DF3D224FB /* GrandGardenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A20E0492F33CB45425A98C /* GrandGardenTests.swift */; };
 		B987080F70636E313CF5DBC5 /* GrandGardenViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30E70DD2A1CCD4AABF93995 /* GrandGardenViews.swift */; };
 		199DA1A106DEB2C72907BC21 /* WeatherHelpersViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAC2A32DAF9C0E4BDE13FCF /* WeatherHelpersViews.swift */; };
@@ -359,6 +364,7 @@
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
 		4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestCardUITests.swift; sourceTree = "<group>"; };
 		9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CelebrationUITests.swift; sourceTree = "<group>"; };
+		8AB8C1CF6CE1E78960EB79CB /* BadgesUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgesUITests.swift; sourceTree = "<group>"; };
 		4DA662141FB5A76A22AE6D6E /* PlusOfferPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlusOfferPolicy.swift; sourceTree = "<group>"; };
 		4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PotCatalogTests.swift; sourceTree = "<group>"; };
 		500B058D92EC73FD924DC8CE /* Reminders.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Reminders.swift; sourceTree = "<group>"; };
@@ -485,6 +491,7 @@
 		D4DB9132C916E5B75B28BE77 /* wf-button.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-button.m4a"; sourceTree = "<group>"; };
 		D7C771AB1111BA1267E678AF /* PlantCollectible.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantCollectible.swift; sourceTree = "<group>"; };
 		D7DA8F2D5FF4FD7D8DEFF8E5 /* BadgesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgesView.swift; sourceTree = "<group>"; };
+		0F9C06D6D14965C171C2F0EF /* BadgeDetailView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeDetailView.swift; sourceTree = "<group>"; };
 		73F25F4250DCA311CA4395EB /* BadgeMomentView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeMomentView.swift; sourceTree = "<group>"; };
 		D9550E7376E237963E1CA789 /* TapBurst.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TapBurst.swift; sourceTree = "<group>"; };
 		DA61364BB027900BC30E6C17 /* wf-badgeGold.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeGold.m4a"; sourceTree = "<group>"; };
@@ -510,7 +517,9 @@
 		EF01514127063E580BD3F0E2 /* WakePuzzleView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WakePuzzleView.swift; sourceTree = "<group>"; };
 		EF908A564AC2DBFD8ADCFBBA /* LoveEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoveEngineTests.swift; sourceTree = "<group>"; };
 		F53AF4373CF0983348711216 /* Badges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
+		8FADE11C66FC9CA2303BBAEE /* BadgeFacts.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeFacts.swift; sourceTree = "<group>"; };
 		F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+Pots.swift"; sourceTree = "<group>"; };
+		56EA5C0B0F1AD4C2B9EB6E96 /* AppModel+Badges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+Badges.swift"; sourceTree = "<group>"; };
 		857F2189635F58CB6E66E8D1 /* AppModel+WeatherSound.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+WeatherSound.swift"; sourceTree = "<group>"; };
 		F787992B59617103496CEE38 /* TendingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendingUITests.swift; sourceTree = "<group>"; };
 		F887962950E79A156ED26A3F /* ButterflyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyView.swift; sourceTree = "<group>"; };
@@ -528,6 +537,7 @@
 		0CEAB3460F19775C8484231B /* WeatherPuzzle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherPuzzle.swift; sourceTree = "<group>"; };
 		E8E240339C0865E6293BBF24 /* WeatherShelterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherShelterTests.swift; sourceTree = "<group>"; };
 		B7FB88B27E4975EF58299E27 /* WeatherPuzzleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherPuzzleTests.swift; sourceTree = "<group>"; };
+		5BA49C5140C40B823EDAC41E /* BadgeCatalogueTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeCatalogueTests.swift; sourceTree = "<group>"; };
 		A4A20E0492F33CB45425A98C /* GrandGardenTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GrandGardenTests.swift; sourceTree = "<group>"; };
 		E30E70DD2A1CCD4AABF93995 /* GrandGardenViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GrandGardenViews.swift; sourceTree = "<group>"; };
 		EFAC2A32DAF9C0E4BDE13FCF /* WeatherHelpersViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherHelpersViews.swift; sourceTree = "<group>"; };
@@ -620,6 +630,7 @@
 				354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */,
 				51C2253A511FED21EE98FCD0 /* Butterfly.swift */,
 				F53AF4373CF0983348711216 /* Badges.swift */,
+				8FADE11C66FC9CA2303BBAEE /* BadgeFacts.swift */,
 				235887FB6ABDC2ED7F728A3C /* Paywall.swift */,
 				0ED2AA84626C61A605393776 /* ButterflyGameModel.swift */,
 				13457F8B016917B22CB55A1C /* Share.swift */,
@@ -765,6 +776,7 @@
 				0AF5D23A6281D4A815A10399 /* EndgameAppTests.swift */,
 				A4A20E0492F33CB45425A98C /* GrandGardenTests.swift */,
 				B7FB88B27E4975EF58299E27 /* WeatherPuzzleTests.swift */,
+				5BA49C5140C40B823EDAC41E /* BadgeCatalogueTests.swift */,
 				E8E240339C0865E6293BBF24 /* WeatherShelterTests.swift */,
 				71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */,
 				7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */,
@@ -902,6 +914,7 @@
 				3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */,
 				C8CFA5BED25190317B98E622 /* GardenShortcuts.swift */,
 				F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */,
+				56EA5C0B0F1AD4C2B9EB6E96 /* AppModel+Badges.swift */,
 				ABF1212A4E968C83B4FDC5D4 /* AppModel+Weather.swift */,
 				857F2189635F58CB6E66E8D1 /* AppModel+WeatherSound.swift */,
 			);
@@ -928,6 +941,7 @@
 				5A4C64F5ADBB45D602E50A5F /* PlusView.swift */,
 				2EA96D7DD8E3103D3D959B4A /* ShedView.swift */,
 				D7DA8F2D5FF4FD7D8DEFF8E5 /* BadgesView.swift */,
+				0F9C06D6D14965C171C2F0EF /* BadgeDetailView.swift */,
 				73F25F4250DCA311CA4395EB /* BadgeMomentView.swift */,
 				F887962950E79A156ED26A3F /* ButterflyView.swift */,
 				1F9C82D7DFDE6E520A95AC7E /* WakeSheet.swift */,
@@ -1011,6 +1025,7 @@
 				1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */,
 				4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */,
 				9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */,
+				8AB8C1CF6CE1E78960EB79CB /* BadgesUITests.swift */,
 			);
 			name = WordFloraUITests;
 			path = WordFloraUITests;
@@ -1232,6 +1247,7 @@
 				67D33D3868BCC5E3E36ABA02 /* WeatherUITests.swift in Sources */,
 				4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */,
 				A9BC1C319B4BDB047932E1DA /* CelebrationUITests.swift in Sources */,
+				38A1261D135A45B95FC980BA /* BadgesUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1242,6 +1258,7 @@
 				038399A18E57EC5DAEACB3F8 /* EndgameAppTests.swift in Sources */,
 				A8F0B75EF1640A9DF3D224FB /* GrandGardenTests.swift in Sources */,
 				0D762E777185B8438D3CB760 /* WeatherPuzzleTests.swift in Sources */,
+				A06184D6A71D83CBD49E5005 /* BadgeCatalogueTests.swift in Sources */,
 				7B4B6ED41E093D452AEA2A3E /* WeatherShelterTests.swift in Sources */,
 				05B7E3F9F4DC0094781F5022 /* GameViewModelTests.swift in Sources */,
 				CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */,
@@ -1357,6 +1374,7 @@
 				6B6F1DB72D2C6C1D6C0E5390 /* ToolEngine.swift in Sources */,
 				97840C908C8D6F794ACC028D /* Butterfly.swift in Sources */,
 				AA753988BC83E23E320FFC56 /* Badges.swift in Sources */,
+				92F80F91C0372B4EA186BB19 /* BadgeFacts.swift in Sources */,
 				70C01EAA5FB7F523FBF1C46C /* AIValidators.swift in Sources */,
 				5731534192B9E4F7B8B0B453 /* GardenAI.swift in Sources */,
 				DAF56180207E14B1B5DB828C /* StoreMigrator.swift in Sources */,
@@ -1389,6 +1407,7 @@
 				7134B8F63F8B167F415D50C5 /* AdsService.swift in Sources */,
 				B0E129A407B3E68D0AC5BD33 /* ShedView.swift in Sources */,
 				3B0ACB4FD72E0B1901B947AA /* BadgesView.swift in Sources */,
+				3EA22E9E7557EA275FC34574 /* BadgeDetailView.swift in Sources */,
 				D6B2379EB638D8BEBF8BA2D1 /* BadgeMomentView.swift in Sources */,
 				4B412E233E82E83F1C3BA7B8 /* ButterflyGameModel.swift in Sources */,
 				1CEC41D7155EFBA55139F8BF /* ButterflyView.swift in Sources */,
@@ -1439,6 +1458,7 @@
 				F4C0D43C87AF2524BB79A1A1 /* TendAnimationView.swift in Sources */,
 				7DD477E02162F248269BFF98 /* PotCatalog.swift in Sources */,
 				1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */,
+				A66072D8C1AD1347B9133BA9 /* AppModel+Badges.swift in Sources */,
 				8268EE14C8E89B8569354755 /* WeatherViews.swift in Sources */,
 				00306C0B86191F5D34F816C8 /* AppModel+Weather.swift in Sources */,
 				96F140C05B70252AE40031B6 /* GardenWeather.swift in Sources */,

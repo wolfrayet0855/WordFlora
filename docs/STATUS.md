@@ -23,9 +23,9 @@ Privacy policy and support URLs (`Links.swift` currently points at placeholder `
 
 ## Known gaps / next
 - Word bank is a 30-entry starter; difficulty bands need calibration once the full bank exists.
-- Badge catalog is 12 of the 36 designed badges; the rest need counters and rules.
+- Badge catalog: all 36 designed badges plus Weathered are built (see "Badge catalogue complete" below).
 - No Game Center, spaced-review rounds, camera "Find a plant", voice guessing, Image Playground sticker.
-- Daily Bloom share is text only; no ShareLink for badges.
+- Daily Bloom share is text only. Badges share an image card (13 and up only).
 - Prototype-only ideas not built: plant diary, first-bloom ceremony, season/weather mood, welcome-back card.
 
 ## Review-fix pass: rulings and deferrals (2026-11-03)

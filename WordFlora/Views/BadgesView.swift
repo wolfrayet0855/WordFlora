@@ -2,8 +2,12 @@ import SwiftUI
 
 struct BadgesView: View {
     @Environment(AppModel.self) private var app
+    @State private var open: BadgeDef?
 
-    private var defs: [BadgeDef] { (try? BadgeCatalog.load()) ?? [] }
+    private static let catalog: [BadgeDef] = (try? BadgeCatalog.load()) ?? []
+    /// The Sharer badge only shows to players who can share (13 and up, age known).
+    private var defs: [BadgeDef] { Self.catalog.filter { $0.counter != BadgeCounter.badgeShares.rawValue || app.canShareBadges } }
+
     var body: some View {
         let all = defs
         ScrollView {
@@ -23,13 +27,36 @@ struct BadgesView: View {
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Badges")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear { app.refreshBadgeFacts() }        // quiet catch-up, so the page matches the garden
+        .sheet(item: $open) { def in BadgeDetailView(def: def, tier: max(1, app.badges.tier(of: def.id))).environment(app) }
     }
 
-    private func card(_ def: BadgeDef) -> some View {
-        let state = app.badges
+    @ViewBuilder private func card(_ def: BadgeDef) -> some View {
+        let tier = app.badges.tier(of: def.id)
+        if tier > 0 {
+            // An earned badge opens larger, with its share button.
+            Button { open = def } label: { cardBody(def, tier: tier) }
+                .buttonStyle(.plain)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(label(def, tier: tier))
+                .accessibilityHint(BadgeDetailCopy.openHint)
+                .accessibilityAddTraits(.isButton)
+                .accessibilityIdentifier("badge.\(def.id)")
+        } else {
+            cardBody(def, tier: tier)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(label(def, tier: tier))
+                .accessibilityIdentifier("badge.\(def.id)")
+        }
+    }
+
+    private func label(_ def: BadgeDef, tier: Int) -> String {
+        "\(def.title ?? def.id): \(tier == 0 ? "not earned yet" : ["bronze", "silver", "gold"][tier - 1])"
+    }
+
+    private func cardBody(_ def: BadgeDef, tier: Int) -> some View {
         let counter = BadgeCounter(rawValue: def.counter)
-        let progress = counter.map { state.progress(of: $0) } ?? 0
-        let tier = (1...3).filter { state.unlockedDate(badge: def.id, tier: $0) != nil }.max() ?? 0
+        let progress = counter.map { app.badges.progress(of: $0) } ?? 0
         let nextThreshold = tier < 3 ? def.thresholds[tier] : def.thresholds[2]
         return VStack(spacing: 8) {
             BadgeArtView(badgeId: def.id, tier: max(1, tier)).frame(height: 84)
@@ -38,13 +65,12 @@ struct BadgesView: View {
             Text(def.blurb ?? "").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             if !app.settings.quietGarden {
                 ProgressView(value: Double(min(progress, nextThreshold)), total: Double(nextThreshold)).tint(Color.successText)
-                Text(tier == 3 ? "Gold!" : "\(progress) of \(nextThreshold)").font(Theme.font(.caption, weight: .semibold)).foregroundStyle(Color.secondaryText)
+                Text(tier == 3 ? "Gold!" : "\(min(progress, nextThreshold)) of \(nextThreshold)").font(Theme.font(.caption, weight: .semibold)).foregroundStyle(Color.secondaryText)
             }
         }
         .padding(Space.m).frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(tier > 0 ? Color.appAccent.opacity(0.5) : Color.appPrimaryText.opacity(0.08)))
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(def.title ?? def.id): \(tier == 0 ? "not earned yet" : ["bronze", "silver", "gold"][tier - 1])")
+        .contentShape(RoundedRectangle(cornerRadius: Theme.cardRadius))
     }
 }
