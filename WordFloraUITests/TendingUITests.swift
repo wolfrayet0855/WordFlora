@@ -234,18 +234,26 @@ final class TendingUITests: XCTestCase {
     /// Text the scroll view clips at its edge (under the navigation bar, or above the pinned tend buttons) is measured
     /// against whatever covers it, so only text fully inside the scroll view is judged for contrast.
     /// `excuse` lets a test pass over one named kind of issue on chosen elements; each one excused is printed.
-    /// `dynamicTypeApart`: run the Dynamic Type check on its own, after every other check. It grows the text, so a
-    /// long page reflows under its scroll offset and the page is somewhere else when it is done; run together, the
-    /// other checks could look at whatever had scrolled into view mid-check. Every check still runs on this screen.
-    /// `unresolvedUnderFooter`: issues of these kinds that come back with no element (nil) are noted, not failed. Only the
+    /// `dynamicTypeApart`: run the clipped-text and Dynamic Type checks each on its own, after every other check. Both
+    /// grow the text, so a long page reflows under its scroll offset and the page is somewhere else when they are done;
+    /// run together, the other checks could look at whatever had scrolled into view mid-check. Every check still runs.
+    /// `unresolvedUnderFooter`: issues of these kinds that come back with no element (nil) are noted, not failed. The
     /// repot sheet passes it: its last row of tiles scrolls under the footer's 28pt fade by design, and text drawn
     /// there faded, on a tile mostly covered by the footer, is read by the audit as text with no visible element.
+    /// The end of the Shed passes it too, for the same reading of the pot cards' words scrolled up under the status
+    /// and navigation bars (see auditShedPots).
     private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = [], dynamicTypeApart: Bool = false,
                        unresolvedUnderFooter: XCUIAccessibilityAuditType = [],
                        excuse: @escaping (XCUIAccessibilityAuditIssue, XCUIElement) -> Bool = { _, _ in false }) {
         if dynamicTypeApart {
-            auditOnce(name, types: XCUIAccessibilityAuditType.all.subtracting(ignoring).subtracting(.dynamicType),
+            // The clipped-text check also grows the text (seen in the run's screen recording), so the page reflows
+            // and scrolls under it like the Dynamic Type check. Contrast and the other checks run first, on the page
+            // as the test left it; the two checks that resize the text run after them, each on its own.
+            auditOnce(name, types: XCUIAccessibilityAuditType.all.subtracting(ignoring).subtracting([.dynamicType, .textClipped]),
                       unresolvedOK: unresolvedUnderFooter, excuse: excuse)
+            if !ignoring.contains(.textClipped) {
+                auditOnce(name + "-textClipped", types: .textClipped, unresolvedOK: unresolvedUnderFooter, excuse: excuse)
+            }
             if !ignoring.contains(.dynamicType) {
                 auditOnce(name + "-dynamicType", types: .dynamicType, unresolvedOK: unresolvedUnderFooter, excuse: excuse)
             }
@@ -289,7 +297,7 @@ final class TendingUITests: XCTestCase {
                     if !v.contains(e.frame) { return true }
                 }
                 if issue.element == nil, unresolvedOK.contains(issue.auditType) {
-                    skipped.append("\(issue.compactDescription) (no element, under the footer)"); return true
+                    skipped.append("\(issue.compactDescription) (no element, under the footer or the top bar)"); return true
                 }
                 if let e = issue.element, excuse(issue, e) { skipped.append("\(issue.compactDescription) on '\(e.label)'"); return true }
                 findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' [\(issue.element?.identifier ?? "")] \(issue.element.map { "\($0.frame)" } ?? "")")
@@ -522,8 +530,13 @@ final class TendingUITests: XCTestCase {
     /// The Shed's 4 x 4 pot cards at accessibility sizes. As on the pick tiles, contrast (the check samples the pot art
     /// with the text) and Dynamic Type (the card words stop growing at xxxLarge so four fit a row) are excused on pot
     /// cards only; clipped text, hit regions, labels and traits are judged, and every check elsewhere.
-    func testTheShedPotsPassTheAuditAtAccessibilityTextSizes() {
-        for size in ["AccessibilityL", "AccessibilityXXXL"] {
+    /// One size per test: each audit now runs in three passes, and both sizes in one test came close to the 2 minute
+    /// allowance (104 s).
+    func testTheShedPotsPassTheAuditAtAccessibilityL() { auditShedPots("AccessibilityL") }
+    func testTheShedPotsPassTheAuditAtAccessibilityXXXL() { auditShedPots("AccessibilityXXXL") }
+
+    private func auditShedPots(_ size: String) {
+        do {
             app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything",
                                    "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategory\(size)"]
             app.launch()
@@ -536,11 +549,35 @@ final class TendingUITests: XCTestCase {
             XCTAssertTrue(app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'shed-pot-'")).firstMatch.exists)
             // Excused by what the element is (a pot card), not where it was: the Dynamic Type check reflows the page,
             // so frames taken before the audit could match a tool tile that had moved into a card's old place.
-            audit("shed-pots-\(size)", dynamicTypeApart: true, excuse: { issue, e in
+            // "Potentially inaccessible text" with no element is noted, not failed: at the end of the page the first
+            // pot row's words sit faded under the status bar and the navigation bar. Moving the page down 90 pt at a
+            // time, the finding stayed while words were up there (pot cards, the Pots heading, a tool's line) and went
+            // away at the one stop where only a tile's coloured edge was (QA, 2026-11-06). Every check that names an
+            // element is still judged.
+            audit("shed-pots-\(size)", dynamicTypeApart: true, unresolvedUnderFooter: .elementDetection, excuse: { issue, e in
                 [.contrast, .dynamicType].contains(issue.auditType) && e.identifier.hasPrefix("shed-pot-") && e.identifier != "shed-pot-hint"
             })
             app.terminate()
         }
+    }
+
+    /// The Shed's tool tiles at accessibility sizes, scrolled until the last tile (Sun lamp) is in view: their words
+    /// now sit under the art, so the names stay whole ("Shear / s" and "Mis- / ter" broke beside the art). Each size
+    /// in its own test (each audit runs in three passes).
+    func testTheShedToolsPassTheAuditAtAccessibilityL() { auditShedTools("AccessibilityL") }
+    func testTheShedToolsPassTheAuditAtAccessibilityXXXL() { auditShedTools("AccessibilityXXXL") }
+
+    private func auditShedTools(_ size: String) {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategory\(size)"]
+        app.launch()
+        app.buttons["Shed"].tap()
+        XCTAssertTrue(app.buttons["shed.tool.can"].waitForExistence(timeout: 5))
+        let lamp = app.buttons["shed.tool.lamp"]
+        for _ in 0..<10 where !lamp.isHittable { app.swipeUp(); sleep(1) }
+        XCTAssertTrue(lamp.isHittable, "the last tool is in view")
+        shot("shed-tools-\(size)")
+        audit("shed-tools-\(size)", dynamicTypeApart: true)
     }
 
     /// Swipes until the page's last element is on screen and stops moving (no momentum left), then lets it settle.

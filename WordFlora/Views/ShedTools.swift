@@ -140,8 +140,11 @@ struct ToolTile: View {
         Button(action: open) {
             Group {
                 if typeSize.isAccessibilitySize {
-                    HStack(alignment: .center, spacing: 12) { art; text(alignment: .leading) }
+                    // Text under the art, across the whole tile: beside the art (which grows with the text) the
+                    // names had a third of the width and broke mid-word ("Shear / s", "Mis- / ter").
+                    VStack(alignment: .leading, spacing: 8) { art; text(alignment: .leading) }
                         .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 8)
                 } else {
                     VStack(spacing: 4) { art; text(alignment: .center) }.frame(maxWidth: .infinity)
                 }
@@ -168,8 +171,13 @@ struct ToolTile: View {
         tint.fill.opacity(0.45)
     }
 
+    /// At accessibility sizes the art sits on its own row above the words, so it stops growing at 2x: the words
+    /// are what needs the room.
+    private var artScale: CGFloat { typeSize.isAccessibilitySize ? min(1, 132 / circle) : 1 }
+
     private var art: some View {
-        ZStack {
+        let circle = circle * artScale, artW = artW * artScale
+        return ZStack {
             Circle().fill(Color.appSurface.opacity(0.72)).frame(width: circle, height: circle)
             if owned {
                 Image("tool_\(tool.rawValue)_t\(tier)").resizable().scaledToFit().frame(width: artW, height: artW * 62 / 58)
