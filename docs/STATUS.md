@@ -1,6 +1,6 @@
-# WordFlora build status (2026-11-03)
+# WordFlora build status (2026-11-06)
 
-Branch `1-feat-triviaapi-and-earn-flora`. Spec: `docs/superpowers/specs/2026-11-02-wordflora-v2-design.md` (sections 11-20 hold the latest decisions). Plan: `docs/superpowers/plans/2026-11-02-wordflora-v2.md`.
+Branch `3-feat-content-and-polish` (iPhone only, `TARGETED_DEVICE_FAMILY = 1`). The sections below are dated; the oldest ones describe earlier branches. Spec: `docs/superpowers/specs/2026-11-02-wordflora-v2-design.md` (sections 11-20 hold the latest decisions). Plan: `docs/superpowers/plans/2026-11-02-wordflora-v2.md`.
 
 ## Verified by automated tests (simulator, iPhone 16, iOS 18.5)
 - ~250 unit tests: word bank/validator, Daily Bloom (time zones, DST), round logic, Rose meter, Garden Days, progression, help ladder, tending, tools, butterfly, badges, ad gate and accounting, reminders, sound events, share text, storage migration, StoreKit config, paywall rules, widget actions, iCloud flag logic.
@@ -12,14 +12,14 @@ Branch `1-feat-triviaapi-and-earn-flora`. Spec: `docs/superpowers/specs/2026-11-
 ## NOT verified (needs a real device, an account, or ears/eyes)
 - **Widget on a Home Screen / Lock Screen:** builds, embeds and signs; never seen rendered. The interactive water button is untested on device.
 - **iCloud sync end to end:** needs two devices and the CloudKit schema deployed to Production. Conflict handling is SwiftData/CloudKit last-writer-wins; our "max/union" merge rule exists as logic (`BadgeState.merged`) but is not wired into sync.
-- **Ads:** only Google test ids are configured. Real units, UMP message setup, `app-ads.txt` and a privacy policy URL are owner tasks. Consent form and real ad serving are untested.
+- **Ads:** the committed `Config/Ads.xcconfig` holds Google's public test ids only. The owner's real ids live in the git-ignored `Config/Ads.local.xcconfig` on the owner's machine and are never committed. UMP message setup, `app-ads.txt` and a privacy policy URL are owner tasks. Consent form and real ad serving are untested.
 - **Sounds:** the recommended set was chosen on design rationale; nobody has listened. Haptics are untested on device.
 - **On-device AI ("Tell me more"):** compiles and falls back safely; behavior on a real Apple Intelligence device is untested; context limit and kids-content behavior need a spike.
 - **Real StoreKit sandbox purchase** against App Store Connect products, parental gate flow, Ask to Buy.
 - **Reminders** on a real device (permission prompt, delivery).
 
 ## Owner items (see `docs/setup/owner-setup-steps.md`)
-Privacy policy and support URLs (`Links.swift` currently points at placeholder `wordflora.app` pages), real AdMob ids in `Config/Ads.local.xcconfig`, App Store Connect product creation, CloudKit schema deploy, age rating, privacy labels, review of the 30 starter words and writing of ~270 more (`WordFlora/Resources/Words.json`, validator in `WordBankValidator`), fact-check of remaining species/plant facts.
+Privacy policy and support URLs (`Links.swift` currently points at placeholder `wordflora.app` pages), confirm the real AdMob ids in the git-ignored `Config/Ads.local.xcconfig` (never committed), App Store Connect product creation, CloudKit schema deploy, age rating, privacy labels, review of the 30 starter words and writing of ~270 more (`WordFlora/Resources/Words.json`, validator in `WordBankValidator`), fact-check of remaining species/plant facts.
 
 ## Known gaps / next
 - Word bank is a 30-entry starter; difficulty bands need calibration once the full bank exists.
@@ -259,3 +259,11 @@ Owner rule: nothing cut. All six open items from the sections above are built.
 - **Rebased onto `e28f138 Merge spacing pass`** (the branch moved during the run; no conflicts): build OK, unit 950 run, 947 pass (the 3 StoreKitConfigTests), `EndgameUITests` 15/15 and `WeatherUITests` 27/27 on the rebased branch.
 - **Open / owner looks:** (1) the bloom wave and all the kit art are my drawings with no approved mockup: owner look on device; (2) the picture clue's 30 descriptions describe the real plants, checked against the lavender art only; (3) the AX audit wait above is a stabiliser, the flake was not reproduced; (4) the full UI suite was not run (only the classes touched).
 - **Process note:** the shared scratchpad already had `run.sh` and `udid` from another agent; my first run wrote over them before I moved to `scratchpad/builderD/`.
+
+## Review readiness (2026-11-06, branch `compliance-review-fixes` on `3-feat-content-and-polish`)
+- **Privacy manifests:** `WordFlora/PrivacyInfo.xcprivacy` (app) and `WordFloraWidget/PrivacyInfo.xcprivacy` (widget), both in their targets' Resources. UserDefaults reasons `CA92.1` (app-only defaults) and `1C8F.1` (the `group.beta.WordFlora` App Group the widget shares). The app's collected data types mirror what the Google Mobile Ads SDK 13.12 manifest declares (device ID, advertising data, product interaction, coarse location, performance, other diagnostics, crash data); only the device ID is marked as tracking, and only an adult who says yes to the tracking prompt can be tracked. `NSPrivacyTracking` is true with no tracking domains (the SDK lists none). The widget collects nothing and does not track.
+- **Export compliance:** `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO` on the app target (Debug and Release).
+- **Tracking prompt:** adults only (`AdGate.mayAskTracking`). 13 to 17 get UMP consent and non-personalised (teen-treated) ads with no tracking prompt; under 13 and an unknown age never load an ad.
+- **Parental gate on outbound links:** `GatedLink` (Settings: Privacy Policy, Report an ad; Plus: Manage subscription, Terms of Use, Privacy Policy) asks the grown-up question first for under 13 and an unknown age (`ParentalGate.outbound`); 13+ open at once. Purchases were already gated. The sheet is now shared (`ParentalGateSheet`).
+- **Wild Weather note:** under 13 only, "Ask a grown-up if you like." under the Wild Weather switch (`WeatherUICopy.wildGrownUpNote`, in the CopySafety list).
+- **Tests:** unit `testTrackingPromptOnlyForAdults`, `testOutboundLinksAskAGrownUpFirstForYoungOrUnknownAges`, `testGateCopyIsGentle`, `testUnder13SeeAGrownUpNoteBesideWildWeather`, `ReviewReadinessTests` (export key, app and widget manifests read from the built bundle). UI `ParentalGateLinkUITests` (Settings and Plus links show the gate for under 13, a wrong answer stays in the app; adults see no gate) and the two Wild Weather tests in `WeatherUITests` check the note.
