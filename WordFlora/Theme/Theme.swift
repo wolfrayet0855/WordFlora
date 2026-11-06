@@ -82,7 +82,7 @@ struct Card<Content: View>: View {
     @ViewBuilder var content: Content
     var body: some View {
         content
-            .padding(16)
+            .padding(Space.card)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
             .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appPrimaryText.opacity(0.08)))

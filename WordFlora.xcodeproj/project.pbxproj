@@ -140,6 +140,7 @@
 		9640E4CF89AD1324C08B70FE /* CoreRulesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03162041D3ADF3CEE1CCF23B /* CoreRulesTests.swift */; };
 		97840C908C8D6F794ACC028D /* Butterfly.swift in Sources */ = {isa = PBXBuildFile; fileRef = 51C2253A511FED21EE98FCD0 /* Butterfly.swift */; };
 		97D9721A1B688223FD44BBCD /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 616F9C7CA1B8EB8C04DD8F97 /* Theme.swift */; };
+		5A1CE0000000000000000001 /* Spacing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5A1CE0000000000000000002 /* Spacing.swift */; };
 		99A763B192E74385836B56C6 /* SeedPotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C95EE8F83CC87F157461F447 /* SeedPotView.swift */; };
 		9A467E6C2C922C05007E28B8 /* WordFloraApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A467E6B2C922C05007E28B8 /* WordFloraApp.swift */; };
 		9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9A467E6F2C922C06007E28B8 /* Assets.xcassets */; };
@@ -372,6 +373,7 @@
 		E92993D3AB94B100229DC61D /* GuideCopy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GuideCopy.swift; sourceTree = "<group>"; };
 		5DACB1B15E0B500548ECCC8E /* LifePanel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifePanel.swift; sourceTree = "<group>"; };
 		616F9C7CA1B8EB8C04DD8F97 /* Theme.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		5A1CE0000000000000000002 /* Spacing.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Spacing.swift; sourceTree = "<group>"; };
 		6406AFD4A968B89AEFEE8100 /* WordFloraTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = WordFloraTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6624B0783F70383BBF4A343C /* HomeView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		673807997651A94A74A50735 /* VoicePickerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VoicePickerTests.swift; sourceTree = "<group>"; };
@@ -660,6 +662,7 @@
 			isa = PBXGroup;
 			children = (
 				616F9C7CA1B8EB8C04DD8F97 /* Theme.swift */,
+				5A1CE0000000000000000002 /* Spacing.swift */,
 			);
 			name = Theme;
 			path = Theme;
@@ -1351,6 +1354,7 @@
 				423B9277680D308402B3B6CD /* AppModel.swift in Sources */,
 				49FAB31C34389B1250039A76 /* GameRouter.swift in Sources */,
 				97D9721A1B688223FD44BBCD /* Theme.swift in Sources */,
+				5A1CE0000000000000000001 /* Spacing.swift in Sources */,
 				9C64E00429B6E0B94A88592A /* FlowerView.swift in Sources */,
 				74EACFE66FDEB10460FE1624 /* IntroBloomView.swift in Sources */,
 				E877E5958CF762C6A223EECA /* PetalConfettiView.swift in Sources */,
