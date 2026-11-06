@@ -169,6 +169,12 @@ final class AppModel {
         plant.lastLovedAt = now(); try? context.save()
     }
 
+    /// The plant's short answer to a tap hello (PlantVoice), seeded like the tend lines; `tap` moves to the next line.
+    func helloLine(_ plant: PlantCollectible, tap: Int) -> String {
+        let day = Int(now().timeIntervalSince1970 / 86_400) &+ plant.earnedCount
+        return PlantVoice.helloLine(plantId: plant.plantId, daySeed: day, tap: tap)
+    }
+
     /// Called when a wake-up challenge succeeds.
     func wake(_ plant: PlantCollectible) {
         plant.lastLovedAt = now(); try? context.save()
