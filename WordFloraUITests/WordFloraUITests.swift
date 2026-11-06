@@ -595,4 +595,62 @@ final class FidelityScreensUITests: XCTestCase {
             app.terminate()
         }
     }
+
+    /// Badges, Settings, Plus, Daily Bloom and the age question, for the spacing audit (`docs/pm/spacing-audit.md`).
+    func testBadgesSettingsPlusDailyAndAgeScreens() {
+        for look in Self.looks {
+            launch(look, ["-uitest-gardened", "-uitest-everything"])
+            app.buttons["tile-Badges"].tap()
+            XCTAssertTrue(app.staticTexts["Green Thumb"].waitForExistence(timeout: 5))
+            sleep(1); shot("badges-\(look.0)")
+            app.navigationBars.buttons.firstMatch.tap()
+            app.buttons["Settings"].tap()
+            XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+            sleep(1); shot("settings-\(look.0)")
+            app.swipeUp(); sleep(1); shot("settings-\(look.0)-2")
+            let plus = app.buttons["Remove ads and sync with iCloud"]
+            for _ in 0..<6 where !plus.isHittable { app.swipeUp() }
+            plus.tap()
+            XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))
+            sleep(1); shot("plus-\(look.0)")
+            app.terminate()
+            launch(look, ["-uitest-gardened", "-uitest-everything", "-uitest-word=LOTUS"])
+            let daily = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Daily Bloom'")).firstMatch
+            XCTAssertTrue(daily.waitForExistence(timeout: 5))
+            daily.tap()
+            XCTAssertTrue(app.buttons["Z"].waitForExistence(timeout: 5))
+            sleep(1); shot("daily-\(look.0)")
+            app.terminate()
+            XCUIDevice.shared.appearance = look.1
+            app.launchArguments = ["-uitest"] + look.2
+            app.launch()
+            XCTAssertTrue(app.buttons["Under 13"].waitForExistence(timeout: 12))
+            sleep(1); shot("age-\(look.0)")
+            app.terminate()
+        }
+    }
+
+    /// The cards over Home and the game: forecast card, weather banner, break card, the Grand Garden and the seed's
+    /// wake sheet.
+    func testCardScreens() {
+        for look in Self.looks {
+            launch(look, ["-uitest-forecast=bigWind"])
+            sleep(2); shot("forecast-\(look.0)")
+            app.terminate()
+            launch(look, ["-uitest-weather=busyBugs"])
+            sleep(2); shot("banner-\(look.0)")
+            app.terminate()
+            launch(look, ["-uitest-word=LOTUS", "-uitest-break-card"])
+            app.buttons["Play"].tap()
+            XCTAssertTrue(app.staticTexts["Time for a little break"].waitForExistence(timeout: 5))
+            sleep(2); shot("break-\(look.0)")
+            app.terminate()
+            XCUIDevice.shared.appearance = look.1
+            app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-everything", "-uitest-crown", "-uitest-reduce-motion"] + look.2
+            app.launch()
+            XCTAssertTrue(app.descendants(matching: .any)["grandGarden.title"].firstMatch.waitForExistence(timeout: 8))
+            sleep(2); shot("grand-\(look.0)")
+            app.terminate()
+        }
+    }
 }
