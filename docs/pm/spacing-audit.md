@@ -71,5 +71,21 @@ Widgets were not audited (out of scope).
 ## Checked after the fixes
 
 Light, dark and AccessibilityXXXL screenshots of all the screens above, plus the guide in light and at accessibility
-text sizes. The accessibility audits in GuideUITests, WordFloraUITests, RestCardUITests, WeatherUITests,
-EndgameUITests, TendingUITests and HomeLayoutUITests were run after the change.
+text sizes, on a fresh iPhone 17 simulator (iOS 26.5).
+
+UI test results on the branch (after rebasing onto `3-feat-content-and-polish` at f8ff4de):
+
+- FidelityScreensUITests: all 7 pass (two new tests: Badges/Settings/Plus/Daily Bloom/age, and the cards over Home and the game).
+- WeatherUITests (whole class, after the rebase), GuideUITests audits at default and accessibility sizes, HomeLayoutUITests,
+  WordFloraUITests audits for Home, Garden, plant, Shed, Badges, Levels, Settings, Visitors: pass.
+- Same failures on the base commit (a36330c, same simulator, same day), so not from this change:
+  RestCardUITests `testAuditRestCard` and `testAuditRestCardDarkAtALargeTextSize` (Dynamic Type "partially unsupported"
+  or "text clipped" on a different element each run), WordFloraUITests `testAuditGameAndResting` ("Level 1") and
+  `testAuditPaywallAndOnboarding` ("No ads, ever"), and GuideUITests runs where the age tap does not reach the guide
+  within 5 s (`testSkipOnPageFourGoesToTheFirstWord` failed on base too).
+- After the change, text could stop just under iOS 26's top scroll-edge fade in two scroll-to-the-end audits (Badges
+  rank in EndgameUITests, Shed pots in TendingUITests). Both audit helpers now start the visible area 64 pt below the
+  bar. On a rerun those two tests still failed once each with a different finding ('Your Grand Garden' contrast in the
+  replay card, and an unlabelled "potentially inaccessible text" on the Shed pots at AccessibilityL); both elements
+  are unchanged in colour, so these look like the same run-to-run audit noise, but they were not green here.
+- A few TendingUITests runs failed with "Failed to terminate beta.WordFlora" (simulator under load); they passed on rerun.
