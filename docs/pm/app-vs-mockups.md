@@ -1,5 +1,35 @@
 # App vs mockups: fidelity review (2026-11-04)
 
+## Second pass (2026-11-05, evening)
+Build: `3-feat-content-and-polish` at `a42496c` plus the fixes below. Shots came only from the UI test runner (`FidelityScreensUITests` in `WordFloraUITests.swift`, plus the existing Guide, RestCard, Celebration and Tending screenshot tests), on an own iPhone 17 / iOS 26.5 simulator, in light, dark (device and app switch) and AX XXXL (the largest size). Compared with the approved mockups' shot folders: home-v2, fact-card, tending, pots, shed-visitors/shed-v2, rest-card (variant a), level-map, onboarding-guide, logo/v3, celebrate, repot-sheet. To repeat: run `FidelityScreensUITests` with `TEST_RUNNER_SCREENSHOT_DIR=<dir>`; files are `fid-<screen>-<look>.png`.
+
+Already right (no action): level map (light, dark), rest and break cards (variant a), Visitors page, repot sheet at default sizes (A/B/C/E), onboarding guide (checked page for page earlier today), intro and confetti (wordmark v3, rose and gold only), the Home hero blank band (fixed earlier), Shed tools with no price on unfound tools and no unreachable cost.
+
+Fixed in this pass:
+- [must] **Garden: lock icons on plants not found yet** (`PlantCard`), against the no-lock rule; VoiceOver said "Locked plant". Now a soft sparkle and "Not found yet, level N" (unit test).
+- [must] **Plant page at AX XXXL: the tend buttons overflowed** ("Wa-ter", "Fee d", "shin e" spilled over the tiles and each other). From accessibility size 3 up the 2 x 2 tiles show the icon on top and the title on one line (shrinks to fit); the caption stays the VoiceOver value (`TendActionButton.compact`).
+- [should] **Shed Plus pot cards at accessibility sizes** broke "Word-Flora" mid-word in the narrow cards; they say "A Plus pot" there (the full line stays at standard sizes and in VoiceOver).
+- [must] **Game at AX XXXL:** "Help" broke as "Hel / p" (now the bulb alone, still labelled Help), and the keyboard letters spilled out of the keys (now shrink to fit the key). Game is not in the approved list; fixed because it is broken at the largest size.
+- [must] **CopySafety in VoiceOver:** the game flower said "N of 8 petals left" ("left" is banned). Now "N of 8 petals on the flower" (unit test runs CopySafety on it).
+- [must] **Home Explore tiles too tall** (from the first pass, still open): the 96 pt minimum sat inside the padding, so tiles were about 121 pt (Badges 84 pt). Now 96 pt / 64 pt whole tiles.
+- [should] **Home glyphs:** Shed uses the single wrench (`wrench.adjustable.fill`), Badges the filled medal (`medal.fill`), tile icons 24 pt (from the first pass).
+- [should] **Home at AX XXXL:** Daily Bloom broke "every-one" mid-word beside the sun disc; at accessibility sizes the disc sits above the words and the chevron goes. The hero's leaf is dropped at accessibility sizes so "Your garden is new" uses the full width.
+- [should] **Plant page "love petals" caption** (fact-card mockup "3 love petals"): "5 love petals" now sits under the pip row, so the pips never read as lives next to the Life panel hearts (first pass "Love shown twice"; unit test). Left out at accessibility sizes, where the stage is small and the Life sheet right under it carries the love key.
+- [should] **Name card eyebrow** reads "How it got its name" as in the mockup; VoiceOver and the speaker still say "How Daisy got its name" (unit test).
+- [should] **Repot sheet at AX XXXL:** header, pill, summary and button filled the first screen and no pot showed. At accessibility sizes the "Rose pink pot, fresh loam soil" summary now scrolls with the sheet (after the soils), so the pinned footer is the button (and a tapped pot's hint).
+- [should] **Game hint card** (first pass): the speaker sat about 20 pt below a one-line clue and made the card tall; it is now centred on the clue with its 44 pt hit area kept.
+
+Still open:
+- [must, open] **Shed at AX XXXL: tool names break mid-word** ("Mis-ter", "Shea rs"): the tool art grows to about 190 pt beside the words. Two fixes were built and dropped: art capped at 84 pt beside the words, and art above the words from accessibility size 3. Both read well, but with either the Shed pots audit (`testTheShedPotsPassTheAuditAtAccessibilityTextSizes`) reported contrast on a tool tile's line ("Waters 1 plant per tap") at AX XXXL on most runs (4 of 5), where the old layout passes that size (it keeps its known AX L "Butterfly net" flake, 1 of 3 in a quiet rerun). The finding looks like the audit judging a tile mid-reflow, not real contrast, but it is not proven, so the old layout stays. Next step: find why the audit sees tool tiles at all after the test scrolls to the pots (`scrollToEnd`), then land the art-above layout.
+- [owner] **Shed pots: two mockups disagree.** shed-v2 `p-pots` (marked "Proposed") draws the 16 pots on wooden shelves with one goal line and no bars; `pots/s3-shed` (built, approved with the pot ladder) uses cards with a progress bar. The app follows `pots/s3-shed` in a 4 x 4 grid. The `ShelfPlank` asset is ready if the owner picks the shelves.
+- [owner] **Life panel open or collapsed on the plant page** (first pass decision 2): open, it makes the stage tall and the name card starts under the tend bar; the fact-card mockup shows the collapsed "Life" tab.
+- [nice] Home at AX XXXL: the hero (four text lines at that size) pushes Play below the first screen; the mockup's large frame is a smaller size. Nothing clips.
+- [nice] Back buttons are the iOS 26 round glass chevron; mockups show "< Home" text (the level map already says Home).
+- [nice] Rest card title is a size smaller than in mockup a.
+- [nice] Intro at 2.4 s: the flowers are still opening where the mockup strip shows them open (timing only).
+- [nice] Game: no "HINT" eyebrow and no petals caption (old screens mockup, not in the approved list).
+- Test notes are in `docs/STATUS.md` ("Fidelity pass 2").
+
 Side-by-side page: http://localhost:8765/qa/ (app shots in `design-preview/qa/shots/`, rendered first-round mockups in `design-preview/qa/mock/`).
 New level map mockup: http://localhost:8765/level-map/.
 
