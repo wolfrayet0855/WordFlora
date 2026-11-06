@@ -118,3 +118,9 @@ enum WeatherLook {
         optedIn && wildAvailable(ageBand: ageBand, calmMode: calmMode, quietGarden: quietGarden)
     }
 }
+
+/// App-side only (the widget also compiles `WeatherUICopy` but knows no age band).
+extension WeatherUICopy {
+    /// The grown-up note sits under the Wild Weather switch for under-13 players only.
+    static func showsWildGrownUpNote(ageBand: AgeBand?) -> Bool { ageBand == .under13 }
+}

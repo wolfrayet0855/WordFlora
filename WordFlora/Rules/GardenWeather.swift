@@ -120,7 +120,6 @@ enum WeatherUICopy {
     static let wildConfirmMessage = "A big storm can make up to 4 plants look one step smaller. Care, a weather puzzle or time brings them back within 4 days. Your level and your plants stay just as they are."
     /// Shown under the Wild Weather switch for under-13 players only (any age may still choose it).
     static let wildGrownUpNote = "Ask a grown-up if you like."
-    static func showsWildGrownUpNote(ageBand: AgeBand?) -> Bool { ageBand == .under13 }
     static let wildConfirm = "Turn it on"
     static let wildCancel = "Not now"
     static let notifyToggle = "Tell me about garden weather"
