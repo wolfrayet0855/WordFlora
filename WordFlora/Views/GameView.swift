@@ -177,6 +177,8 @@ struct GameView: View {
                         Label("Simpler clue", systemImage: "sparkles").font(Theme.font(.subheadline, weight: .semibold)).frame(minHeight: Theme.minTap)
                     }
                     .accessibilityHint("Asks the on-device assistant to say the clue more simply. Free.")
+                    // The 44 point hit area may reach into the card's padding, so the space under the words matches the top.
+                    .padding(.bottom, -12)
                 }
             }
         }
@@ -290,7 +292,7 @@ struct GameView: View {
                     }
                     .padding(.top, 6)
                 }
-                .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
+                .padding(.horizontal, Space.card).padding(.top, Space.xs).padding(.bottom, Space.card)
             }
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
@@ -332,7 +334,7 @@ struct GameView: View {
                     .padding(.top, 6)
                     if goAdFreeOnCard { goAdFreeRow.padding(.top, 2) }
                 }
-                .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
+                .padding(.horizontal, Space.card).padding(.top, Space.xs).padding(.bottom, Space.card)
             }
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
@@ -399,9 +401,9 @@ struct GameView: View {
     /// Dim (unless the win's own dim is already up), then the card on top so text is never covered.
     /// `padding` is the card's inner padding (the resting and break cards bring their own, under a full-bleed header);
     /// `centered` keeps a short card in the middle of the screen while a tall one still scrolls.
-    private func dimmed<C: View>(dim: Bool = true, padding: CGFloat = 20, centered: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
+    private func dimmed<C: View>(dim: Bool = true, padding: CGFloat = Space.card, centered: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
         let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
-        let card = content().padding(padding).background(Color.appBackground, in: shape).clipShape(shape).padding(24)
+        let card = content().padding(padding).background(Color.appBackground, in: shape).clipShape(shape).padding(Space.section)
         return ZStack {
             if dim { Color.black.opacity(0.45).ignoresSafeArea() }
             if centered {

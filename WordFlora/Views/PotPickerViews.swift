@@ -119,7 +119,7 @@ struct RepotSheet: View {
                 // (and a tapped pot's hint) and the first pots show on the first screen.
                 if typeSize.isAccessibilitySize { RepotSummary(pot: pot, soil: pickedSoil).padding(.top, 16) }
             }
-            .padding(.horizontal, 20).padding(.top, 24).padding(.bottom, 16)
+            .padding(.horizontal, Space.gutter).padding(.top, Space.section).padding(.bottom, Space.card)
             .frame(maxWidth: .infinity, alignment: .leading)
         }
         .scrollIndicators(.visible)
@@ -491,7 +491,7 @@ struct RepotFooter: View {
             .accessibilityIdentifier("repot-go")
         }
         .animation(.easeInOut(duration: reduceMotion ? 0.15 : 0.2), value: hinted)
-        .padding(.horizontal, 20).padding(.top, 8).padding(.bottom, 8)
+        .padding(.horizontal, Space.gutter).padding(.top, Space.s).padding(.bottom, Space.s)
         .background(alignment: .top) {
             Color.appBackground
                 .overlay(alignment: .top) { Rectangle().fill(Color.appPrimaryText.opacity(0.12)).frame(height: 1) }

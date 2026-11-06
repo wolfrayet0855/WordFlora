@@ -324,7 +324,7 @@ struct UpgradeCard: View {
                 Button(ShedCopy.yay, action: done).buttonStyle(PrimaryButtonStyle()).padding(.top, 4)
             }
             .fixedSize(horizontal: false, vertical: true)
-            .padding(18)
+            .padding(Space.card)
             .background(Color.appBackground, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
             .padding(32)
             .scaleEffect(reduceMotion || shown ? 1 : 0.9)

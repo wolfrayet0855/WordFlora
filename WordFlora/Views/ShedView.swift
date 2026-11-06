@@ -32,7 +32,7 @@ struct ShedView: View {
                 }, record: { !app.recordEarnedPots().isEmpty })
                 .padding(.top, 6)
             }
-            .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 40)
+            .padding(.horizontal, Space.gutter).padding(.top, Space.xs).padding(.bottom, 40)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Garden Shed")

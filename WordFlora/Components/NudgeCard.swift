@@ -19,7 +19,7 @@ struct NudgeCard: View {
                 ScrollView {
                     card
                         .background(Color.appBackground, in: shape).clipShape(shape)
-                        .padding(24)
+                        .padding(Space.section)
                         .frame(maxWidth: .infinity, minHeight: geo.size.height)
                 }
                 .scrollBounceBehavior(.basedOnSize)
@@ -58,7 +58,7 @@ struct NudgeCard: View {
                 }
                 .padding(.top, 6)
             }
-            .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
+            .padding(.horizontal, Space.card).padding(.top, Space.xs).padding(.bottom, Space.card)
         }
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isModal)

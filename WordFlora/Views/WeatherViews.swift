@@ -117,7 +117,7 @@ struct ForecastCard: View {
                 .accessibilityHint(WeatherUICopy.gotItHint)
                 .accessibilityIdentifier("weather-gotit")
             }
-            .padding(14)
+            .padding(Space.card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.appSurface, in: shape)
@@ -206,7 +206,7 @@ struct WeatherBanner: View {
                     .accessibilityIdentifier("weather-puzzle")
                 }
             }
-            .padding(14)
+            .padding(Space.card)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.tileGardenFill, in: shape)

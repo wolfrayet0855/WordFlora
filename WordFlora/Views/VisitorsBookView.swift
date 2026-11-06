@@ -43,7 +43,7 @@ struct VisitorsBookView: View {
                     }
                 }
             }
-            .padding(20)
+            .padding(.horizontal, Space.gutter).padding(.vertical, Space.card)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle(EndgameCopy.visitorsBook)
@@ -79,7 +79,7 @@ struct VisitorsBookView: View {
             }
             Spacer(minLength: 0)
         }
-        .padding(14)
+        .padding(Space.card)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(isMet ? Color.appSurface : Color.clear, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius)
