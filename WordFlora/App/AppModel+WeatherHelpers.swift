@@ -84,7 +84,7 @@ extension AppModel {
                                           allFound: allPlantsFound)
     }
 
-    var weatherPuzzleOffersHarder: Bool { WeatherPuzzlePolicy.offersHarder(ageBand: settings.ageBand, wild: weatherNow.wild) }
+    var weatherPuzzleOffersHarder: Bool { WeatherPuzzlePolicy.offersHarder(calm: settings.calmMode, wild: weatherNow.wild) }
 
     /// Names the puzzle draws from: found plants when there are enough for the tier, else the whole catalog.
     func weatherPuzzleNames(tier: WeatherPuzzleTier) -> [String] {

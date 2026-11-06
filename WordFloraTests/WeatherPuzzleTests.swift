@@ -109,10 +109,9 @@ final class WeatherPuzzleTests: XCTestCase {
         XCTAssertEqual(WeatherPuzzlePolicy.tier(wild: true, pickedHarder: false), .storm)
         XCTAssertEqual(WeatherPuzzlePolicy.tier(wild: false, pickedHarder: true), .storm)
         XCTAssertEqual(WeatherPuzzlePolicy.tier(wild: false, pickedHarder: false), .gentle)
-        XCTAssertTrue(WeatherPuzzlePolicy.offersHarder(ageBand: .eighteenPlus, wild: false))
-        XCTAssertFalse(WeatherPuzzlePolicy.offersHarder(ageBand: .under13, wild: false))
-        XCTAssertFalse(WeatherPuzzlePolicy.offersHarder(ageBand: nil, wild: false))
-        XCTAssertFalse(WeatherPuzzlePolicy.offersHarder(ageBand: .eighteenPlus, wild: true), "Wild Weather is already the harder one")
+        XCTAssertTrue(WeatherPuzzlePolicy.offersHarder(calm: false, wild: false), "opt-in at any age")
+        XCTAssertFalse(WeatherPuzzlePolicy.offersHarder(calm: true, wild: false))
+        XCTAssertFalse(WeatherPuzzlePolicy.offersHarder(calm: false, wild: true), "Wild Weather is already the harder one")
     }
 
     func testTheDailyCapHolds() {

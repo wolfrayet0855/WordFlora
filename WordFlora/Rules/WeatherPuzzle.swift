@@ -116,9 +116,11 @@ enum WeatherPuzzlePolicy {
         return age >= 0 && age < economy.weatherPuzzleDays && !rescuedDays.contains(w.eventDay)
     }
 
-    /// Wild Weather always plays the storm tier; otherwise gentle, with "A harder one" for 13+.
+    /// Wild Weather always plays the storm tier; otherwise gentle, with an optional "A harder one" chip. Owner decision
+    /// (2026-11-05): challenge is opt-in at any age and Calm decides calm, so the chip shows whenever the puzzle does
+    /// (the puzzle itself never shows in Calm). Gentle stays the default pick.
     static func tier(wild: Bool, pickedHarder: Bool) -> WeatherPuzzleTier { wild || pickedHarder ? .storm : .gentle }
-    static func offersHarder(ageBand: AgeBand?, wild: Bool) -> Bool { !wild && ageBand != nil && ageBand != .under13 }
+    static func offersHarder(calm: Bool, wild: Bool) -> Bool { !wild && !calm }
 
     /// Fresh puzzles started today (the stored pair is `weatherPuzzleDay`/`weatherPuzzleCount`).
     static func startedToday(puzzleDay: Int, puzzleCount: Int, today: Int) -> Int { puzzleDay == today ? max(0, puzzleCount) : 0 }
