@@ -26,4 +26,15 @@ final class PlantVoiceTests: XCTestCase {
         let many = Set((0..<30).map { PlantVoice.line(plantId: "rose", event: .water, daySeed: $0) })
         XCTAssertGreaterThan(many.count, 1)
     }
+
+    /// A tap hello gets a short gentle answer; each tap in a day moves to the next line so a few taps show variety.
+    func testAHelloGetsAGentleAnswerThatChangesFromTapToTap() {
+        for t in PlantVoice.Trait.allCases {
+            XCTAssertGreaterThanOrEqual(PlantVoice.lines(trait: t, event: .hello).count, 3)
+        }
+        let first = PlantVoice.helloLine(plantId: "rose", daySeed: 100, tap: 1)
+        XCTAssertEqual(first, PlantVoice.helloLine(plantId: "rose", daySeed: 100, tap: 1))
+        XCTAssertNotEqual(first, PlantVoice.helloLine(plantId: "rose", daySeed: 100, tap: 2))
+        XCTAssertTrue(PlantVoice.lines(trait: PlantVoice.trait(for: "rose"), event: .hello).contains(first))
+    }
 }

@@ -339,6 +339,9 @@ final class WordFloraUITests: XCTestCase {
         app.buttons["Visitors"].tap()
         XCTAssertTrue(app.staticTexts["3 of 12 friends met"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["Say hello"].exists)
+        let friend = app.staticTexts["visitors.friendOfTheDay"]
+        XCTAssertTrue(friend.exists, "a friend of the day")
+        XCTAssertTrue(friend.label.hasPrefix("Say hello to a") && friend.label.hasSuffix(" today"), friend.label)
         let unmet = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'visitor-unmet-'"))
         XCTAssertEqual(unmet.count, 9, "friends not met yet show as soft outlines")
         XCTAssertFalse(app.images["lock.fill"].exists)
@@ -380,6 +383,14 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertFalse(app.buttons["shed.upgradeButton"].exists)
         XCTAssertEqual(prices.count, 0)
         shot("shed-quiet-sheet")
+    }
+
+    func testVisitorsInQuietGardenHaveNoFriendOfTheDay() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything", "-uitest-quiet"]
+        app.launch()
+        app.buttons["Visitors"].tap()
+        XCTAssertTrue(app.buttons["Say hello"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["visitors.friendOfTheDay"].exists)
     }
 
     func testAuditVisitorsAndShed() {
@@ -678,13 +689,15 @@ final class ParentalGateLinkUITests: XCTestCase {
     private func expectGateThenCancel(after tapping: XCUIElement) {
         scrollTo(tapping)
         tapping.tap()
-        XCTAssertTrue(app.staticTexts["For grown-ups"].waitForExistence(timeout: 3))
+        // The young player's Settings section is also called "For grown-ups", so the gate is found by its answer field.
         let answer = app.textFields["parentalGate.answer"]
+        XCTAssertTrue(answer.waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Please ask a grown-up to answer this before continuing."].exists)
         answer.tap(); answer.typeText("1")
         app.buttons["Continue"].tap()
         XCTAssertTrue(app.staticTexts["Not quite. Try again."].waitForExistence(timeout: 2), "a wrong answer stays in the app")
         app.buttons["Cancel"].tap()
-        XCTAssertFalse(app.staticTexts["For grown-ups"].waitForExistence(timeout: 2))
+        XCTAssertFalse(answer.waitForExistence(timeout: 2))
         XCTAssertEqual(app.state, .runningForeground)
     }
 
@@ -696,9 +709,14 @@ final class ParentalGateLinkUITests: XCTestCase {
 
     func testUnder13PlusLinksAskAGrownUpFirst() {
         launch(age: "under13")
-        scrollTo(app.buttons["Remove ads and sync with iCloud"])
-        app.buttons["Remove ads and sync with iCloud"].tap()
-        XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))
+        let row = app.buttons["settings.plus"]
+        scrollTo(row)
+        XCTAssertEqual(row.label, "WordFlora Plus", "no ad or price pitch on the young player's row")
+        XCTAssertFalse(app.buttons["Remove ads and sync with iCloud"].exists)
+        XCTAssertTrue(app.staticTexts["For grown-ups"].exists, "the section is for grown-ups")
+        row.tap()
+        XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].label.hasPrefix("WordFlora is complete without Plus."))
         expectGateThenCancel(after: app.buttons["Terms of Use"])
         expectGateThenCancel(after: app.buttons["Manage subscription"])
     }
@@ -709,5 +727,11 @@ final class ParentalGateLinkUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Privacy Policy"].exists)
         XCTAssertTrue(app.buttons["Report an ad"].exists)
         XCTAssertFalse(app.staticTexts["For grown-ups"].exists)
+        let row = app.buttons["settings.plus"]
+        scrollTo(row)
+        XCTAssertEqual(row.label, "Remove ads and sync with iCloud", "the grown-up row is unchanged")
+        row.tap()
+        XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["plus.grownUpsIntro"].exists)
     }
 }

@@ -489,6 +489,14 @@ Garden weather: now and then a big wind, a dry spell or a frosty night visits yo
 ```
 Re-answer the age-rating questionnaire with weather in mind (spec Q-1): cartoon-gentle, infrequent, no fear or peril.
 
+### D6b. Description lines for ads, Plus and the Terms of Use
+Add these lines to the end of the App Store description (the app uses Apple's standard license agreement, the same link as the Terms of Use button on the Plus page):
+```
+Free with ads for grown-up players; WordFlora Plus removes ads and syncs your garden with iCloud. Players under 13 never see ads. Family Sharing covers up to six people.
+WordFlora Plus is an auto-renewing subscription (yearly with a 3-day free trial for new subscribers, or monthly). It renews unless turned off at least 24 hours before the end of the period, and you can manage or cancel it in your App Store account settings.
+Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+```
+
 ### D8. Review notes (paste into App Store Connect > App Review Information > Notes)
 ```
 WordFlora is a gentle word-guessing garden game for a mixed audience. It asks the player's age band at the start (under 13, 13 to 17, 18 or older).

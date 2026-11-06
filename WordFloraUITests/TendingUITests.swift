@@ -81,6 +81,16 @@ final class TendingUITests: XCTestCase {
         XCTAssertEqual(water.value as? String, "Give a drink", "one drink is good; a second still works")
     }
 
+    /// A tap hello: the plant answers with a short line in the same toast the tend lines use.
+    func testATapHelloGetsAShortAnswer() {
+        open("Daisy", plantId: "daisy")
+        app.buttons["plant-love"].tap()
+        XCTAssertTrue(toast.waitForExistence(timeout: 3), "the plant says hello back")
+        XCTAssertFalse(toast.label.contains("growth"), toast.label)
+        XCTAssertFalse(toast.label.isEmpty)
+        shot("tend-hello")
+    }
+
     func testFeedSunAndRepotEachPlayTheirEffect() {
         open("Daisy", plantId: "daisy", extra: ["-uitest-tend-hold"])
         app.buttons["tend-feed"].tap()

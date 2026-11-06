@@ -5,7 +5,7 @@ import Foundation
 /// here is random in a way that touches rewards: the trait is fixed per plant and the line only varies by day.
 enum PlantVoice {
     enum Trait: CaseIterable { case cheerful, sleepy, shy }
-    enum Event: CaseIterable { case water, soil, sun, prune, grew }
+    enum Event: CaseIterable { case water, soil, sun, prune, grew, hello }
 
     static func trait(for plantId: String) -> Trait {
         let h = plantId.unicodeScalars.reduce(UInt32(5381)) { ($0 &* 33) &+ $1.value }
@@ -29,7 +29,15 @@ enum PlantVoice {
         case (.shy, .sun): return ["The light is so soft today.", "Peeking out to say thanks."]
         case (.shy, .prune): return ["That felt careful, thank you.", "Oh, so gentle."]
         case (.shy, .grew): return ["I think I grew a bit!", "Look, a new little leaf."]
+        case (.cheerful, .hello): return ["Hello, hello! Great to see you!", "Hi there, friend!", "Yay, a hello!", "Hello! Want to play?"]
+        case (.sleepy, .hello): return ["Mmm, hello there.", "Oh, hi. That was nice.", "A soft hello back to you.", "Hello, sunny friend."]
+        case (.shy, .hello): return ["Oh! Hi there.", "Hello... thank you for saying hi.", "A little wave back to you.", "Hi. I am glad you came."]
         }
+    }
+
+    /// A tap hello's answer. Each tap moves to the next line, so a few hellos in a row show a few different lines.
+    static func helloLine(plantId: String, daySeed: Int, tap: Int) -> String {
+        line(plantId: plantId, event: .hello, daySeed: daySeed &+ tap)
     }
 
     static func line(plantId: String, event: Event, daySeed: Int) -> String {

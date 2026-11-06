@@ -53,6 +53,15 @@ enum VisitorSpawner {
         return lantern ? day + night : day
     }
 
+    /// The Visitors page's friend of the day: one daytime visitor, fixed for a player's seed and a Gregorian day key
+    /// (`WeatherDay.key`), mixed the same way the weather is so every device agrees. Only a suggestion: catching and
+    /// meeting work as always.
+    static func friendOfTheDay(seed: Int64, day: Int) -> VisitorSpecies {
+        let ids = pool(evening: false, lantern: false)
+        let x = WeatherEngine.mix(UInt64(bitPattern: seed) ^ WeatherEngine.mix(UInt64(bitPattern: Int64(day)) &+ 0x5A17_F00D))
+        return VisitorCatalog.species(ids[Int(x % UInt64(ids.count))])!
+    }
+
     private static func weight(_ r: VisitorCatalog.Rarity) -> Int {
         switch r { case .common: return 6; case .uncommon: return 3; case .rare: return 1 }
     }
@@ -118,6 +127,10 @@ enum VisitorsCopy {
     static let playBlurbCalm = "Take your time. Say hello to 5 friends, or tap Done."
     static let playBlurbTap = "Tap the visitors resting on the flowers. Every visit is a good one."
     static let sayHello = "Say hello"
+    static func friendOfTheDay(_ name: String) -> String {
+        let article = name.first.map { "AEIOU".contains($0.uppercased()) } == true ? "an" : "a"
+        return "Say hello to \(article) \(name) today"
+    }
     static let eveningTitle = "Evening friends"
     static let eveningTimes = "5:30 to 9:30 pm"
     static func netTitle(tier: Int) -> String { "Your net: " + ["small", "medium", "big"][min(3, max(1, tier)) - 1] }

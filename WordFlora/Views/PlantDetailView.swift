@@ -328,11 +328,13 @@ struct PlantDetailView: View {
         return GrandGardenArt.stageScale(snap.shownStage) / GrandGardenArt.stageScale(snap.stage)
     }
 
-    /// A small hello: the plant sways back and settles, hearts float up, and it counts as love.
+    /// A small hello: the plant sways back and settles, hearts float up, it counts as love, and the plant answers
+    /// with a short line in the same toast (and VoiceOver announcement) the tend lines use.
     private func hello(_ plant: PlantCollectible) {
         if app.showsWakeCard(plant) { showWake = true; return }   // Wake the seed: a tap on a seed offers the wake sheet
         hellos += 1
         app.love(plant)
+        show(app.helloLine(plant, tap: hellos), ok: true, after: 0)
         guard !reduceMotion else { return }
         withAnimation(.interpolatingSpring(stiffness: 90, damping: 5)) { sway = 7 }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) { withAnimation(.interpolatingSpring(stiffness: 90, damping: 5)) { sway = 0 } }

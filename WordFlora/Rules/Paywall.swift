@@ -76,3 +76,17 @@ enum ParentalGate {
 
     static func isRequired(ageBand: AgeBand?) -> Bool { ageBand == nil || ageBand == .under13 }
 }
+
+/// The Settings way into Plus. Young players and unknown ages see it as "For grown-ups", and Plus opens with one calm
+/// line saying the game is complete without it. Teen and adult players see the usual row. The purchase itself still
+/// asks a grown-up first (ParentalGate); nothing changes on the play screens.
+enum PlusEntry {
+    static let grownUps = "For grown-ups"
+    static let introLine = "WordFlora is complete without Plus. Plus removes ads for grown-up players and syncs the garden with iCloud. Family Sharing covers up to six people."
+
+    static func sectionTitle(ageBand: AgeBand?) -> String { ParentalGate.isRequired(ageBand: ageBand) ? grownUps : PlusPlan.groupName }
+    static func rowTitle(ageBand: AgeBand?) -> String {
+        ParentalGate.isRequired(ageBand: ageBand) ? PlusPlan.groupName : "Remove ads and sync with iCloud"
+    }
+    static func intro(ageBand: AgeBand?) -> String? { ParentalGate.isRequired(ageBand: ageBand) ? introLine : nil }
+}
