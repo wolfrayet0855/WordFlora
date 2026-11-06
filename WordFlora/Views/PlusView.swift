@@ -190,8 +190,8 @@ struct GatedLink: View {
 enum Links {
     static let manageSubscriptions = URL(string: "https://apps.apple.com/account/subscriptions")!
     static let terms = URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!
-    /// Owner to confirm the hosted privacy policy address (spec section 6).
-    static let privacy = URL(string: "https://wordflora.app/privacy")!
-    static let support = URL(string: "https://wordflora.app/support")!
-    static let reportAd = URL(string: "mailto:support@wordflora.app?subject=Report%20an%20ad")!
+    /// The hosted privacy policy (also entered in App Store Connect).
+    static let privacy = URL(string: "https://shapehaveninnovations.com/privacy")!
+    /// Google's AdMob help centre, where an ad can be reported.
+    static let reportAd = URL(string: "https://support.google.com/admob")!
 }
