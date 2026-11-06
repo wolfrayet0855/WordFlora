@@ -4,7 +4,7 @@ import SwiftUI
 // only the helper for tomorrow's (or today's) weather has a Set out button, the rest read Ready. No prices, no Plus
 // tags, no locks, and nothing is used up. Hidden in Calm and Quiet Garden.
 
-/// The helper's picture: a drawn icon in a ring (builder C may swap in final art by name `helper_<id>`).
+/// The helper's picture: drawn art (`HelperArt`) in a ring.
 struct HelperIcon: View {
     let helper: WeatherHelper
     @ScaledMetric(relativeTo: .title2) private var size: CGFloat = 52
@@ -13,12 +13,7 @@ struct HelperIcon: View {
         ZStack {
             Circle().fill(Color.appBackground)
             Circle().strokeBorder(Color(red: 0.55, green: 0.36, blue: 0.20), lineWidth: 3)
-            if UIImage(named: "helper_\(helper.rawValue)") != nil {
-                Image("helper_\(helper.rawValue)").resizable().scaledToFit().padding(size * 0.14)
-            } else {
-                Image(systemName: helper.symbol).font(.system(size: size * 0.42, weight: .semibold))
-                    .foregroundStyle(Color.successText)
-            }
+            HelperArt(helper: helper).padding(size * 0.12)
         }
         .frame(width: size, height: size)
         .accessibilityHidden(true)

@@ -77,4 +77,34 @@ final class WeatherArtSnapshotTests: XCTestCase {
             XCTAssertGreaterThan(colourCount(try render(GrandGardenPanorama(plants: garden, gold: true, still: true), "grand-garden-gold", dark: dark, width: 393)), 12)
         }
     }
+    /// The weather kit art (Shed helpers, stickers, the Weathered badge tiers): each one draws, each is its own picture,
+    /// and the helpers' line ink follows dark mode. Saved for a look beside design-preview/events.
+    func testTheWeatherKitArtDrawsAndEachPictureIsItsOwn() throws {
+        var helperShots: [Data] = []
+        for h in WeatherHelper.allCases {
+            var bytes: [Data] = []
+            for dark in [false, true] {
+                let img = try render(HelperArt(helper: h).frame(width: 120, height: 120), "helper-\(h.rawValue)", dark: dark, width: 120)
+                XCTAssertGreaterThan(colourCount(img), 5, "\(h) looks blank")
+                bytes.append(img.pngData() ?? Data())
+            }
+            XCTAssertNotEqual(bytes[0], bytes[1], "\(h): the line ink lightens in dark mode")
+            helperShots.append(bytes[0])
+        }
+        XCTAssertEqual(Set(helperShots).count, WeatherHelper.allCases.count, "every helper has its own picture")
+        var stickerShots: [Data] = []
+        for st in WeatherSticker.allCases {
+            let img = try render(StickerArt(sticker: st).frame(width: 120, height: 120), "sticker-\(st.rawValue)", dark: false, width: 120)
+            XCTAssertGreaterThan(colourCount(img), 4, "\(st) looks blank")
+            stickerShots.append(img.pngData() ?? Data())
+        }
+        XCTAssertEqual(Set(stickerShots).count, WeatherSticker.allCases.count, "every sticker has its own picture")
+        var badgeShots: [Data] = []
+        for tier in 1...3 {
+            let img = try render(WeatheredBadgeArt(tier: tier).frame(width: 160, height: 160), "badge-weathered-t\(tier)", dark: false, width: 160)
+            XCTAssertGreaterThan(colourCount(img), 8, "tier \(tier) looks blank")
+            badgeShots.append(img.pngData() ?? Data())
+        }
+        XCTAssertEqual(Set(badgeShots).count, 3, "bronze, silver and gold differ")
+    }
 }

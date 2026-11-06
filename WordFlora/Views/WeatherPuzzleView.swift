@@ -8,16 +8,15 @@ import SwiftUI
 // day and the plant page of a weathered plant when `app.weatherPuzzleOpen`. Wild Weather's second part (the butterfly
 // catch, E-12) can follow `onSolvedWord` before the solve is recorded.
 
-/// A weather sticker drawn as a picture (an emoji rendered to an image, so it is never judged as text).
+/// A weather sticker's picture (drawn art, `StickerArt`), one image with its name for VoiceOver.
 struct WeatherStickerImage: View {
     let sticker: WeatherSticker
     var owned = true
     @ScaledMetric(relativeTo: .title) private var size: CGFloat = 56
 
     var body: some View {
-        Image(uiImage: Self.render(sticker.emoji))
-            .resizable().scaledToFit()
-            .padding(size * 0.14)
+        StickerArt(sticker: sticker)
+            .padding(size * 0.08)
             .frame(width: size, height: size)
             .background(Circle().fill(Color.appSurface))
             .overlay(Circle().stroke(Color.appPrimaryText.opacity(0.15), style: StrokeStyle(lineWidth: 1.5, dash: owned ? [] : [4, 3])))
@@ -25,19 +24,6 @@ struct WeatherStickerImage: View {
             .accessibilityElement()
             .accessibilityLabel(EndgameCopy.stickerPage(sticker.name, owned: owned))
             .accessibilityAddTraits(.isImage)
-    }
-
-    @MainActor private static var cache: [String: UIImage] = [:]
-    @MainActor static func render(_ emoji: String) -> UIImage {
-        if let c = cache[emoji] { return c }
-        let s = CGSize(width: 96, height: 96)
-        let img = UIGraphicsImageRenderer(size: s).image { _ in
-            let a = NSAttributedString(string: emoji, attributes: [.font: UIFont.systemFont(ofSize: 76)])
-            let b = a.size()
-            a.draw(at: CGPoint(x: (s.width - b.width) / 2, y: (s.height - b.height) / 2))
-        }
-        cache[emoji] = img
-        return img
     }
 }
 

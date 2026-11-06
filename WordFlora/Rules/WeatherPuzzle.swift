@@ -32,19 +32,6 @@ enum WeatherSticker: Int, CaseIterable, Identifiable {
         }
     }
 
-    /// Drawn as a picture (never as text, so the accessibility audit sees one image with its label).
-    var emoji: String {
-        switch self {
-        case .rainbow: return "🌈"
-        case .frogFriend: return "🐸"
-        case .ladybird: return "🐞"
-        case .kite: return "🪁"
-        case .snowflake: return "❄️"
-        case .sunHat: return "👒"
-        case .puddleBoots: return "🥾"
-        }
-    }
-
     /// The next sticker to earn: the first one not in the album yet. Nil once all seven are there.
     static func next(in album: StickerAlbum) -> WeatherSticker? { allCases.first { album.count(of: $0.id) == 0 } }
     static func owned(in album: StickerAlbum) -> [WeatherSticker] { allCases.filter { album.count(of: $0.id) > 0 } }

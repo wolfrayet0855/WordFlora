@@ -71,18 +71,6 @@ enum WeatherHelper: String, CaseIterable, Identifiable {
     static func helper(for kind: WeatherKind) -> WeatherHelper {
         allCases.first { $0.kinds.contains(kind) } ?? .shadeCloth
     }
-
-    /// An SF Symbol used until the drawn helper art lands.
-    var symbol: String {
-        switch self {
-        case .shadeCloth: return "sun.haze"
-        case .bugCover: return "ladybug"
-        case .windNet: return "wind"
-        case .frostCloth: return "snowflake"
-        case .umbrella: return "umbrella"
-        case .raisedBed: return "leaf"
-        }
-    }
 }
 
 enum ShelterPolicy {

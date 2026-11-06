@@ -252,6 +252,8 @@ final class ButterflyAndBadgeTests: XCTestCase {
         for d in try BadgeCatalog.load() {
             XCTAssertFalse((d.title ?? "").isEmpty, d.id); XCTAssertFalse((d.blurb ?? "").isEmpty, d.id)
             XCTAssertEqual(CopySafety.check(d.title ?? ""), [], d.id); XCTAssertEqual(CopySafety.check(d.blurb ?? ""), [], d.id)
+            // The Weathered badge is drawn in code (WeatheredBadgeArt); every other badge ships image art.
+            if BadgeArtView.drawn.contains(d.id) { continue }
             for tier in 1...3 { XCTAssertNotNil(UIImage(named: "badge_\(d.id)_t\(tier)"), "missing art badge_\(d.id)_t\(tier)") }
         }
     }

@@ -78,8 +78,7 @@ struct BadgeMomentView: View {
                 PetalConfettiView(level: level, origin: .point(centre), seed: UInt64(unlock.tier) &+ 13, arcRadius: 110,
                                   freezeAt: hold ? 0.9 : nil)      // UI tests hold one frame of the spiral
                 VStack(spacing: 18) {
-                    Image("badge_\(unlock.badgeId)_t\(max(1, min(3, unlock.tier)))")
-                        .resizable().scaledToFit()
+                    BadgeArtView(badgeId: unlock.badgeId, tier: unlock.tier)
                         .frame(width: 150, height: 150)
                         .scaleEffect(pops ? (shown ? 1 : 0.3) : 1)
                         .rotationEffect(.degrees(pops && !shown ? -12 : 0))

@@ -32,7 +32,7 @@ struct BadgesView: View {
         let tier = (1...3).filter { state.unlockedDate(badge: def.id, tier: $0) != nil }.max() ?? 0
         let nextThreshold = tier < 3 ? def.thresholds[tier] : def.thresholds[2]
         return VStack(spacing: 8) {
-            Image("badge_\(def.id)_t\(max(1, tier))").resizable().scaledToFit().frame(height: 84)
+            BadgeArtView(badgeId: def.id, tier: max(1, tier)).frame(height: 84)
                 .saturation(tier > 0 ? 1 : 0).opacity(tier > 0 ? 1 : 0.35).accessibilityHidden(true)
             Text(def.title ?? def.id).font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             Text(def.blurb ?? "").font(Theme.font(.caption)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)

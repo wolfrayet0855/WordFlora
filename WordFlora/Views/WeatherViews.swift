@@ -150,7 +150,7 @@ struct ForecastCard: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
             Button { app.setOutHelper(); helperState = app.helperState(helper) } label: {
-                Label(ShelterCopy.cardStep(helper), systemImage: helper.symbol)
+                Label { Text(ShelterCopy.cardStep(helper)) } icon: { HelperArt(helper: helper).frame(width: 28, height: 28) }
                     .font(Theme.font(.callout, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                     .padding(.horizontal, 16).frame(minHeight: Theme.minTap)
                     .overlay(Capsule().stroke(Color.successText, lineWidth: 2))
