@@ -78,6 +78,7 @@ struct ShedWeatherSection: View {
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(state == .setOut ? Color.successText : Color.appPrimaryText.opacity(0.08),
                                                                           lineWidth: state == .setOut ? 2 : 1))
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("helper.\(h.rawValue)")
     }
 

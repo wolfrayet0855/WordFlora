@@ -194,14 +194,20 @@ private struct GrandGardenPage: View {
                     Label(EndgameCopy.crownEarned, systemImage: "sparkles")
                         .font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                         .padding(.horizontal, 14).padding(.vertical, 8)
-                        .background(crownGold.opacity(0.28), in: Capsule())
-                    Text(EndgameCopy.everyPlantFound)
-                        .font(Theme.font(.largeTitle, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
-                        .multilineTextAlignment(.center).accessibilityAddTraits(.isHeader)
-                        .accessibilityFocused(titleFocus)
-                        .accessibilityIdentifier("grandGarden.title")
-                    Text(EndgameCopy.everyPlantLine)
-                        .font(Theme.font(.body)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
+                        .background(Color.appSurface, in: Capsule())
+                        .overlay(Capsule().stroke(crownGold, lineWidth: 2))
+                    // A soft card under the words, so falling petals never pass behind the text.
+                    VStack(spacing: 8) {
+                        Text(EndgameCopy.everyPlantFound)
+                            .font(Theme.font(.largeTitle, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                            .multilineTextAlignment(.center).accessibilityAddTraits(.isHeader)
+                            .accessibilityFocused(titleFocus)
+                            .accessibilityIdentifier("grandGarden.title")
+                        Text(EndgameCopy.everyPlantLine)
+                            .font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal, 12).padding(.vertical, 8)
+                    .background(Color.appBackground, in: RoundedRectangle(cornerRadius: 18))
                     GardenHills(plants: app.plants(), compact: typeSize.isAccessibilitySize)
                         .padding(.horizontal, -20)
                     legend
@@ -217,16 +223,15 @@ private struct GrandGardenPage: View {
     }
 
     private var legend: some View {
-        ViewThatFits {
-            HStack(spacing: 24) { legendItem(EndgameCopy.stillGrowing, small: true); legendItem(EndgameCopy.fullBloom, small: false) }
-            VStack(alignment: .leading, spacing: 8) { legendItem(EndgameCopy.stillGrowing, small: true); legendItem(EndgameCopy.fullBloom, small: false) }
-        }
+        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 8)) : AnyLayout(HStackLayout(spacing: 24))
+        return layout { legendItem(EndgameCopy.stillGrowing, small: true); legendItem(EndgameCopy.fullBloom, small: false) }
     }
 
     private func legendItem(_ text: String, small: Bool) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "camera.macro").font(small ? .caption : .body).foregroundStyle(Color.successText).accessibilityHidden(true)
             Text(text).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 }
@@ -344,13 +349,12 @@ struct GoldenPips: View {
     let days: Int
     let label: String
     @ScaledMetric(relativeTo: .body) private var pip: CGFloat = 16
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
         let goal = Economy.default.goldenDaysNeeded
-        ViewThatFits {
-            HStack(spacing: 10) { pips(goal); words }
-            VStack(alignment: .leading, spacing: 6) { pips(goal); words }
-        }
+        let layout = typeSize >= .xxLarge ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6)) : AnyLayout(HStackLayout(spacing: 10))
+        layout { pips(goal); if !label.isEmpty { words } }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(EndgameCopy.goldenPips(days: min(days, goal), of: goal))
     }
@@ -386,7 +390,8 @@ struct RankChips: View {
                 .background(r == rank ? Color.appAccent : Color.appBackground, in: Capsule())
                 .overlay(Capsule().stroke(Color.appPrimaryText.opacity(0.12)))
             }
-            .accessibilityHidden(true)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(BloomRank.allCases.dropFirst().map(\.name).joined(separator: ", "))
             Text(EndgameCopy.youAre(rank)).font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                 .accessibilityIdentifier("bloomRank.line")
         }
@@ -419,12 +424,16 @@ private struct GoldCrownPage: View {
                 VStack(spacing: 16) {
                     GardenerCrownView(gold: true).frame(maxWidth: 280).padding(.top, 40)
                         .background(Circle().fill(crownGold.opacity(0.3)).blur(radius: 30).accessibilityHidden(true))
-                    Text(EndgameCopy.goldCrownTitle).font(Theme.font(.largeTitle, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
-                        .multilineTextAlignment(.center).accessibilityAddTraits(.isHeader).accessibilityFocused(titleFocus)
-                        .accessibilityIdentifier("goldCrown.title")
-                    Text(EndgameCopy.goldCrownLine).font(Theme.font(.title3, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
-                        .multilineTextAlignment(.center)
-                    Text(EndgameCopy.goldCrownTurns).font(Theme.font(.body)).foregroundStyle(Color.secondaryText).multilineTextAlignment(.center)
+                    VStack(spacing: 10) {
+                        Text(EndgameCopy.goldCrownTitle).font(Theme.font(.largeTitle, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                            .multilineTextAlignment(.center).accessibilityAddTraits(.isHeader).accessibilityFocused(titleFocus)
+                            .accessibilityIdentifier("goldCrown.title")
+                        Text(EndgameCopy.goldCrownLine).font(Theme.font(.title3, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                            .multilineTextAlignment(.center)
+                        Text(EndgameCopy.goldCrownTurns).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center)
+                    }
+                    .padding(.horizontal, 12).padding(.vertical, 8)
+                    .background(Color.appBackground, in: RoundedRectangle(cornerRadius: 18))
                     GardenHills(plants: app.plants(), compact: true).padding(.horizontal, -20)
                     Button(EndgameCopy.lovely, action: done).buttonStyle(PrimaryButtonStyle()).accessibilityIdentifier("goldCrown.done")
                 }

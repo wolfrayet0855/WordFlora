@@ -189,14 +189,14 @@ struct HomeView: View {
                 if let wordsTowardPlant {
                     // HOOK (progress meter): the visual words-toward-plant meter (mocked separately) goes here.
                     Text(PlantProgressCopy.homeLine(toward: wordsTowardPlant, per: app.game.wordsPerPlant))
-                        .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
+                        .font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)   // full ink: the audit found 88% too faint on the hero
                         .fixedSize(horizontal: false, vertical: true)
                 }
                 if showRose {
                     let threshold = Economy.default.roseThreshold
                     let full = roseStock >= Economy.default.roseCap
                     Text(HomeRoseLine.text(stock: roseStock, progress: roseProgress, threshold: threshold, full: full))
-                        .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
+                        .font(Theme.font(.caption)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }

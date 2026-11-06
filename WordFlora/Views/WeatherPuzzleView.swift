@@ -48,6 +48,7 @@ struct WeatherPuzzleSheet: View {
 
     @Environment(AppModel.self) private var app
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var stage: Stage = .intro
     @State private var harder = false
     @State private var puzzle: WakePuzzle?
@@ -107,10 +108,8 @@ struct WeatherPuzzleSheet: View {
                 .background(Color.appAccent.opacity(0.14), in: RoundedRectangle(cornerRadius: Theme.cardRadius))
                 .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appAccent.opacity(0.6)))
                 if app.weatherPuzzleOffersHarder {
-                    ViewThatFits {
-                        HStack(spacing: 10) { tierChip(false); tierChip(true) }
-                        VStack(spacing: 10) { tierChip(false); tierChip(true) }
-                    }
+                    let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 10)) : AnyLayout(HStackLayout(alignment: .top, spacing: 10))
+                    layout { tierChip(false); tierChip(true) }
                 }
                 Button(WeatherPuzzleCopy.start) { start() }.buttonStyle(PrimaryButtonStyle())
                     .accessibilityIdentifier("weatherPuzzle.start")
@@ -136,6 +135,7 @@ struct WeatherPuzzleSheet: View {
                 Text(isHarder ? WeatherPuzzleCopy.harder : WeatherPuzzleCopy.gentle).font(Theme.font(.headline, weight: .bold))
                 Text(isHarder ? WeatherPuzzleCopy.harderSub : WeatherPuzzleCopy.gentleSub).font(Theme.font(.footnote, weight: .semibold))
             }
+            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             .foregroundStyle(Color.appPrimaryText)
             .frame(maxWidth: .infinity, minHeight: 56).padding(.vertical, 6)
             .background(on ? Color.successText.opacity(0.14) : Color.appSurface, in: RoundedRectangle(cornerRadius: 14))
@@ -255,6 +255,7 @@ struct WeatherPuzzleBoardView: View {
     let solved: () -> Void
 
     @Environment(AppModel.self) private var app
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var board: WakePuzzleBoard
     @State private var started = Date()
     @State private var now = Date()
@@ -301,9 +302,10 @@ struct WeatherPuzzleBoardView: View {
                         .transition(.opacity)
                 }
                 grid(Array(puzzle.tiles.indices)) { tile($0) }
-                ViewThatFits {
-                    HStack(spacing: 10) { buttons }
-                    VStack(spacing: 10) { buttons }
+                VStack(spacing: 10) {
+                    let row = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 10)) : AnyLayout(HStackLayout(spacing: 10))
+                    row { clearButton; takeBackButton }
+                    peekButton
                 }
             }
             .padding(.horizontal, 20).padding(.vertical, 16)
@@ -313,10 +315,16 @@ struct WeatherPuzzleBoardView: View {
         .sensoryFeedback(.selection, trigger: board.letters.compactMap { $0 }.count) { _, _ in app.settings.hapticsOn }
     }
 
-    @ViewBuilder private var buttons: some View {
+    private var clearButton: some View {
         Button(WeatherPuzzleCopy.clear) { board.clear(); order = []; notQuite = false }.buttonStyle(SecondaryButtonStyle())
+    }
+
+    private var takeBackButton: some View {
         Button(WeatherPuzzleCopy.takeBack) { takeBack() }.buttonStyle(SecondaryButtonStyle())
             .accessibilityIdentifier("weatherPuzzle.takeBack")
+    }
+
+    private var peekButton: some View {
         Button { if board.peek(at: elapsed) { check() } } label: {
             Label(board.canPeek(at: elapsed) ? WeatherPuzzleCopy.peek : WeatherPuzzleCopy.peekSoon, systemImage: "eye")
         }

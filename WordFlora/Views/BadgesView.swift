@@ -8,11 +8,12 @@ struct BadgesView: View {
 
     var body: some View {
         ScrollView {
-            EndgameBadgesHeader().padding(.horizontal, 20).padding(.top, 20)
             LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(defs, id: \.id) { def in card(def) }
             }
             .padding(20)
+            // The bloom rank and the Grand Garden replay sit under the badges, so the badge grid keeps its place.
+            EndgameBadgesHeader().padding(.horizontal, 20).padding(.bottom, 24)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Badges")
