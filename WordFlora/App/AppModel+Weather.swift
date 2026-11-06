@@ -127,6 +127,16 @@ extension AppModel {
         weatherInputs().mapValues(WeatherLook.compute).filter { !$0.value.isEmpty }
     }
 
+    /// A small, stable key for this plant's weather state ("" = no weather), for a "changed since last visit" check
+    /// (the Life panel can store the key it last showed and open itself when it differs). Changes when an event's look
+    /// starts, mends, shelters, dips or passes; the same on every launch within one state.
+    func weatherChangeKey(for plant: PlantCollectible) -> String {
+        guard let input = weatherInputs()[plant.plantId] else { return "" }
+        let out = WeatherLook.compute(input)
+        guard !out.isEmpty, let kind = input.kind else { return "" }
+        return "\(input.eventDay):\(kind.rawValue):\(out.look?.rawValue ?? "-"):\(out.setback):\(out.mending ? 1 : 0)"
+    }
+
     /// Wild Weather's level ring: per level, how many full-bloom plants show a stage lower for now (the dashed
     /// "mending" segment). Earned values, the word level and garden-level completion never read this.
     func levelMending() -> [Int: Int] {

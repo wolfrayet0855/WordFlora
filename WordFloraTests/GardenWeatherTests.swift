@@ -433,6 +433,15 @@ final class GardenWeatherAppTests: XCTestCase {
         XCTAssertNotNil(stops.first { $0.mending > 0 }?.mendingLine)
         XCTAssertTrue(app.plants().allSatisfy { $0.stage == 4 }, "the stored stage never changes")
 
+        // The "changed since last visit" key: set while the plant shows weather, empty when it does not.
+        let dipped = try XCTUnwrap(app.plants().first { app.weatherLooks()[$0.plantId]?.setback == 1 })
+        let key = app.weatherChangeKey(for: dipped)
+        XCTAssertTrue(key.hasPrefix("\(big.day):\(big.kind.rawValue):"), key)
+        XCTAssertEqual(app.weatherChangeKey(for: dipped), key, "stable within one state")
+        app.setWildWeather(false)
+        XCTAssertNotEqual(app.weatherChangeKey(for: dipped), key, "a change of state changes the key")
+        app.setWildWeather(true)
+
         // Care today stands it tall tomorrow; and Calm hides it at once.
         clock.date = weatherDate(day: big.day + 4, hour: 10)
         XCTAssertEqual(app.levelMending(), [:], "mends by itself within 4 days")
