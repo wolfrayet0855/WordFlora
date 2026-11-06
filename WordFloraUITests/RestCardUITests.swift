@@ -56,8 +56,19 @@ final class RestCardUITests: XCTestCase {
     /// Waits until the card has finished opening (it fades in and grows a little): its frame stays the same for two
     /// looks in a row. A fixed one second was not always enough on a busy machine, and the Dynamic Type audit then
     /// measured text that was still being scaled.
+    /// When the card's scene started to play (set by `settle`). The scene's loops hold still after
+    /// `RestScene.playSeconds` (10 s), and the audit waits for that: measured while the scene redraws 30 times a second,
+    /// the card's texts were sometimes caught mid-layout under load ("Dynamic Type partially unsupported").
+    private var sceneStarted = Date.distantPast
+
+    private func waitForTheSceneToHold() {
+        let wait = sceneStarted.addingTimeInterval(11).timeIntervalSinceNow
+        if wait > 0 { usleep(useconds_t(wait * 1_000_000)) }
+    }
+
     private func settle(_ el: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
         XCTAssertTrue(el.waitForExistence(timeout: 5), file: file, line: line)
+        sceneStarted = Date()
         var previous = CGRect.null
         for _ in 0..<20 {
             let f = el.frame
@@ -265,6 +276,7 @@ final class RestCardUITests: XCTestCase {
     /// Text a scroll view clips at its edge is measured against whatever covers it; only text fully inside the
     /// scroll view is judged for contrast.
     private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = []) {
+        waitForTheSceneToHold()
         var findings = [String]()
         let scroll = app.scrollViews.firstMatch
         let nav = app.navigationBars.firstMatch

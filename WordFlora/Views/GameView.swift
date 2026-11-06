@@ -41,7 +41,9 @@ struct GameView: View {
             Color.appBackground.ignoresSafeArea()
             VStack(spacing: 10) {
                 topBar.modifier(BehindModalCard(active: cardIsModal, minHeight: Theme.minTap))
-                FlowerView(petals: vm.petalsRemaining, resting: vm.phase == .restingOffer || vm.phase == .rested)
+                // Still behind the resting and break cards: a sway that never ends kept the app from going idle
+                // while a card sat open, and the accessibility audit then measured the card's text mid-layout.
+                FlowerView(petals: vm.petalsRemaining, resting: vm.phase == .restingOffer || vm.phase == .rested, sway: !cardIsModal)
                     .frame(height: 170)
                 VStack(spacing: 10) {
                     hintCard

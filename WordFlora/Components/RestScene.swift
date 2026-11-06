@@ -2,7 +2,8 @@ import SwiftUI
 
 /// The sky header on the resting card (night: lavender asleep under a moon) and the break card (day: a sunflower
 /// under the sun). Decorative only, so it is hidden from VoiceOver. Fixed height; it does not grow with text size.
-/// Loops (breathing plant, twinkling stars, floating z's) stop under the system or the app's own Reduce Motion.
+/// Loops (breathing plant, twinkling stars, floating z's) play for `playSeconds`, then hold; under the system or the
+/// app's own Reduce Motion they never start.
 struct RestScene: View {
     enum Kind { case night, day }
     var kind: Kind
@@ -12,6 +13,12 @@ struct RestScene: View {
     @Environment(\.self) private var environment
 
     static let height: CGFloat = 176
+    /// The loops play for a few breaths as the card opens, then the scene holds one frame (as the Home weather art
+    /// does). A card can sit open for a long time; a scene redrawn 30 times a second for as long as it is open keeps
+    /// the app from ever going idle, and the accessibility audit, which grows the text and waits for the card to
+    /// settle, then measured the card mid-layout ("Dynamic Type partially unsupported" on its texts, under load).
+    static let playSeconds = 10.0
+    @State private var settled = false
     private var reduceMotion: Bool { systemReduceMotion || app.settings.reduceMotionOverride }
 
     /// Star centres as fractions of a 345pt-wide card (the mockup's layout), with their sizes. None sit in the
@@ -21,7 +28,7 @@ struct RestScene: View {
     ]
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion)) { timeline in
+        TimelineView(.animation(minimumInterval: 1 / 30, paused: reduceMotion || settled)) { timeline in
             let t = reduceMotion ? 0 : timeline.date.timeIntervalSinceReferenceDate
             GeometryReader { geo in
                 ZStack(alignment: .topLeading) {
@@ -44,6 +51,10 @@ struct RestScene: View {
         .frame(height: Self.height)
         .clipped()
         .accessibilityHidden(true)
+        .task {
+            try? await Task.sleep(for: .seconds(Self.playSeconds))
+            settled = true
+        }
     }
 
     // MARK: Pieces

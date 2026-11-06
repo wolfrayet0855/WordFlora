@@ -31,9 +31,10 @@ struct FlowerView: View {
             .rotationEffect(.degrees(sway && !systemReduceMotion && !resting ? (swayPhase ? 1.6 : -1.6) : 0), anchor: .bottom)
         }
         .aspectRatio(200.0 / 240.0, contentMode: .fit)
-        .onAppear {
-            guard sway, !systemReduceMotion else { return }
-            withAnimation(.easeInOut(duration: 3.2).repeatForever(autoreverses: true)) { swayPhase = true }
+        .onAppear(perform: startSway)
+        // `sway` can turn off for a while (behind the game's resting and break cards) and back on.
+        .onChange(of: sway) { _, on in
+            if on { startSway() } else { var t = Transaction(); t.disablesAnimations = true; withTransaction(t) { swayPhase = false } }
         }
         .onChange(of: petals) { old, new in
             guard new < old else { return }
@@ -48,6 +49,12 @@ struct FlowerView: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(resting ? "Flower resting" : Self.petalsLabel(petals))
+    }
+
+    private func startSway() {
+        guard sway, !systemReduceMotion else { return }
+        swayPhase = false
+        withAnimation(.easeInOut(duration: 3.2).repeatForever(autoreverses: true)) { swayPhase = true }
     }
 
     /// VoiceOver's count of the petals still on the flower (never "left": CopySafety).
