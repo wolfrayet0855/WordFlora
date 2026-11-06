@@ -48,27 +48,31 @@ private struct AgeQuestionView: View {
     @State private var offerQuiet = false
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                FlowerView(petals: 8).frame(height: 140)
-                Text("How old are you?").font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                Text("This helps us set up the right experience. You can still play whichever way you like.")
-                    .font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
-                VStack(spacing: 12) {
-                    ageButton("Under 13", .under13)
-                    ageButton("13 to 17", .thirteenPlus)
-                    ageButton("18 or older", .eighteenPlus)
+        GeometryReader { geo in
+            ScrollView {
+                VStack(spacing: Space.section) {
+                    FlowerView(petals: 8).frame(height: 140)
+                    Text("How old are you?").font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    Text("This helps us set up the right experience. You can still play whichever way you like.")
+                        .font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
+                    VStack(spacing: 12) {
+                        ageButton("Under 13", .under13)
+                        ageButton("13 to 17", .thirteenPlus)
+                        ageButton("18 or older", .eighteenPlus)
+                    }
+                    // One dialog for the one question (not one per button, which all shared the same flag).
+                    .confirmationDialog("Would you like a quieter garden?", isPresented: $offerQuiet, titleVisibility: .visible) {
+                        Button("Yes, keep it quiet") { app.settings.quietGarden = true; app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
+                        Button("No thanks") { app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
+                    } message: { Text("Quiet Garden hides numbers and timers so tending is just relaxing. You can change it any time in Settings.") }
                 }
-                // One dialog for the one question (not one per button, which all shared the same flag).
-                .confirmationDialog("Would you like a quieter garden?", isPresented: $offerQuiet, titleVisibility: .visible) {
-                    Button("Yes, keep it quiet") { app.settings.quietGarden = true; app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
-                    Button("No thanks") { app.onboarding.selectAge(.under13, guideSeen: app.profile?.guideSeen ?? false) }
-                } message: { Text("Quiet Garden hides numbers and timers so tending is just relaxing. You can change it any time in Settings.") }
+                .padding(.horizontal, Space.gutter).padding(.vertical, Space.section).frame(maxWidth: .infinity)
+                // The question sits in the middle of the screen rather than over an empty lower half.
+                .frame(minHeight: geo.size.height)
             }
-            .padding(24).frame(maxWidth: .infinity)
+            .scrollBounceBehavior(.basedOnSize)
         }
-        .scrollBounceBehavior(.basedOnSize)
     }
 
     private func ageButton(_ title: String, _ band: AgeBand) -> some View {

@@ -3,6 +3,8 @@ import SwiftUI
 struct PlantCard: View {
     let plant: PlantCollectible
     var compact = false
+    /// In a garden row: stretch to the row's height so both cards in the row line up.
+    var fillsHeight = false
 
     private var earned: Bool { plant.earnedCount > 0 }
 
@@ -33,8 +35,8 @@ struct PlantCard: View {
                 Label("×\(plant.earnedCount)", systemImage: "leaf.fill").font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.successText)
             }
         }
-        .padding(compact ? 8 : 12)
-        .frame(maxWidth: .infinity)
+        .padding(compact ? Space.s : Space.m)
+        .frame(maxWidth: .infinity, maxHeight: fillsHeight ? .infinity : nil, alignment: .top)
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(earned ? Color.appAccent.opacity(0.45) : Color.appPrimaryText.opacity(0.08)))
         .accessibilityElement(children: .ignore)
