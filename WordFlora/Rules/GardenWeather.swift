@@ -118,6 +118,8 @@ enum WeatherUICopy {
     static let wildFootnote = "A bigger challenge, if you like. A big storm can make up to 4 plants look one step smaller for a few days. You can turn it off at any time."
     static let wildConfirmTitle = "Turn on Wild Weather?"
     static let wildConfirmMessage = "A big storm can make up to 4 plants look one step smaller. Care, a weather puzzle or time brings them back within 4 days. Your level and your plants stay just as they are."
+    /// Shown under the Wild Weather switch for under-13 players only (any age may still choose it).
+    static let wildGrownUpNote = "Ask a grown-up if you like."
     static let wildConfirm = "Turn it on"
     static let wildCancel = "Not now"
     static let notifyToggle = "Tell me about garden weather"
@@ -135,7 +137,7 @@ enum WeatherUICopy {
     static let notificationBody = "Give a drink or a hello today. Your garden is ready."
 
     static var all: [String] {
-        [sectionTitle, toggle, footnote, calmFootnote, wildToggle, wildFootnote, wildConfirmTitle, wildConfirmMessage, wildConfirm,
+        [sectionTitle, toggle, footnote, calmFootnote, wildToggle, wildFootnote, wildGrownUpNote, wildConfirmTitle, wildConfirmMessage, wildConfirm,
          wildCancel, notifyToggle, notifyFootnote, cardLine, cardReady, gotIt, gotItHint, bannerLine, notificationBody]
             + WeatherKind.allCases.flatMap { k in
                 [chipLabel(WeatherCopy.forecastChip(k)), WeatherCopy.forecastTitle(k), WeatherCopy.eventLine(k),

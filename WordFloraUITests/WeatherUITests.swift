@@ -152,6 +152,7 @@ final class WeatherUITests: XCTestCase {
         reveal(wild)
         XCTAssertTrue(wild.exists)
         XCTAssertEqual(wild.value as? String, "0", "off by default")
+        XCTAssertFalse(app.staticTexts["settings.wildGrownUpNote"].exists, "the grown-up note is for under 13 only")
         wild.switches.firstMatch.tap()
         let alert = app.alerts["Turn on Wild Weather?"]
         XCTAssertTrue(alert.waitForExistence(timeout: 3))
@@ -176,6 +177,7 @@ final class WeatherUITests: XCTestCase {
         let wild = app.switches["settings.wildWeather"]
         reveal(wild)
         XCTAssertTrue(wild.exists, "any age may choose it with Calm off")
+        XCTAssertTrue(app.staticTexts["settings.wildGrownUpNote"].exists, "a gentle grown-up note under 13")
         XCTAssertEqual(wild.value as? String, "0")
         XCTAssertFalse(app.switches["settings.weatherNotify"].exists, "the forecast reminder stays hidden under 13")
     }

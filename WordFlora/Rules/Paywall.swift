@@ -45,9 +45,23 @@ enum PaywallCopy {
     }
 }
 
-/// A grown-up check before any purchase for young players (spec sections 11, 13).
+/// A grown-up check before any purchase or outbound link (web page, mail, subscription management) for young
+/// players and unknown ages (spec sections 11, 13).
 enum ParentalGate {
     struct Challenge: Equatable { var question: String; var answer: Int }
+
+    enum Copy {
+        static let title = "For grown-ups"
+        static let prompt = "Please ask a grown-up to answer this before continuing."
+        static let wrong = "Not quite. Try again."
+    }
+
+    /// What tapping a link that leaves the app does: open it straight away, or ask a grown-up first.
+    enum Outbound: Equatable { case open(URL), askFirst(URL) }
+
+    static func outbound(_ url: URL, ageBand: AgeBand?) -> Outbound {
+        isRequired(ageBand: ageBand) ? .askFirst(url) : .open(url)
+    }
 
     static func challenge(seed: UInt64) -> Challenge {
         var rng = SplitMix64(seed: seed)

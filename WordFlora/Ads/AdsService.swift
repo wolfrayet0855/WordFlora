@@ -4,8 +4,8 @@ import UserMessagingPlatform
 import AppTrackingTransparency
 
 /// Google AdMob wrapper (spec sections 6, 11-13, 16, 18). Nothing here runs for under-13 players or Plus subscribers:
-/// `AdGate.mayLoadAnyAd` is checked first, consent appears only right before the first ad request, and every ad
-/// request carries a G content rating. Ad unit ids come from Info.plist (xcconfig), test ids by default.
+/// `AdGate.mayLoadAnyAd` is checked first, consent appears only right before the first ad request, the tracking
+/// prompt is for adults only (`AdGate.mayAskTracking`), and every ad request carries a G content rating. Ad unit ids come from Info.plist (xcconfig), test ids by default.
 @Observable
 @MainActor
 final class AdsService {
@@ -37,7 +37,7 @@ final class AdsService {
         config.ageRestrictedTreatment = ageBand == .thirteenPlus ? .teen : .unspecified
         await requestConsent()
         guard canRequestAds, isStillAllowed() else { return }
-        await requestTrackingIfNeeded()
+        if AdGate.mayAskTracking(ageBand: ageBand) { await requestTrackingIfNeeded() }   // adults only
         guard isStillAllowed() else { return }
         MobileAds.shared.start(completionHandler: nil)
         started = true

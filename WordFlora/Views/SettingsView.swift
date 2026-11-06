@@ -81,8 +81,8 @@ struct SettingsView: View {
                 }
             }
             Section("Privacy and ads") {
-                Link("Report an ad", destination: Links.reportAd)
-                Link("Privacy Policy", destination: Links.privacy)
+                GatedLink("Report an ad", url: Links.reportAd)
+                GatedLink("Privacy Policy", url: Links.privacy)
                 if app.ads.privacyOptionsRequired {
                     Button("Ad privacy choices") { Task { await app.ads.presentPrivacyOptions() } }
                 }

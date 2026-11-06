@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5E1A7C0D2B3F4A6E8C9D0A12 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5E1A7C0D2B3F4A6E8C9D0A11 /* PrivacyInfo.xcprivacy */; };
+		5E1A7C0D2B3F4A6E8C9D0A14 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 5E1A7C0D2B3F4A6E8C9D0A13 /* PrivacyInfo.xcprivacy */; };
 		7E10B1C316D5701BEDBA3CFD /* SplitMix64.swift in Sources */ = {isa = PBXBuildFile; fileRef = B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */; };
 		53C1F3AF73A761947FD0F913 /* Weather.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8FDAD053638CA18F19E93110 /* Weather.swift */; };
 		67D33D3868BCC5E3E36ABA02 /* WeatherUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */; };
@@ -296,6 +298,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5E1A7C0D2B3F4A6E8C9D0A11 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		5E1A7C0D2B3F4A6E8C9D0A13 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherUITests.swift; sourceTree = "<group>"; };
 		C40D198A32674A4B82B5E6DA /* GardenWeatherTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWeatherTests.swift; sourceTree = "<group>"; };
 		30CEA55B59A2D4DBB58757C6 /* WeatherViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherViews.swift; sourceTree = "<group>"; };
@@ -586,6 +590,7 @@
 				E96DC5D77A1287D3DF73CD43 /* WordFloraWidgetBundle.swift */,
 				F9B200507C4629386A0C486C /* GardenWidget.swift */,
 				C00FA8B6C6AAB943BB16239C /* Info.plist */,
+				5E1A7C0D2B3F4A6E8C9D0A13 /* PrivacyInfo.xcprivacy */,
 				A2BDF97F749985947F3401F0 /* WordFloraWidget.entitlements */,
 				83712C10C30A4B3A1C6FB841 /* WaterControl.swift */,
 			);
@@ -854,6 +859,7 @@
 			isa = PBXGroup;
 			children = (
 				9A467E792C9230E2007E28B8 /* Info.plist */,
+				5E1A7C0D2B3F4A6E8C9D0A11 /* PrivacyInfo.xcprivacy */,
 				9A467E6B2C922C05007E28B8 /* WordFloraApp.swift */,
 				9A467E6F2C922C06007E28B8 /* Assets.xcassets */,
 				9A467E712C922C06007E28B8 /* Preview Content */,
@@ -1167,6 +1173,7 @@
 			files = (
 				9A467E732C922C06007E28B8 /* Preview Assets.xcassets in Resources */,
 				9A467E702C922C06007E28B8 /* Assets.xcassets in Resources */,
+				5E1A7C0D2B3F4A6E8C9D0A12 /* PrivacyInfo.xcprivacy in Resources */,
 				D61844C609FE7631DFFBF7CF /* Plants.json in Resources */,
 				B0A84140CA3EB38FD1419110 /* PlantThinning.json in Resources */,
 				59896F4A896FCF2AAA27E877 /* Words.json in Resources */,
@@ -1206,6 +1213,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3E4D8C4B5FD7B1BA5171F2A2 /* Assets.xcassets in Resources */,
+				5E1A7C0D2B3F4A6E8C9D0A14 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1665,6 +1673,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WordFlora/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = WordFlora;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
@@ -1698,6 +1707,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = WordFlora/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = WordFlora;
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";

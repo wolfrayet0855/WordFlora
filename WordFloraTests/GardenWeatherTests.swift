@@ -505,6 +505,15 @@ final class WeatherUICopyTests: XCTestCase {
         XCTAssertTrue(WeatherUICopy.wildConfirmMessage.contains("level"))
         XCTAssertTrue(WeatherUICopy.wildConfirmMessage.contains("4 days"))
     }
+
+    func testUnder13SeeAGrownUpNoteBesideWildWeather() {
+        XCTAssertEqual(WeatherUICopy.wildGrownUpNote, "Ask a grown-up if you like.")
+        XCTAssertTrue(WeatherUICopy.all.contains(WeatherUICopy.wildGrownUpNote))
+        XCTAssertTrue(WeatherUICopy.showsWildGrownUpNote(ageBand: .under13))
+        XCTAssertFalse(WeatherUICopy.showsWildGrownUpNote(ageBand: .thirteenPlus))
+        XCTAssertFalse(WeatherUICopy.showsWildGrownUpNote(ageBand: .eighteenPlus))
+        XCTAssertFalse(WeatherUICopy.showsWildGrownUpNote(ageBand: nil))
+    }
 }
 
 // MARK: The plant page's weather art and sound (mounted only behind the weather gate)

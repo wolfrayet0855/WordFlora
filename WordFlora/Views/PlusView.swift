@@ -3,13 +3,10 @@ import StoreKit
 
 struct PlusView: View {
     @Environment(AppModel.self) private var app
-    @Environment(\.openURL) private var openURL
     @State private var selected: PlusPlan = .yearly
     @State private var busy = false
     @State private var message: String?
     @State private var gate: ParentalGate.Challenge?
-    @State private var gateAnswer = ""
-    @State private var gateWrong = false
 
     private var store: EntitlementService { app.entitlements }
 
@@ -32,10 +29,10 @@ struct PlusView: View {
 
                 VStack(spacing: 2) {
                     Button("Restore purchases") { Task { await store.restore(); app.updateSyncFlag() } }.tapTarget()
-                    Button("Manage subscription") { openURL(Links.manageSubscriptions) }.tapTarget()
+                    GatedLink("Manage subscription", url: Links.manageSubscriptions).tapTarget()
                     HStack(spacing: 8) {
-                        Link("Terms of Use", destination: Links.terms).tapTarget()
-                        Link("Privacy Policy", destination: Links.privacy).tapTarget()
+                        GatedLink("Terms of Use", url: Links.terms).tapTarget()
+                        GatedLink("Privacy Policy", url: Links.privacy).tapTarget()
                     }
                 }
                 .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
@@ -46,7 +43,9 @@ struct PlusView: View {
         .navigationTitle("Plus")
         .navigationBarTitleDisplayMode(.inline)
         .task { await store.loadProducts() }
-        .sheet(item: $gate) { challenge in gateSheet(challenge) }
+        .sheet(item: $gate) { challenge in
+            ParentalGateSheet(challenge: challenge, onPass: { gate = nil; startPurchase() }, onCancel: { gate = nil })
+        }
     }
 
     // MARK: Plans
@@ -117,7 +116,6 @@ struct PlusView: View {
 
     private func buy() {
         if ParentalGate.isRequired(ageBand: app.settings.ageBand) {
-            gateAnswer = ""; gateWrong = false
             gate = ParentalGate.challenge(seed: UInt64(Date().timeIntervalSince1970))
         } else { startPurchase() }
     }
@@ -136,23 +134,58 @@ struct PlusView: View {
         }
     }
 
-    private func gateSheet(_ c: ParentalGate.Challenge) -> some View {
+}
+
+extension ParentalGate.Challenge: Identifiable { var id: String { question } }
+
+/// The grown-up question, used before a purchase and before any link that leaves the app.
+struct ParentalGateSheet: View {
+    let challenge: ParentalGate.Challenge
+    let onPass: () -> Void
+    let onCancel: () -> Void
+    @State private var answer = ""
+    @State private var wrong = false
+
+    var body: some View {
         VStack(spacing: 16) {
-            Text("For grown-ups").font(Theme.font(.title2, weight: .bold))
-            Text("Please ask a grown-up to answer this before continuing.").font(Theme.font(.callout)).multilineTextAlignment(.center)
-            Text(c.question).font(Theme.font(.title, weight: .heavy))
-            TextField("Answer", text: $gateAnswer).keyboardType(.numberPad).textFieldStyle(.roundedBorder).frame(maxWidth: 160).multilineTextAlignment(.center)
-            if gateWrong { Text("Not quite. Try again.").font(Theme.font(.footnote)).foregroundStyle(Color.appDanger) }
+            Text(ParentalGate.Copy.title).font(Theme.font(.title2, weight: .bold))
+            Text(ParentalGate.Copy.prompt).font(Theme.font(.callout)).multilineTextAlignment(.center)
+            Text(challenge.question).font(Theme.font(.title, weight: .heavy))
+            TextField("Answer", text: $answer).keyboardType(.numberPad).textFieldStyle(.roundedBorder).frame(maxWidth: 160).multilineTextAlignment(.center)
+                .accessibilityIdentifier("parentalGate.answer")
+            if wrong { Text(ParentalGate.Copy.wrong).font(Theme.font(.footnote)).foregroundStyle(Color.appDanger) }
             Button("Continue") {
-                if ParentalGate.check(answer: gateAnswer, against: c) { gate = nil; startPurchase() } else { gateWrong = true }
+                if ParentalGate.check(answer: answer, against: challenge) { onPass() } else { wrong = true }
             }.buttonStyle(PrimaryButtonStyle())
-            Button("Cancel") { gate = nil }.frame(minHeight: Theme.minTap)
+            Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
         }
         .padding(24).presentationDetents([.medium])
     }
 }
 
-extension ParentalGate.Challenge: Identifiable { var id: String { question } }
+/// A link that leaves the app (web page, mail, subscription management). Adults and 13 to 17 open it at once;
+/// under 13 and an unknown age answer the grown-up question first (`ParentalGate.outbound`).
+struct GatedLink: View {
+    @Environment(AppModel.self) private var app
+    @Environment(\.openURL) private var openURL
+    @State private var gate: ParentalGate.Challenge?
+    private let title: String
+    private let url: URL
+
+    init(_ title: String, url: URL) { self.title = title; self.url = url }
+
+    var body: some View {
+        Button(title) {
+            switch ParentalGate.outbound(url, ageBand: app.settings.ageBand) {
+            case .open(let u): openURL(u)
+            case .askFirst: gate = ParentalGate.challenge(seed: UInt64(Date().timeIntervalSince1970))
+            }
+        }
+        .sheet(item: $gate) { challenge in
+            ParentalGateSheet(challenge: challenge, onPass: { gate = nil; openURL(url) }, onCancel: { gate = nil })
+        }
+    }
+}
 
 enum Links {
     static let manageSubscriptions = URL(string: "https://apps.apple.com/account/subscriptions")!

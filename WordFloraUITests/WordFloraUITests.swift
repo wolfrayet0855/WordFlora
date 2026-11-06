@@ -656,3 +656,58 @@ final class FidelityScreensUITests: XCTestCase {
         }
     }
 }
+
+/// Links that leave the app ask a grown-up first for under 13 (Settings and Plus). Only the gate is checked here:
+/// a right answer would leave the app for Safari or Mail.
+final class ParentalGateLinkUITests: XCTestCase {
+    let app = XCUIApplication()
+
+    override func setUpWithError() throws { continueAfterFailure = false }
+
+    private func launch(age: String) {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-age=\(age)"]
+        app.launch()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+    }
+
+    private func scrollTo(_ element: XCUIElement) {
+        for _ in 0..<8 where !(element.exists && element.isHittable) { app.swipeUp() }
+    }
+
+    private func expectGateThenCancel(after tapping: XCUIElement) {
+        scrollTo(tapping)
+        tapping.tap()
+        XCTAssertTrue(app.staticTexts["For grown-ups"].waitForExistence(timeout: 3))
+        let answer = app.textFields["parentalGate.answer"]
+        answer.tap(); answer.typeText("1")
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(app.staticTexts["Not quite. Try again."].waitForExistence(timeout: 2), "a wrong answer stays in the app")
+        app.buttons["Cancel"].tap()
+        XCTAssertFalse(app.staticTexts["For grown-ups"].waitForExistence(timeout: 2))
+        XCTAssertEqual(app.state, .runningForeground)
+    }
+
+    func testUnder13SettingsLinksAskAGrownUpFirst() {
+        launch(age: "under13")
+        expectGateThenCancel(after: app.buttons["Privacy Policy"])
+        expectGateThenCancel(after: app.buttons["Report an ad"])
+    }
+
+    func testUnder13PlusLinksAskAGrownUpFirst() {
+        launch(age: "under13")
+        scrollTo(app.buttons["Remove ads and sync with iCloud"])
+        app.buttons["Remove ads and sync with iCloud"].tap()
+        XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))
+        expectGateThenCancel(after: app.buttons["Terms of Use"])
+        expectGateThenCancel(after: app.buttons["Manage subscription"])
+    }
+
+    func testAdultsSeeTheSameLinksWithNoGateOnScreen() {
+        launch(age: "eighteenPlus")
+        scrollTo(app.buttons["Privacy Policy"])
+        XCTAssertTrue(app.buttons["Privacy Policy"].exists)
+        XCTAssertTrue(app.buttons["Report an ad"].exists)
+        XCTAssertFalse(app.staticTexts["For grown-ups"].exists)
+    }
+}

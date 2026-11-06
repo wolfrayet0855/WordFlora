@@ -465,7 +465,7 @@ Source: Apple App Review Guidelines section 1.3 / 5.1.4: https://developer.apple
 Note the spec cites 2.5.18 for ad display requirements; same guideline URL.
 
 ### D5. Export compliance
-In Xcode target Info (or Info.plist) the developer should add `ITSAppUsesNonExemptEncryption` = `NO` if the app uses only standard OS encryption (HTTPS, CloudKit). Then App Store Connect will not ask each upload. AdMob/UMP use HTTPS only. Answer "No" to non-exempt encryption **(confirm with developer; legal responsibility is yours)**. Tell the developer you want this key; do not edit it now.
+Done in the project: `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO` on the app target, because the app uses only standard OS encryption (HTTPS, CloudKit) and AdMob/UMP use HTTPS only. App Store Connect will not ask each upload. Answer "No" to non-exempt encryption if asked **(legal responsibility is yours)**.
 
 ### D6. Screenshots (sizes required)
 Apple lets you supply only the largest size per device family; it scales down **(verify in UI)**. Current required sets (as I recall; verify in App Store Connect > Screenshot Specifications):
@@ -473,8 +473,7 @@ Apple lets you supply only the largest size per device family; it scales down **
 |---|---|
 | iPhone 6.9" | 1320 x 2868 (also accepts 1290 x 2796) |
 | iPhone 6.5" | 1284 x 2778 or 1242 x 2688 (fallback) |
-| iPad 13" (since TARGETED_DEVICE_FAMILY = "1,2" the app is iPad too) | 2064 x 2752 or 2048 x 2732 |
-Min 1, max 10 per size. Because the project targets iPad, you need iPad screenshots OR change the device family (developer decision D3). Source: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications **(not fetched; verify)**.
+Min 1, max 10 per size. The app is iPhone only (`TARGETED_DEVICE_FAMILY = 1` on the app and widget), so no iPad screenshots are needed. On an iPad it runs as an iPhone app, and App Store Connect does not ask for iPad screenshots for an iPhone-only build **(verify in UI)**. Source: https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications **(not fetched; verify)**.
 
 ### D7. Name and trademark check
 1. Search the App Store (and Google Play) for "WordFlora", "Word Flora", "Wordflora".
@@ -489,6 +488,27 @@ Wild Weather must be explained in the App Store description, not only in Setting
 Garden weather: now and then a big wind, a dry spell or a frosty night visits your garden. Plants look a little different for a few days, and a drink or a hello helps them perk up. Nothing you grow goes away. Want a bigger challenge? Turn on Wild Weather in Settings: a big storm can make up to 4 plants look one step smaller for up to 4 days, until care, a weather puzzle or time brings them back. Your level never goes down. Calm mode and Quiet Garden keep the weather away.
 ```
 Re-answer the age-rating questionnaire with weather in mind (spec Q-1): cartoon-gentle, infrequent, no fear or peril.
+
+### D8. Review notes (paste into App Store Connect > App Review Information > Notes)
+```
+WordFlora is a gentle word-guessing garden game for a mixed audience. It asks the player's age band at the start (under 13, 13 to 17, 18 or older).
+
+Garden weather is cosmetic. Now and then weather visits the garden and plants look a little different for a few days; care, a weather puzzle or time brings them back. Nothing earned is ever removed: found plants, growth stages, pots, badges and the level all stay.
+
+Wild Weather is opt-in. It is off by default, sits in Settings > Garden weather, needs Calm mode off (and Quiet Garden off), and asks for confirmation before it turns on. It only makes up to 4 plants look one step smaller for up to 4 days; the level never goes down. Under 13 players see the note "Ask a grown-up if you like." beside the switch.
+
+Children and ads: players under 13 (and anyone who has not answered the age question) never load any ad and never see the consent or tracking prompts. 13 to 17 get G-rated, non-personalised ads and no tracking prompt. Adults see the consent form, then the App Tracking Transparency prompt, before the first ad. Every ad request is G rated. WordFlora Plus removes all ads.
+
+Purchases and outbound links: for under 13 (and an unknown age), buying WordFlora Plus and every link that leaves the app (Privacy Policy, Report an ad, Terms of Use, Manage subscription) first ask a grown-up a multiplication question.
+
+To see weather states without waiting, the app accepts these launch arguments (Xcode scheme > Run > Arguments; debug and UI-test use only, they replace the stored garden):
+  -uitest -uitest-onboarded -uitest-weather-today=hailShower      a weather day today (also drySpell, busyBugs, bigWind, frostyNight, hotDay, bigPuddles)
+  -uitest -uitest-onboarded -uitest-weather-tomorrow=bigWind      the forecast card the day before
+  -uitest -uitest-onboarded -uitest-weather-rewarded               a weather day where the puzzle's reward shows
+  -uitest -uitest-onboarded -uitest-crown                          every plant found, the Grand Garden ceremony
+  -uitest -uitest-onboarded -uitest-age=under13                    the under-13 experience (no ads, gates on)
+```
+Keep this text in step with the app: if a rule above changes, update it before the next submission.
 
 ### D: send back
 ```
@@ -550,7 +570,7 @@ Signing OK on device:       yes/no (first error line: ______)
 1. Keep `beta.WordFlora` as the permanent bundle ID, or switch before A4 (it cannot change after).
 2. Exact product IDs (`plus_yearly`/`plus_monthly` vs prefixed) since they are permanent.
 3. Territories and whether to adjust Apple's auto-converted prices.
-4. Whether to ship iPad (`TARGETED_DEVICE_FAMILY = "1,2"` currently) which needs iPad screenshots.
+4. iPad: decided, iPhone only for now (`TARGETED_DEVICE_FAMILY = 1`). Adding iPad later needs iPad layouts checked and iPad screenshots.
 5. One banner unit or one per screen.
 6. Which developer website/domain hosts privacy policy and `app-ads.txt`.
 
