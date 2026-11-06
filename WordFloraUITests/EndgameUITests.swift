@@ -36,9 +36,10 @@ final class EndgameUITests: XCTestCase {
         var findings = [String]()
         let scroll = app.scrollViews.firstMatch
         // Text scrolled up under the navigation bar, or under iOS 26's soft scroll-edge fade just below it, is measured
-        // against the bar and the fade, so the visible area starts 44 pt below the bar.
+        // against the bar and the fade, so the visible area starts 64 pt below the bar (text whose top sat 44 pt below
+        // it still read as faded).
         let bar = app.navigationBars.firstMatch
-        let top = bar.exists ? bar.frame.maxY + 44 : 0
+        let top = bar.exists ? bar.frame.maxY + 64 : 0
         let visible: CGRect? = scroll.exists
             ? CGRect(x: scroll.frame.minX, y: max(scroll.frame.minY, top), width: scroll.frame.width, height: scroll.frame.maxY - max(scroll.frame.minY, top))
             : nil
