@@ -58,14 +58,13 @@ enum WeatherShelterArt {
 
     /// A green shade cloth on two poles, its cool shadow over the plant.
     private static func shadeCloth(_ g: GraphicsContext) {
-        g.fill(WeatherDraw.ellipse(180, 210, 90, 16), with: .color(Color(hex: 0x3E6247).opacity(0.18)))
         var poles = Path()
         poles.move(to: WeatherDraw.pt(70, 66)); poles.addLine(to: WeatherDraw.pt(70, floor))
         poles.move(to: WeatherDraw.pt(292, 52)); poles.addLine(to: WeatherDraw.pt(292, floor))
         g.stroke(poles, with: .color(Color(hex: 0x7A5238)), style: StrokeStyle(lineWidth: 5, lineCap: .round))
         var cloth = Path()
         cloth.move(to: WeatherDraw.pt(50, 72)); cloth.addLine(to: WeatherDraw.pt(312, 40))
-        cloth.addLine(to: WeatherDraw.pt(312, 62)); cloth.addLine(to: WeatherDraw.pt(50, 96)); cloth.closeSubpath()
+        cloth.addLine(to: WeatherDraw.pt(312, 76)); cloth.addLine(to: WeatherDraw.pt(50, 110)); cloth.closeSubpath()
         g.fill(cloth, with: .color(Color(hex: 0x6B8F71).opacity(0.92)))
         g.stroke(cloth, with: .color(Color(hex: 0x3E6247)), style: StrokeStyle(lineWidth: 2.4, lineJoin: .round))
     }
