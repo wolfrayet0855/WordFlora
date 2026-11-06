@@ -125,6 +125,16 @@ final class GuideCopyTests: XCTestCase {
         XCTAssertTrue(long.isSubset(of: ["challenge", "butterflies"]), "long words: \(long)")
     }
 
+    /// The hearts are the plant's energy; the petals stay love. Hello and care fill the energy hearts.
+    func testHeartsPageCallsTheHeartsEnergy() {
+        let love = GuideCopy.page("love")
+        XCTAssertEqual(love.title, "Hearts and hellos")
+        XCTAssertEqual(love.lines(quiet: false)[0], "Say hello or care for your plant each day to fill its energy hearts.")
+        XCTAssertEqual(love.lines(quiet: true)[0], love.lines(quiet: false)[0])
+        XCTAssertTrue(love.art.contains("4 of 5 energy hearts"), love.art)
+        XCTAssertEqual(GuideCopy.Art.love, "Energy")
+    }
+
     func testOnlyTheLovePageHasAQuietVariant() {
         let love = GuideCopy.page("love")
         XCTAssertEqual(love.lines(quiet: true)[1], "Your plant keeps all it grows, always.")

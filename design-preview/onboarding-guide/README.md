@@ -107,10 +107,10 @@ The copy below is exact.
 - **Lines:** "Say hello or care for your plant each day to fill its hearts." / "After a few rainy days it naps as a seed. A fun challenge wakes it, and it keeps all it grew."
 - **Quiet Garden or Calm mode on:** line 2 becomes "Your plant keeps all it grows, always."
 - **Art:**
-  - The rose plant (140), with a "Hello!" bubble and a "Love" row of 5 hearts (4 filled, 1 outline).
+  - The rose plant (140), with a "Hello!" bubble and an "Energy" row of 5 hearts (4 filled, 1 outline).
   - Below, a white card: `SeedPotView` (84, small cloud with 2 drops) labelled "Naps as a seed", then an arrow, then a sprout in a Terracotta pot with a sparkle, labelled "Wakes with a challenge".
   - In Quiet or Calm mode, drop the bottom card's cloud and drops; keep the rest.
-- **a11y:** "A plant with 4 of 5 hearts saying hello. Below, a seed napping in its pot wakes up as a sprout."
+- **a11y:** "A plant with 4 of 5 energy hearts saying hello. Below, a seed napping in its pot wakes up as a sprout."
 
 ### 5. `garden`: "Your garden and friends"
 - **Lines:** "Visit all your plants in the Garden." / "Catch butterflies to meet visitors and earn points for Shed tools."

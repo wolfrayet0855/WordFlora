@@ -52,11 +52,11 @@ enum GuideCopy {
                      "Prune and repot to help it reach full bloom."],
              art: "A plant growing from tiny to full bloom, with water, feed, sun, prune and repot buttons."),
         Page(id: "love", title: "Hearts and hellos",
-             lines: ["Say hello or care for your plant each day to fill its hearts.",
+             lines: ["Say hello or care for your plant each day to fill its energy hearts.",
                      "After a few rainy days it naps as a seed. A fun challenge wakes it, and it keeps all it grew."],
-             linesQuiet: ["Say hello or care for your plant each day to fill its hearts.",
+             linesQuiet: ["Say hello or care for your plant each day to fill its energy hearts.",
                           "Your plant keeps all it grows, always."],
-             art: "A plant with 4 of 5 hearts saying hello. Below, a seed napping in its pot wakes up as a sprout."),
+             art: "A plant with 4 of 5 energy hearts saying hello. Below, a seed napping in its pot wakes up as a sprout."),
         Page(id: "garden", title: "Your garden and friends",
              lines: ["Visit all your plants in the Garden.",
                      "Catch butterflies to meet visitors and earn points for Shed tools."],
@@ -88,7 +88,7 @@ enum GuideCopy {
         static let stageNames = LifeStats.stageNames
         static let tendActions = ["Water", "Feed", "Sun", "Prune", "Repot"]
         static let hello = "Hello!"
-        static let love = "Love"
+        static let love = "Energy"
         static let naps = "Naps as a seed"
         static let wakes = "Wakes with a challenge"
         static let garden = "Garden"

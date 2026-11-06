@@ -131,7 +131,7 @@ final class StatsActionRuleTests: XCTestCase {
         _ = water(p, pr, noon); XCTAssertEqual(meters(p, noon).hearts, 2)
         _ = water(p, pr, noon); XCTAssertEqual(meters(p, noon).hearts, 3, "the second drink is the finishing touch")
         _ = feed(p, pr, noon); _ = sun(p, pr, noon)
-        XCTAssertEqual(meters(p, noon).hearts, 5); XCTAssertEqual(meters(p, noon).loveLine, "Loved")
+        XCTAssertEqual(meters(p, noon).hearts, 5); XCTAssertEqual(meters(p, noon).loveLine, "Full of energy")
         XCTAssertEqual(ToolEngine.prune(p, inventory: ToolInventory(), now: noon, calendar: utc, economy: eco).reason, .notOwned)
     }
 

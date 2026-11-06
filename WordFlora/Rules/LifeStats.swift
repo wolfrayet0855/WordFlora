@@ -57,7 +57,7 @@ enum LifeStats {
         var stageLabel: String {
             "Growing, \(LifeStats.stageNames[shownStage].lowercased()) stage" + (dipped ? ". \(LifeStats.mendingNote)" : "")
         }
-        var heartsLabel: String { "Love, \(hearts) of 5 hearts. \(loveLine)" }
+        var heartsLabel: String { "Energy, \(hearts) of 5 hearts. \(loveLine)" }
     }
 
     static let floor = 0.3
@@ -75,13 +75,13 @@ enum LifeStats {
     static let showLabel = "Show Life panel"
     static let keyLine = "Love keeps its petals."
     static let growingTitle = "Growing"
-    static let loveTitle = "Love"
+    static let energyTitle = "Energy"
     static let meterNames = (water: "Water", sunshine: "Sunshine", happiness: "Happiness")
     static let waterWords = ["Full", "Good", "Ready for a drink"]
     static let sunWords = ["Bright", "Ready for sun"]
     static let happyWords = ["Happy", "Cosy"]
     static let restWord = "Resting"
-    static let loveLines = ["Loved", "Feeling loved", "Hellos help", "Ready for a hello", "Ready for you"]
+    static let loveLines = ["Full of energy", "Lots of energy", "Hellos help", "Ready for a hello", "Ready for you"]
     static let gentleRain = "Gentle rain"
     static let rainAndThunder = "Rain and soft thunder"
 
@@ -99,7 +99,7 @@ enum LifeStats {
     }
 
     static func allCopy(name: String) -> [String] {
-        [title, hideLabel, showLabel, keyLine, growingTitle, loveTitle, meterNames.water, meterNames.sunshine, meterNames.happiness,
+        [title, hideLabel, showLabel, keyLine, growingTitle, energyTitle, meterNames.water, meterNames.sunshine, meterNames.happiness,
          restWord, gentleRain, rainAndThunder, plantLabel(name: name, pips: 3), seedLabel(name: name), keyLabel(pips: 2), hint(name: name),
          rainAnnouncement(name: name)]
             + waterWords + sunWords + happyWords + loveLines + stageNames

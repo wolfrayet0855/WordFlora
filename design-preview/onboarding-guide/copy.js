@@ -29,12 +29,12 @@ const GUIDE_COPY = {
               'Prune and repot to help it reach full bloom.'],
       art: 'A plant growing from tiny to full bloom, with water, feed, sun, prune and repot buttons.' },
     { id: 'love', title: 'Hearts and hellos',
-      lines: ['Say hello or care for your plant each day to fill its hearts.',
+      lines: ['Say hello or care for your plant each day to fill its energy hearts.',
               'After a few rainy days it naps as a seed. A fun challenge wakes it, and it keeps all it grew.'],
       // Quiet Garden or Calm mode on: plants never rain or nap, so line 2 changes.
-      linesQuiet: ['Say hello or care for your plant each day to fill its hearts.',
+      linesQuiet: ['Say hello or care for your plant each day to fill its energy hearts.',
                    'Your plant keeps all it grows, always.'],
-      art: 'A plant with 4 of 5 hearts saying hello. Below, a seed napping in its pot wakes up as a sprout.' },
+      art: 'A plant with 4 of 5 energy hearts saying hello. Below, a seed napping in its pot wakes up as a sprout.' },
     { id: 'garden', title: 'Your garden and friends',
       lines: ['Visit all your plants in the Garden.',
               'Catch butterflies to meet visitors and earn points for Shed tools.'],
@@ -55,7 +55,7 @@ const GUIDE_COPY = {
   // Small words drawn inside the illustrations (also linted).
   artText: ['Clue', 'A white flower with a sunny middle', 'Help', 'Petals = tries', 'New plant found!',
     'word', 'Tiny', 'Sprout', 'Bud', 'Bloom', 'Full bloom', 'Water', 'Feed', 'Sun', 'Prune', 'Repot', 'Hello!',
-    'Love', 'Naps as a seed', 'Wakes with a challenge', 'Garden', 'Shed', 'Visitors', 'points',
+    'Energy', 'Naps as a seed', 'Wakes with a challenge', 'Garden', 'Shed', 'Visitors', 'points',
     'Daily Bloom', 'One word for everyone today', 'Seedling', 'Wildwood', 'Grove', 'Ancient', 'Gold ring = full bloom',
     '10 plants opens the next level', 'You are here', 'Soon', 'Rare plants', 'Pots', 'Badges', 'Level 5'],
 };

@@ -87,7 +87,7 @@ struct LifePanelContent: View {
 
     private var love: some View {
         VStack(alignment: .leading, spacing: 7) {
-            Text(LifeStats.loveTitle).font(nameFont).foregroundStyle(Color.appPrimaryText)
+            Text(LifeStats.energyTitle).font(nameFont).foregroundStyle(Color.appPrimaryText)
                 .accessibilityHidden(true)
             HStack(spacing: large ? 4 : 0) {
                 ForEach(0..<5, id: \.self) { i in
