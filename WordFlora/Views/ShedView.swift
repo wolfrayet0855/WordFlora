@@ -20,6 +20,7 @@ struct ShedView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 ShedHeader(points: points, quiet: quiet) { router.go(.butterfly) }
+                if app.showsWeatherHelpers { ShedWeatherSection().padding(.top, 6) }
                 sectionHeader(ShedCopy.toolsTitle, ShedCopy.toolsSubtitle).padding(.top, 6)
                 LazyVGrid(columns: columns, spacing: 10) {
                     ForEach(ShedTool.order, id: \.self) { tool in
@@ -44,7 +45,7 @@ struct ShedView: View {
                 UpgradeCard(tool: up.tool, tier: up.tier, reduceMotion: reduceMotion) { justUpgraded = nil }
             }
         }
-        .onAppear { app.syncToolUnlocks() }
+        .onAppear { app.syncToolUnlocks(); app.receiveWeatherKitIfDue() }
     }
 
     private func sectionHeader(_ title: String, _ subtitle: String) -> some View {

@@ -12,6 +12,8 @@ struct BadgesView: View {
                 ForEach(defs, id: \.id) { def in card(def) }
             }
             .padding(20)
+            // The bloom rank and the Grand Garden replay sit under the badges, so the badge grid keeps its place.
+            EndgameBadgesHeader().padding(.horizontal, 20).padding(.bottom, 24)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Badges")

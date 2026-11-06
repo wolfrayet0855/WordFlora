@@ -26,11 +26,15 @@ final class AppModel {
     let storeDegraded: Bool
     static let degradedStoreMessage = "We couldn't open your saved garden just now. Please close and reopen the app. Your saved garden is safe."
     private var lastBadgedRoundId: String?
-    private let now: () -> Date
+    let now: () -> Date
     /// The model's clock (tests pass a fixed one).
     var nowDate: Date { now() }
     /// UI tests only (`-uitest-forecast=`, `-uitest-weather=`): replaces the weather schedule; every gate still applies.
     var weatherTestOverride: GardenWeather.Override?
+    /// This visit showed an ending ceremony or the weather puzzle: no Plus card and no ads for the rest of it
+    /// (endgame-and-events spec 2.4 and 8). Set by `markQuietVisit()`; a new launch starts clear.
+    private(set) var quietVisit = false
+    func markQuietVisit() { quietVisit = true }
 
     var context: ModelContext { container.mainContext }
 
@@ -224,11 +228,13 @@ final class AppModel {
         guard result.applied else { return TendOutcome(applied: false, message: Self.message(for: result.reason, action: action, plant: plant)) }
 
         plant.lastLovedAt = date
+        let turnedGolden = recordGoldenDay(plant, tending: action, at: date)
         let counter: BadgeCounter? = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return nil } }()
         if let counter { enqueueBadgeMoments(badges.record(counter, now: date, quiet: quiet), after: 1.0); p.badgesJSON = badges.json }
         try? context.save()
 
         let name = plant.nickname.isEmpty ? plant.name : plant.nickname
+        if turnedGolden { return TendOutcome(applied: true, message: EndgameCopy.goldenLine(name: name)) }
         let day = Int(date.timeIntervalSince1970 / 86_400) &+ plant.earnedCount
         let event: PlantVoice.Event = { switch action { case .water: return .water; case .feed, .repot: return .soil; case .sun: return .sun; case .prune: return .prune } }()
         if result.stageUp { return TendOutcome(applied: true, stageUp: true, message: "\(name) grew a little! " + PlantVoice.line(plantId: plant.plantId, event: .grew, daySeed: day)) }
@@ -390,13 +396,13 @@ final class AppModel {
 
     /// Banner shows on Home and Garden only, from the second session, for free players who are not young.
     var showBanner: Bool {
-        adsEnabled && entitlements.hasLoaded && onboarding.isComplete && settings.completedSessions >= 1
+        adsEnabled && !quietVisit && entitlements.hasLoaded && onboarding.isComplete && settings.completedSessions >= 1
             && AdGate.mayLoadAnyAd(isUnderThirteen: ParentalGate.isRequired(ageBand: settings.ageBand), hasRemoveAds: entitlements.state.hasRemoveAds)
     }
 
     /// Runs when the player taps "One more" on the resting card: at most one ad, only if every rule allows it.
     func adBeforeNextRound() async {
-        guard adsEnabled else { return }
+        guard adsEnabled, !quietVisit else { return }
         let ctx = adContext(choice: .oneMore)
         guard AdGate.shouldShowInterstitial(ctx) else { return }
         await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
@@ -407,7 +413,7 @@ final class AppModel {
     /// The same rules as `adBeforeNextRound`, judged as of the end of the celebration's quiet window: the card opens
     /// the moment a celebration is dismissed, and the earliest deliberate tap comes after that window.
     var adWouldPlayOnOneMore: Bool {
-        guard adsEnabled else { return false }
+        guard adsEnabled, !quietVisit else { return false }
         var ctx = adContext(choice: .oneMore)
         ctx.now = ctx.now.addingTimeInterval(ctx.peakWindowSeconds)
         return AdGate.shouldShowInterstitial(ctx)
@@ -432,7 +438,7 @@ final class AppModel {
         var r = AdGate.ReturnContext(now: t, enoughAt: restExitAt, ad: ad)
         r.calmMode = settings.calmMode
         r.quietGarden = settings.quietGarden
-        r.adsAvailable = adsEnabled
+        r.adsAvailable = adsEnabled && !quietVisit
         return AdGate.returnVisit(r)
     }
 
@@ -480,7 +486,8 @@ final class AppModel {
 
     /// Called when Home appears. Records the offer as soon as it shows, so it appears once per milestone.
     func checkPlusOffer() {
-        guard plusOfferEnabled, plusOffer == nil, !homeWeather.quietsOffers else { return }   // never beside the weather
+        // Never beside the weather, a ceremony or the weather puzzle.
+        guard plusOfferEnabled, plusOffer == nil, !homeWeather.quietsOffers, !quietVisit, pendingCeremony == nil else { return }
         var c = PlusOfferPolicy.Context(now: now())
         c.ageBand = settings.ageBand
         c.hasPlus = entitlements.state.hasPlus
@@ -553,6 +560,16 @@ final class AppModel {
         p.badgesJSON = badges.json
         try? context.save()
         syncToolUnlocks()
+        return unlocks
+    }
+
+    /// One step on a badge counter, with its moments queued and the profile saved (the weather puzzle's Weathered step).
+    @discardableResult
+    func recordBadgeStep(_ counter: BadgeCounter, after delay: Double = 0) -> [BadgeUnlock] {
+        let unlocks = badges.record(counter, now: now(), quiet: settings.quietGarden)
+        enqueueBadgeMoments(unlocks, after: delay)
+        profile?.badgesJSON = badges.json
+        try? context.save()
         return unlocks
     }
 

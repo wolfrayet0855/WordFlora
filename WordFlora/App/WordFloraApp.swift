@@ -86,6 +86,8 @@ struct WordFloraApp: App {
             }
             try? model.context.save()
         }
+        // Weather helpers, the weather puzzle and the Grand Garden (EndgameUITestFixtures lists the flags).
+        if uiTesting { EndgameUITestFixtures.apply(args: args, to: model) }
         if uiTesting && args.contains("-uitest-plus") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }

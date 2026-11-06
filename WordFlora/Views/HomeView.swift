@@ -114,6 +114,7 @@ struct HomeView: View {
                              showRose: unlocked.contains(.rose),
                              // Before the first plant the next word brings one at once, so the count only shows after it (and not in Quiet Garden).
                              wordsTowardPlant: stats.plantsEarned > 0 && !app.settings.quietGarden ? app.game.wordsTowardPlant : nil)
+                        EndgameHomeCard()
 
                         // Garden weather (empty in Calm mode and Quiet Garden): a chip, then the card or the banner.
                         if let chip = weather.chip { WeatherChip(text: chip, kind: weather.chipKind) }
@@ -167,6 +168,7 @@ struct HomeView: View {
             if app.homeWeather.quietsOffers { weatherVisit = true }      // no ad banner in a visit with the weather
             app.checkPlusOffer(); playAdNote = app.returnVisit == .adMayPlay
         }
+        .grandGardenCeremony()
         .navigationBarHidden(true)
         .overlay(alignment: .bottomLeading) { layoutReport }
     }
@@ -175,7 +177,7 @@ struct HomeView: View {
 
     private var topBar: some View {
         HStack {
-            WordmarkView(style: .title).layoutPriority(1)
+            WordmarkView(style: .title).crowned(app.crown).layoutPriority(1)
             Spacer()
             Button { router.go(.settings) } label: {
                 Image(systemName: "gearshape.fill").font(.system(size: gearSize)).frame(minWidth: Theme.minTap, minHeight: Theme.minTap)
@@ -215,7 +217,7 @@ struct HomeView: View {
                     let threshold = Economy.default.roseThreshold
                     let full = roseStock >= Economy.default.roseCap
                     Text(HomeRoseLine.text(stock: roseStock, progress: roseProgress, threshold: threshold, full: full))
-                        .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
+                        .font(Theme.font(.caption)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
             }

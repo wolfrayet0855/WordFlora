@@ -61,6 +61,66 @@ enum EndgamePolicy {
     static func bloomsToNextRank(dailyBloomsDone: Int, economy: Economy = .default) -> Int? {
         economy.bloomRankThresholds.first { $0 > dailyBloomsDone }.map { $0 - max(0, dailyBloomsDone) }
     }
+
+    // MARK: Ceremonies (G-2, G-3)
+
+    enum Ceremony: String, Equatable { case grandGarden, goldCrown }
+
+    /// The ceremony to play now, once each: the Grand Garden first, then the gold crown (never both in one go).
+    static func nextCeremony(allFound: Bool, allFullBloom: Bool, crownSeenAt: Date?, goldCrownSeenAt: Date?) -> Ceremony? {
+        if shouldShowCeremony(allFound: allFound, seenAt: crownSeenAt) { return .grandGarden }
+        if crownSeenAt != nil, shouldShowGoldCrown(allFullBloom: allFullBloom, seenAt: goldCrownSeenAt) { return .goldCrown }
+        return nil
+    }
+
+    /// The crown on the Home wordmark: computed from earned values every time, so it can never be taken away.
+    enum Crown: Equatable { case none, green, gold }
+    static func crown(allFound: Bool, allFullBloom: Bool) -> Crown { allFound ? (allFullBloom ? .gold : .green) : .none }
+
+    // MARK: Golden blooms (G-4)
+
+    struct GoldenCandidate: Equatable { var id: String; var name: String; var days: Int; var stage: Int }
+
+    /// Home features one plant a day: the full-bloom plant nearest to golden (ties broken by a per-day order, so the
+    /// pick is the same all day on every device). Nil before every plant is found or once every plant is golden.
+    static func featuredGolden(_ plants: [GoldenCandidate], allFound: Bool, day: Int, economy: Economy = .default) -> GoldenCandidate? {
+        guard allFound else { return nil }
+        return plants.filter { $0.stage >= 4 && !isGolden(days: $0.days, economy: economy) }
+            .min { a, b in
+                (-a.days, WeatherEngine.orderKey(plantId: a.id, day: day), a.id) < (-b.days, WeatherEngine.orderKey(plantId: b.id, day: day), b.id)
+            }
+    }
+
+    static func allGolden(_ days: [Int], economy: Economy = .default) -> Bool {
+        !days.isEmpty && days.allSatisfy { isGolden(days: $0, economy: economy) }
+    }
+
+    // MARK: The Grand Garden picture
+
+    /// Five terraced hills, back to front: level 5 at the back (8), then 9, 10, 11 and the first finds at the front (12).
+    static let hillSizes = [8, 9, 10, 11, 12]
+
+    /// The plants (sorted by level, then name) dealt onto the hills, back row first.
+    static func hills<T>(_ sortedByLevel: [T]) -> [[T]] {
+        var rest = Array(sortedByLevel.reversed())
+        var rows: [[T]] = []
+        for n in hillSizes {
+            rows.append(Array(rest.prefix(n).reversed()))
+            rest = Array(rest.dropFirst(n))
+        }
+        if !rest.isEmpty { rows[rows.count - 1] = Array(rest.reversed()) + rows[rows.count - 1] }
+        return rows
+    }
+
+    /// How big a plant is drawn on the hills at its earned stage: Tiny 42%, Sprout 58%, Bud 78%, Full bloom 100%.
+    static func hillScale(stage: Int) -> Double {
+        switch stage {
+        case ...1: return 0.42
+        case 2: return 0.58
+        case 3: return 0.78
+        default: return 1.0
+        }
+    }
 }
 
 /// Every endgame line the UI will show, grade 2-3 and positive only (checked by CopySafety and the weather avoid list).
@@ -91,12 +151,61 @@ enum EndgameCopy {
     static let topRank = "You reached the top rank. Keep on blooming!"
     static let visitorsBook = "Visitors' book"
 
+    // The Grand Garden ceremony (design-preview/endgame direction A, Revision 1)
+    static let crownEarned = "You earned the Gardener's Crown"
+    static let everyPlantFound = "Every plant found!"
+    static let everyPlantLine = "You found all 50. What a garden! The crown is yours to keep."
+    static let seeWhatsNext = "See what grows next"
+    static let walkGarden = "Walk my garden"
+    static let stillGrowing = "Still growing"
+    static let fullBloom = "Full bloom"
+    static let gardenPicture = "Your garden with all 50 plants"
+    static let crownPicture = "The Gardener's Crown, a ring of leaves and flowers"
+    static let goldCrownPicture = "The Gardener's Crown with gold flowers"
+    static let lovely = "Lovely"
+    static let crownOnWordmark = "You wear the Gardener's Crown"
+    static let goldCrownOnWordmark = "You wear the gold Gardener's Crown"
+
+    // What grows next
+    static let whatGrowsNext = "What grows next"
+    static let keepsGrowing = "Your garden keeps growing."
+    static let goldenBlurb = "Care for a plant on 7 different days to make it golden."
+    static func goldenProgress(name: String, days: Int, of goal: Int) -> String { "\(name) \(days) of \(goal)" }
+    static let ranksBlurb = "Every Daily Bloom you play counts. Ranks go up, never down."
+    static func youAre(_ rank: BloomRank) -> String { rank == .unranked ? "Play a Daily Bloom to start." : "You are a \(rank.name)." }
+    static let bookBlurb = "A page for every visitor you meet, and your weather stickers."
+    static let weatherTitle = "Garden weather"
+    static let weatherBlurb = "Some days bring wind or frost. Your plants bounce back with care."
+    static let staysWithYou = "Your crown and all your plants stay with you."
+    static let backToGarden = "Back to my garden"
+
+    // Golden blooms on Home and the plant page
+    static let goldenNote = "Golden days come from water, food, sun or a trim."
+    static func goldenPips(days: Int, of goal: Int) -> String { "\(days) of \(goal) golden days" }
+
+    // The Visitors' book
+    static let bookFriends = "Garden friends"
+    static func bookFriendsCount(_ n: Int, of total: Int) -> String { "\(n) of \(total) friends in your book" }
+    static let bookStickers = "Weather stickers"
+    static func bookStickersCount(_ n: Int, of total: Int) -> String { "\(n) of \(total) weather stickers" }
+    static let bookStickersHint = "Weather puzzles bring the next sticker."
+    static let bookNotYet = "Not in your book yet"
+    static func bookPage(_ name: String, met: Int) -> String { met == 1 ? "\(name), met once" : "\(name), met \(met) times" }
+    static func stickerPage(_ name: String, owned: Bool) -> String { owned ? "\(name) sticker" : "\(name) sticker, not in your book yet" }
+    static let rankTitleShort = "Your bloom rank"
+
     static func all(name: String) -> [String] {
         let ranks = BloomRank.allCases.dropFirst()
         return [grandGardenTitle, grandGardenLine, crownTitle, crownLine, goldCrownTitle, goldCrownLine, goldCrownTurns, whatsNextTitle,
                 whatsNextGolden, whatsNextRanks, whatsNextWeather, replay, goldenTitle, goldenLine(name: name),
                 daysFromGolden(name: name, days: 3), daysFromGolden(name: name, days: 1), allGolden, rankTitle, rankNext(1), rankNext(18),
-                topRank, visitorsBook]
-            + ranks.map(\.name) + ranks.map(rankLine)
+                topRank, visitorsBook,
+                crownEarned, everyPlantFound, everyPlantLine, seeWhatsNext, walkGarden, stillGrowing, fullBloom, gardenPicture,
+                crownPicture, goldCrownPicture, lovely, crownOnWordmark, goldCrownOnWordmark, whatGrowsNext, keepsGrowing, goldenBlurb,
+                goldenProgress(name: name, days: 4, of: 7), ranksBlurb, bookBlurb, weatherTitle, weatherBlurb, staysWithYou, backToGarden,
+                goldenNote, goldenPips(days: 3, of: 7), bookFriends, bookFriendsCount(4, of: 12), bookStickers, bookStickersCount(2, of: 7),
+                bookStickersHint, bookNotYet, bookPage(name, met: 1), bookPage(name, met: 3), stickerPage("Kite", owned: true),
+                stickerPage("Kite", owned: false), rankTitleShort]
+            + ranks.map(\.name) + ranks.map(rankLine) + BloomRank.allCases.map(youAre)
     }
 }
