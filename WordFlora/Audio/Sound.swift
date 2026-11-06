@@ -73,15 +73,17 @@ extension SoundPlaying {
 
 /// Why the ambient bed is lowered. It comes back only when no reason is left.
 struct DuckState: Equatable {
-    enum Reason { case readAloud, thunder }
+    enum Reason { case readAloud, thunder, weather }
     private(set) var readAloud = false
     private(set) var thunder = false
-    var ducked: Bool { readAloud || thunder }
+    /// A weather bed is playing (docs/pm/endgame-events-audio-plan.md: the garden bed sits under it).
+    private(set) var weather = false
+    var ducked: Bool { readAloud || thunder || weather }
 
     /// Sets one reason; returns the new ducked state when it changed, nil when nothing needs doing.
     mutating func set(_ reason: Reason, _ on: Bool) -> Bool? {
         let before = ducked
-        switch reason { case .readAloud: readAloud = on; case .thunder: thunder = on }
+        switch reason { case .readAloud: readAloud = on; case .thunder: thunder = on; case .weather: weather = on }
         return ducked == before ? nil : ducked
     }
 }
@@ -90,7 +92,7 @@ struct DuckState: Equatable {
 final class SoundPlayer: SoundPlaying {
     static let shared = SoundPlayer()
 
-    var enabled = true { didSet { if !enabled { stopAmbient(); cancelThunderDuck() } } }
+    var enabled = true { didSet { if !enabled { stopAmbient(); cancelThunderDuck(); WeatherSoundPlayer.shared.stopAll() } } }
     var master: Float = 0.8
     private(set) var playCount = 0
     private var players: [SoundEvent: AVAudioPlayer] = [:]
@@ -147,7 +149,13 @@ final class SoundPlayer: SoundPlaying {
     func stopAmbient() { ambient?.stop(); ambient = nil; cancelThunderDuck() }
 
     /// Lowers the garden bed while a clue is read aloud, then brings it back (unless the thunder roll still plays).
-    func duckAmbient(_ on: Bool) { setDuck(.readAloud, on) }
+    func duckAmbient(_ on: Bool) {
+        setDuck(.readAloud, on)
+        WeatherSoundPlayer.shared.setReadAloud(on)
+    }
+
+    /// Lowers the garden bed while a weather bed plays.
+    func duckForWeather(_ on: Bool) { setDuck(.weather, on) }
 
     static let duckedVolume: Float = 0.08
 

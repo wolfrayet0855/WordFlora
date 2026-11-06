@@ -29,10 +29,19 @@
 		1581D6A2E8210D4686510D56 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
 		170893E1A2616D1CEACC9A9D /* wf-earned.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5510B1B69285FC4D97F91D07 /* wf-earned.m4a */; };
 		19FC1E7D0E23F1EEAA3D062F /* wf-thunder.m4a in Resources */ = {isa = PBXBuildFile; fileRef = DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */; };
+		55375551216352E2369FAA25 /* wf-wind-loop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 537C16CD40328D0046A80DC6 /* wf-wind-loop.m4a */; };
+		2FF1472D05417CBB04C31AC2 /* wf-storm-loop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A845D68363E9AD512C1E6F94 /* wf-storm-loop.m4a */; };
+		8CC51C8EC6CC117619BA0C88 /* wf-drought-loop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 61F78EE0C062B99EFBEB7092 /* wf-drought-loop.m4a */; };
+		52F6F4788BC3CFB5F73C80C5 /* wf-termite-tick.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 2F32290880316F5992BFAE2C /* wf-termite-tick.m4a */; };
+		82342113C10CF330E77D2B77 /* wf-relief-chime.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 374B885D209D4B81620206A7 /* wf-relief-chime.m4a */; };
+		BDB67239B70BC67CC7678E70 /* wf-grand-flourish.m4a in Resources */ = {isa = PBXBuildFile; fileRef = E644C3AF25706A169A15A100 /* wf-grand-flourish.m4a */; };
+		67B2BEDE6284453719DABAE9 /* wf-frost-twinkle.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9A4E5C585F438288A75992D0 /* wf-frost-twinkle.m4a */; };
+		0024C1E00A06DA917C4F9630 /* wf-hail-patter.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6888A2D538B05C68ACE5F5E2 /* wf-hail-patter.m4a */; };
 		1A0DEDAC7F9EC16779453E20 /* WordFloraWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 99F163FA4DA73F8563DD08F0 /* WordFloraWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		1A1EF2246D18FBC822B23F43 /* wf-butterfly.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B3C67B3F3D18A565BC91069D /* wf-butterfly.m4a */; };
 		1B1F6E25CDDEF290B4E2EDA4 /* VoicePickerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 673807997651A94A74A50735 /* VoicePickerTests.swift */; };
 		1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */ = {isa = PBXBuildFile; fileRef = F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */; };
+		E80F615F00CD303B26AE7EC8 /* AppModel+WeatherSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 857F2189635F58CB6E66E8D1 /* AppModel+WeatherSound.swift */; };
 		1CE9AE24116B633B3AF3403A /* WakePuzzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = A60BDD5B19B690060D44B813 /* WakePuzzle.swift */; };
 		1CEC41D7155EFBA55139F8BF /* ButterflyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F887962950E79A156ED26A3F /* ButterflyView.swift */; };
 		1D3676A7C18FACB6F1FC68CD /* RoseMeter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */; };
@@ -110,6 +119,9 @@
 		812CC68498F635B4E42F0D32 /* FeatureUnlockPolicy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 273D0B97DCD04A94ECA1484E /* FeatureUnlockPolicy.swift */; };
 		86050D07DBF30E19DA387BC3 /* LevelMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 025558730A17C81DFFB5A5C3 /* LevelMapView.swift */; };
 		86156687C026EBE9B3D0545A /* SoundTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2C1238F02F6B7F38D8F11C7 /* SoundTests.swift */; };
+		8430DC080869E0EDA85BB48B /* WeatherSoundTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 236331D33643B9083E1DFE30 /* WeatherSoundTests.swift */; };
+		BB90299158214EF837362C75 /* WeatherArtTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0BC726CA25EBBC8D07B2EA1C /* WeatherArtTests.swift */; };
+		350F8FED4A5BCFC5B4EBEDDF /* WeatherArtSnapshotTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C98906C2750BE8B0E626CB39 /* WeatherArtSnapshotTests.swift */; };
 		867CAC1CAA12369D5294EA65 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2209A1734F0A48837A37BC23 /* RootView.swift */; };
 		89D5ED23DA9588AA0C10C640 /* LifePalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = 81A738D4825EDE5CDE9AA4F4 /* LifePalette.swift */; };
 		8B908579FF1372C98EF7FB86 /* PlantCollectible.swift in Sources */ = {isa = PBXBuildFile; fileRef = D7C771AB1111BA1267E678AF /* PlantCollectible.swift */; };
@@ -168,10 +180,21 @@
 		BA042FFFFC29EF40C286AF09 /* wf-wrong.m4a in Resources */ = {isa = PBXBuildFile; fileRef = FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */; };
 		BBD809AA53056AA81E77D918 /* GardenShortcuts.swift in Sources */ = {isa = PBXBuildFile; fileRef = C8CFA5BED25190317B98E622 /* GardenShortcuts.swift */; };
 		BD2A8358AA71C44082C046C0 /* Sound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6BA2FA0C2D96FAD52648169E /* Sound.swift */; };
+		3D4E2073B3BAB4E197B96990 /* WeatherSound.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8A2603DD146FF9E0C393E91A /* WeatherSound.swift */; };
+		B860D8B4DD8D2E8153E63AC1 /* WeatherSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E268793BEEF5DC12F0FEC59E /* WeatherSoundPlayer.swift */; };
 		BF1505CF8E342EDAE2B067A9 /* SimplerClueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDA79853A58ADD9A3C086E7 /* SimplerClueTests.swift */; };
 		BF85587E45FCFE74CE68D2B7 /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F94DF6CFF0C826E3155B6 /* EntitlementService.swift */; };
 		C01954BECB8A0A87686D11CE /* Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13457F8B016917B22CB55A1C /* Share.swift */; };
 		C0301098F862C6C9DF220D24 /* RainOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF243532D79B05FABE12F6B1 /* RainOverlay.swift */; };
+		CE5FA8A1B7CBD2843E93DD49 /* WeatherArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333953FCC06979F201C1B1C1 /* WeatherArt.swift */; };
+		A2EAA42710D96198BA88AAF1 /* WeatherSky.swift in Sources */ = {isa = PBXBuildFile; fileRef = 748C3E58AF634BFCB1C7F6C7 /* WeatherSky.swift */; };
+		0E49C416A031E189CF9E528C /* WeatherDrawing.swift in Sources */ = {isa = PBXBuildFile; fileRef = D217012C1174A869182A6064 /* WeatherDrawing.swift */; };
+		0F91EB6703C042B658001FF8 /* WeatherOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D87DC99B92050196FD1DD9E /* WeatherOverlay.swift */; };
+		B488CE6B9E259DA4415DE492 /* WeatherShelterArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = A170D71DACFD813C848FD6AE /* WeatherShelterArt.swift */; };
+		F91FDE14A88D1F6B80CA0A71 /* WeatherStage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF7352C3AE8255972375807 /* WeatherStage.swift */; };
+		B2A66AF6C98CAB94702EF6D2 /* ReliefArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF1248E07562D3379165721 /* ReliefArt.swift */; };
+		CC76825E7D6915AFCD0C239E /* GardenersCrown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7AED6668DCEE9BF8FB0C92BD /* GardenersCrown.swift */; };
+		01130059B892B364032EF5C1 /* GrandGardenArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 527D0C409DA0CAEBE8E526E1 /* GrandGardenArt.swift */; };
 		C0A400B31989FDA16B29412C /* LifeStatsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A17B66E1750BA0EC6874EED /* LifeStatsTests.swift */; };
 		C2FB34C4102FCBD97EADB91E /* CopySafety.swift in Sources */ = {isa = PBXBuildFile; fileRef = A21DF9A95AEA44F66C376C83 /* CopySafety.swift */; };
 		5CC1646FA99B378A3185C74E /* CelebrationStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = D40977C2116F40B9A5914F84 /* CelebrationStyle.swift */; };
@@ -342,6 +365,8 @@
 		6ACF0034A28D0F546B9B9DB9 /* wf-badgeSilver.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeSilver.m4a"; sourceTree = "<group>"; };
 		6B246B40089EA34F9E6A1CE5 /* WakeChallenge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WakeChallenge.swift; sourceTree = "<group>"; };
 		6BA2FA0C2D96FAD52648169E /* Sound.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Sound.swift; sourceTree = "<group>"; };
+		8A2603DD146FF9E0C393E91A /* WeatherSound.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherSound.swift"; sourceTree = "<group>"; };
+		E268793BEEF5DC12F0FEC59E /* WeatherSoundPlayer.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherSoundPlayer.swift"; sourceTree = "<group>"; };
 		6D34CCDEB804DD45AF53C466 /* PlusOfferPolicyTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlusOfferPolicyTests.swift; sourceTree = "<group>"; };
 		6E08620029509154DEB72456 /* AssistTuner.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AssistTuner.swift; sourceTree = "<group>"; };
 		6E0AF7DB096B1ADC301F75FE /* FlowerView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FlowerView.swift; sourceTree = "<group>"; };
@@ -394,10 +419,22 @@
 		A86EDC2288FBFA94769434C1 /* wf-rest.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-rest.m4a"; sourceTree = "<group>"; };
 		AA8D41F1F986145B3482846F /* ShedTools.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShedTools.swift; sourceTree = "<group>"; };
 		AF243532D79B05FABE12F6B1 /* RainOverlay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RainOverlay.swift; sourceTree = "<group>"; };
+		333953FCC06979F201C1B1C1 /* WeatherArt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherArt.swift"; sourceTree = "<group>"; };
+		748C3E58AF634BFCB1C7F6C7 /* WeatherSky.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherSky.swift"; sourceTree = "<group>"; };
+		D217012C1174A869182A6064 /* WeatherDrawing.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherDrawing.swift"; sourceTree = "<group>"; };
+		7D87DC99B92050196FD1DD9E /* WeatherOverlay.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherOverlay.swift"; sourceTree = "<group>"; };
+		A170D71DACFD813C848FD6AE /* WeatherShelterArt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherShelterArt.swift"; sourceTree = "<group>"; };
+		8DF7352C3AE8255972375807 /* WeatherStage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherStage.swift"; sourceTree = "<group>"; };
+		2FF1248E07562D3379165721 /* ReliefArt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "ReliefArt.swift"; sourceTree = "<group>"; };
+		7AED6668DCEE9BF8FB0C92BD /* GardenersCrown.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "GardenersCrown.swift"; sourceTree = "<group>"; };
+		527D0C409DA0CAEBE8E526E1 /* GrandGardenArt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "GrandGardenArt.swift"; sourceTree = "<group>"; };
 		B0DEEEBD8B052299970213DD /* wf-key.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-key.m4a"; sourceTree = "<group>"; };
 		B1A188B4F331705EAF0FD7F2 /* ProgressionPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ProgressionPolicy.swift; sourceTree = "<group>"; };
 		B1B0A69A8B11B55F0BD37713 /* wf-correct.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-correct.m4a"; sourceTree = "<group>"; };
 		B2C1238F02F6B7F38D8F11C7 /* SoundTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SoundTests.swift; sourceTree = "<group>"; };
+		236331D33643B9083E1DFE30 /* WeatherSoundTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherSoundTests.swift"; sourceTree = "<group>"; };
+		0BC726CA25EBBC8D07B2EA1C /* WeatherArtTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherArtTests.swift"; sourceTree = "<group>"; };
+		C98906C2750BE8B0E626CB39 /* WeatherArtSnapshotTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "WeatherArtSnapshotTests.swift"; sourceTree = "<group>"; };
 		B3C67B3F3D18A565BC91069D /* wf-butterfly.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-butterfly.m4a"; sourceTree = "<group>"; };
 		B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlayerProfile.swift; sourceTree = "<group>"; };
 		B4C0CA8E08136EA474C34FD6 /* SplitMix64.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SplitMix64.swift; sourceTree = "<group>"; };
@@ -431,6 +468,14 @@
 		DA61364BB027900BC30E6C17 /* wf-badgeGold.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeGold.m4a"; sourceTree = "<group>"; };
 		DBDCE1A9248AD5C4EDCBE08A /* GardenBackupTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenBackupTests.swift; sourceTree = "<group>"; };
 		DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-thunder.m4a"; sourceTree = "<group>"; };
+		537C16CD40328D0046A80DC6 /* wf-wind-loop.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-wind-loop.m4a"; sourceTree = "<group>"; };
+		A845D68363E9AD512C1E6F94 /* wf-storm-loop.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-storm-loop.m4a"; sourceTree = "<group>"; };
+		61F78EE0C062B99EFBEB7092 /* wf-drought-loop.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-drought-loop.m4a"; sourceTree = "<group>"; };
+		2F32290880316F5992BFAE2C /* wf-termite-tick.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-termite-tick.m4a"; sourceTree = "<group>"; };
+		374B885D209D4B81620206A7 /* wf-relief-chime.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-relief-chime.m4a"; sourceTree = "<group>"; };
+		E644C3AF25706A169A15A100 /* wf-grand-flourish.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-grand-flourish.m4a"; sourceTree = "<group>"; };
+		9A4E5C585F438288A75992D0 /* wf-frost-twinkle.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-frost-twinkle.m4a"; sourceTree = "<group>"; };
+		6888A2D538B05C68ACE5F5E2 /* wf-hail-patter.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-hail-patter.m4a"; sourceTree = "<group>"; };
 		DE3B9B93CE1A034E8C165CB7 /* Badges.json */ = {isa = PBXFileReference; includeInIndex = 1; path = Badges.json; sourceTree = "<group>"; };
 		DFF28D3D26629318AA9D49A4 /* GardenBackup.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenBackup.swift; sourceTree = "<group>"; };
 		E0F27137167AD56F3C378B56 /* PlantThinning.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantThinning.swift; sourceTree = "<group>"; };
@@ -444,6 +489,7 @@
 		EF908A564AC2DBFD8ADCFBBA /* LoveEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LoveEngineTests.swift; sourceTree = "<group>"; };
 		F53AF4373CF0983348711216 /* Badges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Badges.swift; sourceTree = "<group>"; };
 		F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+Pots.swift"; sourceTree = "<group>"; };
+		857F2189635F58CB6E66E8D1 /* AppModel+WeatherSound.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+WeatherSound.swift"; sourceTree = "<group>"; };
 		F787992B59617103496CEE38 /* TendingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendingUITests.swift; sourceTree = "<group>"; };
 		F887962950E79A156ED26A3F /* ButterflyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyView.swift; sourceTree = "<group>"; };
 		F9B200507C4629386A0C486C /* GardenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidget.swift; sourceTree = "<group>"; };
@@ -605,6 +651,8 @@
 			isa = PBXGroup;
 			children = (
 				6BA2FA0C2D96FAD52648169E /* Sound.swift */,
+				8A2603DD146FF9E0C393E91A /* WeatherSound.swift */,
+				E268793BEEF5DC12F0FEC59E /* WeatherSoundPlayer.swift */,
 				78762A5E58BEBD2ED663551F /* ReadAloud.swift */,
 				A6A01FC491120FB6F06CDF63 /* VoicePicker.swift */,
 			);
@@ -651,6 +699,15 @@
 				9D9DBF6CF922185F20488618 /* NameStoryCard.swift */,
 				52107D98E6FA3FE503D0BDC7 /* LayeredPlantView.swift */,
 				AF243532D79B05FABE12F6B1 /* RainOverlay.swift */,
+				333953FCC06979F201C1B1C1 /* WeatherArt.swift */,
+				748C3E58AF634BFCB1C7F6C7 /* WeatherSky.swift */,
+				D217012C1174A869182A6064 /* WeatherDrawing.swift */,
+				7D87DC99B92050196FD1DD9E /* WeatherOverlay.swift */,
+				A170D71DACFD813C848FD6AE /* WeatherShelterArt.swift */,
+				8DF7352C3AE8255972375807 /* WeatherStage.swift */,
+				2FF1248E07562D3379165721 /* ReliefArt.swift */,
+				7AED6668DCEE9BF8FB0C92BD /* GardenersCrown.swift */,
+				527D0C409DA0CAEBE8E526E1 /* GrandGardenArt.swift */,
 				C95EE8F83CC87F157461F447 /* SeedPotView.swift */,
 				2F738E93544B38467408EB43 /* TendAnimationView.swift */,
 				5937A430C3FA390AF941B091 /* PotArtView.swift */,
@@ -683,6 +740,9 @@
 				B5A871D657C5B861E3C18DD0 /* WidgetActionsTests.swift */,
 				BCCA6D160865CEBA2AA66E39 /* ReminderTests.swift */,
 				B2C1238F02F6B7F38D8F11C7 /* SoundTests.swift */,
+				236331D33643B9083E1DFE30 /* WeatherSoundTests.swift */,
+				0BC726CA25EBBC8D07B2EA1C /* WeatherArtTests.swift */,
+				C98906C2750BE8B0E626CB39 /* WeatherArtSnapshotTests.swift */,
 				BC96D8FD408D4A3C5C97BD6A /* ShareTests.swift */,
 				E5603BA4007B124D652F8467 /* ReconcileTests.swift */,
 				FBDA79853A58ADD9A3C086E7 /* SimplerClueTests.swift */,
@@ -794,6 +854,7 @@
 				C8CFA5BED25190317B98E622 /* GardenShortcuts.swift */,
 				F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */,
 				ABF1212A4E968C83B4FDC5D4 /* AppModel+Weather.swift */,
+				857F2189635F58CB6E66E8D1 /* AppModel+WeatherSound.swift */,
 			);
 			name = App;
 			path = App;
@@ -873,6 +934,14 @@
 				9BB89B0B7D5A508F1A4C13B4 /* wf-word.m4a */,
 				FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */,
 				DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */,
+				537C16CD40328D0046A80DC6 /* wf-wind-loop.m4a */,
+				A845D68363E9AD512C1E6F94 /* wf-storm-loop.m4a */,
+				61F78EE0C062B99EFBEB7092 /* wf-drought-loop.m4a */,
+				2F32290880316F5992BFAE2C /* wf-termite-tick.m4a */,
+				374B885D209D4B81620206A7 /* wf-relief-chime.m4a */,
+				E644C3AF25706A169A15A100 /* wf-grand-flourish.m4a */,
+				9A4E5C585F438288A75992D0 /* wf-frost-twinkle.m4a */,
+				6888A2D538B05C68ACE5F5E2 /* wf-hail-patter.m4a */,
 			);
 			name = Sounds;
 			path = Sounds;
@@ -1073,6 +1142,14 @@
 				EDB86ADCB596F2390F8642F7 /* wf-word.m4a in Resources */,
 				BA042FFFFC29EF40C286AF09 /* wf-wrong.m4a in Resources */,
 				19FC1E7D0E23F1EEAA3D062F /* wf-thunder.m4a in Resources */,
+				55375551216352E2369FAA25 /* wf-wind-loop.m4a in Resources */,
+				2FF1472D05417CBB04C31AC2 /* wf-storm-loop.m4a in Resources */,
+				8CC51C8EC6CC117619BA0C88 /* wf-drought-loop.m4a in Resources */,
+				52F6F4788BC3CFB5F73C80C5 /* wf-termite-tick.m4a in Resources */,
+				82342113C10CF330E77D2B77 /* wf-relief-chime.m4a in Resources */,
+				BDB67239B70BC67CC7678E70 /* wf-grand-flourish.m4a in Resources */,
+				67B2BEDE6284453719DABAE9 /* wf-frost-twinkle.m4a in Resources */,
+				0024C1E00A06DA917C4F9630 /* wf-hail-patter.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1123,6 +1200,9 @@
 				2152B2B444259D51618BC231 /* WidgetActionsTests.swift in Sources */,
 				5000EF3A884C020D4BA90F09 /* ReminderTests.swift in Sources */,
 				86156687C026EBE9B3D0545A /* SoundTests.swift in Sources */,
+				8430DC080869E0EDA85BB48B /* WeatherSoundTests.swift in Sources */,
+				BB90299158214EF837362C75 /* WeatherArtTests.swift in Sources */,
+				350F8FED4A5BCFC5B4EBEDDF /* WeatherArtSnapshotTests.swift in Sources */,
 				8C948E1D10D95B62874FDD00 /* ShareTests.swift in Sources */,
 				EC4500E6CD3A54445703ACAF /* ReconcileTests.swift in Sources */,
 				BF1505CF8E342EDAE2B067A9 /* SimplerClueTests.swift in Sources */,
@@ -1245,6 +1325,8 @@
 				617E6838EBE8B27619FA5225 /* SharedDefaults.swift in Sources */,
 				0ADEE1C9ED4D2BCB5FD62A2A /* Reminders.swift in Sources */,
 				BD2A8358AA71C44082C046C0 /* Sound.swift in Sources */,
+				3D4E2073B3BAB4E197B96990 /* WeatherSound.swift in Sources */,
+				B860D8B4DD8D2E8153E63AC1 /* WeatherSoundPlayer.swift in Sources */,
 				C01954BECB8A0A87686D11CE /* Share.swift in Sources */,
 				299DD84807EAF9534EA522A8 /* ShareCard.swift in Sources */,
 				4893251B6742C018C90A9E01 /* BreakPolicy.swift in Sources */,
@@ -1272,6 +1354,15 @@
 				6A3637FF809AEE76F03A30E6 /* NameStoryCard.swift in Sources */,
 				80C6C5F5EDC6DB0C83563F51 /* LayeredPlantView.swift in Sources */,
 				C0301098F862C6C9DF220D24 /* RainOverlay.swift in Sources */,
+				CE5FA8A1B7CBD2843E93DD49 /* WeatherArt.swift in Sources */,
+				A2EAA42710D96198BA88AAF1 /* WeatherSky.swift in Sources */,
+				0E49C416A031E189CF9E528C /* WeatherDrawing.swift in Sources */,
+				0F91EB6703C042B658001FF8 /* WeatherOverlay.swift in Sources */,
+				B488CE6B9E259DA4415DE492 /* WeatherShelterArt.swift in Sources */,
+				F91FDE14A88D1F6B80CA0A71 /* WeatherStage.swift in Sources */,
+				B2A66AF6C98CAB94702EF6D2 /* ReliefArt.swift in Sources */,
+				CC76825E7D6915AFCD0C239E /* GardenersCrown.swift in Sources */,
+				01130059B892B364032EF5C1 /* GrandGardenArt.swift in Sources */,
 				99A763B192E74385836B56C6 /* SeedPotView.swift in Sources */,
 				F4C0D43C87AF2524BB79A1A1 /* TendAnimationView.swift in Sources */,
 				7DD477E02162F248269BFF98 /* PotCatalog.swift in Sources */,
@@ -1279,6 +1370,7 @@
 				8268EE14C8E89B8569354755 /* WeatherViews.swift in Sources */,
 				00306C0B86191F5D34F816C8 /* AppModel+Weather.swift in Sources */,
 				96F140C05B70252AE40031B6 /* GardenWeather.swift in Sources */,
+				E80F615F00CD303B26AE7EC8 /* AppModel+WeatherSound.swift in Sources */,
 				347A410A75615F9238BE8729 /* PotArtView.swift in Sources */,
 				EDC9869F995C67A16F2AB495 /* PotPickerViews.swift in Sources */,
 				5C79C89D5D157B3BC8D2F263 /* RestScene.swift in Sources */,
