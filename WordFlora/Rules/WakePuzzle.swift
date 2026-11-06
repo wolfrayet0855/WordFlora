@@ -15,6 +15,8 @@ struct WakePuzzle: Equatable, Hashable {
     let tiles: [Character]
     let hint: String
     let intro: String
+    /// Slot indices after which a gap is drawn (two-word storm answers). Empty for the wake puzzle.
+    var gaps: [Int] = []
 
     static let minLetters = 5
     static let maxLetters = 10
@@ -101,12 +103,14 @@ struct WakePuzzleBoard: Equatable {
     private(set) var placed: [Int?]
     /// Given or peeked letters, which cannot be taken back.
     private(set) var locked: [Character?]
-    private var consumed = Set<Int>()
+    private(set) var consumed = Set<Int>()
     private var lastPeekAt = 0.0
     private let answer: [Character]
 
-    init(puzzle: WakePuzzle) {
+    /// `firstPeekFree`: the weather puzzle's storm tier gives the first peek at once, then one every 30 s.
+    init(puzzle: WakePuzzle, firstPeekFree: Bool = false) {
         self.puzzle = puzzle
+        if firstPeekFree { lastPeekAt = -WakePuzzle.peekInterval }
         self.placed = Array(repeating: nil, count: puzzle.slots.count)
         self.locked = puzzle.slots
         self.answer = Array(puzzle.answer)

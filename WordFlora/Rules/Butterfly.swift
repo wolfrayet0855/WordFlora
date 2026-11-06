@@ -103,7 +103,8 @@ struct StickerAlbum: Codable, Equatable {
     }
     func count(of id: String) -> Int { counts[id] ?? 0 }
     func lastSeen(of id: String) -> Date? { seenAt[id] }
-    var species: Int { counts.values.filter { $0 > 0 }.count }
+    /// Visitor species met. Weather stickers share the album (ids `weather.n`) but are not visitors, so they never count here.
+    var species: Int { counts.filter { $0.value > 0 && !WeatherSticker.isWeather($0.key) }.count }
     var isComplete: Bool { VisitorCatalog.all.allSatisfy { count(of: $0.id) > 0 } }
 }
 

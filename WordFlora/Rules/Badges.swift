@@ -3,6 +3,8 @@ import Foundation
 enum BadgeCounter: String, CaseIterable, Codable {
     case levelSets, plantsOwned, feeds, waterings, repots, prunes, streak
     case perfectBlooms, revives, dailyBloomsDone, visitorSpecies, butterflyPlays
+    /// Weather puzzles solved (one step per solve that earned a reward). Accumulates; never goes down.
+    case weathered
 
     /// High-water counters only ever go up to the best value seen; the rest accumulate.
     var isHighWater: Bool {
