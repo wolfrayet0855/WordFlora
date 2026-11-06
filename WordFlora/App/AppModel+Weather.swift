@@ -124,7 +124,7 @@ extension AppModel {
             out[plant.plantId] = WeatherLook.Input(
                 kind: ev.kind, eventDay: ev.day, today: c.today, effect: effects[plant.plantId] ?? .light,
                 lastCareAt: WeatherLook.careAt(lastTendedAt: plant.lastTendedAt, lastLovedAt: plant.lastLovedAt),
-                seenAt: p.weatherSeenAt, sheltered: p.weatherShelterDay == ev.day, rescued: p.weatherRescuedDays.contains(ev.day),
+                seenAt: p.weatherSeenAt, sheltered: ShelterPolicy.isSheltered(shelterDay: p.weatherShelterDay, eventDay: ev.day), rescued: p.weatherRescuedDays.contains(ev.day),
                 wild: wild, stage: plant.stage, rank: ranks[plant.plantId] ?? Int.max, calm: false, isSeed: love.isSeed,
                 loveRaining: love.raining, name: plant.nickname.isEmpty ? plant.name : plant.nickname)
         }
@@ -183,5 +183,34 @@ extension AppModel {
     var reminderForecast: (Date) -> WeatherKind? {
         let c = weatherContext, opted = settings.weatherNotify, allowed = weatherNotifyAvailable
         return { GardenWeather.reminderForecast(on: $0, c, optedIn: opted, notifyAllowed: allowed) }
+    }
+
+    /// The plant on Home's weather card: the sunflower once found (as in the mockup), else the first found plant.
+    var weatherCardPlantImage: String {
+        let found = plants().filter { $0.earnedCount > 0 }
+        return (found.first { $0.plantId == "sunflower" } ?? found.first)?.imageName ?? "plant_sunflower"
+    }
+
+    // MARK: Life panel visits
+
+    /// A plant page visit: true when the Life panel should open (the weather slot, hearts or seed state changed since
+    /// the last visit). Records what this visit shows.
+    @discardableResult
+    func lifePanelVisit(_ plant: PlantCollectible, hearts: Int, isSeed: Bool) -> Bool {
+        let key = LifePanelVisit.key(weather: weatherChangeKey(for: plant), hearts: hearts, isSeed: isSeed)
+        let opens = LifePanelVisit.opens(lastSeen: plant.lifeSeenKey, current: key)
+        record(key, plant)
+        return opens
+    }
+
+    /// A change seen on the page itself (a hello, a tend, care mending the weather) counts as seen.
+    func markLifeSeen(_ plant: PlantCollectible, hearts: Int, isSeed: Bool) {
+        let key = LifePanelVisit.key(weather: weatherChangeKey(for: plant), hearts: hearts, isSeed: isSeed)
+        if key != plant.lifeSeenKey { record(key, plant) }
+    }
+
+    private func record(_ key: String, _ plant: PlantCollectible) {
+        plant.lifeSeenKey = key; plant.lifeSeenAt = nowDate
+        try? context.save()
     }
 }

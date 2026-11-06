@@ -200,4 +200,19 @@ final class ReconcileTests: XCTestCase {
         XCTAssertEqual(run(oldFirst: true), Date(timeIntervalSince1970: 100))
         XCTAssertEqual(run(oldFirst: false), Date(timeIntervalSince1970: 100))
     }
+
+    func testLifeSeenKeyMergeTakesTheLaterVisit() {
+        func rose(_ key: String, at t: Double?) -> PlantCollectible {
+            let p = PlantCollectible(name: "Rose", botanicalName: "r", botanicalFact: "f", level: 1, imageName: "plant_rose", plantId: "rose")
+            p.lifeSeenKey = key; p.lifeSeenAt = t.map { Date(timeIntervalSince1970: $0) } ?? .distantPast
+            return p
+        }
+        XCTAssertEqual(rose("", at: nil).lifeSeenKey, "", "a new plant has seen nothing")
+        var k = rose("a", at: 100); DataReconciler.merge(rose("b", at: 200), into: k)
+        XCTAssertEqual(k.lifeSeenKey, "b"); XCTAssertEqual(k.lifeSeenAt, Date(timeIntervalSince1970: 200))
+        k = rose("b", at: 200); DataReconciler.merge(rose("a", at: 100), into: k)
+        XCTAssertEqual(k.lifeSeenKey, "b"); XCTAssertEqual(k.lifeSeenAt, Date(timeIntervalSince1970: 200))
+        k = rose("a", at: 100); DataReconciler.merge(rose("", at: nil), into: k)
+        XCTAssertEqual(k.lifeSeenKey, "a", "an unvisited copy never clears a visit")
+    }
 }

@@ -169,9 +169,13 @@ enum ShelterCopy {
 
     static let setOutHint = "Sets it out for the weather. It costs nothing."
 
+    /// The forecast card's step: "Set out the wind net", then "The wind net is out for your whole garden."
+    static func cardStep(_ h: WeatherHelper) -> String { "Set out the \(name(h).lowercased())" }
+    static func cardDone(_ h: WeatherHelper) -> String { "The \(name(h).lowercased()) is out for your whole garden." }
+
     static func all() -> [String] {
         WeatherHelper.allCases.flatMap { h in
-            [name(h), blurb(h), rowLabel(h, state: .ready), rowLabel(h, state: .canSetOut), rowLabel(h, state: .setOut)]
+            [name(h), blurb(h), rowLabel(h, state: .ready), rowLabel(h, state: .canSetOut), rowLabel(h, state: .setOut), cardStep(h), cardDone(h)]
         } + WeatherKind.allCases.flatMap { [chip($0, today: true), chip($0, today: false)] }
           + [sectionTitle, sectionLine, sectionLineNoForecast, ready, setOut, isOut, setOutHint]
     }

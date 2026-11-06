@@ -225,4 +225,27 @@ final class GardenBackupTests: XCTestCase {
             XCTAssertTrue(CopySafety.check(line).isEmpty, line)
         }
     }
+
+    func testTheLifePanelsLastSeenKeyRoundTripsAndOldBackupsStillRead() throws {
+        growSomething()
+        let rose = plant("rose"); rose.lifeSeenKey = "|h2|plant"; rose.lifeSeenAt = Date(timeIntervalSince1970: 5_000); try ctx.save()
+        let data = try GardenBackup.make(context: ctx, now: .now).encoded()
+        XCTAssertTrue(String(data: data, encoding: .utf8)!.contains("\"lifeSeenKey\""))
+
+        let fresh = try SharedContainer.make(inMemory: true)
+        try PlantCatalog.seedIfNeeded(context: fresh.mainContext)
+        let other = plant("rose", in: fresh.mainContext)
+        other.lifeSeenKey = "|h0|plant"; other.lifeSeenAt = Date(timeIntervalSince1970: 9_000)
+        guard case .success = GardenBackup.restore(data, into: fresh.mainContext, badgeDefs: defs) else { return XCTFail("restore failed") }
+        XCTAssertEqual(plant("rose", in: fresh.mainContext).lifeSeenKey, "|h0|plant", "a restore never rolls back a later visit")
+        XCTAssertEqual(plant("daisy", in: fresh.mainContext).lifeSeenKey, "")
+
+        var json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        json["plants"] = (json["plants"] as! [[String: Any]]).map { var p = $0; p.removeValue(forKey: "lifeSeenKey"); p.removeValue(forKey: "lifeSeenAt"); return p }
+        let old = try JSONSerialization.data(withJSONObject: json)
+        guard case .success(let decoded) = GardenBackup.decode(old) else { return XCTFail("old backup should read") }
+        XCTAssertNil(decoded.plants.first { $0.plantId == "rose" }?.lifeSeenKey)
+        guard case .success = GardenBackup.restore(old, into: ctx, badgeDefs: defs) else { return XCTFail("old backup should restore") }
+        XCTAssertEqual(plant("rose").lifeSeenKey, "|h2|plant", "an older backup changes no visit")
+    }
 }

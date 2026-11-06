@@ -105,6 +105,8 @@ enum DataReconciler {
         // Golden days: the later day key wins; the count of days earned takes the max, so it never goes down.
         k.goldenDayKey = max(k.goldenDayKey, o.goldenDayKey)
         k.goldenDays = max(k.goldenDays, o.goldenDays)
+        // The Life panel's last-seen key: the later visit wins, and the key travels with its stamp.
+        if o.lifeSeenAt > k.lifeSeenAt { k.lifeSeenKey = o.lifeSeenKey; k.lifeSeenAt = o.lifeSeenAt }
         if k.nickname.isEmpty { k.nickname = o.nickname }
         if k.soilType.isEmpty { k.soilType = o.soilType }
     }

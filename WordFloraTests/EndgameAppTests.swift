@@ -247,3 +247,117 @@ final class EndgameAppTests: XCTestCase {
         XCTAssertEqual(app.album.species, 0)
     }
 }
+
+/// The integration hooks between the helpers/puzzle (builder B) and the weather wiring (builder A), and the Life panel
+/// rule (closed by default; opens on a visit where the weather, hearts or seed state changed since the last one).
+@MainActor
+final class WeatherHooksTests: XCTestCase {
+    let base = EndgameAppTests()
+
+    func testTheGardenWeatherSettingDecidesHelpersAndThePuzzle() throws {
+        let app = try base.makeApp()
+        base.weather(app, eventIn: 0)
+        XCTAssertTrue(app.gardenWeatherSettingOn)
+        XCTAssertTrue(app.weatherPuzzleOpen)
+        app.settings.gardenWeather = false
+        XCTAssertFalse(app.gardenWeatherSettingOn, "the Garden weather switch, not just Calm")
+        XCTAssertFalse(app.weatherNow.showsMechanics)
+        XCTAssertFalse(app.weatherPuzzleOpen)
+        app.settings.gardenWeather = true
+        app.settings.quietGarden = true
+        XCTAssertFalse(app.gardenWeatherSettingOn, "Quiet Garden hides weather")
+        app.settings.quietGarden = false
+        app.settings.calmMode = true
+        XCTAssertFalse(app.gardenWeatherSettingOn, "Calm hides weather")
+    }
+
+    func testWildWeatherInTheHelpersFollowsTheSettingsWildRule() throws {
+        let app = try base.makeApp(age: .under13)
+        base.weather(app, eventIn: 0)
+        app.setWildWeather(true)
+        XCTAssertTrue(app.weatherNow.wild, "any age may opt in with Calm off")
+        app.settings.gardenWeather = false
+        XCTAssertFalse(app.weatherNow.wild)
+    }
+
+    func testASetOutHelperKeepsTheEventsPlantsSnugOnThePlantPage() throws {
+        let app = try base.makeApp()
+        base.weather(app, eventIn: 1, kind: .bigWind)
+        XCTAssertTrue(app.receiveWeatherKitIfDue())
+        XCTAssertTrue(app.setOutHelper())
+        base.clock = base.clock.addingTimeInterval(86_400)
+        for p in app.plants() where p.earnedCount > 0 { p.lastLovedAt = base.clock.addingTimeInterval(-3_600) }
+        app.markWeatherSeen()
+        XCTAssertTrue(app.weatherSheltered)
+        let inputs = app.weatherInputs()
+        XCTAssertFalse(inputs.isEmpty)
+        for (_, i) in inputs { XCTAssertTrue(i.sheltered, "the plant page reads weatherSheltered") }
+    }
+
+    func testWildWeatherPartTwoIsACatchOfThreeThatEasesAfterTwoTries() {
+        XCTAssertFalse(WeatherPuzzlePolicy.needsCatch(wild: false))
+        XCTAssertTrue(WeatherPuzzlePolicy.needsCatch(wild: true))
+        XCTAssertEqual(WeatherPuzzlePolicy.catchGoal(misses: 0), 3)
+        XCTAssertEqual(WeatherPuzzlePolicy.catchGoal(misses: 1), 3)
+        XCTAssertEqual(WeatherPuzzlePolicy.catchGoal(misses: 2), 2)
+    }
+
+    // MARK: Shown-stage dip (display only)
+
+    func testTheSnapshotShowsTheDippedStageAndKeepsTheStoredOne() {
+        var s = LifeStats.Snapshot(water: .init(name: "W", word: "w", fill: 0.5), sunshine: .init(name: "S", word: "s", fill: 0.5),
+                                   happiness: .init(name: "H", word: "h", fill: 0.5), stage: 4, hearts: 2, loveLine: "", pips: 5,
+                                   isSeed: false, rainDay: 0)
+        XCTAssertEqual(s.shownStage, 4); XCTAssertFalse(s.dipped)
+        s.weather = WeatherLook.Output(look: .full, setback: 1, shownStage: 3, line: "x")
+        XCTAssertEqual(s.shownStage, 3); XCTAssertTrue(s.dipped)
+        XCTAssertEqual(s.stage, 4, "the stored stage is untouched")
+        XCTAssertTrue(s.stageLabel.contains("bloom stage"))
+        XCTAssertTrue(s.stageLabel.contains(LifeStats.mendingNote))
+        XCTAssertEqual(CopySafety.check(LifeStats.mendingNote), [])
+        XCTAssertEqual(PlantDetailView.dipScale(s), 0.8, accuracy: 0.001, "drawn one stage smaller")
+        s.weather = nil
+        XCTAssertEqual(PlantDetailView.dipScale(s), 1)
+    }
+
+    // MARK: Life panel
+
+    func testLifePanelKey() {
+        let a = LifePanelVisit.key(weather: "", hearts: 2, isSeed: false)
+        XCTAssertNotEqual(a, LifePanelVisit.key(weather: "", hearts: 3, isSeed: false))
+        XCTAssertNotEqual(a, LifePanelVisit.key(weather: "330:bigWind:full:0:0", hearts: 2, isSeed: false))
+        XCTAssertNotEqual(a, LifePanelVisit.key(weather: "", hearts: 2, isSeed: true))
+        XCTAssertFalse(LifePanelVisit.opens(lastSeen: "", current: a), "the first visit starts closed")
+        XCTAssertFalse(LifePanelVisit.opens(lastSeen: a, current: a))
+        XCTAssertTrue(LifePanelVisit.opens(lastSeen: a, current: a + "x"))
+    }
+
+    func testThePanelOpensOnlyOnAVisitWhereSomethingChanged() throws {
+        let app = try base.makeApp()
+        let plant = try XCTUnwrap(app.plants().first)
+        plant.earnedCount = 1
+        XCTAssertFalse(app.lifePanelVisit(plant, hearts: 0, isSeed: false), "first visit: closed")
+        XCTAssertEqual(plant.lifeSeenAt, base.clock)
+        XCTAssertFalse(app.lifePanelVisit(plant, hearts: 0, isSeed: false), "nothing changed: closed")
+        XCTAssertTrue(app.lifePanelVisit(plant, hearts: 1, isSeed: false), "hearts changed: opens")
+        XCTAssertFalse(app.lifePanelVisit(plant, hearts: 1, isSeed: false))
+        XCTAssertTrue(app.lifePanelVisit(plant, hearts: 1, isSeed: true), "seed state changed: opens")
+        // A change seen on the page itself (a hello) is recorded, so the next visit stays closed.
+        app.markLifeSeen(plant, hearts: 2, isSeed: true)
+        XCTAssertFalse(app.lifePanelVisit(plant, hearts: 2, isSeed: true))
+    }
+
+    func testThePanelOpensWhenTheWeatherSlotChanged() throws {
+        let app = try base.makeApp()
+        let plant = try XCTUnwrap(app.plants().first)
+        plant.earnedCount = 1
+        XCTAssertFalse(app.lifePanelVisit(plant, hearts: 0, isSeed: false))
+        app.weatherTestOverride = GardenWeather.Override(forecast: nil, event: .bigWind)
+        app.profile?.weatherGatedFromDay = app.weatherToday
+        for p in app.plants().prefix(6) { p.earnedCount = 1 }
+        plant.lastLovedAt = base.clock.addingTimeInterval(-3_600)
+        app.markWeatherSeen()
+        XCTAssertFalse(app.weatherChangeKey(for: plant).isEmpty)
+        XCTAssertTrue(app.lifePanelVisit(plant, hearts: 0, isSeed: false))
+    }
+}

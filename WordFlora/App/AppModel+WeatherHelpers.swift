@@ -12,8 +12,8 @@ import Foundation
 //   the puzzle with `WeatherPuzzleSheet` when `weatherPuzzleOpen` is true. The plant page's `WeatherLook.Input.sheltered`
 //   is `weatherSheltered`.
 extension AppModel {
-    /// HOOK (builder A): the device-local Garden weather setting. Defaults to on unless Calm mode (spec 4.5).
-    var gardenWeatherSettingOn: Bool { WeatherEngine.defaultWeatherOn(calmMode: settings.calmMode) }
+    /// The device-local Garden weather setting (off in Calm, else the player's choice) and Quiet Garden off.
+    var gardenWeatherSettingOn: Bool { settings.gardenWeather && !settings.quietGarden && !settings.calmMode }
 
     // Today's day key for weather is `weatherToday` (AppModel+Weather.swift).
 
@@ -22,8 +22,7 @@ extension AppModel {
         guard let p = profile else { return .none }
         let found = plants().filter { $0.earnedCount > 0 }.count
         let tends = badges.progress(of: .waterings) + badges.progress(of: .feeds)
-        let wild = WeatherLook.wildActive(optedIn: p.wildWeather, ageBand: settings.ageBand, calmMode: settings.calmMode,
-                                          quietGarden: settings.quietGarden)
+        let wild = wildWeatherOn          // Calm off, Quiet Garden off, Garden weather on, and chosen (any age)
         return GardenWeatherNow.compute(seed: p.weatherSeed, startDay: p.weatherStartDay, today: weatherToday,
                                         highWater: p.weatherHighWaterDay, gatedFromDay: p.weatherGatedFromDay, found: found, tends: tends,
                                         quietGarden: settings.quietGarden, weatherOn: gardenWeatherSettingOn, calm: settings.calmMode,

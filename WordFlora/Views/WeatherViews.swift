@@ -41,77 +41,156 @@ struct WeatherChip: View {
     }
 }
 
-/// The forecast card on Home, the day before: what is coming, one gentle step, and "Got it".
+/// The weather picture across the top of the Home card (builder C's `WeatherStage` on a full-width sky): a found
+/// plant in its pot, posed by the weather. Decorative (hidden from VoiceOver; the card's words say it all). Reduce
+/// Motion (system or the app's switch) and Low Power hold one still frame; it pauses when the app is not active.
+struct WeatherCardArt: View {
+    let kind: WeatherKind
+    var look: WeatherEffect = .full
+    @Environment(AppModel.self) private var app
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
+    @Environment(\.colorScheme) private var scheme
+    @State private var lowPower = LowPowerWatch()
+    static let plantSize: CGFloat = 80
+
+    var body: some View {
+        let r = WeatherOverlay.sceneRect(plantSize: Self.plantSize)
+        let still = reduceMotion || app.settings.reduceMotionOverride || lowPower.isOn
+        ZStack(alignment: .bottom) {
+            WeatherSky(kind: kind, look: look)
+            Color(hex: scheme == .dark ? 0x3A503A : 0xE3D9C0)
+                .frame(height: (WeatherOverlay.sceneHeight - WeatherOverlay.floorY) * r.height / WeatherOverlay.sceneHeight)
+            WeatherStage(kind: kind, look: look, plantSize: Self.plantSize, still: still, paused: scenePhase != .active) {
+                WeatherPreviewPlant(imageName: app.weatherCardPlantImage, size: Self.plantSize)
+            }
+        }
+        .frame(maxWidth: .infinity).frame(height: r.height)
+        .clipped()
+        .accessibilityHidden(true)
+        .accessibilityIdentifier("weather-card-art")
+    }
+}
+
+/// The forecast card on Home, the day before: what is coming, one gentle step, the helper to set out, and "Got it".
 struct ForecastCard: View {
     let kind: WeatherKind
     let onGotIt: () -> Void
+    @Environment(AppModel.self) private var app
     @Environment(\.dynamicTypeSize) private var typeSize
-    @ScaledMetric(relativeTo: .title3) private var iconSize: CGFloat = 24
+    @State private var kitNew = false
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 20, style: .continuous) }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            HStack(alignment: .firstTextBaseline, spacing: 10) {
-                if !typeSize.isAccessibilitySize {
-                    Image(systemName: kind.symbol).font(.system(size: iconSize)).foregroundStyle(Color.accentText)
-                        .accessibilityHidden(true)
-                }
+        VStack(alignment: .leading, spacing: 0) {
+            // Accessibility sizes drop the picture so the words get the room.
+            if !typeSize.isAccessibilitySize { WeatherCardArt(kind: kind, look: .light) }
+            VStack(alignment: .leading, spacing: 8) {
                 Text(WeatherCopy.forecastTitle(kind))
                     .font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
                     .accessibilityAddTraits(.isHeader)
+                Text(WeatherUICopy.cardLine).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                helperStep
+                Text(WeatherUICopy.cardReady).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                Button(action: onGotIt) {
+                    Text(WeatherUICopy.gotIt).font(Theme.font(.callout, weight: .bold)).foregroundStyle(Color.ink)
+                        .padding(.horizontal, 18).frame(minHeight: Theme.minTap)
+                        .background(Color.appAccent, in: Capsule())
+                }
+                .buttonStyle(.plain)
+                .accessibilityHint(WeatherUICopy.gotItHint)
+                .accessibilityIdentifier("weather-gotit")
             }
-            Text(WeatherUICopy.cardLine).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
-                .fixedSize(horizontal: false, vertical: true)
-            // HOOK (weather helpers, E-7): the "Set out the <helper>" step and button go here.
-            Text(WeatherUICopy.cardReady).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
-                .fixedSize(horizontal: false, vertical: true)
-            Button(action: onGotIt) {
-                Text(WeatherUICopy.gotIt).font(Theme.font(.callout, weight: .bold)).foregroundStyle(Color.ink)
-                    .padding(.horizontal, 18).frame(minHeight: Theme.minTap)
-                    .background(Color.appAccent, in: Capsule())
-            }
-            .buttonStyle(.plain)
-            .accessibilityHint(WeatherUICopy.gotItHint)
-            .accessibilityIdentifier("weather-gotit")
+            .padding(14)
         }
-        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.appSurface, in: shape)
+        .clipShape(shape)
         .overlay(shape.stroke(Color.appPrimaryText.opacity(0.12)))
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("weather-forecast-card")
+        .onAppear { if app.receiveWeatherKitIfDue() { kitNew = true } }
+    }
+
+    /// E-7: one tap sets out tomorrow's helper (free, nothing used up); then it reads as done. Hidden in Calm (looks only).
+    @ViewBuilder private var helperStep: some View {
+        let helper = WeatherHelper.helper(for: kind)
+        switch app.helperState(helper) {
+        case .setOut:
+            Label {
+                Text(ShelterCopy.cardDone(helper)).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            } icon: {
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.successText)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityIdentifier("weather-helper-done")
+        case .canSetOut:
+            if kitNew {
+                Text(WeatherCopy.kitLine).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Button { app.setOutHelper() } label: {
+                Label(ShelterCopy.cardStep(helper), systemImage: helper.symbol)
+                    .font(Theme.font(.callout, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                    .padding(.horizontal, 16).frame(minHeight: Theme.minTap)
+                    .overlay(Capsule().stroke(Color.successText, lineWidth: 2))
+            }
+            .buttonStyle(.plain)
+            .accessibilityHint(ShelterCopy.setOutHint)
+            .accessibilityIdentifier("weather-setout")
+        case .ready:
+            EmptyView()
+        }
     }
 }
 
-/// The soft banner on the weather day itself.
+/// The soft banner on the weather day itself, with the weather puzzle's entry while it is open (never in Calm).
 struct WeatherBanner: View {
     let kind: WeatherKind
+    @Environment(AppModel.self) private var app
     @Environment(\.dynamicTypeSize) private var typeSize
-    @ScaledMetric(relativeTo: .title3) private var iconSize: CGFloat = 22
+    @State private var puzzle = false
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 20, style: .continuous) }
 
     var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            if !typeSize.isAccessibilitySize {
-                Image(systemName: kind.symbol).font(.system(size: iconSize)).foregroundStyle(Color.accentText)
-                    .accessibilityHidden(true)
+        let open = app.weatherPuzzleOpen
+        VStack(alignment: .leading, spacing: 0) {
+            if !typeSize.isAccessibilitySize { WeatherCardArt(kind: kind, look: app.weatherSheltered ? .snug : .full) }
+            VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(WeatherCopy.eventLine(kind)).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                    Text(WeatherUICopy.bannerLine).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("weather-banner-text")
+                if open {
+                    Text(WeatherPuzzleCopy.rewardLine(app.weatherPuzzleReward)).font(Theme.font(.subheadline))
+                        .foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
+                    Button { puzzle = true } label: {
+                        Text(WeatherPuzzleCopy.bannerButton).font(Theme.font(.callout, weight: .bold)).foregroundStyle(Color.ink)
+                            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 18).padding(.vertical, 6).frame(maxWidth: .infinity, minHeight: Theme.minTap)
+                            .background(Color.appAccent, in: Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityIdentifier("weather-puzzle")
+                }
             }
-            VStack(alignment: .leading, spacing: 2) {
-                Text(WeatherCopy.eventLine(kind)).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text(WeatherUICopy.bannerLine).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
-                    .fixedSize(horizontal: false, vertical: true)
-                // HOOK (weather puzzle, E-8): the optional "Weather puzzle" entry goes here.
-            }
-            Spacer(minLength: 0)
+            .padding(14)
         }
-        .padding(14)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.tileGardenFill, in: shape)
+        .clipShape(shape)
         .overlay(shape.stroke(Color.appPrimaryText.opacity(0.12)))
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: .contain)
         .accessibilityIdentifier("weather-banner")
+        .fullScreenCover(isPresented: $puzzle) { WeatherPuzzleSheet { puzzle = false }.environment(app) }
     }
 }
 

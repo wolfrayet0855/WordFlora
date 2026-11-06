@@ -66,6 +66,11 @@ struct WordFloraApp: App {
             if let p = model.plants().first { p.earnedCount = 1; p.lastLovedAt = Date.now.addingTimeInterval(-(n * 86_400 + 3_600)) }
             try? model.context.save()
         }
+        if uiTesting && args.contains("-uitest-life-changed") {
+            // Every plant "last seen" in another state, so the next plant page visit opens the Life panel by itself.
+            for p in model.plants() { p.lifeSeenKey = "earlier"; p.lifeSeenAt = .now }
+            try? model.context.save()
+        }
         if uiTesting && args.contains("-uitest-pots") {
             // A pot collection part way up the ladder: levels 1 and 2 finished, 6 plants in level 3, 3 Garden Days.
             var inLevel = [Int: Int]()

@@ -54,10 +54,14 @@ struct LifePanelContent: View {
                     ForEach(0..<5, id: \.self) { i in
                         if i > 0 { Spacer(minLength: 0) }
                         ZStack {
-                            if i < snapshot.stage {
+                            if snapshot.dipped && i > snapshot.shownStage && i <= snapshot.stage {
+                                // Wild Weather: the earned stage the plant is resting back to, as a dashed gold ring.
+                                Circle().fill(Color.appSurface)
+                                Circle().stroke(LifePalette.sun, style: StrokeStyle(lineWidth: large ? 3 : 2, dash: [large ? 5 : 3, large ? 4 : 2.5]))
+                            } else if i < snapshot.shownStage {
                                 Circle().fill(LifePalette.leafBright)
                                 Image(systemName: "checkmark").font(.system(size: dot * 0.5, weight: .heavy)).foregroundStyle(LifePalette.leafInk)
-                            } else if i == snapshot.stage {
+                            } else if i == snapshot.shownStage {
                                 Circle().fill(Color.appSurface)
                                 Circle().stroke(LifePalette.leafBright, lineWidth: large ? 4 : 3)
                                 Circle().fill(LifePalette.leaf).padding(dot * 0.3)
@@ -70,8 +74,12 @@ struct LifePanelContent: View {
                     }
                 }
             }
-            Text(LifeStats.stageWord(snapshot.stage, seed: snapshot.isSeed)).font(smallFont).foregroundStyle(Color.appPrimaryText)
+            Text(LifeStats.stageWord(snapshot.shownStage, seed: snapshot.isSeed)).font(smallFont).foregroundStyle(Color.appPrimaryText)
                 .fixedSize(horizontal: false, vertical: true)
+            if snapshot.dipped {
+                Text(LifeStats.mendingNote).font(smallFont).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(snapshot.stageLabel + (snapshot.isSeed ? ", kept safe" : ""))

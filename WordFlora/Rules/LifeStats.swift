@@ -50,7 +50,13 @@ enum LifeStats {
         /// The weather look and any shown-stage dip, computed only (nil when there is nothing to show).
         var weather: WeatherLook.Output? = nil
 
-        var stageLabel: String { "Growing, \(LifeStats.stageNames[stage].lowercased()) stage" }
+        /// Wild Weather's shown-stage dip: the stage the page draws (display only; `stage` stays the stored one).
+        var shownStage: Int { dipped ? max(0, min(4, weather?.shownStage ?? stage)) : stage }
+        var dipped: Bool { (weather?.setback ?? 0) > 0 }
+
+        var stageLabel: String {
+            "Growing, \(LifeStats.stageNames[shownStage].lowercased()) stage" + (dipped ? ". \(LifeStats.mendingNote)" : "")
+        }
         var heartsLabel: String { "Love, \(hearts) of 5 hearts. \(loveLine)" }
     }
 
@@ -63,6 +69,8 @@ enum LifeStats {
     // MARK: Copy (every visible or spoken line on the panel lives here so the copy test can read it all)
 
     static let title = "Life"
+    /// Under the stage path while Wild Weather shows a plant one stage smaller.
+    static let mendingNote = "Resting after the weather. Care helps it stand tall."
     static let hideLabel = "Hide Life panel"
     static let showLabel = "Show Life panel"
     static let keyLine = "Love keeps its petals."
@@ -234,4 +242,12 @@ extension LifeStats.Inputs {
                   soilRichness: plant.soilRichness, stage: plant.stage, waterToday: plant.waterToday, waterDay: plant.waterDay,
                   now: now, calendar: calendar, exempt: exempt, economy: economy)
     }
+}
+
+/// The Life panel on the plant page starts closed and opens itself on a visit where the plant's weather slot, its
+/// hearts or its seed state changed since the last visit (owner ruling 2026-11-06).
+enum LifePanelVisit {
+    static func key(weather: String, hearts: Int, isSeed: Bool) -> String { "\(weather)|h\(hearts)|\(isSeed ? "seed" : "plant")" }
+    /// The first visit (nothing seen yet) starts closed too.
+    static func opens(lastSeen: String, current: String) -> Bool { !lastSeen.isEmpty && lastSeen != current }
 }

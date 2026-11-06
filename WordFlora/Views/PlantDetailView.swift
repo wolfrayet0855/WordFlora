@@ -16,7 +16,11 @@ struct PlantDetailView: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.colorScheme) private var colorScheme
-    @AppStorage("lifePanelHidden") private var panelHidden = false
+    /// The Life panel starts closed and opens itself on a visit where the weather slot, hearts or seed state changed
+    /// since the last visit (`AppModel.lifePanelVisit`). The player's own open/close lasts for the visit.
+    @State private var panelHidden = true
+    @State private var visited = false
+    @State private var weatherPuzzle = false
     @AccessibilityFocusState private var focus: PanelFocus?
     @State private var toast: ToastItem?
     @State private var toastCount = 0
@@ -62,15 +66,26 @@ struct PlantDetailView: View {
     private func displayName(_ plant: PlantCollectible) -> String { plant.nickname.isEmpty ? plant.name : plant.nickname }
 
     private func snapshot(_ plant: PlantCollectible) -> LifeStats.Snapshot {
-        LifeStats.snapshot(.init(plant: plant, now: .now, calendar: .current, exempt: app.settings.quietGarden || app.settings.calmMode))
+        var inputs = LifeStats.Inputs(plant: plant, now: .now, calendar: .current, exempt: app.settings.quietGarden || app.settings.calmMode)
+        inputs.weather = app.weatherInputs()[plant.plantId]       // empty in Calm, Quiet Garden or with weather off
+        return LifeStats.snapshot(inputs)
     }
 
     @ViewBuilder private func content(_ plant: PlantCollectible) -> some View {
         let snap = snapshot(plant)
         let wx = app.plantWeather(plant)
+        let lifeKey = LifePanelVisit.key(weather: app.weatherChangeKey(for: plant), hearts: snap.hearts, isSeed: snap.isSeed)
         Group {
             if large { largeLayout(plant, snap, wx) } else { standardLayout(plant, snap, wx) }
         }
+        .onAppear {
+            guard !visited else { return }
+            visited = true
+            panelHidden = !app.lifePanelVisit(plant, hearts: snap.hearts, isSeed: snap.isSeed)
+        }
+        // A change that happens on this page (a hello, a tend, care mending the weather) has been seen.
+        .onChange(of: lifeKey) { _, _ in app.markLifeSeen(plant, hearts: snap.hearts, isSeed: snap.isSeed) }
+        .fullScreenCover(isPresented: $weatherPuzzle) { WeatherPuzzleSheet { weatherPuzzle = false }.environment(app) }
         // Garden weather: the day's bed and arrival sound while the stage is on screen (silent with Sound off, Calm,
         // Quiet Garden; see WeatherSoundGate). When care mends the look on this page, the relief chime ends the bed.
         .weatherSoundscape(wx?.kind, active: stageVisible)
@@ -273,6 +288,8 @@ struct PlantDetailView: View {
                                  onShown: { n in app.markPetalsShown(plant, pips: n) },
                                  groundClip: CGRect(x: soil.minX * k, y: soil.minY * k, width: soil.width * k, height: soil.height * k))
                 .goldenBloom(app.isGolden(plant))
+                // Wild Weather's shown-stage dip: the plant looks one stage smaller for now (display only).
+                .scaleEffect(Self.dipScale(snap), anchor: UnitPoint(x: 0.5, y: 188.0 / 220))
                 .rotationEffect(.degrees(thirsty ? 5 : sway), anchor: .bottom)
                 .transition(.opacity)
             }
@@ -303,6 +320,12 @@ struct PlantDetailView: View {
         .accessibilityHint(snap.isSeed ? WakeCopy.wakeButton(name: name) : LifeStats.hint(name: name))
         .accessibilityAction { hello(plant) }
         .accessibilityIdentifier("plant-love")
+    }
+
+    /// Wild Weather draws a dipped plant at the size of its shown stage relative to its stored one (1 = unchanged).
+    static func dipScale(_ snap: LifeStats.Snapshot) -> CGFloat {
+        guard snap.dipped else { return 1 }
+        return GrandGardenArt.stageScale(snap.shownStage) / GrandGardenArt.stageScale(snap.stage)
     }
 
     /// A small hello: the plant sways back and settles, hearts float up, and it counts as love.
@@ -351,6 +374,13 @@ struct PlantDetailView: View {
         // MARK: Wake the seed (end)
         GoldenProgressCard(plant: plant)
 
+        // The weather puzzle, from a weathered plant's page while it is open (never in Calm or Quiet Garden).
+        if app.weatherPuzzleOpen && (app.plantWeather(plant) != nil || snap.dipped) {
+            Button(WeatherPuzzleCopy.bannerButton) { weatherPuzzle = true }
+                .buttonStyle(SecondaryButtonStyle())
+                .accessibilityIdentifier("plant.weatherPuzzle")
+        }
+
         NameStoryCard(name: plant.name, botanicalName: plant.botanicalName, fact: plant.botanicalFact,
                       story: PlantCatalog.nameStory(for: plant.plantId))
 
@@ -393,7 +423,7 @@ struct PlantDetailView: View {
         let thirsty = TendingEngine.isThirsty(plant, now: .now, calm: app.settings.calmMode)
         let name = displayName(plant)
         let line = snap.rainDay > 0 ? LoveEngine.rainLine(name: name)
-            : (thirsty ? PlantDetailCopy.thirsty : LifeStats.stageWord(snap.stage, seed: snap.isSeed))
+            : (thirsty ? PlantDetailCopy.thirsty : LifeStats.stageWord(snap.shownStage, seed: snap.isSeed))
         return VStack(spacing: 4) {
             Text(line).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText).multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)

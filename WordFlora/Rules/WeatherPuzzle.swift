@@ -108,6 +108,12 @@ extension WakePuzzle {
 
 /// Who gets which puzzle, when it may be played, and what it gives.
 enum WeatherPuzzlePolicy {
+    /// Wild Weather's puzzle has two parts: the word, then a short butterfly catch (spec section 5).
+    static func needsCatch(wild: Bool) -> Bool { wild }
+
+    /// The catch goal: 3 friends, eased to 2 after two tries that ran out of time (`WakeRule.isEasier`).
+    static func catchGoal(misses: Int) -> Int { WakeRule.butterflyGoal(dreamsInARow: misses) }
+
     /// The puzzle is there from the event day through the 3 days after, while weather mechanics show (never in Calm or
     /// Quiet Garden) and the event is not already solved.
     static func isOpen(weather w: GardenWeatherNow, rescuedDays: [Int], economy: Economy = .default) -> Bool {
@@ -228,6 +234,10 @@ enum WeatherPuzzleCopy {
         return peeked ? "Spot \(i + 1), \(letter), \(peekedSuffix)" : "Spot \(i + 1), \(letter)"
     }
     static let bannerButton = "Try the weather puzzle"
+    /// Wild Weather's part 2 (a short butterfly catch after the word).
+    static let catchTitle = "One more part"
+    static func catchLine(goal: Int) -> String { "Say hello to \(goal) friends to finish." }
+    static let catchAgain = "The friends flew off. Try again!"
 
     static func all(name: String) -> [String] {
         let rewards: [WeatherPuzzlePolicy.Reward] = [
@@ -241,6 +251,7 @@ enum WeatherPuzzleCopy {
             + [title, gentle, gentleSub, harder, harderSub, start, skip, skipSub, newPuzzle, plenty, notQuite, peek, peekSoon, clear,
                takeBack, stormIntro, stormHint(letters: 12, words: 2), stormHint(letters: 8, words: 1), solvedTitle, solvedLine,
                wordEarned, goldenEarned(name: name), plantArrived(name: name), weatheredStep(1, of: 3), weatheredDone, done,
-               slotLabel(0, letter: "V", peeked: true), slotLabel(1, letter: nil, peeked: false), bannerButton]
+               slotLabel(0, letter: "V", peeked: true), slotLabel(1, letter: nil, peeked: false), bannerButton,
+               catchTitle, catchLine(goal: 3), catchLine(goal: 2), catchAgain]
     }
 }

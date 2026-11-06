@@ -55,7 +55,10 @@ struct WeatherPuzzleSheet: View {
     @State private var solved: AppModel.WeatherSolve?
     @AccessibilityFocusState private var titleFocus: Bool
 
-    enum Stage { case intro, playing, plenty, solved }
+    @State private var catchMisses = 0
+    @State private var catchRound = 0
+
+    enum Stage { case intro, playing, catchFriends, plenty, solved }
 
     private var tier: WeatherPuzzleTier { WeatherPuzzlePolicy.tier(wild: app.weatherNow.wild, pickedHarder: harder) }
 
@@ -72,6 +75,7 @@ struct WeatherPuzzleSheet: View {
                     .id(puzzle)
                     .transition(.opacity)
                 }
+            case .catchFriends: catchPart.transition(.opacity)
             case .plenty: plenty.transition(.opacity)
             case .solved: solvedView.transition(.opacity)
             }
@@ -157,9 +161,39 @@ struct WeatherPuzzleSheet: View {
 
     private func finish() {
         onSolvedWord?()
+        // Wild Weather: the word, then a short butterfly catch (spec section 5); the solve is recorded after both.
+        if WeatherPuzzlePolicy.needsCatch(wild: app.weatherNow.wild) {
+            stage = .catchFriends
+            return
+        }
+        record()
+    }
+
+    private func record() {
         solved = app.solveWeatherPuzzle()
         stage = .solved
         AccessibilityNotification.Announcement(WeatherPuzzleCopy.solvedTitle).post()
+    }
+
+    // MARK: Wild Weather part 2
+
+    private var catchPart: some View {
+        let goal = WeatherPuzzlePolicy.catchGoal(misses: catchMisses)
+        return VStack(spacing: 8) {
+            Text(WeatherPuzzleCopy.catchTitle).font(Theme.font(.title2, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                .accessibilityAddTraits(.isHeader).accessibilityIdentifier("weatherPuzzle.catch")
+                .padding(.top, 16)
+            Text(catchMisses > 0 ? WeatherPuzzleCopy.catchAgain + " " + WeatherPuzzleCopy.catchLine(goal: goal) : WeatherPuzzleCopy.catchLine(goal: goal))
+                .font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true).padding(.horizontal, 20)
+            WakeButterflyGame(goal: goal) { caught in
+                if caught { record() } else { catchMisses += 1; catchRound += 1 }
+            }
+            .id(catchRound)
+            Button(WeatherPuzzleCopy.skip, action: close).buttonStyle(SecondaryButtonStyle())
+                .padding(.horizontal, 20).padding(.bottom, 12)
+                .accessibilityIdentifier("weatherPuzzle.catchSkip")
+        }
     }
 
     // MARK: The cap and the solve

@@ -68,7 +68,7 @@ final class WeatherUITests: XCTestCase {
     func testTheWeatherDayShowsASoftBanner() {
         launch(["-uitest-weather=busyBugs"])
         XCTAssertTrue(banner.waitForExistence(timeout: 5))
-        XCTAssertTrue(banner.label.contains("Busy bugs came to the garden."))
+        XCTAssertTrue(app.descendants(matching: .any)["weather-banner-text"].label.contains("Busy bugs came to the garden."))
         XCTAssertFalse(card.exists)
         shot("weather-banner")
     }
@@ -202,6 +202,59 @@ final class WeatherUITests: XCTestCase {
         shot("weather-chip-dark-still")
         // No dark audit here: dark Home without any weather already gets a contrast finding on the Daily Bloom line
         // ("One word for everyone today", D4EDD4 on 4D3039, about 10:1 by the colour values); see docs/STATUS.md.
+    }
+
+    // MARK: Helpers and the puzzle on Home and the plant page (real seed fixtures, so the helpers' rules apply)
+
+    func testTheForecastCardSetsOutTheHelperInOneTap() {
+        launch(["-uitest-weather-tomorrow=bigWind"])
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        let setOut = app.buttons["weather-setout"]
+        XCTAssertTrue(setOut.waitForExistence(timeout: 3))
+        XCTAssertEqual(setOut.label, "Set out the wind net")
+        audit("weather-card-helper")
+        setOut.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["weather-helper-done"].waitForExistence(timeout: 3))
+        XCTAssertFalse(setOut.exists)
+        shot("weather-card-helper-out")
+        audit("weather-card-helper-out")
+    }
+
+    func testCalmShowsNoHelperStep() {
+        launch(["-uitest-calm", "-uitest-weather-tomorrow=bigWind"])
+        XCTAssertFalse(card.waitForExistence(timeout: 2))
+        XCTAssertFalse(app.buttons["weather-setout"].exists)
+    }
+
+    func testTheBannerOpensTheWeatherPuzzleAndSkipComesBack() {
+        launch(["-uitest-weather-today=bigWind", "-uitest-weather-rewarded"])
+        XCTAssertTrue(banner.waitForExistence(timeout: 5))
+        let play = app.buttons["weather-puzzle"]
+        XCTAssertTrue(play.exists)
+        shot("weather-banner-puzzle")
+        audit("weather-banner-puzzle")
+        play.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["weatherPuzzle.title"].waitForExistence(timeout: 5))
+        app.buttons["weatherPuzzle.skip"].tap()
+        XCTAssertTrue(banner.waitForExistence(timeout: 5))
+    }
+
+    func testTheBannerAtTheLargestTextSizePassesTheAudit() {
+        launch(["-uitest-weather-today=hailShower"], size: "UICTContentSizeCategoryAccessibilityXXXL")
+        XCTAssertTrue(banner.waitForExistence(timeout: 5))
+        Thread.sleep(forTimeInterval: 1)
+        audit("weather-banner-ax")
+    }
+
+    func testAWeatheredPlantsPageOpensTheWeatherPuzzle() {
+        _ = openDaisy(["-uitest-weather-today=bigWind"])
+        let entry = app.buttons["plant.weatherPuzzle"]
+        for _ in 0..<4 where !(entry.exists && entry.isHittable) { app.swipeUp() }
+        XCTAssertTrue(entry.exists)
+        entry.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["weatherPuzzle.title"].waitForExistence(timeout: 5))
+        app.buttons["weatherPuzzle.skip"].tap()
+        XCTAssertTrue(app.buttons["plant-love"].waitForExistence(timeout: 5))
     }
 
     // MARK: Plant page weather art and sound (mounted only behind the weather gate)

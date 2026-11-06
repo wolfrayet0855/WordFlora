@@ -183,11 +183,16 @@ final class WordFloraUITests: XCTestCase {
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
     }
 
-    func testLifePanelMinimisesToATabAndComesBack() {
+    /// The Life panel starts closed (owner ruling 2026-11-06); a tap opens it and the chevron closes it again.
+    func testLifePanelStartsClosedAndOpensOnATap() {
         openClover(["-uitest-gardened"])
         let plant = app.buttons["plant-love"]
         XCTAssertTrue(plant.waitForExistence(timeout: 5))
         XCTAssertEqual(plant.label, "Clover, 5 of 5 love petals")
+        let first = app.buttons["Show Life panel"]
+        XCTAssertTrue(first.waitForExistence(timeout: 3), "a first visit starts closed")
+        XCTAssertFalse(app.buttons["Hide Life panel"].exists)
+        first.tap()
         let hide = app.buttons["Hide Life panel"]
         XCTAssertTrue(hide.waitForExistence(timeout: 3))
         XCTAssertTrue(app.otherElements["Life"].exists || app.staticTexts["Life"].exists)
@@ -200,6 +205,35 @@ final class WordFloraUITests: XCTestCase {
         shot("plant-life-minimised")
         show.tap()
         XCTAssertTrue(app.buttons["Hide Life panel"].waitForExistence(timeout: 3))
+    }
+
+    /// A hello on the page is seen there, so the next visit stays closed; a change made elsewhere opens it.
+    func testLifePanelOpensItselfOnlyAfterAChangeSinceTheLastVisit() {
+        openClover(["-uitest-gardened"])
+        let plant = app.buttons["plant-love"]
+        XCTAssertTrue(plant.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["Show Life panel"].waitForExistence(timeout: 3))
+        plant.tap()                                            // a hello: one more heart, seen on this page
+        sleep(1)
+        app.navigationBars.buttons.firstMatch.tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
+        XCTAssertTrue(app.buttons["Show Life panel"].waitForExistence(timeout: 5), "nothing new since the last visit")
+        app.terminate()
+        openClover(["-uitest-gardened", "-uitest-life-changed"])
+        XCTAssertTrue(app.buttons["Hide Life panel"].waitForExistence(timeout: 5), "something changed: the panel opens")
+        audit("plant-life-open")
+    }
+
+    /// The opened panel at an accessibility size (the sheet under the plant).
+    func testAuditThePlantPageWithTheLifePanelOpenAtALargeTextSize() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-life-changed",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]
+        app.launch()
+        app.buttons["Garden"].tap()
+        app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
+        XCTAssertTrue(app.buttons["Hide Life panel"].waitForExistence(timeout: 5))
+        sleep(1)
+        audit("plant-life-open-ax")
     }
 
     func testARainyDayReadsFewerLovePetalsAndAHelloBringsThemBack() {

@@ -46,6 +46,11 @@ final class PlantCollectible {
     /// Merge: the later key wins and the count takes the max, so a count never goes down. Defaulted for migration and CloudKit.
     var goldenDays: Int = 0
     var goldenDayKey: Int = 0
+    /// The Life panel's "what you saw last visit" key (weather slot, hearts, seed state; `LifePanelVisit.key`) and
+    /// when it was recorded. The panel starts closed and opens on a visit where the key changed. Merge: the later
+    /// visit wins and the key travels with its stamp. Defaulted for migration and CloudKit.
+    var lifeSeenKey: String = ""
+    var lifeSeenAt: Date = Date.distantPast
 
     init(name: String, botanicalName: String, botanicalFact: String,
          level: Int, imageName: String, plantId: String? = nil) {
