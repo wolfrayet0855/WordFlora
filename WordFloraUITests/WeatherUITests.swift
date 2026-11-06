@@ -30,16 +30,45 @@ final class WeatherUITests: XCTestCase {
 
     /// Home's weather art plays for 5 s, then holds (WeatherCardArt.playSeconds); audits judge the settled Home
     /// (at accessibility sizes, after Home's weather refresh and the card's first read have redrawn it).
-    private func settleHomeArt() { Thread.sleep(forTimeInterval: 6) }
+    /// Then waits until Home has stopped changing (`waitForStableHome`).
+    private func settleHomeArt() { Thread.sleep(forTimeInterval: 6); waitForStableHome() }
+
+    /// Home's hero, weather card or banner and Play, by frame and label (plus the text count): what a late redraw moves.
+    private func homeLayout() -> String {
+        let hero = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS 'Guess words. Grow a garden.'")).firstMatch
+        return [hero, card, banner, app.buttons["Play"]].map { e in e.exists ? "\(e.frame)|\(e.label)" : "-" }.joined(separator: " ; ")
+            + " #\(app.staticTexts.count)"
+    }
+
+    /// Waits until Home reads the same three times in a row, 0.5 s apart (at most 20 s). Home finishes work after launch
+    /// on its own time (the weather refresh, the weather kit arriving with the first forecast and redrawing the card, the
+    /// ad and offer checks); on a loaded machine that can land while the Dynamic Type audit measures the hero, which then
+    /// reads as "partially unsupported". The audit itself is unchanged.
+    private func waitForStableHome() {
+        var last = homeLayout(), same = 0
+        let end = Date().addingTimeInterval(20)
+        while same < 2 && Date() < end {
+            Thread.sleep(forTimeInterval: 0.5)
+            let now = homeLayout()
+            same = now == last ? same + 1 : 0
+            last = now
+        }
+    }
 
     private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = []) {
         var findings = [String]()
+        let before = app.buttons["Play"].exists ? homeLayout() : nil
         do {
             try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
                 findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
                 return true
             }
         } catch { findings.append("\(name): audit failed to run: \(error)") }
+        // Evidence for a finding: did Home move while the audit ran?
+        if !findings.isEmpty, let before {
+            let after = homeLayout()
+            findings.append(before == after ? "\(name): Home was still during the audit" : "\(name): Home moved during the audit:\n  before \(before)\n  after  \(after)")
+        }
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
 
