@@ -105,6 +105,7 @@ struct HomeView: View {
                              showRose: unlocked.contains(.rose),
                              // Before the first plant the next word brings one at once, so the count only shows after it (and not in Quiet Garden).
                              wordsTowardPlant: stats.plantsEarned > 0 && !app.settings.quietGarden ? app.game.wordsTowardPlant : nil)
+                        EndgameHomeCard()
 
                         if app.showWelcomeBack || app.plusOffer != nil {
                             VStack(spacing: 10) {
@@ -147,6 +148,7 @@ struct HomeView: View {
         .task(id: app.restExitAt) { await followReturnWindow() }
         .task { await app.prepareBannerIfAllowed() }
         .onAppear { app.checkPlusOffer(); playAdNote = app.returnVisit == .adMayPlay }
+        .grandGardenCeremony()
         .navigationBarHidden(true)
         .overlay(alignment: .bottomLeading) { layoutReport }
     }
@@ -155,7 +157,7 @@ struct HomeView: View {
 
     private var topBar: some View {
         HStack {
-            WordmarkView(style: .title).layoutPriority(1)
+            WordmarkView(style: .title).crowned(app.crown).layoutPriority(1)
             Spacer()
             Button { router.go(.settings) } label: {
                 Image(systemName: "gearshape.fill").font(.system(size: gearSize)).frame(minWidth: Theme.minTap, minHeight: Theme.minTap)

@@ -208,6 +208,20 @@
 		79EAC747CBAC36831FB4CA85 /* WeatherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 40E2B4BA7F79178D9473B616 /* WeatherTests.swift */; };
 		DE7AA3C310999E655FB4FAE4 /* EndgameTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 883A6BAC468814CB14620178 /* EndgameTests.swift */; };
 		6C0B1D5E2F3A4B5C6D7E8F91 /* copy.js in Resources */ = {isa = PBXBuildFile; fileRef = 6C0B1D5E2F3A4B5C6D7E8F90 /* copy.js */; };
+		A4EE73267937B622F2B154C9 /* WeatherShelter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 578D5C64E77E3A6E162EA88E /* WeatherShelter.swift */; };
+		04C602C60D26F2F7423838DC /* WeatherPuzzle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0CEAB3460F19775C8484231B /* WeatherPuzzle.swift */; };
+		7B4B6ED41E093D452AEA2A3E /* WeatherShelterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8E240339C0865E6293BBF24 /* WeatherShelterTests.swift */; };
+		0D762E777185B8438D3CB760 /* WeatherPuzzleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7FB88B27E4975EF58299E27 /* WeatherPuzzleTests.swift */; };
+		A8F0B75EF1640A9DF3D224FB /* GrandGardenTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4A20E0492F33CB45425A98C /* GrandGardenTests.swift */; };
+		B987080F70636E313CF5DBC5 /* GrandGardenViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = E30E70DD2A1CCD4AABF93995 /* GrandGardenViews.swift */; };
+		199DA1A106DEB2C72907BC21 /* WeatherHelpersViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = EFAC2A32DAF9C0E4BDE13FCF /* WeatherHelpersViews.swift */; };
+		1B099F165F64F335330130BF /* WeatherPuzzleView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F4B9FFFBF43C5406C84009 /* WeatherPuzzleView.swift */; };
+		CEA1AC229AD21480468AADCC /* VisitorsBookView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBFC3EC62DDDD73C622380C6 /* VisitorsBookView.swift */; };
+		B7DB0BCD628066805667C2E7 /* AppModel+WeatherHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1F2AFCDE000EA56D659E322 /* AppModel+WeatherHelpers.swift */; };
+		A0B6C8A87C81F7910186DE0A /* AppModel+Endgame.swift in Sources */ = {isa = PBXBuildFile; fileRef = E68B27117994C86A30778F84 /* AppModel+Endgame.swift */; };
+		338556715280368164F2204B /* EndgameUITestFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = B232E85C3513A789081EB59B /* EndgameUITestFixtures.swift */; };
+		038399A18E57EC5DAEACB3F8 /* EndgameAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AF5D23A6281D4A815A10399 /* EndgameAppTests.swift */; };
+		40657B4A87AED2B8A9D73738 /* EndgameUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33E7F3C5D3C3F907AF97E068 /* EndgameUITests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -443,6 +457,20 @@
 		40E2B4BA7F79178D9473B616 /* WeatherTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherTests.swift; sourceTree = "<group>"; };
 		883A6BAC468814CB14620178 /* EndgameTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EndgameTests.swift; sourceTree = "<group>"; };
 		6C0B1D5E2F3A4B5C6D7E8F90 /* copy.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = copy.js; path = "design-preview/onboarding-guide/copy.js"; sourceTree = SOURCE_ROOT; };
+		578D5C64E77E3A6E162EA88E /* WeatherShelter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherShelter.swift; sourceTree = "<group>"; };
+		0CEAB3460F19775C8484231B /* WeatherPuzzle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherPuzzle.swift; sourceTree = "<group>"; };
+		E8E240339C0865E6293BBF24 /* WeatherShelterTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherShelterTests.swift; sourceTree = "<group>"; };
+		B7FB88B27E4975EF58299E27 /* WeatherPuzzleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherPuzzleTests.swift; sourceTree = "<group>"; };
+		A4A20E0492F33CB45425A98C /* GrandGardenTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GrandGardenTests.swift; sourceTree = "<group>"; };
+		E30E70DD2A1CCD4AABF93995 /* GrandGardenViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GrandGardenViews.swift; sourceTree = "<group>"; };
+		EFAC2A32DAF9C0E4BDE13FCF /* WeatherHelpersViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherHelpersViews.swift; sourceTree = "<group>"; };
+		22F4B9FFFBF43C5406C84009 /* WeatherPuzzleView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WeatherPuzzleView.swift; sourceTree = "<group>"; };
+		FBFC3EC62DDDD73C622380C6 /* VisitorsBookView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = VisitorsBookView.swift; sourceTree = "<group>"; };
+		F1F2AFCDE000EA56D659E322 /* AppModel+WeatherHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+WeatherHelpers.swift"; sourceTree = "<group>"; };
+		E68B27117994C86A30778F84 /* AppModel+Endgame.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+Endgame.swift"; sourceTree = "<group>"; };
+		B232E85C3513A789081EB59B /* EndgameUITestFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EndgameUITestFixtures.swift; sourceTree = "<group>"; };
+		0AF5D23A6281D4A815A10399 /* EndgameAppTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EndgameAppTests.swift; sourceTree = "<group>"; };
+		33E7F3C5D3C3F907AF97E068 /* EndgameUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EndgameUITests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -505,6 +533,8 @@
 		0566861B1A43EDA120F46097 /* Rules */ = {
 			isa = PBXGroup;
 			children = (
+				0CEAB3460F19775C8484231B /* WeatherPuzzle.swift */,
+				578D5C64E77E3A6E162EA88E /* WeatherShelter.swift */,
 				045A383C28CF63B7AA1690E5 /* Economy.swift */,
 				2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */,
 				99940443AEBC1F94C00E15D2 /* StreakEngine.swift */,
@@ -650,6 +680,10 @@
 		7D0DBDDECE719C4DAFC3BF7C /* WordFloraTests */ = {
 			isa = PBXGroup;
 			children = (
+				0AF5D23A6281D4A815A10399 /* EndgameAppTests.swift */,
+				A4A20E0492F33CB45425A98C /* GrandGardenTests.swift */,
+				B7FB88B27E4975EF58299E27 /* WeatherPuzzleTests.swift */,
+				E8E240339C0865E6293BBF24 /* WeatherShelterTests.swift */,
 				71CA59FC62B45FC5CCCCF46A /* GameViewModelTests.swift */,
 				7F70CB02A7B09BF0E9027412 /* PlantCatalogTests.swift */,
 				07E6A1305C8A4BB87A255C2F /* WordProviderTests.swift */,
@@ -773,6 +807,9 @@
 		9E23B58B4B39EB7CF069A62B /* App */ = {
 			isa = PBXGroup;
 			children = (
+				B232E85C3513A789081EB59B /* EndgameUITestFixtures.swift */,
+				E68B27117994C86A30778F84 /* AppModel+Endgame.swift */,
+				F1F2AFCDE000EA56D659E322 /* AppModel+WeatherHelpers.swift */,
 				801243E3923ADEAD47B705CE /* AppSettings.swift */,
 				439E45E6B9B1F70CB95378CC /* AppModel.swift */,
 				3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */,
@@ -786,6 +823,10 @@
 		A841EEEF90C43CD8DE8C83AB /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				FBFC3EC62DDDD73C622380C6 /* VisitorsBookView.swift */,
+				22F4B9FFFBF43C5406C84009 /* WeatherPuzzleView.swift */,
+				EFAC2A32DAF9C0E4BDE13FCF /* WeatherHelpersViews.swift */,
+				E30E70DD2A1CCD4AABF93995 /* GrandGardenViews.swift */,
 				6624B0783F70383BBF4A343C /* HomeView.swift */,
 				ED57CCECFEDB2A2033A60F12 /* GardenView.swift */,
 				2209A1734F0A48837A37BC23 /* RootView.swift */,
@@ -864,6 +905,7 @@
 		EBAECBCEA5F2B91D55A725B8 /* WordFloraUITests */ = {
 			isa = PBXGroup;
 			children = (
+				33E7F3C5D3C3F907AF97E068 /* EndgameUITests.swift */,
 				395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */,
 				394854942795553C29283849 /* HomeLayoutUITests.swift */,
 				7D65EE66A938417ADBD5C554 /* GuideUITests.swift */,
@@ -1073,6 +1115,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				40657B4A87AED2B8A9D73738 /* EndgameUITests.swift in Sources */,
 				D107E764254121AC6777295F /* WordFloraUITests.swift in Sources */,
 				8E6670903E6120DF66036EBF /* HomeLayoutUITests.swift in Sources */,
 				15E39A57FDD379D5CBBB32E0 /* GuideUITests.swift in Sources */,
@@ -1086,6 +1129,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				038399A18E57EC5DAEACB3F8 /* EndgameAppTests.swift in Sources */,
+				A8F0B75EF1640A9DF3D224FB /* GrandGardenTests.swift in Sources */,
+				0D762E777185B8438D3CB760 /* WeatherPuzzleTests.swift in Sources */,
+				7B4B6ED41E093D452AEA2A3E /* WeatherShelterTests.swift in Sources */,
 				05B7E3F9F4DC0094781F5022 /* GameViewModelTests.swift in Sources */,
 				CF399EF915EA6C6F91A05889 /* PlantCatalogTests.swift in Sources */,
 				21F06B6221D6075031D257BC /* WordProviderTests.swift in Sources */,
@@ -1156,6 +1203,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				338556715280368164F2204B /* EndgameUITestFixtures.swift in Sources */,
+				A0B6C8A87C81F7910186DE0A /* AppModel+Endgame.swift in Sources */,
+				B7DB0BCD628066805667C2E7 /* AppModel+WeatherHelpers.swift in Sources */,
+				CEA1AC229AD21480468AADCC /* VisitorsBookView.swift in Sources */,
+				1B099F165F64F335330130BF /* WeatherPuzzleView.swift in Sources */,
+				199DA1A106DEB2C72907BC21 /* WeatherHelpersViews.swift in Sources */,
+				B987080F70636E313CF5DBC5 /* GrandGardenViews.swift in Sources */,
+				04C602C60D26F2F7423838DC /* WeatherPuzzle.swift in Sources */,
+				A4EE73267937B622F2B154C9 /* WeatherShelter.swift in Sources */,
 				9A467E6C2C922C05007E28B8 /* WordFloraApp.swift in Sources */,
 				68EF45C14F3CEC72F7042540 /* PlayerProfile.swift in Sources */,
 				2FAAC760A0B5D1B374DD5839 /* PlantCollectible.swift in Sources */,

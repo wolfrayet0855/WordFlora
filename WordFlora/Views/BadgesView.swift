@@ -8,6 +8,7 @@ struct BadgesView: View {
 
     var body: some View {
         ScrollView {
+            EndgameBadgesHeader().padding(.horizontal, 20).padding(.top, 20)
             LazyVGrid(columns: columns, spacing: 12) {
                 ForEach(defs, id: \.id) { def in card(def) }
             }

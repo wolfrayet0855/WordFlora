@@ -11,6 +11,7 @@ enum GameRoute: Hashable {
     case visitors
     case badges
     case plus
+    case visitorsBook
 }
 
 @Observable

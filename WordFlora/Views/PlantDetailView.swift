@@ -241,6 +241,7 @@ struct PlantDetailView: View {
                 LayeredPlantView(imageName: plant.imageName, pips: snap.pips, shownPips: plant.lastShownPips, size: s,
                                  onShown: { n in app.markPetalsShown(plant, pips: n) },
                                  groundClip: CGRect(x: soil.minX * k, y: soil.minY * k, width: soil.width * k, height: soil.height * k))
+                .goldenBloom(app.isGolden(plant))
                 .rotationEffect(.degrees(thirsty ? 5 : sway), anchor: .bottom)
                 .transition(.opacity)
             }
@@ -317,6 +318,7 @@ struct PlantDetailView: View {
         // MARK: Wake the seed (begin). Kept to this one block for the planned redesign of this screen.
         if app.showsWakeCard(plant) { WakeSeedCard(plant: plant, isPresented: $showWake) }
         // MARK: Wake the seed (end)
+        GoldenProgressCard(plant: plant)
 
         NameStoryCard(name: plant.name, botanicalName: plant.botanicalName, fact: plant.botanicalFact,
                       story: PlantCatalog.nameStory(for: plant.plantId))

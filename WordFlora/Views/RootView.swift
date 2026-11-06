@@ -52,6 +52,7 @@ struct RootView: View {
                     case .plus: PlusView()
                     case .settings: SettingsView()
                     case .levelMap: LevelMapView()
+                    case .visitorsBook: VisitorsBookView()
                     default: ComingSoonView(title: String(describing: route))
                     }
                 }

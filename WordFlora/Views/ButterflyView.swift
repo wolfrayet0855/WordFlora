@@ -270,6 +270,9 @@ struct VisitorsView: View {
                 metCard(met: album.species, total: total)
                 playCard
                 infoRow
+                Button { router.go(.visitorsBook) } label: { Label(EndgameCopy.visitorsBook, systemImage: "book.fill") }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .accessibilityIdentifier("visitors.book")
                 Text(VisitorsCopy.album.uppercased()).font(Theme.font(.footnote, weight: .heavy)).tracking(1.5)
                     .foregroundStyle(Color.secondaryText).padding(.top, 4).accessibilityAddTraits(.isHeader)
                     .accessibilityLabel(VisitorsCopy.album)
