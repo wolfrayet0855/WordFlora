@@ -360,6 +360,26 @@ final class GameViewModel {
         1 + (misses <= 2 ? 1 : 0) + (isDaily ? 1 : 0)
     }
 
+    /// A weather puzzle's bonus word (endgame-and-events spec 4.1): one step toward the next plant, as a won word would
+    /// take. Returns the plant's name when the step brings it (it arrives like any other found plant, with its 2 soil).
+    @discardableResult
+    func grantBonusWord() -> String? {
+        guard let profile = playerProfile else { return nil }
+        let step = WeatherPuzzlePolicy.wordStep(current: profile.wordsTowardPlant, economy: economy)
+        profile.wordsTowardPlant = step.count
+        defer { try? modelContext.save() }
+        guard step.plantArrives else { return nil }
+        let plants = allPlants()
+        let level = profile.currentLevel
+        let pick = plants.filter { $0.level == level && $0.earnedCount == 0 }.randomElement(using: &rng)
+            ?? plants.filter { $0.earnedCount == 0 }.min { ($0.level, $0.plantId) < ($1.level, $1.plantId) }
+        guard let pick else { return nil }
+        pick.earnedCount += 1; pick.lastLovedAt = now()
+        profile.soil += 2
+        refreshLevel()
+        return pick.name
+    }
+
     /// Owner decision 2026-11-04: the very first plant ever and a hero word's unfound plant arrive at once; otherwise each
     /// win moves one word toward the next plant, which arrives on every `wordsPerPlant`-th word. Nil = no plant this round.
     private func awardPlant(for e: WordEntry) -> (name: String, isNew: Bool)? {
