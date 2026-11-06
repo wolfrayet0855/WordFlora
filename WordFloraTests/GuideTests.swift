@@ -282,3 +282,82 @@ final class GuideSeenStoreTests: XCTestCase {
         XCTAssertTrue(profile().guideSeen)
     }
 }
+
+/// The Quiet Garden offer after "Under 13" (design-preview/quiet-garden, docs/pm/quiet-garden.md): its words and
+/// what each answer does.
+final class QuietGardenCopyTests: XCTestCase {
+    /// CopySafety's list plus words that would scare, sell, or promise what Quiet Garden does not do (it does not hide
+    /// the butterfly game's time bar; Calm mode does).
+    static let extraBanned = ["save", "danger", "lose", "lock", "locked", "plus", "ad", "ads", "price", "buy", "timer", "timers", "must"]
+
+    func testEveryStringIsGentleAndPlain() {
+        for s in QuietGardenCopy.allStrings {
+            XCTAssertEqual(CopySafety.check(s), [], s)
+            for w in Self.extraBanned {
+                XCTAssertNil(s.range(of: "\\b\(w)\\b", options: [.regularExpression, .caseInsensitive]), "\(w) in: \(s)")
+            }
+            XCTAssertNil(s.rangeOfCharacter(from: .decimalDigits), "no numbers: \(s)")
+            XCTAssertLessThanOrEqual(s.split(separator: " ").count, 8, s)
+        }
+    }
+
+    func testTheWordsOnTheScreen() {
+        XCTAssertEqual(QuietGardenCopy.title, "Would you like a quiet garden?")
+        XCTAssertEqual(QuietGardenCopy.yes, "Yes, keep it quiet")
+        XCTAssertEqual(QuietGardenCopy.no, "No thanks, show everything")
+        XCTAssertEqual(QuietGardenCopy.note, "You can change this any time in Settings.")
+        XCTAssertEqual(QuietGardenCopy.rows.count, 3, "two lines on what changes, one on what stays")
+        XCTAssertEqual(QuietGardenCopy.rows.first?.text, "No points or counting. Just tending.")
+    }
+
+    func testShortWordsForYoungReaders() {
+        let words = QuietGardenCopy.allStrings.joined(separator: " ").split(separator: " ").map { $0.filter(\.isLetter).lowercased() }
+        XCTAssertTrue(Set(words.filter { $0.count >= 9 }).isSubset(of: ["everything"]), "\(words.filter { $0.count >= 9 })")
+    }
+}
+
+@MainActor
+final class QuietGardenOfferTests: XCTestCase {
+    var container: ModelContainer!
+    var ctx: ModelContext { container.mainContext }
+
+    override func setUp() async throws {
+        container = try SharedContainer.make(inMemory: true)
+        try PlantCatalog.seedIfNeeded(context: ctx)
+        ctx.insert(PlayerProfile()); try ctx.save()
+    }
+
+    /// At the offer: the intro is over and "Under 13" applied its defaults, as the tap does before the offer shows.
+    private func atTheOffer() -> AppModel {
+        let settings = AppSettings(defaults: UserDefaults(suiteName: "qg-\(UUID().uuidString)")!)
+        let app = AppModel(container: container, settings: settings, notifications: ReminderTests.FakeCenter())
+        app.onboarding.introFinished()
+        app.settings.applyAgeDefaults(.under13)
+        return app
+    }
+
+    func testYesTurnsQuietGardenOnAndPicksUnder13() {
+        let app = atTheOffer()
+        app.answerQuietOffer(keepQuiet: true)
+        XCTAssertTrue(app.settings.quietGarden)
+        XCTAssertTrue(app.settings.calmMode, "under 13 still starts in Calm")
+        XCTAssertEqual(app.onboarding.selectedAgeBand, .under13)
+        XCTAssertEqual(app.onboarding.step, .guide)
+    }
+
+    func testNoThanksKeepsQuietGardenOffAndPicksUnder13() {
+        let app = atTheOffer()
+        app.answerQuietOffer(keepQuiet: false)
+        XCTAssertFalse(app.settings.quietGarden)
+        XCTAssertTrue(app.settings.calmMode, "the Calm default for under 13 stays as before")
+        XCTAssertEqual(app.onboarding.selectedAgeBand, .under13)
+        XCTAssertEqual(app.onboarding.step, .guide)
+    }
+
+    func testAGuideAlreadySeenElsewhereGoesStraightToTheFirstWord() throws {
+        let app = atTheOffer()
+        app.profile?.guideSeen = true
+        app.answerQuietOffer(keepQuiet: true)
+        XCTAssertEqual(app.onboarding.step, .tutorialWord)
+    }
+}
