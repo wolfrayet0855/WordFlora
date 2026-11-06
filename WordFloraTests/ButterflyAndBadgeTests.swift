@@ -51,6 +51,24 @@ final class ButterflyAndBadgeTests: XCTestCase {
         XCTAssertEqual(VisitorCatalog.Rarity.rare.label, "Rare visitor")
     }
 
+    // MARK: Friend of the day
+    func testFriendOfTheDayIsADayVisitorFixedPerSeedAndDay() {
+        let a = VisitorSpawner.friendOfTheDay(seed: 42, day: 300)
+        XCTAssertEqual(a, VisitorSpawner.friendOfTheDay(seed: 42, day: 300))
+        XCTAssertFalse(a.nightOnly, "always a friend who can come in the daytime game")
+        let days = Set((0..<60).map { VisitorSpawner.friendOfTheDay(seed: 42, day: $0).id })
+        XCTAssertGreaterThan(days.count, 4, "it changes from day to day")
+        let seeds = Set((1...40).map { VisitorSpawner.friendOfTheDay(seed: Int64($0) &* 7_919, day: 300).id })
+        XCTAssertGreaterThan(seeds.count, 1, "players get different friends on the same day")
+        XCTAssertTrue(Set(VisitorSpawner.pool(evening: false, lantern: false)).isSuperset(of: days))
+    }
+
+    func testFriendOfTheDayLine() {
+        XCTAssertEqual(VisitorsCopy.friendOfTheDay("Monarch"), "Say hello to a Monarch today")
+        XCTAssertEqual(VisitorsCopy.friendOfTheDay("Owl"), "Say hello to an Owl today")
+        for v in VisitorCatalog.all { XCTAssertEqual(CopySafety.check(VisitorsCopy.friendOfTheDay(v.name)), []) }
+    }
+
     // MARK: Visitors page
     func testAlbumRemembersWhenEachFriendWasSeen() {
         var a = StickerAlbum()

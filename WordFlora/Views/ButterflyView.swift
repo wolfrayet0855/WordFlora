@@ -329,6 +329,13 @@ struct VisitorsView: View {
                         Text(VisitorsCopy.playTitle).font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                         Text(app.settings.calmMode ? VisitorsCopy.playBlurbCalm : VisitorsCopy.playBlurb)
                             .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
+                        // Friend of the day: a suggestion only, hidden in Quiet Garden.
+                        if !app.settings.quietGarden {
+                            let friend = VisitorSpawner.friendOfTheDay(seed: app.profile?.weatherSeed ?? 0, day: app.weatherToday)
+                            Text(VisitorsCopy.friendOfTheDay(friend.name))
+                                .font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                                .accessibilityIdentifier("visitors.friendOfTheDay")
+                        }
                     }
                     .fixedSize(horizontal: false, vertical: true)
                 }
