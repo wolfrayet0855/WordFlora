@@ -47,6 +47,16 @@ final class GameViewModel {
     private(set) var missesThisRound = 0
     private(set) var finishedRoundId: String?
 
+    // Speed bloom (opt-in gold ring on level 4-5 words; Rules/SpeedBloom.swift)
+    /// Read as each round begins (AppModel passes the device-local settings).
+    var speedBloomPrefs: () -> SpeedBloom.Prefs = { .off }
+    /// UI tests only: a fixed ring length in seconds.
+    var speedBloomBudgetOverride: TimeInterval?
+    /// This round's gold ring, or nil when Speed bloom does not apply.
+    private(set) var speedRing: SpeedBloomRing?
+    /// True when this round's word was solved before the ring closed (one Quick Bloom).
+    private(set) var quickBloom = false
+
     // Round result
     private(set) var earnedPlantName: String?
     private(set) var earnedPlantIsNew = false
@@ -133,6 +143,7 @@ final class GameViewModel {
     func startTutorial(entry: WordEntry) {
         begin(entry, daily: false)
         isTutorial = true
+        speedRing = nil
     }
 
     private func begin(_ e: WordEntry, daily: Bool) {
@@ -159,7 +170,17 @@ final class GameViewModel {
         roseDropped = false
         sessionBeat = false
         roundId = UUID().uuidString
+        quickBloom = false
+        speedRing = SpeedBloom.applies(speedBloomPrefs(), wordLevel: e.level, isDaily: daily, isTutorial: false)
+            ? SpeedBloomRing(budget: speedBloomBudgetOverride ?? SpeedBloom.seconds(for: e.word, extraTime: speedBloomPrefs().extraTime))
+            : nil
         phase = .playing
+    }
+
+    /// Moves the gold ring on by `dt` seconds of play. It only moves while the word is being played.
+    func advanceSpeedRing(by dt: TimeInterval) {
+        guard phase == .playing, speedRing?.isFilling == true else { return }
+        speedRing?.advance(by: dt)
     }
 
     // MARK: - Playing
@@ -183,6 +204,7 @@ final class GameViewModel {
         }
 
         if isWordComplete {
+            quickBloom = speedRing?.wordSolved() ?? false
             phase = .won
             finishRound(won: true)
         } else if petalsRemaining == 0 {
@@ -230,6 +252,7 @@ final class GameViewModel {
             guessedLetters.insert(ch)
         }
         helpersUsed += 1
+        speedRing?.helpTapped()
     }
 
     // MARK: - Resting (loss)
@@ -253,6 +276,7 @@ final class GameViewModel {
 
     private func finalizeLoss() {
         phase = .rested
+        speedRing?.roundRested()
         revealedAnswer = currentWord
         finishRound(won: false)
     }

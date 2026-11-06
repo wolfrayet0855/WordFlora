@@ -12,6 +12,8 @@ enum BadgeCounter: String, CaseIterable, Codable {
     case perfectBlooms, revives, dailyBloomsDone, visitorSpecies, butterflyPlays
     /// Weather puzzles solved (one step per solve that earned a reward). Accumulates; never goes down.
     case weathered
+    /// Speed bloom words solved before the gold ring closed (opt-in, 13+). Accumulates; never goes down.
+    case quickBlooms
 
     // Collection: worked out from the garden and the album each time (`BadgeFacts`), kept as best-so-far values.
     case rarePlants, desertPlants, waterPlants, treePlants, floweringPlants, stickers

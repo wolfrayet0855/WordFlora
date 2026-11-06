@@ -42,6 +42,16 @@ final class AppSettings {
     /// The weather day key on which "Got it" hid the forecast card.
     var weatherCardDismissedDay: Int { didSet { defaults.set(weatherCardDismissedDay, forKey: "weatherCardDismissedDay") } }
 
+    /// Speed bloom (opt-in, off by default, never prompted; SpeedBloom). Device-local, like Calm mode.
+    var speedBloomOn: Bool { didSet { defaults.set(speedBloomOn, forKey: "speedBloomOn") } }
+    /// Speed bloom's "Extra time": the gold ring takes half as long again.
+    var speedBloomExtraTime: Bool { didSet { defaults.set(speedBloomExtraTime, forKey: "speedBloomExtraTime") } }
+
+    /// What the Speed bloom rule reads as each round begins.
+    var speedBloomPrefs: SpeedBloom.Prefs {
+        SpeedBloom.Prefs(optedIn: speedBloomOn, extraTime: speedBloomExtraTime, ageBand: ageBand, calmMode: calmMode, quietGarden: quietGarden)
+    }
+
     /// Garden weather: off in Calm mode (the one Calm toggle decides, owner 2026-11-05), else the choice, on by default.
     /// The widget reads the same rule (SharedDefaults.gardenWeather).
     var gardenWeather: Bool {
@@ -86,6 +96,8 @@ final class AppSettings {
         gardenWeatherChoice = defaults.object(forKey: "gardenWeather") == nil ? nil : defaults.bool(forKey: "gardenWeather")
         weatherNotify = bool("weatherNotify", false)
         weatherCardDismissedDay = defaults.integer(forKey: "weatherCardDismissedDay")
+        speedBloomOn = bool("speedBloomOn", false)
+        speedBloomExtraTime = bool("speedBloomExtraTime", false)
     }
 
     /// Applies the defaults that depend on the age answer (called once, when the player answers).

@@ -58,6 +58,7 @@ final class AppModel {
         self.onboarding = OnboardingFlow(restoredComplete: settings.onboardingComplete, ageBand: settings.ageBand)
         game.soundEnabled = settings.soundOn
         game.ai = GardenAIProvider.current(); game.aiIsModelBacked = GardenAIProvider.isModelBacked()
+        game.speedBloomPrefs = { [weak settings] in settings?.speedBloomPrefs ?? .off }
         game.seedPlantsIfNeeded()
         reconcileSyncedData()
         SoundPlayer.configureSession()
@@ -583,6 +584,7 @@ final class AppModel {
             if BadgeFacts.isSteady(misses: game.missesThisRound) { unlocks += badges.record(.steadySolves, now: t, quiet: quiet) }
             if BadgeFacts.isLongWord(game.currentWord) { unlocks += badges.record(.longWords, now: t, quiet: quiet) }
             unlocks += recordCollectionFacts(now: t, quiet: quiet)       // the plant that arrived, the level reached
+            if game.quickBloom { unlocks += badges.record(.quickBlooms, now: t, quiet: quiet) }
         }
         if !game.isTutorial && BadgeFacts.isMorning(t, calendar: .current) {
             unlocks += badges.recordDay(.morningDays, day: BadgeFacts.dayNumber(t, calendar: .current), now: t, quiet: quiet)

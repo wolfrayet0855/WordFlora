@@ -216,6 +216,18 @@
     "blurb": "Solve weather puzzles"
   },
   {
+    "id": "quick_bloom",
+    "family": "play",
+    "counter": "quickBlooms",
+    "thresholds": [
+      1,
+      10,
+      30
+    ],
+    "title": "Quick Bloom",
+    "blurb": "Finish a Speed bloom word before the gold ring closes"
+  },
+  {
     "id": "first_bloom",
     "family": "tending",
     "counter": "fullBlooms",

@@ -2,7 +2,7 @@ import XCTest
 import SwiftData
 @testable import WordFlora
 
-/// The full badge catalogue (36 designed badges plus Weathered): their rules, counters, merge, sharing and moments.
+/// The full badge catalogue (36 designed badges plus Weathered and Quick Bloom): their rules, counters, merge, sharing and moments.
 @MainActor
 final class BadgeCatalogueTests: XCTestCase {
     let t0 = Date(timeIntervalSince1970: 1_780_000_000)
@@ -10,7 +10,7 @@ final class BadgeCatalogueTests: XCTestCase {
 
     // MARK: Catalogue
 
-    /// design-preview/brand/v4/badges.html: 36 emblems, with the Round 5 thresholds, plus the Weathered badge.
+    /// design-preview/brand/v4/badges.html: 36 emblems, with the Round 5 thresholds, plus the Weathered and Quick Bloom badges.
     static let designed: [String: (counter: String, thresholds: [Int])] = [
         "rare_finds": ("rarePlants", [1, 3, 6]), "desert_dweller": ("desertPlants", [2, 4, 6]),
         "water_lover": ("waterPlants", [1, 2, 3]), "tree_hugger": ("treePlants", [2, 4, 6]),
@@ -26,11 +26,11 @@ final class BadgeCatalogueTests: XCTestCase {
         "shed_keeper": ("shedUpgrades", [3, 6, 12]), "sharer": ("badgeShares", [1, 5, 20]),
     ]
     static let builtBefore = ["level_sets", "plant_collector", "feeder", "green_thumb", "master_repotter", "pruning_pro", "streak",
-                              "perfect_bloom", "resurrected", "daily_bloom", "visitor_friend", "gentle_net", "weathered"]
+                              "perfect_bloom", "resurrected", "daily_bloom", "visitor_friend", "gentle_net", "weathered", "quick_bloom"]
 
-    func testTheCatalogueHoldsAllThirtySixDesignedBadgesAndWeathered() throws {
+    func testTheCatalogueHoldsAllThirtySixDesignedBadgesWeatheredAndQuickBloom() throws {
         let defs = try BadgeCatalog.load()
-        XCTAssertEqual(defs.count, 37)
+        XCTAssertEqual(defs.count, 38)
         XCTAssertEqual(Set(defs.map(\.id)), Set(Self.designed.keys).union(Self.builtBefore))
         for (id, want) in Self.designed {
             let d = try XCTUnwrap(defs.first { $0.id == id }, id)

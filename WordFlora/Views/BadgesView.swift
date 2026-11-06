@@ -5,8 +5,16 @@ struct BadgesView: View {
     @State private var open: BadgeDef?
 
     private static let catalog: [BadgeDef] = (try? BadgeCatalog.load()) ?? []
-    /// The Sharer badge only shows to players who can share (13 and up, age known).
-    private var defs: [BadgeDef] { Self.catalog.filter { $0.counter != BadgeCounter.badgeShares.rawValue || app.canShareBadges } }
+    /// The Sharer badge only shows to players who can share (13 and up, age known). Quick Bloom shows only once Speed
+    /// bloom is on or the badge is earned, so the shelf never suggests the toggle.
+    private var defs: [BadgeDef] {
+        let state = app.badges
+        return Self.catalog.filter { def in
+            (def.counter != BadgeCounter.badgeShares.rawValue || app.canShareBadges)
+                && (def.id != SpeedBloom.badgeId
+                    || SpeedBloom.showsBadge(app.settings.speedBloomPrefs, earnedAnyTier: state.unlockedDate(badge: def.id, tier: 1) != nil))
+        }
+    }
 
     var body: some View {
         let all = defs
