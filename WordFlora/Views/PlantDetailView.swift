@@ -26,6 +26,7 @@ struct PlantDetailView: View {
     @State private var toastCount = 0
     @State private var sway = 0.0
     @State private var hellos = 0
+    @State private var petalNotes = 0
     @State private var showRepot = false
     @State private var renaming = false
     @State private var draftName = ""
@@ -104,6 +105,7 @@ struct PlantDetailView: View {
                           lastRoll: { app.lastThunderRoll }, roll: { app.rollThunder() })
         }
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: tendTaps) { _, _ in app.settings.hapticsOn }
+        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.35), trigger: petalNotes)
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button { draftName = plant.nickname; renaming = true } label: { Image(systemName: "pencil") }
@@ -236,7 +238,8 @@ struct PlantDetailView: View {
                 if showPot {
                     Color.clear.frame(height: rowHeight)
                 } else {
-                    PetalPipRow(count: snap.pips, large: large).frame(minHeight: rowHeight)
+                    // The petal sound toy: tap a petal for its note, the love flower for all five (tap the plant for hello).
+                    PetalPipRow(count: snap.pips, large: large, onPetal: playPetal).frame(minHeight: rowHeight)
                 }
                 if raining && reduceMotion {
                     Label(LifeStats.badge(thunder: weather.thunder), systemImage: "drop.fill")
@@ -244,10 +247,10 @@ struct PlantDetailView: View {
                         .padding(.horizontal, 12).padding(.vertical, 6)
                         .background(LifePalette.glass, in: Capsule()).overlay(Capsule().stroke(LifePalette.line))
                         .accessibilityHidden(true)
+                        .allowsHitTesting(false)
                 }
             }
             .padding(.top, rowTop)
-            .allowsHitTesting(false)
         }
         .frame(maxWidth: .infinity, minHeight: height, alignment: .top)
         .background {
@@ -326,6 +329,12 @@ struct PlantDetailView: View {
     static func dipScale(_ snap: LifeStats.Snapshot) -> CGFloat {
         guard snap.dipped else { return 1 }
         return GrandGardenArt.stageScale(snap.shownStage) / GrandGardenArt.stageScale(snap.stage)
+    }
+
+    /// The petal sound toy (PetalNotes): gentle notes and a light tap, never a hello and never counted.
+    private func playPetal(_ petal: Int?) {
+        PetalSynth.shared.play(tap: petal, volume: PetalNotes.volume(soundOn: app.settings.soundOn, calm: app.settings.calmMode))
+        if PetalNotes.haptic(hapticsOn: app.settings.hapticsOn) { petalNotes += 1 }
     }
 
     /// A small hello: the plant sways back and settles, hearts float up, and it counts as love.
