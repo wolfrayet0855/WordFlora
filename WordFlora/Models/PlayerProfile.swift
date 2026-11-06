@@ -58,7 +58,7 @@ final class PlayerProfile {
     /// Fresh weather puzzles today (`weatherPuzzleDay` is its day key). Merge: the later day wins; same day, max.
     var weatherPuzzleDay: Int = 0
     var weatherPuzzleCount: Int = 0
-    /// Wild Weather opt-in (13+, Calm off only; never under 13). Merge: AND, so off wins.
+    /// Wild Weather opt-in (any age, owner ruling 2026-11-05; Calm and Quiet Garden hide it). Merge: AND, so off wins.
     var wildWeather: Bool = false
     /// The first day key the weather gate opened. Merge: min of nonzero.
     var weatherGatedFromDay: Int = 0
