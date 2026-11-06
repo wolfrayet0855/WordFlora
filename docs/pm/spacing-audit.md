@@ -24,7 +24,7 @@ inner space of cards.
 | `Space.section` | 24 | box to heading, between blocks, overlay cards to the screen edge |
 
 Rules: content blocks inside a box get `Space.card` on all four sides; one-line rows (key card, Daily Bloom) may use
-12 top and bottom with 16 at the sides; modal cards (rest, break, nudge) float 24 from the screen edge with 16 inside.
+12 top and bottom with 16 at the sides; modal cards (rest, break, nudge) float 24 from the screen edge with 20 inside.
 
 ## Root cause on the guide
 
@@ -49,7 +49,7 @@ first layer pins the drawing area's top-left corner (the same fix inside the two
 | Home | "Explore" heading 4 pt in from the gutter | Kept: optical alignment with the tile corners | nit, kept |
 | Game | Hint card: 16 above the clue, ~28 under "Simpler clue" (44 pt hit area) | Hit area may reach into the card padding; 16 under the words | must, fixed |
 | Game | Side margin 12 (keyboard needs the width) | Kept on purpose | ok |
-| Rest / break / nudge cards | 24 from the screen, 20 inside, 4 under the scene | 24 from the screen, 16 inside (4 under the full-bleed scene kept) | fixed |
+| Rest / break / nudge cards | 24 from the screen, 20 inside on the sides and bottom, 4 under the full-bleed scene | Kept: already even. Moving to 16 inside made the rest card's accessibility audits fail at large text (reward line, ad note), so these modal cards stay at 20 | ok, kept |
 | Garden | Gutter 20 vs 16 on Home; a found plant's card taller than "Not found yet" beside it, so cards in a row floated at different heights | Gutter 16; two-column Grid, both cards take the row's height | must, fixed |
 | Plant page | Life panel 12 from the edge vs 16 for the name card and tend buttons; tend bar 14 | All on 16 | must, fixed |
 | Repot sheet | Sides 20 vs 16 elsewhere | 16; header 24 top | fixed |

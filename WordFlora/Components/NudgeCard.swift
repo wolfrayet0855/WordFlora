@@ -58,7 +58,7 @@ struct NudgeCard: View {
                 }
                 .padding(.top, 6)
             }
-            .padding(.horizontal, Space.card).padding(.top, Space.xs).padding(.bottom, Space.card)
+            .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
         }
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isModal)

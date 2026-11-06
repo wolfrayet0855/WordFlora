@@ -292,7 +292,7 @@ struct GameView: View {
                     }
                     .padding(.top, 6)
                 }
-                .padding(.horizontal, Space.card).padding(.top, Space.xs).padding(.bottom, Space.card)
+                .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
             }
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
@@ -334,7 +334,7 @@ struct GameView: View {
                     .padding(.top, 6)
                     if goAdFreeOnCard { goAdFreeRow.padding(.top, 2) }
                 }
-                .padding(.horizontal, Space.card).padding(.top, Space.xs).padding(.bottom, Space.card)
+                .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
             }
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
@@ -401,7 +401,7 @@ struct GameView: View {
     /// Dim (unless the win's own dim is already up), then the card on top so text is never covered.
     /// `padding` is the card's inner padding (the resting and break cards bring their own, under a full-bleed header);
     /// `centered` keeps a short card in the middle of the screen while a tall one still scrolls.
-    private func dimmed<C: View>(dim: Bool = true, padding: CGFloat = Space.card, centered: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
+    private func dimmed<C: View>(dim: Bool = true, padding: CGFloat = 20, centered: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
         let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
         let card = content().padding(padding).background(Color.appBackground, in: shape).clipShape(shape).padding(Space.section)
         return ZStack {
