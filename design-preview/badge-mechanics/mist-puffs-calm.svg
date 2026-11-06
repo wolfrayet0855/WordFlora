@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" width="160" height="100">
+  <!-- Mist Maker, Calm mode: half the droplets (12), one puff, no sound. Same origin as mist-puffs.svg. -->
+  <path d="M70 42 c -6 -10 8 -16 14 -10 c 4 -8 18 -6 18 4 c 10 0 12 14 2 16 c -2 8 -16 8 -20 2 c -8 4 -18 -4 -14 -12 Z" fill="#E2F1FB" fill-opacity=".82"/>
+  <g fill="#7CC4F0">
+    <circle cx="22" cy="48" r="2.4"/><circle cx="46" cy="38" r="2.2"/><circle cx="52" cy="62" r="2.8"/>
+    <circle cx="90" cy="18" r="2.6"/><circle cx="128" cy="44" r="2.4"/><circle cx="140" cy="62" r="2.6"/>
+  </g>
+  <g fill="#fff" stroke="#7CC4F0" stroke-width="1.2">
+    <circle cx="44" cy="50" r="2.4"/><circle cx="76" cy="26" r="2.2"/><circle cx="104" cy="40" r="3"/>
+    <circle cx="104" cy="88" r="2"/><circle cx="122" cy="14" r="1.8"/><circle cx="132" cy="80" r="2"/>
+  </g>
+</svg>
