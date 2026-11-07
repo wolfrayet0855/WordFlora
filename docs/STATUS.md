@@ -351,3 +351,37 @@ Owner wanted Speed bloom in this release; built to the approved design.
 | UI batches | NOT RUN: the first two attempts failed before any test ran (runner "Timed out while loading Accessibility" on a freshly booted simulator under load); a single probe test then passed; the third attempt was stopped by the host for low memory |
 
 **Still unverified:** the whole UI suite after these merges (all 12 batches), the Quiet Garden offer screenshots against `design-preview/quiet-garden/shots`, shots of the Speed bloom ring, the quest card, the badge detail sheet and the grown-ups Plus page, the Release build check, and on device: Living Touch feel and haptic, the widget Say hello button on a real Home Screen.
+
+## Gate G0 verification (2026-11-07, branch `3-feat-content-and-polish`, from tip `a502aa4`)
+Own simulator `WF Integ3 iPhone 17` (iOS 26.5), one xcodebuild at a time, test timeouts on; the simulator was erased once mid-run (it had grown to ~210 processes).
+
+**Fixes (tests written to find the real cause; no audit weakened or skipped):**
+- `10286b1` DailyQuest family line: `scrollTo` returned while the Settings list was still gliding, so the audit measured the backup footnote sliding into the line's old place (clipped, low contrast, "partially unsupported"). The audit now waits until the element reads the same three times, and reports whether it moved if anything is found.
+- `2c8c573` Endgame Badges page: run as one audit, the Dynamic Type check grew the badge texts, the page reflowed about 190 pt under the audit, and contrast was sampled where the cards no longer were (blank cream for the Grand Garden card; cards under the bar fade read as in the clear). As in `TendingUITests`, contrast and the other checks run first on the page as left, then clipped text and Dynamic Type each on their own; the page is scrolled one settled swipe at a time and must read still first.
+- `f584be8` Game screen: at accessibility sizes the "Simpler clue" button's -12 pt bottom pull pushed the sparkle and words over the clue card's edge (seen in the AX5 shot); the pull now applies only below accessibility sizes.
+
+**Results**
+
+| Run | Result |
+|---|---|
+| Unit (`WordFloraTests`) | 1081 run, 1078 pass; only the 3 known `StoreKitConfigTests` (two "notEntitled", one time allowance) |
+| Already green before this pass | WordFloraUITests, Fidelity + HomeLayout + Celebration, Tending, RestCard, Guide, Badges, ParentalGateLink, QuietGardenOffer |
+| EndgameUITests (whole class) | 15/15 after `2c8c573` (was 14/15) |
+| WeatherUITests | 26/26 (fix `a178043` confirmed) |
+| SpeedBloomUITests | 10/10 (fix `7102fb1` confirmed) |
+| DailyQuestUITests | 6/6 after `10286b1` |
+| WordFloraUITests puzzle tests (7: solving, every third word, resting reveal, Help second clue, first session, audit game and resting, level map) | 7/7 |
+| CelebrationUITests | 5/5 |
+| RestCardUITests | 16/16 |
+| After `f584be8`: testPuzzleScreens + testAuditGameAndResting + testHelpRevealsASecondClue | 3/3 |
+| Release build (simulator, unsigned) | BUILD SUCCEEDED. Release Info.plist: all four AdMob keys real; Debug: all four Google test ids. `TARGETED_DEVICE_FAMILY = 1` in all four build settings. |
+
+**Fresh puzzle screenshots** (`FidelityScreensUITests.testPuzzleScreens`, iPhone 17, 402 pt)
+- Before: `scratchpad/shots/puzzle/fid-puzzle-*.png`. After: `scratchpad/shots/puzzle-after/fid-puzzle-*.png`, AX5 after the clue fix: `scratchpad/shots/puzzle-after2/` (scratchpad = `/private/tmp/claude-501/-Users-computer-Desktop-workspace-WordFlora/4a7b4bed-9e4b-4277-b17d-f2a3956c6a07/scratchpad`).
+- PHOTOSYNTHESIS: before, the 14 tiles ran off the right edge; after, all 14 sit on one row with margin. 375 pt is covered by `GameViewModelTests.testEveryWordInTheBankFitsOneRowOnA375PointPhone` (green). CHERRY BLOSSOM wraps at the space (6 + 7), as designed.
+- Win card: before, it sat over the top bar (Home, Level 1, Help showing through); after, centred under a dim, clear of the bar. The resting card (light and dark) is centred too; the game's flower peeks above both cards behind the dim, which reads as intended.
+- Keys: used-right keys solid green with a check, used-wrong keys pink with a cross and greyed letter; readable in light and dark. Help is a filled capsule.
+- Speed bloom ring: a clear 5 pt amber line over a visible cream track, part drained.
+- AX5: the clue card no longer spills "Simpler clue" over its edge (fixed). Still worth a look: at AX5 the key letters fill the keys and the check / cross marks overlap the letters (R, S, Z); readable, passes the audits, left for a design call.
+
+**Device-only checks still open:** Living Touch feel and haptic; the widget "Say hello" button on a real Home Screen; the badge moment's pass-through tap; thunder loudness; petal notes by ear.
