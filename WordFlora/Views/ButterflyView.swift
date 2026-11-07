@@ -125,7 +125,10 @@ struct ButterflyView: View {
                 ForEach(popups) { p in popup(p, size: geo.size) }
                 VStack(spacing: 10) {
                     if g.showsTimeBar {
-                        ProgressView(value: min(g.elapsed, g.roundSeconds), total: g.roundSeconds).tint(Color.appAccent).padding(.horizontal, 24)
+                        // The bar is 4 pt tall; its accessibility frame is 44 pt (the hit area check), and the negative
+                        // padding keeps the layout where it was.
+                        ProgressView(value: min(g.elapsed, g.roundSeconds), total: g.roundSeconds).tint(Color.appAccent)
+                            .frame(height: 44).padding(.vertical, -20).padding(.horizontal, 24)
                             .accessibilityLabel("Game progress")
                     }
                     if showTip {

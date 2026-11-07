@@ -14,7 +14,7 @@ struct SettingsView: View {
     var body: some View {
         @Bindable var s = app.settings
         Form {
-            Section("Play") {
+            Section(settings: "Play") {
                 Picker("Word difficulty", selection: $s.difficulty) {
                     Text("Auto").tag(AppSettings.Difficulty.auto)
                     Text("Gentle").tag(AppSettings.Difficulty.gentle)
@@ -40,12 +40,12 @@ struct SettingsView: View {
                         .accessibilityIdentifier("settings.easierButterfliesNote")
                 }
             }
-            Section(GuideCopy.UI.settingsHeader) {
+            Section(settings: GuideCopy.UI.settingsHeader) {
                 Button { showGuide = true } label: { Label(GuideCopy.UI.settingsRow, systemImage: "book.pages") }
                     .accessibilityIdentifier("settings.showGuide")
                 Text(GuideCopy.UI.settingsFoot).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
-            Section("Comfort") {
+            Section(settings: "Comfort") {
                 Toggle("Sound", isOn: $s.soundOn).onChange(of: s.soundOn) { _, v in app.game.soundEnabled = v; app.updateAmbience() }
                 Toggle("Garden ambience", isOn: $s.ambienceOn).onChange(of: s.ambienceOn) { _, _ in app.updateAmbience() }
                 Toggle("Haptics", isOn: $s.hapticsOn)
@@ -55,7 +55,7 @@ struct SettingsView: View {
                     .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
             GardenWeatherSettingsSection()
-            Section("Reminders") {
+            Section(settings: "Reminders") {
                 Toggle("Gentle daily reminder", isOn: Binding(
                     get: { s.remindMe },
                     set: { on in
@@ -73,7 +73,7 @@ struct SettingsView: View {
                 Text("At most one a day, never at night, and they stop on their own if you take a break.").font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 if reminderDenied { Text("Notifications are off for WordFlora. You can allow them in your device settings.").font(.footnote).foregroundStyle(Color.appDanger) }
             }
-            Section("Appearance") {
+            Section(settings: "Appearance") {
                 Picker("Theme", selection: $s.appearance) {
                     Text("System").tag(AppSettings.Appearance.system)
                     Text("Light").tag(AppSettings.Appearance.light)
@@ -81,7 +81,7 @@ struct SettingsView: View {
                 }.pickerStyle(.segmented)
                 Toggle("Show everything", isOn: $s.showEverything)
             }
-            Section(PlusEntry.sectionTitle(ageBand: s.ageBand)) {
+            Section(settings: PlusEntry.sectionTitle(ageBand: s.ageBand)) {
                 Button { router.go(.plus) } label: { Label(PlusEntry.rowTitle(ageBand: s.ageBand), systemImage: "sparkles") }
                     .accessibilityIdentifier("settings.plus")
                 FamilyShareNudgeRow()
@@ -90,7 +90,7 @@ struct SettingsView: View {
                         .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 }
             }
-            Section("Your garden") {
+            Section(settings: "Your garden") {
                 Button { prepareBackup() } label: { Label(GardenBackup.Copy.backupTitle, systemImage: "square.and.arrow.up") }
                 Button { importing = true } label: { Label(GardenBackup.Copy.restoreTitle, systemImage: "square.and.arrow.down") }
                 Text(GardenBackup.Copy.footnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
@@ -99,14 +99,14 @@ struct SettingsView: View {
                         .accessibilityIdentifier("backup-message")
                 }
             }
-            Section("Privacy and ads") {
+            Section(settings: "Privacy and ads") {
                 GatedLink("Report an ad", url: Links.reportAd)
                 GatedLink("Privacy Policy", url: Links.privacy)
                 if app.ads.privacyOptionsRequired {
                     Button("Ad privacy choices") { Task { await app.ads.presentPrivacyOptions() } }
                 }
             }
-            Section("About") {
+            Section(settings: "About") {
                 LabeledContent("Version", value: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0")
             }
         }
@@ -141,5 +141,18 @@ struct SettingsView: View {
         case .success: backupMessage = (GardenBackup.Copy.restored, true)
         case .failure(let e): backupMessage = (e.message, false)
         }
+    }
+}
+
+/// A Settings section header in the app's secondary text colour. The stock grey header measured just under 4.5:1 on the
+/// grouped background (Apple's contrast audit), so the headers use `Color.secondaryText`, which meets it in light and dark.
+struct SettingsHeader: View {
+    let title: String
+    var body: some View { Text(title).foregroundStyle(Color.secondaryText) }
+}
+
+extension Section where Parent == SettingsHeader, Content: View, Footer == EmptyView {
+    init(settings title: String, @ViewBuilder content: () -> Content) {
+        self.init(content: content, header: { SettingsHeader(title: title) })
     }
 }

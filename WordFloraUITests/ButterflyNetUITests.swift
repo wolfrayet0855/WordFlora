@@ -41,6 +41,18 @@ final class ButterflyNetUITests: XCTestCase {
         for _ in 0..<14 where !(e.exists && e.isHittable) { up ? app.swipeDown() : app.swipeUp() }
     }
 
+    /// Badge moments dim the app: wait until none is showing (one may follow another), and return the badges they named.
+    @discardableResult
+    private func letBadgeMomentsPass() -> [String] {
+        var seen = [String]()
+        let moment = element("badgeMoment")
+        while moment.waitForExistence(timeout: 4) {
+            seen.append(moment.label)
+            XCTAssertTrue(moment.waitForNonExistence(timeout: 12), "the badge moment goes")
+        }
+        return seen
+    }
+
     /// Apple's audit, every finding collected. Contrast and Dynamic Type are judged only for elements fully inside the
     /// visible scroll area (as in BadgeMechanicsUITests); the Dynamic Type and clipped-text checks run on their own after
     /// the rest, since they grow the text and reflow the page.
@@ -182,10 +194,11 @@ final class ButterflyNetUITests: XCTestCase {
         XCTAssertTrue(summary.waitForExistence(timeout: 15))
         XCTAssertEqual(element("butterfly.summary.gentle").label, "1 gentle hello")
         shot("net-gentle-summary")
-        let moment = element("badgeMoment")
-        XCTAssertTrue(moment.waitForExistence(timeout: 8), "ten gentle hellos earn the bronze Gentle Net badge")
-        XCTAssertTrue(moment.label.contains("Gentle Net"), moment.label)
+        // The first friend met also earns Visitor Friend and First Catch; the moments come one after another.
+        XCTAssertTrue(element("badgeMoment").waitForExistence(timeout: 8))
         shot("net-gentle-badge-moment")
+        let moments = letBadgeMomentsPass()
+        XCTAssertTrue(moments.contains { $0.contains("Gentle Net") }, "ten gentle hellos earn the bronze Gentle Net badge: \(moments)")
     }
 
     // MARK: Accessibility audits
@@ -239,7 +252,8 @@ final class ButterflyNetUITests: XCTestCase {
         XCTAssertTrue(resting.waitForExistence(timeout: 5))
         resting.tap()
         XCTAssertTrue(summary.waitForExistence(timeout: 15))
-        sleep(2)
+        letBadgeMomentsPass()
+        sleep(1)
         shot("net-summary-ax5-dark")
         audit("net-summary-ax5-dark")
     }
