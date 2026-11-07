@@ -439,3 +439,8 @@ Builders must apply these before and while building. They override earlier numbe
 - Quiet Garden and R2: one rule for everyone: the R2 prompt is hidden in Quiet Garden for all ages and Plus (no asymmetry).
 - Order: G3, CloudKit deploy, G4a, G5, G4b, G6 (G4b after G5). G4a spec writing proceeds lock-free during G3. Options O1-O6 stay unapplied; ranking if the date slips (needs owner approval): O6 (already the order), O5, O1 native, O4 R3, O3 collapsible, O2 app-open last.
 - Revenue expectation: $90-205 a month at 10,000 players (review estimate), not $150-295.
+
+## Review rulings 2 (lead, 2026-11-07, from docs/pm/weak-spots-review-2.md)
+- R2 is hidden while the "A short ad may play first" note shows on the resting card (never stack two ad prompts). R2 title: "Watch a short video for a hint". Hide the whisper dot during the Daily Bloom.
+- Section 1.1's cap numbers are stale: the Review rulings numbers above win (pushed 2/session, all full-screen 4/session and 8/day, app-open to next pushed 600 s). Builders update 1.1 to match.
+- Review notes (D8) must say ads begin from session 3 and that under-13/unknown ages never see any.

@@ -116,3 +116,6 @@ Backups: R2 (55 / 10), W2 (71 / 12), S2 (74 / 13), H2 (51 / 8), all pass CopySaf
 - Snowdrop hardened leaf tips on RHS/Kew (only Cambridge University Botanic Garden and secondary pages).
 - Hellebore sepal persistence and flowering time on RHS/Kew (only Wikipedia citing Herrera 2005, plus garden sites).
 - Not tried: Royal Botanic Garden Edinburgh pages and RSPB via a browser.
+
+## Ruling (lead, 2026-11-07, from docs/pm/weak-spots-review-2.md)
+Robin fact is reworded because "all year round" over-claims (robins go quiet in the late-summer moult): "Robins sing through the winter, not just in spring." (52 chars, 9 words, CopySafety clean). Wren, snowdrop and hellebore ship as written; backups R2/S2/H2 stay ready if a source check contradicts. Owner check (10 min): RSPB robin, Kew snowdrop, RHS hellebore pages.
