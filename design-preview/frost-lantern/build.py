@@ -28,7 +28,7 @@ T = {
     "Visitor.eye": "#2C2418", "Plant.groundShadow": "#2C3E2C",
     "Pot.honeyCream": "#FFF0C2", "white": "#FFFFFF",
     # New art colours for the pack (art constants, not colorsets).
-    "FL.iceBody": "#B7D6E6", "FL.iceRim": "#5E93B0", "FL.iceShade": "#93BCD2", "FL.frostFern": "#3F7596",
+    "FL.iceBody": "#B7D6E6", "FL.iceRim": "#548BAC", "FL.iceShade": "#93BCD2", "FL.frostFern": "#3F7596",
     "FL.lanternBody": "#B5403A", "FL.lanternRim": "#D9665A", "FL.lanternShade": "#93302B",
     "FL.lanternBand": "#8A2A25", "FL.lanternInk": "#5E211C",
     "FL.indigoBody": "#6A70D0", "FL.indigoRim": "#7F86D9", "FL.indigoShade": "#4A4FAE", "FL.ice": "#CFE6F0",
@@ -44,7 +44,7 @@ T = {
     "FL.leg": "#7A5A44",
     "FL.wrenBody": "#8A5A34", "FL.wrenWing": "#6E4524", "FL.wrenBar": "#4E2F17", "FL.wrenBelly": "#D8B98E",
     "FL.wrenBrow": "#EBD7B4",
-    "FL.stickerFrost": "#DCEBF2", "FL.stickerBark": "#F1E6D6",
+    "FL.stickerFrost": "#DCEBF2", "FL.stickerMist": "#E6EAF0",
     "FL.snowdropLeaf": "#6E9C7E", "FL.snowdropLeafVein": "#A9C9B4", "FL.snowdropEdge": "#768C91",
     "FL.helleboreSepal": "#C46B8C", "FL.helleboreEdge": "#9A4A6B", "FL.helleboreCentre": "#C9D86A",
     "FL.helleboreStamen": "#F2E7A0", "FL.helleboreLeaf": "#3F6F4A", "FL.helleboreVein": "#6E9C7E",
@@ -371,7 +371,7 @@ def wren_parts(wing_rot):
 
 VISITORS = {
     "robin": {"parts": robin_parts, "legs": (49, 57, 73), "tint": "FL.stickerFrost", "name": "European robin"},
-    "wren": {"parts": wren_parts, "legs": (47, 55, 72), "tint": "FL.stickerBark", "name": "Winter wren (Eurasian wren)"},
+    "wren": {"parts": wren_parts, "legs": (47, 55, 72), "tint": "FL.stickerMist", "name": "Winter wren (Eurasian wren)"},
 }
 
 

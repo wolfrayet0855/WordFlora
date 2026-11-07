@@ -40,7 +40,7 @@ All three use the shared 120 x 100 pot box and draw in `PotPainter`'s order: bod
 
 | id | Name | Body / rim / shade | Decoration colours (index order) | Pattern | a11y label |
 |---|---|---|---|---|---|
-| `frostedGlass` | Frosted glass | `#B7D6E6` / `#5E93B0` / `#93BCD2` | `0xFFFFFF`, `0x3F7596` | `frost`: frost band with a scalloped top along the foot, three frost ferns rising from it, two glints (hidden in outline) | Icy blue pot with frost ferns |
+| `frostedGlass` | Frosted glass | `#B7D6E6` / `#548BAC` / `#93BCD2` | `0xFFFFFF`, `0x3F7596` | `frost`: frost band with a scalloped top along the foot, three frost ferns rising from it, two glints (hidden in outline) | Icy blue pot with frost ferns |
 | `lanternRed` | Lantern red | `#B5403A` / `#D9665A` / `#93302B` | `0xF5C858`, `0xFFF0C2`, `0x5E211C`, `0x8A2A25` | `lanterns`: a deep band (hidden in outline), a cream string, three paper lanterns (gold, cream, gold) with caps, tassels and a glow (glow knocks out in outline) | Red pot with a band of paper lanterns |
 | `snowflakeIndigo` | Snowflake indigo | `#6A70D0` / `#7F86D9` / `#4A4FAE` | `0xFFFFFF`, `0xCFE6F0` | `snowflakes`: three six-armed flakes with hub and side twigs (twigs hidden in outline), six ice dots (hidden in outline) | Indigo pot with white snowflakes |
 
@@ -58,8 +58,10 @@ stage and in the repot preview.
   line, or "A grown-up can find this in Settings." for the pack pots (mirroring `PotCatalog.plusHint`). There is no lock
   and no price.
 - A pack pot reads as itself at 28 pt: the lantern string is chunky, the snowflakes have a hub, and the frost band
-  sits at the foot. The frost band blends into a white card (body 1.5:1), so on light grounds the rim (3.1 to 3.3:1)
-  carries the edge, the same way Jade vine's rim does.
+  sits at the foot. The frost band blends into a white card (body 1.5:1), so on light grounds the rim carries the edge,
+  the same way Jade vine's rim does. The Frosted glass rim is deepened to `#548BAC` (3.5 to 3.7:1 on light grounds,
+  3.1 on dark surface). The suggested `#4F86A8` would drop to 2.9:1 on dark surface, so this is the nearest value
+  that still passes on all four grounds with a little margin.
 
 ## 2. Lantern Keeper badge (G3)
 
@@ -120,7 +122,7 @@ imagesets with `preserves-vector-representation`, like the others.
 - Facing leading (beak to the left), like `hummingbird`. The wing turns about (56,52): a = -38 degrees, b = +26,
   idle = +6.
 - Sticker frame as in `VisitorArt`: white r 55 disc with a 12 % shadow disc, a tint disc r 47, and the idle pose at
-  0.92. Tints: robin `FL.stickerFrost`, wren `FL.stickerBark`.
+  0.92. Tints: robin `FL.stickerFrost`, wren `FL.stickerMist` (a cool grey, so the brown wren stands off its disc).
 - Not-owned or not-met stickers use the album's existing outline rule (`grayscale(1)` at 35 %). There is no extra art.
 - Each bird reads on both themes through one part: on light grounds the brown back (robin 4.9:1, wren 5.5:1), on dark
   grounds the orange breast (4.7:1) or the pale belly (12.5:1 robin, 7.8:1 wren).
@@ -169,7 +171,7 @@ Sizes are in points as drawn in the app. "Box" is the SVG's own unit box.
 | `visitor_robin_a/b/idle.svg` | Robin flight and resting frames | 90 (box 100) | `FL.robinBack`, `FL.robinWing`, `FL.robinWingEdge`, `FL.robinBreast`, `FL.robinGrey`, `FL.robinBelly`, `FL.beak`, `Visitor.eye`, `FL.leg` |
 | `visitor_robin_sticker.svg` | Robin sticker | 22 to 108 (box 120) | as above + `FL.stickerFrost`, `white` |
 | `visitor_wren_a/b/idle.svg` | Wren flight and resting frames | 90 (box 100) | `FL.wrenBody`, `FL.wrenWing`, `FL.wrenBar`, `FL.wrenBelly`, `FL.wrenBrow`, `FL.beak`, `Visitor.eye`, `FL.leg` |
-| `visitor_wren_sticker.svg` | Wren sticker | 22 to 108 (box 120) | as above + `FL.stickerBark`, `white` |
+| `visitor_wren_sticker.svg` | Wren sticker | 22 to 108 (box 120) | as above + `FL.stickerMist`, `white` |
 | `plant_snowdrop.svg` | Snowdrop, full bloom, layered | plant size (132 to 220) (box 200) | `white`, `FL.snowdropEdge`, `FL.snowdropLeaf`, `FL.snowdropLeafVein`, `PetalKit.stem`, `PetalKit.leaf`, `Plant.groundShadow` |
 | `plant_snowdrop_stages.svg` | Snowdrop stages 0 to 4 | as above, per panel | as above |
 | `plant_hellebore.svg` | Hellebore, full bloom, layered | plant size (box 200) | `FL.helleboreSepal`, `FL.helleboreEdge`, `FL.helleboreCentre`, `FL.helleboreStamen`, `FL.helleboreLeaf`, `FL.helleboreVein`, `FL.helleboreStem`, `Plant.groundShadow` |
@@ -189,12 +191,12 @@ New art constants (`FL.*`), with hex values in `build.py`:
 
 | Group | Tokens |
 |---|---|
-| Frosted glass | `iceBody #B7D6E6`, `iceRim #5E93B0`, `iceShade #93BCD2`, `frostFern #3F7596` |
+| Frosted glass | `iceBody #B7D6E6`, `iceRim #548BAC`, `iceShade #93BCD2`, `frostFern #3F7596` |
 | Lantern red | `lanternBody #B5403A`, `lanternRim #D9665A`, `lanternShade #93302B`, `lanternBand #8A2A25`, `lanternInk #5E211C`, `lanternRed #C8473E`, `glow #F5C858` |
 | Snowflake indigo | `indigoBody #6A70D0`, `indigoRim #7F86D9`, `indigoShade #4A4FAE`, `ice #CFE6F0` |
 | Scene and card | `skyL1 #D3DEEE`, `skyL2 #DFE5F1`, `skyL3 #EAE6F0`, `skyD1 #17233A`, `skyD2 #1E2C46`, `skyD3 #283752`, `hillL #C4D3E4`, `hillD #33425E`, `moon #F6E8B0`, `snow #F4F7FB`, `snowShade #DCE5EF`, `snowDark #9AA7BC`, `snowShadeDark #7D8BA3`, `stringDark #8C7A6B`, `fir #3F6F4A`, `firDark #2E5538`, `post #5E4A3A`, `postDark #3E3128`, `woodLight #D9A066`, `woodEdge #9A5F2A` |
 | Robin | `robinBack #7A6A4E`, `robinWing #5E4E36`, `robinWingEdge #9A8A68`, `robinBreast #E2733A`, `robinGrey #A9B0B8`, `robinBelly #F3EEE6`, `beak #3A2C1E`, `leg #7A5A44`, `stickerFrost #DCEBF2` |
-| Wren | `wrenBody #8A5A34`, `wrenWing #6E4524`, `wrenBar #4E2F17`, `wrenBelly #D8B98E`, `wrenBrow #EBD7B4`, `stickerBark #F1E6D6` |
+| Wren | `wrenBody #8A5A34`, `wrenWing #6E4524`, `wrenBar #4E2F17`, `wrenBelly #D8B98E`, `wrenBrow #EBD7B4`, `stickerMist #E6EAF0` |
 | Snowdrop | `snowdropLeaf #6E9C7E`, `snowdropLeafVein #A9C9B4`, `snowdropEdge #768C91` |
 | Hellebore | `helleboreSepal #C46B8C`, `helleboreEdge #9A4A6B`, `helleboreCentre #C9D86A`, `helleboreStamen #F2E7A0`, `helleboreLeaf #3F6F4A`, `helleboreVein #6E9C7E`, `helleboreStem #5E8A4E` |
 
@@ -205,7 +207,7 @@ to app text placed over the scene or card. Grounds: `appBackground` and `appSurf
 
 | Part | bg light | surface light | bg dark | surface dark | Verdict |
 |---|---|---|---|---|---|
-| Frosted glass rim `#5E93B0` | 3.1 | 3.3 | 4.3 | 3.4 | passes on all four |
+| Frosted glass rim `#548BAC` (deepened from `#5E93B0`) | 3.5 | 3.7 | 3.9 | 3.1 | passes on all four |
 | Lantern red rim `#D9665A` | 3.3 | 3.5 | 4.1 | 3.3 | passes on all four |
 | Snowflake indigo rim `#7F86D9` (unchanged) | 3.1 | 3.3 | 4.4 | 3.4 | passes on all four |
 | Snowflake indigo body `#6A70D0` | 4.1 | 4.3 | 3.3 | 2.6 | rim carries the edge on dark surface |
