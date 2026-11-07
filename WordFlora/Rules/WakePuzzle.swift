@@ -59,8 +59,22 @@ struct WakePuzzle: Equatable, Hashable {
         return a
     }
 
+    /// A one-line meaning clue for each plant name: the word bank's clue for that plant, keyed by the upper-cased name.
+    /// A clue that would give the name away is left out.
+    static func meanings(from entries: [WordEntry]) -> [String: String] {
+        var out = [String: String]()
+        for e in entries where e.kind == .hero {
+            let key = normalized(e.word)
+            guard !key.isEmpty, out[key] == nil, !normalized(e.hint).contains(key) else { continue }
+            out[key] = e.hint
+        }
+        return out
+    }
+
     /// Builds today's puzzle for the plant being woken. Prefers a name other than that plant's own (which is on screen).
-    static func make(plantId: String, day: Int, names: [String], easier: Bool = false) -> WakePuzzle? {
+    /// `meanings` (from `meanings(from:)`) adds a line on what the answer means; the letters and slots do not change.
+    static func make(plantId: String, day: Int, names: [String], easier: Bool = false,
+                     meanings: [String: String] = [:]) -> WakePuzzle? {
         let all = candidates(from: names)
         let others = all.filter { $0.lowercased() != plantId.lowercased() }
         let pool = others.isEmpty ? all : others
@@ -81,7 +95,7 @@ struct WakePuzzle: Equatable, Hashable {
             tiles = Array(tiles.dropFirst()) + [tiles[0]]
         }
         return WakePuzzle(variant: variant, answer: answer, slots: slots, tiles: tiles,
-                          hint: WakeCopy.puzzleHint(letters: letters.count),
+                          hint: WakeCopy.puzzleHint(letters: letters.count, meaning: meanings[answer]),
                           intro: variant == .anagram ? WakeCopy.puzzleIntroAnagram : WakeCopy.puzzleIntroVowels)
     }
 

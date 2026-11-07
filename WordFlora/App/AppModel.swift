@@ -222,8 +222,12 @@ final class AppModel {
         let all = plants()
         let found = all.filter { $0.earnedCount > 0 }.map(\.name)
         let names = WakePuzzle.candidates(from: found).count >= 3 ? found : all.map(\.name)
-        return WakePuzzle.make(plantId: plant.plantId, day: WakePuzzle.day(for: now()), names: names, easier: wakeIsEasier)
+        return WakePuzzle.make(plantId: plant.plantId, day: WakePuzzle.day(for: now()), names: names, easier: wakeIsEasier,
+                               meanings: plantMeanings)
     }
+
+    /// The one-line meaning clue for each plant name, from the word bank's plant clues (wake and gentle weather puzzles).
+    var plantMeanings: [String: String] { WakePuzzle.meanings(from: bank.entries) }
 
     /// Records a wake try. A win wakes the seed; "still dreaming" changes nothing but the next suggestion.
     func finishWake(_ plant: PlantCollectible, challenge: WakeChallenge, woke: Bool) {
