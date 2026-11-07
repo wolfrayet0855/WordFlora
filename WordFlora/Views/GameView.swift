@@ -259,7 +259,8 @@ struct GameView: View {
                     }
                     .accessibilityHint("Asks the on-device assistant to say the clue more simply. Free.")
                     // The 44 point hit area may reach into the card's padding, so the space under the words matches the top.
-                    .padding(.bottom, -12)
+                    // At accessibility sizes the words are taller than 44 points and would cross the card's edge, so no pull.
+                    .padding(.bottom, dynamicTypeSize.isAccessibilitySize ? 0 : -12)
                 }
             }
         }
