@@ -23,7 +23,7 @@ Privacy policy and support URLs (`Links.swift` currently points at placeholder `
 
 ## Known gaps / next
 - Word bank is a 30-entry starter; difficulty bands need calibration once the full bank exists.
-- Badge catalog: all 36 designed badges plus Weathered are built (see "Badge catalogue complete" below).
+- Badge catalog: all 36 designed badges plus Weathered and Quick Bloom are built, 38 in all (see "Release candidate 2" below).
 - No Game Center, spaced-review rounds, camera "Find a plant", voice guessing, Image Playground sticker.
 - Daily Bloom share is text only. Badges share an image card (13 and up only).
 - Prototype-only ideas not built: plant diary, first-bloom ceremony, season/weather mood, welcome-back card.
@@ -334,3 +334,20 @@ Owner wanted Speed bloom in this release; built to the approved design.
 - **UI test flags:** `-uitest-speedbloom` (switch on, levels 1-3 found so the word level is 4), `-uitest-speedbloom-extra`, `-uitest-speedbloom-seconds=N` (short ring), `-uitest-word-level=N` (level of the `-uitest-word` word); with the existing `-uitest-age=`, `-uitest-calm`, `-uitest-quiet`.
 - **Verified:** unit `SpeedBloomRuleTests` 18/18, `SpeedBloomGameTests` 9/9 and `ButterflyAndBadgeTests` 32/32 green in the simulator (iPhone 17, iOS 26.5). Badge art checked by eye beside the existing badges (rendered in a browser).
 - **Built but NOT verified (runs stopped: the shared machine was overloaded):** the full unit suite; every UI test in `SpeedBloomUITests` (Settings toggle shown/hidden by age, Calm, Quiet Garden; "Take your time" after a short ring with no petal cost; Help pause; no ring under 13, in Calm, in Quiet Garden or on a level 1 word; Quick Bloom on the shelf only when on; Apple's accessibility audit of the game with Speed bloom on at the default size and AX XXXL, and of the "Take your time" state). The ring and the "Take your time" pill have not been seen in the simulator. The integrator should run the unit suite and `SpeedBloomUITests` (and `WordFloraUITests`, which share Settings and the game).
+
+## Release candidate 2 (2026-11-06, branch `3-feat-content-and-polish`, integrator)
+**Merged (`--no-ff`, in order):** `03429d4` grown-ups Plus row, plant hello reply, friend of the day, Energy wording (clean); `0788698` daily quest, petal notes, Family Sharing line (SettingsView: "For grown-ups" section title/row kept with the Family Sharing row under it; PlantDetailView: both doc comments and `playPetal` kept; this file: both sections); `a46ec13` badge catalogue and badge sharing (AppModel `roundFinished`: quest step and the new badge counters both kept); `eb1c2b2` Speed bloom and the Quick bloom badge (Badges.json: the 37-badge catalogue plus `quick_bloom` after Weathered, 38 in all; `quickBlooms` step inside the won-round block; BadgesView: one `defs` filter for Sharer (13+) and Quick Bloom (Speed bloom on or earned); `BadgeCatalogueTests` now expects 38); `02248f7` Quiet Garden offer (OnboardingView: the old confirmation dialog removed in favour of the full-screen offer). `project.pbxproj` merged cleanly each time, `plutil -lint` OK, new files in their targets; build-for-testing succeeded after every merge.
+
+**Built after the merges (`cb2cc4a`, tests written first and seen red):**
+- Living Touch (light): `Rules/LivingTouch.swift`; a simultaneous DragGesture on the plant (not the petal row): the plant leans with the finger (up to 8 degrees at half the plant's width; none under Reduce Motion, system or app switch; half in Calm), a soft impact at most every 0.3 s (Haptics switch), and every third sideways stroke (within 4 s of each other) is one hello through the tap hello's path (`hello(plant)`: PlantVoice line, `app.love`, hearts). Seeds keep the tap only. VoiceOver unchanged. UI test `TendingUITests.testTheThirdStrokeOnThePlantSaysHello`.
+- Widget hello: `HelloPlantIntent` beside `WaterPlantIntent`, `WidgetActions.hello` (sets `lastLovedAt`; never wakes a seed), a "Say hello" button beside the water button on the medium widget (side by side, or stacked if it does not fit). The app counts widget hellos and drinks toward the daily quest when it comes to the front (`refreshQuestFromGarden`). `LoveEngine.swift` added to the widget target.
+- Under 13 never loses petals: `AppModel.loveExempt` = Quiet Garden or Calm or under 13; the widget reads the same rule (`SharedDefaults.loveExempt`), the plant page's Life panel uses `app.loveExempt`, and the guide's love page shows the "keeps all it grows" lines for under 13. Rain, seed and wake stay for 13 and up.
+
+**Results (own `WF Integ3 iPhone 17`, iOS 26.5, timeouts on)**
+
+| Run | Result |
+|---|---|
+| Unit (`WordFloraTests`) | 1066 run, 1063 pass; only the 3 known `StoreKitConfigTests` |
+| UI batches | NOT RUN: the first two attempts failed before any test ran (runner "Timed out while loading Accessibility" on a freshly booted simulator under load); a single probe test then passed; the third attempt was stopped by the host for low memory |
+
+**Still unverified:** the whole UI suite after these merges (all 12 batches), the Quiet Garden offer screenshots against `design-preview/quiet-garden/shots`, shots of the Speed bloom ring, the quest card, the badge detail sheet and the grown-ups Plus page, the Release build check, and on device: Living Touch feel and haptic, the widget Say hello button on a real Home Screen.

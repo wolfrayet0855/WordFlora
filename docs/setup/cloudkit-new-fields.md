@@ -41,6 +41,8 @@ SwiftData's CloudKit mirroring stores a model `X` as record type `CD_X` and a pr
 
 SwiftData may store arrays of value types as encoded data (Bytes) instead of a list, depending on the OS version; whatever the development schema shows after step 1 below is the truth, so deploy what it generated rather than creating fields by hand.
 
+Release candidate 2 (2026-11-06): the merged grown-ups row, hello reply, friend of the day, daily quest, petal notes, Family Sharing line, badge catalogue, Speed bloom, Quiet Garden offer, Living Touch and widget hello add no stored model field beyond the three `quest*` fields above. New badge counters live inside `PlayerProfile.badgesJSON` (already synced), the friend of the day is worked out from the weather seed and the day (nothing stored), and the Speed bloom switches and the Quiet Garden choice are device settings (UserDefaults / App Group), not CloudKit.
+
 ## How to deploy (owner)
 
 1. Run a debug build with iCloud sync on, signed into iCloud, on the new build. Open the garden, play a round, open a plant page and the Shed, so a `PlayerProfile` and a `PlantCollectible` record are saved. This makes CloudKit add the fields above to the **Development** schema (see `owner-setup-steps.md`, B8).
