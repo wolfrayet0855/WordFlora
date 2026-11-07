@@ -476,7 +476,7 @@ Own simulator `WF G2b iPhone 17` (iOS 26.5), derived data `dd-g2b`, one xcodebui
 
 **Changed outside the brief (found by the audits)**
 - Butterfly game time bar: the 4 pt bar was its own accessibility element and failed the hit-area audit; it is now one 44 pt element ("Game progress", a percent value) around the same bar, layout unchanged.
-- Settings section headers (and Garden weather's) use `SettingsHeader`: `Color.secondaryText`, subheadline semibold, growing in place, instead of the stock grey, which measured just under 4.5:1 ("nearly passed" / failed in the audit).
+- Settings section headers stay stock. A custom darker header was tried (the stock grey measures "nearly passed" for contrast) and dropped: it made the Family Sharing line's Dynamic Type audit fail on a neighbouring row (`DailyQuestUITests`), which passes on the base commit.
 - Butterfly game navigation bar: solid, pale sky blue in light mode and navy `#1F2A4A` in dark mode. In dark mode the system title is white and sat on the pale day sky (contrast audit fail at AX XXXL dark).
 - `AppModelTendingTests.testGlowLanternBringsNightVisitorsAtAnyHourAndIsUsedUp` looked at one pinned seed; the new move draws changed which seed meets a night friend in 30 s, so it now lights six rounds and checks a night friend came (same assertion).
 - `CelebrationTests` expectation: one play no longer earns Gentle Net. `BadgeCatalogueTests`: `butterflyPlays` joins the retired counters.
@@ -485,7 +485,19 @@ Own simulator `WF G2b iPhone 17` (iOS 26.5), derived data `dd-g2b`, one xcodebui
 - Unit `ButterflyNetTests` (37): pace table and under-13 never Quick wings in any combination; app start pace by age, Easier, Calm, wake, Reduce Motion, VoiceOver, Switch Control; Quick wings and gentle constants and radii; round lengths; spawn speeds by pace; hit geometry (inside / rim / outside, true circle 60 pt in and 70 pt out at r 64 on 390 x 700, swept capsule, scoop, lift tests nothing); gentle never harder than today (1,000 seeded points x 3 screens x 3 tiers, and the model against today's `catchAt`); lag and Reduce Motion; rest point clear of the pill and the edge; turns (tell first, once, no reversal, inside the edges, never with a perch), no turns gentle or Calm; never two resting at once (3 paces x 2 tick sizes x 30 seeds); perch lengths 3 / 2 / 5 s and flying on; landing share 1/3 within 3 points over 3,000+ spawns; landings on a flower; same seed same game; Reduce Motion spawns unchanged; gentle flags (resting yes, flying no, Reduce Motion all, Calm only resting); one hello per sweep and the 0.25 s lift; no grace in Quick wings; nothing after the round; rewards the same in every pace; Gentle Net counting, bronze at ten, wake counts, Quiet Garden no count, catalogue, earned tiers kept; copy; the sweeping-player simulation.
 - UI `ButterflyNetUITests` (11): who sees Easier butterflies and the chip, the scene's pace id for four set-ups, a Quick wings short round to the summary with rewards, Quiet Garden summary with no rewards row, a gentle hello under Reduce Motion that earns Gentle Net (moment and Badges page), audits (all types, contrast and Dynamic Type judged inside the visible scroll area as in BadgeMechanicsUITests) of Settings > Play (default light, AX XXXL dark and light), the Visitors card (default light and dark, AX XXXL dark and light), the game scene (default light, AX XXXL dark) and the summary with a gentle hello (AX XXXL dark), and net screenshots light and dark.
 
-RESULTS_PLACEHOLDER
+**Results** (`WF G2b iPhone 17`, iOS 26.5, erased before each batch)
+
+| Run | Result |
+|---|---|
+| Unit (`WordFloraTests`) | 1154 run, 1154 pass (incl. `ButterflyNetTests` 37) |
+| ButterflyNetUITests | 11 of 14 pass; the 3 Settings > Play audits fail (below) |
+| WordFloraUITests: butterfly round, Visitors page, Calm game, Quiet Garden visitors, Home, Garden, Settings and level map, Garden/Settings/Plus audit | 8/8 |
+| BadgesUITests 4/4, CelebrationUITests 6/6, BadgeMechanicsUITests 5/5, FidelityScreensUITests 7/7, SpeedBloom settings toggle 1/1 | pass |
+| DailyQuestUITests `testGrownUpsSeeTheFamilyLineInSettingsAndOnPlus` | **fails on this branch, passes on the base commit** (below) |
+
+**Open: Settings Dynamic Type audit (needs a decision)**
+- At the default text size the Dynamic Type audit reports "partially unsupported" on the new "Easier butterflies" toggle row, built exactly like the Speed bloom rows above it (stock `Toggle`, `Theme.font(.footnote)` note), which are not reported. Adding the two rows also moves the "Your garden" footnote next to the Family Sharing line, and the family-line audit then reports that footnote the same way; on the base commit it passes. Tried and dropped: darker scaling section headers, text that grows in place, one combined row, scrolling the rows near the top, waiting for a still page. The audit was not loosened. Options: put Easier butterflies in its own section or on the Visitors page, or look at the Form's Dynamic Type behaviour as a whole (WordFloraUITests already skips Dynamic Type for stock Settings rows).
+- The two AX XXXL Settings audits do not find the note after scrolling at that size (test mechanics); the toggle itself was audited at AX XXXL in earlier runs with only an unresolved, unlabelled "text clipped" finding.
 
 **For the owner**
 - Turns in Quick wings: built as specced (one swerve with a 0.4 s tell). Needs the owner playtest; the fallback (drop turns, keep speed + hoop + perch) is one line (`ButterflyPace.turns`) and was not applied.
