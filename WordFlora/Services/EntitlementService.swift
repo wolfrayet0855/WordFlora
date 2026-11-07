@@ -64,6 +64,30 @@ final class EntitlementService {
         return lifetimeProduct
     }
 
+    /// UI tests only (`-uitest-prices`): the local StoreKit file's prices, shown when the store returns nothing, so
+    /// the page can be checked on any simulator. Nothing can be bought from a preview (purchase needs a `Product`).
+    private(set) var previewPrices: [PlusChoice: Decimal]?
+    func debugPreviewPrices(_ p: [PlusChoice: Decimal]) { previewPrices = p }
+
+    /// The price to show for a choice, in the store's own currency.
+    func price(for choice: PlusChoice) -> Decimal? {
+        product(for: choice)?.price ?? previewPrices?[choice]
+    }
+
+    func displayPrice(for choice: PlusChoice) -> String? {
+        if let p = product(for: choice) { return p.displayPrice }
+        return previewPrices?[choice].map { $0.formatted(.currency(code: "USD")) }
+    }
+
+    /// Formats an amount like the store does (used for "about X a month").
+    func formatted(_ amount: Decimal, like choice: PlusChoice) -> String {
+        product(for: choice)?.priceFormatStyle.format(amount) ?? amount.formatted(.currency(code: "USD"))
+    }
+
+    /// The store (or the UI test preview) offers this choice.
+    func offers(_ choice: PlusChoice) -> Bool { displayPrice(for: choice) != nil }
+    var offersAnything: Bool { PlusChoice.allCases.contains(where: offers) }
+
     /// A plan is live once Plus is on; Plus Forever once it is owned (a subscriber already has Plus).
     private func isLive(_ choice: PlusChoice) -> Bool { choice == .lifetime ? state.hasLifetime : state.hasPlus }
 

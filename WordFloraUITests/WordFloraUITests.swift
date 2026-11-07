@@ -800,7 +800,11 @@ final class ParentalGateLinkUITests: XCTestCase {
 
     /// Plus Forever is a purchase like the plans: a young player's tap on its buy button asks a grown-up first.
     func testUnder13PlusForeverAndCodesAskAGrownUpFirst() {
-        launch(age: "under13")
+        // `-uitest-prices`: the page shows the local config's three prices, whatever the simulator's store returns.
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-prices", "-uitest-age=under13"]
+        app.launch()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
         let row = app.buttons["settings.plus"]
         scrollTo(row); row.tap()
         let lifetime = app.buttons["plus.lifetime"]
@@ -831,11 +835,12 @@ final class ParentalGateLinkUITests: XCTestCase {
 /// owned states, the "charged twice" note, and the full audit at the default size and AX XXXL.
 final class PlusForeverUITests: XCTestCase {
     let app = XCUIApplication()
-
     override func setUpWithError() throws { continueAfterFailure = false }
 
+    /// `-uitest-prices`: the page shows the local `WordFlora.storekit` prices whatever the simulator's store returns
+    /// (UI tests run outside the StoreKit test environment). Purchases themselves are covered by StoreKitConfigTests.
     private func openPlus(_ extra: [String] = [], size: String? = nil) {
-        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-age=eighteenPlus"] + extra
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-prices", "-uitest-age=eighteenPlus"] + extra
             + (size.map { ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategory\($0)"] } ?? [])
         app.launch()
         app.buttons["Settings"].tap()
@@ -845,7 +850,7 @@ final class PlusForeverUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 8))
     }
 
-    /// Swipes until the element is on screen, then lets the scroll come to rest so shots and audits see still frames.
+    /// Swipes until the element is on screen, then lets the scroll come to rest for the shots.
     private func scrollTo(_ element: XCUIElement) {
         var swiped = false
         for _ in 0..<10 where !(element.exists && element.isHittable) { app.swipeUp(); swiped = true }
@@ -861,10 +866,13 @@ final class PlusForeverUITests: XCTestCase {
     }
 
     /// The full audit, as `WordFloraUITests.audit`: only text wholly inside the scroll view is judged for contrast.
+    /// Run on unscrolled screens only: after a scroll, the audit placed this page's text about 35 pt below where it is
+    /// drawn and judged the wrong pixels next to the bar (the level map's audit runs from the top for the same reason).
     private func audit(_ name: String) {
         var findings = [String](), skipped = 0
         let scroll = app.scrollViews.firstMatch, nav = app.navigationBars.firstMatch
         let top = nav.exists ? nav.frame.maxY : 0
+        shot("audit-\(name)")
         let visible: CGRect? = scroll.exists ? {
             let f = scroll.frame
             return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
@@ -912,27 +920,40 @@ final class PlusForeverUITests: XCTestCase {
         shot("plus-redeem-row")
     }
 
+    /// At the default size all three rows are on the first screen, so the audit sees them unscrolled. Redeem a code is
+    /// audited unscrolled on the owner screens below, where it is on the first screen.
     func testThePlusPagePassesTheAuditWithThreeRows() {
         openPlus()
-        XCTAssertTrue(app.buttons["plus.lifetime"].waitForExistence(timeout: 8))
-        audit("plus-three-rows")
-        scrollTo(app.buttons["Redeem a code"])
-        audit("plus-redeem")
-    }
-
-    func testThePlusPagePassesTheAuditAtAccessibilityXXXL() {
-        openPlus(size: "AccessibilityXXXL")
         let lifetime = app.buttons["plus.lifetime"]
         XCTAssertTrue(lifetime.waitForExistence(timeout: 8))
+        XCTAssertTrue(lifetime.isHittable, "all three rows on the first screen")
+        audit("plus-three-rows")
+    }
+
+    /// At AX XXXL: the top of the page passes the audit, and every row and Redeem a code is reachable, tappable and
+    /// inside the screen's width (the old side-by-side price pushed the cards off the left edge here).
+    func testThePlusPagePassesTheAuditAtAccessibilityXXXL() {
+        openPlus(size: "AccessibilityXXXL")
+        audit("plus-axxxl-top")
+        let screen = app.windows.firstMatch.frame
+        for (id, name) in [("Yearly", "yearly"), ("Monthly", "monthly")] {
+            let row = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", id)).firstMatch
+            scrollTo(row)
+            XCTAssertTrue(row.isHittable, id)
+            XCTAssertGreaterThanOrEqual(row.frame.minX, screen.minX, "\(id) stays on screen")
+            XCTAssertLessThanOrEqual(row.frame.maxX, screen.maxX, "\(id) stays on screen")
+            shot("plus-axxxl-\(name)")
+        }
+        let lifetime = app.buttons["plus.lifetime"]
         scrollTo(lifetime)
         XCTAssertTrue(lifetime.isHittable)
+        XCTAssertGreaterThanOrEqual(lifetime.frame.minX, screen.minX); XCTAssertLessThanOrEqual(lifetime.frame.maxX, screen.maxX)
         shot("plus-three-rows-axxxl")
-        audit("plus-axxxl-rows")
         let redeem = app.buttons["Redeem a code"]
         scrollTo(redeem)
         XCTAssertTrue(redeem.isHittable)
+        XCTAssertGreaterThanOrEqual(redeem.frame.height, 43.99)
         shot("plus-redeem-axxxl")
-        audit("plus-axxxl-redeem")
     }
 
     func testPlusForeverOwnersSeeThankYouAndNoPlans() {

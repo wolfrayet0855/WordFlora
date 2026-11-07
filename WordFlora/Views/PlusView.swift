@@ -68,47 +68,47 @@ struct PlusView: View {
     // MARK: Plans
 
     @ViewBuilder private var plans: some View {
-        if store.loadFailed && store.products.isEmpty {
+        if store.loadFailed && !store.offersAnything {
             Card { Text("We couldn't load the plans. Check your connection and try again.").font(Theme.font(.callout)) }
             Button("Try again") { Task { await store.loadProducts() } }.buttonStyle(SecondaryButtonStyle())
         } else {
-            let yearlyPrice = store.products[.yearly].map { ($0.price as NSDecimalNumber).doubleValue } ?? 0
-            let monthlyPrice = store.products[.monthly].map { ($0.price as NSDecimalNumber).doubleValue } ?? 0
+            let yearlyPrice = store.price(for: .yearly).map { ($0 as NSDecimalNumber).doubleValue } ?? 0
+            let monthlyPrice = store.price(for: .monthly).map { ($0 as NSDecimalNumber).doubleValue } ?? 0
             VStack(spacing: 12) {
-                planCard(.yearly, extra: yearlyPrice > 0 ? "About \(perMonthText(store.products[.yearly], yearlyPrice)) a month · save \(PaywallMath.savingsPercent(yearly: yearlyPrice, monthly: monthlyPrice))%" : nil)
+                planCard(.yearly, extra: yearlyPrice > 0 ? "About \(perMonthText(yearlyPrice)) a month · save \(PaywallMath.savingsPercent(yearly: yearlyPrice, monthly: monthlyPrice))%" : nil)
                 planCard(.monthly, extra: nil)
                 // While the store loads every row waits (as the plans do); once it answers without Plus Forever, no row.
-                if store.lifetimeProduct != nil || store.products.isEmpty { lifetimeCard }
+                if store.offers(.lifetime) || !store.offersAnything { lifetimeCard }
             }
-            let price = store.product(for: selected)?.displayPrice ?? ""
+            let price = store.displayPrice(for: selected) ?? ""
             let copy = PaywallCopy.make(choice: selected, displayPrice: price, trialEligible: store.trialEligible && selected == .yearly)
             Button { ask(then: .purchase) } label: { Text(busy ? "One moment…" : copy.cta) }
-                .buttonStyle(PrimaryButtonStyle()).disabled(busy || store.product(for: selected) == nil)
+                .buttonStyle(PrimaryButtonStyle()).disabled(busy || !store.offers(selected))
             Text(copy.finePrint).font(Theme.font(.caption)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText)
             if let message { Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText).multilineTextAlignment(.center) }
         }
     }
 
     /// Formatted in the store's own currency, never a hard-coded "$".
-    private func perMonthText(_ product: Product?, _ yearly: Double) -> String {
-        let perMonth = Decimal(PaywallMath.perMonth(yearly: yearly))
-        return product?.priceFormatStyle.format(perMonth) ?? String(format: "%.2f", PaywallMath.perMonth(yearly: yearly))
+    private func perMonthText(_ yearly: Double) -> String {
+        store.formatted(Decimal(PaywallMath.perMonth(yearly: yearly)), like: .yearly)
     }
 
     private func planCard(_ plan: PlusPlan, extra: String?) -> some View {
-        let product = store.products[plan]
-        let copy = PaywallCopy.make(plan: plan, displayPrice: product?.displayPrice ?? "", trialEligible: false)
+        let choice: PlusChoice = plan == .yearly ? .yearly : .monthly
+        let shown = store.displayPrice(for: choice)
+        let copy = PaywallCopy.make(plan: plan, displayPrice: shown ?? "", trialEligible: false)
         var lines = [(String, Color)]()
         if plan == .yearly && store.trialEligible { lines.append(("3 days free to start", .successText)) }
         if let extra { lines.append((extra, .secondaryText)) }
-        return choiceCard(plan == .yearly ? .yearly : .monthly, title: copy.headline, badge: plan == .yearly ? copy.detail : nil,
-                          lines: lines, price: product.map { $0.displayPrice + (plan == .yearly ? "/yr" : "/mo") } ?? "")
+        return choiceCard(choice, title: copy.headline, badge: plan == .yearly ? copy.detail : nil,
+                          lines: lines, price: shown.map { $0 + (plan == .yearly ? "/yr" : "/mo") } ?? "")
     }
 
     /// Plus Forever: the third choice, under the two plans. Same card and type sizes, no badge, never the default.
     private var lifetimeCard: some View {
         choiceCard(.lifetime, title: PlusPlan.lifetimeName, badge: nil,
-                   lines: [(PaywallCopy.lifetimeLine, .secondaryText)], price: store.lifetimeProduct?.displayPrice ?? "")
+                   lines: [(PaywallCopy.lifetimeLine, .secondaryText)], price: store.displayPrice(for: .lifetime) ?? "")
             .accessibilityIdentifier("plus.lifetime")
     }
 
@@ -124,7 +124,7 @@ struct PlusView: View {
                         if let badge {
                             Text(badge).font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                                 .fixedSize(horizontal: false, vertical: true)
-                                .padding(.horizontal, 8).padding(.vertical, 3).background(Color.appAccent.opacity(0.3), in: Capsule())
+                                .padding(.horizontal, 8).padding(.vertical, 3).background(Color.appAccent.opacity(0.3), in: RoundedRectangle(cornerRadius: 10))
                         }
                     }
                     ForEach(lines, id: \.0) { line in
@@ -211,7 +211,6 @@ struct PlusView: View {
 }
 
 extension ParentalGate.Challenge: Identifiable { var id: String { question } }
-
 /// The grown-up question, used before a purchase and before any link that leaves the app.
 struct ParentalGateSheet: View {
     let challenge: ParentalGate.Challenge

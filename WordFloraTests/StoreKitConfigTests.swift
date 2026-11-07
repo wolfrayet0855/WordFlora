@@ -91,6 +91,15 @@ final class StoreKitConfigTests: XCTestCase {
         XCTAssertNil(lifetime.subscription)
     }
 
+    /// The UI tests' price preview (`-uitest-prices`) shows exactly the local config's prices.
+    func testTheUITestPricePreviewMatchesTheLocalConfig() async throws {
+        let products = try await Product.products(for: PlusPlan.plusProductIDs)
+        for choice in PlusChoice.allCases {
+            let product = try XCTUnwrap(products.first { $0.id == choice.productID }, choice.productID)
+            XCTAssertEqual(UITestPrices.local[choice], product.price, choice.productID)
+        }
+    }
+
     func testBuyingPlusForeverTurnsOnPlus() async throws {
         let svc = EntitlementService(startListening: false)
         await svc.loadProducts()
