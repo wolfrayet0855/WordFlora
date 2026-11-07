@@ -9,10 +9,10 @@ struct FamilyShareNudgeRow: View {
     var body: some View {
         if FamilyShareNudge.isShown(ageBand: app.settings.ageBand, hasPlus: app.entitlements.state.hasPlus,
                                     quietGarden: app.settings.quietGarden) {
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 6) { line; button }
-                VStack(alignment: .leading, spacing: 2) { line; button }
-            }
+            // One fixed layout: a ViewThatFits that swapped from a row to a stack as the text grew was judged
+            // "Dynamic Type partially unsupported" by the accessibility audit on the Plus screen.
+            VStack(alignment: .leading, spacing: 2) { line; button }
+            .frame(maxWidth: .infinity, alignment: .leading)
             .accessibilityElement(children: .contain)
             .accessibilityIdentifier("familyShare.nudge")
         }
