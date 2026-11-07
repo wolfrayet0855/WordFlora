@@ -11,6 +11,8 @@ final class StoreKitConfigTests: XCTestCase {
     override func setUp() async throws {
         session = try SKTestSession(configurationFileNamed: "WordFlora")      // bundled copy of Config/WordFlora.storekit
         session.disableDialogs = true
+        // Session settings persist in the simulator's store between tests: start every test without Ask to Buy.
+        session.askToBuyEnabled = false
         session.clearTransactions()
     }
 
