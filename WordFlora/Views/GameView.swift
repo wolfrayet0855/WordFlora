@@ -170,7 +170,10 @@ struct GameView: View {
     private var showTakeYourTime: Bool { vm.speedRing?.outcome == .relaxed && vm.phase == .playing && !cardIsModal }
 
     private var takeYourTime: some View {
+        // Its own width: the flower's overlay offers less than the pill needs, and the text wrapped ("Take your / time"),
+        // which the audit reported as clipped.
         Label(SpeedBloomCopy.takeYourTime, systemImage: "leaf.fill")
+            .fixedSize()
             .font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
             .padding(.vertical, 6).padding(.horizontal, 14)
             .background(Color.tileGardenFill, in: Capsule())
