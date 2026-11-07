@@ -263,19 +263,14 @@ final class ButterflyNetUITests: XCTestCase {
         do {
             launch(["-uitest-age=thirteenPlus"], size: size, dark: dark)
             openSettings()
-            let toggle = app.switches["settings.easierButterflies"], note = element("settings.easierButterfliesNote")
+            let row = element("settings.easierButterfliesRow"), note = element("settings.easierButterfliesNote")
             scrollTo(note)
-            // The new rows near the top, so they stay on screen while the audit grows the text.
-            // Slow swipes until the toggle row sits in the top third, clear of the bar.
-            let list = app.collectionViews.firstMatch, barBottom = app.navigationBars.firstMatch.frame.maxY
-            for _ in 0..<6 where toggle.exists && toggle.frame.minY > barBottom + 200 { list.swipeUp(velocity: .slow) }
-            for _ in 0..<3 where !toggle.exists || toggle.frame.minY < barBottom + 16 { list.swipeDown(velocity: .slow) }
             waitUntilStill(note)
             let name = "net-settings\(size == nil ? "" : "-ax5")\(dark ? "-dark" : "")"
             shot(name)
             // As DailyQuestUITests audits the Family Sharing row: only findings on the new rows fail here; the rest of
             // Settings has its own audit in WordFloraUITests.
-            auditWithin(name, targets: [toggle, note])
+            auditWithin(name, targets: [row, note])
         }
     }
 
