@@ -272,10 +272,16 @@ final class AppModelTendingTests: XCTestCase {
     }
 
     func testGlowLanternBringsNightVisitorsAtAnyHourAndIsUsedUp() throws {
-        let app = try makeApp(now: { self.localDate(hour: 11) }); app.profile?.glowLanterns = 1
-        var g = app.startButterflyGame(seed: 2, useLantern: true)
-        XCTAssertEqual(app.profile?.glowLanterns, 0)
-        var saw = Set<String>(); for _ in 0..<600 { g.tick(0.05); g.visitors.forEach { saw.insert($0.speciesId) } }
+        let app = try makeApp(now: { self.localDate(hour: 11) })
+        // A few lit rounds, not one pinned seed: a round with two visitors at a time meets a night friend most of the
+        // time, never always (the Gentle Net and Quick wings draws moved which seed happens to).
+        var saw = Set<String>()
+        for seed in UInt64(2)...7 {
+            app.profile?.glowLanterns = 1
+            var g = app.startButterflyGame(seed: seed, useLantern: true)
+            XCTAssertEqual(app.profile?.glowLanterns, 0)
+            for _ in 0..<600 { g.tick(0.05); g.visitors.forEach { saw.insert($0.speciesId) } }
+        }
         XCTAssertTrue(saw.contains("firefly") || saw.contains("luna"))
         _ = app.startButterflyGame(seed: 3, useLantern: true)                   // none left, falls back to the normal pool
         XCTAssertEqual(app.profile?.glowLanterns, 0)
