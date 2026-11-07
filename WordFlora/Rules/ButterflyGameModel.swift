@@ -273,7 +273,7 @@ struct ButterflyGameModel {
         var hellos = [Hello]()
         for index in chosen.map(\.index).sorted(by: >) { hellos.append(sayHello(at: index)) }
         if pace.oneHelloPerSweep { helloReadyAt = elapsed + pace.helloPause }
-        return hellos.reversed()
+        return Array(hellos.reversed())
     }
 
     private mutating func sayHello(at index: Int) -> Hello {

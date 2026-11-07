@@ -60,7 +60,7 @@ enum ButterflyPace: String, CaseIterable {
     var oneHelloPerSweep: Bool { self == .quickWings }
 
     /// The hoop radius in points (the drawn hoop is exactly this): 48 / 64 / 80, or 40 / 56 / 72 in Quick wings.
-    func netRadius(tier: Int) -> Double { ToolEngine.netCatchRadius(tier: tier, pace: self) }
+    func netRadius(tier: Int) -> Double { ToolEngine.netCatchRadius(tier: tier, quickWings: self == .quickWings) }
 }
 
 /// Hit tests for the net, in scene points (spec section 2). The hoop is a true circle; a drag is tested as the capsule

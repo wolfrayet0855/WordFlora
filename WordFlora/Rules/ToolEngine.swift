@@ -84,8 +84,8 @@ enum ToolEngine {
     private static func index(_ tier: Int, _ count: Int) -> Int { min(count, max(1, tier)) - 1 }
 
     static func netCatchRadius(tier: Int) -> Double { netCatchPoints[index(tier, netCatchPoints.count)] }
-    static func netCatchRadius(tier: Int, pace: ButterflyPace) -> Double {
-        pace == .quickWings ? netCatchPointsQuick[index(tier, netCatchPointsQuick.count)] : netCatchRadius(tier: tier)
+    static func netCatchRadius(tier: Int, quickWings: Bool) -> Double {
+        quickWings ? netCatchPointsQuick[index(tier, netCatchPointsQuick.count)] : netCatchRadius(tier: tier)
     }
     static func trickleHours(forMister tier: Int) -> Double { misterTrickleHours[index(tier, misterTrickleHours.count)] }
     static func trickleCap(forMister tier: Int) -> Int { misterTrickleCaps[index(tier, misterTrickleCaps.count)] }

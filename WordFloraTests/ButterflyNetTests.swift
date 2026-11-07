@@ -522,7 +522,7 @@ final class ButterflyNetTests: XCTestCase {
         let alsoAvoid = ["save", "rescue", "danger", "warning", "alert", "locked", "timer", "countdown", "caught", "capture", "jar"]
         for line in lines {
             XCTAssertEqual(CopySafety.check(line), [], line)
-            XCTAssertEqual(SpeedBloom.pressureWords(in: line), [], line)
+            XCTAssertEqual(SpeedBloomCopy.pressureWords(in: line), [], line)
             for w in alsoAvoid { XCTAssertFalse(line.lowercased().contains(w), "\(line) has \(w)") }
         }
         for line in VisitorsCopy.all + GentleNetCopy.all { XCTAssertEqual(CopySafety.check(line), [], line) }

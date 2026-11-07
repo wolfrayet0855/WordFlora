@@ -324,7 +324,7 @@ struct ButterflyView: View {
 
     private func placeRest() {
         guard let g = game, sceneSize.width > 0 else { return }
-        let rest = ButterflyNet.restPoint(scene: sceneSize, radius: radius(g), pillTop: pillTop.map(Double.init), lastLift: net.lastLift)
+        let rest = ButterflyNet.restPoint(scene: sceneSize, radius: radius(g), pillTop: pillTop.map { Double($0) }, lastLift: net.lastLift)
         let first = net.restPoint == .zero
         net.restPoint = rest
         if first || reduceMotion { if !net.isDown { net.position = rest; net.target = rest } }
@@ -351,10 +351,9 @@ struct ButterflyView: View {
     /// Switch Control's "Swing the net": a hello to the visitor nearest the net's rest point.
     private func swingToNearest() {
         guard let g = game, sceneSize.width > 0 else { return }
-        let rest = net.restPoint
-        let nearest = g.visitors.min { a, b in
-            hypot(a.x * sceneSize.width - rest.x, a.y * sceneSize.height - rest.y) < hypot(b.x * sceneSize.width - rest.x, b.y * sceneSize.height - rest.y)
-        }
+        let rx = Double(net.restPoint.x), ry = Double(net.restPoint.y), w = Double(sceneSize.width), h = Double(sceneSize.height)
+        func away(_ v: ButterflyGameModel.Visitor) -> Double { hypot(v.x * w - rx, v.y * h - ry) }
+        let nearest = g.visitors.min { away($0) < away($1) }
         if let nearest { helloTo(nearest.id) }
     }
 
