@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="700" viewBox="0 0 820 700" font-family="ui-rounded, 'SF Pro Rounded', Nunito, system-ui, sans-serif">
+  <title>WordFlora rewarded prompts R1, R2, R3 with free variants, light and dark</title>
+  <desc>Each prompt is one full-width secondary-style button (never the primary style, so it never competes with Play or One more). Ad version: play-rectangle icon and the words "short video" in the label itself. Free version (Plus, under 13, unknown age): a leaf or sun icon, no video wording; Plus adds "Included with Plus"; children see no Plus words. Text wraps; no line limit.</desc>
+  <g>
+    <rect width="410" height="700" fill="#FAF7F0"/>
+    <text x="20" y="30" font-size="12" font-weight="800" letter-spacing="1" fill="#2C3E2C" fill-opacity="0.58">R1 · TOP OF MY GARDEN, WATER AT 0</text>
+    <rect x="20" y="42" width="370" height="118" rx="16" fill="#FFFFFF" stroke="#2C3E2C" stroke-opacity="0.12"/>
+    <text x="36" y="72" font-size="15" font-weight="700" fill="#2C3E2C">Your watering can is empty.</text>
+    <rect x="36" y="88" width="338" height="52" rx="14" fill="none" stroke="#2C3E2C" stroke-opacity="0.3" stroke-width="1.5"/>
+    <rect x="52" y="104" width="22" height="18" rx="4" fill="none" stroke="#2C3E2C" stroke-width="1.6"/><path d="M60 108 l7 5 -7 5z" fill="#2C3E2C"/>
+    <text x="84" y="119" font-size="15" font-weight="600" fill="#2C3E2C">Watch a short video for 2 drops</text>
+    <text x="20" y="196" font-size="12" font-weight="800" letter-spacing="1" fill="#2C3E2C" fill-opacity="0.58">R2 · RESTING CARD, BELOW ONE MORE / ENOUGH</text>
+    <rect x="20" y="208" width="370" height="62" rx="16" fill="none" stroke="#2C3E2C" stroke-opacity="0.12"/>
+    <rect x="36" y="230" width="22" height="18" rx="4" fill="none" stroke="#2C3E2C" stroke-width="1.6"/><path d="M44 234 l7 5 -7 5z" fill="#2C3E2C"/>
+    <text x="70" y="236" font-size="15" font-weight="600" fill="#2C3E2C">Ask the garden for a hint</text>
+    <text x="70" y="256" font-size="13" fill="#2C3E2C" fill-opacity="0.6">Short video · a whisper for your next word</text>
+    <text x="20" y="306" font-size="12" font-weight="800" letter-spacing="1" fill="#2C3E2C" fill-opacity="0.58">R3 · WAKE SHEET, AFTER ONE "STILL DREAMING"</text>
+    <rect x="20" y="318" width="370" height="62" rx="16" fill="none" stroke="#2C3E2C" stroke-opacity="0.12"/>
+    <rect x="36" y="340" width="22" height="18" rx="4" fill="none" stroke="#2C3E2C" stroke-width="1.6"/><path d="M44 344 l7 5 -7 5z" fill="#2C3E2C"/>
+    <text x="70" y="346" font-size="15" font-weight="600" fill="#2C3E2C">Wake with a short video</text>
+    <text x="70" y="366" font-size="13" fill="#2C3E2C" fill-opacity="0.6">The two challenges stay free</text>
+    <text x="20" y="420" font-size="12" font-weight="800" letter-spacing="1" fill="#2C3E2C" fill-opacity="0.58">FREE VARIANTS (PLUS · UNDER 13 · UNKNOWN AGE)</text>
+    <rect x="20" y="432" width="370" height="62" rx="16" fill="none" stroke="#2C3E2C" stroke-opacity="0.12"/>
+    <path d="M47 470 c-10 -2 -12 -14 -2 -24 c10 10 8 22 2 24z" fill="#4CAF50"/>
+    <text x="70" y="458" font-size="15" font-weight="600" fill="#2C3E2C">Fill from the rain barrel</text>
+    <text x="70" y="478" font-size="13" fill="#2C3E2C" fill-opacity="0.6">Included with Plus (children: no caption)</text>
+    <rect x="20" y="504" width="370" height="62" rx="16" fill="none" stroke="#2C3E2C" stroke-opacity="0.12"/>
+    <path d="M47 542 c-10 -2 -12 -14 -2 -24 c10 10 8 22 2 24z" fill="#4CAF50"/>
+    <text x="70" y="530" font-size="15" font-weight="600" fill="#2C3E2C">Ask the garden for a hint</text>
+    <text x="70" y="550" font-size="13" fill="#2C3E2C" fill-opacity="0.6">A whisper for your next word</text>
+    <rect x="20" y="576" width="370" height="62" rx="16" fill="none" stroke="#2C3E2C" stroke-opacity="0.12"/>
+    <circle cx="47" cy="607" r="9" fill="#E8A838"/>
+    <text x="70" y="602" font-size="15" font-weight="600" fill="#2C3E2C">Wake gently</text>
+    <text x="70" y="622" font-size="13" fill="#2C3E2C" fill-opacity="0.6">Once a day, after one try</text>
+    <text x="205" y="672" font-size="11" fill="#2C3E2C" fill-opacity="0.55" text-anchor="middle">Calm mode: same rows, no shimmer, no sound</text>
+  </g>
+  <g transform="translate(410,0)">
+    <rect width="410" height="700" fill="#1A2E1A"/>
+    <text x="20" y="30" font-size="12" font-weight="800" letter-spacing="1" fill="#D4EDD4" fill-opacity="0.58">R1 · TOP OF MY GARDEN, WATER AT 0</text>
+    <rect x="20" y="42" width="370" height="118" rx="16" fill="#2C3E2C" stroke="#D4EDD4" stroke-opacity="0.14"/>
+    <text x="36" y="72" font-size="15" font-weight="700" fill="#D4EDD4">Your watering can is empty.</text>
+    <rect x="36" y="88" width="338" height="52" rx="14" fill="none" stroke="#D4EDD4" stroke-opacity="0.3" stroke-width="1.5"/>
+    <rect x="52" y="104" width="22" height="18" rx="4" fill="none" stroke="#D4EDD4" stroke-width="1.6"/><path d="M60 108 l7 5 -7 5z" fill="#D4EDD4"/>
+    <text x="84" y="119" font-size="15" font-weight="600" fill="#D4EDD4">Watch a short video for 2 drops</text>
+    <text x="20" y="196" font-size="12" font-weight="800" letter-spacing="1" fill="#D4EDD4" fill-opacity="0.58">R2 · RESTING CARD, BELOW ONE MORE / ENOUGH</text>
+    <rect x="20" y="208" width="370" height="62" rx="16" fill="none" stroke="#D4EDD4" stroke-opacity="0.14"/>
+    <rect x="36" y="230" width="22" height="18" rx="4" fill="none" stroke="#D4EDD4" stroke-width="1.6"/><path d="M44 234 l7 5 -7 5z" fill="#D4EDD4"/>
+    <text x="70" y="236" font-size="15" font-weight="600" fill="#D4EDD4">Ask the garden for a hint</text>
+    <text x="70" y="256" font-size="13" fill="#D4EDD4" fill-opacity="0.6">Short video · a whisper for your next word</text>
+    <text x="20" y="306" font-size="12" font-weight="800" letter-spacing="1" fill="#D4EDD4" fill-opacity="0.58">R3 · WAKE SHEET, AFTER ONE "STILL DREAMING"</text>
+    <rect x="20" y="318" width="370" height="62" rx="16" fill="none" stroke="#D4EDD4" stroke-opacity="0.14"/>
+    <rect x="36" y="340" width="22" height="18" rx="4" fill="none" stroke="#D4EDD4" stroke-width="1.6"/><path d="M44 344 l7 5 -7 5z" fill="#D4EDD4"/>
+    <text x="70" y="346" font-size="15" font-weight="600" fill="#D4EDD4">Wake with a short video</text>
+    <text x="70" y="366" font-size="13" fill="#D4EDD4" fill-opacity="0.6">The two challenges stay free</text>
+    <text x="20" y="420" font-size="12" font-weight="800" letter-spacing="1" fill="#D4EDD4" fill-opacity="0.58">FREE VARIANTS (PLUS · UNDER 13 · UNKNOWN AGE)</text>
+    <rect x="20" y="432" width="370" height="62" rx="16" fill="none" stroke="#D4EDD4" stroke-opacity="0.14"/>
+    <path d="M47 470 c-10 -2 -12 -14 -2 -24 c10 10 8 22 2 24z" fill="#66BB6A"/>
+    <text x="70" y="458" font-size="15" font-weight="600" fill="#D4EDD4">Fill from the rain barrel</text>
+    <text x="70" y="478" font-size="13" fill="#D4EDD4" fill-opacity="0.6">Included with Plus (children: no caption)</text>
+    <rect x="20" y="504" width="370" height="62" rx="16" fill="none" stroke="#D4EDD4" stroke-opacity="0.14"/>
+    <path d="M47 542 c-10 -2 -12 -14 -2 -24 c10 10 8 22 2 24z" fill="#66BB6A"/>
+    <text x="70" y="530" font-size="15" font-weight="600" fill="#D4EDD4">Ask the garden for a hint</text>
+    <text x="70" y="550" font-size="13" fill="#D4EDD4" fill-opacity="0.6">A whisper for your next word</text>
+    <rect x="20" y="576" width="370" height="62" rx="16" fill="none" stroke="#D4EDD4" stroke-opacity="0.14"/>
+    <circle cx="47" cy="607" r="9" fill="#F0C060"/>
+    <text x="70" y="602" font-size="15" font-weight="600" fill="#D4EDD4">Wake gently</text>
+    <text x="70" y="622" font-size="13" fill="#D4EDD4" fill-opacity="0.6">Once a day, after one try</text>
+    <text x="205" y="672" font-size="11" fill="#D4EDD4" fill-opacity="0.55" text-anchor="middle">Calm mode: same rows, no shimmer, no sound</text>
+  </g>
+</svg>

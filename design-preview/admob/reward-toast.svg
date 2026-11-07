@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="360" viewBox="0 0 820 360" font-family="ui-rounded, 'SF Pro Rounded', Nunito, system-ui, sans-serif">
+  <title>WordFlora reward toasts, light and dark</title>
+  <desc>Bottom toast above the safe area and above any banner, full width minus 20 pt gutters, wraps at large text. Fades in 0.25 s (no rise under Reduce Motion or Calm), stays 3 s (6 s with VoiceOver on, and tap to close), posts the same text as a VoiceOver announcement. No confetti, no sound in Calm; the usual soft chime otherwise. The same toast is used for the free (Plus, child) paths.</desc>
+  <g>
+    <rect width="410" height="360" fill="#FAF7F0"/>
+    <rect x="20" y="30" width="370" height="64" rx="20" fill="#FFFFFF" stroke="#2C3E2C" stroke-opacity="0.12"/>
+    <path d="M54 46 c-9 12 -13 18 -13 24 a13 13 0 0 0 26 0 c0 -6 -4 -12 -13 -24z" fill="#4FA3D9"/>
+    <text x="80" y="68" font-size="16" font-weight="700" fill="#2C3E2C">2 drops are in your can</text>
+    <rect x="20" y="130" width="370" height="64" rx="20" fill="#FFFFFF" stroke="#2C3E2C" stroke-opacity="0.12"/>
+    <path d="M52 176 c-12 -3 -15 -18 -3 -30 c12 12 10 27 3 30z" fill="#4CAF50"/>
+    <text x="80" y="158" font-size="16" font-weight="700" fill="#2C3E2C">A whisper is waiting</text>
+    <text x="80" y="178" font-size="13" fill="#2C3E2C" fill-opacity="0.6">Tap Help in your next word</text>
+    <rect x="20" y="230" width="370" height="64" rx="20" fill="#FFFFFF" stroke="#2C3E2C" stroke-opacity="0.12"/>
+    <circle cx="52" cy="262" r="11" fill="#E8A838"/>
+    <text x="80" y="268" font-size="16" font-weight="700" fill="#2C3E2C">Daisy is awake</text>
+    <text x="205" y="330" font-size="11" fill="#2C3E2C" fill-opacity="0.55" text-anchor="middle">No "Ad" label on the toast: it reports the reward, not an ad</text>
+  </g>
+  <g transform="translate(410,0)">
+    <rect width="410" height="360" fill="#1A2E1A"/>
+    <rect x="20" y="30" width="370" height="64" rx="20" fill="#2C3E2C" stroke="#D4EDD4" stroke-opacity="0.14"/>
+    <path d="M54 46 c-9 12 -13 18 -13 24 a13 13 0 0 0 26 0 c0 -6 -4 -12 -13 -24z" fill="#6BB8E8"/>
+    <text x="80" y="68" font-size="16" font-weight="700" fill="#D4EDD4">2 drops are in your can</text>
+    <rect x="20" y="130" width="370" height="64" rx="20" fill="#2C3E2C" stroke="#D4EDD4" stroke-opacity="0.14"/>
+    <path d="M52 176 c-12 -3 -15 -18 -3 -30 c12 12 10 27 3 30z" fill="#66BB6A"/>
+    <text x="80" y="158" font-size="16" font-weight="700" fill="#D4EDD4">A whisper is waiting</text>
+    <text x="80" y="178" font-size="13" fill="#D4EDD4" fill-opacity="0.6">Tap Help in your next word</text>
+    <rect x="20" y="230" width="370" height="64" rx="20" fill="#2C3E2C" stroke="#D4EDD4" stroke-opacity="0.14"/>
+    <circle cx="52" cy="262" r="11" fill="#F0C060"/>
+    <text x="80" y="268" font-size="16" font-weight="700" fill="#D4EDD4">Daisy is awake</text>
+    <text x="205" y="330" font-size="11" fill="#D4EDD4" fill-opacity="0.55" text-anchor="middle">No "Ad" label on the toast: it reports the reward, not an ad</text>
+  </g>
+</svg>

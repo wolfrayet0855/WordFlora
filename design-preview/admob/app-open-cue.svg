@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="720" viewBox="0 0 820 720" font-family="ui-rounded, 'SF Pro Rounded', Nunito, system-ui, sans-serif">
+  <title>WordFlora app-open cue, light and dark</title>
+  <desc>Full-screen calm cue shown on return after at least 4 hours, before the app-open ad and covering the app content. Still pot and sprout (no motion, so Reduce Motion needs no variant), heading, the Ad chip with the line "A short ad, then your garden", a static three-dot wait mark, and a full-width "Skip to my garden" button. It lifts after at most 2.5 seconds if no ad loaded. VoiceOver: modal, reads heading then the ad line, focus can reach Skip at once.</desc>
+  <g>
+    <rect width="410" height="720" fill="#FAF7F0"/>
+    <!-- pot + sprout -->
+    <path d="M165 300 h80 l-10 70 h-60z" fill="#C97B4A"/>
+    <rect x="158" y="290" width="94" height="16" rx="5" fill="#B5683A"/>
+    <path d="M205 290 v-60" stroke="#4CAF50" stroke-width="5" stroke-linecap="round"/>
+    <path d="M205 250 c-30 -6 -40 -30 -38 -40 c22 0 38 18 38 40z" fill="#4CAF50"/>
+    <path d="M205 238 c28 -6 38 -28 36 -38 c-22 0 -36 16 -36 38z" fill="#66BB6A"/>
+    <text x="205" y="430" font-size="26" font-weight="800" fill="#2C3E2C" text-anchor="middle">Welcome back</text>
+    <text x="205" y="462" font-size="17" fill="#2C3E2C" fill-opacity="0.7" text-anchor="middle">to your garden</text>
+    <rect x="98" y="492" width="32" height="22" rx="5" fill="#2C3E2C"/>
+    <text x="114" y="508" font-size="13" font-weight="800" fill="#FAF7F0" text-anchor="middle">Ad</text>
+    <text x="140" y="508" font-size="15" fill="#2C3E2C">A short ad, then your garden</text>
+    <circle cx="190" cy="548" r="4" fill="#2C3E2C" fill-opacity="0.35"/>
+    <circle cx="205" cy="548" r="4" fill="#2C3E2C" fill-opacity="0.35"/>
+    <circle cx="220" cy="548" r="4" fill="#2C3E2C" fill-opacity="0.35"/>
+    <rect x="24" y="620" width="362" height="52" rx="16" fill="none" stroke="#2C3E2C" stroke-opacity="0.3" stroke-width="1.5"/>
+    <text x="205" y="652" font-size="17" font-weight="700" fill="#2C3E2C" text-anchor="middle">Skip to my garden</text>
+  </g>
+  <g transform="translate(410,0)">
+    <rect width="410" height="720" fill="#1A2E1A"/>
+    <path d="M165 300 h80 l-10 70 h-60z" fill="#9C5E38"/>
+    <rect x="158" y="290" width="94" height="16" rx="5" fill="#86502F"/>
+    <path d="M205 290 v-60" stroke="#66BB6A" stroke-width="5" stroke-linecap="round"/>
+    <path d="M205 250 c-30 -6 -40 -30 -38 -40 c22 0 38 18 38 40z" fill="#66BB6A"/>
+    <path d="M205 238 c28 -6 38 -28 36 -38 c-22 0 -36 16 -36 38z" fill="#81C784"/>
+    <text x="205" y="430" font-size="26" font-weight="800" fill="#D4EDD4" text-anchor="middle">Welcome back</text>
+    <text x="205" y="462" font-size="17" fill="#D4EDD4" fill-opacity="0.7" text-anchor="middle">to your garden</text>
+    <rect x="98" y="492" width="32" height="22" rx="5" fill="#D4EDD4"/>
+    <text x="114" y="508" font-size="13" font-weight="800" fill="#1A2E1A" text-anchor="middle">Ad</text>
+    <text x="140" y="508" font-size="15" fill="#D4EDD4">A short ad, then your garden</text>
+    <circle cx="190" cy="548" r="4" fill="#D4EDD4" fill-opacity="0.35"/>
+    <circle cx="205" cy="548" r="4" fill="#D4EDD4" fill-opacity="0.35"/>
+    <circle cx="220" cy="548" r="4" fill="#D4EDD4" fill-opacity="0.35"/>
+    <rect x="24" y="620" width="362" height="52" rx="16" fill="none" stroke="#D4EDD4" stroke-opacity="0.3" stroke-width="1.5"/>
+    <text x="205" y="652" font-size="17" font-weight="700" fill="#D4EDD4" text-anchor="middle">Skip to my garden</text>
+  </g>
+</svg>
