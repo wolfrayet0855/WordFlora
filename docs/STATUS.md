@@ -476,7 +476,8 @@ Own simulator `WF G2b iPhone 17` (iOS 26.5), derived data `dd-g2b`, one xcodebui
 
 **Changed outside the brief (found by the audits)**
 - Butterfly game time bar: the 4 pt bar was its own accessibility element and failed the hit-area audit; it is now one 44 pt element ("Game progress", a percent value) around the same bar, layout unchanged.
-- Settings section headers (and Garden weather's) use `Color.secondaryText` instead of the stock grey, which measured just under 4.5:1 ("nearly passed" / failed in the audit).
+- Settings section headers (and Garden weather's) use `SettingsHeader`: `Color.secondaryText`, subheadline semibold, growing in place, instead of the stock grey, which measured just under 4.5:1 ("nearly passed" / failed in the audit).
+- Butterfly game navigation bar: solid, pale sky blue in light mode and navy `#1F2A4A` in dark mode. In dark mode the system title is white and sat on the pale day sky (contrast audit fail at AX XXXL dark).
 - `AppModelTendingTests.testGlowLanternBringsNightVisitorsAtAnyHourAndIsUsedUp` looked at one pinned seed; the new move draws changed which seed meets a night friend in 30 s, so it now lights six rounds and checks a night friend came (same assertion).
 - `CelebrationTests` expectation: one play no longer earns Gentle Net. `BadgeCatalogueTests`: `butterflyPlays` joins the retired counters.
 
