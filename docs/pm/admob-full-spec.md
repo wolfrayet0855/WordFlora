@@ -444,3 +444,12 @@ Builders must apply these before and while building. They override earlier numbe
 - R2 is hidden while the "A short ad may play first" note shows on the resting card (never stack two ad prompts). R2 title: "Watch a short video for a hint". Hide the whisper dot during the Daily Bloom.
 - Section 1.1's cap numbers are stale: the Review rulings numbers above win (pushed 2/session, all full-screen 4/session and 8/day, app-open to next pushed 600 s). Builders update 1.1 to match.
 - Review notes (D8) must say ads begin from session 3 and that under-13/unknown ages never see any.
+
+## Review rulings 3: ad unit ids (lead, 2026-11-07, from docs/pm/admob-ad-ids-review.md)
+Supersedes section 5.2 and 5.3 counts. Existing real units are reused; the owner creates no more units.
+- Garden banner reuses the Home banner unit (no separate Garden unit). Build fallback `ADMOB_BANNER_GARDEN_ID = $(ADMOB_BANNER_ID)` in Config/Ads.xcconfig; runtime chain: Garden -> Home; collapsible -> Garden -> Home; hint and wake -> water rewarded; app open and native: empty id disables that format (never a cross-format fallback).
+- Add Debug test ids to Config/Ads.xcconfig for the five new keys (collapsible banner, hint, wake, app open, native) using Google's published test ids per format; Info.plist and `AdsService.Unit` get the new keys.
+- Release safety: add a build phase that fails a Release build if the local ads file is missing or any Release id equals a Google test id; Garden == Home is allowed.
+- G4a unit tests (5): fallback chain, no cross-format fallback, id shape regex, Debug-only test ids / Release none, format disabled when id empty.
+- Fix spec inconsistencies (six new units -> five existing; one BannerView has one unit so the collapsible handoff swaps views; remove stale "remote config" wording in AdGate.Context and owner-setup C3; C3/C10 unit counts).
+- Owner console checklist (5): confirm formats (Home banner = Banner, collapsible = Banner, app open = App open, native = Native advanced with image+video on, rewarded units = Rewarded not Rewarded interstitial); no app-level child tag; refresh 60 s on Home and off on the collapsible unit; frequency caps and AdMob-only mediation groups.
