@@ -90,6 +90,10 @@ final class DailyQuestUITests: XCTestCase {
         tile.tap()
         let petals = element("petal-notes")
         XCTAssertTrue(petals.waitForExistence(timeout: 5))
+        // The first look at Daisy's fact card earns the bronze Wild Discovery badge; its name card sits over the petal
+        // row for 2.6 s and a tap on it closes the moment, so the taps wait until it has gone.
+        let moment = element("badgeMoment")
+        if moment.waitForExistence(timeout: 4) { XCTAssertTrue(moment.waitForNonExistence(timeout: 10), "the badge moment goes") }
         XCTAssertEqual(petals.label, "Play petal notes")
         XCTAssertTrue(petals.elementType == .button || petals.isHittable)
         petals.tap()
@@ -118,7 +122,7 @@ final class DailyQuestUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Already have Plus on a family phone?"].exists)
         XCTAssertTrue(element("familyShare.restore").exists)
         audit("family-settings", within: line)
-        app.buttons["Remove ads and sync with iCloud"].tap()
+        app.buttons["settings.plus"].tap()
         let onPlus = element("familyShare.nudge")
         XCTAssertTrue(onPlus.waitForExistence(timeout: 5))
         scrollTo(onPlus)
@@ -130,7 +134,8 @@ final class DailyQuestUITests: XCTestCase {
             app.launchArguments = ["-uitest", "-uitest-onboarded"] + extra
             app.launch()
             openSettings()
-            let plusRow = app.buttons["Remove ads and sync with iCloud"]
+            // The row is named by age ("WordFlora Plus" under 13, in the "For grown-ups" section), so it is found by id.
+            let plusRow = app.buttons["settings.plus"]
             scrollTo(plusRow)
             XCTAssertTrue(plusRow.exists, "\(extra)")
             XCTAssertFalse(element("familyShare.nudge").exists, "\(extra)")

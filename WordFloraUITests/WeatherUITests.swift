@@ -321,6 +321,10 @@ final class WeatherUITests: XCTestCase {
         tile.tap()
         let plant = app.buttons["plant-love"]
         XCTAssertTrue(plant.waitForExistence(timeout: 5))
+        // The first look at a found plant's fact card earns the bronze Wild Discovery badge; its moment dims the app
+        // and sits over the plant for 2.6 s, so taps and audits wait until it has gone.
+        let moment = app.descendants(matching: .any)["badgeMoment"].firstMatch
+        if moment.waitForExistence(timeout: 4) { XCTAssertTrue(moment.waitForNonExistence(timeout: 10), "the badge moment goes") }
         return plant
     }
 
