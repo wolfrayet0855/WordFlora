@@ -74,14 +74,15 @@ final class ButterflyNetUITests: XCTestCase {
                               ("-textClipped", .textClipped), ("-dynamicType", .dynamicType)] as [(String, XCUIAccessibilityAuditType)] {
             waitUntilStill(targets[0])
             let frames = targets.map(\.frame)
-            var findings = [String]()
+            var findings = [String](), issues = [XCUIAccessibilityAuditIssue]()
             do {
-                try app.performAccessibilityAudit(for: types) { issue in
-                    guard let e = issue.element, frames.contains(where: { $0.intersects(e.frame) }) else { return true }
-                    findings.append("\(name)\(pass): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(e.label)' \(e.frame)")
-                    return true
-                }
+                // Collected first and judged after the audit, so no element is looked up while it runs.
+                try app.performAccessibilityAudit(for: types) { issue in issues.append(issue); return true }
             } catch { findings.append("\(name)\(pass): audit failed to run: \(error)") }
+            for issue in issues {
+                guard let e = issue.element, e.exists, frames.contains(where: { $0.intersects(e.frame) }) else { continue }
+                findings.append("\(name)\(pass): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(e.label)' \(e.frame)")
+            }
             XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
         }
     }
@@ -265,13 +266,10 @@ final class ButterflyNetUITests: XCTestCase {
             let toggle = app.switches["settings.easierButterflies"], note = element("settings.easierButterfliesNote")
             scrollTo(note)
             // The new rows near the top, so they stay on screen while the audit grows the text.
-            // A slow drag with a hold at the end (no fling): the toggle row's top lands 40 pt under the bar.
-            let barBottom = app.navigationBars.firstMatch.frame.maxY
-            let lift = toggle.frame.minY - (barBottom + 40)
-            if abs(lift) > 10 {
-                let start = app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 30, dy: lift > 0 ? toggle.frame.midY : barBottom + 60))
-                start.press(forDuration: 0.2, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -lift)), withVelocity: .slow, thenHoldForDuration: 0.6)
-            }
+            // Slow swipes until the toggle row sits in the top third, clear of the bar.
+            let list = app.collectionViews.firstMatch, barBottom = app.navigationBars.firstMatch.frame.maxY
+            for _ in 0..<6 where toggle.exists && toggle.frame.minY > barBottom + 200 { list.swipeUp(velocity: .slow) }
+            for _ in 0..<3 where !toggle.exists || toggle.frame.minY < barBottom + 16 { list.swipeDown(velocity: .slow) }
             waitUntilStill(note)
             let name = "net-settings\(size == nil ? "" : "-ax5")\(dark ? "-dark" : "")"
             shot(name)
