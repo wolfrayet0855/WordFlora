@@ -57,10 +57,26 @@ final class ButterflyNetUITests: XCTestCase {
     /// Apple's audit, every finding collected. Contrast and Dynamic Type are judged only for elements fully inside the
     /// visible scroll area (as in BadgeMechanicsUITests); the Dynamic Type and clipped-text checks run on their own after
     /// the rest, since they grow the text and reflow the page.
-    private func audit(_ name: String) {
+    /// `still`: an element on the page that must stop moving before each pass (a Form reflows after the text-growing
+    /// passes; auditing mid-reflow judged rows that were still being measured).
+    private func audit(_ name: String, still: XCUIElement? = nil) {
+        if let still { waitUntilStill(still) }
         auditOnce(name, types: XCUIAccessibilityAuditType.all.subtracting([.dynamicType, .textClipped]))
+        if let still { waitUntilStill(still) }
         auditOnce(name + "-textClipped", types: .textClipped)
+        if let still { waitUntilStill(still) }
         auditOnce(name + "-dynamicType", types: .dynamicType)
+    }
+
+    private func waitUntilStill(_ e: XCUIElement) {
+        var last = e.frame, same = 0
+        let end = Date().addingTimeInterval(20)
+        while same < 2 && Date() < end {
+            Thread.sleep(forTimeInterval: 0.5)
+            let now = e.frame
+            same = now == last ? same + 1 : 0
+            last = now
+        }
     }
 
     private func auditOnce(_ name: String, types: XCUIAccessibilityAuditType) {
@@ -218,6 +234,7 @@ final class ButterflyNetUITests: XCTestCase {
     // MARK: Accessibility audits
 
     func testAuditSettingsPlay() {
+        continueAfterFailure = true                // every size and theme reports its findings
         for (size, dark) in [(nil, false), (Self.axXXXL, true), (Self.axXXXL, false)] as [(String?, Bool)] {
             launch(["-uitest-age=thirteenPlus"], size: size, dark: dark)
             openSettings()
@@ -226,7 +243,7 @@ final class ButterflyNetUITests: XCTestCase {
             sleep(1)
             let name = "net-settings\(size == nil ? "" : "-ax5")\(dark ? "-dark" : "")"
             shot(name)
-            audit(name)
+            audit(name, still: note)
             app.terminate()
         }
     }
@@ -247,6 +264,7 @@ final class ButterflyNetUITests: XCTestCase {
 
     /// The game itself, held still with Reduce Motion so the audit sees one frame.
     func testAuditTheGameScene() {
+        continueAfterFailure = true
         for (size, dark) in [(nil, false), (Self.axXXXL, true)] as [(String?, Bool)] {
             launch(["-uitest-age=thirteenPlus", "-uitest-reduce-motion"], size: size, dark: dark)
             openGame()

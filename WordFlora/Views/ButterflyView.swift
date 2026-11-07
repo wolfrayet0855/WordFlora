@@ -12,6 +12,7 @@ struct ButterflyView: View {
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
     @Environment(\.accessibilitySwitchControlEnabled) private var switchControl
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var game: ButterflyGameModel?
     @State private var summary: ButterflyRewards.Summary?
@@ -52,17 +53,11 @@ struct ButterflyView: View {
         }
         .navigationTitle("Butterfly game")
         .navigationBarTitleDisplayMode(.inline)
-        // The bar takes the sky's top colour and its scheme, so the title reads on the day sky in dark mode too.
-        .toolbarBackground(evening ? Color(hex: 0x1F2A4A) : Color(hex: 0xBFE6F5), for: .navigationBar)
+        // The bar is solid in the app's own scheme: in dark mode the system title is white, so it gets the evening sky's
+        // navy behind it instead of the pale day sky (white on pale blue failed the contrast audit).
+        .toolbarBackground(colorScheme == .dark ? Color(hex: 0x1F2A4A) : Color(hex: 0xBFE6F5), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
-        .toolbarColorScheme(evening ? .dark : .light, for: .navigationBar)
         .toolbar {
-            // The title is drawn in the sky's ink (dark by day, white in the evening) whatever the app's appearance:
-            // the system title followed dark mode and measured light-on-light over the day sky.
-            ToolbarItem(placement: .principal) {
-                Text("Butterfly game").font(Theme.font(.headline, weight: .semibold)).foregroundStyle(onSky)
-                    .accessibilityAddTraits(.isHeader)
-            }
             if let game, game.calm, summary == nil {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(VisitorsCopy.done) { endNow() }.accessibilityIdentifier("calm-done")
