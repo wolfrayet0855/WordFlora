@@ -8,6 +8,11 @@ named in the request does not exist in the repo; the Gentle Net art notes below 
 **Owner ask:** a visible net the player uses to catch visitors, and a slightly harder game for 13+. Under 13 and Calm stay
 exactly as gentle as today. Reduce Motion resting rules stay as they are. Rewards stay as they are.
 
+> Built in gate G2b (2026-11-07) with the visual review's must-fixes: rim `#8D9AA6` for silver, 5 pt, and a 1 pt ink
+> outline on every rim tier by day (cream `#FAF7F0` at 80% on rim and handle in the evening sky); the resting net at 85%
+> with its lowest point at least 24 pt above the "said hello" pill. Calm follows the art spec's correction: it moves
+> visitors at 60% and uses the landing rule (5 s rest), so only resting hellos are gentle there.
+
 ## 0. What the game does today (the baseline we must not make harder)
 - `ButterflyView` sends every `DragGesture` sample to `ButterflyGameModel.catchAt(x:y:radius:)`, which takes the nearest
   visitor within the radius. A white "swoosh" trail draws the finger path. No net is drawn in the game.
@@ -38,7 +43,7 @@ wings. Wake-game rounds (`WakeSheet`) always use `.gentle` and keep their own tu
 | Round | 35 s (Calm: no bar, 5 hellos or Done) | **45 s** (10 more seconds, never fewer) |
 | Visitor speed | 0.06 to 0.14 widths/s (Calm x0.6) | **x1.3** (0.078 to 0.182) |
 | Spawn gap | 1.2 s | 1.0 s (keeps the sky as full, since faster visitors cross sooner) |
-| Hoop radius by Shed tier | 48 / 64 / 80 pt + 6 pt grace | **40 / 56 / 72 pt**, no grace |
+| Hoop **radius in points** by Shed tier | 48 / 64 / 80 pt radius (96 / 128 / 160 pt across) + 6 pt grace | **40 / 56 / 72 pt radius** (80 / 112 / 144 pt across), no grace |
 | What counts as a hit | today's area OR the finger OR the hoop (union) | the hoop only (true circle in points) |
 | Path change | none | each flying visitor may turn **once**, with a 0.4 s tell |
 | Perch (Gentle Net landing) | 1 in 3 land once, 3 s | 1 in 3 land once, **2 s** |
@@ -106,7 +111,8 @@ widths of an edge, so a visitor cannot swerve away just as it arrives.
   `settings.hapticsOn`, beside the existing `.success` on the summary.
 
 ## 3. Shed net tiers
-`ToolEngine.netCatchPoints` stays `[48, 64, 80]` (gentle). Add `netCatchPointsQuick = [40, 56, 72]` and
+All net sizes are a **radius in points** (the smallest hoop, 40 pt radius, is 80 pt across, well above the 44 pt
+target size; the hoop is a hit area, not a button). `ToolEngine.netCatchPoints` stays `[48, 64, 80]` (gentle). Add `netCatchPointsQuick = [40, 56, 72]` and
 `netCatchRadius(tier:pace:)`. The hoop drawn is the radius used, so what you see is what says hello.
 `ShedCopy.effect(.net, tier:)` stays "Small / Bigger / Biggest catch circle" (true in both paces). The Visitors page
 "Your net: small" card is unchanged.
