@@ -120,7 +120,9 @@ final class ButterflyNetUITests: XCTestCase {
 
     private func openSettings() {
         app.buttons["Settings"].tap()
-        XCTAssertTrue(app.switches["Haptics"].waitForExistence(timeout: 5))
+        // The bar, not a row: at AX XXXL the list builds only the rows on screen.
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 8))
+        sleep(1)
     }
 
     private func openVisitors() {
@@ -254,6 +256,9 @@ final class ButterflyNetUITests: XCTestCase {
     func testAuditSettingsPlayAtAXXXLInLight() { auditSettingsPlay(size: Self.axXXXL, dark: false) }
 
     private func auditSettingsPlay(size: String?, dark: Bool) {
+        // Settings is a long Form: each finding's element is looked up to see whether it is one of the new rows, which
+        // takes a few minutes for the three passes (the stock rows report many Dynamic Type findings).
+        executionTimeAllowance = 360
         do {
             launch(["-uitest-age=thirteenPlus"], size: size, dark: dark)
             openSettings()
