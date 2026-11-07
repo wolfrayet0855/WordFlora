@@ -121,6 +121,42 @@ final class WakePuzzleTests: XCTestCase {
     func testNoPuzzleWhenThereAreNoUsableNames() {
         XCTAssertNil(WakePuzzle.make(plantId: "rose", day: 1, names: ["Fern", "Rose"]))
     }
+
+    // MARK: Meaning clue (puzzle-experience-review UX5)
+
+    func testEveryWakeAnswerHasAOneLineMeaningClueThatNeverGivesTheNameAway() throws {
+        let meanings = WakePuzzle.meanings(from: try WordBank.load().entries)
+        let catalogNames = try PlantCatalog.load().map(\.name)
+        let answers = WakePuzzle.candidates(from: catalogNames)
+        XCTAssertFalse(answers.isEmpty)
+        for answer in answers {
+            let line = try XCTUnwrap(meanings[answer], "\(answer) has a meaning clue")
+            XCTAssertFalse(WakePuzzle.normalized(line).contains(answer), line)
+            XCTAssertFalse(line.contains("\n"))
+            XCTAssertEqual(CopySafety.check(line), [], line)
+        }
+    }
+
+    func testTheMeaningClueOnlyChangesTheHint() throws {
+        let meanings = WakePuzzle.meanings(from: try WordBank.load().entries)
+        for day in 0..<30 {
+            let plain = try XCTUnwrap(WakePuzzle.make(plantId: "rose", day: day, names: names))
+            let meant = try XCTUnwrap(WakePuzzle.make(plantId: "rose", day: day, names: names, meanings: meanings))
+            XCTAssertEqual([plain.answer, String(plain.tiles)], [meant.answer, String(meant.tiles)])
+            XCTAssertEqual(plain.slots, meant.slots)
+            XCTAssertEqual(plain.hint, WakeCopy.puzzleHint(letters: plain.answer.count))
+            if let line = meanings[meant.answer] {
+                XCTAssertEqual(meant.hint, "\(line) \(meant.answer.count) letters.")
+                XCTAssertFalse(meant.hint.uppercased().contains(meant.answer), meant.hint)
+            }
+            // The gentle weather puzzle gets the same line; the storm tier keeps its own hint.
+            let gentle = try XCTUnwrap(WakePuzzle.weather(tier: .gentle, eventDay: day, attempt: 0, names: names, meanings: meanings))
+            XCTAssertEqual(gentle, WakePuzzle.make(plantId: "weather", day: day &* 16, names: names, meanings: meanings))
+        }
+        XCTAssertEqual(WakeCopy.puzzleHint(letters: 7, meaning: nil), "A plant name with 7 letters.")
+        XCTAssertEqual(WakeCopy.puzzleHint(letters: 7, meaning: "A small desert plant that looks just like a pebble."),
+                       "A small desert plant that looks just like a pebble. 7 letters.")
+    }
 }
 
 final class WakePuzzleBoardTests: XCTestCase {

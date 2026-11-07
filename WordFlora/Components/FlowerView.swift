@@ -10,6 +10,7 @@ struct FlowerView: View {
     var bloomRing: Double? = nil
 
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.colorScheme) private var colorScheme
     @State private var falling: [Int: FallingPetal] = [:]
     @State private var swayPhase = false
 
@@ -22,7 +23,7 @@ struct FlowerView: View {
             let scale = min(geo.size.width / 200, geo.size.height / 240)
             ZStack {
                 stem
-                if let fill = bloomRing, !resting { goldRing(fill).transition(.opacity) }
+                if let fill = bloomRing, !resting { goldRing(fill, scale: scale).transition(.opacity) }
                 ForEach(0..<8, id: \.self) { i in petal(i) }
                 ForEach(falling.keys.sorted(), id: \.self) { i in fallingPetal(i) }
                 if resting { bud }
@@ -103,13 +104,19 @@ struct FlowerView: View {
         .animation(.spring(response: 0.45, dampingFraction: 0.7), value: isPresent)
     }
 
-    /// A faint track and a soft gold arc that fills clockwise from the top, just outside the petal tips.
-    private func goldRing(_ fill: Double) -> some View {
-        let gold = Color(hex: 0xE8A838)
+    /// The ring's line in the 200 x 240 design space, so it shows `PuzzleInk.ringLine` points at any flower size.
+    static func ringLineWidth(scale: CGFloat) -> CGFloat { PuzzleInk.ringLine / max(scale, 0.1) }
+
+    /// A faint track and a gold arc that fills clockwise from the top, just outside the petal tips.
+    /// The track stays visible on the cream; in light mode the arc is a deeper gold than the flower's centre.
+    private func goldRing(_ fill: Double, scale: CGFloat) -> some View {
+        let dark = colorScheme == .dark
+        let track = PuzzleInk.ringTrack(dark: dark)
+        let line = Self.ringLineWidth(scale: scale)
         return ZStack {
-            Circle().stroke(Color(hex: 0xF5C858).opacity(0.28), lineWidth: 5)
+            Circle().stroke(Color(hex: track.hex).opacity(track.opacity), lineWidth: line)
             Circle().trim(from: 0, to: max(0, min(1, fill)))
-                .stroke(gold.opacity(0.9), style: StrokeStyle(lineWidth: 5, lineCap: .round))
+                .stroke(Color(hex: PuzzleInk.ringFill(dark: dark)), style: StrokeStyle(lineWidth: line, lineCap: .round))
                 .rotationEffect(.degrees(-90))
                 .animation(systemReduceMotion ? nil : .linear(duration: 0.5), value: fill)
         }

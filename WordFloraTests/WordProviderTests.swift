@@ -256,3 +256,50 @@ final class WordProviderTests: XCTestCase {
         XCTAssertNotNil(a.wordId(for: date("2025-12-01 12:00")))
     }
 }
+
+/// The plant clues rewritten for young readers (docs/pm/puzzle-experience-review.md, UX1). A rough Flesch-Kincaid grade
+/// with a simple syllable count: noisy on one short sentence, so the grade 4 bar is held for the rewritten clues.
+final class ClueReadabilityTests: XCTestCase {
+    static let rewritten = ["l1-rose", "l1-tulip", "l1-fern", "l2-bamboo", "l2-aloe-vera", "l2-cherry-blossom",
+                            "l3-venus-flytrap", "l3-baobab", "l3-lithops", "l4-sundew", "l4-passionflower", "l4-ghost-pipe",
+                            "l3-welwitschia", "l5-silversword", "l5-rainbow-eucalyptus"]
+
+    /// Vowel groups (y counts), less a silent final e (but not "-le").
+    static func syllables(_ word: String) -> Int {
+        let w = Array(word.lowercased().filter { ("a"..."z").contains($0) })
+        guard !w.isEmpty else { return 0 }
+        let vowels: Set<Character> = ["a", "e", "i", "o", "u", "y"]
+        var n = 0, previous = false
+        for ch in w { let v = vowels.contains(ch); if v && !previous { n += 1 }; previous = v }
+        let s = String(w)
+        if s.hasSuffix("e") && !s.hasSuffix("le") && n > 1 { n -= 1 }
+        return max(1, n)
+    }
+
+    static func grade(_ text: String) -> Double {
+        let words = text.split(whereSeparator: \.isWhitespace).map { String($0.filter(\.isLetter)) }.filter { !$0.isEmpty }
+        let sentences = max(1, text.split(whereSeparator: { ".!?".contains($0) }).filter { $0.contains(where: \.isLetter) }.count)
+        let syllableCount = words.map(syllables).reduce(0, +)
+        return 0.39 * Double(words.count) / Double(sentences) + 11.8 * Double(syllableCount) / Double(words.count) - 15.59
+    }
+
+    func testTheSyllableCountIsSensible() {
+        XCTAssertEqual(Self.syllables("plant"), 1)
+        XCTAssertEqual(Self.syllables("flower"), 2)
+        XCTAssertEqual(Self.syllables("shade"), 1)
+        XCTAssertEqual(Self.syllables("volcano"), 3)
+        XCTAssertEqual(Self.syllables("purple"), 2)
+        XCTAssertGreaterThan(Self.grade("A thorny shrub famous for sweet-smelling flowers in many colors"), 6)
+    }
+
+    func testTheRewrittenPlantCluesReadAtGradeFourOrBelow() throws {
+        let entries = Dictionary(uniqueKeysWithValues: try WordBank.load().entries.map { ($0.id, $0) })
+        for id in Self.rewritten {
+            let e = try XCTUnwrap(entries[id], id)
+            XCTAssertLessThanOrEqual(Self.grade(e.hint), 4.0, "\(id): \(e.hint)")
+            XCTAssertTrue(e.hint.hasSuffix("."), "\(id) ends with a full stop")
+            XCTAssertTrue(HintValidator.isSafe(e.hint, answer: e.word), "\(id) never gives the answer away")
+            XCTAssertLessThanOrEqual(e.hint.split(separator: " ").count, 14, id)
+        }
+    }
+}

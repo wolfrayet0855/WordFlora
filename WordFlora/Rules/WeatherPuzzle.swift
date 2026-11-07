@@ -66,10 +66,12 @@ extension WakePuzzle {
 
     /// The weather puzzle for an event. Gentle: today's wake puzzle exactly, keyed to the event and attempt. Storm: a
     /// longer plant name, every slot open, one decoy tile, and two-word names keep their gap.
-    static func weather(tier: WeatherPuzzleTier, eventDay: Int, attempt: Int, names: [String], economy: Economy = .default) -> WakePuzzle? {
+    /// `meanings` gives the gentle tier the wake puzzle's meaning line; the storm tier keeps its picture clue.
+    static func weather(tier: WeatherPuzzleTier, eventDay: Int, attempt: Int, names: [String], economy: Economy = .default,
+                        meanings: [String: String] = [:]) -> WakePuzzle? {
         switch tier {
         case .gentle:
-            return make(plantId: "weather", day: eventDay &* 16 &+ attempt, names: names)
+            return make(plantId: "weather", day: eventDay &* 16 &+ attempt, names: names, meanings: meanings)
         case .storm:
             let pool = stormCandidates(from: names, economy: economy).sorted()   // order-free, so every device agrees
             guard !pool.isEmpty else { return make(plantId: "weather", day: eventDay &* 16 &+ attempt, names: names) }

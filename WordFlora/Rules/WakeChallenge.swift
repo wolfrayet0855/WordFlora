@@ -83,6 +83,11 @@ enum WakeCopy {
     static let peekSoon = "A peek comes soon"
     static let clear = "Clear"
     static func puzzleHint(letters: Int) -> String { "A plant name with \(letters) letters." }
+    /// With a meaning clue: the clue, then the letter count ("A small desert plant that looks just like a pebble. 7 letters.").
+    static func puzzleHint(letters: Int, meaning: String?) -> String {
+        guard let meaning, !meaning.isEmpty else { return puzzleHint(letters: letters) }
+        return "\(meaning) \(letters) letters."
+    }
 
     static func awake(name: String) -> String { "\(name) is awake!" }
     static func awakeAnnouncement(name: String) -> String { "\(name) is awake." }
@@ -100,6 +105,7 @@ enum WakeCopy {
         var lines = [seedCard(name: name), wakeButton(name: name), sheetTitle(name: name), sheetSubtitle, suggestedBadge, close,
                      butterflyIntro(goal: 3), butterflyIntro(goal: 2), puzzleIntroAnagram, puzzleIntroVowels, start, caughtSoFar(1, goal: 3),
                      notQuite, peek, peekSoon, clear, puzzleHint(letters: 7),
+                     puzzleHint(letters: 7, meaning: "A small desert plant that looks just like a pebble."),
                      awake(name: name), awakeAnnouncement(name: name), petalsComing, tapToSeeAll, done,
                      stillDreaming(name: name), tryAgainAnyTime, stillDreamingShort, tryAgain, tryButterflies]
         for c in WakeChallenge.allCases {

@@ -108,7 +108,8 @@ extension AppModel {
             try? context.save()
         }
         let attempt = WeatherPuzzlePolicy.attempt(puzzleDay: p.weatherPuzzleDay, puzzleCount: p.weatherPuzzleCount, today: today)
-        return WakePuzzle.weather(tier: tier, eventDay: weatherNow.eventDay, attempt: attempt, names: weatherPuzzleNames(tier: tier))
+        return WakePuzzle.weather(tier: tier, eventDay: weatherNow.eventDay, attempt: attempt, names: weatherPuzzleNames(tier: tier),
+                                  meanings: plantMeanings)
     }
 
     /// "New puzzle": a different puzzle for the same event, at most 3 fresh ones a day. Nil once today's are used.
@@ -118,7 +119,8 @@ extension AppModel {
         let pair = WeatherPuzzlePolicy.afterStart(puzzleDay: p.weatherPuzzleDay, puzzleCount: p.weatherPuzzleCount, today: today)
         p.weatherPuzzleDay = pair.day; p.weatherPuzzleCount = pair.count
         try? context.save()
-        return WakePuzzle.weather(tier: tier, eventDay: weatherNow.eventDay, attempt: pair.count - 1, names: weatherPuzzleNames(tier: tier))
+        return WakePuzzle.weather(tier: tier, eventDay: weatherNow.eventDay, attempt: pair.count - 1, names: weatherPuzzleNames(tier: tier),
+                                  meanings: plantMeanings)
     }
 
     struct WeatherSolve: Equatable {
