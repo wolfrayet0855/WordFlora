@@ -10,7 +10,7 @@ These files are for agents to review and builders to draw from. They are not own
 - Regenerate: `python3 design-preview/frost-lantern/build.py`. Each colour sits once in its palette table `T`, so a
   colour change is one edit plus a rerun. Every file's header comment lists its colours and anchor points.
 
-**Scope.** Only the items the plan lists. The plan names **two** visitors (European robin and winter wren), so this
+**Scope.** Only the items the plan lists. The plan names **two** visitors (European robin and wren), so this
 lane delivers two, not three. G5 is not marked for later, so the scene, visitors and plants are full art, not sketches.
 
 ## Rules used for every asset
@@ -40,9 +40,9 @@ All three use the shared 120 x 100 pot box and draw in `PotPainter`'s order: bod
 
 | id | Name | Body / rim / shade | Decoration colours (index order) | Pattern | a11y label |
 |---|---|---|---|---|---|
-| `frostedGlass` | Frosted glass | `#B7D6E6` / `#5E93B0` / `#93BCD2` | `0xFFFFFF`, `0x3F7596` | `frost`: frost band with a scalloped top along the foot, three frost ferns rising from it, two glints (hidden in outline) | Icy blue pot with frost ferns |
+| `frostedGlass` | Frosted glass | `#B7D6E6` / `#548BAC` / `#93BCD2` | `0xFFFFFF`, `0x3F7596` | `frost`: frost band with a scalloped top along the foot, three frost ferns rising from it, two glints (hidden in outline) | Icy blue pot with frost ferns |
 | `lanternRed` | Lantern red | `#B5403A` / `#D9665A` / `#93302B` | `0xF5C858`, `0xFFF0C2`, `0x5E211C`, `0x8A2A25` | `lanterns`: a deep band (hidden in outline), a cream string, three paper lanterns (gold, cream, gold) with caps, tassels and a glow (glow knocks out in outline) | Red pot with a band of paper lanterns |
-| `snowflakeIndigo` | Snowflake indigo | `#4A4FAE` / `#7F86D9` / `#363A8C` | `0xFFFFFF`, `0xCFE6F0` | `snowflakes`: three six-armed flakes with hub and side twigs (twigs hidden in outline), six ice dots (hidden in outline) | Indigo pot with white snowflakes |
+| `snowflakeIndigo` | Snowflake indigo | `#6A70D0` / `#7F86D9` / `#4A4FAE` | `0xFFFFFF`, `0xCFE6F0` | `snowflakes`: three six-armed flakes with hub and side twigs (twigs hidden in outline), six ice dots (hidden in outline) | Indigo pot with white snowflakes |
 
 **States and sizes.** "Empty" means the pot alone, as on tiles. "Occupied" means it has the soil top, as on the plant
 stage and in the repot preview.
@@ -58,22 +58,27 @@ stage and in the repot preview.
   line, or "A grown-up can find this in Settings." for the pack pots (mirroring `PotCatalog.plusHint`). There is no lock
   and no price.
 - A pack pot reads as itself at 28 pt: the lantern string is chunky, the snowflakes have a hub, and the frost band
-  sits at the foot. The frost band blends into a white card (body 1.5:1), so on light grounds the rim (3.1 to 3.3:1)
-  carries the edge, the same way Jade vine's rim does.
+  sits at the foot. The frost band blends into a white card (body 1.5:1), so on light grounds the rim carries the edge,
+  the same way Jade vine's rim does. The Frosted glass rim is deepened to `#548BAC` (3.5 to 3.7:1 on light grounds,
+  3.1 on dark surface). The suggested `#4F86A8` would drop to 2.9:1 on dark surface, so this is the nearest value
+  that still passes on all four grounds with a little margin.
 
 ## 2. Lantern Keeper badge (G3)
 
 `badge_lantern_keeper_t1.svg`, `_t2.svg`, `_t3.svg`, 100 x 100, the asset names the plan gives. Same frame as every
-`BadgeArt` badge: a dodecagon in the tier's dark and light colours, a `#FFFDF5` disc with a 2 pt tier stroke, and 1, 2
-or 3 tier dots at y 91. The icon is a red paper lantern (`FL.lanternRed` with a `PetalKit.marigold` glow, ink caps
-and a gold tassel) with a small frost-blue snowflake. Tiers differ only by frame colour and dots, as for the other badges.
+`BadgeArt` badge: a dodecagon in the tier's dark and light colours and a `#FFFDF5` disc with a 2 pt tier stroke. The
+1, 2 or 3 tier dots are 1.5x the usual size (r 5.4 at y 86, 12 units apart, 2.1 white stroke) so the count reads at
+44 pt and tiers do not rely on frame colour alone (checked side by side at 44 pt). The icon is a red paper lantern
+(`FL.lanternRed` with a `PetalKit.marigold` glow, ink caps and a gold tassel), centred on the disc at x 50, with a
+small frost-blue snowflake at the top right. Tiers differ by frame colour and dot count.
 I left out the unused gradient `<defs>` that older badge files carry. Add the three files to `Assets.xcassets/BadgeArt` as
 imagesets with `preserves-vector-representation`, like the others.
 
 ## 3. Seasons row glyph and pack card (G3)
 
-- **`seasons-row-glyph.svg`**, 24 x 24: a filled paper lantern (the rib is an even-odd slit) and a small snowflake,
-  single colour. Ship it as a template image so `Label("Seasons", image: "seasons-row-glyph")` tints it
+- **`seasons-row-glyph.svg`**, 24 x 24: an outline paper lantern alone (wide open body at a 2 pt stroke, one thin
+  rib oval, flat caps, hook and tassel), single colour. The earlier filled lantern with a snowflake read as "0*" at
+  22 pt; the snowflake is dropped because at that size it reads as an asterisk. Checked at 22, 24 and 28 pt. Ship it as a template image so `Label("Seasons", image: "seasons-row-glyph")` tints it
   `appPrimaryText` like the row's SF Symbol neighbours (10.7:1 light, 11.6:1 dark). If a custom glyph is unwanted, the
   SF Symbol `snowflake` is the fallback.
 - **`pack-card-light.svg` / `pack-card-dark.svg`**, 353 x 150, the same frame as `ShedScene`: three pots on a snowy
@@ -89,16 +94,26 @@ imagesets with `preserves-vector-representation`, like the others.
 - 393 x 852. Scale to fill the width, bottom aligned, behind everything on Home and Garden. Hide it from VoiceOver.
 - Light is a winter dusk (pale blue to lilac). Dark is a night sky with a crescent moon and stars. The detail (hills,
   firs, a snow-capped fence, two lantern posts, a lantern string, snowdrops in the bank) sits in the lower 40 %. The
-  top 55 % is calm sky.
+  top 55 % is calm sky. The two snowdrop clumps are drawn at 0.45 and 0.425 of the plant box (1.25x the first draft)
+  with the 2.0 edge, so they hold on white snow.
 - Named groups: `sky`, `moon`, `stars` (dark only), `hills`, `firs`, `fence`, `lanterns`, `snowbank`, `snowdrops`.
   Snowfall comes from the weather layer, as the plan says. The art has no flakes, so under Reduce Motion and Low Power
   the scene is simply still. Optional motion: the lantern halos may breathe between their two opacities over about 4 s
   with motion on. They are static under Reduce Motion, Low Power and Calm.
-- **Text rule:** text over the scene sits on `appSurface` cards, or in the sky zone above y 460 (`appPrimaryText` on the
-  sky: 8.4:1 light, 12.6:1 dark). Never put text directly on the dark snow bank (2.0:1).
+- **Text rule (builder):** text over the scene sits on an `appSurface` card, or on a scrim of
+  `Color.appBackground.opacity(0.6)` with the card's corner radius. Measured: `#9AA7BC` under a 60 % `#1A2E1A` scrim is
+  `#4D5E5B`, 5.5:1 against `appPrimaryText` dark (50 % gives 4.55:1, the floor). Never put text directly on the dark
+  snow bank (2.0:1). Text in the sky zone above y 460 is fine without a card (`appPrimaryText` on the sky: 8.4:1
+  light, 12.6:1 dark). The snow bank is **not** darkened: 4.5:1 would need about `#5C6A82`, which drops the bank to
+  2.2:1 against the sky and stops it reading as snow.
+- **Dark lantern string:** `FL.stringDark #8C7A6B`, a warm light brown. The old `FL.snowShadeDark` string was the same
+  colour as the shade hill behind it and vanished; the warm string now separates from the cool hill by hue.
 - The scene is cosmetic, so it shows in Calm and Quiet Garden (plan G5 acceptance).
 
-### Visitors: European robin and winter wren
+### Visitors: European robin and wren
+
+The wren's display name is "Wren" everywhere (never "Winter wren", which is the North American *T. hiemalis*; the
+art is the Eurasian wren, *T. troglodytes*).
 
 | File | Use | Size |
 |---|---|---|
@@ -110,7 +125,7 @@ imagesets with `preserves-vector-representation`, like the others.
 - Facing leading (beak to the left), like `hummingbird`. The wing turns about (56,52): a = -38 degrees, b = +26,
   idle = +6.
 - Sticker frame as in `VisitorArt`: white r 55 disc with a 12 % shadow disc, a tint disc r 47, and the idle pose at
-  0.92. Tints: robin `FL.stickerFrost`, wren `FL.stickerBark`.
+  0.92. Tints: robin `FL.stickerFrost`, wren `FL.stickerMist` (a cool grey, so the brown wren stands off its disc).
 - Not-owned or not-met stickers use the album's existing outline rule (`grayscale(1)` at 35 %). There is no extra art.
 - Each bird reads on both themes through one part: on light grounds the brown back (robin 4.9:1, wren 5.5:1), on dark
   grounds the orange breast (4.7:1) or the pale belly (12.5:1 robin, 7.8:1 wren).
@@ -121,16 +136,17 @@ imagesets with `preserves-vector-representation`, like the others.
 |---|---|
 | `plant_snowdrop.svg` | Full bloom, 200 x 200 plant box, ground at y 177 like every plant. Groups follow `PlantThinning` layers: `ground`, `back` (static), `petals` with `r<head>_s<i>`, then `front`. Three nodding heads at (118,72), (70,88) and (140,104), each with 3 outer tepals (9 petals); the inner bells with their green V are in `front`. |
 | `plant_hellebore.svg` | Full bloom, same box. Three heads at (102,74), (60,104) and (144,100), each with 5 sepals (15 petals); the lime centres and stamens are in `front`. |
-| `plant_snowdrop_stages.svg`, `plant_hellebore_stages.svg` | Five 200 x 200 panels, stages 0 to 4 (`LifeStats.stageNames`: Tiny, Sprout, Bud, Bloom, Full bloom). Panel 4 is the full-bloom file. |
+| `plant_snowdrop_stages.svg`, `plant_hellebore_stages.svg` | **Reference, not shipped; ship only the layered full-bloom files.** Five 200 x 200 panels, stages 0 to 4 (`LifeStats.stageNames`: Tiny, Sprout, Bud, Bloom, Full bloom), for review only. Do not make imagesets from them. |
 
 - Split each full-bloom file into `PlantLayers` imagesets by group id (`plant_snowdrop_ground`, `_back`, `_r0_s0` ...,
   `_front`). Add a `PlantThinning.json` entry with `kind: "petals"`, the head pivots above and rings `[0]`, `[1]`,
   `[2]`, the same pattern as `plant_daisy`.
-- **Stages:** the app today draws one plant image and scales it by stage (`GrandGardenArt.stageScale`). The stage
-  panels are drawn at full size. Use one approach, not both: the panels **or** the scaled full-bloom art. Combining
-  them shrinks a Tiny plant twice. The seed stage keeps `SeedPotView`.
-- Contrast: snowdrop petals are white with an `FL.snowdropEdge` stroke (3.3:1 on `appBackground` light, 3.5:1 on
-  surface). Hellebore sepals are 3.2 to 4.0:1 on all four grounds, so the bloom reads without its edge.
+- **Stages:** ship the scaled full-bloom art only. The plant page draws `LayeredPlantView` and shows growth by
+  revealing petal rings, and the Grand Garden scales the one full-bloom image by `GrandGardenArt.stageScale`. Nothing
+  reads a per-stage image, and using the stage panels as well would shrink a Tiny plant twice. The stage panels are
+  reference, not shipped. The seed stage keeps `SeedPotView`.
+- Contrast: snowdrop petals are white with an `FL.snowdropEdge` stroke of 2.0 units on the tepal, bell and bud (it
+  was 1.4, under 1 pt at the 132 pt compact stage), 3.3:1 on `appBackground` light, 3.5:1 on surface. Hellebore sepals are 3.2 to 4.0:1 on all four grounds, so the bloom reads without its edge.
 
 ## Asset manifest
 
@@ -155,15 +171,15 @@ Sizes are in points as drawn in the app. "Box" is the SVG's own unit box.
 | `pack-card-light.svg` | Seasons shelf card, Seasons page header | full card width, about 335 to 353 x 150 | `FL.skyL1`, `FL.skyL3`, `FL.snow`, `FL.woodLight`, `FL.woodEdge`, `FL.lanternInk`, `FL.glow`, `FL.iceRim`, the three pots, plants and robin |
 | `pack-card-dark.svg` | Same, dark | as above | `FL.skyD2`, `FL.skyD3`, `FL.snowDark`, `FL.snowShadeDark`, stars `#E8EEF8` at 70 %, rest as light |
 | `scene-light.svg` | Home and Garden background, light | screen width, 393 x 852 box | `FL.skyL1-3`, `FL.moon`, `FL.hillL`, `FL.snowShade`, `FL.snow`, `FL.fir`, `FL.post`, `FL.postDark`, `FL.lanternRed`, `FL.lanternInk`, `FL.glow`, `PetalKit.marigold`, snowdrop colours |
-| `scene-dark.svg` | Same, dark | as above | `FL.skyD1-3`, `FL.moon`, stars, `FL.hillD`, `FL.snowShadeDark`, `FL.snowDark`, `FL.firDark`, `FL.postDark`, lantern colours |
+| `scene-dark.svg` | Same, dark | as above | `FL.skyD1-3`, `FL.moon`, stars, `FL.hillD`, `FL.snowShadeDark`, `FL.snowDark`, `FL.firDark`, `FL.postDark`, `FL.stringDark`, lantern colours |
 | `visitor_robin_a/b/idle.svg` | Robin flight and resting frames | 90 (box 100) | `FL.robinBack`, `FL.robinWing`, `FL.robinWingEdge`, `FL.robinBreast`, `FL.robinGrey`, `FL.robinBelly`, `FL.beak`, `Visitor.eye`, `FL.leg` |
 | `visitor_robin_sticker.svg` | Robin sticker | 22 to 108 (box 120) | as above + `FL.stickerFrost`, `white` |
 | `visitor_wren_a/b/idle.svg` | Wren flight and resting frames | 90 (box 100) | `FL.wrenBody`, `FL.wrenWing`, `FL.wrenBar`, `FL.wrenBelly`, `FL.wrenBrow`, `FL.beak`, `Visitor.eye`, `FL.leg` |
-| `visitor_wren_sticker.svg` | Wren sticker | 22 to 108 (box 120) | as above + `FL.stickerBark`, `white` |
+| `visitor_wren_sticker.svg` | Wren sticker | 22 to 108 (box 120) | as above + `FL.stickerMist`, `white` |
 | `plant_snowdrop.svg` | Snowdrop, full bloom, layered | plant size (132 to 220) (box 200) | `white`, `FL.snowdropEdge`, `FL.snowdropLeaf`, `FL.snowdropLeafVein`, `PetalKit.stem`, `PetalKit.leaf`, `Plant.groundShadow` |
-| `plant_snowdrop_stages.svg` | Snowdrop stages 0 to 4 | as above, per panel | as above |
+| `plant_snowdrop_stages.svg` | Snowdrop stages 0 to 4: reference, not shipped; ship only the layered full-bloom files | n/a | as above |
 | `plant_hellebore.svg` | Hellebore, full bloom, layered | plant size (box 200) | `FL.helleboreSepal`, `FL.helleboreEdge`, `FL.helleboreCentre`, `FL.helleboreStamen`, `FL.helleboreLeaf`, `FL.helleboreVein`, `FL.helleboreStem`, `Plant.groundShadow` |
-| `plant_hellebore_stages.svg` | Hellebore stages 0 to 4 | as above, per panel | as above |
+| `plant_hellebore_stages.svg` | Hellebore stages 0 to 4: reference, not shipped; ship only the layered full-bloom files | n/a | as above |
 | `review-light.svg`, `review-dark.svg` | Agent review sheets, not shipped | 1100 x 1360 | all of the above on `appBackground` and `appSurface` |
 | `build.py` | Generator, not shipped | n/a | the palette table `T` |
 
@@ -179,12 +195,12 @@ New art constants (`FL.*`), with hex values in `build.py`:
 
 | Group | Tokens |
 |---|---|
-| Frosted glass | `iceBody #B7D6E6`, `iceRim #5E93B0`, `iceShade #93BCD2`, `frostFern #3F7596` |
+| Frosted glass | `iceBody #B7D6E6`, `iceRim #548BAC`, `iceShade #93BCD2`, `frostFern #3F7596` |
 | Lantern red | `lanternBody #B5403A`, `lanternRim #D9665A`, `lanternShade #93302B`, `lanternBand #8A2A25`, `lanternInk #5E211C`, `lanternRed #C8473E`, `glow #F5C858` |
-| Snowflake indigo | `indigoBody #4A4FAE`, `indigoRim #7F86D9`, `indigoShade #363A8C`, `ice #CFE6F0` |
-| Scene and card | `skyL1 #D3DEEE`, `skyL2 #DFE5F1`, `skyL3 #EAE6F0`, `skyD1 #17233A`, `skyD2 #1E2C46`, `skyD3 #283752`, `hillL #C4D3E4`, `hillD #33425E`, `moon #F6E8B0`, `snow #F4F7FB`, `snowShade #DCE5EF`, `snowDark #9AA7BC`, `snowShadeDark #7D8BA3`, `fir #3F6F4A`, `firDark #2E5538`, `post #5E4A3A`, `postDark #3E3128`, `woodLight #D9A066`, `woodEdge #9A5F2A` |
+| Snowflake indigo | `indigoBody #6A70D0`, `indigoRim #7F86D9`, `indigoShade #4A4FAE`, `ice #CFE6F0` |
+| Scene and card | `skyL1 #D3DEEE`, `skyL2 #DFE5F1`, `skyL3 #EAE6F0`, `skyD1 #17233A`, `skyD2 #1E2C46`, `skyD3 #283752`, `hillL #C4D3E4`, `hillD #33425E`, `moon #F6E8B0`, `snow #F4F7FB`, `snowShade #DCE5EF`, `snowDark #9AA7BC`, `snowShadeDark #7D8BA3`, `stringDark #8C7A6B`, `fir #3F6F4A`, `firDark #2E5538`, `post #5E4A3A`, `postDark #3E3128`, `woodLight #D9A066`, `woodEdge #9A5F2A` |
 | Robin | `robinBack #7A6A4E`, `robinWing #5E4E36`, `robinWingEdge #9A8A68`, `robinBreast #E2733A`, `robinGrey #A9B0B8`, `robinBelly #F3EEE6`, `beak #3A2C1E`, `leg #7A5A44`, `stickerFrost #DCEBF2` |
-| Wren | `wrenBody #8A5A34`, `wrenWing #6E4524`, `wrenBar #4E2F17`, `wrenBelly #D8B98E`, `wrenBrow #EBD7B4`, `stickerBark #F1E6D6` |
+| Wren | `wrenBody #8A5A34`, `wrenWing #6E4524`, `wrenBar #4E2F17`, `wrenBelly #D8B98E`, `wrenBrow #EBD7B4`, `stickerMist #E6EAF0` |
 | Snowdrop | `snowdropLeaf #6E9C7E`, `snowdropLeafVein #A9C9B4`, `snowdropEdge #768C91` |
 | Hellebore | `helleboreSepal #C46B8C`, `helleboreEdge #9A4A6B`, `helleboreCentre #C9D86A`, `helleboreStamen #F2E7A0`, `helleboreLeaf #3F6F4A`, `helleboreVein #6E9C7E`, `helleboreStem #5E8A4E` |
 
@@ -195,9 +211,10 @@ to app text placed over the scene or card. Grounds: `appBackground` and `appSurf
 
 | Part | bg light | surface light | bg dark | surface dark | Verdict |
 |---|---|---|---|---|---|
-| Frosted glass rim `#5E93B0` | 3.1 | 3.3 | 4.3 | 3.4 | passes on all four |
+| Frosted glass rim `#548BAC` (deepened from `#5E93B0`) | 3.5 | 3.7 | 3.9 | 3.1 | passes on all four |
 | Lantern red rim `#D9665A` | 3.3 | 3.5 | 4.1 | 3.3 | passes on all four |
-| Snowflake indigo rim `#7F86D9` | 3.1 | 3.3 | 4.4 | 3.4 | passes on all four |
+| Snowflake indigo rim `#7F86D9` (unchanged) | 3.1 | 3.3 | 4.4 | 3.4 | passes on all four |
+| Snowflake indigo body `#6A70D0` | 4.1 | 4.3 | 3.3 | 2.6 | rim carries the edge on dark surface |
 | Outline ink (theme's own) on its ground | 4.7 | 5.0 | 5.4 | 4.3 | passes (existing values) |
 | Badge icon `FL.lanternRed` on `Badge.disc` | 4.7 | 4.7 | 4.7 | 4.7 | passes (the disc is the same in both themes) |
 | Seasons glyph (`appPrimaryText`) | 10.7 | 11.5 | 11.6 | 9.2 | passes text level |
@@ -206,12 +223,12 @@ to app text placed over the scene or card. Grounds: `appBackground` and `appSurf
 | Snowdrop edge (light) / petal (dark) | 3.3 | 3.5 | 14.5 | 11.5 | passes |
 | Hellebore sepal | 3.4 | 3.6 | 4.0 | 3.2 | passes |
 
-Pattern on its own body: frost fern 3.3, lantern gold 3.5 (cream on the band 7.6), snowflakes 7.0, ice dots 5.4,
+Pattern on its own body: frost fern 3.3, lantern gold 3.5 (cream on the band 7.6), snowflakes 4.3, ice dots 3.4 (on the lighter `#6A70D0` body),
 outline ink on outline fill 3.8 light / 3.5 dark. The white frost band on Frosted glass is 1.5:1. It is a soft texture,
 not an identifying shape: the ferns carry the pattern.
 
 Scene (decorative, hidden from VoiceOver, so 1.4.11 does not apply): `appPrimaryText` on the sky is 8.4:1 light and 12.6:1
-dark, and on light snow 10.7:1. On dark snow it is **2.0:1**, hence the text rule above. The dark firs sit at 1.2:1 on
+dark, and on light snow 10.7:1. On dark snow it is **2.0:1**, hence the text rule above (card or 60 % scrim, 5.5:1). The dark firs sit at 1.2:1 on
 the dark hills. Their snow caps give the shape, and nothing interactive sits there.
 
 ## Colour-blind check
@@ -221,36 +238,57 @@ as the catalogue rule requires. These are the closest pairs, with luminance cont
 
 | Pair | Ratios | Told apart by |
 |---|---|---|
-| Snowflake indigo vs Starlight | 1.08 / 1.07 / 1.07 / 1.04 | six-armed flakes with a hub and twigs vs four-point sparkles; indigo rim vs teal rim |
-| Snowflake indigo vs Moonlit | 1.22 / 1.25 / 1.21 / 1.24 | flakes vs one big crescent |
+| Snowflake indigo vs Starlight | 1.49 / 1.49 / 1.50 / 1.52 | six-armed flakes with a hub and twigs vs four-point sparkles; indigo rim vs teal rim |
+| Snowflake indigo vs Dewdrop | 1.36 / 1.29 / 1.40 / 1.34 | flakes vs drops; the darker indigo rim |
+| Snowflake indigo vs Moonlit | 1.95 / 1.97 / 1.95 / 1.98 | flakes vs one big crescent |
 | Frosted glass vs Jade vine | 1.30 / 1.27 / 1.33 / 1.30 | frost band and ferns vs hanging jade flowers on a vine rail |
 | Lantern red vs Terracotta | 1.60 / 1.75 / 1.52 / 1.59 | lantern band vs two rings |
 | Robin breast vs back | 1.69 / 1.43 / 1.85 / 1.68 | the breast's grey edge band and shape. The robin still reads as a robin by silhouette and the white belly |
 | Hellebore sepal vs leaf | 1.63 / 1.36 / 1.82 / 1.66 | flower shape and the pale centre; leaves are palmate |
 
-The Snowflake indigo and Starlight pair is the weakest in grey. It matches the existing Moonlit and Starlight precedent
-(`design-preview/pots/notes.md`). If a reviewer wants more distance, lighten the indigo body to about `#6A70D0`. That
-passes 3:1 on its own on all four grounds, but it moves closer to Dewdrop's lilac.
+The Snowflake indigo body is lightened from `#4A4FAE` to `#6A70D0` (the shade takes the old body, `#4A4FAE`; the rim
+stays `#7F86D9`). That lifts the Starlight pair from 1.08 to 1.49 in grey. The rim still passes 3:1 on all four app
+grounds (table above). The new body sits nearer Dewdrop's lilac `#9686CC` (1.36), told apart by flakes vs drops and the
+darker rim. Builders: paste the new body and shade into the `snowflakeIndigo` entry in `PotCatalog`; the `PotMark`
+lists in `pot-marks.swift.txt` hold only decoration colours and do not change.
 
 ## Draft facts (for the owner's G5 fact-check, not yet checked)
 
-The plan asks for owner-checked facts. These drafts are short and simple, and still need to go through `CopySafety`
-and a source in `docs/research/`:
+The plan asks for owner-checked facts. These are still **drafts**: each needs a source and the checklist below before
+the G5 go/no-go. The app rule (`docs/research/visitor-facts.md`): one or two sentences, at most 16 words and 90
+characters, short words, `CopySafety.check` empty, no death or danger.
 
-- Robin: "Robins sing in winter too. Some even sing at night near street lights."
-- Wren: "Wrens are tiny, but their song is very loud. On cold nights, many wrens snuggle in one nest box."
-- Snowdrop: "Snowdrops bloom in late winter. Their hard leaf tips push up through cold ground."
-- Hellebore: "Hellebores bloom in winter. Their colourful parts are sepals, so they last for weeks."
+- Robin: "Robins sing in winter too. Some even sing at night near street lights." (70 / 13)
+- Wren: "Wrens are tiny but very loud singers. On cold nights, many snuggle in one nest box." (83 / 16)
+- Snowdrop: "Snowdrops bloom in late winter. Their hard leaf tips push up through cold ground." (81 / 14)
+- Hellebore: "Hellebores bloom in winter. Their bright parts are sepals, so they stay for weeks." (82 / 14)
+
+The wren line was shortened (the old one was 96 characters and 19 words). The hellebore line drops "last", which
+`CopySafety` bans, and "colourful", which no shipped string spells either way.
+
+Source-check checklist (owner, about 20 min, before G5):
+
+1. One authoritative source per fact, noted in a new table in `docs/research/visitor-facts.md` (birds) and a short
+   `docs/research/plant-facts-frost-lantern.md` (plants), same format as the visitor table.
+   - Birds: RSPB species page **and** BTO BirdFacts. Robin: winter song, night singing near street lights. Wren: loud
+     song for its size, communal roosting in nest boxes in cold weather.
+   - Plants: RHS grow guide **and** Kew plant page. Snowdrop (*Galanthus nivalis*): late-winter flowering, hardened leaf
+     tips. Hellebore: petal-like sepals, long display.
+2. Run each line through `CopySafety.check` and the 90 character / 16 word limits (add the four lines to the existing
+   fact test when the catalogue entries land).
+3. Under-13 safety: no death, cold-danger or "or they would freeze" framing (the wren line stays about snuggling).
+   **Never mention toxicity** (hellebores and snowdrops are poisonous) and **never invite picking, touching or
+   tasting**. No numbers a child cannot picture.
+4. Hedge anything regional ("Some even sing at night") rather than state it as universal.
 
 ## Open questions
 
-1. **Wren name and species.** The plan pairs the *European* robin with the *winter* wren. "Winter wren" is today the
-   North American *Troglodytes hiemalis*. The European bird is the Eurasian wren (*T. troglodytes*). The art fits both.
-   Pick the display name ("Wren" avoids the problem).
+1. **Wren name and species.** Settled: the display name is "Wren" everywhere. The plan's "winter wren" is today the
+   North American *Troglodytes hiemalis*; the art is the Eurasian wren (*T. troglodytes*), so facts use RSPB and BTO.
 2. **Hellebore species.** I drew the Lenten rose (*H. orientalis*, plum) so it does not repeat the snowdrop's white.
    The Christmas rose (*H. niger*) is white and blooms nearer December. It is a colour swap in `build.py` if wanted.
-3. **Stage art.** Should the glasshouse plants use the five stage panels, or the scaled full-bloom art like the 50 ladder
-   plants? Use one, never both (section 4).
+3. **Stage art.** Settled: the scaled full-bloom art, like the 50 ladder plants. The stage panels are reference, not
+   shipped (section 4).
 4. **Visitor count.** The brief to this lane said "3+ visitors". The plan lists two (robin and wren). Scope is frozen, so
    there are two. A third needs a plan change.
 5. **Glow Lantern overlap.** The backlog Glow Lantern (`docs/STATUS.md`) and the Shed light are kept from reading as

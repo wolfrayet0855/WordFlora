@@ -28,23 +28,23 @@ T = {
     "Visitor.eye": "#2C2418", "Plant.groundShadow": "#2C3E2C",
     "Pot.honeyCream": "#FFF0C2", "white": "#FFFFFF",
     # New art colours for the pack (art constants, not colorsets).
-    "FL.iceBody": "#B7D6E6", "FL.iceRim": "#5E93B0", "FL.iceShade": "#93BCD2", "FL.frostFern": "#3F7596",
+    "FL.iceBody": "#B7D6E6", "FL.iceRim": "#548BAC", "FL.iceShade": "#93BCD2", "FL.frostFern": "#3F7596",
     "FL.lanternBody": "#B5403A", "FL.lanternRim": "#D9665A", "FL.lanternShade": "#93302B",
     "FL.lanternBand": "#8A2A25", "FL.lanternInk": "#5E211C",
-    "FL.indigoBody": "#4A4FAE", "FL.indigoRim": "#7F86D9", "FL.indigoShade": "#363A8C", "FL.ice": "#CFE6F0",
+    "FL.indigoBody": "#6A70D0", "FL.indigoRim": "#7F86D9", "FL.indigoShade": "#4A4FAE", "FL.ice": "#CFE6F0",
     "FL.lanternRed": "#C8473E",
     "FL.snow": "#F4F7FB", "FL.snowShade": "#DCE5EF", "FL.snowDark": "#9AA7BC", "FL.snowShadeDark": "#7D8BA3",
     "FL.skyL1": "#D3DEEE", "FL.skyL2": "#DFE5F1", "FL.skyL3": "#EAE6F0",
     "FL.skyD1": "#17233A", "FL.skyD2": "#1E2C46", "FL.skyD3": "#283752",
     "FL.hillL": "#C4D3E4", "FL.hillD": "#33425E", "FL.moon": "#F6E8B0",
     "FL.post": "#5E4A3A", "FL.postDark": "#3E3128", "FL.fir": "#3F6F4A", "FL.firDark": "#2E5538",
-    "FL.glow": "#F5C858",
+    "FL.glow": "#F5C858", "FL.stringDark": "#8C7A6B",
     "FL.robinBack": "#7A6A4E", "FL.robinWing": "#5E4E36", "FL.robinWingEdge": "#9A8A68",
     "FL.robinBreast": "#E2733A", "FL.robinGrey": "#A9B0B8", "FL.robinBelly": "#F3EEE6", "FL.beak": "#3A2C1E",
     "FL.leg": "#7A5A44",
     "FL.wrenBody": "#8A5A34", "FL.wrenWing": "#6E4524", "FL.wrenBar": "#4E2F17", "FL.wrenBelly": "#D8B98E",
     "FL.wrenBrow": "#EBD7B4",
-    "FL.stickerFrost": "#DCEBF2", "FL.stickerBark": "#F1E6D6",
+    "FL.stickerFrost": "#DCEBF2", "FL.stickerMist": "#E6EAF0",
     "FL.snowdropLeaf": "#6E9C7E", "FL.snowdropLeafVein": "#A9C9B4", "FL.snowdropEdge": "#768C91",
     "FL.helleboreSepal": "#C46B8C", "FL.helleboreEdge": "#9A4A6B", "FL.helleboreCentre": "#C9D86A",
     "FL.helleboreStamen": "#F2E7A0", "FL.helleboreLeaf": "#3F6F4A", "FL.helleboreVein": "#6E9C7E",
@@ -282,8 +282,9 @@ def snowflake(x, y, r, col, w):
 
 
 # ---------------------------------------------------------------- badge
-TIERS = {1: ("Badge.bronze", "Badge.bronzeLight", [50]), 2: ("Badge.silver", "Badge.silverLight", [45, 55]),
-         3: ("Badge.gold", "Badge.goldLight", [40, 50, 60])}
+# Tier pips at 1.5x the BadgeArt dots (r 5.4 at y 86, 12 apart) so 1, 2 or 3 reads at 44 pt, not frame colour alone.
+TIERS = {1: ("Badge.bronze", "Badge.bronzeLight", [50]), 2: ("Badge.silver", "Badge.silverLight", [44, 56]),
+         3: ("Badge.gold", "Badge.goldLight", [38, 50, 62])}
 DODEC = "50.0,4.0 73.0,10.2 89.8,27.0 96.0,50.0 89.8,73.0 73.0,89.8 50.0,96.0 27.0,89.8 10.2,73.0 4.0,50.0 10.2,27.0 27.0,10.2"
 
 
@@ -293,7 +294,7 @@ def badge_svg(tier):
          '<polygon points="%s" fill="%s" transform="translate(50 50) scale(.92) translate(-50 -50)"/>' % (DODEC, c(lt)),
          '<circle cx="50" cy="48" r="33" fill="%s" stroke="%s" stroke-width="2"/>' % (c("Badge.disc"), c(dk))]
     ink = c("FL.lanternInk")
-    o.append('<g>')
+    o.append('<g transform="translate(3 0)">')  # lantern centred on the disc (x 50)
     o.append('<path d="M47 21 V27" stroke="%s" stroke-width="2.4" stroke-linecap="round"/>' % ink)
     o.append('<rect x="39" y="26" width="16" height="5" rx="1.6" fill="%s"/>' % ink)
     o.append('<ellipse cx="47" cy="46" rx="14" ry="15" fill="%s"/>' % c("FL.lanternRed"))
@@ -302,10 +303,10 @@ def badge_svg(tier):
     o.append('<path d="M43 44 Q44 40 47 39" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" fill="none" stroke-opacity=".9"/>')
     o.append('<rect x="41" y="60" width="12" height="4.5" rx="1.6" fill="%s"/>' % ink)
     o.append('<path d="M47 64.5 V72" stroke="%s" stroke-width="3" stroke-linecap="round"/>' % c("PetalKit.marigold"))
-    o.append(snowflake(68, 32, 7.5, c("FL.frostFern"), 2.2))
     o.append("</g>")
+    o.append(snowflake(69, 31, 7.5, c("FL.frostFern"), 2.2))
     for x in dots:
-        o.append('<circle cx="%s" cy="91" r="3.6" fill="%s" stroke="#fff" stroke-width="1.4"/>' % (f(x), c(lt)))
+        o.append('<circle cx="%s" cy="86" r="5.4" fill="%s" stroke="#fff" stroke-width="2.1"/>' % (f(x), c(lt)))
     return "".join(o)
 
 
@@ -313,19 +314,19 @@ def badge_files():
     for t in (1, 2, 3):
         dk, lt, _ = TIERS[t]
         write("badge_lantern_keeper_t%d.svg" % t, svg_doc(100, 100, badge_svg(t),
-              "Lantern Keeper tier %d. Frame as every BadgeArt badge: dodecagon %s/%s, disc Badge.disc, %d tier dot(s). Icon FL.lanternRed, FL.lanternInk, PetalKit.marigold, snowflake FL.frostFern. Same art on light and dark." % (t, dk, lt, t)))
+              "Lantern Keeper tier %d. Frame as every BadgeArt badge: dodecagon %s/%s, disc Badge.disc, %d tier dot(s) at 1.5x (r 5.4, y 86). Lantern centred at x 50. Icon FL.lanternRed, FL.lanternInk, PetalKit.marigold, snowflake FL.frostFern. Same art on light and dark." % (t, dk, lt, t)))
 
 
 # ---------------------------------------------------------------- Seasons row glyph (template)
 def glyph_svg(col="#000000"):
-    """A filled paper lantern (the rib is an even-odd slit) and a small snowflake, SF Symbol weight at 17 to 22 pt."""
-    o = ['<path d="M10 1.8 V5" stroke="%s" stroke-width="1.8" stroke-linecap="round"/>' % col,
-         '<rect x="5.6" y="4.4" width="8.8" height="2.6" rx="1" fill="%s"/>' % col,
-         '<path fill-rule="evenodd" fill="%s" d="M10 6.4 C3.2 7.4 3.2 18.6 10 19.6 C16.8 18.6 16.8 7.4 10 6.4 Z '
-         'M9.2 9 C8.2 11.5 8.2 14.5 9.2 17 L10.8 17 C11.8 14.5 11.8 11.5 10.8 9 Z"/>' % col,
-         '<rect x="6.4" y="19" width="7.2" height="2.4" rx="1" fill="%s"/>' % col,
-         '<path d="M10 21.4 V23" stroke="%s" stroke-width="1.8" stroke-linecap="round"/>' % col]
-    o.append(snowflake(19.6, 5.4, 3.9, col, 1.6))
+    """An outline paper lantern alone: a wide open body (2 pt stroke), one thin inner rib oval, flat caps, hook and
+    tassel. Drawn for 22 to 28 pt in one colour. No solid body and no snowflake: at 22 pt a flake reads as an asterisk."""
+    o = ['<path d="M12 1.4 V4" stroke="%s" stroke-width="1.8" stroke-linecap="round"/>' % col,
+         '<rect x="7.04" y="3.6" width="9.92" height="2.6" rx="1" fill="%s"/>' % col,
+         '<ellipse cx="12" cy="12" rx="8" ry="6" fill="none" stroke="%s" stroke-width="2"/>' % col,
+         '<ellipse cx="12" cy="12" rx="3.36" ry="5.6" fill="none" stroke="%s" stroke-width="1.2"/>' % col,
+         '<rect x="8" y="17.4" width="8" height="2.4" rx="1" fill="%s"/>' % col,
+         '<path d="M12 19.8 V23" stroke="%s" stroke-width="1.8" stroke-linecap="round"/>' % col]
     return "".join(o)
 
 
@@ -370,7 +371,7 @@ def wren_parts(wing_rot):
 
 VISITORS = {
     "robin": {"parts": robin_parts, "legs": (49, 57, 73), "tint": "FL.stickerFrost", "name": "European robin"},
-    "wren": {"parts": wren_parts, "legs": (47, 55, 72), "tint": "FL.stickerBark", "name": "Winter wren (Eurasian wren)"},
+    "wren": {"parts": wren_parts, "legs": (47, 55, 72), "tint": "FL.stickerMist", "name": "Wren"},
 }
 
 
@@ -423,12 +424,12 @@ def snowdrop_stem(x0, hx, hy, s):
 
 
 def snowdrop_petal(hx, hy, s, deg):
-    return ('<ellipse cx="0" cy="%s" rx="%s" ry="%s" transform="translate(%s %s) rotate(%s)" fill="#FFFFFF" stroke="%s" stroke-width="1.4"/>' % (
+    return ('<ellipse cx="0" cy="%s" rx="%s" ry="%s" transform="translate(%s %s) rotate(%s)" fill="#FFFFFF" stroke="%s" stroke-width="2"/>' % (
         f(12 * s), f(5.6 * s), f(12 * s), f(hx), f(hy), f(deg), c("FL.snowdropEdge")))
 
 
 def snowdrop_bell(hx, hy, s):
-    return ('<ellipse cx="%s" cy="%s" rx="%s" ry="%s" fill="#FFFFFF" stroke="%s" stroke-width="1.2"/>'
+    return ('<ellipse cx="%s" cy="%s" rx="%s" ry="%s" fill="#FFFFFF" stroke="%s" stroke-width="2"/>'
             '<path d="M%s %s L%s %s L%s %s" stroke="%s" stroke-width="%s" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' % (
                 f(hx), f(hy + 10 * s), f(4.2 * s), f(7 * s), c("FL.snowdropEdge"),
                 f(hx - 2.6 * s), f(hy + 13 * s), f(hx), f(hy + 15.6 * s), f(hx + 2.6 * s), f(hy + 13 * s), c("PetalKit.stem"), f(1.8 * s)))
@@ -457,7 +458,7 @@ def snowdrop_stage(st, prefix):
             '<path d="M100 176 V128" stroke="%s" stroke-width="3.2" stroke-linecap="round"/>' % c("PetalKit.stem")
     if st == 2:
         bud = ('<path d="M100 176 V100" stroke="%s" stroke-width="3.4" stroke-linecap="round"/>'
-               '<path d="M100 76 C107 84 107 98 100 102 C93 98 93 84 100 76 Z" fill="#FFFFFF" stroke="%s" stroke-width="1.4"/>'
+               '<path d="M100 76 C107 84 107 98 100 102 C93 98 93 84 100 76 Z" fill="#FFFFFF" stroke="%s" stroke-width="2"/>'
                '<path d="M100 104 C104 98 104 90 100 88" stroke="%s" stroke-width="2.6" fill="none" stroke-linecap="round"/>') % (
             c("PetalKit.stem"), c("FL.snowdropEdge"), c("PetalKit.leaf"))
         return ground(36) + strap_leaf(96, 176, 78, 116, -5, 4) + strap_leaf(104, 176, 124, 120, 6, 4) + bud
@@ -549,8 +550,8 @@ def plant_files():
           "Snowdrop (Galanthus nivalis), full bloom, 200 x 200 plant box. Groups = PlantThinning layers: ground, back (static), petals r<head>_s<i> (3 heads x 3 outer tepals), front (inner bells). Head pivots: (118,72) (70,88) (140,104)."))
     write("plant_hellebore.svg", svg_doc(200, 200, hellebore_full(),
           "Hellebore (Helleborus orientalis, Lenten rose), full bloom, 200 x 200 plant box. Layers: ground, back, petals r<head>_s<k> (3 heads x 5 sepals), front (centres). Head pivots: (102,74) (60,104) (144,100)."))
-    write("plant_snowdrop_stages.svg", stage_sheet(snowdrop_stage, "Snowdrop at stages 0-4 (LifeStats.stageNames). Each panel is a 200 x 200 plant box; panel 4 = plant_snowdrop.svg."))
-    write("plant_hellebore_stages.svg", stage_sheet(hellebore_stage, "Hellebore at stages 0-4 (LifeStats.stageNames). Each panel is a 200 x 200 plant box; panel 4 = plant_hellebore.svg."))
+    write("plant_snowdrop_stages.svg", stage_sheet(snowdrop_stage, "Reference, not shipped: ship only the layered full-bloom files. Snowdrop at stages 0-4 (LifeStats.stageNames). Each panel is a 200 x 200 plant box; panel 4 = plant_snowdrop.svg."))
+    write("plant_hellebore_stages.svg", stage_sheet(hellebore_stage, "Reference, not shipped: ship only the layered full-bloom files. Hellebore at stages 0-4 (LifeStats.stageNames). Each panel is a 200 x 200 plant box; panel 4 = plant_hellebore.svg."))
 
 
 # ---------------------------------------------------------------- pack card (Shed Seasons shelf), 353 x 150
@@ -643,7 +644,7 @@ def scene_svg(dark):
         o.append('<g id="stars">%s</g>' % "".join('<circle cx="%s" cy="%s" r="1.3" fill="#E8EEF8" fill-opacity=".7"/>' % (f(x), f(y)) for x, y in stars))
     o.append('<g id="hills"><path d="M0 560 Q70 520 150 548 T300 534 T393 540 V852 H0 Z" fill="%s"/>'
              '<path d="M0 600 Q90 570 196 590 T393 584 V852 H0 Z" fill="%s"/></g>' % (c("FL.hillD") if dark else c("FL.hillL"), shade))
-    o.append('<g id="firs">%s%s%s</g>' % (fir(44, 600, 92, dark), fir(352, 596, 110, dark), fir(312, 604, 70, dark)))
+    o.append('<g id="firs">%s%s%s</g>' % (fir(44, 600, 92, dark), fir(377, 596, 110, dark), fir(312, 604, 70, dark)))
     # fence
     fence = []
     post = c("FL.postDark") if dark else c("FL.post")
@@ -654,7 +655,7 @@ def scene_svg(dark):
     fence.append(snow_cap(0, 643, 393, snow))
     o.append('<g id="fence">%s</g>' % "".join(fence))
     # lantern string between two posts, then the posts
-    o.append('<g id="lanterns"><path d="M86 590 Q196 614 306 590" stroke="%s" stroke-width="1.8" fill="none"/>' % (c("FL.snowShadeDark") if dark else c("FL.lanternInk")))
+    o.append('<g id="lanterns"><path d="M86 590 Q196 614 306 590" stroke="%s" stroke-width="1.8" fill="none"/>' % (c("FL.stringDark") if dark else c("FL.lanternInk")))
     for x, y, b in [(132, 599, "FL.lanternRed"), (196, 602, "PetalKit.marigold"), (260, 599, "FL.lanternRed")]:
         o.append(lantern(x, y, 0.8, b, dark=dark))
     o.append(lamp_post(80, 700, 116, dark) + lamp_post(306, 700, 116, dark) + "</g>")
@@ -663,7 +664,7 @@ def scene_svg(dark):
              '<path d="M0 742 Q110 724 210 744 T393 736" stroke="%s" stroke-width="10" fill="none" stroke-linecap="round" opacity=".7"/>'
              '<path d="M30 800 Q150 782 260 800" stroke="%s" stroke-width="8" fill="none" stroke-linecap="round" opacity=".6"/></g>' % (snow, shade, shade))
     tufts = []
-    for x, y, s in [(52, 700, 0.36), (338, 694, 0.34)]:
+    for x, y, s in [(52, 700, 0.45), (338, 694, 0.425)]:  # 1.25x the first draft, so the clumps hold on snow
         tufts.append(plant_at(snowdrop_full, x - 100 * s, y - 180 * s, 200 * s))
     o.append('<g id="snowdrops">%s</g>' % "".join(tufts))
     return "".join(o)
@@ -737,7 +738,7 @@ def review_svg(dark):
         o.append(nest(650, yy, 108, 108, 120, 120, sticker_svg(v)))
         label(770, yy + 60, VISITORS[v]["name"], 13)
     # plants stages
-    label(24, 900, "Glasshouse plants, stages 0-4 at 100 pt")
+    label(24, 900, "Glasshouse plants, stages 0-4 at 100 pt (reference, not shipped)")
     for r, fn in enumerate((snowdrop_stage, hellebore_stage)):
         for i in range(5):
             o.append(nest(24 + i * 110, 912 + r * 112, 100, 100, 200, 200, fn(i, uid("rv") + "_")))
@@ -745,9 +746,9 @@ def review_svg(dark):
     label(600, 900, "Scene, 393 x 852 at 0.48")
     o.append(nest(600, 912, 189, 409, 393, 852, scene_svg(dark)))
     card(810, 1060, 270, 110)
-    label(826, 1100, "Cards over the scene keep", 13, "500")
-    label(826, 1120, "appSurface, so text contrast", 13, "500")
-    label(826, 1140, "never depends on the art.", 13, "500")
+    label(826, 1100, "Text over the scene sits on an", 13, "500")
+    label(826, 1120, "appSurface card or a 60 % appBackground", 13, "500")
+    label(826, 1140, "scrim, never on the snow bank.", 13, "500")
     return svg_doc(W, H, "".join(o), "Agent review sheet, %s. Not shipped." % th)
 
 
@@ -755,7 +756,7 @@ def main():
     pot_files()
     badge_files()
     write("seasons-row-glyph.svg", svg_doc(24, 24, glyph_svg(),
-          "Seasons row glyph for Settings > Plus. 24 x 24, single colour, 1.8 stroke: ship as a template image (renderingMode .template) so the Label tints it like its SF Symbol neighbours."))
+          "Seasons row glyph for Settings > Plus. 24 x 24, single colour: an outline paper lantern alone (2 stroke body, 1.2 rib oval, flat caps). Ship as a template image (renderingMode .template) so the Label tints it like its SF Symbol neighbours. Checked at 22, 24 and 28 pt."))
     visitor_files()
     plant_files()
     card_files()
