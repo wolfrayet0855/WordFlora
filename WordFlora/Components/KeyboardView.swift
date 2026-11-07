@@ -12,8 +12,9 @@ enum KeyboardLayout {
     static let maxKeyHeight: CGFloat = 64
     /// The check or cross under a used key's letter grows with the text size up to 14 pt.
     static let maxMarkSize: CGFloat = 14
-    /// The letter stops growing at this size; above it the key's Large Content Viewer shows the letter instead.
-    static let letterSizeCap = DynamicTypeSize.accessibility2
+    /// The smallest the letter may shrink to fit its box (title3 at AX5 is well over twice its default, in a box
+    /// about 46 pt tall and 33 pt wide); the key's Large Content Viewer shows the letter full size.
+    static let letterMinimumScale: CGFloat = 0.4
 
     /// The key height for a scaled `keyHeight` (from `@ScaledMetric`): never below the base, never above the cap.
     static func keyHeight(scaled: CGFloat) -> CGFloat { min(max(scaled, keyHeight), maxKeyHeight) }
@@ -91,8 +92,9 @@ struct KeyboardView: View {
             // two can never overlap (Apple's stacked layout for glyphs beside text at large sizes).
             VStack(spacing: 0) {
                 Text(letter).font(Theme.font(.title3, weight: .bold))
-                    .dynamicTypeSize(...KeyboardLayout.letterSizeCap)
-                    .lineLimit(1).minimumScaleFactor(0.7)
+                    // No Dynamic Type cap: Apple's audit fails text that stops growing (tried at AX2, every key
+                    // failed). The letter grows with the text size and shrinks only to fit its fixed box.
+                    .lineLimit(1).minimumScaleFactor(KeyboardLayout.letterMinimumScale)
                     .anchorPreference(key: KeyPartFrames.self, value: .bounds) { Self.uiTestProbes ? ["key.\(letter).letter": $0] : [:] }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                 // Colour is never the only signal: used keys carry a check or a cross too.
@@ -122,7 +124,7 @@ struct KeyboardView: View {
         // The label stays the letter alone (so Voice Control's "Tap R" works); the state is the value.
         .accessibilityLabel(letter)
         .accessibilityValue(Self.stateValue(s))
-        // The letter stops growing at AX2 and the key cannot grow wider: a long press shows it large.
+        // The key cannot grow wider, so at large sizes the letter is shrunk to fit: a long press shows it large.
         .accessibilityShowsLargeContentViewer {
             switch s {
             case .unused: Text(letter)
@@ -175,3 +177,4 @@ struct KeyPressStyle: ButtonStyle {
             .animation(.easeOut(duration: 0.08), value: configuration.isPressed)
     }
 }
+

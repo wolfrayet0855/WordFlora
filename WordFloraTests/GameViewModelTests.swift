@@ -555,7 +555,7 @@ final class PuzzleLayoutTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(key - strip, 34, "the letter's box at scale \(scale)")
         }
         XCTAssertEqual(KeyboardLayout.height(keyHeight: KeyboardLayout.maxKeyHeight), 208, "3 rows of 64 and two 8 pt gaps")
-        XCTAssertEqual(KeyboardLayout.letterSizeCap, .accessibility2)
+        XCTAssertEqual(KeyboardLayout.letterMinimumScale, 0.4)
     }
 
     func testAKeyReadsItsLetterThenItsState() {
