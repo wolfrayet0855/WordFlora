@@ -32,7 +32,19 @@ final class EndgameUITests: XCTestCase {
     /// elements fully inside the visible scroll area: text cut by a scroll edge is measured against what covers it, and
     /// a card half below the fold reads as "partially unsupported". Each element passed over this way is printed.
     /// `excuse`: findings passed over on purpose; each is printed.
-    private func audit(_ name: String, excuse: @escaping (XCUIAccessibilityAuditIssue) -> Bool = { _ in false }) {
+    /// `dynamicTypeApart`: the Dynamic Type and clipped-text checks grow the text, so a long page reflows and scrolls
+    /// under the audit and the contrast check then samples text at the wrong place (as found for TendingUITests). On
+    /// such a page contrast and the other checks run first on the page as the test left it, then those two each on their own.
+    private func audit(_ name: String, dynamicTypeApart: Bool = false,
+                       excuse: @escaping (XCUIAccessibilityAuditIssue) -> Bool = { _ in false }) {
+        guard dynamicTypeApart else { auditOnce(name, types: .all, excuse: excuse); return }
+        auditOnce(name, types: XCUIAccessibilityAuditType.all.subtracting([.dynamicType, .textClipped]), excuse: excuse)
+        auditOnce(name + "-textClipped", types: .textClipped, excuse: excuse)
+        auditOnce(name + "-dynamicType", types: .dynamicType, excuse: excuse)
+    }
+
+    private func auditOnce(_ name: String, types: XCUIAccessibilityAuditType,
+                           excuse: @escaping (XCUIAccessibilityAuditIssue) -> Bool) {
         var findings = [String]()
         let scroll = app.scrollViews.firstMatch
         // Text scrolled up under the navigation bar, or under iOS 26's soft scroll-edge fade just below it, is measured
@@ -44,7 +56,7 @@ final class EndgameUITests: XCTestCase {
             ? CGRect(x: scroll.frame.minX, y: max(scroll.frame.minY, top), width: scroll.frame.width, height: scroll.frame.maxY - max(scroll.frame.minY, top))
             : nil
         do {
-            try app.performAccessibilityAudit(for: .all) { issue in
+            try app.performAccessibilityAudit(for: types) { issue in
                 if excuse(issue) { print("\(name): excused: \(issue.compactDescription) '\(issue.element?.label ?? "")'"); return true }
                 if [.contrast, .dynamicType].contains(issue.auditType), let v = visible {
                     guard let e = issue.element else { return true }
@@ -55,6 +67,20 @@ final class EndgameUITests: XCTestCase {
             }
         } catch { findings.append("\(name): audit failed to run: \(error)") }
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
+    }
+
+    /// Waits until the given elements' frames read the same three times in a row, 0.5 s apart (at most 20 s).
+    private func waitForStillPage(_ elements: [XCUIElement], file: StaticString = #filePath, line: UInt = #line) {
+        func layout() -> [CGRect] { elements.map { $0.exists ? $0.frame : .null } }
+        var last = layout(), same = 0
+        let end = Date().addingTimeInterval(20)
+        while same < 2 && Date() < end {
+            Thread.sleep(forTimeInterval: 0.5)
+            let now = layout()
+            same = now == last ? same + 1 : 0
+            last = now
+        }
+        XCTAssertEqual(same, 2, "the page came to rest before the audit", file: file, line: line)
     }
 
     private func openShed() {
@@ -305,15 +331,28 @@ final class EndgameUITests: XCTestCase {
         // grid above does not reflow under the audit (the pattern found for the Shed audit).
         // The grid holds every badge (37), so swipe until the replay button at the very end is on screen, then once more.
         let replay = app.buttons["badges.replayGrandGarden"]
-        for _ in 0..<30 where !(replay.exists && replay.isHittable) { app.swipeUp() }
-        app.swipeUp()
-        sleep(2)
+        // One swipe at a time, each let to settle, until the last card stops moving (TendingUITests.scrollToEnd), then
+        // the page must hold still before the audit. The audit is split (dynamicTypeApart): run together, the Dynamic
+        // Type check grew the badge texts, the page reflowed about 190 pt under the audit, and contrast was sampled
+        // where the cards no longer were.
+        let rank = element("badges.bloomRank")
+        var previous = CGRect.null
+        for _ in 0..<40 {
+            if rank.exists, rank.isHittable, replay.isHittable, rank.frame == previous { break }
+            previous = rank.exists ? rank.frame : .null
+            app.swipeUp()
+            sleep(1)
+        }
+        XCTAssertTrue(rank.isHittable && replay.isHittable, "reached the end of the Badges page")
+        let topCard = element("badge.wild_discovery"), lastCard = element("badge.sharer")
+        waitForStillPage([replay, rank, topCard, lastCard])
+        shot("badges-rank")
         // The badge grid above is the existing Badges page (audited on its own in WordFloraUITests.testAuditMoreScreens);
         // after a long scroll its lazy cards reflow under the Dynamic Type check, so here only Dynamic Type on grid
         // cards is passed over. The rank and replay cards are judged in full.
         // The grid ends above the Grand Garden card, whose top is just above its replay button.
         let gridBottom = app.buttons["badges.replayGrandGarden"].frame.minY - 40
-        audit("badges-rank", excuse: { issue in
+        audit("badges-rank", dynamicTypeApart: true, excuse: { issue in
             guard issue.auditType == .dynamicType, let e = issue.element else { return false }
             return e.frame.maxY <= gridBottom
         })
