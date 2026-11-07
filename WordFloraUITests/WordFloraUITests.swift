@@ -731,7 +731,8 @@ final class FidelityScreensUITests: XCTestCase {
             sleep(1); shot("settings-\(look.0)")
             app.swipeUp(); sleep(1); shot("settings-\(look.0)-2")
             let plus = app.buttons["Remove ads and sync with iCloud"]
-            for _ in 0..<6 where !plus.isHittable { app.swipeUp() }
+            // At AX XXXL the Settings page is long enough that six swipes stopped short of the row.
+            for _ in 0..<14 where !(plus.exists && plus.isHittable) { app.swipeUp() }
             plus.tap()
             XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))
             sleep(1); shot("plus-\(look.0)")
