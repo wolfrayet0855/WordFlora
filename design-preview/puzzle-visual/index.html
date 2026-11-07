@@ -1,0 +1,107 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Puzzle visual fixes</title>
+<link rel="stylesheet" href="../theme.css"><script src="../theme.js"></script>
+<style>
+/* Before/after for the top 3 visual fixes in docs/pm/puzzle-experience-review.md (V1 long words, V2 dead space + scale, V3 key states). */
+body{background:var(--stage);padding:24px 16px;margin:0}
+h1{font-size:20px;margin:0 0 4px}
+p.lead{margin:0 0 20px;opacity:.85;max-width:860px}
+.row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.col{display:flex;flex-direction:column;gap:8px;align-items:center}
+.lbl{font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+.phone{width:402px;height:874px;background:var(--bg);border-radius:48px;position:relative;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.18);display:flex;flex-direction:column}
+.status{height:62px}
+.bar{display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 12px;position:relative}
+.bar .t{position:absolute;left:0;right:0;text-align:center;font-size:17px;pointer-events:none}
+.bar .t.semi{font-weight:600}
+.help{font-weight:600;font-size:15px;display:flex;gap:4px;align-items:center;padding:0 12px;height:36px;border-radius:18px}
+.help.pill{background:#E3EFDC}
+[data-theme=dark] .help.pill{background:#2C3E2C}
+.flower{display:flex;justify-content:center}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;font-size:17px;line-height:1.3}
+.card .eyebrow{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;opacity:.75;margin-bottom:4px}
+.tiles{display:flex;justify-content:center;gap:6px}
+.tile{border-radius:10px;display:grid;place-items:center;font-weight:800;flex:none}
+.tile.blank{background:var(--surface);border:2px solid color-mix(in srgb,var(--text) 18%,transparent)}
+.tile.blank.strong{border-color:color-mix(in srgb,var(--text) 55%,transparent)}
+.tile.hit{background:color-mix(in srgb,var(--accent) 22%,var(--bg));border:2px solid var(--accent)}
+.kb{display:flex;flex-direction:column;gap:8px;padding:0 12px 8px}
+.kr{display:flex;gap:5px;justify-content:center}
+.k{height:50px;border-radius:9px;background:var(--surface);border:1px solid color-mix(in srgb,var(--text) 14%,transparent);display:grid;place-items:center;font-weight:700;font-size:20px;position:relative}
+.k.sh{box-shadow:0 1px 0 color-mix(in srgb,var(--text) 22%,transparent);border-radius:10px}
+.k.ok{background:#2E7D32;color:#fff;border-color:transparent}
+[data-theme=dark] .k.ok{background:#81C784;color:#fff}
+[data-theme=dark] .k.ok.fixed{color:#1A2E1A}
+.k.no{background:color-mix(in srgb,var(--danger) 22%,var(--surface));color:color-mix(in srgb,var(--text) 45%,transparent);border-color:transparent}
+.k.no.fixed{color:color-mix(in srgb,var(--text) 70%,transparent)}
+.k i{position:absolute;top:2px;right:4px;font-style:normal;font-size:9px;font-weight:900}
+.k.fixed i{font-size:11px}
+.note{background:#FFF6D8;color:#2C3E2C;border-radius:10px;padding:8px 10px;font-size:13px;max-width:402px}
+.overflow{position:relative}
+.overflow::after{content:"off screen";position:absolute;right:-6px;top:-18px;font-size:11px;color:#E85050;font-weight:700}
+.spacer{flex:1;background:repeating-linear-gradient(45deg,transparent 0 8px,rgba(232,80,80,.08) 8px 16px)}
+.spacer.ok{background:none}
+section{margin-bottom:40px}
+@media (max-width:860px){.phone{transform:scale(.8);transform-origin:top center;margin-bottom:-170px}}
+</style></head><body>
+<h1>Puzzle screen: top 3 visual fixes</h1>
+<p class="lead">Static before/after mockups at iPhone 17 Pro size (402 x 874 pt). Before follows the current code (GameView, KeyboardView, WordTilesView); After applies V1-V3 from docs/pm/puzzle-experience-review.md. Toggle dark with the theme switch (theme.js) to see V3.</p>
+
+<section>
+<div class="row">
+ <div class="col"><div class="lbl">Before</div>
+  <div class="phone" id="before">
+   <div class="status"></div>
+   <div class="bar"><span>&#8962;</span><span class="t">Level 5</span><span class="help">&#128161; Help</span></div>
+   <div class="flower" style="height:170px;margin-top:10px"><img src="../flowers/flower_8.svg" height="170" alt=""></div>
+   <div style="padding:10px 12px 0"><div class="card">When a plant bends toward the light.</div></div>
+   <div class="tiles overflow" style="margin:10px 20px 0;justify-content:flex-start" id="beforeTiles"></div>
+   <div class="spacer"></div>
+   <div class="kb" id="kbBefore"></div>
+   <div style="height:34px"></div>
+  </div>
+  <div class="note">V1: PHOTOTROPISM (12 letters) at 30 pt tiles is 426 pt wide in a 362 pt column, so the last tiles fall off screen. V2: about 210 pt of empty cream (hatched) between the tiles and the keys. Title "Level 5" regular weight, off centre.</div>
+ </div>
+ <div class="col"><div class="lbl">After</div>
+  <div class="phone" id="after">
+   <div class="status"></div>
+   <div class="bar"><span>&#8962;</span><span class="t semi">Level 5</span><span class="help pill">&#128161; Help</span></div>
+   <div class="spacer ok" style="flex:.4"></div>
+   <div class="flower" style="height:236px"><img src="../flowers/flower_8.svg" height="236" alt=""></div>
+   <div class="spacer ok" style="flex:.3"></div>
+   <div style="padding:0 16px"><div class="card"><div class="eyebrow">Clue</div>When a plant bends toward the light.</div></div>
+   <div class="tiles" style="margin:16px 16px 0" id="afterTiles"></div>
+   <div class="spacer ok" style="flex:.6"></div>
+   <div class="kb" id="kbAfter"></div>
+   <div style="height:34px"></div>
+  </div>
+  <div class="note">V1: tile width = min(40, (column - gaps) / letters), here 25 pt; letters scale with it. V2: flower grows into the free space (170 to ~236 pt), clue/tiles on the 16 pt gutter, a "Clue" eyebrow, tiles 40 x 52 for short words. Title semibold and truly centred, Help reads as a button.</div>
+ </div>
+</div>
+</section>
+
+<section>
+<div class="row">
+ <div class="col"><div class="lbl">V3 key states before</div><div class="kb" id="statesBefore" style="background:var(--bg);padding:16px;border-radius:16px"></div>
+  <div class="note">Dark mode: white on #81C784 is 2.0:1. Used-wrong letters 2.3-2.7:1, 9 pt glyph. Rows have different key widths (33 / 37 / 39 pt) and no stagger.</div></div>
+ <div class="col"><div class="lbl">V3 key states after</div><div class="kb" id="statesAfter" style="background:var(--bg);padding:16px;border-radius:16px"></div>
+  <div class="note">Correct key text #1A2E1A in dark (7.2:1), wrong letters at 70% (4.0-4.3:1), 11 pt glyph, one key width for every row (row 2 and 3 centred, so they stagger), 1 pt bottom shadow so keys lift off the cream.</div></div>
+</div>
+</section>
+
+<script>
+const word="PHOTOTROPISM", shown=new Set("PHOT");
+function tiles(el,w,h,fs){for(const c of word){const d=document.createElement('div');const hit=shown.has(c);d.className='tile '+(hit?'hit':(el.id==='afterTiles'?'blank strong':'blank'));d.style.width=w+'px';d.style.height=h+'px';d.style.fontSize=fs+'px';d.textContent=hit?c:'';el.appendChild(d)}}
+tiles(document.getElementById('beforeTiles'),30,42,22);
+const col=402-32, n=word.length, tw=Math.min(40,Math.floor((col-(n-1)*6)/n));
+tiles(document.getElementById('afterTiles'),tw,Math.round(tw*1.3),Math.round(tw*.75));
+const rows=["QWERTYUIOP","ASDFGHJKL","ZXCVBNM"], ok=new Set("PHOT"), no=new Set("ZXQ");
+function kb(el,fixed){const W=402-24, base=(W-9*5)/10;
+ rows.forEach((r,ri)=>{const row=document.createElement('div');row.className='kr';
+  const w=fixed?base:(ri===0?base:Math.min(40,(W-(r.length-1)*5)/r.length));
+  for(const c of r){const k=document.createElement('div');k.className='k'+(fixed?' sh fixed':'')+(ok.has(c)?' ok':no.has(c)?' no':'');k.style.width=w+'px';k.innerHTML=c+(ok.has(c)?'<i>&#10003;</i>':no.has(c)?'<i>&#10005;</i>':'');row.appendChild(k)}
+  el.appendChild(row)})}
+kb(document.getElementById('kbBefore'),false);kb(document.getElementById('kbAfter'),true);
+kb(document.getElementById('statesBefore'),false);kb(document.getElementById('statesAfter'),true);
+</script>
+</body></html>
