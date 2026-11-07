@@ -795,6 +795,25 @@ final class ParentalGateLinkUITests: XCTestCase {
         shot("plus-grown-ups")
         expectGateThenCancel(after: app.buttons["Terms of Use"])
         expectGateThenCancel(after: app.buttons["Manage subscription"])
+        expectGateThenCancel(after: app.buttons["plus.redeem"])
+    }
+
+    /// Plus Forever is a purchase like the plans: a young player's tap on its buy button asks a grown-up first.
+    func testUnder13PlusForeverAndCodesAskAGrownUpFirst() {
+        // `-uitest-prices`: the page shows the local config's three prices, whatever the simulator's store returns.
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-prices", "-uitest-age=under13"]
+        app.launch()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        let row = app.buttons["settings.plus"]
+        scrollTo(row); row.tap()
+        let lifetime = app.buttons["plus.lifetime"]
+        XCTAssertTrue(lifetime.waitForExistence(timeout: 8))
+        scrollTo(lifetime); lifetime.tap()
+        let buy = app.buttons["Buy Plus Forever"]
+        XCTAssertTrue(buy.waitForExistence(timeout: 3))
+        expectGateThenCancel(after: buy)
+        expectGateThenCancel(after: app.buttons["Redeem a code"])
     }
 
     func testAdultsSeeTheSameLinksWithNoGateOnScreen() {
@@ -809,5 +828,151 @@ final class ParentalGateLinkUITests: XCTestCase {
         row.tap()
         XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.staticTexts["plus.grownUpsIntro"].exists)
+    }
+}
+
+/// Plus Forever and Redeem a code on the Plus page: the third row under the two plans (never the default), the
+/// owned states, the "charged twice" note, and the full audit at the default size and AX XXXL.
+final class PlusForeverUITests: XCTestCase {
+    let app = XCUIApplication()
+    override func setUpWithError() throws { continueAfterFailure = false }
+
+    /// `-uitest-prices`: the page shows the local `WordFlora.storekit` prices whatever the simulator's store returns
+    /// (UI tests run outside the StoreKit test environment). Purchases themselves are covered by StoreKitConfigTests.
+    private func openPlus(_ extra: [String] = [], size: String? = nil) {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-prices", "-uitest-age=eighteenPlus"] + extra
+            + (size.map { ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategory\($0)"] } ?? [])
+        app.launch()
+        app.buttons["Settings"].tap()
+        let row = app.buttons["settings.plus"]
+        scrollTo(row)
+        row.tap()
+        XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 8))
+    }
+
+    /// Swipes until the element is on screen, then lets the scroll come to rest for the shots.
+    private func scrollTo(_ element: XCUIElement) {
+        var swiped = false
+        for _ in 0..<10 where !(element.exists && element.isHittable) { app.swipeUp(); swiped = true }
+        if swiped { sleep(2) }
+    }
+
+    private func shot(_ name: String) {
+        let data = XCUIScreen.main.screenshot().pngRepresentation
+        if let dir = ProcessInfo.processInfo.environment["SCREENSHOT_DIR"] {
+            try? data.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+        }
+        let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
+    }
+
+    /// The full audit, as `WordFloraUITests.audit`: only text wholly inside the scroll view is judged for contrast.
+    /// Run on unscrolled screens only: after a scroll, the audit placed this page's text about 35 pt below where it is
+    /// drawn and judged the wrong pixels next to the bar (the level map's audit runs from the top for the same reason).
+    private func audit(_ name: String) {
+        var findings = [String](), skipped = 0
+        let scroll = app.scrollViews.firstMatch, nav = app.navigationBars.firstMatch
+        let top = nav.exists ? nav.frame.maxY : 0
+        shot("audit-\(name)")
+        let visible: CGRect? = scroll.exists ? {
+            let f = scroll.frame
+            return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
+        }() : nil
+        do {
+            try app.performAccessibilityAudit(for: .all) { issue in
+                if issue.auditType == .contrast, let v = visible {
+                    guard let e = issue.element else { skipped += 1; return true }
+                    if !v.contains(e.frame) { return true }
+                }
+                findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
+                return true
+            }
+        } catch { findings.append("\(name): audit failed to run: \(error)") }
+        if skipped > 0 { print("\(name): contrast on \(skipped) clipped, unresolved element(s) not judged") }
+        XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
+    }
+
+    func testPlusForeverIsTheThirdRowAndYearlyStaysTheDefault() {
+        openPlus()
+        let lifetime = app.buttons["plus.lifetime"]
+        XCTAssertTrue(lifetime.waitForExistence(timeout: 8))
+        XCTAssertTrue(lifetime.label.contains("Plus Forever"), lifetime.label)
+        XCTAssertTrue(lifetime.label.contains("Pay once, keep Plus on this Apple ID. No renewals."), lifetime.label)
+        XCTAssertFalse(lifetime.isSelected, "Plus Forever is never the default")
+        let yearly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Yearly'")).firstMatch
+        let monthly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Monthly'")).firstMatch
+        XCTAssertTrue(yearly.isSelected, "Yearly stays the default")
+        XCTAssertLessThan(yearly.frame.minY, monthly.frame.minY)
+        XCTAssertLessThan(monthly.frame.minY, lifetime.frame.minY, "Plus Forever sits under Yearly and Monthly")
+        XCTAssertFalse(lifetime.label.lowercased().contains("best"), "no badge on Plus Forever")
+        scrollTo(lifetime); lifetime.tap()
+        XCTAssertTrue(lifetime.isSelected)
+        let buy = app.buttons["Buy Plus Forever"]
+        XCTAssertTrue(buy.waitForExistence(timeout: 3))
+        let fine = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'One payment of'")).firstMatch
+        XCTAssertTrue(fine.exists); XCTAssertTrue(fine.label.hasSuffix("No renewals."), fine.label)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'renews automatically'")).firstMatch.exists,
+                       "no renewal wording while Plus Forever is picked")
+        shot("plus-three-rows")
+        let redeem = app.buttons["Redeem a code"]
+        scrollTo(redeem)
+        XCTAssertTrue(redeem.exists && redeem.isHittable)
+        XCTAssertGreaterThanOrEqual(redeem.frame.height, 43.99)
+        shot("plus-redeem-row")
+    }
+
+    /// At the default size all three rows are on the first screen, so the audit sees them unscrolled. Redeem a code is
+    /// audited unscrolled on the owner screens below, where it is on the first screen.
+    func testThePlusPagePassesTheAuditWithThreeRows() {
+        openPlus()
+        let lifetime = app.buttons["plus.lifetime"]
+        XCTAssertTrue(lifetime.waitForExistence(timeout: 8))
+        XCTAssertTrue(lifetime.isHittable, "all three rows on the first screen")
+        audit("plus-three-rows")
+    }
+
+    /// At AX XXXL: the top of the page passes the audit, and every row and Redeem a code is reachable, tappable and
+    /// inside the screen's width (the old side-by-side price pushed the cards off the left edge here).
+    func testThePlusPagePassesTheAuditAtAccessibilityXXXL() {
+        openPlus(size: "AccessibilityXXXL")
+        audit("plus-axxxl-top")
+        let screen = app.windows.firstMatch.frame
+        for (id, name) in [("Yearly", "yearly"), ("Monthly", "monthly")] {
+            let row = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", id)).firstMatch
+            scrollTo(row)
+            XCTAssertTrue(row.isHittable, id)
+            XCTAssertGreaterThanOrEqual(row.frame.minX, screen.minX, "\(id) stays on screen")
+            XCTAssertLessThanOrEqual(row.frame.maxX, screen.maxX, "\(id) stays on screen")
+            shot("plus-axxxl-\(name)")
+        }
+        let lifetime = app.buttons["plus.lifetime"]
+        scrollTo(lifetime)
+        XCTAssertTrue(lifetime.isHittable)
+        XCTAssertGreaterThanOrEqual(lifetime.frame.minX, screen.minX); XCTAssertLessThanOrEqual(lifetime.frame.maxX, screen.maxX)
+        shot("plus-three-rows-axxxl")
+        let redeem = app.buttons["Redeem a code"]
+        scrollTo(redeem)
+        XCTAssertTrue(redeem.isHittable)
+        XCTAssertGreaterThanOrEqual(redeem.frame.height, 43.99)
+        shot("plus-redeem-axxxl")
+    }
+
+    func testPlusForeverOwnersSeeThankYouAndNoPlans() {
+        openPlus(["-uitest-plus-forever"])
+        XCTAssertTrue(app.staticTexts["You have Plus Forever"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["plus.lifetime"].exists)
+        XCTAssertFalse(app.buttons["Subscribe"].exists)
+        XCTAssertFalse(app.staticTexts["plus.paysTwice"].exists, "no subscription, so no note")
+        audit("plus-forever-owned")
+    }
+
+    func testOwnersWithASubscriptionAreToldToCancelIt() {
+        openPlus(["-uitest-plus-twice"])
+        XCTAssertTrue(app.staticTexts["You have Plus Forever"].waitForExistence(timeout: 5))
+        let note = app.staticTexts["plus.paysTwice"]
+        XCTAssertTrue(note.exists)
+        XCTAssertEqual(note.label, "You still have a subscription. Cancel it so you aren't charged twice.")
+        XCTAssertTrue(app.buttons["Cancel the subscription"].exists)
+        shot("plus-pays-twice")
+        audit("plus-pays-twice")
     }
 }

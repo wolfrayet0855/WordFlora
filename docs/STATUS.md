@@ -417,3 +417,45 @@ Own simulator `WF G1 iPhone 17` (iOS 26.5), derived data `dd-g1`, one xcodebuild
 - The faded bloom sits at one of five seeded spots in the upper part of the plant art, not on a real bloom of each plant's art (the plant art has no bloom anchors). On the clover it reads as a dry flower on its own stem beside the leaves; worth a look across a few plants on localhost.
 - The stamp press goes from 1.35 to 1 in one ease-in (the 0.96 settle is left out).
 - Device only: Listen to the end stamping the page (real voice), the stamp haptic.
+
+## Gate G2: StoreKit reds, Plus Forever, Redeem a code (2026-11-07, from `3-feat-content-and-polish` tip `0ea7e2e`)
+Own simulator `WF G2 iPhone 17` (iOS 26.5), derived data `dd-g2`, one xcodebuild at a time, test timeouts on, simulator erased with `mediaanalysisd` disabled before each batch. No new stored fields.
+
+**The 3 red StoreKitConfigTests: cause and fix**
+- storekitd refused every `SKTestSession` call with "beta.WordFlora is not installed for development" (simulator log, `com.apple.storekit`). Debug simulator builds here sign "to run locally" with no provisioning profile, so nothing put `get-task-allow` in the simulated entitlements. The session's config never loaded: products came from the real App Store sandbox (where `plus_yearly` and `plus_monthly` already exist, which is why the two load tests passed), purchases threw `notEntitled`, and `testPurchaseOnlyReportsSuccessOnceTheEntitlementIsLive` waited on a sandbox purchase sheet until the time allowance.
+- Fix: Debug simulator builds use `WordFlora/WordFlora-Simulator.entitlements` (`CODE_SIGN_ENTITLEMENTS[sdk=iphonesimulator*]`, Debug only): the app's entitlements plus `get-task-allow`. Release and device builds still use `WordFlora/WordFlora.entitlements`, unchanged. Keep the two files in step if a capability is added. `Config/WordFlora.storekit` was also rewritten in Xcode's version 4 layout with numeric ids. Tried and dropped: a StoreKit configuration on the scheme's Test action (no effect under xcodebuild). No test was skipped or loosened.
+
+**What**
+- **Plus Forever (B1):** `plus_lifetime`, non-consumable, $34.99, Family Sharing on, display name "Plus Forever", in `Config/WordFlora.storekit`. `EntitlementState`: lifetime counts as Plus (no ads, sync, Plus pots), never expires, revoked transactions and expired subscriptions never count; `hasLifetime`, `paysTwice` (lifetime plus a live subscription). `PlusPlan` stays subscriptions only; `PlusChoice` (yearly, monthly, lifetime) drives the page and `purchase`. Restore and `Transaction.updates` needed nothing new (non-consumables are in `currentEntitlements`).
+- **Plus page:** a third card under Yearly and Monthly, same type sizes, no badge, never the default (Yearly stays selected): "Plus Forever", "Pay once, keep Plus on this Apple ID. No renewals.", the price. Picked, the button reads "Buy Plus Forever" and the fine print "One payment of $34.99. Pay once, keep Plus on this Apple ID. No renewals." (no trial or renewal wording). The card hides when the store answers without the product. Owners see "You have Plus Forever"; an owner with a live subscription also sees "You still have a subscription. Cancel it so you aren't charged twice." and a Cancel the subscription button (`.manageSubscriptionsSheet`, behind the grown-up question for under 13 / unknown).
+- **One card layout at every size:** at AX XXXL the old cards ran off the left edge of the screen (price beside the title, a fixed-size "Best value" badge). All three cards now stack title, lines and price on the left with the choice circle on the right and wrap; no ViewThatFits. The badge is a rounded rectangle so it reads well when it wraps.
+- **Redeem a code (B4):** a row under Restore purchases on the Plus page. It opens Apple's code sheet with `AppStore.presentOfferCodeRedeemSheet(in:)` on the active window scene (iOS 16+, fine for 17.5), behind the grown-up question for under 13 and unknown ages, then refreshes entitlements and the sync flag. A redeemed code also arrives through `Transaction.updates`, which `EntitlementService` already listens to (started at launch outside UI tests).
+- **TendingUITests:** `testRepotSheetScreensLikeTheMockup` is now four tests (Light, Dark, AccessibilityL, DarkReduceMotion) with the same assertions and screenshots.
+- UI fixtures: `-uitest-prices` (the page shows the local file's prices whatever the simulator's store returns; UI tests run outside the StoreKit test environment, and nothing can be bought from a preview), `-uitest-plus-forever`, `-uitest-plus-twice`. Copy in `PaywallCopy.all`, checked by CopySafety. Ads logic, the privacy manifest and `PlusOfferPolicy` are unchanged.
+
+**Tests**
+- Unit (`PaywallRulesTests`): lifetime alone, lifetime with a subscription (pays twice), lifetime beside an expired subscription, revoked lifetime, an end date on lifetime ignored, choices and ids, lifetime copy (no trial or renewal wording) through CopySafety.
+- `SKTestSession` (`StoreKitConfigTests`, 14): the original six, plus Plus Forever loads as a family-shareable non-consumable at 34.99, buying it turns Plus on, it survives Restore on a fresh service, it outlasts an expired subscription (and the pays-twice state clears), a refund turns it off, Ask to Buy is pending until approved, and the UI price preview matches the local file.
+- UI: `PlusForeverUITests` (row order and default, buy button and fine print, Redeem row, owner states, pays-twice note, audit unscrolled at the default size with all three rows and on both owner screens with Redeem a code on screen, AX XXXL audit of the top plus every row and Redeem reachable and inside the screen width); `ParentalGateLinkUITests` (Redeem behind the gate; new test: Plus Forever's buy button and Redeem behind the gate for under 13).
+
+`setUp` also turns Ask to Buy off for every test: `SKTestSession` settings persist in the simulator's store between tests, and the Ask to Buy test left the next purchases pending.
+
+**Results** (`WF G2 iPhone 17`, iOS 26.5, simulator erased before each batch)
+
+| Run | Result |
+|---|---|
+| Unit (`WordFloraTests`) | 1115 run, 1115 pass; `StoreKitConfigTests` 14/14 (the 3 old reds included) |
+| PlusForeverUITests | 5/5 |
+| ParentalGateLinkUITests | 4/4 |
+| WordFloraUITests (paywall, subscriber, Garden/Settings/Plus audit, paywall and onboarding audit, more screens incl. Settings) | 5/5 |
+| FidelityScreensUITests `testBadgesSettingsPlusDailyAndAgeScreens` | pass |
+| TendingUITests | 26/26 (the four repot look tests 28 to 35 s each) |
+
+**Shots checked by eye** (`scratchpad/g2shots/`): the Plus page with three cards and Plus Forever picked (button and fine print), the cards at AX XXXL (everything wraps on screen), the owner card with the pays-twice note and Redeem a code, the under-13 page.
+
+**Open items**
+- Scrolled audits of the Plus page: after any scroll the audit placed this page's text about 35 pt below where it is drawn (screenshots taken right before each audit show the text crisp and clear of the bar) and reported one contrast failure on the line nearest the bar. The audits therefore run on unscrolled screens only, as the level map's already does; nothing in the audit was loosened.
+- App Store Connect: `plus_lifetime` and the offer codes `GARDENFRIEND` / `WELCOMEBACK` (owner-setup-steps A13, A14). Until `plus_lifetime` exists there, the live page shows only the two plans (the card hides).
+- Device only: the offer code sheet and a real redemption (TestFlight), a family-shared Plus Forever.
+- At AX XXXL "Yearly" breaks as "Year-ly" beside the wrapped Best value badge. Readable; moving the badge to its own line would fix it if the owner prefers.
+- The pays-twice note shows while lifetime and a subscription are both active, even if auto-renew is already off (renewal info is not read).

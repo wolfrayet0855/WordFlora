@@ -98,6 +98,15 @@ struct WordFloraApp: App {
         if uiTesting && args.contains("-uitest-plus") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
+        // The Plus page with the local StoreKit file's prices, whatever the simulator's store returns.
+        if uiTesting && args.contains("-uitest-prices") { model.entitlements.debugPreviewPrices(UITestPrices.local) }
+        // Plus Forever owned, alone or beside a subscription that is still renewing (the "charged twice" note).
+        if uiTesting && args.contains("-uitest-plus-forever") {
+            model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID]))
+        }
+        if uiTesting && args.contains("-uitest-plus-twice") {
+            model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID, "plus_yearly"]))
+        }
         if uiTesting && args.contains("-uitest-everything") { model.settings.showEverything = true; model.syncToolUnlocks() }
         // Visitors and Shed tests: a few friends in the album, shed points, Calm mode or Quiet Garden.
         if uiTesting && args.contains("-uitest-album") {
@@ -208,4 +217,11 @@ struct WordFloraApp: App {
                 }
         }
     }
+}
+
+/// `-uitest-prices`: the prices in `Config/WordFlora.storekit` (StoreKitConfigTests checks they match). UI tests launch
+/// the app outside the StoreKit test environment, where the store may return no products or only some.
+enum UITestPrices {
+    static let local: [PlusChoice: Decimal] = [.yearly: Decimal(string: "12.99")!, .monthly: Decimal(string: "3.99")!,
+                                               .lifetime: Decimal(string: "34.99")!]
 }

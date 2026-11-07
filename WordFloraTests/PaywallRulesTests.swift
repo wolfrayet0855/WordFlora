@@ -119,6 +119,67 @@ final class PaywallRulesTests: XCTestCase {
         for line in [PlusEntry.grownUps, PlusEntry.introLine] { XCTAssertEqual(CopySafety.check(line), [], line) }
     }
 
+    // MARK: Plus Forever (lifetime) and codes
+    func testLifetimeAloneIsPlusWithNoAdsAndSync() {
+        let s = EntitlementState(activeProductIDs: ["plus_lifetime"])
+        XCTAssertTrue(s.hasPlus); XCTAssertTrue(s.hasRemoveAds); XCTAssertTrue(s.hasCloudSync)
+        XCTAssertTrue(s.hasLifetime); XCTAssertFalse(s.hasActiveSubscription); XCTAssertFalse(s.paysTwice)
+        XCTAssertEqual(PlusPlan.lifetimeID, "plus_lifetime")
+        XCTAssertEqual(PlusPlan.lifetimeName, "Plus Forever")
+        XCTAssertFalse(PlusPlan.allProductIDs.contains("plus_lifetime"), "the subscription plans stay subscriptions only")
+        XCTAssertEqual(PlusPlan.plusProductIDs, ["plus_yearly", "plus_monthly", "plus_lifetime"])
+    }
+
+    func testLifetimeWithASubscriptionIsPlusAndSaysItPaysTwice() {
+        for sub in ["plus_yearly", "plus_monthly"] {
+            let s = EntitlementState(activeProductIDs: ["plus_lifetime", sub])
+            XCTAssertTrue(s.hasPlus); XCTAssertTrue(s.hasLifetime); XCTAssertTrue(s.paysTwice)
+        }
+    }
+
+    func testLifetimeBeatsAnExpiredSubscription() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        let s = EntitlementState(entries: [.init(productID: "plus_monthly", expiresAt: now.addingTimeInterval(-60)),
+                                           .init(productID: "plus_lifetime")], now: now)
+        XCTAssertTrue(s.hasPlus); XCTAssertTrue(s.hasLifetime)
+        XCTAssertFalse(s.hasActiveSubscription); XCTAssertFalse(s.paysTwice)
+    }
+
+    func testRevokedLifetimeIsOffAndLiveSubscriptionsStillCount() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        XCTAssertFalse(EntitlementState(entries: [.init(productID: "plus_lifetime", revoked: true)], now: now).hasPlus)
+        let expired = EntitlementState(entries: [.init(productID: "plus_yearly", expiresAt: now)], now: now)
+        XCTAssertFalse(expired.hasPlus, "a subscription that ends now is over")
+        let live = EntitlementState(entries: [.init(productID: "plus_yearly", expiresAt: now.addingTimeInterval(86_400)),
+                                              .init(productID: "plus_lifetime", revoked: true)], now: now)
+        XCTAssertTrue(live.hasPlus); XCTAssertFalse(live.hasLifetime)
+        // Plus Forever has no end date, and a stray date on it never turns it off.
+        XCTAssertTrue(EntitlementState(entries: [.init(productID: "plus_lifetime", expiresAt: now.addingTimeInterval(-1))], now: now).hasLifetime)
+    }
+
+    func testChoicesMapToTheirProductsAndYearlyStaysFirst() {
+        XCTAssertEqual(PlusChoice.allCases, [.yearly, .monthly, .lifetime])
+        XCTAssertEqual(PlusChoice.yearly.productID, "plus_yearly")
+        XCTAssertEqual(PlusChoice.monthly.productID, "plus_monthly")
+        XCTAssertEqual(PlusChoice.lifetime.productID, "plus_lifetime")
+        XCTAssertNil(PlusChoice.lifetime.plan)
+    }
+
+    func testLifetimeCopyIsCalmAndHonest() {
+        XCTAssertEqual(PaywallCopy.lifetimeLine, "Pay once, keep Plus on this Apple ID. No renewals.")
+        let c = PaywallCopy.lifetime(displayPrice: "$34.99")
+        XCTAssertEqual(c.headline, "Plus Forever")
+        XCTAssertEqual(c.finePrint, "One payment of $34.99. Pay once, keep Plus on this Apple ID. No renewals.")
+        XCTAssertFalse(c.finePrint.lowercased().contains("free"))
+        XCTAssertFalse(c.finePrint.contains("renews automatically"))
+        XCTAssertEqual(PaywallCopy.make(choice: .lifetime, displayPrice: "$34.99", trialEligible: true), c, "never trial wording")
+        XCTAssertEqual(PaywallCopy.make(choice: .yearly, displayPrice: "$12.99", trialEligible: true),
+                       PaywallCopy.make(plan: .yearly, displayPrice: "$12.99", trialEligible: true))
+        XCTAssertEqual(PaywallCopy.redeem, "Redeem a code")
+        for line in PaywallCopy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
+        for text in [c.headline, c.detail, c.cta] { XCTAssertEqual(CopySafety.check(text), [], text) }
+    }
+
     func testGateCopyIsGentle() {
         for line in [ParentalGate.Copy.title, ParentalGate.Copy.prompt, ParentalGate.Copy.wrong] {
             XCTAssertEqual(CopySafety.check(line), [], line)

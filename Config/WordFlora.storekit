@@ -1,66 +1,164 @@
 {
-  "identifier": "B7F2C0A1",
-  "nonRenewingSubscriptions": [],
-  "products": [],
-  "settings": {},
-  "subscriptionGroups": [
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "B7F2C0A1-4E3D-4C2B-9A18-5D6E7F809A1B",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
     {
-      "id": "21700001",
-      "localizations": [],
-      "name": "WordFlora Plus",
-      "subscriptions": [
+      "displayPrice" : "34.99",
+      "familyShareable" : true,
+      "internalID" : "6745000003",
+      "localizations" : [
         {
-          "adHocOffers": [],
-          "codeOffers": [],
-          "displayPrice": "12.99",
-          "familyShareable": true,
-          "groupNumber": 1,
-          "internalID": "6B45000001",
-          "introductoryOffer": {
-            "internalID": "6B45000011",
-            "numberOfPeriods": 1,
-            "paymentMode": "free",
-            "subscriptionPeriod": "P3D"
+          "description" : "No ads, iCloud sync and Plus pots. Pay once, no renewals.",
+          "displayName" : "Plus Forever",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "plus_lifetime",
+      "referenceName" : "Plus Lifetime",
+      "type" : "NonConsumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "",
+    "_developerTeamID" : "",
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 0,
+    "_locale" : "en_US",
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Load Products"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Purchase"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Verification"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Store Sync"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Subscription Status"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "App Transaction"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Manage Subscriptions Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Refund Request Sheet"
+      },
+      {
+        "current" : null,
+        "enabled" : false,
+        "name" : "Offer Code Redeem Sheet"
+      }
+    ]
+  },
+  "subscriptionGroups" : [
+    {
+      "id" : "21700001",
+      "localizations" : [
+
+      ],
+      "name" : "WordFlora Plus",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "12.99",
+          "familyShareable" : true,
+          "groupNumber" : 1,
+          "internalID" : "6745000001",
+          "introductoryOffer" : {
+            "internalID" : "6745000011",
+            "numberOfPeriods" : 1,
+            "paymentMode" : "free",
+            "subscriptionPeriod" : "P3D"
           },
-          "localizations": [
+          "localizations" : [
             {
-              "description": "No ads and iCloud sync, billed yearly",
-              "displayName": "WordFlora Plus Yearly",
-              "locale": "en_US"
+              "description" : "No ads and iCloud sync, billed yearly",
+              "displayName" : "WordFlora Plus Yearly",
+              "locale" : "en_US"
             }
           ],
-          "productID": "plus_yearly",
-          "recurringSubscriptionPeriod": "P1Y",
-          "referenceName": "Plus Yearly",
-          "subscriptionGroupID": "21700001",
-          "type": "RecurringSubscription"
+          "productID" : "plus_yearly",
+          "recurringSubscriptionPeriod" : "P1Y",
+          "referenceName" : "Plus Yearly",
+          "subscriptionGroupID" : "21700001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         },
         {
-          "adHocOffers": [],
-          "codeOffers": [],
-          "displayPrice": "3.99",
-          "familyShareable": true,
-          "groupNumber": 2,
-          "internalID": "6B45000002",
-          "localizations": [
+          "adHocOffers" : [
+
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "3.99",
+          "familyShareable" : true,
+          "groupNumber" : 2,
+          "internalID" : "6745000002",
+          "introductoryOffer" : null,
+          "localizations" : [
             {
-              "description": "No ads and iCloud sync, billed monthly",
-              "displayName": "WordFlora Plus Monthly",
-              "locale": "en_US"
+              "description" : "No ads and iCloud sync, billed monthly",
+              "displayName" : "WordFlora Plus Monthly",
+              "locale" : "en_US"
             }
           ],
-          "productID": "plus_monthly",
-          "recurringSubscriptionPeriod": "P1M",
-          "referenceName": "Plus Monthly",
-          "subscriptionGroupID": "21700001",
-          "type": "RecurringSubscription",
-          "introductoryOffer": null
+          "productID" : "plus_monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Plus Monthly",
+          "subscriptionGroupID" : "21700001",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
         }
       ]
     }
   ],
-  "version": {
-    "major": 3,
-    "minor": 0
+  "version" : {
+    "major" : 4,
+    "minor" : 0
   }
 }
