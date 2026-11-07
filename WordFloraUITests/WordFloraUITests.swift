@@ -449,6 +449,100 @@ final class WordFloraUITests: XCTestCase {
 
     func testAuditHome() { launch(); XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5)); audit("home") }
 
+    // MARK: key marks at large text (docs/research/key-marks-at-large-text.md)
+
+    /// The six letters the review named (wide R, S, Z, W, M and narrow I), shot unused, right and wrong.
+    private static let markLetters = "RSZWMI"
+
+    /// One look: the keyboard unused, every named key right, then every named key wrong, each audited and shot; then a
+    /// mixed round with the test-only probes on, which checks that each mark sits under its letter, the key sizes and
+    /// that the puzzle still fits the screen. `size` is a UIContentSizeCategory name, nil for the default (Large).
+    private func checkKeyMarks(_ look: String, size: String?, dark: Bool) {
+        executionTimeAllowance = 600
+        // A light/dark switch redraws every app for a moment; an audit run inside that redraw reported every text on
+        // the page as "Dynamic Type partially unsupported" (3 of 4 such failures came right after a switch). So the
+        // switch is given time, and each audit waits until the page has stopped moving. The audit itself is unchanged.
+        if XCUIDevice.shared.appearance != (dark ? .dark : .light) {
+            XCUIDevice.shared.appearance = dark ? .dark : .light
+            sleep(3)
+        }
+        addTeardownBlock { XCUIDevice.shared.appearance = .light }
+        func settle() {
+            let parts = [app.staticTexts["A test hint"], app.buttons["Q"], app.buttons["M"], app.buttons["Help"]]
+            func layout() -> [CGRect] { parts.map { $0.exists ? $0.frame : .null } }
+            var last = layout(), same = 0
+            let end = Date().addingTimeInterval(15)
+            while same < 2 && Date() < end {
+                Thread.sleep(forTimeInterval: 0.5)
+                let now = layout()
+                same = now == last ? same + 1 : 0
+                last = now
+            }
+            sleep(1)
+        }
+        func open(_ word: String, probes: Bool = false) {
+            app.terminate()
+            app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-word=\(word)"] + (dark ? ["-uitest-dark"] : [])
+                + (probes ? ["-uitest-key-probes"] : []) + (size.map { ["-UIPreferredContentSizeCategoryName", $0] } ?? [])
+            app.launch()
+            app.buttons["Play"].tap()
+            XCTAssertTrue(app.buttons["Z"].waitForExistence(timeout: 8), look)
+            XCTAssertTrue(app.staticTexts["A test hint"].waitForExistence(timeout: 5), "\(look): the round drew the word")
+        }
+        func value(_ ch: Character) -> String { app.buttons[String(ch)].value as? String ?? "" }
+        // Every named letter is in the word; the trailing O keeps the round open after six right guesses.
+        open("RSZWMIO")
+        for ch in Self.markLetters { XCTAssertEqual(value(ch), "", "\(look): \(ch) unused has no state") }
+        settle(); shot("keys-\(look)-unused"); audit("keys-\(look)-unused")
+        tapLetters(Self.markLetters)
+        for ch in Self.markLetters {
+            XCTAssertEqual(app.buttons[String(ch)].label, String(ch), "\(look): the label is the letter alone")
+            XCTAssertEqual(value(ch), "in the word", "\(look): \(ch)")
+        }
+        settle(); shot("keys-\(look)-correct"); audit("keys-\(look)-correct")
+        // None of the named letters is in the word: six wrong guesses, two short of the resting reveal.
+        open("PLANT")
+        tapLetters(Self.markLetters)
+        for ch in Self.markLetters {
+            XCTAssertEqual(app.buttons[String(ch)].label, String(ch), "\(look): the label is the letter alone")
+            XCTAssertEqual(value(ch), "not in the word", "\(look): \(ch)")
+        }
+        settle(); shot("keys-\(look)-wrong"); audit("keys-\(look)-wrong")
+
+        // Mixed round with probes: R, S, W, I right; Z, M wrong.
+        open("WRIST", probes: true)
+        tapLetters("RSWZMI")
+        let height: CGFloat = size == nil ? 50 : 64
+        let screen = app.windows.firstMatch.frame
+        for ch in Self.markLetters {
+            let key = app.buttons[String(ch)].frame
+            let letter = app.descendants(matching: .any)["key.\(ch).letter"], mark = app.descendants(matching: .any)["key.\(ch).mark"]
+            XCTAssertTrue(letter.waitForExistence(timeout: 3) && mark.exists, "\(look): probes for \(ch)")
+            XCTAssertLessThanOrEqual(letter.frame.maxY, mark.frame.minY + 0.5, "\(look): \(ch)'s mark sits below its letter \(letter.frame) \(mark.frame)")
+            XCTAssertGreaterThanOrEqual(letter.frame.height, 14, "\(look): \(ch)'s letter keeps its size")
+            XCTAssertTrue(key.insetBy(dx: -0.5, dy: -0.5).contains(letter.frame) && key.insetBy(dx: -0.5, dy: -0.5).contains(mark.frame),
+                          "\(look): \(ch)'s letter and mark stay inside the key \(key)")
+            XCTAssertGreaterThanOrEqual(key.width, 28, "\(look): \(ch) width")
+            XCTAssertEqual(key.height, height, accuracy: 0.5, "\(look): \(ch) height")
+        }
+        // The whole puzzle still fits: the clue above the keyboard, the bottom row on screen.
+        let hint = app.staticTexts["A test hint"].frame
+        XCTAssertLessThanOrEqual(hint.maxY, app.buttons["Q"].frame.minY, "\(look): the clue sits above the keyboard")
+        XCTAssertLessThanOrEqual(app.buttons["M"].frame.maxY, screen.maxY, "\(look): the bottom row is on screen")
+        XCTAssertTrue(app.buttons["Q"].isHittable && app.buttons["P"].isHittable && app.buttons["N"].isHittable, look)
+        sleep(1); shot("keys-\(look)-mixed")
+        app.terminate()
+    }
+
+    func testKeyMarksAtTheDefaultSizeInLight() { checkKeyMarks("default-light", size: nil, dark: false) }
+    func testKeyMarksAtTheDefaultSizeInDark() { checkKeyMarks("default-dark", size: nil, dark: true) }
+    func testKeyMarksAtAX1InLight() { checkKeyMarks("ax1-light", size: "UICTContentSizeCategoryAccessibilityM", dark: false) }
+    func testKeyMarksAtAX1InDark() { checkKeyMarks("ax1-dark", size: "UICTContentSizeCategoryAccessibilityM", dark: true) }
+    func testKeyMarksAtAX3InLight() { checkKeyMarks("ax3-light", size: "UICTContentSizeCategoryAccessibilityXL", dark: false) }
+    func testKeyMarksAtAX3InDark() { checkKeyMarks("ax3-dark", size: "UICTContentSizeCategoryAccessibilityXL", dark: true) }
+    func testKeyMarksAtAX5InLight() { checkKeyMarks("ax5-light", size: "UICTContentSizeCategoryAccessibilityXXXL", dark: false) }
+    func testKeyMarksAtAX5InDark() { checkKeyMarks("ax5-dark", size: "UICTContentSizeCategoryAccessibilityXXXL", dark: true) }
+
     func testAuditGameAndResting() {
         launch(word: "LOTUS"); app.buttons["Play"].tap()
         XCTAssertTrue(app.buttons["Z"].waitForExistence(timeout: 5)); audit("game")
@@ -637,7 +731,8 @@ final class FidelityScreensUITests: XCTestCase {
             sleep(1); shot("settings-\(look.0)")
             app.swipeUp(); sleep(1); shot("settings-\(look.0)-2")
             let plus = app.buttons["Remove ads and sync with iCloud"]
-            for _ in 0..<6 where !plus.isHittable { app.swipeUp() }
+            // At AX XXXL the Settings page is long enough that six swipes stopped short of the row.
+            for _ in 0..<14 where !(plus.exists && plus.isHittable) { app.swipeUp() }
             plus.tap()
             XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))
             sleep(1); shot("plus-\(look.0)")

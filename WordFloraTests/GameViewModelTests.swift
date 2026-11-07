@@ -540,6 +540,30 @@ final class PuzzleLayoutTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(KeyboardLayout.keyHeight, Theme.minTap)
     }
 
+    /// Key marks at large text (docs/research/key-marks-at-large-text.md): the key grows only from 50 to 64 pt, the mark
+    /// from 11 to 14 pt, and the mark's strip always leaves the letter a box of its own.
+    func testKeysGrowWithTheTextSizeWithinTheirClampsAndTheMarkKeepsItsOwnStrip() {
+        XCTAssertEqual(KeyboardLayout.keyHeight(scaled: 30), 50, "never below the default")
+        XCTAssertEqual(KeyboardLayout.keyHeight(scaled: 57), 57)
+        XCTAssertEqual(KeyboardLayout.keyHeight(scaled: 130), 64, "AX5 stops at 64")
+        XCTAssertEqual(KeyboardLayout.markSize(scaled: 8), PuzzleInk.usedGlyphSize)
+        XCTAssertEqual(KeyboardLayout.markSize(scaled: 40), 14)
+        for scale: CGFloat in [1, 1.2, 1.6, 2.4, 3.1] {
+            let key = KeyboardLayout.keyHeight(scaled: KeyboardLayout.keyHeight * scale)
+            let strip = KeyboardLayout.markStrip(mark: KeyboardLayout.markSize(scaled: PuzzleInk.usedGlyphSize * scale))
+            XCTAssertGreaterThanOrEqual(key, Theme.minTap)
+            XCTAssertGreaterThanOrEqual(key - strip, 34, "the letter's box at scale \(scale)")
+        }
+        XCTAssertEqual(KeyboardLayout.height(keyHeight: KeyboardLayout.maxKeyHeight), 208, "3 rows of 64 and two 8 pt gaps")
+        XCTAssertEqual(KeyboardLayout.letterMinimumScale, 0.4)
+    }
+
+    func testAKeyReadsItsLetterThenItsState() {
+        XCTAssertEqual(KeyboardView.stateValue(.unused), "")
+        XCTAssertEqual(KeyboardView.stateValue(.correct), "in the word")
+        XCTAssertEqual(KeyboardView.stateValue(.wrong), "not in the word")
+    }
+
     func testTheSpeedBloomRingIsFivePointsAtAnyFlowerSize() {
         for scale: CGFloat in [0.71, 0.85, 0.98] {
             XCTAssertEqual(FlowerView.ringLineWidth(scale: scale) * scale, 5, accuracy: 0.001)

@@ -6,7 +6,27 @@ enum KeyboardLayout {
     static let rows = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"]
     static let gap: CGFloat = 5
     static let rowGap: CGFloat = 8
+    /// A key's height at the default text size. Keys are width-bound (ten to a row), so only the height grows with the
+    /// text size, and only up to `maxKeyHeight`: three rows of 64 pt and two gaps keep the puzzle on one screen at AX5.
     static let keyHeight: CGFloat = 50
+    static let maxKeyHeight: CGFloat = 64
+    /// The check or cross under a used key's letter grows with the text size up to 14 pt.
+    static let maxMarkSize: CGFloat = 14
+    /// The smallest the letter may shrink to fit its box (title3 at AX5 is well over twice its default, in a box
+    /// about 46 pt tall and 33 pt wide); the key's Large Content Viewer shows the letter full size.
+    static let letterMinimumScale: CGFloat = 0.4
+
+    /// The key height for a scaled `keyHeight` (from `@ScaledMetric`): never below the base, never above the cap.
+    static func keyHeight(scaled: CGFloat) -> CGFloat { min(max(scaled, keyHeight), maxKeyHeight) }
+    /// The mark's point size for a scaled `PuzzleInk.usedGlyphSize`.
+    static func markSize(scaled: CGFloat) -> CGFloat { min(max(scaled, PuzzleInk.usedGlyphSize), maxMarkSize) }
+    /// The strip under the letter that holds the mark, 2 pt clear above and below it. Every key keeps it, used or not,
+    /// so the letter never moves when its state changes and the mark can never sit on the letter.
+    static func markStrip(mark: CGFloat) -> CGFloat { mark + 4 }
+    /// The keyboard's height for a key height: three rows and two row gaps.
+    static func height(keyHeight: CGFloat) -> CGFloat {
+        CGFloat(rows.count) * keyHeight + CGFloat(rows.count - 1) * rowGap
+    }
     /// Before the keyboard has been measured: a 375 pt phone on the 12 pt margin.
     static let fallbackWidth: CGFloat = 351
 
@@ -28,6 +48,11 @@ struct KeyboardView: View {
 
     @Environment(\.colorScheme) private var colorScheme
     @State private var width: CGFloat = 0
+    @ScaledMetric(relativeTo: .title3) private var scaledKeyHeight: CGFloat = KeyboardLayout.keyHeight
+    @ScaledMetric(relativeTo: .caption2) private var scaledMark: CGFloat = PuzzleInk.usedGlyphSize
+    /// UI tests only: lays an untappable box over each letter and mark, so a test can read their frames (the key's
+    /// own parts merge into one button for VoiceOver). Never on in the audited runs.
+    private static let uiTestProbes = ProcessInfo.processInfo.arguments.contains("-uitest-key-probes")
 
     var body: some View {
         let keyWidth = KeyboardLayout.keyWidth(available: width)
@@ -41,22 +66,54 @@ struct KeyboardView: View {
         // minWidth 0: the measured width is the room offered, never the keys' own width.
         .frame(minWidth: 0, maxWidth: .infinity)
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
+        .overlayPreferenceValue(KeyPartFrames.self) { parts in
+            if Self.uiTestProbes {
+                GeometryReader { proxy in
+                    ForEach(parts.keys.sorted(), id: \.self) { id in
+                        let r = parts[id].map { proxy[$0] } ?? .zero
+                        Color.clear.frame(width: r.width, height: r.height)
+                            .accessibilityElement()
+                            .accessibilityIdentifier(id).accessibilityLabel(id)
+                            .position(x: r.midX, y: r.midY)
+                    }
+                }
+                .allowsHitTesting(false)
+            }
+        }
     }
 
     private func key(_ ch: Character, width: CGFloat) -> some View {
         let s = state(ch)
         let shape = RoundedRectangle(cornerRadius: 9)
+        let mark = KeyboardLayout.markSize(scaled: scaledMark)
+        let letter = String(ch)
         return Button { onTap(ch) } label: {
-            ZStack(alignment: .topTrailing) {
-                // The letter grows with the text size up to what the key can hold, then shrinks to fit (keys keep their size).
-                Text(String(ch)).font(Theme.font(.title3, weight: .bold)).lineLimit(1).minimumScaleFactor(0.4)
+            // One layout at every size: the letter in the upper box, the mark in a strip of its own below it, so the
+            // two can never overlap (Apple's stacked layout for glyphs beside text at large sizes).
+            VStack(spacing: 0) {
+                Text(letter).font(Theme.font(.title3, weight: .bold))
+                    // No Dynamic Type cap: Apple's audit fails text that stops growing (tried at AX2, every key
+                    // failed). The letter grows with the text size and shrinks only to fit its fixed box.
+                    .lineLimit(1).minimumScaleFactor(KeyboardLayout.letterMinimumScale)
+                    .anchorPreference(key: KeyPartFrames.self, value: .bounds) { Self.uiTestProbes ? ["key.\(letter).letter": $0] : [:] }
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                // Colour is never the only signal: used keys carry a glyph too.
-                if s == .correct { Image(systemName: "checkmark").font(.system(size: PuzzleInk.usedGlyphSize, weight: .black)).padding(3) }
-                if s == .wrong { Image(systemName: "xmark").font(.system(size: PuzzleInk.usedGlyphSize, weight: .black)).padding(3) }
+                // Colour is never the only signal: used keys carry a check or a cross too.
+                Group {
+                    switch s {
+                    case .correct: Image(systemName: "checkmark")
+                    case .wrong: Image(systemName: "xmark")
+                    case .unused: Color.clear.frame(width: mark, height: mark)
+                    }
+                }
+                .font(.system(size: mark, weight: .black))
+                .anchorPreference(key: KeyPartFrames.self, value: .bounds) {
+                    Self.uiTestProbes && s != .unused ? ["key.\(letter).mark": $0] : [:]
+                }
+                .frame(height: KeyboardLayout.markStrip(mark: mark))
+                .accessibilityHidden(true)
             }
             .foregroundStyle(foreground(s))
-            .frame(width: width, height: KeyboardLayout.keyHeight)
+            .frame(width: width, height: KeyboardLayout.keyHeight(scaled: scaledKeyHeight))
             .background(background(s), in: shape)
             .overlay(shape.stroke(Color.appPrimaryText.opacity(s == .unused ? 0.14 : 0)))
             // A 1 pt lip under an unused key, as on the iOS keyboard, so keys stand off the cream.
@@ -64,7 +121,26 @@ struct KeyboardView: View {
         }
         .buttonStyle(KeyPressStyle())
         .disabled(!enabled || s != .unused)
-        .accessibilityLabel(String(ch) + (s == .correct ? ", in the word" : s == .wrong ? ", not in the word" : ""))
+        // The label stays the letter alone (so Voice Control's "Tap R" works); the state is the value.
+        .accessibilityLabel(letter)
+        .accessibilityValue(Self.stateValue(s))
+        // The key cannot grow wider, so at large sizes the letter is shrunk to fit: a long press shows it large.
+        .accessibilityShowsLargeContentViewer {
+            switch s {
+            case .unused: Text(letter)
+            case .correct: Label(letter, systemImage: "checkmark")
+            case .wrong: Label(letter, systemImage: "xmark")
+            }
+        }
+    }
+
+    /// What VoiceOver reads after the letter: "in the word", "not in the word", or nothing for an unused key.
+    static func stateValue(_ s: GameViewModel.KeyState) -> String {
+        switch s {
+        case .unused: return ""
+        case .correct: return "in the word"
+        case .wrong: return "not in the word"
+        }
     }
 
     private func background(_ s: GameViewModel.KeyState) -> Color {
@@ -84,6 +160,14 @@ struct KeyboardView: View {
     }
 }
 
+/// UI tests only: the letter's and the mark's bounds per key, by probe id.
+private struct KeyPartFrames: PreferenceKey {
+    static let defaultValue: [String: Anchor<CGRect>] = [:]
+    static func reduce(value: inout [String: Anchor<CGRect>], nextValue: () -> [String: Anchor<CGRect>]) {
+        value.merge(nextValue()) { $1 }
+    }
+}
+
 struct KeyPressStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
@@ -93,3 +177,4 @@ struct KeyPressStyle: ButtonStyle {
             .animation(.easeOut(duration: 0.08), value: configuration.isPressed)
     }
 }
+
