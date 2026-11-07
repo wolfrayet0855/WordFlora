@@ -484,7 +484,17 @@ Own simulator `WF G2b iPhone 17` (iOS 26.5), derived data `dd-g2b`, one xcodebui
 - Unit `ButterflyNetTests` (37): pace table and under-13 never Quick wings in any combination; app start pace by age, Easier, Calm, wake, Reduce Motion, VoiceOver, Switch Control; Quick wings and gentle constants and radii; round lengths; spawn speeds by pace; hit geometry (inside / rim / outside, true circle 60 pt in and 70 pt out at r 64 on 390 x 700, swept capsule, scoop, lift tests nothing); gentle never harder than today (1,000 seeded points x 3 screens x 3 tiers, and the model against today's `catchAt`); lag and Reduce Motion; rest point clear of the pill and the edge; turns (tell first, once, no reversal, inside the edges, never with a perch), no turns gentle or Calm; never two resting at once (3 paces x 2 tick sizes x 30 seeds); perch lengths 3 / 2 / 5 s and flying on; landing share 1/3 within 3 points over 3,000+ spawns; landings on a flower; same seed same game; Reduce Motion spawns unchanged; gentle flags (resting yes, flying no, Reduce Motion all, Calm only resting); one hello per sweep and the 0.25 s lift; no grace in Quick wings; nothing after the round; rewards the same in every pace; Gentle Net counting, bronze at ten, wake counts, Quiet Garden no count, catalogue, earned tiers kept; copy; the sweeping-player simulation.
 - UI `ButterflyNetUITests` (14): who sees Easier butterflies and the chip (and switching it on brings the gentle game), the scene's pace id for four set-ups, a Quick wings short round to the summary with rewards, Quiet Garden summary with no rewards row, a gentle hello under Reduce Motion that earns Gentle Net (moment and Badges page), audits (all types, contrast and Dynamic Type judged inside the visible scroll area as in BadgeMechanicsUITests) of the Visitors card with Easier butterflies on (default light, AX XXXL dark and light), the Visitors card (default light and dark, AX XXXL dark and light), the game scene (default light, AX XXXL dark) and the summary with a gentle hello (AX XXXL dark), and net screenshots light and dark.
 
-RESULTS_PLACEHOLDER
+**Results** (`WF G2b iPhone 17`, iOS 26.5, erased only between the two batches, load under 15 before each)
+
+| Run | Result |
+|---|---|
+| Unit (`WordFloraTests`) | 1154 run, 1154 pass (incl. `ButterflyNetTests` 37) |
+| ButterflyNetUITests | 14/14 (the Easier switch test rerun green in batch 2 after its Calm set-up fix) |
+| DailyQuestUITests | 6/6 (the Family Sharing line audit passes again: Settings is as on the base commit) |
+| WordFloraUITests: butterfly round, Visitors page, Calm game, Quiet Garden visitors, Home, Garden, Settings and level map, Garden/Settings/Plus audit | 8/8 |
+| SpeedBloomUITests settings toggle | 1/1 |
+| BadgesUITests 4/4, CelebrationUITests 5/5, FidelityScreensUITests 7/7 | pass |
+| Earlier on this branch: BadgeMechanicsUITests | 5/5 |
 
 **For the owner**
 - Turns in Quick wings: kept as built (lead decision); one swerve with a 0.4 s tell. The fallback (drop turns, keep speed + hoop + perch) is one line (`ButterflyPace.turns`) if the owner playtest calls it unfair.
