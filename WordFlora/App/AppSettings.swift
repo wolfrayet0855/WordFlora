@@ -51,6 +51,9 @@ final class AppSettings {
     var easierButterflies: Bool { didSet { defaults.set(easierButterflies, forKey: "easierButterflies") } }
     /// Gentle Net's tip ("Some friends rest on a flower") has been shown once on this device.
     var gentleNetTipShown: Bool { didSet { defaults.set(gentleNetTipShown, forKey: "gentleNetTipShown") } }
+    /// The day the grown-ups' Family Sharing note last appeared in Settings (under 13 and unknown age, once a week
+    /// at most; `FamilyShareNudge`). Device-local.
+    var familyNudgeShownAt: Date? { didSet { defaults.set(familyNudgeShownAt, forKey: "familyNudgeShownAt") } }
 
     /// What the Speed bloom rule reads as each round begins.
     var speedBloomPrefs: SpeedBloom.Prefs {
@@ -105,6 +108,7 @@ final class AppSettings {
         speedBloomExtraTime = bool("speedBloomExtraTime", false)
         easierButterflies = bool("easierButterflies", false)
         gentleNetTipShown = bool("gentleNetTipShown", false)
+        familyNudgeShownAt = defaults.object(forKey: "familyNudgeShownAt") as? Date
     }
 
     /// Applies the defaults that depend on the age answer (called once, when the player answers).
