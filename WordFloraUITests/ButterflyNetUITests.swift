@@ -119,7 +119,8 @@ final class ButterflyNetUITests: XCTestCase {
         app.buttons["Say hello"].tap()
         XCTAssertTrue(element("butterfly.scene.gentle").waitForExistence(timeout: 5))
         app.terminate()
-        for args in [["-uitest-age=thirteenPlus", "-uitest-calm"], ["-uitest-age=under13"]] {
+        // A grown-up in Calm (an age flag re-applies its own Calm default after `-uitest-calm`), and under 13.
+        for args in [["-uitest-calm"], ["-uitest-age=under13"]] {
             launch(args)
             openVisitors()
             XCTAssertFalse(app.switches["visitors.easierButterflies"].exists, "\(args)")
