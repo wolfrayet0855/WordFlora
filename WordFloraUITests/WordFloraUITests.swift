@@ -459,8 +459,27 @@ final class WordFloraUITests: XCTestCase {
     /// that the puzzle still fits the screen. `size` is a UIContentSizeCategory name, nil for the default (Large).
     private func checkKeyMarks(_ look: String, size: String?, dark: Bool) {
         executionTimeAllowance = 600
-        XCUIDevice.shared.appearance = dark ? .dark : .light
+        // A light/dark switch redraws every app for a moment; an audit run inside that redraw reported every text on
+        // the page as "Dynamic Type partially unsupported" (3 of 4 such failures came right after a switch). So the
+        // switch is given time, and each audit waits until the page has stopped moving. The audit itself is unchanged.
+        if XCUIDevice.shared.appearance != (dark ? .dark : .light) {
+            XCUIDevice.shared.appearance = dark ? .dark : .light
+            sleep(3)
+        }
         addTeardownBlock { XCUIDevice.shared.appearance = .light }
+        func settle() {
+            let parts = [app.staticTexts["A test hint"], app.buttons["Q"], app.buttons["M"], app.buttons["Help"]]
+            func layout() -> [CGRect] { parts.map { $0.exists ? $0.frame : .null } }
+            var last = layout(), same = 0
+            let end = Date().addingTimeInterval(15)
+            while same < 2 && Date() < end {
+                Thread.sleep(forTimeInterval: 0.5)
+                let now = layout()
+                same = now == last ? same + 1 : 0
+                last = now
+            }
+            sleep(1)
+        }
         func open(_ word: String, probes: Bool = false) {
             app.terminate()
             app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-word=\(word)"] + (dark ? ["-uitest-dark"] : [])
@@ -474,13 +493,13 @@ final class WordFloraUITests: XCTestCase {
         // Every named letter is in the word; the trailing O keeps the round open after six right guesses.
         open("RSZWMIO")
         for ch in Self.markLetters { XCTAssertEqual(value(ch), "", "\(look): \(ch) unused has no state") }
-        sleep(1); shot("keys-\(look)-unused"); audit("keys-\(look)-unused")
+        settle(); shot("keys-\(look)-unused"); audit("keys-\(look)-unused")
         tapLetters(Self.markLetters)
         for ch in Self.markLetters {
             XCTAssertEqual(app.buttons[String(ch)].label, String(ch), "\(look): the label is the letter alone")
             XCTAssertEqual(value(ch), "in the word", "\(look): \(ch)")
         }
-        sleep(1); shot("keys-\(look)-correct"); audit("keys-\(look)-correct")
+        settle(); shot("keys-\(look)-correct"); audit("keys-\(look)-correct")
         // None of the named letters is in the word: six wrong guesses, two short of the resting reveal.
         open("PLANT")
         tapLetters(Self.markLetters)
@@ -488,7 +507,7 @@ final class WordFloraUITests: XCTestCase {
             XCTAssertEqual(app.buttons[String(ch)].label, String(ch), "\(look): the label is the letter alone")
             XCTAssertEqual(value(ch), "not in the word", "\(look): \(ch)")
         }
-        sleep(1); shot("keys-\(look)-wrong"); audit("keys-\(look)-wrong")
+        settle(); shot("keys-\(look)-wrong"); audit("keys-\(look)-wrong")
 
         // Mixed round with probes: R, S, W, I right; Z, M wrong.
         open("WRIST", probes: true)
