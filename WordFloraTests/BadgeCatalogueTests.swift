@@ -41,7 +41,7 @@ final class BadgeCatalogueTests: XCTestCase {
         // kept in the JSON, read by no badge: Pruning Pro moved from `prunes` to `tidyTrims`).
         XCTAssertEqual(Set(defs.map(\.counter)).count, defs.count)
         XCTAssertEqual(Set(defs.map(\.counter)), BadgeCatalog.knownCounters.subtracting(BadgeCounter.retired.map(\.rawValue)))
-        XCTAssertEqual(BadgeCounter.retired, [.prunes])
+        XCTAssertEqual(BadgeCounter.retired, [.prunes, .butterflyPlays])
         XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.counter, "tidyTrims")
         XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.thresholds, [5, 20, 50])
     }

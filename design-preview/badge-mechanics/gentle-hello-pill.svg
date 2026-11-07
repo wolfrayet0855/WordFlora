@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 44" width="180" height="44">
+  <!-- Gentle Net: pill background for "Gentle hello!". The app draws the text (17 pt rounded semibold, #2C3E2C,
+       leading edge at x 44). Pale rose fill so it reads on the light game sky and on the dark garden. -->
+  <rect x="1.5" y="1.5" width="177" height="41" rx="20.5" fill="#FFF1F3" stroke="#F2788A" stroke-width="2"/>
+  <g transform="translate(10 8) scale(.58)">
+    <path d="M24 41 C 10 31 5 24 5 16.5 C 5 10.5 9.6 6 15.2 6 C 19 6 22 8.2 24 11.4 C 26 8.2 29 6 32.8 6 C 38.4 6 43 10.5 43 16.5 C 43 24 38 31 24 41 Z"
+          fill="#F2788A" stroke="#D9566C" stroke-width="2.4" stroke-linejoin="round"/>
+    <ellipse cx="14.5" cy="15" rx="4.2" ry="2.8" fill="#fff" fill-opacity=".75" transform="rotate(-30 14.5 15)"/>
+  </g>
+</svg>

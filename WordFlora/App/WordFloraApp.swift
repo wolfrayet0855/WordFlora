@@ -180,6 +180,16 @@ struct WordFloraApp: App {
         }
         // The in-app Reduce Motion switch and a fixed theme, for the guide's still and dark screenshots.
         if uiTesting && args.contains("-uitest-reduce-motion") { model.settings.reduceMotionOverride = true }
+        // Butterfly net: Easier butterflies on, a 6 s round (so a test reaches the summary), a fixed seed, and Gentle Net
+        // with nine gentle hellos already (the next earns the bronze badge).
+        if uiTesting && args.contains("-uitest-easier-butterflies") { model.settings.easierButterflies = true }
+        if uiTesting && args.contains("-uitest-butterfly-short") { model.butterflyRoundOverride = 6 }
+        if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-butterfly-seed=") }).flatMap({ UInt64($0.dropFirst("-uitest-butterfly-seed=".count)) }) {
+            model.butterflySeedOverride = n
+        }
+        if uiTesting && args.contains("-uitest-gentlenet") {
+            model.updateBadges(announce: false) { state, _, t in state.record(.gentleHellos, amount: 9, now: t) }
+        }
         if uiTesting && args.contains("-uitest-dark") { model.settings.appearance = .dark }
         if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-sessions=") }).flatMap({ Int($0.dropFirst("-uitest-sessions=".count)) }) {
             model.settings.completedSessions = n            // past the first sessions, so the ad rules can say yes

@@ -313,7 +313,7 @@ final class CelebrationTests: XCTestCase {
         g.visitors = [ButterflyGameModel.Visitor(id: 90, speciesId: "monarch", x: 0.5, y: 0.5, vx: 0, vy: 0, born: 0, resting: false)]
         g.catchAt(x: 0.5, y: 0.5)
         app.finishButterflyGame(g)
-        XCTAssertEqual(app.pendingBadges.map(\.badgeId), ["visitor_friend", "gentle_net", "first_butterfly"])
+        XCTAssertEqual(app.pendingBadges.map(\.badgeId), ["visitor_friend", "first_butterfly"], "Gentle Net now counts gentle hellos, not plays")
         XCTAssertEqual(app.badgeMomentDelay, 1.9, "after the summary's petals")
     }
 

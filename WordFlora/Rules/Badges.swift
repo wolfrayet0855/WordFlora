@@ -16,6 +16,8 @@ enum BadgeCounter: String, CaseIterable, Codable {
     case quickBlooms
     /// Pruning Pro: trims made while a faded bloom showed (`FadedBloom`). Accumulates; never goes down.
     case tidyTrims
+    /// Gentle Net: hellos to a visitor resting on a flower. Accumulates; never goes down.
+    case gentleHellos
 
     // Collection: worked out from the garden and the album each time (`BadgeFacts`), kept as best-so-far values.
     case rarePlants, desertPlants, waterPlants, treePlants, floweringPlants, stickers
@@ -39,8 +41,8 @@ enum BadgeCounter: String, CaseIterable, Codable {
 
     /// Counters still kept in the JSON (and still counted) that no badge reads any more. Their earned tiers stay: the
     /// badge that moved to a new counter keeps its `unlocked` dates, so its card shows the higher of the two.
-    /// `prunes`: Pruning Pro moved to `tidyTrims`.
-    static let retired: Set<BadgeCounter> = [.prunes]
+    /// `prunes`: Pruning Pro moved to `tidyTrims`. `butterflyPlays`: Gentle Net moved to `gentleHellos`.
+    static let retired: Set<BadgeCounter> = [.prunes, .butterflyPlays]
 }
 
 struct BadgeDef: Codable, Equatable, Identifiable {

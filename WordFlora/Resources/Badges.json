@@ -350,14 +350,14 @@
   {
     "id": "gentle_net",
     "family": "explorer",
-    "counter": "butterflyPlays",
+    "counter": "gentleHellos",
     "thresholds": [
-      1,
       10,
-      30
+      40,
+      100
     ],
     "title": "Gentle Net",
-    "blurb": "Play the butterfly game"
+    "blurb": "Say hello to a friend resting on a flower"
   },
   {
     "id": "first_butterfly",

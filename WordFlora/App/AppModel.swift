@@ -390,6 +390,9 @@ final class AppModel {
 
     /// `-uitest-daytime`: UI tests that check the ad note judge the rules as by day, so they pass at any hour.
     var uiTestDaytime = false
+    /// UI tests: a short butterfly round (`-uitest-butterfly-short`) and a fixed seed (`-uitest-butterfly-seed=`).
+    var butterflyRoundOverride: Double?
+    var butterflySeedOverride: UInt64?
 
     func adContext(choice: AdGate.Choice?) -> AdGate.Context {
         var c = AdGate.Context(now: now())
@@ -665,15 +668,24 @@ final class AppModel {
         return counter.playsToday(on: now(), calendar: .current)
     }
 
-    /// Calm mode gives the gentle round (no clock, slower visitors, 5 hellos). The wake game keeps its own goal.
+    /// The pace a round would start at now (ButterflyPace.resolve): Calm, the gentle game, or Quick wings for 13 and up.
+    func butterflyPace(reduceMotion: Bool = false, voiceOver: Bool = false, switchControl: Bool = false, wake: Bool = false) -> ButterflyPace {
+        ButterflyPace.resolve(.init(calmMode: settings.calmMode, wake: wake, reduceMotion: reduceMotion, voiceOver: voiceOver,
+                                    switchControl: switchControl, ageBand: settings.ageBand, easierButterflies: settings.easierButterflies))
+    }
+
+    /// Calm mode gives the gentle round (no clock, slower visitors, 5 hellos); 13 and up get Quick wings unless Easier
+    /// butterflies is on. The wake game always keeps its own gentle tuning.
     func startButterflyGame(seed: UInt64 = UInt64.random(in: .min ... .max), useLantern: Bool = false, reduceMotion: Bool = false,
-                            wake: Bool = false) -> ButterflyGameModel {
+                            wake: Bool = false, voiceOver: Bool = false, switchControl: Bool = false) -> ButterflyGameModel {
         let evening = VisitorSpawner.isEvening(now(), calendar: .current)
         var lantern = false
         if useLantern, !evening, let p = profile, p.glowLanterns > 0 { p.glowLanterns -= 1; lantern = true; try? context.save() }
         let flowering = plants().filter { $0.earnedCount > 0 && $0.stage >= 3 }.count
+        let pace = butterflyPace(reduceMotion: reduceMotion, voiceOver: voiceOver, switchControl: switchControl, wake: wake)
         return ButterflyGameModel(pool: VisitorSpawner.pool(evening: evening, lantern: lantern), floweringPlants: flowering,
-                                  reduceMotion: reduceMotion, seed: seed, calm: settings.calmMode && !wake)
+                                  reduceMotion: reduceMotion, seed: butterflySeedOverride ?? seed, pace: pace,
+                                  roundSeconds: wake || pace == .calm ? nil : butterflyRoundOverride)
     }
 
     /// Applies the end-of-game rewards. Stickers always count; currency respects the 3-a-day limit and Quiet Garden.
@@ -702,6 +714,9 @@ final class AppModel {
         }
 
         var unlocks = badges.record(.visitorSpecies, value: a.species, now: t, quiet: quiet) + badges.record(.butterflyPlays, now: t, quiet: quiet)
+        // Gentle Net: hellos to resting friends (wake games count too). Quiet Garden records nothing and shows no count.
+        if !game.caughtGently.isEmpty { unlocks += badges.record(.gentleHellos, amount: game.caughtGently.count, now: t, quiet: quiet) }
+        summary.gentleHellos = quiet ? 0 : game.caughtGently.count
         for (counter, n) in BadgeFacts.catches(game.caught).sorted(by: { $0.key.rawValue < $1.key.rawValue }) where n > 0 {
             unlocks += badges.record(counter, amount: n, now: t, quiet: quiet)
         }
