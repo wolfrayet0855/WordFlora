@@ -1,26 +1,49 @@
 import SwiftUI
 
 /// The butterfly game itself. It starts as soon as it opens (the Visitors page is its front door).
+/// The player holds a net (docs/pm/butterfly-net-spec.md): the hoop follows the finger with a soft lag and says hello to
+/// visitors it sweeps over; every hello is a hello, not a capture, and the visitor always flies free.
 /// Calm mode: no time bar, slower visitors, and the round ends after 5 hellos or a tap on Done.
+/// Quick wings (13 and up, unless Easier butterflies is on): a little quicker visitors, a smaller hoop, a longer round.
+/// Gentle Net: a visitor that lands on a flower can get a gentle hello.
 struct ButterflyView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
+    @Environment(\.accessibilitySwitchControlEnabled) private var switchControl
+    @Environment(\.colorScheme) private var colorScheme
 
     @State private var game: ButterflyGameModel?
     @State private var summary: ButterflyRewards.Summary?
-    @State private var swoosh: [CGPoint] = []
+    @State private var net = ButterflyNet(restPoint: .zero)
+    @State private var finger: CGPoint?
+    @State private var sceneSize: CGSize = .zero
+    @State private var bottomInset: CGFloat = 0
+    @State private var pillTop: CGFloat?
     @State private var popups: [Popup] = []
+    @State private var ghosts: [Ghost] = []
+    @State private var netLift: CGFloat = 0
+    @State private var netDrop: CGFloat = 0
+    @State private var pocket = false
     @State private var newFriend: String?
     @State private var metThisRound: Set<String> = []
+    @State private var gentleThisRound: Set<String> = []
+    @State private var showTip = false
     @State private var lastTick = Date()
     private let ticker = Timer.publish(every: 1.0 / 30.0, on: .main, in: .common).autoconnect()
 
-    struct Popup: Identifiable { let id = UUID(); var species: String; var at: CGPoint }
+    struct Popup: Identifiable { let id = UUID(); var species: String; var at: CGPoint; var gentle: Bool; var risen = false }
+    /// The visitor's soft fold into the mesh and its flight out again (view only; it left the game at once).
+    struct Ghost: Identifiable { let id = UUID(); var species: String; var at: CGPoint; var folded = false; var freed = false }
 
     private var reduceMotion: Bool { systemReduceMotion || app.settings.reduceMotionOverride }
     private var evening: Bool { VisitorSpawner.isEvening(.now, calendar: .current) }
     private var onSky: Color { evening ? .white : Color.ink }
+    private var tier: Int { app.inventory.tier(of: .net) }
+    private func radius(_ g: ButterflyGameModel) -> Double { g.pace.netRadius(tier: tier) }
+    /// The garden bed's plants (the flowering ones are what attract visitors); landed visitors rest on them.
+    private var bedPlants: [PlantCollectible] { Array(app.plants().filter { $0.earnedCount > 0 }.prefix(6)) }
 
     var body: some View {
         ZStack {
@@ -30,6 +53,10 @@ struct ButterflyView: View {
         }
         .navigationTitle("Butterfly game")
         .navigationBarTitleDisplayMode(.inline)
+        // The bar is solid in the app's own scheme: in dark mode the system title is white, so it gets the evening sky's
+        // navy behind it instead of the pale day sky (white on pale blue failed the contrast audit).
+        .toolbarBackground(colorScheme == .dark ? Color(hex: 0x1F2A4A) : Color(hex: 0xBFE6F5), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
         .toolbar {
             if let game, game.calm, summary == nil {
                 ToolbarItem(placement: .confirmationAction) {
@@ -39,6 +66,9 @@ struct ButterflyView: View {
         }
         .onAppear { if game == nil && summary == nil { start() } }
         .sensoryFeedback(.success, trigger: summary != nil) { _, ended in ended && app.settings.hapticsOn }
+        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: game?.caught.count ?? 0) { old, new in
+            new > old && app.settings.hapticsOn
+        }
         .onReceive(ticker) { now in
             guard var g = game, summary == nil else { lastTick = now; return }
             // Real elapsed time, so a busy screen can never slow the game down; capped so a long pause isn't a jump.
@@ -46,7 +76,11 @@ struct ButterflyView: View {
             lastTick = now
             g.tick(dt)
             game = g
-            if g.isFinished { finish(g) }
+            if let swept = net.step(dt, reduceMotion: reduceMotion) { sweep(from: swept.from, to: swept.to) }
+            if let g = game {
+                maybeShowTip(g)
+                if g.isFinished { finish(g) }
+            }
         }
     }
 
@@ -60,7 +94,7 @@ struct ButterflyView: View {
                     Rectangle().fill(Color(hex: 0x4E9A55).opacity(0.85)).frame(height: 120)
                     // The player's own plants line the garden bed; flowering ones are what attract visitors.
                     HStack(spacing: -6) {
-                        ForEach(app.plants().filter { $0.earnedCount > 0 }.prefix(6), id: \.plantId) { p in
+                        ForEach(bedPlants, id: \.plantId) { p in
                             Image(p.imageName).resizable().scaledToFit().frame(height: 74).accessibilityHidden(true)
                         }
                     }.padding(.bottom, 30)
@@ -71,31 +105,51 @@ struct ButterflyView: View {
     private func scene(_ g: ButterflyGameModel) -> some View {
         GeometryReader { geo in
             ZStack {
-                ForEach(g.visitors) { v in
-                    Image(frame(for: v, elapsed: g.elapsed)).resizable().scaledToFit().frame(width: 64, height: 64)
-                        .scaleEffect(x: v.vx < 0 ? -1 : 1, y: 1)
-                        .position(x: v.x * geo.size.width, y: v.y * geo.size.height)
-                        .accessibilityElement().accessibilityLabel(VisitorCatalog.species(v.speciesId)?.name ?? "Visitor")
-                        .accessibilityAddTraits(.isButton)
-                        .accessibilityAction { catchAt(CGPoint(x: v.x * geo.size.width, y: v.y * geo.size.height), in: geo.size) }
+                // A soft halo under each resting visitor, so a child can see "this one is resting".
+                ForEach(g.visitors.filter(\.resting)) { v in
+                    RestingHalo(breathing: !reduceMotion)
+                        .position(x: v.x * geo.size.width, y: v.y * geo.size.height + 22)
                 }
-                swooshPath
-                ForEach(popups) { p in
-                    VStack(spacing: 6) {
-                        Image("visitor_\(p.species)_sticker").resizable().scaledToFit().frame(width: 72, height: 72)
-                        Text(VisitorsCopy.caughtPill(VisitorCatalog.species(p.species)?.name ?? "Visitor"))
-                            .font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.ink)
-                            .padding(.horizontal, 14).padding(.vertical, 6)
-                            .background(Color.white, in: Capsule()).shadow(color: .black.opacity(0.12), radius: 3, y: 1)
-                    }
-                    .position(x: min(max(p.at.x, 90), geo.size.width - 90), y: max(p.at.y, 70))
-                    .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
-                    .accessibilityHidden(true)
+                ForEach(g.visitors) { v in visitor(v, g: g, size: geo.size) }
+                ForEach(ghosts) { ghost in
+                    Image("visitor_\(ghost.species)_idle").resizable().scaledToFit().frame(width: 64, height: 64)
+                        .scaleEffect(ghost.folded && !ghost.freed ? 0.45 : (ghost.freed ? 0.6 : 1))
+                        .opacity(ghost.freed ? 0 : 1)
+                        .position(ghost.at)
+                        .allowsHitTesting(false).accessibilityHidden(true)
                 }
+                if let g = game {
+                    let r = radius(g)
+                    ButterflyNetCanvas(center: net.position, radius: r, tier: tier, evening: evening,
+                                       handleRight: ButterflyNet.handlePointsRight(hoopX: net.position.x, sceneWidth: geo.size.width),
+                                       handleScale: tier <= 1 && g.pace == .quickWings ? 0.9 : 1.1, pocket: pocket)
+                        .offset(y: netLift + netDrop)
+                        .opacity(net.isDown ? 1 : ButterflyNet.restingOpacity)
+                        .shadow(color: .black.opacity(net.isDown ? 0 : 0.12), radius: 3)
+                }
+                ForEach(popups) { p in popup(p, size: geo.size) }
                 VStack(spacing: 10) {
                     if g.showsTimeBar {
-                        ProgressView(value: g.elapsed, total: ButterflyGameModel.duration).tint(Color.appAccent).padding(.horizontal, 24)
+                        // The bar is 4 pt tall; its accessibility frame is 44 pt (the hit area check), and the negative
+                        // padding keeps the layout where it was.
+                        let done = min(g.elapsed, g.roundSeconds) / g.roundSeconds
+                        Color.clear.frame(height: 44)
+                            .overlay { ProgressView(value: done).tint(Color.appAccent).accessibilityHidden(true) }
+                            .padding(.vertical, -20).padding(.horizontal, 24)
+                            .accessibilityElement()
                             .accessibilityLabel("Game progress")
+                            .accessibilityValue("\(Int((done * 100).rounded())) percent")
+                            .accessibilityAddTraits(.updatesFrequently)
+                            .accessibilityIdentifier("butterfly.progress")
+                    }
+                    if showTip {
+                        Text(GentleNetCopy.tip).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.ink)
+                            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                            .padding(.horizontal, 14).padding(.vertical, 8)
+                            .background(Color.white.opacity(0.92), in: Capsule())
+                            .padding(.horizontal, 24)
+                            .transition(.opacity)
+                            .accessibilityIdentifier("butterfly.gentleTip")
                     }
                     Spacer()
                     if let newFriend, let v = VisitorCatalog.species(newFriend) { newFriendCard(v) }
@@ -106,19 +160,71 @@ struct ButterflyView: View {
                             .padding(.horizontal, 14).padding(.vertical, 8)
                             .background(Color.white.opacity(0.92), in: Capsule())
                             .accessibilityAddTraits(.updatesFrequently)
+                            .onGeometryChange(for: CGFloat.self) { $0.frame(in: .named("butterflyScene")).minY } action: { top in
+                                pillTop = top; placeRest()
+                            }
                     }
                     .padding(.horizontal, 16)
                 }
                 .padding(.top, 8).padding(.bottom, 136)
             }
+            .coordinateSpace(name: "butterflyScene")
             .contentShape(Rectangle())
             .gesture(DragGesture(minimumDistance: 0)
                 .onChanged { value in
-                    if !reduceMotion { swoosh.append(value.location); if swoosh.count > 14 { swoosh.removeFirst() } }
-                    catchAt(value.location, in: geo.size)
+                    finger = value.location
+                    if !net.isDown {
+                        let s = net.touchDown(at: value.location)      // a scoop: the hoop jumps under the finger
+                        sweep(from: s.from, to: s.to)
+                    } else {
+                        net.drag(to: value.location)
+                        // The gentle game also tests every finger sample with today's area, so no catch that worked
+                        // before can fail now. Quick wings tests the hoop's sweep on each tick only.
+                        if game?.pace != .quickWings { sweep(from: net.position, to: net.position) }
+                    }
                 }
-                .onEnded { _ in withAnimation(reduceMotion ? nil : .easeOut(duration: 0.25)) { swoosh.removeAll() } })
+                .onEnded { _ in net.lift(); finger = nil; placeRest() })
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(VisitorsCopy.sceneLabel)
+            .accessibilityIdentifier("butterfly.scene.\(g.pace.rawValue)")
+            .accessibilityAction(named: VisitorsCopy.swingAction) { swingToNearest() }
+            .onAppear { configure(geo) }
+            .onChange(of: geo.size) { configure(geo) }
         }
+    }
+
+    private func visitor(_ v: ButterflyGameModel.Visitor, g: ButterflyGameModel, size: CGSize) -> some View {
+        let name = VisitorCatalog.species(v.speciesId)?.name ?? "Visitor"
+        return Image(frame(for: v, elapsed: g.elapsed)).resizable().scaledToFit().frame(width: 64, height: 64)
+            .scaleEffect(x: v.vx < 0 ? -1 : 1, y: 1)
+            .position(x: v.x * size.width, y: v.y * size.height)
+            .accessibilityElement()
+            .accessibilityLabel(v.resting ? GentleNetCopy.restingLabel(name: name) : VisitorsCopy.flyingLabel(name))
+            .accessibilityHint(v.resting ? GentleNetCopy.restingHint : VisitorsCopy.netHint)
+            .accessibilityAddTraits(.isButton)
+            .accessibilityAction { helloTo(v.id) }
+    }
+
+    @ViewBuilder
+    private func popup(_ p: Popup, size: CGSize) -> some View {
+        VStack(spacing: 6) {
+            Image("visitor_\(p.species)_sticker").resizable().scaledToFit().frame(width: 72, height: 72)
+                .overlay(alignment: .topTrailing) { if p.gentle { GentleHeart(size: 26).offset(x: 6, y: -4) } }
+            if p.gentle {
+                GentleHelloPill()
+            } else {
+                Text(VisitorsCopy.caughtPill(VisitorCatalog.species(p.species)?.name ?? "Visitor"))
+                    .font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.ink)
+                    .padding(.horizontal, 14).padding(.vertical, 6)
+                    .background(Color.white, in: Capsule()).shadow(color: .black.opacity(0.12), radius: 3, y: 1)
+            }
+        }
+        .offset(y: p.risen ? -24 : 0)
+        // Inside the scene: never under the bar, never down on the garden bed.
+        .position(x: min(max(p.at.x, 100), size.width - 100), y: min(max(p.at.y, 90), size.height - 150))
+        .transition(reduceMotion ? .opacity : .scale.combined(with: .opacity))
+        .allowsHitTesting(false)
+        .accessibilityHidden(true)
     }
 
     private func newFriendCard(_ v: VisitorSpecies) -> some View {
@@ -139,15 +245,6 @@ struct ButterflyView: View {
         .accessibilityElement(children: .combine)
     }
 
-    private var swooshPath: some View {
-        Path { p in
-            guard let first = swoosh.first else { return }
-            p.move(to: first); swoosh.dropFirst().forEach { p.addLine(to: $0) }
-        }
-        .stroke(Color.white.opacity(0.75), style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
-        .allowsHitTesting(false)
-    }
-
     private func summaryCard(_ s: ButterflyRewards.Summary) -> some View {
         ZStack {
             Color.black.opacity(0.45).ignoresSafeArea()
@@ -161,15 +258,26 @@ struct ButterflyView: View {
                         Text(VisitorsCopy.newInAlbum(s.newFriendIds.count))
                             .font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText).multilineTextAlignment(.center)
                     }
+                    // Gentle Net: not shown at 0, and never in Quiet Garden (the summary's count is 0 there).
+                    if s.gentleHellos > 0 {
+                        Text(GentleNetCopy.summary(s.gentleHellos))
+                            .font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center)
+                            .accessibilityIdentifier("butterfly.summary.gentle")
+                    }
                     if !s.newStickerIds.isEmpty {
                         // Wraps into rows, so a big round (5 or more friends) never runs past the card.
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 84), spacing: 8)], spacing: 10) {
                             ForEach(s.newStickerIds, id: \.self) { id in
+                                let name = VisitorCatalog.species(id)?.name ?? ""
+                                let gentle = gentleThisRound.contains(id)
                                 VStack(spacing: 2) {
                                     Image("visitor_\(id)_sticker").resizable().scaledToFit().frame(width: 60, height: 60).accessibilityHidden(true)
-                                    Text(VisitorCatalog.species(id)?.name ?? "").font(Theme.font(.caption, weight: .semibold))
+                                        .overlay(alignment: .topTrailing) { if gentle { GentleHeart(size: 24).offset(x: 6, y: -4) } }
+                                    Text(name).font(Theme.font(.caption, weight: .semibold))
                                         .foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                                 }
+                                .accessibilityElement(children: .ignore)
+                                .accessibilityLabel(gentle ? "\(name), \(GentleNetCopy.heartLabel)" : name)
                             }
                         }
                         if let fact = (s.newFriendIds + s.newStickerIds).compactMap({ VisitorCatalog.species($0)?.fact }).first {
@@ -183,6 +291,7 @@ struct ButterflyView: View {
                             if s.shedPoints > 0 { Label("\(s.shedPoints)", systemImage: "star.fill").accessibilityLabel(ShedCopy.points(s.shedPoints)) }
                             if s.scoops > 0 { Label("\(s.scoops)", systemImage: "shippingbox.fill").accessibilityLabel("\(s.scoops) soil") }
                         }.font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                        .accessibilityElement(children: .contain).accessibilityIdentifier("butterfly.summary.rewards")
                     }
                     Button("Play again") { summary = nil; game = nil; start() }.buttonStyle(PrimaryButtonStyle())
                     Button(VisitorsCopy.done) { router.back() }.buttonStyle(SecondaryButtonStyle())
@@ -195,38 +304,131 @@ struct ButterflyView: View {
     // MARK: Actions
 
     private func frame(for v: ButterflyGameModel.Visitor, elapsed: Double) -> String {
-        if v.resting { return "visitor_\(v.speciesId)_idle" }
+        if v.showsIdle { return "visitor_\(v.speciesId)_idle" }
         return "visitor_\(v.speciesId)_\(Int(elapsed * 4) % 2 == 0 ? "a" : "b")"
     }
 
     private func start() {
-        game = app.startButterflyGame(reduceMotion: reduceMotion)
+        game = app.startButterflyGame(reduceMotion: reduceMotion, voiceOver: voiceOver, switchControl: switchControl)
         lastTick = Date()
         summary = nil
         metThisRound = []
+        gentleThisRound = []
         newFriend = nil
+        ghosts = []
+        showTip = false
+        if sceneSize != .zero { tellGameTheScene() }
     }
 
-    private func catchAt(_ point: CGPoint, in size: CGSize) {
-        guard var g = game, size.width > 0, size.height > 0 else { return }
-        // The net tier sets the catch circle (48/64/80 pt); the model works in normalised coordinates.
-        let radius = ToolEngine.netCatchRadius(tier: app.inventory.tier(of: .net)) / size.width
-        guard let species = g.catchAt(x: point.x / size.width, y: point.y / size.height, radius: max(0.08, radius)) else { return }
+    /// The scene's size, its flowers and where landed visitors sit, and the net's rest point.
+    private func configure(_ geo: GeometryProxy) {
+        sceneSize = geo.size
+        bottomInset = geo.safeAreaInsets.bottom
+        tellGameTheScene()
+        placeRest()
+    }
+
+    private func tellGameTheScene() {
+        guard sceneSize.width > 0, sceneSize.height > 0 else { return }
+        // Bed plants are 74 pt tall, 30 pt above the screen's bottom edge; a landed visitor sits on top of them.
+        let perchY = Double((sceneSize.height + bottomInset - 90) / sceneSize.height)
+        game?.setScene(size: sceneSize, perchSpots: ButterflyNet.flowerSpots(count: bedPlants.count, sceneWidth: Double(sceneSize.width)),
+                       perchY: perchY)
+    }
+
+    private func placeRest() {
+        guard let g = game, sceneSize.width > 0 else { return }
+        let rest = ButterflyNet.restPoint(scene: sceneSize, radius: radius(g), pillTop: pillTop.map { Double($0) }, lastLift: net.lastLift)
+        let first = net.restPoint == .zero
+        net.restPoint = rest
+        if first || reduceMotion { if !net.isDown { net.position = rest; net.target = rest } }
+    }
+
+    private func sweep(from a: CGPoint, to b: CGPoint) {
+        guard var g = game, sceneSize.width > 0 else { return }
+        let hellos = g.catchSwept(from: a, to: b, finger: finger, scene: sceneSize, radius: radius(g))
+        guard !hellos.isEmpty else { return }
         game = g
-        app.play(.butterfly)
+        for h in hellos { greet(h, hoop: net.position) }
+    }
+
+    /// VoiceOver (and any assistive tap): the net swings to this visitor and says hello. No aiming needed.
+    private func helloTo(_ id: Int) {
+        guard var g = game, let h = g.sayHello(toVisitor: id) else { return }
+        game = g
+        let p = CGPoint(x: h.x * sceneSize.width, y: h.y * sceneSize.height)
+        if !reduceMotion { net.position = p }
+        greet(h, hoop: p)
+        if !reduceMotion { DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) { placeRest(); if !net.isDown { net.target = net.restPoint } } }
+    }
+
+    /// Switch Control's "Swing the net": a hello to the visitor nearest the net's rest point.
+    private func swingToNearest() {
+        guard let g = game, sceneSize.width > 0 else { return }
+        let rx = Double(net.restPoint.x), ry = Double(net.restPoint.y), w = Double(sceneSize.width), h = Double(sceneSize.height)
+        func away(_ v: ButterflyGameModel.Visitor) -> Double { hypot(v.x * w - rx, v.y * h - ry) }
+        let nearest = g.visitors.min { away($0) < away($1) }
+        if let nearest { helloTo(nearest.id) }
+    }
+
+    private func greet(_ h: ButterflyGameModel.Hello, hoop: CGPoint) {
+        let species = h.speciesId
+        app.play(.butterfly, volume: h.gentle ? 0.7 : 1)
+        if h.gentle { gentleThisRound.insert(species) }
         let name = VisitorCatalog.species(species)?.name ?? "Visitor"
-        let popup = Popup(species: species, at: point)
-        withAnimation(reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.55)) { popups.append(popup) }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) { withAnimation { popups.removeAll { $0.id == popup.id } } }
+        let at = CGPoint(x: h.x * sceneSize.width, y: h.y * sceneSize.height)
+        let popup = Popup(species: species, at: at, gentle: h.gentle)
+        withAnimation(reduceMotion ? .easeInOut(duration: 0.25) : .spring(response: 0.3, dampingFraction: 0.55)) { popups.append(popup) }
+        if h.gentle && !reduceMotion {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                withAnimation(.easeOut(duration: 1.2)) { if let i = popups.firstIndex(where: { $0.id == popup.id }) { popups[i].risen = true } }
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + (h.gentle ? 1.6 : 1.3)) {
+            withAnimation(.easeOut(duration: h.gentle ? 0.4 : 0.3)) { popups.removeAll { $0.id == popup.id } }
+        }
+        if !reduceMotion { foldAndFree(species, from: at, hoop: hoop, gentle: h.gentle) }
         let isNew = app.album.count(of: species) == 0 && !metThisRound.contains(species)
         metThisRound.insert(species)
         if isNew {
             withAnimation(reduceMotion ? nil : .spring(response: 0.4, dampingFraction: 0.8)) { newFriend = species }
             DispatchQueue.main.asyncAfter(deadline: .now() + 2.4) { if newFriend == species { withAnimation { newFriend = nil } } }
-            AccessibilityNotification.Announcement("\(VisitorsCopy.newFriendTitle(name)). \(name) says hello").post()
-        } else {
-            AccessibilityNotification.Announcement("\(name) says hello").post()
         }
+        let line = h.gentle ? GentleNetCopy.announcement(name: name) : "\(name) says hello"
+        AccessibilityNotification.Announcement(isNew ? "\(VisitorsCopy.newFriendTitle(name)). \(line)" : line).post()
+    }
+
+    /// Fold (0.25 s), lift (0.2 s), free (0.5 s). A gentle hello first lowers the net softly onto the flower.
+    private func foldAndFree(_ species: String, from at: CGPoint, hoop: CGPoint, gentle: Bool) {
+        if gentle {
+            netDrop = -28
+            withAnimation(.easeOut(duration: 0.35)) { netDrop = 0 }
+        }
+        let ghost = Ghost(species: species, at: at)
+        ghosts.append(ghost)
+        DispatchQueue.main.async {
+            withAnimation(.easeIn(duration: 0.25)) {
+                pocket = true
+                if let i = ghosts.firstIndex(where: { $0.id == ghost.id }) { ghosts[i].at = hoop; ghosts[i].folded = true }
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            pocket = false
+            withAnimation(.spring(response: 0.2, dampingFraction: 0.6)) { netLift = -12 }
+            withAnimation(.easeOut(duration: 0.5)) {
+                if let i = ghosts.firstIndex(where: { $0.id == ghost.id }) { ghosts[i].freed = true; ghosts[i].at.y -= 70 }
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) { withAnimation(.spring(response: 0.25, dampingFraction: 0.6)) { netLift = 0 } }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) { ghosts.removeAll { $0.id == ghost.id } }
+    }
+
+    /// The first time any visitor rests, a small tip under the sky for 4 s (once per device).
+    private func maybeShowTip(_ g: ButterflyGameModel) {
+        guard !app.settings.gentleNetTipShown, g.visitors.contains(where: \.resting) else { return }
+        app.settings.gentleNetTipShown = true
+        withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) { showTip = true }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4) { withAnimation(.easeInOut(duration: 0.3)) { showTip = false } }
     }
 
     private func endNow() {
@@ -244,6 +446,7 @@ struct ButterflyView: View {
     }
 }
 
+
 // MARK: Visitors page
 
 /// The Visitors page: friends met, a big "Say hello" card that starts the game, and the album right there.
@@ -252,6 +455,9 @@ struct VisitorsView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
+    @Environment(\.accessibilitySwitchControlEnabled) private var switchControl
     @State private var detail: VisitorSpecies?
 
     /// Two cards a row, one at accessibility text sizes.
@@ -321,14 +527,38 @@ struct VisitorsView: View {
         .accessibilityElement(children: .combine)
     }
 
+    /// The pace the next round would have (the chip and blurb say what it will be like).
+    private var pace: ButterflyPace {
+        app.butterflyPace(reduceMotion: systemReduceMotion || app.settings.reduceMotionOverride, voiceOver: voiceOver, switchControl: switchControl)
+    }
+
+    private var playBlurb: String {
+        switch pace {
+        case .calm: return VisitorsCopy.playBlurbCalm
+        case .quickWings: return VisitorsCopy.playBlurbQuick
+        case .gentle: return VisitorsCopy.playBlurb
+        }
+    }
+
     private var playCard: some View {
         Card {
             VStack(alignment: .leading, spacing: 14) {
                 HStack(alignment: .top, spacing: 14) {
                     Image("visitor_monarch_a").resizable().scaledToFit().frame(width: 60, height: 60).accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text(VisitorsCopy.playTitle).font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                        Text(app.settings.calmMode ? VisitorsCopy.playBlurbCalm : VisitorsCopy.playBlurb)
+                        // The Quick wings chip sits beside the title, and under it at accessibility text sizes.
+                        let titleRow = typeSize.isAccessibilitySize
+                            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6)) : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 8))
+                        titleRow {
+                            Text(VisitorsCopy.playTitle).font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                            if pace == .quickWings { QuickWingsChip() }
+                        }
+                        // Easier butterflies, right by the chip: 13 and up with Calm off (under 13 never sees it). It
+                        // stays shown while on, so the gentle game can be switched back to Quick wings here too.
+                        if ButterflyPace.offersEasierSwitch(ageBand: app.settings.ageBand, calmMode: app.settings.calmMode) {
+                            easierSwitch
+                        }
+                        Text(playBlurb)
                             .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
                         // Friend of the day: a suggestion only, hidden in Quiet Garden.
                         if !app.settings.quietGarden {
@@ -343,6 +573,23 @@ struct VisitorsView: View {
                 Button(VisitorsCopy.sayHello) { router.go(.butterfly) }.buttonStyle(PrimaryButtonStyle())
             }
         }
+    }
+
+    /// One layout at every size: the switch row, then its note; both use text styles and wrap.
+    private var easierSwitch: some View {
+        @Bindable var s = app.settings
+        return VStack(alignment: .leading, spacing: 4) {
+            Toggle(isOn: $s.easierButterflies) {
+                Text(VisitorsCopy.easierToggle).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .tint(Color.successText)
+            .accessibilityIdentifier("visitors.easierButterflies")
+            Text(VisitorsCopy.easierFootnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("visitors.easierButterfliesNote")
+        }
+        .padding(.top, 4)
     }
 
     private var infoRow: some View {

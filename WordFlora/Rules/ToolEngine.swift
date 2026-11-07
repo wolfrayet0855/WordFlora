@@ -72,7 +72,10 @@ enum ToolEngine {
     static let pruneCooldownDays = 2.0
     static let repotMatchGrowth = 4
     /// Butterfly net: the catch circle around a finger, in points, by tier (v4 design, visitors section 5).
+    /// The radius is in points, so the smallest hoop is 96 pt across (gentle game).
     static let netCatchPoints = [48.0, 64.0, 80.0]
+    /// Quick wings (13 and up): a smaller hoop, 40 / 56 / 72 pt radius (80 to 144 pt across), with no grace.
+    static let netCatchPointsQuick = [40.0, 56.0, 72.0]
     /// Mister: the free water drops come faster and a little more can collect. Tier 1 is the plain Economy trickle.
     /// The daily drinks per plant (`waterPerDay`) and the water bank cap never change.
     static let misterTrickleHours = [4.0, 3.0, 2.0]
@@ -81,6 +84,9 @@ enum ToolEngine {
     private static func index(_ tier: Int, _ count: Int) -> Int { min(count, max(1, tier)) - 1 }
 
     static func netCatchRadius(tier: Int) -> Double { netCatchPoints[index(tier, netCatchPoints.count)] }
+    static func netCatchRadius(tier: Int, quickWings: Bool) -> Double {
+        quickWings ? netCatchPointsQuick[index(tier, netCatchPointsQuick.count)] : netCatchRadius(tier: tier)
+    }
     static func trickleHours(forMister tier: Int) -> Double { misterTrickleHours[index(tier, misterTrickleHours.count)] }
     static func trickleCap(forMister tier: Int) -> Int { misterTrickleCaps[index(tier, misterTrickleCaps.count)] }
 

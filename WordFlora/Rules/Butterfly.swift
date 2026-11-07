@@ -154,6 +154,18 @@ enum VisitorsCopy {
     }
     static func newInAlbum(_ n: Int) -> String { n == 1 ? "1 new friend in your album" : "\(n) new friends in your album" }
 
+    // The net and Quick wings (docs/pm/butterfly-net-spec.md section 5). No digits, nothing about time or speed.
+    static let quickWings = "Quick wings"
+    static let playBlurbQuick = "Follow the visitors with your net. They flit and turn. Every visit is a good one."
+    static let easierToggle = "Easier butterflies"
+    /// What the switch brings back (the gentle net is not bigger, only more forgiving).
+    static let easierFootnote = "Easier butterflies: slower visitors and a more forgiving net. Rounds are a little shorter."
+    static func flyingLabel(_ name: String) -> String { "\(name), flying" }
+    static let netHint = "Says hello with your net"
+    /// Switch Control and VoiceOver: a named action on the scene that says hello to the visitor nearest the net.
+    static let swingAction = "Swing the net"
+    static let sceneLabel = "Butterfly garden"
+
     static func seen(_ date: Date, now: Date, calendar: Calendar) -> String {
         let days = calendar.dateComponents([.day], from: calendar.startOfDay(for: date), to: calendar.startOfDay(for: now)).day ?? 0
         switch days {
@@ -175,6 +187,7 @@ enum VisitorsCopy {
                      saidHello(2), caughtPill("Monarch"), summaryTitle(friends: 0), summaryTitle(friends: 1), summaryTitle(friends: 4),
                      newInAlbum(1), newInAlbum(3), "Seen today", "Seen yesterday", "Seen 5 days ago",
                      cardLabel(name: "Monarch", rarity: .uncommon, met: 3, seen: "Seen today"), cardLabel(name: "Luna Moth", rarity: .rare, met: 0, seen: nil)]
+        lines += [quickWings, playBlurbQuick, easierToggle, easierFootnote, flyingLabel("Monarch"), netHint, swingAction, sceneLabel]
         for r in [VisitorCatalog.Rarity.common, .uncommon, .rare] { lines += [r.label, newFriendLine(r)] }
         return lines
     }
@@ -202,6 +215,8 @@ enum ButterflyRewards {
         var newStickerIds: [String] = []
         /// Visitors met for the very first time this round (new to the album).
         var newFriendIds: [String] = []
+        /// Gentle Net: hellos to resting friends this round (0 in Quiet Garden, where no count shows).
+        var gentleHellos = 0
     }
     static let rewardedPlaysPerDay = 3
 

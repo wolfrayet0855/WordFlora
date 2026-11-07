@@ -47,6 +47,11 @@ final class AppSettings {
     /// Speed bloom's "Extra time": the gold ring takes half as long again.
     var speedBloomExtraTime: Bool { didSet { defaults.set(speedBloomExtraTime, forKey: "speedBloomExtraTime") } }
 
+    /// Butterfly game, 13 and up: turns Quick wings off and brings back the gentle game. Device-local, like Speed bloom.
+    var easierButterflies: Bool { didSet { defaults.set(easierButterflies, forKey: "easierButterflies") } }
+    /// Gentle Net's tip ("Some friends rest on a flower") has been shown once on this device.
+    var gentleNetTipShown: Bool { didSet { defaults.set(gentleNetTipShown, forKey: "gentleNetTipShown") } }
+
     /// What the Speed bloom rule reads as each round begins.
     var speedBloomPrefs: SpeedBloom.Prefs {
         SpeedBloom.Prefs(optedIn: speedBloomOn, extraTime: speedBloomExtraTime, ageBand: ageBand, calmMode: calmMode, quietGarden: quietGarden)
@@ -98,6 +103,8 @@ final class AppSettings {
         weatherCardDismissedDay = defaults.integer(forKey: "weatherCardDismissedDay")
         speedBloomOn = bool("speedBloomOn", false)
         speedBloomExtraTime = bool("speedBloomExtraTime", false)
+        easierButterflies = bool("easierButterflies", false)
+        gentleNetTipShown = bool("gentleNetTipShown", false)
     }
 
     /// Applies the defaults that depend on the age answer (called once, when the player answers).

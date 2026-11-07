@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 60" width="120" height="60">
+  <!-- Gentle Net: soft gold halo on the flower under a resting visitor, so a child can see "this one is resting".
+       Marigold #F5C858 / centreOuter #E8A838. Breathes 0.85 to 1.0 opacity over 2.4 s; held still in Reduce Motion. -->
+  <ellipse cx="60" cy="30" rx="54" ry="22" fill="#F5C858" fill-opacity=".22"/>
+  <ellipse cx="60" cy="30" rx="44" ry="16" fill="none" stroke="#E8A838" stroke-opacity=".7" stroke-width="2.2" stroke-dasharray="2 6" stroke-linecap="round"/>
+</svg>
