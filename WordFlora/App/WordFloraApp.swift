@@ -98,6 +98,13 @@ struct WordFloraApp: App {
         if uiTesting && args.contains("-uitest-plus") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
+        // Plus Forever owned, alone or beside a subscription that is still renewing (the "charged twice" note).
+        if uiTesting && args.contains("-uitest-plus-forever") {
+            model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID]))
+        }
+        if uiTesting && args.contains("-uitest-plus-twice") {
+            model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID, "plus_yearly"]))
+        }
         if uiTesting && args.contains("-uitest-everything") { model.settings.showEverything = true; model.syncToolUnlocks() }
         // Visitors and Shed tests: a few friends in the album, shed points, Calm mode or Quiet Garden.
         if uiTesting && args.contains("-uitest-album") {
