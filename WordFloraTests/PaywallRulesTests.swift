@@ -137,6 +137,36 @@ final class PaywallRulesTests: XCTestCase {
         }
     }
 
+    /// The "charged twice" note reads the renewal info: only while auto-renew is still on.
+    func testPaysTwiceOnlyWhileTheSubscriptionWillRenew() {
+        let now = Date(timeIntervalSince1970: 2_000_000_000)
+        let end = now.addingTimeInterval(20 * 86_400)
+        let cases: [(Bool?, Bool, Date?)] = [(true, true, nil), (nil, true, nil), (false, false, end)]
+        for (renew, paysTwice, endsBeside) in cases {
+            let s = EntitlementState(entries: [.init(productID: "plus_lifetime"),
+                                               .init(productID: "plus_yearly", expiresAt: end, willAutoRenew: renew)], now: now)
+            XCTAssertTrue(s.hasPlus); XCTAssertTrue(s.hasActiveSubscription)
+            XCTAssertEqual(s.paysTwice, paysTwice, "willAutoRenew \(String(describing: renew))")
+            XCTAssertEqual(s.subscriptionEndsBesideLifetime, endsBeside)
+        }
+        // Two live subscriptions: one still renewing is enough for the note; with both off the later end date shows.
+        let later = end.addingTimeInterval(86_400)
+        let mixed = EntitlementState(entries: [.init(productID: "plus_lifetime"),
+                                               .init(productID: "plus_yearly", expiresAt: end, willAutoRenew: false),
+                                               .init(productID: "plus_monthly", expiresAt: later, willAutoRenew: true)], now: now)
+        XCTAssertTrue(mixed.paysTwice); XCTAssertNil(mixed.subscriptionEndsBesideLifetime)
+        let bothOff = EntitlementState(entries: [.init(productID: "plus_lifetime"),
+                                                 .init(productID: "plus_yearly", expiresAt: end, willAutoRenew: false),
+                                                 .init(productID: "plus_monthly", expiresAt: later, willAutoRenew: false)], now: now)
+        XCTAssertFalse(bothOff.paysTwice); XCTAssertEqual(bothOff.subscriptionEndsBesideLifetime, later)
+        // A subscriber without Plus Forever never sees either line, renewing or not.
+        let subOnly = EntitlementState(entries: [.init(productID: "plus_yearly", expiresAt: end, willAutoRenew: false)], now: now)
+        XCTAssertFalse(subOnly.paysTwice); XCTAssertNil(subOnly.subscriptionEndsBesideLifetime)
+        XCTAssertEqual(CopySafety.check(PaywallCopy.subscriptionEnds(on: "December 1, 2026")), [])
+        XCTAssertEqual(PaywallCopy.subscriptionEnds(on: "December 1, 2026"),
+                       "Your subscription ends on December 1, 2026 and will not renew. Plus Forever keeps going after that.")
+    }
+
     func testLifetimeBeatsAnExpiredSubscription() {
         let now = Date(timeIntervalSince1970: 2_000_000_000)
         let s = EntitlementState(entries: [.init(productID: "plus_monthly", expiresAt: now.addingTimeInterval(-60)),

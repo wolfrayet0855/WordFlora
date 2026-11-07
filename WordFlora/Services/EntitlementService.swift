@@ -53,7 +53,14 @@ final class EntitlementService {
         var entries = [EntitlementState.Entry]()
         for await result in Transaction.currentEntitlements {
             guard case .verified(let t) = result else { continue }
-            entries.append(.init(productID: t.productID, revoked: t.revocationDate != nil, expiresAt: t.expirationDate))
+            // Renewal info tells a subscription that will renew from one whose auto-renew is already off.
+            var willAutoRenew: Bool?
+            if t.productType == .autoRenewable, let status = await t.subscriptionStatus,
+               case .verified(let info) = status.renewalInfo {
+                willAutoRenew = info.willAutoRenew
+            }
+            entries.append(.init(productID: t.productID, revoked: t.revocationDate != nil, expiresAt: t.expirationDate,
+                                 willAutoRenew: willAutoRenew))
         }
         state = EntitlementState(entries: entries, now: .now)
         hasLoaded = true

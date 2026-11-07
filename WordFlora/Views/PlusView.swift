@@ -40,7 +40,7 @@ struct PlusView: View {
                 }.frame(maxWidth: .infinity, alignment: .leading)
 
                 if store.state.hasPlus { activeCard } else { plans }
-                FamilyShareNudgeRow()
+                FamilyShareNudgeRow(placement: .plusPage)
 
                 VStack(spacing: 2) {
                     Button("Restore purchases") { Task { await store.restore(); app.updateSyncFlag() } }.tapTarget()
@@ -165,6 +165,11 @@ struct PlusView: View {
                         .accessibilityIdentifier("plus.paysTwice")
                     Button(PaywallCopy.cancelSubscription) { ask(then: .manageSubscriptions) }
                         .buttonStyle(SecondaryButtonStyle())
+                } else if let ends = store.state.subscriptionEndsBesideLifetime {
+                    // Auto-renew is already off, so nothing more is charged: one calm line, no button.
+                    Text(PaywallCopy.subscriptionEnds(on: ends.formatted(date: .long, time: .omitted)))
+                        .font(Theme.font(.callout)).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("plus.subscriptionEnds")
                 }
             }
         }

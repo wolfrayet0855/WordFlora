@@ -107,6 +107,16 @@ struct WordFloraApp: App {
         if uiTesting && args.contains("-uitest-plus-twice") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID, "plus_yearly"]))
         }
+        // The grown-ups' Family Sharing note was shown two days ago (so not again this week).
+        if uiTesting && args.contains("-uitest-family-note-seen") {
+            model.settings.familyNudgeShownAt = Date.now.addingTimeInterval(-2 * 86_400)
+        }
+        // Plus Forever beside a subscription whose auto-renew is already off (it ends in 20 days): the end-date line.
+        if uiTesting && args.contains("-uitest-plus-ending") {
+            model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID, "plus_yearly"],
+                                                           subscriptionRenews: false,
+                                                           subscriptionEndsAt: Date.now.addingTimeInterval(20 * 86_400)))
+        }
         if uiTesting && args.contains("-uitest-everything") { model.settings.showEverything = true; model.syncToolUnlocks() }
         // Visitors and Shed tests: a few friends in the album, shed points, Calm mode or Quiet Garden.
         if uiTesting && args.contains("-uitest-album") {
