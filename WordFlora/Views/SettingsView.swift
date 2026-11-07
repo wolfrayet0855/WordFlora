@@ -37,19 +37,13 @@ struct SettingsView: View {
                 if ButterflyPace.offersEasierSwitch(ageBand: s.ageBand, calmMode: s.calmMode) {
                     // Text grows in place (fixed vertical size), as the Family Sharing line does, so the Dynamic Type
                     // audit sees it scale inside the Form row.
-                    // One row, built like the Family Sharing line (which passes the audit in this Form).
-                    VStack(alignment: .leading, spacing: 6) {
-                        Toggle(isOn: $s.easierButterflies) {
-                            Text(VisitorsCopy.easierToggle).font(Theme.font(.body)).fixedSize(horizontal: false, vertical: true)
-                        }
-                        .accessibilityIdentifier("settings.easierButterflies")
-                        Text(VisitorsCopy.easierFootnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .accessibilityIdentifier("settings.easierButterfliesNote")
+                    Toggle(isOn: $s.easierButterflies) {
+                        Text(VisitorsCopy.easierToggle).font(Theme.font(.body)).fixedSize(horizontal: false, vertical: true)
                     }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .accessibilityElement(children: .contain)
-                    .accessibilityIdentifier("settings.easierButterfliesRow")
+                    .accessibilityIdentifier("settings.easierButterflies")
+                    Text(VisitorsCopy.easierFootnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("settings.easierButterfliesNote")
                 }
             }
             Section(settings: GuideCopy.UI.settingsHeader) {
