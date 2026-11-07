@@ -64,9 +64,11 @@ stage and in the repot preview.
 ## 2. Lantern Keeper badge (G3)
 
 `badge_lantern_keeper_t1.svg`, `_t2.svg`, `_t3.svg`, 100 x 100, the asset names the plan gives. Same frame as every
-`BadgeArt` badge: a dodecagon in the tier's dark and light colours, a `#FFFDF5` disc with a 2 pt tier stroke, and 1, 2
-or 3 tier dots at y 91. The icon is a red paper lantern (`FL.lanternRed` with a `PetalKit.marigold` glow, ink caps
-and a gold tassel) with a small frost-blue snowflake. Tiers differ only by frame colour and dots, as for the other badges.
+`BadgeArt` badge: a dodecagon in the tier's dark and light colours and a `#FFFDF5` disc with a 2 pt tier stroke. The
+1, 2 or 3 tier dots are 1.5x the usual size (r 5.4 at y 86, 12 units apart, 2.1 white stroke) so the count reads at
+44 pt and tiers do not rely on frame colour alone (checked side by side at 44 pt). The icon is a red paper lantern
+(`FL.lanternRed` with a `PetalKit.marigold` glow, ink caps and a gold tassel), centred on the disc at x 50, with a
+small frost-blue snowflake at the top right. Tiers differ by frame colour and dot count.
 I left out the unused gradient `<defs>` that older badge files carry. Add the three files to `Assets.xcassets/BadgeArt` as
 imagesets with `preserves-vector-representation`, like the others.
 

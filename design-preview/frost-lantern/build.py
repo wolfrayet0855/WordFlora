@@ -282,8 +282,9 @@ def snowflake(x, y, r, col, w):
 
 
 # ---------------------------------------------------------------- badge
-TIERS = {1: ("Badge.bronze", "Badge.bronzeLight", [50]), 2: ("Badge.silver", "Badge.silverLight", [45, 55]),
-         3: ("Badge.gold", "Badge.goldLight", [40, 50, 60])}
+# Tier pips at 1.5x the BadgeArt dots (r 5.4 at y 86, 12 apart) so 1, 2 or 3 reads at 44 pt, not frame colour alone.
+TIERS = {1: ("Badge.bronze", "Badge.bronzeLight", [50]), 2: ("Badge.silver", "Badge.silverLight", [44, 56]),
+         3: ("Badge.gold", "Badge.goldLight", [38, 50, 62])}
 DODEC = "50.0,4.0 73.0,10.2 89.8,27.0 96.0,50.0 89.8,73.0 73.0,89.8 50.0,96.0 27.0,89.8 10.2,73.0 4.0,50.0 10.2,27.0 27.0,10.2"
 
 
@@ -293,7 +294,7 @@ def badge_svg(tier):
          '<polygon points="%s" fill="%s" transform="translate(50 50) scale(.92) translate(-50 -50)"/>' % (DODEC, c(lt)),
          '<circle cx="50" cy="48" r="33" fill="%s" stroke="%s" stroke-width="2"/>' % (c("Badge.disc"), c(dk))]
     ink = c("FL.lanternInk")
-    o.append('<g>')
+    o.append('<g transform="translate(3 0)">')  # lantern centred on the disc (x 50)
     o.append('<path d="M47 21 V27" stroke="%s" stroke-width="2.4" stroke-linecap="round"/>' % ink)
     o.append('<rect x="39" y="26" width="16" height="5" rx="1.6" fill="%s"/>' % ink)
     o.append('<ellipse cx="47" cy="46" rx="14" ry="15" fill="%s"/>' % c("FL.lanternRed"))
@@ -302,10 +303,10 @@ def badge_svg(tier):
     o.append('<path d="M43 44 Q44 40 47 39" stroke="#FFFFFF" stroke-width="1.6" stroke-linecap="round" fill="none" stroke-opacity=".9"/>')
     o.append('<rect x="41" y="60" width="12" height="4.5" rx="1.6" fill="%s"/>' % ink)
     o.append('<path d="M47 64.5 V72" stroke="%s" stroke-width="3" stroke-linecap="round"/>' % c("PetalKit.marigold"))
-    o.append(snowflake(68, 32, 7.5, c("FL.frostFern"), 2.2))
     o.append("</g>")
+    o.append(snowflake(69, 31, 7.5, c("FL.frostFern"), 2.2))
     for x in dots:
-        o.append('<circle cx="%s" cy="91" r="3.6" fill="%s" stroke="#fff" stroke-width="1.4"/>' % (f(x), c(lt)))
+        o.append('<circle cx="%s" cy="86" r="5.4" fill="%s" stroke="#fff" stroke-width="2.1"/>' % (f(x), c(lt)))
     return "".join(o)
 
 
@@ -313,7 +314,7 @@ def badge_files():
     for t in (1, 2, 3):
         dk, lt, _ = TIERS[t]
         write("badge_lantern_keeper_t%d.svg" % t, svg_doc(100, 100, badge_svg(t),
-              "Lantern Keeper tier %d. Frame as every BadgeArt badge: dodecagon %s/%s, disc Badge.disc, %d tier dot(s). Icon FL.lanternRed, FL.lanternInk, PetalKit.marigold, snowflake FL.frostFern. Same art on light and dark." % (t, dk, lt, t)))
+              "Lantern Keeper tier %d. Frame as every BadgeArt badge: dodecagon %s/%s, disc Badge.disc, %d tier dot(s) at 1.5x (r 5.4, y 86). Lantern centred at x 50. Icon FL.lanternRed, FL.lanternInk, PetalKit.marigold, snowflake FL.frostFern. Same art on light and dark." % (t, dk, lt, t)))
 
 
 # ---------------------------------------------------------------- Seasons row glyph (template)
