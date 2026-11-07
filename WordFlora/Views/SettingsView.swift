@@ -148,7 +148,7 @@ struct SettingsView: View {
 /// grouped background (Apple's contrast audit), so the headers use `Color.secondaryText`, which meets it in light and dark.
 struct SettingsHeader: View {
     let title: String
-    var body: some View { Text(title).foregroundStyle(Color.secondaryText) }
+    var body: some View { Text(title).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.secondaryText) }
 }
 
 extension Section where Parent == SettingsHeader, Content: View, Footer == EmptyView {

@@ -41,16 +41,17 @@ final class ButterflyNetUITests: XCTestCase {
         for _ in 0..<14 where !(e.exists && e.isHittable) { up ? app.swipeDown() : app.swipeUp() }
     }
 
-    /// Badge moments dim the app: wait until none is showing (one may follow another), and return the badges they named.
-    @discardableResult
-    private func letBadgeMomentsPass() -> [String] {
-        var seen = [String]()
+    /// Badge moments dim the app: wait until none is showing (the next can follow within half a second).
+    private func letBadgeMomentsPass() {
         let moment = element("badgeMoment")
-        while moment.waitForExistence(timeout: 4) {
-            seen.append(moment.label)
-            XCTAssertTrue(moment.waitForNonExistence(timeout: 12), "the badge moment goes")
+        for _ in 0..<6 where moment.waitForExistence(timeout: 4) {
+            XCTAssertTrue(moment.waitForNonExistence(timeout: 15), "the badge moments go")
         }
-        return seen
+    }
+
+    /// A badge moment naming this badge, while it shows.
+    private func momentNaming(_ title: String) -> XCUIElement {
+        app.descendants(matching: .any).matching(NSPredicate(format: "identifier == 'badgeMoment' AND label CONTAINS %@", title)).firstMatch
     }
 
     /// Apple's audit, every finding collected. Contrast and Dynamic Type are judged only for elements fully inside the
@@ -197,9 +198,9 @@ final class ButterflyNetUITests: XCTestCase {
         XCTAssertEqual(element("butterfly.summary.gentle").label, "1 gentle hello")
         shot("net-gentle-summary")
         // The first friend met also earns Visitor Friend and First Catch; the moments come one after another.
-        XCTAssertTrue(element("badgeMoment").waitForExistence(timeout: 8))
+        XCTAssertTrue(momentNaming("Gentle Net").waitForExistence(timeout: 15), "ten gentle hellos bring the bronze Gentle Net moment")
         shot("net-gentle-badge-moment")
-        let moments = letBadgeMomentsPass()
+        letBadgeMomentsPass()
         shot("net-gentle-after-moments")
         // The badge itself, on the Badges page.
         app.buttons["Done"].tap()
@@ -212,7 +213,6 @@ final class ButterflyNetUITests: XCTestCase {
         for _ in 0..<14 where !card.isHittable { app.swipeUp() }
         shot("net-gentle-badges-page")
         XCTAssertTrue(card.label.lowercased().hasSuffix("bronze"), "ten gentle hellos earn the bronze Gentle Net badge: \(card.label)")
-        XCTAssertTrue(moments.contains { $0.contains("Gentle Net") }, "its moment shows: \(moments)")
     }
 
     // MARK: Accessibility audits

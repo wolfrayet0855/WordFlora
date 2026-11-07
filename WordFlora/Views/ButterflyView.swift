@@ -52,6 +52,10 @@ struct ButterflyView: View {
         }
         .navigationTitle("Butterfly game")
         .navigationBarTitleDisplayMode(.inline)
+        // The bar takes the sky's top colour and its scheme, so the title reads on the day sky in dark mode too.
+        .toolbarBackground(evening ? Color(hex: 0x1F2A4A) : Color(hex: 0xBFE6F5), for: .navigationBar)
+        .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(evening ? .dark : .light, for: .navigationBar)
         .toolbar {
             if let game, game.calm, summary == nil {
                 ToolbarItem(placement: .confirmationAction) {
