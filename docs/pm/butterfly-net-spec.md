@@ -11,7 +11,8 @@ exactly as gentle as today. Reduce Motion resting rules stay as they are. Reward
 > Built in gate G2b (2026-11-07) with the visual review's must-fixes: rim `#8D9AA6` for silver, 5 pt, and a 1 pt ink
 > outline on every rim tier by day (cream `#FAF7F0` at 80% on rim and handle in the evening sky); the resting net at 85%
 > with its lowest point at least 24 pt above the "said hello" pill. Calm follows the art spec's correction: it moves
-> visitors at 60% and uses the landing rule (5 s rest), so only resting hellos are gentle there.
+> visitors at 60% and uses the landing rule (5 s rest), so only resting hellos are gentle there. Lead decision: the
+> "Easier butterflies" switch lives on the Visitors page by the Quick wings chip, not in Settings (section 5).
 
 ## 0. What the game does today (the baseline we must not make harder)
 - `ButterflyView` sends every `DragGesture` sample to `ButterflyGameModel.catchAt(x:y:radius:)`, which takes the nearest

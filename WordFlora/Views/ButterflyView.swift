@@ -553,6 +553,11 @@ struct VisitorsView: View {
                             Text(VisitorsCopy.playTitle).font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                             if pace == .quickWings { QuickWingsChip() }
                         }
+                        // Easier butterflies, right by the chip: 13 and up with Calm off (under 13 never sees it). It
+                        // stays shown while on, so the gentle game can be switched back to Quick wings here too.
+                        if ButterflyPace.offersEasierSwitch(ageBand: app.settings.ageBand, calmMode: app.settings.calmMode) {
+                            easierSwitch
+                        }
                         Text(playBlurb)
                             .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
                         // Friend of the day: a suggestion only, hidden in Quiet Garden.
@@ -568,6 +573,23 @@ struct VisitorsView: View {
                 Button(VisitorsCopy.sayHello) { router.go(.butterfly) }.buttonStyle(PrimaryButtonStyle())
             }
         }
+    }
+
+    /// One layout at every size: the switch row, then its note; both use text styles and wrap.
+    private var easierSwitch: some View {
+        @Bindable var s = app.settings
+        return VStack(alignment: .leading, spacing: 4) {
+            Toggle(isOn: $s.easierButterflies) {
+                Text(VisitorsCopy.easierToggle).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .tint(Color.successText)
+            .accessibilityIdentifier("visitors.easierButterflies")
+            Text(VisitorsCopy.easierFootnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+                .accessibilityIdentifier("visitors.easierButterfliesNote")
+        }
+        .padding(.top, 4)
     }
 
     private var infoRow: some View {

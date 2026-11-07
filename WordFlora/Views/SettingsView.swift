@@ -33,13 +33,6 @@ struct SettingsView: View {
                     Text(SpeedBloomCopy.footnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                         .accessibilityIdentifier("settings.speedBloomNote")
                 }
-                // Butterfly game, 13 and up with Calm off: Quick wings plays unless this is on. Under 13 never sees it.
-                if ButterflyPace.offersEasierSwitch(ageBand: s.ageBand, calmMode: s.calmMode) {
-                    // Built exactly like the Speed bloom rows above.
-                    Toggle(VisitorsCopy.easierToggle, isOn: $s.easierButterflies).accessibilityIdentifier("settings.easierButterflies")
-                    Text(VisitorsCopy.easierFootnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
-                        .accessibilityIdentifier("settings.easierButterfliesNote")
-                }
             }
             Section(GuideCopy.UI.settingsHeader) {
                 Button { showGuide = true } label: { Label(GuideCopy.UI.settingsRow, systemImage: "book.pages") }

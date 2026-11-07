@@ -57,45 +57,10 @@ final class ButterflyNetUITests: XCTestCase {
     /// Apple's audit, every finding collected. Contrast and Dynamic Type are judged only for elements fully inside the
     /// visible scroll area (as in BadgeMechanicsUITests); the Dynamic Type and clipped-text checks run on their own after
     /// the rest, since they grow the text and reflow the page.
-    /// `still`: an element on the page that must stop moving before each pass (a Form reflows after the text-growing
-    /// passes; auditing mid-reflow judged rows that were still being measured).
-    private func audit(_ name: String, still: XCUIElement? = nil) {
-        if let still { waitUntilStill(still) }
+    private func audit(_ name: String) {
         auditOnce(name, types: XCUIAccessibilityAuditType.all.subtracting([.dynamicType, .textClipped]))
-        if let still { waitUntilStill(still) }
         auditOnce(name + "-textClipped", types: .textClipped)
-        if let still { waitUntilStill(still) }
         auditOnce(name + "-dynamicType", types: .dynamicType)
-    }
-
-    /// Every audit type, in the same three passes; findings fail when they are on (or overlap) one of the targets.
-    private func auditWithin(_ name: String, targets: [XCUIElement]) {
-        for (pass, types) in [("", XCUIAccessibilityAuditType.all.subtracting([.dynamicType, .textClipped])),
-                              ("-textClipped", .textClipped), ("-dynamicType", .dynamicType)] as [(String, XCUIAccessibilityAuditType)] {
-            waitUntilStill(targets[0])
-            let frames = targets.map(\.frame)
-            var findings = [String](), issues = [XCUIAccessibilityAuditIssue]()
-            do {
-                // Collected first and judged after the audit, so no element is looked up while it runs.
-                try app.performAccessibilityAudit(for: types) { issue in issues.append(issue); return true }
-            } catch { findings.append("\(name)\(pass): audit failed to run: \(error)") }
-            for issue in issues {
-                guard let e = issue.element, e.exists, frames.contains(where: { $0.intersects(e.frame) }) else { continue }
-                findings.append("\(name)\(pass): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(e.label)' \(e.frame)")
-            }
-            XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
-        }
-    }
-
-    private func waitUntilStill(_ e: XCUIElement) {
-        var last = e.frame, same = 0
-        let end = Date().addingTimeInterval(20)
-        while same < 2 && Date() < end {
-            Thread.sleep(forTimeInterval: 0.5)
-            let now = e.frame
-            same = now == last ? same + 1 : 0
-            last = now
-        }
     }
 
     private func auditOnce(_ name: String, types: XCUIAccessibilityAuditType) {
@@ -119,13 +84,6 @@ final class ButterflyNetUITests: XCTestCase {
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
 
-    private func openSettings() {
-        app.buttons["Settings"].tap()
-        // The bar, not a row: at AX XXXL the list builds only the rows on screen.
-        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 8))
-        sleep(1)
-    }
-
     private func openVisitors() {
         app.buttons["Visitors"].tap()
         XCTAssertTrue(app.buttons["Say hello"].waitForExistence(timeout: 5))
@@ -143,24 +101,35 @@ final class ButterflyNetUITests: XCTestCase {
 
     // MARK: Who sees what
 
+    /// Easier butterflies sits on the Visitors page by the Quick wings chip: 13 and up with Calm off, off by default.
+    /// Turning it on brings back the gentle game (the chip goes; the switch stays to turn it off again).
     func testEasierButterfliesIsOfferedToThirteenPlusOnly() {
         launch(["-uitest-age=thirteenPlus"])
-        openSettings()
-        let toggle = app.switches["settings.easierButterflies"]
-        scrollTo(toggle)
+        openVisitors()
+        let toggle = app.switches["visitors.easierButterflies"]
         XCTAssertTrue(toggle.exists)
         XCTAssertEqual(toggle.value as? String, "0", "off by default: Quick wings plays")
-        XCTAssertTrue(element("settings.easierButterfliesNote").exists)
-        shot("net-settings-13plus")
+        XCTAssertTrue(element("visitors.easierButterfliesNote").exists)
+        XCTAssertTrue(element("visitors.quickWings").exists)
+        shot("net-visitors-easier-off")
+        toggle.switches.firstMatch.tap()
+        XCTAssertTrue(element("visitors.quickWings").waitForNonExistence(timeout: 3), "the gentle game: no chip")
+        XCTAssertEqual(toggle.value as? String, "1")
+        shot("net-visitors-easier-on")
+        app.buttons["Say hello"].tap()
+        XCTAssertTrue(element("butterfly.scene.gentle").waitForExistence(timeout: 5))
         app.terminate()
         for args in [["-uitest-age=thirteenPlus", "-uitest-calm"], ["-uitest-age=under13"]] {
             launch(args)
-            openSettings()
-            for _ in 0..<4 { app.swipeUp() }
-            XCTAssertFalse(app.switches["settings.easierButterflies"].exists, "\(args)")
-            XCTAssertFalse(element("settings.easierButterfliesNote").exists, "\(args)")
+            openVisitors()
+            XCTAssertFalse(app.switches["visitors.easierButterflies"].exists, "\(args)")
+            XCTAssertFalse(element("visitors.easierButterfliesNote").exists, "\(args)")
             app.terminate()
         }
+        launch(["-uitest-age=thirteenPlus", "-uitest-easier-butterflies"])
+        openVisitors()
+        XCTAssertEqual(app.switches["visitors.easierButterflies"].value as? String, "1", "the flag turns it on")
+        XCTAssertFalse(element("visitors.quickWings").exists)
     }
 
     func testTheQuickWingsChipShowsForThirteenPlusOnly() {
@@ -252,26 +221,21 @@ final class ButterflyNetUITests: XCTestCase {
 
     // MARK: Accessibility audits
 
-    func testAuditSettingsPlay() { auditSettingsPlay(size: nil, dark: false) }
-    func testAuditSettingsPlayAtAXXXLInDark() { auditSettingsPlay(size: Self.axXXXL, dark: true) }
-    func testAuditSettingsPlayAtAXXXLInLight() { auditSettingsPlay(size: Self.axXXXL, dark: false) }
+    func testAuditTheEasierSwitch() { auditEasierSwitch(size: nil, dark: false) }
+    func testAuditTheEasierSwitchAtAXXXLInDark() { auditEasierSwitch(size: Self.axXXXL, dark: true) }
+    func testAuditTheEasierSwitchAtAXXXLInLight() { auditEasierSwitch(size: Self.axXXXL, dark: false) }
 
-    private func auditSettingsPlay(size: String?, dark: Bool) {
-        // Settings is a long Form: each finding's element is looked up to see whether it is one of the new rows, which
-        // takes a few minutes for the three passes (the stock rows report many Dynamic Type findings).
-        executionTimeAllowance = 360
-        do {
-            launch(["-uitest-age=thirteenPlus"], size: size, dark: dark)
-            openSettings()
-            let note = element("settings.easierButterfliesNote")
-            scrollTo(note)
-            waitUntilStill(note)
-            let name = "net-settings\(size == nil ? "" : "-ax5")\(dark ? "-dark" : "")"
-            shot(name)
-            // As DailyQuestUITests audits the Family Sharing row: only findings on the new rows fail here; the rest of
-            // Settings has its own audit in WordFloraUITests.
-            auditWithin(name, targets: [note, app.switches["settings.easierButterflies"]].filter(\.exists))
-        }
+    /// The Visitors card with Easier butterflies on (the gentle game, no chip), audited like the other Visitors audits.
+    private func auditEasierSwitch(size: String?, dark: Bool) {
+        launch(["-uitest-age=thirteenPlus", "-uitest-easier-butterflies"], size: size, dark: dark)
+        openVisitors()
+        let note = element("visitors.easierButterfliesNote")
+        scrollTo(note)
+        XCTAssertTrue(note.exists)
+        sleep(1)
+        let name = "net-visitors-easier\(size == nil ? "" : "-ax5")\(dark ? "-dark" : "")"
+        shot(name)
+        audit(name)
     }
 
     func testAuditTheVisitorsCard() {
@@ -290,7 +254,6 @@ final class ButterflyNetUITests: XCTestCase {
 
     /// The game itself, held still with Reduce Motion so the audit sees one frame.
     func testAuditTheGameScene() {
-        continueAfterFailure = true
         for (size, dark) in [(nil, false), (Self.axXXXL, true)] as [(String?, Bool)] {
             launch(["-uitest-age=thirteenPlus", "-uitest-reduce-motion"], size: size, dark: dark)
             openGame()
