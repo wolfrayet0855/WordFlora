@@ -57,6 +57,12 @@ struct ButterflyView: View {
         .toolbarBackground(.visible, for: .navigationBar)
         .toolbarColorScheme(evening ? .dark : .light, for: .navigationBar)
         .toolbar {
+            // The title is drawn in the sky's ink (dark by day, white in the evening) whatever the app's appearance:
+            // the system title followed dark mode and measured light-on-light over the day sky.
+            ToolbarItem(placement: .principal) {
+                Text("Butterfly game").font(Theme.font(.headline, weight: .semibold)).foregroundStyle(onSky)
+                    .accessibilityAddTraits(.isHeader)
+            }
             if let game, game.calm, summary == nil {
                 ToolbarItem(placement: .confirmationAction) {
                     Button(VisitorsCopy.done) { endNow() }.accessibilityIdentifier("calm-done")

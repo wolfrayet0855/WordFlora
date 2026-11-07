@@ -35,8 +35,14 @@ struct SettingsView: View {
                 }
                 // Butterfly game, 13 and up with Calm off: Quick wings plays unless this is on. Under 13 never sees it.
                 if ButterflyPace.offersEasierSwitch(ageBand: s.ageBand, calmMode: s.calmMode) {
-                    Toggle(VisitorsCopy.easierToggle, isOn: $s.easierButterflies).accessibilityIdentifier("settings.easierButterflies")
+                    // Text grows in place (fixed vertical size), as the Family Sharing line does, so the Dynamic Type
+                    // audit sees it scale inside the Form row.
+                    Toggle(isOn: $s.easierButterflies) {
+                        Text(VisitorsCopy.easierToggle).font(Theme.font(.body)).fixedSize(horizontal: false, vertical: true)
+                    }
+                    .accessibilityIdentifier("settings.easierButterflies")
                     Text(VisitorsCopy.easierFootnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("settings.easierButterfliesNote")
                 }
             }
@@ -148,7 +154,10 @@ struct SettingsView: View {
 /// grouped background (Apple's contrast audit), so the headers use `Color.secondaryText`, which meets it in light and dark.
 struct SettingsHeader: View {
     let title: String
-    var body: some View { Text(title).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.secondaryText) }
+    var body: some View {
+        Text(title).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.secondaryText)
+            .fixedSize(horizontal: false, vertical: true)
+    }
 }
 
 extension Section where Parent == SettingsHeader, Content: View, Footer == EmptyView {
