@@ -42,7 +42,7 @@ All three use the shared 120 x 100 pot box and draw in `PotPainter`'s order: bod
 |---|---|---|---|---|---|
 | `frostedGlass` | Frosted glass | `#B7D6E6` / `#5E93B0` / `#93BCD2` | `0xFFFFFF`, `0x3F7596` | `frost`: frost band with a scalloped top along the foot, three frost ferns rising from it, two glints (hidden in outline) | Icy blue pot with frost ferns |
 | `lanternRed` | Lantern red | `#B5403A` / `#D9665A` / `#93302B` | `0xF5C858`, `0xFFF0C2`, `0x5E211C`, `0x8A2A25` | `lanterns`: a deep band (hidden in outline), a cream string, three paper lanterns (gold, cream, gold) with caps, tassels and a glow (glow knocks out in outline) | Red pot with a band of paper lanterns |
-| `snowflakeIndigo` | Snowflake indigo | `#4A4FAE` / `#7F86D9` / `#363A8C` | `0xFFFFFF`, `0xCFE6F0` | `snowflakes`: three six-armed flakes with hub and side twigs (twigs hidden in outline), six ice dots (hidden in outline) | Indigo pot with white snowflakes |
+| `snowflakeIndigo` | Snowflake indigo | `#6A70D0` / `#7F86D9` / `#4A4FAE` | `0xFFFFFF`, `0xCFE6F0` | `snowflakes`: three six-armed flakes with hub and side twigs (twigs hidden in outline), six ice dots (hidden in outline) | Indigo pot with white snowflakes |
 
 **States and sizes.** "Empty" means the pot alone, as on tiles. "Occupied" means it has the soil top, as on the plant
 stage and in the repot preview.
@@ -191,7 +191,7 @@ New art constants (`FL.*`), with hex values in `build.py`:
 |---|---|
 | Frosted glass | `iceBody #B7D6E6`, `iceRim #5E93B0`, `iceShade #93BCD2`, `frostFern #3F7596` |
 | Lantern red | `lanternBody #B5403A`, `lanternRim #D9665A`, `lanternShade #93302B`, `lanternBand #8A2A25`, `lanternInk #5E211C`, `lanternRed #C8473E`, `glow #F5C858` |
-| Snowflake indigo | `indigoBody #4A4FAE`, `indigoRim #7F86D9`, `indigoShade #363A8C`, `ice #CFE6F0` |
+| Snowflake indigo | `indigoBody #6A70D0`, `indigoRim #7F86D9`, `indigoShade #4A4FAE`, `ice #CFE6F0` |
 | Scene and card | `skyL1 #D3DEEE`, `skyL2 #DFE5F1`, `skyL3 #EAE6F0`, `skyD1 #17233A`, `skyD2 #1E2C46`, `skyD3 #283752`, `hillL #C4D3E4`, `hillD #33425E`, `moon #F6E8B0`, `snow #F4F7FB`, `snowShade #DCE5EF`, `snowDark #9AA7BC`, `snowShadeDark #7D8BA3`, `stringDark #8C7A6B`, `fir #3F6F4A`, `firDark #2E5538`, `post #5E4A3A`, `postDark #3E3128`, `woodLight #D9A066`, `woodEdge #9A5F2A` |
 | Robin | `robinBack #7A6A4E`, `robinWing #5E4E36`, `robinWingEdge #9A8A68`, `robinBreast #E2733A`, `robinGrey #A9B0B8`, `robinBelly #F3EEE6`, `beak #3A2C1E`, `leg #7A5A44`, `stickerFrost #DCEBF2` |
 | Wren | `wrenBody #8A5A34`, `wrenWing #6E4524`, `wrenBar #4E2F17`, `wrenBelly #D8B98E`, `wrenBrow #EBD7B4`, `stickerBark #F1E6D6` |
@@ -207,7 +207,8 @@ to app text placed over the scene or card. Grounds: `appBackground` and `appSurf
 |---|---|---|---|---|---|
 | Frosted glass rim `#5E93B0` | 3.1 | 3.3 | 4.3 | 3.4 | passes on all four |
 | Lantern red rim `#D9665A` | 3.3 | 3.5 | 4.1 | 3.3 | passes on all four |
-| Snowflake indigo rim `#7F86D9` | 3.1 | 3.3 | 4.4 | 3.4 | passes on all four |
+| Snowflake indigo rim `#7F86D9` (unchanged) | 3.1 | 3.3 | 4.4 | 3.4 | passes on all four |
+| Snowflake indigo body `#6A70D0` | 4.1 | 4.3 | 3.3 | 2.6 | rim carries the edge on dark surface |
 | Outline ink (theme's own) on its ground | 4.7 | 5.0 | 5.4 | 4.3 | passes (existing values) |
 | Badge icon `FL.lanternRed` on `Badge.disc` | 4.7 | 4.7 | 4.7 | 4.7 | passes (the disc is the same in both themes) |
 | Seasons glyph (`appPrimaryText`) | 10.7 | 11.5 | 11.6 | 9.2 | passes text level |
@@ -216,7 +217,7 @@ to app text placed over the scene or card. Grounds: `appBackground` and `appSurf
 | Snowdrop edge (light) / petal (dark) | 3.3 | 3.5 | 14.5 | 11.5 | passes |
 | Hellebore sepal | 3.4 | 3.6 | 4.0 | 3.2 | passes |
 
-Pattern on its own body: frost fern 3.3, lantern gold 3.5 (cream on the band 7.6), snowflakes 7.0, ice dots 5.4,
+Pattern on its own body: frost fern 3.3, lantern gold 3.5 (cream on the band 7.6), snowflakes 4.3, ice dots 3.4 (on the lighter `#6A70D0` body),
 outline ink on outline fill 3.8 light / 3.5 dark. The white frost band on Frosted glass is 1.5:1. It is a soft texture,
 not an identifying shape: the ferns carry the pattern.
 
@@ -231,16 +232,19 @@ as the catalogue rule requires. These are the closest pairs, with luminance cont
 
 | Pair | Ratios | Told apart by |
 |---|---|---|
-| Snowflake indigo vs Starlight | 1.08 / 1.07 / 1.07 / 1.04 | six-armed flakes with a hub and twigs vs four-point sparkles; indigo rim vs teal rim |
-| Snowflake indigo vs Moonlit | 1.22 / 1.25 / 1.21 / 1.24 | flakes vs one big crescent |
+| Snowflake indigo vs Starlight | 1.49 / 1.49 / 1.50 / 1.52 | six-armed flakes with a hub and twigs vs four-point sparkles; indigo rim vs teal rim |
+| Snowflake indigo vs Dewdrop | 1.36 / 1.29 / 1.40 / 1.34 | flakes vs drops; the darker indigo rim |
+| Snowflake indigo vs Moonlit | 1.95 / 1.97 / 1.95 / 1.98 | flakes vs one big crescent |
 | Frosted glass vs Jade vine | 1.30 / 1.27 / 1.33 / 1.30 | frost band and ferns vs hanging jade flowers on a vine rail |
 | Lantern red vs Terracotta | 1.60 / 1.75 / 1.52 / 1.59 | lantern band vs two rings |
 | Robin breast vs back | 1.69 / 1.43 / 1.85 / 1.68 | the breast's grey edge band and shape. The robin still reads as a robin by silhouette and the white belly |
 | Hellebore sepal vs leaf | 1.63 / 1.36 / 1.82 / 1.66 | flower shape and the pale centre; leaves are palmate |
 
-The Snowflake indigo and Starlight pair is the weakest in grey. It matches the existing Moonlit and Starlight precedent
-(`design-preview/pots/notes.md`). If a reviewer wants more distance, lighten the indigo body to about `#6A70D0`. That
-passes 3:1 on its own on all four grounds, but it moves closer to Dewdrop's lilac.
+The Snowflake indigo body is lightened from `#4A4FAE` to `#6A70D0` (the shade takes the old body, `#4A4FAE`; the rim
+stays `#7F86D9`). That lifts the Starlight pair from 1.08 to 1.49 in grey. The rim still passes 3:1 on all four app
+grounds (table above). The new body sits nearer Dewdrop's lilac `#9686CC` (1.36), told apart by flakes vs drops and the
+darker rim. Builders: paste the new body and shade into the `snowflakeIndigo` entry in `PotCatalog`; the `PotMark`
+lists in `pot-marks.swift.txt` hold only decoration colours and do not change.
 
 ## Draft facts (for the owner's G5 fact-check, not yet checked)
 

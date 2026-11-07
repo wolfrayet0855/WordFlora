@@ -31,7 +31,7 @@ T = {
     "FL.iceBody": "#B7D6E6", "FL.iceRim": "#5E93B0", "FL.iceShade": "#93BCD2", "FL.frostFern": "#3F7596",
     "FL.lanternBody": "#B5403A", "FL.lanternRim": "#D9665A", "FL.lanternShade": "#93302B",
     "FL.lanternBand": "#8A2A25", "FL.lanternInk": "#5E211C",
-    "FL.indigoBody": "#4A4FAE", "FL.indigoRim": "#7F86D9", "FL.indigoShade": "#363A8C", "FL.ice": "#CFE6F0",
+    "FL.indigoBody": "#6A70D0", "FL.indigoRim": "#7F86D9", "FL.indigoShade": "#4A4FAE", "FL.ice": "#CFE6F0",
     "FL.lanternRed": "#C8473E",
     "FL.snow": "#F4F7FB", "FL.snowShade": "#DCE5EF", "FL.snowDark": "#9AA7BC", "FL.snowShadeDark": "#7D8BA3",
     "FL.skyL1": "#D3DEEE", "FL.skyL2": "#DFE5F1", "FL.skyL3": "#EAE6F0",
