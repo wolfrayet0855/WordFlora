@@ -263,14 +263,14 @@ final class ButterflyNetUITests: XCTestCase {
         do {
             launch(["-uitest-age=thirteenPlus"], size: size, dark: dark)
             openSettings()
-            let row = element("settings.easierButterfliesRow"), note = element("settings.easierButterfliesNote")
+            let note = element("settings.easierButterfliesNote")
             scrollTo(note)
             waitUntilStill(note)
             let name = "net-settings\(size == nil ? "" : "-ax5")\(dark ? "-dark" : "")"
             shot(name)
             // As DailyQuestUITests audits the Family Sharing row: only findings on the new rows fail here; the rest of
             // Settings has its own audit in WordFloraUITests.
-            auditWithin(name, targets: [row, note])
+            auditWithin(name, targets: [note, app.switches["settings.easierButterflies"]].filter(\.exists))
         }
     }
 
