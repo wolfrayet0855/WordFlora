@@ -13,9 +13,9 @@ Tone rules used: calm and plain; no "kids", "for children" or "Made for Kids" cl
 | Promotional text (editable without a new build) | see below (about 140) | 170 |
 | Keywords | see below (97) | 100 |
 | Primary category | Games > Word **[ASSUMPTION per the status review]** | |
-| Secondary category | Education **[ASSUMPTION]**. Family is a Games subcategory and may read as a Kids signal; Education is safer. Leave empty if unsure. | |
+| Secondary category | Education (owner confirmed 2026-11-07). Family is a Games subcategory and may read as a Kids signal; Education is safer. Leave empty if unsure. | |
 | Version | 1.0 (build 1) | |
-| Copyright | `2026 Shape Haven Innovations` **[ASSUMPTION: the legal owner name is the domain's company; confirm exact legal name]** | |
+| Copyright | `2026 Shape Haven Innovations` (owner confirmed 2026-11-07) | |
 | Privacy Policy URL | https://shapehaveninnovations.com/privacy | |
 | Support URL | https://shapehaveninnovations.com/support.html | |
 | Marketing URL | https://shapehaveninnovations.com **[ASSUMPTION: site root; it must also host `/app-ads.txt` (C8)]** | |
