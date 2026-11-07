@@ -318,14 +318,14 @@ def badge_files():
 
 # ---------------------------------------------------------------- Seasons row glyph (template)
 def glyph_svg(col="#000000"):
-    """A filled paper lantern (the rib is an even-odd slit) and a small snowflake, SF Symbol weight at 17 to 22 pt."""
-    o = ['<path d="M10 1.8 V5" stroke="%s" stroke-width="1.8" stroke-linecap="round"/>' % col,
-         '<rect x="5.6" y="4.4" width="8.8" height="2.6" rx="1" fill="%s"/>' % col,
-         '<path fill-rule="evenodd" fill="%s" d="M10 6.4 C3.2 7.4 3.2 18.6 10 19.6 C16.8 18.6 16.8 7.4 10 6.4 Z '
-         'M9.2 9 C8.2 11.5 8.2 14.5 9.2 17 L10.8 17 C11.8 14.5 11.8 11.5 10.8 9 Z"/>' % col,
-         '<rect x="6.4" y="19" width="7.2" height="2.4" rx="1" fill="%s"/>' % col,
-         '<path d="M10 21.4 V23" stroke="%s" stroke-width="1.8" stroke-linecap="round"/>' % col]
-    o.append(snowflake(19.6, 5.4, 3.9, col, 1.6))
+    """An outline paper lantern alone: a wide open body (2 pt stroke), one thin inner rib oval, flat caps, hook and
+    tassel. Drawn for 22 to 28 pt in one colour. No solid body and no snowflake: at 22 pt a flake reads as an asterisk."""
+    o = ['<path d="M12 1.4 V4" stroke="%s" stroke-width="1.8" stroke-linecap="round"/>' % col,
+         '<rect x="7.04" y="3.6" width="9.92" height="2.6" rx="1" fill="%s"/>' % col,
+         '<ellipse cx="12" cy="12" rx="8" ry="6" fill="none" stroke="%s" stroke-width="2"/>' % col,
+         '<ellipse cx="12" cy="12" rx="3.36" ry="5.6" fill="none" stroke="%s" stroke-width="1.2"/>' % col,
+         '<rect x="8" y="17.4" width="8" height="2.4" rx="1" fill="%s"/>' % col,
+         '<path d="M12 19.8 V23" stroke="%s" stroke-width="1.8" stroke-linecap="round"/>' % col]
     return "".join(o)
 
 
@@ -755,7 +755,7 @@ def main():
     pot_files()
     badge_files()
     write("seasons-row-glyph.svg", svg_doc(24, 24, glyph_svg(),
-          "Seasons row glyph for Settings > Plus. 24 x 24, single colour, 1.8 stroke: ship as a template image (renderingMode .template) so the Label tints it like its SF Symbol neighbours."))
+          "Seasons row glyph for Settings > Plus. 24 x 24, single colour: an outline paper lantern alone (2 stroke body, 1.2 rib oval, flat caps). Ship as a template image (renderingMode .template) so the Label tints it like its SF Symbol neighbours. Checked at 22, 24 and 28 pt."))
     visitor_files()
     plant_files()
     card_files()

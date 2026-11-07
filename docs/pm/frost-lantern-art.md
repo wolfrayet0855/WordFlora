@@ -72,8 +72,9 @@ imagesets with `preserves-vector-representation`, like the others.
 
 ## 3. Seasons row glyph and pack card (G3)
 
-- **`seasons-row-glyph.svg`**, 24 x 24: a filled paper lantern (the rib is an even-odd slit) and a small snowflake,
-  single colour. Ship it as a template image so `Label("Seasons", image: "seasons-row-glyph")` tints it
+- **`seasons-row-glyph.svg`**, 24 x 24: an outline paper lantern alone (wide open body at a 2 pt stroke, one thin
+  rib oval, flat caps, hook and tassel), single colour. The earlier filled lantern with a snowflake read as "0*" at
+  22 pt; the snowflake is dropped because at that size it reads as an asterisk. Checked at 22, 24 and 28 pt. Ship it as a template image so `Label("Seasons", image: "seasons-row-glyph")` tints it
   `appPrimaryText` like the row's SF Symbol neighbours (10.7:1 light, 11.6:1 dark). If a custom glyph is unwanted, the
   SF Symbol `snowflake` is the fallback.
 - **`pack-card-light.svg` / `pack-card-dark.svg`**, 353 x 150, the same frame as `ShedScene`: three pots on a snowy
