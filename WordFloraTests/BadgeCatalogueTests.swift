@@ -37,9 +37,13 @@ final class BadgeCatalogueTests: XCTestCase {
             XCTAssertEqual(d.counter, want.counter, id); XCTAssertEqual(d.thresholds, want.thresholds, id)
             XCTAssertTrue(["collection", "play", "tending", "explorer"].contains(d.family), id)
         }
-        // One counter per badge, and every counter is used by a badge.
+        // One counter per badge, and every counter is used by a badge, apart from the retired ones (still counted and
+        // kept in the JSON, read by no badge: Pruning Pro moved from `prunes` to `tidyTrims`).
         XCTAssertEqual(Set(defs.map(\.counter)).count, defs.count)
-        XCTAssertEqual(Set(defs.map(\.counter)), BadgeCatalog.knownCounters)
+        XCTAssertEqual(Set(defs.map(\.counter)), BadgeCatalog.knownCounters.subtracting(BadgeCounter.retired.map(\.rawValue)))
+        XCTAssertEqual(BadgeCounter.retired, [.prunes])
+        XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.counter, "tidyTrims")
+        XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.thresholds, [5, 20, 50])
     }
 
     /// Gold is always reachable with what the game holds.
@@ -316,7 +320,8 @@ final class BadgeCatalogueTests: XCTestCase {
         XCTAssertEqual(app.badges.progress(of: .storiesRead), 1)
         XCTAssertEqual(app.pendingBadge?.badgeId, "wild_discovery")
         var album = StickerAlbum(); album.add(["monarch", "ladybug", "honeybee", "luna"]); app.profile?.albumJSON = album.json
-        app.noteVisitorFactsRead()
+        // Field Notes: a page counts when it is read to the end or "I read it!" is tapped (BadgeMechanicsTests).
+        for id in ["monarch", "ladybug", "honeybee", "luna"] { app.collectFieldNote(id) }
         XCTAssertEqual(app.badges.progress(of: .factsRead), 4)
         XCTAssertEqual(app.badges.tier(of: "field_notes"), 1)
     }

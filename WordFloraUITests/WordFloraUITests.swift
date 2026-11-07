@@ -458,7 +458,11 @@ final class WordFloraUITests: XCTestCase {
         app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened"]; app.launch()
         app.buttons["Garden"].tap(); XCTAssertTrue(app.staticTexts["Level 1 · Seedling"].waitForExistence(timeout: 5)); audit("garden")
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
-        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5)); audit("plant")
+        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5))
+        // The first look at the fact card earns Wild Discovery 0.6 s in; its moment dims the page, so the audit waits
+        // for it to go (as openClover does). Run in a batch, the audit sometimes caught the dimmed page.
+        letTheBadgeMomentPass()
+        audit("plant")
     }
 
     func testAuditRainyPlant() {

@@ -385,3 +385,35 @@ Own simulator `WF Integ3 iPhone 17` (iOS 26.5), one xcodebuild at a time, test t
 - AX5: the clue card no longer spills "Simpler clue" over its edge (fixed). Still worth a look: at AX5 the key letters fill the keys and the check / cross marks overlap the letters (R, S, Z); readable, passes the audits, left for a design call.
 
 **Device-only checks still open:** Living Touch feel and haptic; the widget "Say hello" button on a real Home Screen; the badge moment's pass-through tap; thunder loudness; petal notes by ear.
+
+## Gate G1, lane 1: Field Notes, Pruning Pro, SKAdNetwork (2026-11-07, from `3-feat-content-and-polish` tip `04f5744`)
+Own simulator `WF G1 iPhone 17` (iOS 26.5), derived data `dd-g1`, one xcodebuild at a time, test timeouts on. Gentle Net and Mist Maker are not in this lane.
+
+**What**
+- **Field Notes:** every friend in the Visitors' book is a notebook page (paper drawn from `notebook-page.svg`, sepia sticker, "Met on <date>" from `StickerAlbum.seenAt`, fact, Listen, I read it!). A page gets the leaf stamp (`leaf-stamp.svg`, drawn in SwiftUI) only on I read it! or when `ReadAloud` reads the fact to the end; opening the book never marks (the old `noteVisitorFactsRead` on appear is gone). `recordMark(.factsRead, item:)` keeps the old best-so-far value. "Page added to your notebook." line, then the badge moment 1.4 s later. Quiet Garden: I read it!, the toast and the "pages of 12" line are hidden; stamps earned earlier still show. Listen hides under VoiceOver. Stamp press, fade under Reduce Motion (system or app), half speed and no sound in Calm. `ReadAloud.speak(..., onFinish:)` fires only when the current speak ends uncancelled (`FieldNotes.Listening` token guards a stale finish).
+- **Pruning Pro:** `FadedBloom` (pure): stage 3+, Prune ready (owned, not resting), and `mix(seed ^ FNV-1a(plantId) ^ mix(day + salt)) % 3 == 0`. Faded bloom only, no shaggy sprig. A prune while it shows is a tidy trim: new `tidyTrims` counter, tiers 5 / 20 / 50; the plain `prunes` count still runs but is retired from badges (`BadgeCounter.retired`), and old `pruning_pro#n` unlocks stay, so the card shows the higher tier. Line "Snip! A tidy trim. Snipping faded flowers helps new ones grow."; cue line under the plant, VoiceOver ", ready for a trim", Prune hint "Snips the faded flower", faded bloom on the garden card too. Falling dry petal (none under Reduce Motion, half speed in Calm), fresh bud on later visits while the shears rest (worked out again from the trim day, nothing stored). Quiet Garden: cue and lines, no count.
+- **B2a:** `SKAdNetworkItems` in `Info.plist`: the 50 ids on Google's AdMob iOS quick start page, fetched 2026-11-07 (first `cstr6suwn9.skadnetwork`). There were no entries before. `NSPrivacyTrackingDomains` stays empty; the data types were not changed.
+- Art and copy from the art lane branch: the five Field Notes / Pruning Pro SVGs, `FieldNotesCopy`, `PruningProCopy` (now in the project), `docs/pm/badge-mechanics-art.md`. Badges.json: Field Notes blurb "Fill your notebook with friend facts"; Pruning Pro counter `tidyTrims`, 5 / 20 / 50, blurb "Trim plants when they are ready". Catalogue still 38 badges. The guide does not list badges, so no GuideCopy / copy.js change.
+- UI fixtures: `-uitest-fieldnotes` (four friends met, three pages stamped), `-uitest-tidytrim` (found plant in flower, shears, every day a cue day via `fadedBloomTestOverride`, four tidy trims done).
+
+**Tests**
+- `BadgeMechanicsTests` (21): met-only marks, made-up and weather ids ignored, finish once, cancel and stale finish never mark, opening never marks, old value kept, Quiet Garden none; FNV-1a fixed values, cue rate 1/3 within 1 % over 1,000 seeds x 365 days, no cue below stage 3 / resting / without shears, tidy vs plain (same growth), old tiers kept, fresh bud rule; copy through CopySafety plus the extra words; blurbs match; plist has 50 ids including `cstr6suwn9.skadnetwork`.
+- `BadgeMechanicsUITests` (5): I read it! stamps and earns bronze Field Notes (moment shown), Quiet Garden hides I read it! and the count, tidy trim cue + snip + bronze Pruning Pro moment, Apple's audit at AX XXXL in dark on the notebook (before and after the stamp) and on the plant page with the cue. No audit weakened.
+- `WordFloraUITests.testAuditGardenSettingsAndPlus`: in a batch the audit sometimes ran while the Wild Discovery moment dimmed the plant page (failed contrast on "Life", "5 love petals", "Clover"; passed alone). It now waits for the moment to pass first, as `openClover` does.
+
+**Results** (`WF G1 iPhone 17`, iOS 26.5)
+
+| Run | Result |
+|---|---|
+| Unit (`WordFloraTests`) | 1102 run, 1099 pass; only the 3 known `StoreKitConfigTests` |
+| BadgeMechanicsUITests | 5/5 |
+| BadgesUITests, CelebrationUITests, WordFloraUITests (Visitors, Shed, Badges, plant page and garden tests, 10) | all pass (`testAuditGardenSettingsAndPlus` after the wait above, and alone) |
+| EndgameUITests (incl. Visitors' book audit) | 15/15 |
+| TendingUITests | all pass except `testRepotSheetScreensLikeTheMockup`, which runs past the 120 s allowance (about 130 s for its four launches). The untouched base `04f5744`, built and run on the same simulator, does the same (and its sibling takes 94 s there too), so it is the machine's speed, not this gate. Needs an owner/integrator call: a longer allowance for that one test, or splitting its four looks. |
+
+**Shots checked by eye** (UI test attachments in `scratchpad/g1shots/`): the notebook page in light (sepia monarch, Met on, fact on the rules, Listen and I read it! side by side), the stamped page with the Bronze Field Notes moment over it, the stamped page at AX XXXL in dark (paper dimmed, stamp clear of the words, Stamped label), the clover with its faded bloom and the Prune button.
+
+**Open items**
+- The faded bloom sits at one of five seeded spots in the upper part of the plant art, not on a real bloom of each plant's art (the plant art has no bloom anchors). On the clover it reads as a dry flower on its own stem beside the leaves; worth a look across a few plants on localhost.
+- The stamp press goes from 1.35 to 1 in one ease-in (the 0.96 settle is left out).
+- Device only: Listen to the end stamping the page (real voice), the stamp haptic.

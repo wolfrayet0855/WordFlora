@@ -279,6 +279,8 @@ struct TendActionButton: View {
     let look: TendButtonLook
     var large = false
     var nudge = 0
+    /// A hint in place of the look's own (Pruning Pro: "Snips the faded flower" while the cue shows).
+    var hintOverride: String? = nil
     let action: () -> Void
 
     @Environment(\.colorScheme) private var scheme
@@ -318,7 +320,7 @@ struct TendActionButton: View {
         .buttonStyle(TendPressStyle(reduceMotion: reduceMotion))
         .accessibilityLabel(look.accessibilityLabel)
         .accessibilityValue(look.accessibilityValue)
-        .accessibilityHint(look.hint)
+        .accessibilityHint(hintOverride ?? look.hint)
         .accessibilityIdentifier("tend-\(kind.rawValue)")
         .onChange(of: nudge) {
             guard !reduceMotion else { return }

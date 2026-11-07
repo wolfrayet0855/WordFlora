@@ -278,14 +278,14 @@
   {
     "id": "pruning_pro",
     "family": "tending",
-    "counter": "prunes",
+    "counter": "tidyTrims",
     "thresholds": [
       5,
-      25,
-      75
+      20,
+      50
     ],
     "title": "Pruning Pro",
-    "blurb": "Trim plants with the shears"
+    "blurb": "Trim plants when they are ready"
   },
   {
     "id": "mist_maker",
@@ -417,7 +417,7 @@
       12
     ],
     "title": "Field Notes",
-    "blurb": "Read friend facts in the Visitors' book"
+    "blurb": "Fill your notebook with friend facts"
   },
   {
     "id": "bee_friend",

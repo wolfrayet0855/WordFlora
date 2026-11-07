@@ -1,10 +1,23 @@
 import SwiftUI
 
-/// The Visitors' book (G-5): a page for every visitor met, with the fact, plus the weather stickers. Friends not met
+/// The Visitors' book (G-5): a notebook page for every visitor (Field Notes), plus the weather stickers. Friends not met
 /// yet are soft outlines (no locks); stickers not earned yet are dashed. Laid out eagerly so every card stays measurable.
+/// Field Notes: a page is collected only when its fact is read aloud to the end or "I read it!" is tapped, never on
+/// opening the book (docs/pm/badge-mechanics-art.md, section 1).
 struct VisitorsBookView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.dynamicTypeSize) private var typeSize
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
+    @State private var listening = FieldNotes.Listening()
+    @State private var justStamped: String?
+    @State private var toast = 0
+    @State private var toastShown = false
+    @State private var stampTaps = 0
+
+    private static let metFormat: DateFormatter = {
+        let f = DateFormatter(); f.setLocalizedDateFormatFromTemplate("d MMM"); return f
+    }()
 
     var body: some View {
         let album = app.album
@@ -14,8 +27,13 @@ struct VisitorsBookView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 14) {
                 header(EndgameCopy.bookFriends, EndgameCopy.bookFriendsCount(met.count, of: VisitorCatalog.all.count))
-                VStack(spacing: 12) {
-                    ForEach(VisitorCatalog.all, id: \.id) { v in page(v, met: album.count(of: v.id)) }
+                if FieldNotes.showsPageCount(quiet: app.settings.quietGarden) {
+                    Text(FieldNotesCopy.notebookTitle + ": " + FieldNotesCopy.pages(FieldNotes.collected(in: app.badges), of: VisitorCatalog.all.count))
+                        .font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.secondaryText)
+                        .accessibilityIdentifier("book.notebookCount")
+                }
+                VStack(spacing: 18) {
+                    ForEach(VisitorCatalog.all, id: \.id) { v in page(v, album: album) }
                 }
                 if showStickers {
                     header(EndgameCopy.bookStickers, EndgameCopy.bookStickersCount(owned.count, of: WeatherSticker.allCases.count))
@@ -49,7 +67,51 @@ struct VisitorsBookView: View {
         .navigationTitle(EndgameCopy.visitorsBook)
         .navigationBarTitleDisplayMode(.inline)
         .accessibilityIdentifier("visitorsBook")
-        .onAppear { app.noteVisitorFactsRead() }        // Field Notes badge
+        .overlay(alignment: .bottom) { if toastShown { toastView } }
+        .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: stampTaps) { _, _ in app.settings.hapticsOn }
+        // Leaving the book stops the voice; a page read only part way is not collected.
+        .onDisappear { ReadAloud.shared.stop(); listening.cancel() }
+    }
+
+    private var stampMotion: FieldNotesPage.StampMotion {
+        if reduceMotion || app.settings.reduceMotionOverride { return .fade }
+        return app.settings.calmMode ? .calmPress : .press
+    }
+
+    private func listen(_ v: VisitorSpecies) {
+        guard let fact = v.fact else { return }
+        let token = listening.start(v.id)
+        ReadAloud.shared.speak(hint: fact, extra: nil, simpler: nil) {
+            if let page = listening.finish(token: token) { collect(page) }
+        }
+    }
+
+    private func collect(_ id: String) {
+        guard app.collectFieldNote(id) else { return }
+        justStamped = id
+        stampTaps += 1
+        if !app.settings.calmMode { app.play(.button, volume: 0.5) }
+        toast += 1
+        let mine = toast
+        withAnimation(.easeOut(duration: 0.25)) { toastShown = true }
+        AccessibilityNotification.Announcement(FieldNotesCopy.pageAdded).post()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            if toast == mine { withAnimation(.easeIn(duration: 0.25)) { toastShown = false } }
+        }
+    }
+
+    private var toastView: some View {
+        HStack(spacing: 10) {
+            LeafStampView().frame(width: 22, height: 22)
+            Text(FieldNotesCopy.pageAdded).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appBackground)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.horizontal, 16).padding(.vertical, 12)
+        .background(Color.appPrimaryText, in: RoundedRectangle(cornerRadius: 16))
+        .padding(.horizontal, Space.gutter).padding(.bottom, 12)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("book.toast")
     }
 
     private func header(_ title: String, _ line: String) -> some View {
@@ -60,32 +122,15 @@ struct VisitorsBookView: View {
         }
     }
 
-    private func page(_ v: VisitorSpecies, met: Int) -> some View {
-        let isMet = met > 0
-        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(alignment: .leading, spacing: 10)) : AnyLayout(HStackLayout(alignment: .top, spacing: 14))
-        return layout {
-            Image("visitor_\(v.id)_sticker").resizable().scaledToFit().frame(width: 64, height: 64)
-                .saturation(isMet ? 1 : 0).opacity(isMet ? 1 : 0.3)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 4) {
-                Text(v.name).font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                if isMet {
-                    Text(VisitorsCopy.metCount(met)).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.secondaryText)
-                    if let fact = v.fact {
-                        Text(fact).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
-                    }
-                } else {
-                    Text(EndgameCopy.bookNotYet).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
-                }
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(Space.card)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(isMet ? Color.appSurface : Color.clear, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
-        .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius)
-            .strokeBorder(Color.appPrimaryText.opacity(isMet ? 0.08 : 0.25), style: StrokeStyle(lineWidth: 1.5, dash: isMet ? [] : [5, 4])))
-        .accessibilityElement(children: .combine)
-        .accessibilityIdentifier("book.page.\(v.id)")
+    private func page(_ v: VisitorSpecies, album: StickerAlbum) -> some View {
+        let isMet = album.count(of: v.id) > 0
+        let stamped = isMet && app.isFieldNoteStamped(v.id)
+        return FieldNotesPage(
+            visitor: v, met: isMet, metOn: album.lastSeen(of: v.id).map { Self.metFormat.string(from: $0) },
+            stamped: stamped, justStamped: justStamped == v.id,
+            readIt: FieldNotes.readItButton(stamped: stamped, quiet: app.settings.quietGarden),
+            showsListen: v.fact != nil && FieldNotes.showsListen(voiceOverRunning: voiceOver),
+            reading: listening.page == v.id, motion: stampMotion,
+            onListen: { listen(v) }, onReadIt: { listening.cancel(); ReadAloud.shared.stop(); collect(v.id) })
     }
 }
