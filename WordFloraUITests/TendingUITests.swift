@@ -500,34 +500,38 @@ final class TendingUITests: XCTestCase {
     /// The repot sheet in the mockup's states (design-preview/repot-sheet/shots): a newly earned pot picked with the
     /// pill and New tags (A, C), a pot to earn tapped (B), AccessibilityL (D), and dark with Reduce Motion, a Plus pot
     /// tapped and the soil row in view (E). Part way up the ladder, as in the mockup.
-    func testRepotSheetScreensLikeTheMockup() {
-        let looks: [(String, XCUIDevice.Appearance, [String])] = [
-            ("light", .light, []), ("dark", .dark, ["-uitest-dark"]),
-            ("axl", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]),
-            ("reduce-dark", .dark, ["-uitest-dark", "-uitest-reduce-motion"]),
-        ]
-        for (name, look, extra) in looks {
-            XCUIDevice.shared.appearance = look
-            open("Daisy", plantId: "daisy", extra: ["-uitest-pots"] + extra)
-            app.buttons["tend-repot"].tap()
-            let blossom = app.buttons["pot-tile-blossom"]
-            XCTAssertTrue(blossom.waitForExistence(timeout: 3))
-            // Rose pink is not earned in this fixture, so the newly earned Blossom is picked.
-            blossom.tap()
-            XCTAssertEqual(element("repot-summary").label, "Blossom pot, fresh loam soil")
-            sleep(1); shot("repot-a-\(name)")
-            app.buttons["pot-tile-livingStones"].tap()
-            XCTAssertTrue(element("pot-hint").waitForExistence(timeout: 2))
-            sleep(1); shot("repot-b-\(name)")
-            app.buttons["pot-tile-moonlit"].tap()
-            XCTAssertTrue(element("pot-hint").label.contains("Settings"), element("pot-hint").label)
-            let peaty = app.buttons["repot-soil-peaty"], go = app.buttons["repot-go"]
-            for _ in 0..<4 where !(peaty.isHittable && peaty.frame.maxY < go.frame.minY - 60) { app.scrollViews.firstMatch.swipeUp(); sleep(1) }
-            peaty.tap()
-            XCTAssertTrue(peaty.isSelected)
-            sleep(1); shot("repot-e-\(name)")
-            app.terminate()
-        }
+    /// One test per look, so each stays well inside the time allowance (the four launches together ran past it).
+    func testRepotSheetScreensLikeTheMockupLight() { repotSheetLooksLikeTheMockup("light", .light, []) }
+    func testRepotSheetScreensLikeTheMockupDark() { repotSheetLooksLikeTheMockup("dark", .dark, ["-uitest-dark"]) }
+    func testRepotSheetScreensLikeTheMockupAccessibilityL() {
+        repotSheetLooksLikeTheMockup("axl", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
+    }
+    func testRepotSheetScreensLikeTheMockupDarkReduceMotion() {
+        repotSheetLooksLikeTheMockup("reduce-dark", .dark, ["-uitest-dark", "-uitest-reduce-motion"])
+    }
+
+    private func repotSheetLooksLikeTheMockup(_ name: String, _ look: XCUIDevice.Appearance, _ extra: [String]) {
+        XCUIDevice.shared.appearance = look
+        defer { XCUIDevice.shared.appearance = .light }
+        open("Daisy", plantId: "daisy", extra: ["-uitest-pots"] + extra)
+        app.buttons["tend-repot"].tap()
+        let blossom = app.buttons["pot-tile-blossom"]
+        XCTAssertTrue(blossom.waitForExistence(timeout: 3))
+        // Rose pink is not earned in this fixture, so the newly earned Blossom is picked.
+        blossom.tap()
+        XCTAssertEqual(element("repot-summary").label, "Blossom pot, fresh loam soil")
+        sleep(1); shot("repot-a-\(name)")
+        app.buttons["pot-tile-livingStones"].tap()
+        XCTAssertTrue(element("pot-hint").waitForExistence(timeout: 2))
+        sleep(1); shot("repot-b-\(name)")
+        app.buttons["pot-tile-moonlit"].tap()
+        XCTAssertTrue(element("pot-hint").label.contains("Settings"), element("pot-hint").label)
+        let peaty = app.buttons["repot-soil-peaty"], go = app.buttons["repot-go"]
+        for _ in 0..<4 where !(peaty.isHittable && peaty.frame.maxY < go.frame.minY - 60) { app.scrollViews.firstMatch.swipeUp(); sleep(1) }
+        peaty.tap()
+        XCTAssertTrue(peaty.isSelected)
+        sleep(1); shot("repot-e-\(name)")
+        app.terminate()
     }
 
     /// Newly earned pots are recorded when the picker opens, with a closable pill and "New" tags that time only.
