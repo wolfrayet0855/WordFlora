@@ -17,7 +17,7 @@ enum TendEffect: String, CaseIterable, Equatable {
         case .feed: self = .soil
         case .sun: self = .sun
         case .repot: self = .repot
-        case .prune: return nil
+        case .prune, .mist: return nil          // the mist has its own spray (MistSprayView)
         }
     }
 

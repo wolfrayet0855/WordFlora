@@ -7,6 +7,9 @@ extension AppModel {
         Dictionary(((try? PlantCatalog.load()) ?? []).map { ($0.plantId, $0.traitSet) }, uniquingKeysWith: { a, _ in a })
     }()
 
+    /// A plant's catalogue traits (Mist Maker's +2 for tropical, epiphyte and shade plants).
+    func traits(of plant: PlantCollectible) -> Set<String> { Self.traitsById[plant.plantId] ?? [] }
+
     /// The plants found so far, with their catalogue traits.
     var badgePlants: [BadgeFacts.Plant] {
         plants().filter { $0.earnedCount > 0 }

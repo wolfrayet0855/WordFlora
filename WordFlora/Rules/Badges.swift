@@ -24,6 +24,8 @@ enum BadgeCounter: String, CaseIterable, Codable {
     /// The season's earned pot (Frosted glass): marks "in.<day>" / "out.<day>" for Daily Bloom days (`PackCatalog`).
     /// Feeds a pot, not a badge (`potOnly`).
     case seasonBlooms
+    /// Mist Maker: real mists with the Mist button (`ToolEngine.mist`). Accumulates; never goes down.
+    case mistSprays
 
     // Collection: worked out from the garden and the album each time (`BadgeFacts`), kept as best-so-far values.
     case rarePlants, desertPlants, waterPlants, treePlants, floweringPlants, stickers
@@ -49,7 +51,8 @@ enum BadgeCounter: String, CaseIterable, Codable {
     /// Counters still kept in the JSON (and still counted) that no badge reads any more. Their earned tiers stay: the
     /// badge that moved to a new counter keeps its `unlocked` dates, so its card shows the higher of the two.
     /// `prunes`: Pruning Pro moved to `tidyTrims`. `butterflyPlays`: Gentle Net moved to `gentleHellos`.
-    static let retired: Set<BadgeCounter> = [.prunes, .butterflyPlays]
+    /// `mists` (free drops while the mister was owned, no longer recorded): Mist Maker moved to `mistSprays`.
+    static let retired: Set<BadgeCounter> = [.prunes, .butterflyPlays, .mists]
     /// Counters that track a pot's progress rather than a badge (kept in the JSON so they merge and back up).
     static let potOnly: Set<BadgeCounter> = [.seasonBlooms]
 }

@@ -173,7 +173,7 @@ struct LifeTab: View {
 
 /// The plant page's tend buttons.
 enum TendKind: String, CaseIterable, Equatable {
-    case water, feed, sun, prune, repot
+    case water, feed, sun, prune, mist, repot
 
     var title: String {
         switch self {
@@ -181,6 +181,7 @@ enum TendKind: String, CaseIterable, Equatable {
         case .feed: return "Feed"
         case .sun: return "Sun"
         case .prune: return "Prune"
+        case .mist: return MistMakerCopy.button
         case .repot: return "Repot"
         }
     }
@@ -191,6 +192,7 @@ enum TendKind: String, CaseIterable, Equatable {
         case .feed: return "leaf.fill"
         case .sun: return "sun.max.fill"
         case .prune: return "scissors"
+        case .mist: return "humidity.fill"
         case .repot: return "shippingbox.fill"
         }
     }
@@ -201,6 +203,7 @@ enum TendKind: String, CaseIterable, Equatable {
         case .feed: return LifePalette.soil
         case .sun: return LifePalette.sun
         case .prune: return LifePalette.leaf
+        case .mist: return LifePalette.water
         case .repot: return LifePalette.clay
         }
     }
@@ -212,6 +215,7 @@ enum TendKind: String, CaseIterable, Equatable {
         case .feed: return "Add soil"
         case .sun: return "Let it shine"
         case .prune: return "Give a trim"
+        case .mist: return "Mist the leaves"
         case .repot: return "Pick a pot"
         }
     }
@@ -222,6 +226,7 @@ enum TendKind: String, CaseIterable, Equatable {
         case .water: return "Can is dry"
         case .feed, .repot: return "Need scoops"
         case .prune: return "Need shears"
+        case .mist: return "Need the mister"
         case .sun: return "Let it shine"
         }
     }
@@ -247,13 +252,16 @@ struct TendButtonLook: Equatable {
     /// What a tap will do, or the kind reason and next step when it will not.
     let hint: String
 
-    init(kind: TendKind, state: AppModel.ActionState) {
-        accessibilityLabel = kind.title
+    /// `name`: the plant's name, for Mist's VoiceOver label ("Mist Fern", "Fern is misty today").
+    init(kind: TendKind, state: AppModel.ActionState, name: String? = nil) {
+        if kind == .mist, let name {
+            accessibilityLabel = state.status == .done ? MistMakerCopy.doneButtonLabel(name: name) : MistMakerCopy.buttonLabel(name: name)
+        } else { accessibilityLabel = kind.title }
         switch state.status {
         case .ready:
             title = kind.title; caption = kind.readyCaption; badge = .none; lit = true
             accessibilityValue = kind.readyCaption
-            hint = kind.readyCaption
+            hint = kind == .mist ? MistMakerCopy.buttonHint : kind.readyCaption
         case .done:
             title = kind == .prune ? TendKind.trimmed : state.label
             caption = kind == .prune ? TendKind.trimLater : TendKind.moreTomorrow

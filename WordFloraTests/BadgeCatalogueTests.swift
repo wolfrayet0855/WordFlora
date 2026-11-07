@@ -18,7 +18,7 @@ final class BadgeCatalogueTests: XCTestCase {
         "word_whiz": ("wordsSolved", [10, 100, 500]), "steady_hands": ("steadySolves", [5, 25, 100]),
         "level_up": ("levelReached", [2, 4, 5]), "long_word": ("longWords", [3, 15, 50]),
         "morning_garden": ("morningDays", [3, 15, 50]), "first_bloom": ("fullBlooms", [1, 5, 20]),
-        "mist_maker": ("mists", [10, 40, 100]), "sun_seeker": ("suns", [10, 40, 100]),
+        "mist_maker": ("mistSprays", [10, 40, 100]), "sun_seeker": ("suns", [10, 40, 100]),
         "soil_scientist": ("soilMatches", [3, 10, 30]), "steady_gardener": ("tendDays", [7, 30, 100]),
         "first_butterfly": ("catches", [1, 10, 50]), "dusk_visitor": ("duskCatches", [1, 3, 5]),
         "rare_visitor": ("rareSpecies", [1, 2, 3]), "wild_discovery": ("storiesRead", [1, 5, 15]),
@@ -43,7 +43,7 @@ final class BadgeCatalogueTests: XCTestCase {
         XCTAssertEqual(Set(defs.map(\.counter)), BadgeCatalog.knownCounters.subtracting(BadgeCounter.retired.map(\.rawValue))
                                                      .subtracting(BadgeCounter.potOnly.map(\.rawValue)))
         XCTAssertEqual(BadgeCounter.potOnly, [.seasonBlooms], "the season pot counts Daily Bloom marks, no badge reads them")
-        XCTAssertEqual(BadgeCounter.retired, [.prunes, .butterflyPlays])
+        XCTAssertEqual(BadgeCounter.retired, [.prunes, .butterflyPlays, .mists])
         XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.counter, "tidyTrims")
         XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.thresholds, [5, 20, 50])
     }
@@ -306,14 +306,13 @@ final class BadgeCatalogueTests: XCTestCase {
         app.profile?.shedPoints = 200
         XCTAssertTrue(app.upgradeTool(.can))
         XCTAssertEqual(app.badges.progress(of: .shedUpgrades), 1)
-        // Free drops count for Mist Maker once the mister is in the Shed.
+        // Mist Maker now counts real mists (MistMakerTests); the mister's free drops still come but count nothing.
         var inv = app.inventory; inv.unlock(.mister); app.inventory = inv
         app.profile?.water = 0; app.profile?.lastTrickleAt = clock
         clock = clock.addingTimeInterval(3 * 86_400)
         app.refreshFreeDrops()
-        let drops = app.profile?.water ?? 0
-        XCTAssertGreaterThan(drops, 0)
-        XCTAssertEqual(app.badges.progress(of: .mists), drops)
+        XCTAssertGreaterThan(app.profile?.water ?? 0, 0)
+        XCTAssertEqual(app.badges.progress(of: .mists), 0)
     }
 
     func testReadingCountsFactCardsAndVisitorFacts() throws {

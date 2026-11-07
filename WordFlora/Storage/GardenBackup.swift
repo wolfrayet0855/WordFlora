@@ -53,6 +53,8 @@ struct GardenBackup: Codable, Equatable {
         var goldenDays: Int?, goldenDayKey: Int?
         // The Life panel's last-seen key and its stamp (added 2026-11-06). Optional, so older backups still read.
         var lifeSeenKey: String?, lifeSeenAt: Date?
+        // The last Mist (added 2026-11-07 with Mist Maker). Optional, so older backups still read (as never misted).
+        var lastMistedAt: Date?
     }
 
     enum ImportError: Error, Equatable {
@@ -112,7 +114,8 @@ struct GardenBackup: Codable, Equatable {
                   potId: $0.potId, potChosenAt: $0.potChosenAt == .distantPast ? nil : $0.potChosenAt,
                   goldenDays: $0.goldenDays, goldenDayKey: $0.goldenDayKey,
                   lifeSeenKey: $0.lifeSeenKey.isEmpty ? nil : $0.lifeSeenKey,
-                  lifeSeenAt: $0.lifeSeenAt == .distantPast ? nil : $0.lifeSeenAt)
+                  lifeSeenAt: $0.lifeSeenAt == .distantPast ? nil : $0.lifeSeenAt,
+                  lastMistedAt: $0.lastMistedAt)
         }
         let games = (try? context.fetchCount(FetchDescriptor<GameRecord>())) ?? 0
         return GardenBackup(exportedAt: now, profile: snap, plants: plants, gamesRecorded: games)
@@ -204,6 +207,7 @@ struct GardenBackup: Codable, Equatable {
             c.potId = s.potId ?? ""; c.potChosenAt = s.potChosenAt ?? .distantPast
             c.goldenDays = max(0, s.goldenDays ?? 0); c.goldenDayKey = max(0, s.goldenDayKey ?? 0)
             c.lifeSeenKey = s.lifeSeenKey ?? ""; c.lifeSeenAt = s.lifeSeenAt ?? .distantPast
+            c.lastMistedAt = s.lastMistedAt
             DataReconciler.merge(c, into: k)
             report.plantsUpdated += 1
         }

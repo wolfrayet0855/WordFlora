@@ -46,6 +46,8 @@ struct PlantDetailView: View {
     @State private var tendTaps = 0
     @State private var nudges: [TendKind: Int] = [:]
     @State private var snips = 0              // Pruning Pro: a tidy trim drops one dry petal
+    @State private var mists = 0              // Mist Maker: each mist plays the spray once
+    @State private var showMistTip = false    // "Some plants love a little mist on their leaves.", the first time only
 
     private enum PanelFocus: Hashable { case show, hide }
 
@@ -67,6 +69,10 @@ struct PlantDetailView: View {
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle(plant.map(displayName) ?? "Plant")
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            // Mist Maker's tip, once: the first visit on which the Mist button shows.
+            if app.showsMist && !app.settings.mistTipShown { showMistTip = true; app.settings.mistTipShown = true }
+        }
     }
 
     private func displayName(_ plant: PlantCollectible) -> String { plant.nickname.isEmpty ? plant.name : plant.nickname }
@@ -225,6 +231,10 @@ struct PlantDetailView: View {
 
             // The tend effect plays over the plant; taps pass through to it.
             TendAnimationView(play: tends.current, size: s, calm: calm)
+                .padding(.top, plantTop)
+            // Mist Maker's spray (Calm: half the droplets; Reduce Motion or Low Power: the dew cross-fade only).
+            MistSprayView(trigger: mists, size: s, calm: app.settings.calmMode,
+                          reduceMotion: calm || app.settings.reduceMotionOverride)
                 .padding(.top, plantTop)
 
             if let wx {
@@ -446,6 +456,15 @@ struct PlantDetailView: View {
         if large && showsPrune {
             tendButton(.prune, plant)
         }
+        if large && app.showsMist {
+            tendButton(.mist, plant)
+        }
+        if showMistTip {
+            Text(MistMakerCopy.tip).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .accessibilityIdentifier("mist-tip")
+        }
 
         if quiet {
             Text(PlantDetailCopy.quiet).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
@@ -532,6 +551,7 @@ struct PlantDetailView: View {
         case .feed: return .feed
         case .sun: return .sun
         case .prune: return .prune
+        case .mist: return .mist
         case .repot: return .repot(.loam)       // the soil is picked in the sheet; the state does not depend on it
         }
     }
@@ -545,7 +565,8 @@ struct PlantDetailView: View {
                 }
             } else {
                 HStack(spacing: 8) {
-                    ForEach([TendKind.water, .feed, .sun] + (showsPrune ? [.prune] : []) + [.repot], id: \.self) { tendButton($0, plant) }
+                    ForEach([TendKind.water, .feed, .sun] + (showsPrune ? [.prune] : []) + (app.showsMist ? [.mist] : []) + [.repot],
+                            id: \.self) { tendButton($0, plant) }
                 }
                 .fixedSize(horizontal: false, vertical: true)       // every tile as tall as the tallest
             }
@@ -562,7 +583,7 @@ struct PlantDetailView: View {
     private func tendButton(_ kind: TendKind, _ plant: PlantCollectible) -> some View {
         let state = app.actionState(action(for: kind), plant: plant)
         let hint = kind == .prune && app.showsFadedBloom(plant) ? PruningProCopy.pruneHint : nil
-        return TendActionButton(kind: kind, look: TendButtonLook(kind: kind, state: state), large: large, nudge: nudges[kind, default: 0],
+        return TendActionButton(kind: kind, look: TendButtonLook(kind: kind, state: state, name: displayName(plant)), large: large, nudge: nudges[kind, default: 0],
                                 hintOverride: hint) {
             tap(kind, plant)
         }
@@ -638,6 +659,10 @@ struct PlantDetailView: View {
             let play = tends.start(effect, pot: TendPot(id: plant.potId), from: from, at: .now)
             let life = TendMotion.lifetime(effect, calm: calm, hold: TendMotion.uiTestHold)
             DispatchQueue.main.asyncAfter(deadline: .now() + life) { tends.finish(id: play.id) }
+        } else if action == .mist {
+            mists += 1
+            // A soft hiss (the water sound, quiet) on the ambient session; Calm has no sound. The soft haptic stays.
+            if !app.settings.calmMode { app.play(.water, volume: 0.35) }
         } else {
             app.play(.snip)
         }

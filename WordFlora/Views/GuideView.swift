@@ -475,7 +475,8 @@ private struct GuideArt: View {
             Image(systemName: "drop.fill").font(.system(size: 12)).foregroundStyle(Color(hex: 0x5B8FD0))
                 .opacity(d.1).at(44, 96 + d.0)
             HStack(spacing: 4) {
-                ForEach(TendKind.allCases, id: \.self) { k in
+                // The guide shows the five first buttons; Mist joins the row once the mister is in the Shed.
+                ForEach(TendKind.allCases.filter { $0 != .mist }, id: \.self) { k in
                     VStack(spacing: 4) {
                         Image(systemName: k.icon).font(.system(size: 20, weight: .semibold)).foregroundStyle(k.tint)
                             .frame(width: 46, height: 46)

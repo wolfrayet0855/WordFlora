@@ -142,6 +142,12 @@ struct WordFloraApp: App {
             try? model.context.save()
             for id in ["ladybug", "honeybee", "luna"] { model.collectFieldNote(id) }      // three of four: no tier yet
         }
+        if uiTesting && args.contains("-uitest-mist") {
+            // Mist Maker: the mister in the Shed (the Mist button shows) and nine mists already, so the next earns bronze.
+            var inv = model.inventory; inv.unlock(.mister); model.inventory = inv
+            model.updateBadges(announce: false) { state, _, t in state.record(.mistSprays, amount: 9, now: t) }
+            try? model.context.save()
+        }
         if uiTesting && args.contains("-uitest-tidytrim") {
             // Pruning Pro: the found plant (`-uitest-plant=`, or the first) in flower, the shears owned, every day a
             // faded bloom day, and four tidy trims already, so the next one earns the bronze badge.

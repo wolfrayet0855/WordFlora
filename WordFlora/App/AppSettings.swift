@@ -54,6 +54,8 @@ final class AppSettings {
     /// The day the grown-ups' Family Sharing note last appeared in Settings (under 13 and unknown age, once a week
     /// at most; `FamilyShareNudge`). Device-local.
     var familyNudgeShownAt: Date? { didSet { defaults.set(familyNudgeShownAt, forKey: "familyNudgeShownAt") } }
+    /// Mist Maker's tip ("Some plants love a little mist on their leaves.") has been shown once on this device.
+    var mistTipShown: Bool { didSet { defaults.set(mistTipShown, forKey: "mistTipShown") } }
 
     /// What the Speed bloom rule reads as each round begins.
     var speedBloomPrefs: SpeedBloom.Prefs {
@@ -109,6 +111,7 @@ final class AppSettings {
         easierButterflies = bool("easierButterflies", false)
         gentleNetTipShown = bool("gentleNetTipShown", false)
         familyNudgeShownAt = defaults.object(forKey: "familyNudgeShownAt") as? Date
+        mistTipShown = bool("mistTipShown", false)
     }
 
     /// Applies the defaults that depend on the age answer (called once, when the player answers).

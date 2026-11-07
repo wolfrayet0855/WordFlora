@@ -161,6 +161,35 @@ final class GardenBackupTests: XCTestCase {
         XCTAssertEqual(plant("rose").potId, "sunflower")
     }
 
+    /// Mist Maker: `lastMistedAt` round-trips, a backup from before it reads (as never misted), and a restore never
+    /// moves it back.
+    func testLastMistedAtRoundTripsOldBackupsReadAndRestoreNeverLowersIt() throws {
+        growSomething()
+        let rose = plant("rose"); rose.lastMistedAt = Date(timeIntervalSince1970: 5_000); try ctx.save()
+        let data = try GardenBackup.make(context: ctx, now: .now).encoded()
+        XCTAssertTrue(String(data: data, encoding: .utf8)!.contains("\"lastMistedAt\""))
+
+        let fresh = try SharedContainer.make(inMemory: true)
+        try PlantCatalog.seedIfNeeded(context: fresh.mainContext)
+        guard case .success = GardenBackup.restore(data, into: fresh.mainContext, badgeDefs: defs) else { return XCTFail("restore failed") }
+        XCTAssertEqual(plant("rose", in: fresh.mainContext).lastMistedAt, Date(timeIntervalSince1970: 5_000))
+
+        // A later mist on this device is never undone by restoring the older backup.
+        let later = Date(timeIntervalSince1970: 9_000)
+        plant("rose", in: fresh.mainContext).lastMistedAt = later
+        guard case .success = GardenBackup.restore(data, into: fresh.mainContext, badgeDefs: defs) else { return XCTFail("restore failed") }
+        XCTAssertEqual(plant("rose", in: fresh.mainContext).lastMistedAt, later)
+
+        // A backup saved before Mist Maker has no lastMistedAt key; it still reads and changes nothing.
+        var json = try JSONSerialization.jsonObject(with: data) as! [String: Any]
+        json["plants"] = (json["plants"] as! [[String: Any]]).map { var p = $0; p.removeValue(forKey: "lastMistedAt"); return p }
+        let old = try JSONSerialization.data(withJSONObject: json)
+        guard case .success(let decoded) = GardenBackup.decode(old) else { return XCTFail("old backup should read") }
+        XCTAssertNil(decoded.plants.first { $0.plantId == "rose" }?.lastMistedAt)
+        guard case .success = GardenBackup.restore(old, into: ctx, badgeDefs: defs) else { return XCTFail("old backup should restore") }
+        XCTAssertEqual(plant("rose").lastMistedAt, Date(timeIntervalSince1970: 5_000))
+    }
+
     func testWordsTowardTheNextPlantRoundTripAndOldBackupsReadAsZero() throws {
         growSomething()
         profile().wordsTowardPlant = 2; try ctx.save()

@@ -290,14 +290,14 @@
   {
     "id": "mist_maker",
     "family": "tending",
-    "counter": "mists",
+    "counter": "mistSprays",
     "thresholds": [
       10,
       40,
       100
     ],
     "title": "Mist Maker",
-    "blurb": "Gather free drops with the mister"
+    "blurb": "Mist your plants' leaves"
   },
   {
     "id": "sun_seeker",

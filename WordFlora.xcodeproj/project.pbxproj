@@ -19,6 +19,7 @@
 		8892C73C16EE3DC802C0AB49 /* PruningProCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EEF83D295D683850F63AAB /* PruningProCopy.swift */; };
 		D14908A748C34CAC5AE32DB6 /* ButterflyNet.swift in Sources */ = {isa = PBXBuildFile; fileRef = D0CBDF6C4B7B1AD368C7B4A9 /* ButterflyNet.swift */; };
 		10F4EF3D5EE76A461009018C /* GentleNetCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9210EAEA817412B2BE3E18B6 /* GentleNetCopy.swift */; };
+		63A5DA0098B5BBD6F48C8CD2 /* MistMakerCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9902082D799BEB70A5ADB7C9 /* MistMakerCopy.swift */; };
 		1D102BEC661D5B00BB5284A4 /* FieldNotesCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D108EB563BE7CBD91AB04641 /* FieldNotesCopy.swift */; };
 		89CE39ED0692C9262C029212 /* DailyQuestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEDEF414772D98FFF426E11 /* DailyQuestUITests.swift */; };
 		7064F8E27F339CDC045E8101 /* PetalNotesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBDDE6A731F2B904C2CB598 /* PetalNotesTests.swift */; };
@@ -145,6 +146,7 @@
 		73A960D878B4124A30601B58 /* CapacityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6ABB0A3A61951013C0E5506F /* CapacityTests.swift */; };
 		73D43C070CF83BBA5CF8A575 /* PlantThinningTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B50EBB1E418EE1EB9BB4CA6 /* PlantThinningTests.swift */; };
 		73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */; };
+		9FAD5FE246F295E93631912B /* MistMakerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DFCECE93C832460952F5760 /* MistMakerTests.swift */; };
 		33F9745BFCE91884EC8E5B3C /* PackCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0B21CEF2BD93D0F31D80E2AA /* PackCatalogTests.swift */; };
 		7414B32D8EE9EB1450BE77C1 /* wf-badgeSilver.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 6ACF0034A28D0F546B9B9DB9 /* wf-badgeSilver.m4a */; };
 		77DC9100629457266EDDA0DB /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1C1AAA9FCAE4CF29BBA16A8 /* SettingsView.swift */; };
@@ -269,6 +271,7 @@
 		EF9467241BBA43B535D516F9 /* WidgetActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF5CF61BBF7BC272D7B55BB /* WidgetActions.swift */; };
 		F1EC73BEF7CC700E3392A9D0 /* Paywall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235887FB6ABDC2ED7F728A3C /* Paywall.swift */; };
 		F4C0D43C87AF2524BB79A1A1 /* TendAnimationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F738E93544B38467408EB43 /* TendAnimationView.swift */; };
+		09D5BE69C253AC905680B44C /* MistSprayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 627E68248AFD6F801AEC58F4 /* MistSprayView.swift */; };
 		F71D413F98EA5AE19AADA1C0 /* Economy.swift in Sources */ = {isa = PBXBuildFile; fileRef = 045A383C28CF63B7AA1690E5 /* Economy.swift */; };
 		F921D797F2428AE17629481F /* wf-key.m4a in Resources */ = {isa = PBXBuildFile; fileRef = B0DEEEBD8B052299970213DD /* wf-key.m4a */; };
 		F935EF5C075DD18A90D60D6E /* OnboardingFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5CB68790025C9135B9C9E7DA /* OnboardingFlow.swift */; };
@@ -349,6 +352,7 @@
 		F9EEF83D295D683850F63AAB /* PruningProCopy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PruningProCopy.swift; sourceTree = "<group>"; };
 		D0CBDF6C4B7B1AD368C7B4A9 /* ButterflyNet.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyNet.swift; sourceTree = "<group>"; };
 		9210EAEA817412B2BE3E18B6 /* GentleNetCopy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GentleNetCopy.swift; sourceTree = "<group>"; };
+		9902082D799BEB70A5ADB7C9 /* MistMakerCopy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MistMakerCopy.swift; sourceTree = "<group>"; };
 		D108EB563BE7CBD91AB04641 /* FieldNotesCopy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FieldNotesCopy.swift; sourceTree = "<group>"; };
 		3AEDEF414772D98FFF426E11 /* DailyQuestUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyQuestUITests.swift; sourceTree = "<group>"; };
 		FEBDDE6A731F2B904C2CB598 /* PetalNotesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PetalNotesTests.swift; sourceTree = "<group>"; };
@@ -402,6 +406,7 @@
 		2EA96D7DD8E3103D3D959B4A /* ShedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShedView.swift; sourceTree = "<group>"; };
 		2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoseMeter.swift; sourceTree = "<group>"; };
 		2F738E93544B38467408EB43 /* TendAnimationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendAnimationView.swift; sourceTree = "<group>"; };
+		627E68248AFD6F801AEC58F4 /* MistSprayView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MistSprayView.swift; sourceTree = "<group>"; };
 		307B6C22876E273992182CE6 /* AdsService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AdsService.swift; sourceTree = "<group>"; };
 		31A01BCA86B388E2D94431DD /* RestCardTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestCardTests.swift; sourceTree = "<group>"; };
 		992A9B4D57314E9CA00E02F4 /* SpeedBloomTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeedBloomTests.swift; sourceTree = "<group>"; };
@@ -432,6 +437,7 @@
 		8AB8C1CF6CE1E78960EB79CB /* BadgesUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgesUITests.swift; sourceTree = "<group>"; };
 		4DA662141FB5A76A22AE6D6E /* PlusOfferPolicy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlusOfferPolicy.swift; sourceTree = "<group>"; };
 		4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PotCatalogTests.swift; sourceTree = "<group>"; };
+		6DFCECE93C832460952F5760 /* MistMakerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MistMakerTests.swift; sourceTree = "<group>"; };
 		0B21CEF2BD93D0F31D80E2AA /* PackCatalogTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PackCatalogTests.swift; sourceTree = "<group>"; };
 		500B058D92EC73FD924DC8CE /* Reminders.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Reminders.swift; sourceTree = "<group>"; };
 		507CD36D0F85A153026420C3 /* WordBankValidator.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordBankValidator.swift; sourceTree = "<group>"; };
@@ -685,6 +691,7 @@
 				F9EEF83D295D683850F63AAB /* PruningProCopy.swift */,
 				D0CBDF6C4B7B1AD368C7B4A9 /* ButterflyNet.swift */,
 				9210EAEA817412B2BE3E18B6 /* GentleNetCopy.swift */,
+				9902082D799BEB70A5ADB7C9 /* MistMakerCopy.swift */,
 				D108EB563BE7CBD91AB04641 /* FieldNotesCopy.swift */,
 				57A2E5EB1009A8F98F65937E /* LivingTouch.swift */,
 				1D8ECC886D94AA5EE1EB5702 /* FamilyShareNudge.swift */,
@@ -847,6 +854,7 @@
 				527D0C409DA0CAEBE8E526E1 /* GrandGardenArt.swift */,
 				C95EE8F83CC87F157461F447 /* SeedPotView.swift */,
 				2F738E93544B38467408EB43 /* TendAnimationView.swift */,
+				627E68248AFD6F801AEC58F4 /* MistSprayView.swift */,
 				5937A430C3FA390AF941B091 /* PotArtView.swift */,
 				CFC7DA43D02448392F8774BC /* RestScene.swift */,
 				A67EB350B6585FCD83878CE6 /* NudgeCard.swift */,
@@ -910,6 +918,7 @@
 				0A17B66E1750BA0EC6874EED /* LifeStatsTests.swift */,
 				2BEEF2341BC08BF94A6BDA7B /* TendAnimationTests.swift */,
 				4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */,
+				6DFCECE93C832460952F5760 /* MistMakerTests.swift */,
 				0B21CEF2BD93D0F31D80E2AA /* PackCatalogTests.swift */,
 				31A01BCA86B388E2D94431DD /* RestCardTests.swift */,
 				992A9B4D57314E9CA00E02F4 /* SpeedBloomTests.swift */,
@@ -1413,6 +1422,7 @@
 				C0A400B31989FDA16B29412C /* LifeStatsTests.swift in Sources */,
 				C84708A999B2ED2665D94F0A /* TendAnimationTests.swift in Sources */,
 				73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */,
+				9FAD5FE246F295E93631912B /* MistMakerTests.swift in Sources */,
 				33F9745BFCE91884EC8E5B3C /* PackCatalogTests.swift in Sources */,
 				54C470839654E5464D7662F7 /* RestCardTests.swift in Sources */,
 				4AAAA4BD0C544D608F6E3218 /* SpeedBloomTests.swift in Sources */,
@@ -1463,6 +1473,7 @@
 				8892C73C16EE3DC802C0AB49 /* PruningProCopy.swift in Sources */,
 				D14908A748C34CAC5AE32DB6 /* ButterflyNet.swift in Sources */,
 				10F4EF3D5EE76A461009018C /* GentleNetCopy.swift in Sources */,
+				63A5DA0098B5BBD6F48C8CD2 /* MistMakerCopy.swift in Sources */,
 				1D102BEC661D5B00BB5284A4 /* FieldNotesCopy.swift in Sources */,
 				BB1AB463A5262C7F2BAE63B9 /* LivingTouch.swift in Sources */,
 				EC8F3E9045AEE241BE154438 /* FamilyShareNudge.swift in Sources */,
@@ -1590,6 +1601,7 @@
 				01130059B892B364032EF5C1 /* GrandGardenArt.swift in Sources */,
 				99A763B192E74385836B56C6 /* SeedPotView.swift in Sources */,
 				F4C0D43C87AF2524BB79A1A1 /* TendAnimationView.swift in Sources */,
+				09D5BE69C253AC905680B44C /* MistSprayView.swift in Sources */,
 				7DD477E02162F248269BFF98 /* PotCatalog.swift in Sources */,
 				B0349328A8DEF02F2B75DA80 /* PackCatalog.swift in Sources */,
 				1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */,
