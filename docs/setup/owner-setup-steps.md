@@ -548,25 +548,48 @@ Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 ```
 
 ### D8. Review notes (paste into App Store Connect > App Review Information > Notes)
+
+Rewritten 2026-11-07 for a reviewer with no launch arguments, no demo account and no sign-in. Menu names below come from the current source (`SettingsView`, `OnboardingView`, `HomeView`, `PlusView`); items marked [ASSUMPTION] depend on what the final build ships and must be re-checked in the G6 build before pasting. Contact fields go in the separate App Review Information boxes.
+
 ```
-WordFlora is a gentle word-guessing garden game for a mixed audience. It asks the player's age band at the start (under 13, 13 to 17, 18 or older).
+WordFlora is a gentle word-guessing garden game for a mixed audience. There is no sign-in and no account, so no demo account is needed. Everything below can be reached from a fresh install with no special settings.
 
-Garden weather is cosmetic. Now and then weather visits the garden and plants look a little different for a few days; care, a weather puzzle or time brings them back. Nothing earned is ever removed: found plants, growth stages, pots, badges and the level all stay.
+FIRST LAUNCH AND AGE
+On first launch the app asks "How old are you?" with three buttons: Under 13, 13 to 17, 18 or older. The answer sets the experience. Under 13 also sets Calm mode on and offers a Quiet Garden question. To see a different age experience, delete the app and reinstall, then pick another button.
+- 18 or older: ads for grown-ups (see below), Plus purchase without a gate.
+- 13 to 17: G-rated, non-personalised ads, no tracking prompt.
+- Under 13 (and anyone who has not answered): no ad is ever loaded, no consent or tracking prompt, and a grown-up question guards purchases and links.
 
-Wild Weather is opt-in. It is off by default, sits in Settings > Garden weather, needs Calm mode off (and Quiet Garden off), and asks for confirmation before it turns on. It only makes up to 4 plants look one step smaller for up to 4 days; the level never goes down. Under 13 players see the note "Ask a grown-up if you like." beside the switch.
+HOW TO REACH EACH SCREEN
+- Play a puzzle: Home > Play. Tap letters to guess the plant word; win to grow a plant. Daily Bloom is the card under Play.
+- Garden, Shed, Visitors, Levels, Badges: tiles on Home (some unlock as you play; locked tiles show a hint).
+- Settings: the Settings button on Home. It holds Calm mode, Quiet Garden, Garden weather, Reminders, Appearance, the Plus row, backup and restore of the garden file, Privacy and ads, and About.
 
-Children and ads: players under 13 (and anyone who has not answered the age question) never load any ad and never see the consent or tracking prompts. 13 to 17 get G-rated, non-personalised ads and no tracking prompt. Adults see the consent form, then the App Tracking Transparency prompt, before the first ad. Every ad request is G rated. WordFlora Plus removes all ads.
+PLUS, PURCHASES AND THE PARENTAL GATE
+- Open Home > Settings. The Plus row is near the bottom. For 18+ and 13-17 it is labelled "Remove ads and sync with iCloud"; for under 13 the section is titled "For grown-ups" and the row is "WordFlora Plus".
+- The Plus page shows three choices: Yearly ($12.99/year, 3-day free trial for new subscribers, the default), Monthly ($3.99/month) and Plus Forever (one-time $34.99, third row). The page also has Restore purchases, Redeem a code, Manage subscription and Terms of Use.
+- Under 13: tapping a buy button, Redeem a code, Manage subscription, Terms of Use or any link out first shows a grown-up multiplication question. Passing it continues; Cancel returns. To see it, choose "Under 13" on first launch, then Settings > For grown-ups > WordFlora Plus > any buy button. No price, lock or buy button is on any other under-13 screen.
+- Restore purchases: Plus page > Restore purchases. Redeem a code: Plus page > Redeem a code opens Apple's own code sheet. We provided offer codes for reviewers in the field below. [ASSUMPTION: codes created in ASC; paste one here]
+- The pack "Frost & Lantern" (one-time purchase: winter pots, a snowy lantern garden, two winter visitors, two glasshouse plants) is offered from the Shed. [ASSUMPTION: final entry point from the G3/G5 build; fix this line before submitting] It is sold only to 13+ and behind the gate for under 13 [ASSUMPTION: confirm in G3].
+- Plus Forever and the pack are non-consumable and come back with Restore purchases. Nothing in the game is blocked behind a purchase except cosmetic pots, the pack content, ad removal and iCloud sync.
 
-Purchases and outbound links: for under 13 (and an unknown age), buying WordFlora Plus and every link that leaves the app (Privacy Policy, Report an ad, Terms of Use, Manage subscription) first ask a grown-up a multiplication question.
+ADS
+- Ads (banner on Home and Garden, an interstitial after a round you choose to continue, and an optional rewarded ad for water) start from the second session, never the first, and never for under 13. To see one: pick "18 or older", play across two launches. You will first see the Google consent form where required, then the App Tracking Transparency prompt, then ads. Every ad request is G rated. In review builds ad serving may be in test mode [ASSUMPTION: depends on the G4 serving flip]. "Report an ad" is under Settings > Privacy and ads.
 
-To see weather states without waiting, the app accepts these launch arguments (Xcode scheme > Run > Arguments; debug and UI-test use only, they replace the stored garden):
-  -uitest -uitest-onboarded -uitest-weather-today=hailShower      a weather day today (also drySpell, busyBugs, bigWind, frostyNight, hotDay, bigPuddles)
-  -uitest -uitest-onboarded -uitest-weather-tomorrow=bigWind      the forecast card the day before
-  -uitest -uitest-onboarded -uitest-weather-rewarded               a weather day where the puzzle's reward shows
-  -uitest -uitest-onboarded -uitest-crown                          every plant found, the Grand Garden ceremony
-  -uitest -uitest-onboarded -uitest-age=under13                    the under-13 experience (no ads, gates on)
+WILD WEATHER AND QUIET GARDEN
+- Garden weather is cosmetic. Now and then weather visits the garden and plants look a little different for a few days; care, a weather puzzle or time brings them back. Nothing earned is ever removed: found plants, growth stages, pots, badges and the level stay. Weather is date-driven, so a reviewer may see none on the day; the Settings text explains it.
+- Wild Weather: Settings > Garden weather > Wild Weather (opt-in, off by default). It needs Calm mode off and Quiet Garden off, and asks for confirmation before turning on. It only makes up to 4 plants look one step smaller for up to 4 days; the level never goes down. Under 13 sees the note "Ask a grown-up if you like." next to the switch.
+- Quiet Garden: Settings > Comfort > Quiet Garden. It hides counters and wait times and keeps weather away. Calm mode is the switch above it.
+
+OTHER
+- Reminders are a single gentle daily notification, off until the player turns it on in Settings > Reminders.
+- Backup and restore of the garden is a file export/import in Settings > Your garden. iCloud sync turns on only with Plus.
+- Privacy Policy: https://shapehaveninnovations.com/privacy. Support: https://shapehaveninnovations.com/support.html.
+
+Contact for review: [OWNER: name], [OWNER: phone], [OWNER: email]. Available 9:00-18:00 [OWNER: time zone]. [ASSUMPTION: owner fills these in]
+Reviewer offer codes (optional): [OWNER: one-time code for plus_yearly or "none"].
 ```
-Keep this text in step with the app: if a rule above changes, update it before the next submission.
+Keep this text in step with the app: if a rule above changes, update it before the next submission. Before pasting, in the G6 TestFlight build confirm every [ASSUMPTION] line and every button label by hand.
 
 ### D: send back
 ```
