@@ -235,7 +235,7 @@ struct GardenWeatherSettingsSection: View {
     var body: some View {
         let s = app.settings
         if !s.quietGarden {
-            Section(settings: WeatherUICopy.sectionTitle) {
+            Section(WeatherUICopy.sectionTitle) {
                 if s.calmMode {
                     Text(WeatherUICopy.calmFootnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                         .accessibilityIdentifier("settings.weatherCalm")
