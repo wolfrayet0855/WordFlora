@@ -127,9 +127,15 @@ struct ButterflyView: View {
                     if g.showsTimeBar {
                         // The bar is 4 pt tall; its accessibility frame is 44 pt (the hit area check), and the negative
                         // padding keeps the layout where it was.
-                        ProgressView(value: min(g.elapsed, g.roundSeconds), total: g.roundSeconds).tint(Color.appAccent)
-                            .frame(height: 44).padding(.vertical, -20).padding(.horizontal, 24)
+                        let done = min(g.elapsed, g.roundSeconds) / g.roundSeconds
+                        Color.clear.frame(height: 44)
+                            .overlay { ProgressView(value: done).tint(Color.appAccent).accessibilityHidden(true) }
+                            .padding(.vertical, -20).padding(.horizontal, 24)
+                            .accessibilityElement()
                             .accessibilityLabel("Game progress")
+                            .accessibilityValue("\(Int((done * 100).rounded())) percent")
+                            .accessibilityAddTraits(.updatesFrequently)
+                            .accessibilityIdentifier("butterfly.progress")
                     }
                     if showTip {
                         Text(GentleNetCopy.tip).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.ink)

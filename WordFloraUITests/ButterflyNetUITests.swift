@@ -64,7 +64,9 @@ final class ButterflyNetUITests: XCTestCase {
 
     private func auditOnce(_ name: String, types: XCUIAccessibilityAuditType) {
         var findings = [String]()
-        let scroll = app.scrollViews.firstMatch
+        // Settings is a Form: its list is the scroll area. The first section header sits in the bar's scroll-edge band,
+        // where the audit measures it against the bar's edge effect (the same header colour passes further down).
+        let scroll = app.scrollViews.firstMatch.exists ? app.scrollViews.firstMatch : app.collectionViews.firstMatch
         let bar = app.navigationBars.firstMatch
         let top = bar.exists ? bar.frame.maxY + 64 : 0
         let visible: CGRect? = scroll.exists
@@ -161,7 +163,7 @@ final class ButterflyNetUITests: XCTestCase {
         launch(["-uitest-age=thirteenPlus", "-uitest-butterfly-short"])
         openGame()
         XCTAssertTrue(element("butterfly.scene.quickWings").exists)
-        XCTAssertTrue(app.progressIndicators["Game progress"].exists)
+        XCTAssertTrue(element("butterfly.progress").exists)
         sleep(2)
         app.coordinate(withNormalizedOffset: CGVector(dx: 0.1, dy: 0.35)).press(forDuration: 0.05,
             thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.9, dy: 0.45)))
@@ -198,7 +200,19 @@ final class ButterflyNetUITests: XCTestCase {
         XCTAssertTrue(element("badgeMoment").waitForExistence(timeout: 8))
         shot("net-gentle-badge-moment")
         let moments = letBadgeMomentsPass()
-        XCTAssertTrue(moments.contains { $0.contains("Gentle Net") }, "ten gentle hellos earn the bronze Gentle Net badge: \(moments)")
+        shot("net-gentle-after-moments")
+        // The badge itself, on the Badges page.
+        app.buttons["Done"].tap()
+        app.navigationBars.buttons.firstMatch.tap()
+        let tile = app.buttons["tile-Badges"]
+        XCTAssertTrue(tile.waitForExistence(timeout: 8))
+        tile.tap()
+        let card = element("badge.gentle_net")
+        XCTAssertTrue(card.waitForExistence(timeout: 5))
+        for _ in 0..<14 where !card.isHittable { app.swipeUp() }
+        shot("net-gentle-badges-page")
+        XCTAssertTrue(card.label.lowercased().hasSuffix("bronze"), "ten gentle hellos earn the bronze Gentle Net badge: \(card.label)")
+        XCTAssertTrue(moments.contains { $0.contains("Gentle Net") }, "its moment shows: \(moments)")
     }
 
     // MARK: Accessibility audits
