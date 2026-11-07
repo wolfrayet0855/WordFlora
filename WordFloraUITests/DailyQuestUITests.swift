@@ -25,8 +25,24 @@ final class DailyQuestUITests: XCTestCase {
         for _ in 0..<8 where !(e.exists && e.isHittable) { app.swipeUp() }
     }
 
+    /// Waits until the element's frame reads the same three times in a row, 0.5 s apart (at most 20 s). `scrollTo`
+    /// returns as soon as the element is hittable, while the list is still gliding from the last swipe; an audit run then
+    /// measures the text that slides into the element's old place (the Settings backup footnote under the family line
+    /// read as clipped, low contrast and "partially unsupported" that way).
+    private func waitUntilStill(_ e: XCUIElement) {
+        var last = e.frame, same = 0
+        let end = Date().addingTimeInterval(20)
+        while same < 2 && Date() < end {
+            Thread.sleep(forTimeInterval: 0.5)
+            let now = e.frame
+            same = now == last ? same + 1 : 0
+            last = now
+        }
+    }
+
     /// Only issues on the given element fail; the rest of the screen is audited by its own classes.
     private func audit(_ name: String, within target: XCUIElement) {
+        waitUntilStill(target)
         let frame = target.frame
         var findings = [String]()
         do {
@@ -36,6 +52,7 @@ final class DailyQuestUITests: XCTestCase {
                 return true
             }
         } catch { findings.append("\(name): audit failed to run: \(error)") }
+        if !findings.isEmpty { findings.append(target.frame == frame ? "\(name): the element held still" : "\(name): the element moved during the audit: \(frame) -> \(target.frame)") }
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
 
