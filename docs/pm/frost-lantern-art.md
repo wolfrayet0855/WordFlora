@@ -95,8 +95,14 @@ imagesets with `preserves-vector-representation`, like the others.
   Snowfall comes from the weather layer, as the plan says. The art has no flakes, so under Reduce Motion and Low Power
   the scene is simply still. Optional motion: the lantern halos may breathe between their two opacities over about 4 s
   with motion on. They are static under Reduce Motion, Low Power and Calm.
-- **Text rule:** text over the scene sits on `appSurface` cards, or in the sky zone above y 460 (`appPrimaryText` on the
-  sky: 8.4:1 light, 12.6:1 dark). Never put text directly on the dark snow bank (2.0:1).
+- **Text rule (builder):** text over the scene sits on an `appSurface` card, or on a scrim of
+  `Color.appBackground.opacity(0.6)` with the card's corner radius. Measured: `#9AA7BC` under a 60 % `#1A2E1A` scrim is
+  `#4D5E5B`, 5.5:1 against `appPrimaryText` dark (50 % gives 4.55:1, the floor). Never put text directly on the dark
+  snow bank (2.0:1). Text in the sky zone above y 460 is fine without a card (`appPrimaryText` on the sky: 8.4:1
+  light, 12.6:1 dark). The snow bank is **not** darkened: 4.5:1 would need about `#5C6A82`, which drops the bank to
+  2.2:1 against the sky and stops it reading as snow.
+- **Dark lantern string:** `FL.stringDark #8C7A6B`, a warm light brown. The old `FL.snowShadeDark` string was the same
+  colour as the shade hill behind it and vanished; the warm string now separates from the cool hill by hue.
 - The scene is cosmetic, so it shows in Calm and Quiet Garden (plan G5 acceptance).
 
 ### Visitors: European robin and winter wren
@@ -156,7 +162,7 @@ Sizes are in points as drawn in the app. "Box" is the SVG's own unit box.
 | `pack-card-light.svg` | Seasons shelf card, Seasons page header | full card width, about 335 to 353 x 150 | `FL.skyL1`, `FL.skyL3`, `FL.snow`, `FL.woodLight`, `FL.woodEdge`, `FL.lanternInk`, `FL.glow`, `FL.iceRim`, the three pots, plants and robin |
 | `pack-card-dark.svg` | Same, dark | as above | `FL.skyD2`, `FL.skyD3`, `FL.snowDark`, `FL.snowShadeDark`, stars `#E8EEF8` at 70 %, rest as light |
 | `scene-light.svg` | Home and Garden background, light | screen width, 393 x 852 box | `FL.skyL1-3`, `FL.moon`, `FL.hillL`, `FL.snowShade`, `FL.snow`, `FL.fir`, `FL.post`, `FL.postDark`, `FL.lanternRed`, `FL.lanternInk`, `FL.glow`, `PetalKit.marigold`, snowdrop colours |
-| `scene-dark.svg` | Same, dark | as above | `FL.skyD1-3`, `FL.moon`, stars, `FL.hillD`, `FL.snowShadeDark`, `FL.snowDark`, `FL.firDark`, `FL.postDark`, lantern colours |
+| `scene-dark.svg` | Same, dark | as above | `FL.skyD1-3`, `FL.moon`, stars, `FL.hillD`, `FL.snowShadeDark`, `FL.snowDark`, `FL.firDark`, `FL.postDark`, `FL.stringDark`, lantern colours |
 | `visitor_robin_a/b/idle.svg` | Robin flight and resting frames | 90 (box 100) | `FL.robinBack`, `FL.robinWing`, `FL.robinWingEdge`, `FL.robinBreast`, `FL.robinGrey`, `FL.robinBelly`, `FL.beak`, `Visitor.eye`, `FL.leg` |
 | `visitor_robin_sticker.svg` | Robin sticker | 22 to 108 (box 120) | as above + `FL.stickerFrost`, `white` |
 | `visitor_wren_a/b/idle.svg` | Wren flight and resting frames | 90 (box 100) | `FL.wrenBody`, `FL.wrenWing`, `FL.wrenBar`, `FL.wrenBelly`, `FL.wrenBrow`, `FL.beak`, `Visitor.eye`, `FL.leg` |
@@ -183,7 +189,7 @@ New art constants (`FL.*`), with hex values in `build.py`:
 | Frosted glass | `iceBody #B7D6E6`, `iceRim #5E93B0`, `iceShade #93BCD2`, `frostFern #3F7596` |
 | Lantern red | `lanternBody #B5403A`, `lanternRim #D9665A`, `lanternShade #93302B`, `lanternBand #8A2A25`, `lanternInk #5E211C`, `lanternRed #C8473E`, `glow #F5C858` |
 | Snowflake indigo | `indigoBody #4A4FAE`, `indigoRim #7F86D9`, `indigoShade #363A8C`, `ice #CFE6F0` |
-| Scene and card | `skyL1 #D3DEEE`, `skyL2 #DFE5F1`, `skyL3 #EAE6F0`, `skyD1 #17233A`, `skyD2 #1E2C46`, `skyD3 #283752`, `hillL #C4D3E4`, `hillD #33425E`, `moon #F6E8B0`, `snow #F4F7FB`, `snowShade #DCE5EF`, `snowDark #9AA7BC`, `snowShadeDark #7D8BA3`, `fir #3F6F4A`, `firDark #2E5538`, `post #5E4A3A`, `postDark #3E3128`, `woodLight #D9A066`, `woodEdge #9A5F2A` |
+| Scene and card | `skyL1 #D3DEEE`, `skyL2 #DFE5F1`, `skyL3 #EAE6F0`, `skyD1 #17233A`, `skyD2 #1E2C46`, `skyD3 #283752`, `hillL #C4D3E4`, `hillD #33425E`, `moon #F6E8B0`, `snow #F4F7FB`, `snowShade #DCE5EF`, `snowDark #9AA7BC`, `snowShadeDark #7D8BA3`, `stringDark #8C7A6B`, `fir #3F6F4A`, `firDark #2E5538`, `post #5E4A3A`, `postDark #3E3128`, `woodLight #D9A066`, `woodEdge #9A5F2A` |
 | Robin | `robinBack #7A6A4E`, `robinWing #5E4E36`, `robinWingEdge #9A8A68`, `robinBreast #E2733A`, `robinGrey #A9B0B8`, `robinBelly #F3EEE6`, `beak #3A2C1E`, `leg #7A5A44`, `stickerFrost #DCEBF2` |
 | Wren | `wrenBody #8A5A34`, `wrenWing #6E4524`, `wrenBar #4E2F17`, `wrenBelly #D8B98E`, `wrenBrow #EBD7B4`, `stickerBark #F1E6D6` |
 | Snowdrop | `snowdropLeaf #6E9C7E`, `snowdropLeafVein #A9C9B4`, `snowdropEdge #768C91` |
@@ -212,7 +218,7 @@ outline ink on outline fill 3.8 light / 3.5 dark. The white frost band on Froste
 not an identifying shape: the ferns carry the pattern.
 
 Scene (decorative, hidden from VoiceOver, so 1.4.11 does not apply): `appPrimaryText` on the sky is 8.4:1 light and 12.6:1
-dark, and on light snow 10.7:1. On dark snow it is **2.0:1**, hence the text rule above. The dark firs sit at 1.2:1 on
+dark, and on light snow 10.7:1. On dark snow it is **2.0:1**, hence the text rule above (card or 60 % scrim, 5.5:1). The dark firs sit at 1.2:1 on
 the dark hills. Their snow caps give the shape, and nothing interactive sits there.
 
 ## Colour-blind check

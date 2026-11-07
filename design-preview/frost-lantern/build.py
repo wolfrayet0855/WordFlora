@@ -38,7 +38,7 @@ T = {
     "FL.skyD1": "#17233A", "FL.skyD2": "#1E2C46", "FL.skyD3": "#283752",
     "FL.hillL": "#C4D3E4", "FL.hillD": "#33425E", "FL.moon": "#F6E8B0",
     "FL.post": "#5E4A3A", "FL.postDark": "#3E3128", "FL.fir": "#3F6F4A", "FL.firDark": "#2E5538",
-    "FL.glow": "#F5C858",
+    "FL.glow": "#F5C858", "FL.stringDark": "#8C7A6B",
     "FL.robinBack": "#7A6A4E", "FL.robinWing": "#5E4E36", "FL.robinWingEdge": "#9A8A68",
     "FL.robinBreast": "#E2733A", "FL.robinGrey": "#A9B0B8", "FL.robinBelly": "#F3EEE6", "FL.beak": "#3A2C1E",
     "FL.leg": "#7A5A44",
@@ -654,7 +654,7 @@ def scene_svg(dark):
     fence.append(snow_cap(0, 643, 393, snow))
     o.append('<g id="fence">%s</g>' % "".join(fence))
     # lantern string between two posts, then the posts
-    o.append('<g id="lanterns"><path d="M86 590 Q196 614 306 590" stroke="%s" stroke-width="1.8" fill="none"/>' % (c("FL.snowShadeDark") if dark else c("FL.lanternInk")))
+    o.append('<g id="lanterns"><path d="M86 590 Q196 614 306 590" stroke="%s" stroke-width="1.8" fill="none"/>' % (c("FL.stringDark") if dark else c("FL.lanternInk")))
     for x, y, b in [(132, 599, "FL.lanternRed"), (196, 602, "PetalKit.marigold"), (260, 599, "FL.lanternRed")]:
         o.append(lantern(x, y, 0.8, b, dark=dark))
     o.append(lamp_post(80, 700, 116, dark) + lamp_post(306, 700, 116, dark) + "</g>")
