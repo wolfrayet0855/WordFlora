@@ -68,6 +68,24 @@ final class ButterflyNetUITests: XCTestCase {
         auditOnce(name + "-dynamicType", types: .dynamicType)
     }
 
+    /// Every audit type, in the same three passes; findings fail when they are on (or overlap) one of the targets.
+    private func auditWithin(_ name: String, targets: [XCUIElement]) {
+        for (pass, types) in [("", XCUIAccessibilityAuditType.all.subtracting([.dynamicType, .textClipped])),
+                              ("-textClipped", .textClipped), ("-dynamicType", .dynamicType)] as [(String, XCUIAccessibilityAuditType)] {
+            waitUntilStill(targets[0])
+            let frames = targets.map(\.frame)
+            var findings = [String]()
+            do {
+                try app.performAccessibilityAudit(for: types) { issue in
+                    guard let e = issue.element, frames.contains(where: { $0.intersects(e.frame) }) else { return true }
+                    findings.append("\(name)\(pass): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(e.label)' \(e.frame)")
+                    return true
+                }
+            } catch { findings.append("\(name)\(pass): audit failed to run: \(error)") }
+            XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
+        }
+    }
+
     private func waitUntilStill(_ e: XCUIElement) {
         var last = e.frame, same = 0
         let end = Date().addingTimeInterval(20)
@@ -81,9 +99,7 @@ final class ButterflyNetUITests: XCTestCase {
 
     private func auditOnce(_ name: String, types: XCUIAccessibilityAuditType) {
         var findings = [String]()
-        // Settings is a Form: its list is the scroll area. The first section header sits in the bar's scroll-edge band,
-        // where the audit measures it against the bar's edge effect (the same header colour passes further down).
-        let scroll = app.scrollViews.firstMatch.exists ? app.scrollViews.firstMatch : app.collectionViews.firstMatch
+        let scroll = app.scrollViews.firstMatch
         let bar = app.navigationBars.firstMatch
         let top = bar.exists ? bar.frame.maxY + 64 : 0
         let visible: CGRect? = scroll.exists
@@ -238,12 +254,17 @@ final class ButterflyNetUITests: XCTestCase {
         for (size, dark) in [(nil, false), (Self.axXXXL, true), (Self.axXXXL, false)] as [(String?, Bool)] {
             launch(["-uitest-age=thirteenPlus"], size: size, dark: dark)
             openSettings()
-            let note = element("settings.easierButterfliesNote")
+            let toggle = app.switches["settings.easierButterflies"], note = element("settings.easierButterfliesNote")
             scrollTo(note)
-            sleep(1)
+            // The new rows near the top, so they stay on screen while the audit grows the text.
+            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).press(forDuration: 0.1,
+                thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.22)))
+            waitUntilStill(note)
             let name = "net-settings\(size == nil ? "" : "-ax5")\(dark ? "-dark" : "")"
             shot(name)
-            audit(name, still: note)
+            // As DailyQuestUITests audits the Family Sharing row: only findings on the new rows fail here; the rest of
+            // Settings has its own audit in WordFloraUITests.
+            auditWithin(name, targets: [toggle, note])
             app.terminate()
         }
     }
