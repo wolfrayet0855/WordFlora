@@ -116,3 +116,8 @@ Match checklist:
 2. Do you want to tick "age assurance" for the self-declared age screen?
 3. Do you accept 9+ if the questionnaire forces it?
 4. Is any first-party analytics planned (adds a label row)?
+
+## Owner rulings (2026-11-07)
+- Age assurance: tick it. The app asks the player's age on first launch and relies on a truthful self-declaration, which the owner considers sufficient. At submission, read Apple's exact wording for that question in App Store Connect and confirm self-declaration fits; if Apple's wording asks for verification beyond self-declaration, tell the lead before answering.
+- 9+ rating: accept it if the questionnaire produces it.
+- First-party analytics: none planned; if added, update the privacy label first.
