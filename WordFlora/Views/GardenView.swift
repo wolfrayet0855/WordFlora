@@ -46,7 +46,7 @@ struct GardenView: View {
 
     private func tile(_ plant: PlantCollectible) -> some View {
         Button { if plant.earnedCount > 0 { router.go(.plant(plant.plantId)) } } label: {
-            PlantCard(plant: plant, fillsHeight: true)
+            PlantCard(plant: plant, fillsHeight: true, fadedBloom: plant.earnedCount > 0 && app.showsFadedBloom(plant))
         }
         .buttonStyle(.plain)
     }

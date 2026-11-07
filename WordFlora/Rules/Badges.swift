@@ -14,6 +14,8 @@ enum BadgeCounter: String, CaseIterable, Codable {
     case weathered
     /// Speed bloom words solved before the gold ring closed (opt-in, 13+). Accumulates; never goes down.
     case quickBlooms
+    /// Pruning Pro: trims made while a faded bloom showed (`FadedBloom`). Accumulates; never goes down.
+    case tidyTrims
 
     // Collection: worked out from the garden and the album each time (`BadgeFacts`), kept as best-so-far values.
     case rarePlants, desertPlants, waterPlants, treePlants, floweringPlants, stickers
@@ -34,6 +36,11 @@ enum BadgeCounter: String, CaseIterable, Codable {
         default: return false
         }
     }
+
+    /// Counters still kept in the JSON (and still counted) that no badge reads any more. Their earned tiers stay: the
+    /// badge that moved to a new counter keeps its `unlocked` dates, so its card shows the higher of the two.
+    /// `prunes`: Pruning Pro moved to `tidyTrims`.
+    static let retired: Set<BadgeCounter> = [.prunes]
 }
 
 struct BadgeDef: Codable, Equatable, Identifiable {

@@ -7,6 +7,14 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		572A1180A9DD7BAF600EFF8B /* BadgeMechanicsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68B5FE708C15AE7814C68E3 /* BadgeMechanicsUITests.swift */; };
+		B8AEEFAEC5E0F26A2F5D0029 /* BadgeMechanicsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D8CB4AACC4E7F47C423316 /* BadgeMechanicsTests.swift */; };
+		CCE97CB406660310AFDE68CE /* FadedBloomArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC523C72D5B948F83E2AA0A /* FadedBloomArt.swift */; };
+		BE650C0E873F90853479BCDA /* FieldNotesPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 213E354224A78670F40116D6 /* FieldNotesPage.swift */; };
+		F7E19C829CEB1676F7687E38 /* FadedBloom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 06506F9A356ACE605ABE3334 /* FadedBloom.swift */; };
+		C5F4343FD4B1C01AB9FD1F85 /* FieldNotes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8BE7780E94CAABF65D65F445 /* FieldNotes.swift */; };
+		8892C73C16EE3DC802C0AB49 /* PruningProCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EEF83D295D683850F63AAB /* PruningProCopy.swift */; };
+		1D102BEC661D5B00BB5284A4 /* FieldNotesCopy.swift in Sources */ = {isa = PBXBuildFile; fileRef = D108EB563BE7CBD91AB04641 /* FieldNotesCopy.swift */; };
 		89CE39ED0692C9262C029212 /* DailyQuestUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3AEDEF414772D98FFF426E11 /* DailyQuestUITests.swift */; };
 		7064F8E27F339CDC045E8101 /* PetalNotesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEBDDE6A731F2B904C2CB598 /* PetalNotesTests.swift */; };
 		00B09BCDB3D7D7FB1B3AB22F /* LivingTouchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F725B7EC73EBDA9867091EBF /* LivingTouchTests.swift */; };
@@ -320,6 +328,14 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		D68B5FE708C15AE7814C68E3 /* BadgeMechanicsUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeMechanicsUITests.swift; sourceTree = "<group>"; };
+		02D8CB4AACC4E7F47C423316 /* BadgeMechanicsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeMechanicsTests.swift; sourceTree = "<group>"; };
+		FEC523C72D5B948F83E2AA0A /* FadedBloomArt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FadedBloomArt.swift; sourceTree = "<group>"; };
+		213E354224A78670F40116D6 /* FieldNotesPage.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FieldNotesPage.swift; sourceTree = "<group>"; };
+		06506F9A356ACE605ABE3334 /* FadedBloom.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FadedBloom.swift; sourceTree = "<group>"; };
+		8BE7780E94CAABF65D65F445 /* FieldNotes.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FieldNotes.swift; sourceTree = "<group>"; };
+		F9EEF83D295D683850F63AAB /* PruningProCopy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PruningProCopy.swift; sourceTree = "<group>"; };
+		D108EB563BE7CBD91AB04641 /* FieldNotesCopy.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FieldNotesCopy.swift; sourceTree = "<group>"; };
 		3AEDEF414772D98FFF426E11 /* DailyQuestUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DailyQuestUITests.swift; sourceTree = "<group>"; };
 		FEBDDE6A731F2B904C2CB598 /* PetalNotesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PetalNotesTests.swift; sourceTree = "<group>"; };
 		F725B7EC73EBDA9867091EBF /* LivingTouchTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LivingTouchTests.swift; sourceTree = "<group>"; };
@@ -645,6 +661,10 @@
 			isa = PBXGroup;
 			children = (
 				775F4A36E8702D537A139B4E /* PetalNotes.swift */,
+				06506F9A356ACE605ABE3334 /* FadedBloom.swift */,
+				8BE7780E94CAABF65D65F445 /* FieldNotes.swift */,
+				F9EEF83D295D683850F63AAB /* PruningProCopy.swift */,
+				D108EB563BE7CBD91AB04641 /* FieldNotesCopy.swift */,
 				57A2E5EB1009A8F98F65937E /* LivingTouch.swift */,
 				1D8ECC886D94AA5EE1EB5702 /* FamilyShareNudge.swift */,
 				AEB47088A3C13FE5FA358997 /* DailyQuest.swift */,
@@ -775,6 +795,7 @@
 				63632F8178D81B3BCE9A4B5B /* FamilyShareNudgeRow.swift */,
 				F61981CE3FB95C3FE7BF95AA /* DailyQuestCard.swift */,
 				6E0AF7DB096B1ADC301F75FE /* FlowerView.swift */,
+				FEC523C72D5B948F83E2AA0A /* FadedBloomArt.swift */,
 				CC3BFA0C3986516255C7B6EE /* IntroBloomView.swift */,
 				069D1C9D458BA415F9C77241 /* PetalConfettiView.swift */,
 				075897E310644C4DA6A81768 /* PetalKit.swift */,
@@ -815,6 +836,7 @@
 			isa = PBXGroup;
 			children = (
 				FEBDDE6A731F2B904C2CB598 /* PetalNotesTests.swift */,
+				02D8CB4AACC4E7F47C423316 /* BadgeMechanicsTests.swift */,
 				F725B7EC73EBDA9867091EBF /* LivingTouchTests.swift */,
 				69A7ED5DBA0DE0EC9D1EAA81 /* FamilyShareNudgeTests.swift */,
 				E13FEBF3056C53807192151B /* DailyQuestTests.swift */,
@@ -973,6 +995,7 @@
 			isa = PBXGroup;
 			children = (
 				FBFC3EC62DDDD73C622380C6 /* VisitorsBookView.swift */,
+				213E354224A78670F40116D6 /* FieldNotesPage.swift */,
 				22F4B9FFFBF43C5406C84009 /* WeatherPuzzleView.swift */,
 				EFAC2A32DAF9C0E4BDE13FCF /* WeatherHelpersViews.swift */,
 				E30E70DD2A1CCD4AABF93995 /* GrandGardenViews.swift */,
@@ -1065,6 +1088,7 @@
 			isa = PBXGroup;
 			children = (
 				3AEDEF414772D98FFF426E11 /* DailyQuestUITests.swift */,
+				D68B5FE708C15AE7814C68E3 /* BadgeMechanicsUITests.swift */,
 				33E7F3C5D3C3F907AF97E068 /* EndgameUITests.swift */,
 				395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */,
 				394854942795553C29283849 /* HomeLayoutUITests.swift */,
@@ -1289,6 +1313,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				89CE39ED0692C9262C029212 /* DailyQuestUITests.swift in Sources */,
+				572A1180A9DD7BAF600EFF8B /* BadgeMechanicsUITests.swift in Sources */,
 				40657B4A87AED2B8A9D73738 /* EndgameUITests.swift in Sources */,
 				D107E764254121AC6777295F /* WordFloraUITests.swift in Sources */,
 				8E6670903E6120DF66036EBF /* HomeLayoutUITests.swift in Sources */,
@@ -1307,6 +1332,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				7064F8E27F339CDC045E8101 /* PetalNotesTests.swift in Sources */,
+				B8AEEFAEC5E0F26A2F5D0029 /* BadgeMechanicsTests.swift in Sources */,
 				00B09BCDB3D7D7FB1B3AB22F /* LivingTouchTests.swift in Sources */,
 				5C752B59DF1F73D729FC9A2D /* FamilyShareNudgeTests.swift in Sources */,
 				06151EF2B6DD311A979131A9 /* DailyQuestTests.swift in Sources */,
@@ -1399,6 +1425,10 @@
 				30C8E6D7D84C0EC62DCE513D /* DailyQuestCard.swift in Sources */,
 				67853049B0C6DF252C4F2ABF /* AppModel+Quest.swift in Sources */,
 				CB990639F1FCBF7ADA55A4DD /* PetalNotes.swift in Sources */,
+				F7E19C829CEB1676F7687E38 /* FadedBloom.swift in Sources */,
+				C5F4343FD4B1C01AB9FD1F85 /* FieldNotes.swift in Sources */,
+				8892C73C16EE3DC802C0AB49 /* PruningProCopy.swift in Sources */,
+				1D102BEC661D5B00BB5284A4 /* FieldNotesCopy.swift in Sources */,
 				BB1AB463A5262C7F2BAE63B9 /* LivingTouch.swift in Sources */,
 				EC8F3E9045AEE241BE154438 /* FamilyShareNudge.swift in Sources */,
 				D6F9BFB6268A91936268E317 /* DailyQuest.swift in Sources */,
@@ -1406,6 +1436,7 @@
 				A0B6C8A87C81F7910186DE0A /* AppModel+Endgame.swift in Sources */,
 				B7DB0BCD628066805667C2E7 /* AppModel+WeatherHelpers.swift in Sources */,
 				CEA1AC229AD21480468AADCC /* VisitorsBookView.swift in Sources */,
+				BE650C0E873F90853479BCDA /* FieldNotesPage.swift in Sources */,
 				1B099F165F64F335330130BF /* WeatherPuzzleView.swift in Sources */,
 				199DA1A106DEB2C72907BC21 /* WeatherHelpersViews.swift in Sources */,
 				B987080F70636E313CF5DBC5 /* GrandGardenViews.swift in Sources */,
@@ -1450,6 +1481,7 @@
 				97D9721A1B688223FD44BBCD /* Theme.swift in Sources */,
 				5A1CE0000000000000000001 /* Spacing.swift in Sources */,
 				9C64E00429B6E0B94A88592A /* FlowerView.swift in Sources */,
+				CCE97CB406660310AFDE68CE /* FadedBloomArt.swift in Sources */,
 				74EACFE66FDEB10460FE1624 /* IntroBloomView.swift in Sources */,
 				E877E5958CF762C6A223EECA /* PetalConfettiView.swift in Sources */,
 				512057FA5C32E5D577739EAA /* PetalKit.swift in Sources */,

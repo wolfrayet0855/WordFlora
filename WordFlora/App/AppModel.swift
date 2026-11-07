@@ -33,6 +33,8 @@ final class AppModel {
     var weatherTestOverride: GardenWeather.Override?
     /// Tests and `-uitest-quest=<kind>`: today's quest kind (every other quest rule still applies).
     var questTestOverride: QuestKind?
+    /// Tests and `-uitest-tidytrim`: every day is a faded bloom day (stage, shears and the shears' rest still apply).
+    var fadedBloomTestOverride = false
     /// UI tests leave the quest card off unless they ask for it with `-uitest-quest`, so older layouts stay as tested.
     var questHiddenForUITests = false
     /// This visit showed an ending ceremony or the weather puzzle: no Plus card and no ads for the rest of it
@@ -160,6 +162,8 @@ final class AppModel {
         var applied: Bool
         var stageUp = false
         var message: String
+        /// Pruning Pro: this trim snipped a faded bloom (the plant page drops a dry petal).
+        var tidy = false
     }
 
     func refreshFreeDrops() {
@@ -245,6 +249,8 @@ final class AppModel {
         let inv = inventory
         var result = TendResult()
         var repotOutcome: RepotResult.Outcome?
+        // Pruning Pro: read the cue before the trim, which starts the shears' rest and so ends the cue.
+        let tidy: Bool = { if case .prune = action { return showsFadedBloom(plant) } else { return false } }()
 
         switch action {
         case .water: result = ToolEngine.waterWithCan([plant], profile: p, inventory: inv, now: date, calendar: cal, economy: eco, quiet: quiet).first ?? .blocked(.noWater)
@@ -264,17 +270,23 @@ final class AppModel {
         let counter: BadgeCounter = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return .suns } }()
         var unlocks = badges.record(counter, now: date, quiet: quiet)
         if repotOutcome == .happy { unlocks += badges.recordMark(.soilMatches, item: plant.plantId, now: date, quiet: quiet) }   // each plant once
+        if tidy { unlocks += badges.record(.tidyTrims, now: date, quiet: quiet) }       // Pruning Pro: a trim at the right time
         unlocks += badges.recordDay(.tendDays, day: BadgeFacts.dayNumber(date, calendar: cal), now: date, quiet: quiet)
         if result.stageUp { unlocks += recordCollectionFacts(now: date, quiet: quiet) }     // in flower, full bloom
-        enqueueBadgeMoments(unlocks, after: 1.0); p.badgesJSON = badges.json
+        // The tidy trim's line stays up on its own first (at least 1.2 s) before a badge moment.
+        enqueueBadgeMoments(unlocks, after: tidy ? 1.6 : 1.0); p.badgesJSON = badges.json
         try? context.save()
         recordQuestCare(action)
 
         let name = plant.nickname.isEmpty ? plant.name : plant.nickname
-        if turnedGolden { return TendOutcome(applied: true, message: EndgameCopy.goldenLine(name: name)) }
+        if turnedGolden { return TendOutcome(applied: true, message: EndgameCopy.goldenLine(name: name), tidy: tidy) }
         let day = Int(date.timeIntervalSince1970 / 86_400) &+ plant.earnedCount
         let event: PlantVoice.Event = { switch action { case .water: return .water; case .feed, .repot: return .soil; case .sun: return .sun; case .prune: return .prune } }()
-        if result.stageUp { return TendOutcome(applied: true, stageUp: true, message: "\(name) grew a little! " + PlantVoice.line(plantId: plant.plantId, event: .grew, daySeed: day)) }
+        if result.stageUp { return TendOutcome(applied: true, stageUp: true, message: "\(name) grew a little! " + PlantVoice.line(plantId: plant.plantId, event: .grew, daySeed: day), tidy: tidy) }
+        if tidy {
+            let line = PruningProCopy.tidy + " " + PruningProCopy.fact
+            return TendOutcome(applied: true, message: quiet ? line : "\(line) +\(result.gpGained) growth", tidy: true)
+        }
         if repotOutcome == .happy { return TendOutcome(applied: true, message: "\(name) loves its new pot!") }
         if repotOutcome == .neutral { return TendOutcome(applied: true, message: "Repotted.") }
         let voice = PlantVoice.line(plantId: plant.plantId, event: event, daySeed: day)

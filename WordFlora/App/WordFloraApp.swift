@@ -106,6 +106,27 @@ struct WordFloraApp: App {
             model.profile?.albumJSON = album.json
             try? model.context.save()
         }
+        if uiTesting && args.contains("-uitest-fieldnotes") {
+            // Field Notes: four friends met (monarch twice); three pages already stamped, so stamping the monarch's
+            // page earns the bronze badge. The book opens from Visitors.
+            var album = StickerAlbum()
+            album.add(["monarch", "monarch", "ladybug", "honeybee", "luna"], on: Date.now)
+            model.profile?.albumJSON = album.json
+            try? model.context.save()
+            for id in ["ladybug", "honeybee", "luna"] { model.collectFieldNote(id) }      // three of four: no tier yet
+        }
+        if uiTesting && args.contains("-uitest-tidytrim") {
+            // Pruning Pro: the found plant (`-uitest-plant=`, or the first) in flower, the shears owned, every day a
+            // faded bloom day, and four tidy trims already, so the next one earns the bronze badge.
+            if let p = model.plants().first(where: { $0.earnedCount > 0 }) ?? model.plants().first {
+                p.earnedCount = 1; p.stage = BadgeFacts.floweringStage; p.lastPrunedAt = nil
+            }
+            var inv = model.inventory; inv.unlock(.shears); model.inventory = inv
+            model.profile?.water = 5; model.profile?.soil = 3
+            model.fadedBloomTestOverride = true
+            model.updateBadges(announce: false) { state, _, t in state.record(.tidyTrims, amount: 4, now: t) }
+            try? model.context.save()
+        }
         if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-points=") }).flatMap({ Int($0.dropFirst("-uitest-points=".count)) }) {
             model.profile?.shedPoints = n
             try? model.context.save()

@@ -8,6 +8,10 @@ final class ReadAloud: NSObject, AVSpeechSynthesizerDelegate {
     static let shared = ReadAloud()
     private let synth = AVSpeechSynthesizer()
     private var pending = 0
+    /// The utterances of the current `speak`, so a cancelled or older one never counts as the end of this one.
+    private var live = Set<ObjectIdentifier>()
+    /// Called once when every sentence of the current `speak` was spoken to the end (not on a stop or a cancel).
+    private var onFinish: (() -> Void)?
     private var cachedVoice: AVSpeechSynthesisVoice?
 
     override init() {
@@ -55,7 +59,7 @@ final class ReadAloud: NSObject, AVSpeechSynthesizerDelegate {
         return chosen
     }
 
-    func speak(hint: String, extra: String?, simpler: String?) {
+    func speak(hint: String, extra: String?, simpler: String?, onFinish: (() -> Void)? = nil) {
         stop()
         let lines = Self.sentences(hint: hint, extra: extra, simpler: simpler)
         guard !lines.isEmpty else { return }
@@ -65,6 +69,7 @@ final class ReadAloud: NSObject, AVSpeechSynthesizerDelegate {
         SoundPlayer.shared.duckAmbient(true)
         let v = voice()
         pending = lines.count
+        self.onFinish = onFinish
         for (i, line) in lines.enumerated() {
             let u = AVSpeechUtterance(string: line)
             u.voice = v
@@ -74,11 +79,14 @@ final class ReadAloud: NSObject, AVSpeechSynthesizerDelegate {
             u.preUtteranceDelay = i == 0 ? 0.2 : 0
             u.postUtteranceDelay = 0.4
             u.prefersAssistiveTechnologySettings = false
+            live.insert(ObjectIdentifier(u))
             synth.speak(u)
         }
     }
 
     func stop() {
+        onFinish = nil
+        live.removeAll()
         if synth.isSpeaking { synth.stopSpeaking(at: .immediate) }
         finish()
     }
@@ -90,12 +98,24 @@ final class ReadAloud: NSObject, AVSpeechSynthesizerDelegate {
     }
 
     nonisolated func speechSynthesizer(_ s: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        let id = ObjectIdentifier(utterance)
         Task { @MainActor in
+            guard live.remove(id) != nil else { return }         // from an earlier, stopped speak
             pending -= 1
-            if pending <= 0 { finish() }
+            if live.isEmpty {
+                let done = onFinish
+                onFinish = nil
+                finish()
+                done?()
+            }
         }
     }
     nonisolated func speechSynthesizer(_ s: AVSpeechSynthesizer, didCancel utterance: AVSpeechUtterance) {
-        Task { @MainActor in pending = max(0, pending - 1); if pending == 0 { finish() } }
+        let id = ObjectIdentifier(utterance)
+        Task { @MainActor in
+            guard live.remove(id) != nil else { return }
+            onFinish = nil                                          // cut short: not read to the end
+            pending = max(0, pending - 1); if pending == 0 { finish() }
+        }
     }
 }

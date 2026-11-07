@@ -60,11 +60,48 @@ extension AppModel {
         updateBadges(after: 0.6) { state, quiet, t in state.recordMark(.storiesRead, item: plantId, now: t, quiet: quiet) }
     }
 
-    /// Field Notes: the Visitors' book is open, showing the fact of every friend met.
-    func noteVisitorFactsRead() {
-        let read = VisitorCatalog.all.filter { $0.fact != nil && album.count(of: $0.id) > 0 }.count
-        guard read > badges.progress(of: .factsRead) else { return }
-        recordBadgeValue(.factsRead, read)
+    /// Field Notes: a notebook page was read to the end aloud or the child tapped "I read it!" (never on opening the
+    /// page). Each met friend counts once; the count is the number of pages stamped, kept with `factsRead`'s old
+    /// best-so-far value, so earlier progress never goes down. The badge moment waits for the "Page added" line.
+    /// Returns true when the page got its stamp now (false in Quiet Garden, for a friend not met, or a page already stamped).
+    @discardableResult
+    func collectFieldNote(_ speciesId: String) -> Bool {
+        guard !settings.quietGarden, FieldNotes.canCollect(speciesId, album: album),
+              !badges.isMarked(.factsRead, item: speciesId) else { return false }
+        updateBadges(after: 1.4) { state, quiet, t in state.recordMark(.factsRead, item: speciesId, now: t, quiet: quiet) }
+        return true
+    }
+
+    func isFieldNoteStamped(_ speciesId: String) -> Bool { badges.isMarked(.factsRead, item: speciesId) }
+
+    // MARK: Pruning Pro
+
+    /// The weather seed and today's day key feed the faded bloom (nothing is stored).
+    private var fadedBloomSeed: Int64 { profile?.weatherSeed ?? 0 }
+    private var fadedBloomToday: Int { WeatherDay.key(now()) }
+
+    /// A faded bloom shows on this plant today: in flower, Prune ready now, and one of its cue days.
+    /// `fadedBloomTestOverride` (UI tests only) makes every day a cue day; the other rules still apply.
+    func showsFadedBloom(_ plant: PlantCollectible) -> Bool {
+        let ready = actionState(.prune, plant: plant).isReady
+        if fadedBloomTestOverride { return ready && plant.stage >= BadgeFacts.floweringStage }
+        return FadedBloom.shows(seed: fadedBloomSeed, plantId: plant.plantId, day: fadedBloomToday, stage: plant.stage, pruneReady: ready)
+    }
+
+    /// Where the faded bloom sits on the plant art (fractions of its size).
+    func fadedBloomSpot(_ plant: PlantCollectible) -> (x: Double, y: Double) {
+        FadedBloom.spot(seed: fadedBloomSeed, plantId: plant.plantId, day: fadedBloomToday)
+    }
+
+    /// The fresh bud after a tidy trim, on later visits while the shears rest.
+    func showsFreshBud(_ plant: PlantCollectible) -> Bool {
+        guard let last = plant.lastPrunedAt else { return false }
+        let resting = now().timeIntervalSince(last) < ToolEngine.pruneCooldownDays * 86_400
+        if fadedBloomTestOverride {
+            return resting && WeatherDay.key(last) < fadedBloomToday && plant.stage >= BadgeFacts.floweringStage
+        }
+        return FadedBloom.showsFreshBud(seed: fadedBloomSeed, plantId: plant.plantId, today: fadedBloomToday,
+                                        prunedDay: WeatherDay.key(last), stage: plant.stage, resting: resting)
     }
 
     // MARK: Sharing a badge card

@@ -5,6 +5,8 @@ struct PlantCard: View {
     var compact = false
     /// In a garden row: stretch to the row's height so both cards in the row line up.
     var fillsHeight = false
+    /// Pruning Pro: a faded bloom shows on this plant today (the only cue on the card: no badge, dot or number).
+    var fadedBloom = false
 
     private var earned: Bool { plant.earnedCount > 0 }
 
@@ -17,6 +19,9 @@ struct PlantCard: View {
                     .saturation(earned ? 1 : 0)
                     .brightness(earned ? 0 : -0.55)
                     .opacity(earned ? 1 : 0.55)
+                    .overlay(alignment: .top) {
+                        if fadedBloom { FadedBloomView().frame(width: compact ? 22 : 30, height: compact ? 22 : 30).offset(x: 8, y: 4) }
+                    }
                     .accessibilityHidden(true)
                 if !earned {
                     // A soft "on its way" sparkle, never a lock (no lock icons anywhere in the app).
@@ -40,7 +45,8 @@ struct PlantCard: View {
         .background(Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
         .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(earned ? Color.appAccent.opacity(0.45) : Color.appPrimaryText.opacity(0.08)))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(Self.label(name: plant.name, botanicalName: plant.botanicalName, level: plant.level, earned: earned))
+        .accessibilityLabel(fadedBloom ? PruningProCopy.plantLabel(Self.label(name: plant.name, botanicalName: plant.botanicalName, level: plant.level, earned: earned))
+                                       : Self.label(name: plant.name, botanicalName: plant.botanicalName, level: plant.level, earned: earned))
     }
 
     static func label(name: String, botanicalName: String, level: Int, earned: Bool) -> String {

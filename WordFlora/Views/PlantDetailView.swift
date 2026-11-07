@@ -45,6 +45,7 @@ struct PlantDetailView: View {
     @State private var tends = TendSequencer()
     @State private var tendTaps = 0
     @State private var nudges: [TendKind: Int] = [:]
+    @State private var snips = 0              // Pruning Pro: a tidy trim drops one dry petal
 
     private enum PanelFocus: Hashable { case show, hide }
 
@@ -299,6 +300,11 @@ struct PlantDetailView: View {
                 .scaleEffect(Self.dipScale(snap), anchor: UnitPoint(x: 0.5, y: 188.0 / 220))
                 .rotationEffect(.degrees(thirsty ? 5 : sway + lean), anchor: .bottom)
                 .transition(.opacity)
+                // Pruning Pro: one faded bloom on a cue day, the fresh bud on later visits after a tidy trim.
+                FadedBloomOverlay(size: s, spot: app.fadedBloomSpot(plant), showsBloom: app.showsFadedBloom(plant),
+                                  showsBud: app.showsFreshBud(plant), snips: snips,
+                                  reduceMotion: reduceMotion || app.settings.reduceMotionOverride, calm: app.settings.calmMode)
+                    .rotationEffect(.degrees(thirsty ? 5 : sway + lean), anchor: .bottom)
             }
         }
         .frame(width: s, height: s)
@@ -326,11 +332,17 @@ struct PlantDetailView: View {
             }
         }
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(showPot ? LifeStats.seedLabel(name: name) : LifeStats.plantLabel(name: name, pips: snap.pips))
+        .accessibilityLabel(showPot ? LifeStats.seedLabel(name: name) : plantLabel(plant, name: name, pips: snap.pips))
         .accessibilityAddTraits(.isButton)
         .accessibilityHint(snap.isSeed ? WakeCopy.wakeButton(name: name) : LifeStats.hint(name: name))
         .accessibilityAction { hello(plant) }
         .accessibilityIdentifier("plant-love")
+    }
+
+    /// The plant's VoiceOver label, ending with "ready for a trim" while a faded bloom shows.
+    private func plantLabel(_ plant: PlantCollectible, name: String, pips: Int) -> String {
+        let base = LifeStats.plantLabel(name: name, pips: pips)
+        return app.showsFadedBloom(plant) ? PruningProCopy.plantLabel(base) : base
     }
 
     /// Wild Weather draws a dipped plant at the size of its shown stage relative to its stored one (1 = unchanged).
@@ -470,6 +482,16 @@ struct PlantDetailView: View {
         return VStack(spacing: 4) {
             Text(line).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText).multilineTextAlignment(.center)
                 .fixedSize(horizontal: false, vertical: true)
+            if app.showsFadedBloom(plant) {
+                Label(PruningProCopy.cue, systemImage: "scissors")
+                    .font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("plant.tidyCue")
+            } else if app.showsFreshBud(plant) {
+                Text(PruningProCopy.freshBud).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("plant.freshBudLine")
+            }
             if !snap.isSeed {
                 Label(LifeStats.hint(name: name), systemImage: "heart")
                     .font(Theme.font(.footnote, weight: .bold)).foregroundStyle(Color.appPrimaryText)
@@ -539,7 +561,9 @@ struct PlantDetailView: View {
 
     private func tendButton(_ kind: TendKind, _ plant: PlantCollectible) -> some View {
         let state = app.actionState(action(for: kind), plant: plant)
-        return TendActionButton(kind: kind, look: TendButtonLook(kind: kind, state: state), large: large, nudge: nudges[kind, default: 0]) {
+        let hint = kind == .prune && app.showsFadedBloom(plant) ? PruningProCopy.pruneHint : nil
+        return TendActionButton(kind: kind, look: TendButtonLook(kind: kind, state: state), large: large, nudge: nudges[kind, default: 0],
+                                hintOverride: hint) {
             tap(kind, plant)
         }
     }
@@ -607,6 +631,7 @@ struct PlantDetailView: View {
         guard outcome.applied else { refuse(kind, outcome.message); return }
         if let pot { app.choosePot(pot, for: plant) }
         tendTaps += 1
+        if outcome.tidy { snips += 1 }
         if let effect = TendEffect(action) {
             app.play(effect.sound)
             let play = tends.start(effect, pot: TendPot(id: plant.potId), from: from, at: .now)
