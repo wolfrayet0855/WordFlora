@@ -1,3 +1,5 @@
+> **REMOVED 2026-11-07 (owner): AppLovin is not accepting publisher accounts, so no AppLovin product ships in the app. Ignore every AppLovin step below. AdMob stays the only ad network. Gate G4 becomes "AdMob hardening" (see release-plan-extended.md).**
+
 # Owner dated checklist, 2026-11-07 to 2026-11-19
 
 Drafted 2026-11-07 from `docs/pm/status-review-2026-11-07.md` (sections 1 and 5), `docs/pm/release-plan-extended.md` (section 3) and `owner-setup-steps.md`. Target submit date is **Thu 2026-11-19**; the PM says plan externally for **Mon 2026-11-23**. Each line names the gate it depends on (G0 to G6 are the builder gates in the release plan). Time estimates are from the plan. **[ASSUMPTION]** marks anything I inferred. Nothing here was verified in App Store Connect.

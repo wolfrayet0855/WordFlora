@@ -13,7 +13,7 @@ Items here are parked, not cut. Each needs the owner's go before it is built.
   Siri "say hello to Daisy", Say it to me (parent-gated, on-device speech). Skip AR.
 
 ## From the monetization exploration (docs/research/monetization-majors.md)
-- Lifetime "Plus Forever" $34.99, seasonal packs, mediation (AppLovin), offer-code redeem row, classroom edition as a
+- Lifetime "Plus Forever" $34.99, seasonal packs, mediation (dropped 2026-11-07: AppLovin not accepting publishers), offer-code redeem row, classroom edition as a
   separate app (no-go now). Owner decides each.
 
 ## Badge mechanics (docs/pm/badge-mechanics.md; Fable rulings 2026-11-06, none in the first release)

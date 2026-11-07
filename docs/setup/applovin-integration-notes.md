@@ -1,3 +1,5 @@
+> **REMOVED 2026-11-07 (owner): AppLovin is not accepting publisher accounts, so no AppLovin product ships in the app. Ignore every AppLovin step below. AdMob stays the only ad network. Gate G4 becomes "AdMob hardening" (see release-plan-extended.md).**
+
 # AppLovin through AdMob mediation: integration notes
 
 Research date 2026-11-07. Docs only; nothing built. Tags: **[Google]** official Google, **[AL]** official AppLovin, **[inferred]** my reading. "Not fetched" = host refused or page lacked it; verify. Plan context: `docs/research/monetization-majors.md` section 3 (AppLovin bidding as step 3b, about launch +60 days).

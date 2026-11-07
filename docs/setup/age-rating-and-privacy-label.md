@@ -1,3 +1,5 @@
+> **REMOVED 2026-11-07 (owner): AppLovin is not accepting publisher accounts, so no AppLovin product ships in the app. Ignore every AppLovin step below. AdMob stays the only ad network. Gate G4 becomes "AdMob hardening" (see release-plan-extended.md).**
+
 # Age rating and App Privacy label answers
 
 Research date 2026-11-07. Docs only; no code changed. Source tags: **[Apple]** = Apple official, **[Google]** = Google official, **[AL]** = AppLovin official, **[inferred]** = my reading, check it. "Not verified" means the page could not be fetched or does not say. Not legal advice. This refines D2/D3 in `docs/setup/owner-setup-steps.md`.

@@ -1,3 +1,5 @@
+> **REMOVED 2026-11-07 (owner): AppLovin is not accepting publisher accounts, so no AppLovin product ships in the app. Ignore every AppLovin step below. AdMob stays the only ad network. Gate G4 becomes "AdMob hardening" (see release-plan-extended.md).**
+
 # Status review, Sat 2026-11-07 13:00 EST (project manager)
 
 Inputs: `docs/pm/release-plan-extended.md`, `docs/STATUS.md` (Final QA through G2), `docs/pm/backlog.md`, `docs/setup/owner-setup-steps.md`, `docs/setup/cloudkit-new-fields.md`, `docs/pm/butterfly-net-spec.md`, `git log main..HEAD`, `git worktree list`, the lead's state summary. Tip `b371a58`. Worktrees: G2b builder at `0549fc8` ("first pass, not yet built"), art lane at `330469d`.

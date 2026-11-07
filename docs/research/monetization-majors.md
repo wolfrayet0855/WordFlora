@@ -1,3 +1,5 @@
+> **REMOVED 2026-11-07 (owner): AppLovin is not accepting publisher accounts, so no AppLovin product ships in the app. Ignore every AppLovin step below. AdMob stays the only ad network. Gate G4 becomes "AdMob hardening" (see release-plan-extended.md).**
+
 # Five bigger money moves: specs for approval (2026-11-06)
 
 Builds on `revenue-compensation.md` (base case: 10,000 monthly players, about $930/mo, 13+ ads about $665/mo) and `kids-revenue.md`. Code read: `Rules/Paywall.swift`, `Rules/AdGate.swift`, `Rules/PlusOfferPolicy.swift`, `Services/EntitlementService.swift`, `Ads/AdsService.swift`, `Views/PlusView.swift`, `Rules/PotCatalog.swift`, `Config/WordFlora.storekit`, `Config/Ads.xcconfig`. Legal and review points are facts with sources. Revenue figures are estimates.

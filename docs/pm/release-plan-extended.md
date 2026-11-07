@@ -158,3 +158,7 @@ Unchanged: merge the five branches + Living Touch / widget hello / under-13 fix,
   pill at 85%, radius stated in points; shoulds 5, 7, 9.
 - New gate **G1v: puzzle visual fixes** (docs/pm/puzzle-experience-review.md; branch from the fixer agent), right after G0.
 - Submit date moves to about Mon 2026-11-23, inside the owner-approved extension.
+
+## Update 2026-11-07: AppLovin removed (owner)
+AppLovin is not accepting publisher accounts. No AppLovin adapter, SDK, SKAdNetwork ids beyond Google's 50, app-ads.txt line, partner-list change or label delta ships. Everything above that mentions AppLovin is void.
+Gate **G4 is now AdMob hardening** (about 4 h, still after G3, one builder): (1) a unit test that under-13 and unknown ages never start any ad SDK, UMP or ATT, and that 13-17 get non-personalised only; (2) check the merged Xcode privacy report against PrivacyInfo.xcprivacy and fill `NSPrivacyTrackingDomains` with whatever the report flags; (3) confirm the Release bundle uses the real AdMob ids and the debug build uses Google test ids; (4) confirm no AppLovin string or package exists in the project. G4 no longer needs the owner's AppLovin prerequisites. Frees about 10 builder-hours; the schedule gains about a day of slack.
