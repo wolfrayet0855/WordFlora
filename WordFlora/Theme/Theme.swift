@@ -5,6 +5,27 @@ extension Color {
     static let secondaryText = Color.appPrimaryText.opacity(0.88)
 }
 
+/// The puzzle screen's ink levels, in one place so the contrast tests measure exactly what is drawn
+/// (docs/pm/puzzle-experience-review.md V3, V4, V10). Opacities apply to the named colour assets.
+enum PuzzleInk {
+    /// An unrevealed tile's 2 pt outline: appPrimaryText at 55% is at least 3:1 on the cream and on the tile.
+    static let blankOutline = 0.55
+    /// A tried letter that is not in the word: the letter at 70% (about 4:1) over a pink fill of appDanger.
+    static let wrongKeyText = 0.70
+    /// The pink under a wrong key: a clearer rose in dark mode, where 22% read as muddy brown.
+    static func wrongKeyFill(dark: Bool) -> Double { dark ? 0.30 : 0.22 }
+    /// The check and cross on a used key (points, black weight).
+    static let usedGlyphSize: CGFloat = 11
+    /// An unused key's 1 pt lip (appPrimaryText) so it stands off the cream, and the wash while a key is pressed.
+    static let keyLip = 0.22
+    static let keyPressed = 0.08
+    /// Speed bloom ring: the gold arc and its faint track, separate from the gold flower centre in light mode.
+    static func ringFill(dark: Bool) -> UInt32 { dark ? 0xE8A838 : 0xB7791F }
+    static func ringTrack(dark: Bool) -> (hex: UInt32, opacity: Double) { dark ? (0xF5C858, 0.28) : (0xB7791F, 0.35) }
+    /// The ring's line on screen, in points, whatever the flower's size.
+    static let ringLine: CGFloat = 5
+}
+
 enum Theme {
     static func font(_ style: Font.TextStyle, weight: Font.Weight = .regular) -> Font {
         .system(style, design: .rounded, weight: weight)
