@@ -11,6 +11,7 @@ struct PlusView: View {
     /// What a passed grown-up question goes on to do: buy, redeem a code, or open subscription management.
     @State private var afterGate: GatedAction = .purchase
     @State private var showManageSubscriptions = false
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private enum GatedAction { case purchase, redeem, manageSubscriptions }
 
@@ -119,7 +120,12 @@ struct PlusView: View {
         return Button { selected = choice } label: {
             HStack(alignment: .center, spacing: 10) {
                 VStack(alignment: .leading, spacing: 3) {
-                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    // At accessibility sizes the badge goes on its own line under the headline, so "Yearly" keeps the
+                    // full width and never breaks beside a wrapped badge. Same views, only the stack's axis changes.
+                    let titleRow = dynamicTypeSize.isAccessibilitySize
+                        ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4))
+                        : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 8))
+                    titleRow {
                         Text(title).font(Theme.font(.headline)).fixedSize(horizontal: false, vertical: true)
                         if let badge {
                             Text(badge).font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.appPrimaryText)
