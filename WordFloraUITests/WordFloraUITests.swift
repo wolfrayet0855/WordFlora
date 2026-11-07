@@ -181,6 +181,16 @@ final class WordFloraUITests: XCTestCase {
         app.launch()
         app.buttons["Garden"].tap()
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
+        letTheBadgeMomentPass()
+    }
+
+    /// The first look at a found plant's fact card earns the bronze Wild Discovery badge, and its moment dims the whole
+    /// app (62% scrim) for 2.6 s. Taps and audits wait until it has gone, as a child would.
+    private func letTheBadgeMomentPass() {
+        let moment = app.descendants(matching: .any)["badgeMoment"].firstMatch
+        guard moment.waitForExistence(timeout: 4) else { return }
+        let gone = expectation(for: NSPredicate(format: "exists == false"), evaluatedWith: moment)
+        wait(for: [gone], timeout: 10)
     }
 
     /// The Life panel starts closed (owner ruling 2026-11-06); a tap opens it and the chevron closes it again.
@@ -217,6 +227,7 @@ final class WordFloraUITests: XCTestCase {
         sleep(1)
         app.navigationBars.buttons.firstMatch.tap()
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
+        letTheBadgeMomentPass()
         XCTAssertTrue(app.buttons["Show Life panel"].waitForExistence(timeout: 5), "nothing new since the last visit")
         app.terminate()
         openClover(["-uitest-gardened", "-uitest-life-changed"])
@@ -641,6 +652,58 @@ final class FidelityScreensUITests: XCTestCase {
             sleep(1); shot("age-\(look.0)")
             app.terminate()
         }
+    }
+
+    /// The letter puzzle for the puzzle look review: long words (13 and 14 letters), keys used right and wrong, the
+    /// Speed bloom ring part drained, the win card, the resting card, and a 10 letter word at the largest text size.
+    func testPuzzleScreens() {
+        executionTimeAllowance = 600
+        // The fixed word is the only word in the bank, so its level must be the player's level (1, or 4 with
+        // `-uitest-speedbloom`), or the round has no word to draw.
+        func play(_ look: (String, XCUIDevice.Appearance, [String]), _ word: String, level: Int, _ extra: [String] = []) {
+            launch(look, ["-uitest-word=\(word)", "-uitest-word-level=\(level)"] + extra)
+            app.buttons["Play"].tap()
+            XCTAssertTrue(app.buttons["Z"].waitForExistence(timeout: 8))
+            XCTAssertTrue(app.staticTexts["A test hint"].waitForExistence(timeout: 5), "the round drew the word")
+        }
+        for look in Self.looks where look.0 != "ax5" {
+            // Two right letters and three wrong ones, so the keyboard shows all three key looks.
+            play(look, "PHOTOSYNTHESIS", level: 1)
+            for ch in "PHZXQ" { app.buttons[String(ch)].tap() }
+            sleep(1); shot("puzzle-14-photosynthesis-\(look.0)")
+            app.terminate()
+            play(look, "CHERRY BLOSSOM", level: 1)
+            for ch in "RZX" { app.buttons[String(ch)].tap() }
+            sleep(1); shot("puzzle-14-cherry-blossom-\(look.0)")
+            app.terminate()
+            play(look, "CONSTELLATION", level: 1)
+            sleep(1); shot("puzzle-13-constellation-\(look.0)")
+            app.terminate()
+            play(look, "PASSIONFLOWER", level: 4, ["-uitest-speedbloom", "-uitest-speedbloom-seconds=30"])
+            app.buttons["P"].tap()
+            sleep(9); shot("puzzle-speedbloom-ring-\(look.0)")
+            app.terminate()
+            // Three wins open the resting card; the first win card is shot on the way.
+            play(look, "LOTUS", level: 1)
+            for n in 1...3 {
+                XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5), "word \(n)")
+                for ch in "LOTUS" { app.buttons[String(ch)].tap() }
+                let next = app.buttons["Continue"]
+                XCTAssertTrue(next.waitForExistence(timeout: 8), "word \(n)")
+                if n == 1 { sleep(2); shot("puzzle-win-card-\(look.0)") }
+                for _ in 0..<6 where !next.isHittable { app.swipeUp() }
+                next.tap()
+            }
+            XCTAssertTrue(app.staticTexts["The garden is resting"].waitForExistence(timeout: 5))
+            sleep(3); shot("puzzle-rest-card-\(look.0)")
+            app.terminate()
+        }
+        let ax5 = Self.looks[2]
+        play(ax5, "STRAWBERRY", level: 1)
+        for ch in "SRZ" { app.buttons[String(ch)].tap() }
+        sleep(1); shot("puzzle-10-strawberry-ax5")
+        app.swipeUp(); sleep(1); shot("puzzle-10-strawberry-ax5-scrolled")
+        app.terminate()
     }
 
     /// The cards over Home and the game: forecast card, weather banner, break card, the Grand Garden and the seed's
