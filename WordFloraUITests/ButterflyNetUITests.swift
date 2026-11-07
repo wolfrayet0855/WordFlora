@@ -257,8 +257,13 @@ final class ButterflyNetUITests: XCTestCase {
             let toggle = app.switches["settings.easierButterflies"], note = element("settings.easierButterfliesNote")
             scrollTo(note)
             // The new rows near the top, so they stay on screen while the audit grows the text.
-            toggle.coordinate(withNormalizedOffset: CGVector(dx: 0.3, dy: 0.5)).press(forDuration: 0.1,
-                thenDragTo: app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.22)))
+            // A slow drag with a hold at the end (no fling): the toggle row's top lands 40 pt under the bar.
+            let barBottom = app.navigationBars.firstMatch.frame.maxY
+            let lift = toggle.frame.minY - (barBottom + 40)
+            if abs(lift) > 10 {
+                let start = app.coordinate(withNormalizedOffset: .zero).withOffset(CGVector(dx: 30, dy: lift > 0 ? toggle.frame.midY : barBottom + 60))
+                start.press(forDuration: 0.2, thenDragTo: start.withOffset(CGVector(dx: 0, dy: -lift)), withVelocity: .slow, thenHoldForDuration: 0.6)
+            }
             waitUntilStill(note)
             let name = "net-settings\(size == nil ? "" : "-ax5")\(dark ? "-dark" : "")"
             shot(name)
