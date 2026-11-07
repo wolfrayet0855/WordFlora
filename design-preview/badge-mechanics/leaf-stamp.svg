@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Field Notes: the leaf stamp that lands on a notebook page. Ink green = PetalKit.leafDark #3F8A4A.
+       Small knock-out specks give a rubber-stamp feel; they are a mask, so the page shows through in any theme. -->
+  <defs>
+    <mask id="ink">
+      <rect width="120" height="120" fill="#fff"/>
+      <g fill="#000">
+        <circle cx="31" cy="38" r="1.6"/><circle cx="88" cy="30" r="1.2"/><circle cx="96" cy="71" r="1.8"/>
+        <circle cx="70" cy="98" r="1.3"/><circle cx="24" cy="78" r="1.1"/><circle cx="52" cy="18" r="1"/>
+        <circle cx="64" cy="58" r="1.2"/><circle cx="55" cy="74" r="0.9"/><circle cx="43" cy="95" r="1.4"/>
+      </g>
+    </mask>
+  </defs>
+  <g transform="rotate(-12 60 60)" mask="url(#ink)">
+    <circle cx="60" cy="60" r="50" fill="none" stroke="#3F8A4A" stroke-width="5"/>
+    <circle cx="60" cy="60" r="42" fill="none" stroke="#3F8A4A" stroke-width="1.8" stroke-dasharray="3 4" stroke-linecap="round"/>
+    <path d="M60 26 C 84 36 88 66 60 92 C 32 66 36 36 60 26 Z" fill="#3F8A4A"/>
+    <path d="M60 32 V 92" stroke="#F6EBD3" stroke-width="2.6" stroke-linecap="round"/>
+    <path d="M60 50 L 72 42 M60 50 L 48 42 M60 64 L 75 55 M60 64 L 45 55 M60 78 L 71 70 M60 78 L 49 70"
+          stroke="#F6EBD3" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <path d="M60 92 Q 60 100 55 104" stroke="#3F8A4A" stroke-width="3.2" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

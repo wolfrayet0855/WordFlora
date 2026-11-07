@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <!-- Pruning Pro: the fresh bud drawn where the faded bloom was, on the next visit to the plant page (same anchor).
+       Bud = PetalKit.palette[0] rose; sepals leafLight #5FA860 / leafDark #3F8A4A; stem #4E9A55. -->
+  <path d="M30 58 V 34" stroke="#4E9A55" stroke-width="3.6" stroke-linecap="round"/>
+  <path d="M30 12 C 40 18 40 30 30 36 C 20 30 20 18 30 12 Z" fill="#F2788A" stroke="#D9566C" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M30 36 C 22 36 18 30 19 26 C 24 28 28 32 30 36 Z M30 36 C 38 36 42 30 41 26 C 36 28 32 32 30 36 Z" fill="#5FA860" stroke="#3F8A4A" stroke-width="1.6" stroke-linejoin="round"/>
+  <ellipse cx="27" cy="21" rx="2" ry="4" fill="#fff" fill-opacity=".55"/>
+</svg>
