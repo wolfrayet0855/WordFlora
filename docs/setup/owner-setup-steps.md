@@ -168,6 +168,8 @@ Apple's sandbox page 404ed; steps from general knowledge **(verify in UI)**.
 4. **Product > Scheme > Edit Scheme... > Run > Options > StoreKit Configuration**: select `WordFlora.storekit`.
 5. Run in Simulator. Use **Debug > StoreKit > Manage Transactions** (while running) to expire, renew, refund, clear history.
 
+Already done in the repo: `Config/WordFlora.storekit` holds both subscriptions and `plus_lifetime` (A13), and Debug simulator builds use `WordFlora/WordFlora-Simulator.entitlements` (the app's entitlements plus `get-task-allow`) so the StoreKit tests can load it. Keep the two entitlement files in step if a capability is added; Release and device builds use `WordFlora/WordFlora.entitlements` only.
+
 Source: https://developer.apple.com/documentation/xcode/setting-up-storekit-testing-in-xcode (the fetched text was only an outline; labels above from general knowledge, verify in UI).
 
 ### A12. TestFlight check
@@ -176,10 +178,58 @@ Source: https://developer.apple.com/documentation/xcode/setting-up-storekit-test
 3. Add yourself under **TestFlight > Internal Testing**. Install via the TestFlight app. Purchases are sandbox-style and free.
 4. Confirm: paywall shows the correct price and "3 days free" on yearly; buy; ads disappear; Restore works; Manage Subscriptions opens.
 
+### A13. Product 3: plus_lifetime (Plus Forever, non-consumable)
+The app already offers it as a third row on the Plus page, under Yearly and Monthly (Yearly stays the default). It turns Plus on exactly like a subscription and survives Restore purchases.
+1. In the app, sidebar > **Monetization** > **In-App Purchases** > **+** (not under Subscriptions) **(verify in UI)**.
+2. Fill in:
+```
+Type:           Non-Consumable
+Reference Name: Plus Lifetime
+Product ID:     plus_lifetime
+Price (US):     $34.99
+Display Name:   Plus Forever
+Description:    No ads, iCloud sync and Plus pots. Pay once, no renewals.
+Family Sharing: ON   (cannot be turned off again once saved)
+```
+3. **Availability:** all territories you sell the subscriptions in. Review the auto-converted prices like A6.
+4. **Review Information:** a screenshot of the Plus page showing the three rows (Plus Forever is the third), and the note: "Non-consumable lifetime unlock of the same features as the WordFlora Plus subscription. Restore purchases is on the same page."
+5. Submit it **with the app version** (app version page > **In-App Purchases and Subscriptions** > add `plus_lifetime` next to the two subscriptions) **(verify in UI)**.
+6. Never discount it in the app. If the yearly price changes, keep lifetime at about 2.5 to 3 times the yearly price (`docs/research/monetization-majors.md` section 1).
+
+Mirrors this local StoreKit entry (`Config/WordFlora.storekit`, used by the tests):
+```json
+{"displayPrice":"34.99","familyShareable":true,"internalID":"6B45000003","productID":"plus_lifetime",
+ "referenceName":"Plus Lifetime","type":"NonConsumable","localizations":[{"locale":"en_US",
+ "displayName":"Plus Forever","description":"No ads, iCloud sync and Plus pots. Pay once, no renewals."}]}
+```
+
+### A14. Offer codes: GARDENFRIEND and WELCOMEBACK
+The Plus page has a **Redeem a code** row (behind the grown-up question for under 13 and unknown ages). It opens Apple's own code sheet; a redeemed code turns Plus on through the app's `Transaction.updates` listener, so nothing else is needed in the app.
+1. Open **plus_yearly** (or the subscription group) > **Offer Codes** > **+** **(verify in UI)**. Create two **custom codes**:
+```
+Code:          GARDENFRIEND
+Offer:         1 month free
+Eligibility:   new subscribers
+Auto-renew:    OFF after the free month (the "turn off auto-renew" option on the offer)
+Use for:       press, newsletter, creators
+
+Code:          WELCOMEBACK
+Offer:         3 months at 50% off (pay as you go)
+Eligibility:   expired subscribers
+Use for:       win-back
+```
+2. Set a redemption limit and an end date on each (custom codes have a cap you choose; Apple allows up to 1M redemptions per app per quarter).
+3. Test: TestFlight build > Settings > WordFlora Plus > **Redeem a code** > enter the code. Plus should turn on within a moment of the sheet closing.
+4. One-time codes for teachers and reviewers can be generated later from the same screen (batches of 500 to 25,000, they expire within 6 months).
+
+Source: https://developer.apple.com/help/app-store-connect/manage-subscriptions/set-up-offer-codes
+
 ### A: send back
 ```
-Product IDs (exact):       plus_yearly / plus_monthly
+Product IDs (exact):       plus_yearly / plus_monthly / plus_lifetime
 Subscription group name:   WordFlora Plus
+plus_lifetime Family Sharing ON: yes/no
+Offer codes created:       GARDENFRIEND yes/no, WELCOMEBACK yes/no
 Group ID (numeric, from the URL or group page, if shown): ______
 Apple ID app id (numeric, "Apple ID" in App Information): ______
 Trial confirmed on yearly only: yes/no
@@ -537,6 +587,8 @@ Checklist:
 - [ ] App record created, SKU `wordflora-ios-001`
 - [ ] Group `WordFlora Plus`; `plus_yearly` (with 3-day free trial) and `plus_monthly` in "Ready to Submit"
 - [ ] Family Sharing ON on both
+- [ ] `plus_lifetime` (Plus Forever, $34.99, non-consumable, Family Sharing ON) in "Ready to Submit" (A13)
+- [ ] Offer codes GARDENFRIEND (1 month free, auto-renew off) and WELCOMEBACK (3 months at 50%, expired subscribers) (A14)
 - [ ] Sandbox tester created
 - [ ] App Group and iCloud container created and attached to App IDs
 - [ ] Xcode signing works for app and widget on a real device
@@ -557,7 +609,8 @@ App Group ID:               group.beta.WordFlora
 iCloud container ID:        iCloud.beta.WordFlora
 Apple ID (numeric app id):  __________
 Subscription group:         WordFlora Plus   (group id: ______)
-Product IDs:                plus_yearly, plus_monthly
+Product IDs:                plus_yearly, plus_monthly, plus_lifetime
+Offer codes live:           GARDENFRIEND, WELCOMEBACK   yes/no
 Trial on yearly confirmed:  yes/no
 Sandbox tester email:       __________
 AdMob publisher ID:         pub-________________
