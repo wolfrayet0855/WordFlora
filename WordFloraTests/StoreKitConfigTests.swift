@@ -72,4 +72,80 @@ final class StoreKitConfigTests: XCTestCase {
         XCTAssertEqual(outcome, .success)
         XCTAssertTrue(svc.state.hasPlus)
     }
+
+    // MARK: Plus Forever (plus_lifetime)
+
+    /// StoreKit publishes entitlement changes asynchronously; poll briefly instead of racing it.
+    private func waitFor(_ svc: EntitlementService, _ done: (EntitlementState) -> Bool) async throws {
+        for _ in 0..<30 where !done(svc.state) { try await Task.sleep(nanoseconds: 100_000_000); await svc.refresh() }
+    }
+
+    func testPlusForeverLoadsAsAFamilySharedNonConsumable() async throws {
+        let products = try await Product.products(for: [PlusPlan.lifetimeID])
+        let lifetime = try XCTUnwrap(products.first)
+        XCTAssertEqual(lifetime.id, "plus_lifetime")
+        XCTAssertEqual(lifetime.type, .nonConsumable)
+        XCTAssertEqual(lifetime.price, Decimal(string: "34.99"))
+        XCTAssertEqual(lifetime.displayName, "Plus Forever")
+        XCTAssertTrue(lifetime.isFamilyShareable)
+        XCTAssertNil(lifetime.subscription)
+    }
+
+    func testBuyingPlusForeverTurnsOnPlus() async throws {
+        let svc = EntitlementService(startListening: false)
+        await svc.loadProducts()
+        XCTAssertNotNil(svc.lifetimeProduct)
+        XCTAssertFalse(svc.state.hasPlus)
+        let outcome = await svc.purchase(.lifetime)
+        XCTAssertEqual(outcome, .success)
+        XCTAssertTrue(svc.state.hasPlus); XCTAssertTrue(svc.state.hasLifetime)
+        XCTAssertTrue(svc.state.hasRemoveAds); XCTAssertTrue(svc.state.hasCloudSync)
+        XCTAssertFalse(svc.state.paysTwice)
+    }
+
+    func testPlusForeverSurvivesRestore() async throws {
+        try await session.buyProduct(identifier: PlusPlan.lifetimeID)
+        // A fresh service (a new launch, another device) finds it, and so does Restore purchases.
+        let svc = EntitlementService(startListening: false)
+        await svc.restore()
+        try await waitFor(svc) { $0.hasLifetime }
+        XCTAssertTrue(svc.state.hasLifetime); XCTAssertTrue(svc.state.hasPlus)
+    }
+
+    func testPlusForeverOutlastsAnExpiredSubscription() async throws {
+        let svc = EntitlementService(startListening: false)
+        try await session.buyProduct(identifier: "plus_monthly")
+        try await session.buyProduct(identifier: PlusPlan.lifetimeID)
+        try await waitFor(svc) { $0.paysTwice }
+        XCTAssertTrue(svc.state.paysTwice, "lifetime plus a live subscription: the page asks them to cancel it")
+        try session.expireSubscription(productIdentifier: "plus_monthly")
+        try await waitFor(svc) { !$0.hasActiveSubscription }
+        XCTAssertFalse(svc.state.hasActiveSubscription)
+        XCTAssertTrue(svc.state.hasPlus); XCTAssertTrue(svc.state.hasLifetime); XCTAssertFalse(svc.state.paysTwice)
+    }
+
+    /// Ask to Buy: the purchase waits for a parent, then the approval turns Plus Forever on.
+    func testAskToBuyPlusForeverIsPendingUntilApproved() async throws {
+        session.askToBuyEnabled = true
+        let svc = EntitlementService(startListening: false)
+        await svc.loadProducts()
+        let outcome = await svc.purchase(.lifetime)
+        XCTAssertEqual(outcome, .pending)
+        XCTAssertFalse(svc.state.hasPlus)
+        let waiting = try XCTUnwrap(session.allTransactions().first { $0.productIdentifier == PlusPlan.lifetimeID })
+        try session.approveAskToBuyTransaction(identifier: waiting.identifier)
+        try await waitFor(svc) { $0.hasLifetime }
+        XCTAssertTrue(svc.state.hasLifetime); XCTAssertTrue(svc.state.hasPlus)
+    }
+
+    func testARefundedPlusForeverTurnsPlusOff() async throws {
+        let svc = EntitlementService(startListening: false)
+        try await session.buyProduct(identifier: PlusPlan.lifetimeID)
+        try await waitFor(svc) { $0.hasLifetime }
+        XCTAssertTrue(svc.state.hasLifetime)
+        let bought = try XCTUnwrap(session.allTransactions().first { $0.productIdentifier == PlusPlan.lifetimeID })
+        try session.refundTransaction(identifier: bought.identifier)
+        try await waitFor(svc) { !$0.hasPlus }
+        XCTAssertFalse(svc.state.hasPlus)
+    }
 }

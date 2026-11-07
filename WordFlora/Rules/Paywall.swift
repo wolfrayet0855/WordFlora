@@ -7,13 +7,55 @@ enum PlusPlan: CaseIterable {
     static let groupName = "WordFlora Plus"
     var productID: String { self == .yearly ? "plus_yearly" : "plus_monthly" }
     static var allProductIDs: Set<String> { Set(allCases.map(\.productID)) }
+
+    /// Plus Forever: one non-consumable, Family Sharing on. Kept apart from the subscription plans so the trial and
+    /// renewal copy never touches it.
+    static let lifetimeID = "plus_lifetime"
+    static let lifetimeName = "Plus Forever"
+    /// Every product that turns Plus on.
+    static var plusProductIDs: Set<String> { allProductIDs.union([lifetimeID]) }
+}
+
+/// What the Plus page offers: the two subscription plans and Plus Forever. Yearly is the default choice.
+enum PlusChoice: Hashable, CaseIterable {
+    case yearly, monthly, lifetime
+
+    var plan: PlusPlan? {
+        switch self { case .yearly: .yearly; case .monthly: .monthly; case .lifetime: nil }
+    }
+    var productID: String { plan?.productID ?? PlusPlan.lifetimeID }
 }
 
 struct EntitlementState: Equatable {
     var activeProductIDs: Set<String> = []
-    var hasPlus: Bool { !activeProductIDs.isDisjoint(with: PlusPlan.allProductIDs) }
+    var hasPlus: Bool { !activeProductIDs.isDisjoint(with: PlusPlan.plusProductIDs) }
     var hasRemoveAds: Bool { hasPlus }
     var hasCloudSync: Bool { hasPlus }
+    /// Plus Forever owned (bought or family-shared, not refunded). It wins over any subscription state.
+    var hasLifetime: Bool { activeProductIDs.contains(PlusPlan.lifetimeID) }
+    var hasActiveSubscription: Bool { !activeProductIDs.isDisjoint(with: PlusPlan.allProductIDs) }
+    /// Someone who owns Plus Forever and still has a renewing subscription is paying twice; the page says so.
+    var paysTwice: Bool { hasLifetime && hasActiveSubscription }
+
+    init(activeProductIDs: Set<String> = []) { self.activeProductIDs = activeProductIDs }
+
+    /// One transaction as the entitlement rules see it (StoreKit's `Transaction`, reduced to what matters).
+    struct Entry: Equatable {
+        var productID: String
+        var revoked = false
+        var expiresAt: Date?
+    }
+
+    /// Plus from the player's current transactions: refunded or revoked ones never count, an expired subscription
+    /// does not count, and Plus Forever never expires.
+    init(entries: [Entry], now: Date) {
+        var ids = Set<String>()
+        for e in entries where !e.revoked {
+            if e.productID != PlusPlan.lifetimeID, let end = e.expiresAt, end <= now { continue }
+            ids.insert(e.productID)
+        }
+        self.activeProductIDs = ids
+    }
 }
 
 enum PaywallMath {
@@ -42,6 +84,32 @@ enum PaywallCopy {
         case .monthly:
             return Copy(headline: "Monthly", detail: "Flexible", cta: "Subscribe", finePrint: "\(displayPrice) per month. \(renew)")
         }
+    }
+
+    /// Plus Forever's one honest line, on its row and under the button.
+    static let lifetimeLine = "Pay once, keep Plus on this Apple ID. No renewals."
+
+    static func lifetime(displayPrice: String) -> Copy {
+        Copy(headline: PlusPlan.lifetimeName, detail: "Pay once", cta: "Buy \(PlusPlan.lifetimeName)",
+             finePrint: displayPrice.isEmpty ? lifetimeLine : "One payment of \(displayPrice). \(lifetimeLine)")
+    }
+
+    static func make(choice: PlusChoice, displayPrice: String, trialEligible: Bool) -> Copy {
+        guard let plan = choice.plan else { return lifetime(displayPrice: displayPrice) }
+        return make(plan: plan, displayPrice: displayPrice, trialEligible: trialEligible)
+    }
+
+    static let redeem = "Redeem a code"
+    static let ownedLifetime = "You have Plus Forever"
+    static let ownedLifetimeDetail = "Ads are off and your garden can sync across your devices, with no renewals. Thank you for supporting WordFlora."
+    static let paysTwice = "You still have a subscription. Cancel it so you aren't charged twice."
+    static let cancelSubscription = "Cancel the subscription"
+    static let welcomeLifetime = "Welcome to Plus Forever!"
+
+    /// Every Plus page line added for Plus Forever and codes, for the copy checks.
+    static var all: [String] {
+        [lifetimeLine, lifetime(displayPrice: "$34.99").finePrint, lifetime(displayPrice: "").cta, redeem,
+         ownedLifetime, ownedLifetimeDetail, paysTwice, cancelSubscription, welcomeLifetime]
     }
 }
 
