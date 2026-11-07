@@ -146,3 +146,15 @@ Unchanged: merge the five branches + Living Touch / widget hello / under-13 fix,
 - **G5 go/no-go, Fri 11-13 20:00 (art lane):** scene + two visitors with checked facts + two plants at every stage, accepted on localhost by the owner. No-go: G5 skipped, pack product not submitted, pack to 1.1, G6 starts Sat 11-14 12:00 and submit moves **up** to Tue 11-17.
 - **G4 exit, Sat 11-14 12:00:** under-13 never-starts test green; manifest from the built bundle lists both SDKs' types; Release bundle clean. No-go: AppLovin adapter stays in the build but the AdMob ad source stays paused; the app ships AdMob-only serving and the owner flips later with no app update.
 - **G6 exit, Wed 11-18 20:00:** full suite green, TestFlight build installed, owner checklist done with no blocker. No-go: fixes, re-run the touched batches, submit on the slip date (at the latest Mon 11-23).
+
+## Update 2026-11-06 (owner requests, Fable rulings)
+
+- New gate **G2b: butterfly net + Quick wings + Gentle Net badge** (one branch, about 38 builder-hours), after G2 and before G3.
+  Spec: docs/pm/butterfly-net-spec.md; visual review: docs/pm/butterfly-net-visual-review.md.
+  A2 Gentle Net moves from G1 to G2b. No stored fields, so G3 stays the only stored-field gate (one CloudKit deploy).
+- Quick wings constants kept (x1.3 speed, 40/56/72 pt radius, 45 s, one turn with 0.4 s tell, 2 s perch, chip shown);
+  fallback if the owner playtest calls the turn unfair: drop the turns, keep speed + hoop + perch.
+- Must-fixes folded into the G2b brief: ink outline on all rim tiers, dark-scene handle outline, resting net 24 pt above the
+  pill at 85%, radius stated in points; shoulds 5, 7, 9.
+- New gate **G1v: puzzle visual fixes** (docs/pm/puzzle-experience-review.md; branch from the fixer agent), right after G0.
+- Submit date moves to about Mon 2026-11-23, inside the owner-approved extension.
