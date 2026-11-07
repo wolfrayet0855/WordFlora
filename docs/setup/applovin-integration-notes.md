@@ -73,3 +73,6 @@ See `docs/setup/age-rating-and-privacy-label.md` section B2. Short version: Devi
 2. Do you want me to run the SKAdNetwork diff once network access to AppLovin's pages works, or will you run the commands in section 2?
 3. Banner via AppLovin is waterfall-only; accept manual eCPM for a few days, or mediate only interstitial and rewarded?
 4. Ship AppLovin at launch or at +60 days as planned (and update `owner-setup-steps.md` C10, which says no mediation)?
+
+## Owner ruling (2026-11-07)
+AppLovin follows exactly the same age logic as AdMob: free adults get ads, 13 to 17 get non-personalised ads, and under-13 or unknown ages get no ads and no SDK start. No separate adult-only unit rule. The order stays age gate, UMP, ATT (adults only), set treatment, then start; a unit test must prove mediation starts only where AdMob would. Plus removes all ads.
