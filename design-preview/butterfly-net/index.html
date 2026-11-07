@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Butterfly Net</title>
+<style>
+  :root { --ink:#3B3B3B; --bg:#FAF7F0; --card:#FFFFFF; --muted:#6B6B6B; --accent:#4E9A55; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.4 -apple-system, "SF Pro Rounded", system-ui, sans-serif; padding:24px; }
+  h1 { font-size:24px; margin:0 0 4px; } h2 { font-size:17px; margin:0 0 8px; }
+  .lede { color:var(--muted); margin:0 0 20px; max-width:900px; }
+  .row { display:flex; flex-wrap:wrap; gap:22px; align-items:flex-start; }
+  .frame { width:250px; }
+  .cap { font-size:13px; color:var(--muted); margin-top:8px; }
+  .cap b { color:var(--ink); }
+  .phone { position:relative; width:250px; height:480px; border-radius:30px; overflow:hidden; border:6px solid #222; background:linear-gradient(#BFE6F5,#E9F6E0); }
+  .phone.eve { background:linear-gradient(#1F2A4A,#3A3F6B); }
+  .nav { position:absolute; top:0; left:0; right:0; height:40px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; }
+  .eve .nav { color:#fff; }
+  .bar { position:absolute; top:44px; left:18px; right:18px; height:5px; border-radius:3px; background:rgba(0,0,0,.12); }
+  .bar i { display:block; height:100%; border-radius:3px; background:#E07A3F; }
+  .bed { position:absolute; bottom:0; left:0; right:0; height:78px; background:rgba(78,154,85,.85); }
+  .flower { position:absolute; bottom:44px; width:34px; height:34px; border-radius:50%; background:radial-gradient(circle,#FFD34D 30%,#F28AB2 32%); }
+  .pill { position:absolute; right:12px; bottom:90px; background:rgba(255,255,255,.92); border-radius:20px; padding:5px 10px; font-weight:700; font-size:12px; }
+  .vis { position:absolute; width:44px; height:44px; }
+  .net { position:absolute; pointer-events:none; }
+  .finger { position:absolute; width:30px; height:30px; border-radius:50%; background:rgba(0,0,0,.18); border:2px solid rgba(255,255,255,.7); transform:translate(-50%,-50%); }
+  .trail { position:absolute; border-top:2px dashed rgba(59,59,59,.35); transform-origin:left center; }
+  .tell { position:absolute; width:56px; height:56px; border-radius:50%; border:2px dotted rgba(224,122,63,.9); transform:translate(-50%,-50%); }
+  .heart { position:absolute; font-size:16px; color:#E25B7B; }
+  .stick { position:absolute; left:50%; transform:translateX(-50%); top:150px; text-align:center; }
+  .stick span { display:inline-block; background:#fff; border-radius:20px; padding:4px 12px; font-weight:700; font-size:13px; box-shadow:0 1px 3px rgba(0,0,0,.15); }
+  .chip { display:inline-block; font-size:11px; font-weight:700; padding:2px 8px; border-radius:10px; background:#E3F1E4; color:#2F6B35; }
+  .settings { width:250px; height:480px; border-radius:30px; border:6px solid #222; background:#F2F2F7; overflow:hidden; font-size:13px; }
+  .settings .hdr { padding:14px 16px 4px; color:#6B6B6B; font-size:11px; text-transform:uppercase; letter-spacing:.5px; }
+  .settings .grp { background:#fff; margin:0 10px; border-radius:10px; }
+  .settings .it { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; border-bottom:1px solid #E5E5EA; min-height:44px; }
+  .settings .it:last-child { border-bottom:none; }
+  .tg { width:38px; height:22px; border-radius:11px; background:#E5E5EA; position:relative; }
+  .tg::after { content:""; position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.3); }
+  .tg.on { background:#34C759; } .tg.on::after { left:18px; }
+  .foot { padding:6px 14px 0; color:#6B6B6B; font-size:11px; }
+  .tiers { display:flex; gap:26px; align-items:flex-end; background:var(--card); border-radius:20px; padding:18px 22px; }
+  .tiers div { text-align:center; font-size:12px; color:var(--muted); }
+  section { margin-bottom:34px; }
+  .dim { opacity:.55; }
+</style>
+</head>
+<body>
+<h1>Butterfly net</h1><p class="lede" style="margin:0">Phones drawn at 64% of a 390 pt iPhone; hoop sizes are to that scale.</p>
+<p class="lede">The net is the hit area: what the hoop covers is what says hello. Gentle game (under 13, Calm, Easier butterflies) catches at least everything today's game catches. Quick wings (13+ by default) has a smaller hoop at tier 1, livelier flight and a longer round. Visitor art is the app's own; the net is drawn in code from the Shed net colours.</p>
+
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <pattern id="meshW" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0 V9 M0 0 H9" stroke="#9A5F2A" stroke-width="1" stroke-opacity=".55"/></pattern>
+    <pattern id="meshS" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0 V9 M0 0 H9" stroke="#8D9AA6" stroke-width="1" stroke-opacity=".6"/></pattern>
+    <pattern id="meshG" width="9" height="9" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><path d="M0 0 V9 M0 0 H9" stroke="#D49A1E" stroke-width="1" stroke-opacity=".6"/></pattern>
+    <symbol id="net1" viewBox="-60 -60 150 150"><path d="M30 30 L84 84" stroke="#B07A4B" stroke-width="7" stroke-linecap="round"/><circle r="48" fill="#EAF6F3" fill-opacity=".35"/><circle r="48" fill="url(#meshW)"/><circle r="48" fill="none" stroke="#C98A4B" stroke-width="5"/></symbol>
+    <symbol id="net2" viewBox="-60 -60 150 150"><path d="M30 30 L84 84" stroke="#B07A4B" stroke-width="7" stroke-linecap="round"/><rect x="50" y="46" width="14" height="7" rx="3" transform="rotate(45 57 49)" fill="#8D9AA6"/><circle r="48" fill="#EAF6F3" fill-opacity=".35"/><circle r="48" fill="url(#meshS)"/><circle r="48" fill="none" stroke="#C5CED6" stroke-width="5"/></symbol>
+    <symbol id="net3" viewBox="-60 -60 150 150"><path d="M30 30 L84 84" stroke="#B07A4B" stroke-width="7" stroke-linecap="round"/><rect x="50" y="46" width="14" height="7" rx="3" transform="rotate(45 57 49)" fill="#D49A1E"/><circle r="48" fill="#EAF6F3" fill-opacity=".35"/><circle r="48" fill="url(#meshG)"/><circle r="48" fill="none" stroke="#F5C84C" stroke-width="5"/><path d="M38 -52 l3 7 7 3 -7 3 -3 7 -3 -7 -7 -3 7 -3z" fill="#F2B705" stroke="#3B3B3B" stroke-width="1.2"/></symbol>
+  </defs>
+</svg>
+
+<section>
+<h2>1. The gentle game with a net (under 13, Calm, Easier butterflies)</h2>
+<div class="row">
+  <div class="frame">
+    <div class="phone">
+      <div class="nav">Butterfly game</div><div class="bar"><i style="width:40%"></i></div>
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_monarch_a.imageset/visitor_monarch_a.svg" style="left:40px;top:120px">
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_bumblebee_a.imageset/visitor_bumblebee_a.svg" style="left:170px;top:220px">
+      <svg class="net" style="left:122px;top:218px" width="150" height="150"><use href="#net1"/></svg>
+      <div class="bed"></div><div class="flower" style="left:30px"></div><div class="flower" style="left:120px"></div><div class="flower" style="left:190px"></div>
+      <div class="pill">&#9995; 2 said hello</div>
+    </div>
+    <p class="cap"><b>Resting.</b> The net waits bottom right, in thumb reach. Tier 1 hoop 96 pt across (48 pt circle radius, as today).</p>
+  </div>
+  <div class="frame">
+    <div class="phone">
+      <div class="nav">Butterfly game</div><div class="bar"><i style="width:55%"></i></div>
+      <div class="trail" style="left:70px;top:250px;width:80px;transform:rotate(-38deg)"></div>
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_monarch_a.imageset/visitor_monarch_a.svg" style="left:118px;top:150px">
+      <svg class="net" style="left:85px;top:135px" width="150" height="150"><use href="#net1"/></svg>
+      <div class="finger" style="left:150px;top:190px"></div>
+      <div class="bed"></div><div class="flower" style="left:30px"></div><div class="flower" style="left:120px"></div><div class="flower" style="left:190px"></div>
+      <div class="pill">&#9995; 2 said hello</div>
+    </div>
+    <p class="cap"><b>Drag.</b> On touch the hoop jumps under the finger, then follows with a soft lag (about 60 ms). Gentle game: the finger point counts too, so the lag never costs a hello.</p>
+  </div>
+  <div class="frame">
+    <div class="phone">
+      <div class="nav">Butterfly game</div><div class="bar"><i style="width:57%"></i></div>
+      <svg class="net" style="left:85px;top:120px" width="150" height="150"><use href="#net1"/></svg>
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_monarch_idle.imageset/visitor_monarch_idle.svg" style="left:130px;top:160px;width:24px;height:24px">
+      <div class="stick"><img src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_monarch_sticker.imageset/visitor_monarch_sticker.svg" width="56"><br><span>Monarch!</span></div>
+      <div class="bed"></div><div class="flower" style="left:30px"></div><div class="flower" style="left:120px"></div><div class="flower" style="left:190px"></div>
+      <div class="pill">&#9995; 3 said hello</div>
+    </div>
+    <p class="cap"><b>Hello.</b> The visitor folds its wings into the mesh (0.25 s), the net lifts 12 pt, then the visitor flutters up and away free. Sticker and name pill as today.</p>
+  </div>
+  <div class="frame">
+    <div class="phone eve">
+      <div class="nav">Butterfly game</div><div class="bar"><i style="width:30%"></i></div>
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_morpho_idle.imageset/visitor_morpho_idle.svg" style="left:110px;top:330px">
+      <svg class="net" style="left:58px;top:300px" width="150" height="150"><use href="#net3"/></svg>
+      <span class="heart" style="left:150px;top:320px">&#9829;</span>
+      <div class="bed"></div><div class="flower" style="left:30px"></div><div class="flower" style="left:120px"></div><div class="flower" style="left:190px"></div>
+      <div class="pill">&#9995; 1 said hello</div>
+    </div>
+    <p class="cap"><b>Gentle hello</b> (Gentle Net badge). A visitor resting on a flower: the net lowers softly over it and a tiny heart shows. Evening sky, tier 3 gold net.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>2. Quick wings (13+ by default)</h2>
+<div class="row">
+  <div class="frame">
+    <div class="phone">
+      <div class="nav">Butterfly game</div><div class="bar"><i style="width:30%"></i></div>
+      <div class="tell" style="left:72px;top:140px"></div>
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_monarch_idle.imageset/visitor_monarch_idle.svg" style="left:50px;top:118px">
+      <div class="trail" style="left:72px;top:140px;width:70px;transform:rotate(30deg)"></div>
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_ladybug_a.imageset/visitor_ladybug_a.svg" style="left:180px;top:200px">
+      <svg class="net" style="left:140px;top:250px" width="125" height="125"><use href="#net1"/></svg>
+      <div class="bed"></div><div class="flower" style="left:30px"></div><div class="flower" style="left:120px"></div><div class="flower" style="left:190px"></div>
+      <div class="pill">&#9995; 4 said hello</div>
+    </div>
+    <p class="cap"><b>Turn tell.</b> Before its one turn a visitor flares its wings and slows for 0.4 s (dotted ring here only to point it out). Hoop is 40 pt radius at tier 1.</p>
+  </div>
+  <div class="frame">
+    <div class="phone">
+      <div class="nav">Butterfly game</div><div class="bar"><i style="width:62%"></i></div>
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_bumblebee_idle.imageset/visitor_bumblebee_idle.svg" style="left:118px;top:368px">
+      <svg class="net" style="left:40px;top:150px" width="125" height="125"><use href="#net2"/></svg>
+      <div class="finger" style="left:88px;top:198px"></div>
+      <div class="bed"></div><div class="flower" style="left:30px"></div><div class="flower" style="left:120px"></div><div class="flower" style="left:190px"></div>
+      <div class="pill">&#9995; 6 said hello</div>
+    </div>
+    <p class="cap"><b>Short perch.</b> 1 in 3 visitors land once, for 2 s (3 s in the gentle game). Tier 2 silver net, 56 pt radius.</p>
+  </div>
+  <div class="frame">
+    <div class="settings">
+      <div class="hdr" style="padding-top:22px">Play</div>
+      <div class="grp">
+        <div class="it">Word difficulty <span style="color:#8E8E93">Auto</span></div>
+        <div class="it">Show streak <span class="tg on"></span></div>
+        <div class="it">Speed bloom <span class="tg"></span></div>
+        <div class="it">Easier butterflies <span class="tg"></span></div>
+      </div>
+      <div class="foot">Visitors flit and turn more, and the net starts smaller. Rounds are a little longer. Easier butterflies brings back the gentle game.</div>
+      <div class="hdr">Comfort</div>
+      <div class="grp"><div class="it">Calm mode <span class="tg"></span></div><div class="it">Quiet Garden <span class="tg"></span></div></div>
+    </div>
+    <p class="cap"><b>Settings &gt; Play.</b> Shown for 13+ and 18+ with Calm off. Off by default, so teens and adults get Quick wings.</p>
+  </div>
+  <div class="frame">
+    <div class="phone" style="background:var(--bg)">
+      <div style="padding:60px 14px 0">
+        <div style="background:#fff;border-radius:18px;padding:14px">
+          <div style="display:flex;gap:10px"><img src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_monarch_a.imageset/visitor_monarch_a.svg" width="44"><div><b>Say hello to visitors</b><br><span class="chip">Quick wings</span><div style="font-size:12px;color:#6B6B6B;margin-top:4px">Follow the visitors with your net. They flit and turn. Every visit is a good one.</div></div></div>
+          <div style="margin-top:12px;background:#4E9A55;color:#fff;text-align:center;border-radius:14px;padding:11px;font-weight:700">Say hello</div>
+        </div>
+      </div>
+    </div>
+    <p class="cap"><b>Visitors page.</b> A small "Quick wings" chip and its own blurb, so a teen knows which game they are in.</p>
+  </div>
+</div>
+</section>
+
+<section>
+<h2>3. Reduce Motion and the net tiers</h2>
+<div class="row">
+  <div class="frame">
+    <div class="phone">
+      <div class="nav">Butterfly game</div><div class="bar"><i style="width:45%"></i></div>
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_monarch_idle.imageset/visitor_monarch_idle.svg" style="left:40px;top:140px">
+      <img class="vis" src="../../WordFlora/Assets.xcassets/VisitorArt/visitor_ladybug_idle.imageset/visitor_ladybug_idle.svg" style="left:150px;top:250px">
+      <svg class="net" style="left:122px;top:222px" width="150" height="150"><use href="#net1"/></svg>
+      <div class="bed"></div><div class="flower" style="left:30px"></div><div class="flower" style="left:120px"></div><div class="flower" style="left:190px"></div>
+      <div class="pill">&#9995; 2 said hello</div>
+    </div>
+    <p class="cap"><b>Reduce Motion.</b> Visitors rest as today (8 s). A tap shows a still net frame over the visitor (0.2 s cross-fade), no travel, no swing, no lift.</p>
+  </div>
+  <div>
+    <div class="tiers">
+      <div><svg width="110" height="110"><use href="#net1"/></svg><br><b>Tier 1</b><br>gentle 48 pt / Quick wings 40 pt</div>
+      <div><svg width="130" height="130"><use href="#net2"/></svg><br><b>Tier 2</b><br>64 pt / 56 pt</div>
+      <div><svg width="150" height="150"><use href="#net3"/></svg><br><b>Tier 3</b><br>80 pt / 72 pt</div>
+    </div>
+    <p class="cap">Hoop radius = catch radius. Colours from tool_net_t1..t3 (wood, silver, gold with a sparkle). Drawn with SwiftUI shapes, no new image files.</p>
+  </div>
+</div>
+</section>
+</body>
+</html>
