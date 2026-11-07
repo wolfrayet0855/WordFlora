@@ -249,9 +249,12 @@ final class ButterflyNetUITests: XCTestCase {
 
     // MARK: Accessibility audits
 
-    func testAuditSettingsPlay() {
-        continueAfterFailure = true                // every size and theme reports its findings
-        for (size, dark) in [(nil, false), (Self.axXXXL, true), (Self.axXXXL, false)] as [(String?, Bool)] {
+    func testAuditSettingsPlay() { auditSettingsPlay(size: nil, dark: false) }
+    func testAuditSettingsPlayAtAXXXLInDark() { auditSettingsPlay(size: Self.axXXXL, dark: true) }
+    func testAuditSettingsPlayAtAXXXLInLight() { auditSettingsPlay(size: Self.axXXXL, dark: false) }
+
+    private func auditSettingsPlay(size: String?, dark: Bool) {
+        do {
             launch(["-uitest-age=thirteenPlus"], size: size, dark: dark)
             openSettings()
             let toggle = app.switches["settings.easierButterflies"], note = element("settings.easierButterfliesNote")
@@ -270,7 +273,6 @@ final class ButterflyNetUITests: XCTestCase {
             // As DailyQuestUITests audits the Family Sharing row: only findings on the new rows fail here; the rest of
             // Settings has its own audit in WordFloraUITests.
             auditWithin(name, targets: [toggle, note])
-            app.terminate()
         }
     }
 
