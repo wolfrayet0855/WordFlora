@@ -1,5 +1,6 @@
 import XCTest
 import SwiftData
+import UIKit
 @testable import WordFlora
 
 @MainActor
@@ -454,5 +455,162 @@ final class RoseHintTests: XCTestCase {
         XCTAssertEqual(CopySafety.check(line!), [], line!)
         vm.playerProfile?.roseOfJerichoCount = 1
         XCTAssertNil(vm.roseHint)               // nothing to explain once one is held
+    }
+}
+
+/// The puzzle screen's sizes (docs/pm/puzzle-experience-review.md V1, V2, V5, V8, V10).
+@MainActor
+final class PuzzleLayoutTests: XCTestCase {
+    /// iPhone widths from the smallest to the largest, and the room the tiles get on the 16 pt gutter.
+    let screens: [CGFloat] = [320, 375, 393, 430]
+    func room(_ screen: CGFloat) -> CGFloat { screen - 2 * Space.gutter }
+
+    func testWordsOfFourToFourteenLettersFitBetween22And40Points() {
+        // 40 is the default text size; 80 stands for an accessibility size, 34 for a small one.
+        for screen in screens {
+            for n in 4...14 {
+                for preferred: CGFloat in [40, 80, 34] {
+                    let m = TileLayout.metrics(longest: n, width: room(screen), preferred: preferred)
+                    let at = "\(n) letters at \(screen) pt, preferred \(preferred)"
+                    XCTAssertGreaterThanOrEqual(m.side, 22, at)
+                    XCTAssertLessThanOrEqual(m.side, min(40, preferred), at)
+                    XCTAssertEqual(m.height, (m.side * 1.3).rounded(), at)
+                    XCTAssertLessThanOrEqual(m.height, 52, at)
+                    let rows = TileLayout.pieces(of: String(repeating: "A", count: n), lettersPerRow: m.lettersPerRow)
+                    XCTAssertEqual(rows.joined().count, n, at)
+                    for row in rows { XCTAssertLessThanOrEqual(m.rowWidth(letters: row.count), room(screen), at) }
+                    if screen >= 375 { XCTAssertEqual(rows.count, 1, "no wrap: \(at)") }
+                    XCTAssertLessThanOrEqual(rows.count, 2, at)
+                }
+            }
+        }
+    }
+
+    func testShortWordsGetTheFullTileAndLongOnesShrinkStepByStep() {
+        let five = TileLayout.metrics(longest: 5, width: 343)
+        XCTAssertEqual([five.side, five.height, five.gap, five.fontSize], [40, 52, 6, 28])
+        let fourteen = TileLayout.metrics(longest: 14, width: 343)
+        XCTAssertEqual(fourteen.side, 22)
+        XCTAssertEqual(fourteen.lettersPerRow, 14)
+        XCTAssertEqual(fourteen.gap, 2)
+        var last: CGFloat = 41
+        for n in 4...14 {
+            let side = TileLayout.metrics(longest: n, width: 343).side
+            XCTAssertLessThanOrEqual(side, last, "\(n) letters")
+            last = side
+        }
+        // Too wide even at 22 pt: two even rows, not a tail of one or two letters.
+        let narrow = TileLayout.metrics(longest: 14, width: 288)
+        XCTAssertEqual(narrow.lettersPerRow, 7)
+        XCTAssertEqual(TileLayout.pieces(of: "PHOTOSYNTHESIS", lettersPerRow: 7), ["PHOTOSY", "NTHESIS"])
+        XCTAssertEqual(TileLayout.pieces(of: "VENUS FLYTRAP", lettersPerRow: 14), ["VENUS", "FLYTRAP"])
+    }
+
+    func testAccessibilitySizesKeepTheTilesWithinTheRoom() {
+        for screen in screens {
+            for n in 4...14 {
+                XCTAssertEqual(TileLayout.metrics(longest: n, width: room(screen), preferred: 80),
+                               TileLayout.metrics(longest: n, width: room(screen), preferred: 40))
+            }
+        }
+        // Before the first measurement the view falls back to a 375 pt phone's room.
+        XCTAssertEqual(TileLayout.metrics(longest: 14, width: 0), TileLayout.metrics(longest: 14, width: 343))
+    }
+
+    func testEveryWordInTheBankFitsOneRowOnA375PointPhone() throws {
+        for e in try WordBank.load().entries {
+            let longest = e.word.split(separator: " ").map(\.count).max() ?? 0
+            let m = TileLayout.metrics(longest: longest, width: room(375))
+            XCTAssertGreaterThanOrEqual(m.lettersPerRow, longest, e.word)
+            XCTAssertLessThanOrEqual(m.rowWidth(letters: longest), room(375), e.word)
+        }
+    }
+
+    func testEveryKeyboardRowUsesOneKeyWidthAndTheShortRowsStagger() {
+        // The keyboard's room on the 12 pt margin, 320 to 430 pt phones.
+        for width: CGFloat in [296, 351, 369, 406] {
+            let key = KeyboardLayout.keyWidth(available: width)
+            let rows = KeyboardLayout.rows.map { KeyboardLayout.rowWidth($0, keyWidth: key) }
+            for w in rows { XCTAssertLessThanOrEqual(w, width) }
+            XCTAssertLessThan(width - rows[0], 11, "the top row fills the width")
+            XCTAssertEqual((rows[0] - rows[1]) / 2, (key + KeyboardLayout.gap) / 2, "row 2 indents half a key")
+            XCTAssertEqual((rows[0] - rows[2]) / 2, (key + KeyboardLayout.gap) * 1.5, "row 3 a key and a half")
+            XCTAssertGreaterThanOrEqual(key, 25)
+        }
+        XCTAssertGreaterThanOrEqual(KeyboardLayout.keyHeight, Theme.minTap)
+    }
+
+    func testTheSpeedBloomRingIsFivePointsAtAnyFlowerSize() {
+        for scale: CGFloat in [0.71, 0.85, 0.98] {
+            XCTAssertEqual(FlowerView.ringLineWidth(scale: scale) * scale, 5, accuracy: 0.001)
+        }
+    }
+}
+
+/// WCAG contrast from the colour assets themselves, light and dark (puzzle-experience-review V3, V4, V10).
+final class PuzzleContrastTests: XCTestCase {
+    typealias RGB = [Double]
+
+    func asset(_ name: String, dark: Bool) throws -> RGB {
+        let traits = UITraitCollection(userInterfaceStyle: dark ? .dark : .light)
+        let color = try XCTUnwrap(UIColor(named: name, in: Bundle(for: GameViewModel.self), compatibleWith: traits), name)
+        var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+        XCTAssertTrue(color.resolvedColor(with: traits).getRed(&r, green: &g, blue: &b, alpha: &a), name)
+        return [Double(r), Double(g), Double(b)]
+    }
+    func hex(_ h: UInt32) -> RGB { [Double((h >> 16) & 0xFF) / 255, Double((h >> 8) & 0xFF) / 255, Double(h & 0xFF) / 255] }
+    /// `top` at `alpha` over `bottom`.
+    func over(_ top: RGB, _ alpha: Double, _ bottom: RGB) -> RGB { zip(top, bottom).map { $0 * alpha + $1 * (1 - alpha) } }
+    func luminance(_ c: RGB) -> Double {
+        let l = c.map { $0 <= 0.04045 ? $0 / 12.92 : pow(($0 + 0.055) / 1.055, 2.4) }
+        return 0.2126 * l[0] + 0.7152 * l[1] + 0.0722 * l[2]
+    }
+    func ratio(_ a: RGB, _ b: RGB) -> Double {
+        let (x, y) = (luminance(a), luminance(b))
+        return (max(x, y) + 0.05) / (min(x, y) + 0.05)
+    }
+
+    func testTheWcagFormulaMatchesKnownValues() {
+        XCTAssertEqual(ratio(hex(0x000000), hex(0xFFFFFF)), 21, accuracy: 0.01)
+        XCTAssertEqual(ratio(hex(0x777777), hex(0xFFFFFF)), 4.48, accuracy: 0.01)
+    }
+
+    func testACorrectKeysLetterIsEasyToReadInBothAppearances() throws {
+        let dark = ratio(try asset("keyCorrectText", dark: true), try asset("successText", dark: true))
+        XCTAssertGreaterThanOrEqual(dark, 7, "dark: a dark letter on the green (was white at 2.0:1)")
+        let light = ratio(try asset("keyCorrectText", dark: false), try asset("successText", dark: false))
+        XCTAssertGreaterThanOrEqual(light, 4.5, "light: white on the deep green")
+    }
+
+    func testAWrongKeysLetterStaysReadable() throws {
+        for dark in [false, true] {
+            let fill = over(try asset("appDanger", dark: dark), PuzzleInk.wrongKeyFill(dark: dark), try asset("appBackground", dark: dark))
+            let letter = over(try asset("appPrimaryText", dark: dark), PuzzleInk.wrongKeyText, fill)
+            XCTAssertGreaterThanOrEqual(ratio(letter, fill), 3.8, dark ? "dark" : "light")
+        }
+        XCTAssertEqual(PuzzleInk.usedGlyphSize, 11)
+    }
+
+    func testBlankTileOutlinesMeetThreeToOne() throws {
+        for dark in [false, true] {
+            let text = try asset("appPrimaryText", dark: dark)
+            for ground in ["appBackground", "appSurface"] {
+                let g = try asset(ground, dark: dark)
+                XCTAssertGreaterThanOrEqual(ratio(over(text, PuzzleInk.blankOutline, g), g), 3, "\(ground), dark \(dark)")
+            }
+        }
+    }
+
+    func testTheSpeedBloomRingAndItsTrackShowOnTheCream() throws {
+        for dark in [false, true] {
+            let ground = try asset("appBackground", dark: dark)
+            let fill = hex(PuzzleInk.ringFill(dark: dark))
+            let track = PuzzleInk.ringTrack(dark: dark)
+            let trackInk = over(hex(track.hex), track.opacity, ground)
+            XCTAssertGreaterThanOrEqual(ratio(fill, ground), 3, "fill, dark \(dark)")
+            XCTAssertGreaterThanOrEqual(ratio(trackInk, ground), 1.4, "track, dark \(dark)")
+            XCTAssertLessThan(ratio(trackInk, ground), ratio(fill, ground), "the track stays fainter than the arc")
+        }
+        XCTAssertNotEqual(PuzzleInk.ringFill(dark: false), 0xE8A838, "light: not the flower centre's gold")
     }
 }
