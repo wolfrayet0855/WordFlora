@@ -371,7 +371,7 @@ def wren_parts(wing_rot):
 
 VISITORS = {
     "robin": {"parts": robin_parts, "legs": (49, 57, 73), "tint": "FL.stickerFrost", "name": "European robin"},
-    "wren": {"parts": wren_parts, "legs": (47, 55, 72), "tint": "FL.stickerMist", "name": "Winter wren (Eurasian wren)"},
+    "wren": {"parts": wren_parts, "legs": (47, 55, 72), "tint": "FL.stickerMist", "name": "Wren"},
 }
 
 
@@ -550,8 +550,8 @@ def plant_files():
           "Snowdrop (Galanthus nivalis), full bloom, 200 x 200 plant box. Groups = PlantThinning layers: ground, back (static), petals r<head>_s<i> (3 heads x 3 outer tepals), front (inner bells). Head pivots: (118,72) (70,88) (140,104)."))
     write("plant_hellebore.svg", svg_doc(200, 200, hellebore_full(),
           "Hellebore (Helleborus orientalis, Lenten rose), full bloom, 200 x 200 plant box. Layers: ground, back, petals r<head>_s<k> (3 heads x 5 sepals), front (centres). Head pivots: (102,74) (60,104) (144,100)."))
-    write("plant_snowdrop_stages.svg", stage_sheet(snowdrop_stage, "Snowdrop at stages 0-4 (LifeStats.stageNames). Each panel is a 200 x 200 plant box; panel 4 = plant_snowdrop.svg."))
-    write("plant_hellebore_stages.svg", stage_sheet(hellebore_stage, "Hellebore at stages 0-4 (LifeStats.stageNames). Each panel is a 200 x 200 plant box; panel 4 = plant_hellebore.svg."))
+    write("plant_snowdrop_stages.svg", stage_sheet(snowdrop_stage, "Reference, not shipped: ship only the layered full-bloom files. Snowdrop at stages 0-4 (LifeStats.stageNames). Each panel is a 200 x 200 plant box; panel 4 = plant_snowdrop.svg."))
+    write("plant_hellebore_stages.svg", stage_sheet(hellebore_stage, "Reference, not shipped: ship only the layered full-bloom files. Hellebore at stages 0-4 (LifeStats.stageNames). Each panel is a 200 x 200 plant box; panel 4 = plant_hellebore.svg."))
 
 
 # ---------------------------------------------------------------- pack card (Shed Seasons shelf), 353 x 150
@@ -738,7 +738,7 @@ def review_svg(dark):
         o.append(nest(650, yy, 108, 108, 120, 120, sticker_svg(v)))
         label(770, yy + 60, VISITORS[v]["name"], 13)
     # plants stages
-    label(24, 900, "Glasshouse plants, stages 0-4 at 100 pt")
+    label(24, 900, "Glasshouse plants, stages 0-4 at 100 pt (reference, not shipped)")
     for r, fn in enumerate((snowdrop_stage, hellebore_stage)):
         for i in range(5):
             o.append(nest(24 + i * 110, 912 + r * 112, 100, 100, 200, 200, fn(i, uid("rv") + "_")))
@@ -746,9 +746,9 @@ def review_svg(dark):
     label(600, 900, "Scene, 393 x 852 at 0.48")
     o.append(nest(600, 912, 189, 409, 393, 852, scene_svg(dark)))
     card(810, 1060, 270, 110)
-    label(826, 1100, "Cards over the scene keep", 13, "500")
-    label(826, 1120, "appSurface, so text contrast", 13, "500")
-    label(826, 1140, "never depends on the art.", 13, "500")
+    label(826, 1100, "Text over the scene sits on an", 13, "500")
+    label(826, 1120, "appSurface card or a 60 % appBackground", 13, "500")
+    label(826, 1140, "scrim, never on the snow bank.", 13, "500")
     return svg_doc(W, H, "".join(o), "Agent review sheet, %s. Not shipped." % th)
 
 

@@ -10,7 +10,7 @@ These files are for agents to review and builders to draw from. They are not own
 - Regenerate: `python3 design-preview/frost-lantern/build.py`. Each colour sits once in its palette table `T`, so a
   colour change is one edit plus a rerun. Every file's header comment lists its colours and anchor points.
 
-**Scope.** Only the items the plan lists. The plan names **two** visitors (European robin and winter wren), so this
+**Scope.** Only the items the plan lists. The plan names **two** visitors (European robin and wren), so this
 lane delivers two, not three. G5 is not marked for later, so the scene, visitors and plants are full art, not sketches.
 
 ## Rules used for every asset
@@ -110,7 +110,10 @@ imagesets with `preserves-vector-representation`, like the others.
   colour as the shade hill behind it and vanished; the warm string now separates from the cool hill by hue.
 - The scene is cosmetic, so it shows in Calm and Quiet Garden (plan G5 acceptance).
 
-### Visitors: European robin and winter wren
+### Visitors: European robin and wren
+
+The wren's display name is "Wren" everywhere (never "Winter wren", which is the North American *T. hiemalis*; the
+art is the Eurasian wren, *T. troglodytes*).
 
 | File | Use | Size |
 |---|---|---|
@@ -133,14 +136,15 @@ imagesets with `preserves-vector-representation`, like the others.
 |---|---|
 | `plant_snowdrop.svg` | Full bloom, 200 x 200 plant box, ground at y 177 like every plant. Groups follow `PlantThinning` layers: `ground`, `back` (static), `petals` with `r<head>_s<i>`, then `front`. Three nodding heads at (118,72), (70,88) and (140,104), each with 3 outer tepals (9 petals); the inner bells with their green V are in `front`. |
 | `plant_hellebore.svg` | Full bloom, same box. Three heads at (102,74), (60,104) and (144,100), each with 5 sepals (15 petals); the lime centres and stamens are in `front`. |
-| `plant_snowdrop_stages.svg`, `plant_hellebore_stages.svg` | Five 200 x 200 panels, stages 0 to 4 (`LifeStats.stageNames`: Tiny, Sprout, Bud, Bloom, Full bloom). Panel 4 is the full-bloom file. |
+| `plant_snowdrop_stages.svg`, `plant_hellebore_stages.svg` | **Reference, not shipped; ship only the layered full-bloom files.** Five 200 x 200 panels, stages 0 to 4 (`LifeStats.stageNames`: Tiny, Sprout, Bud, Bloom, Full bloom), for review only. Do not make imagesets from them. |
 
 - Split each full-bloom file into `PlantLayers` imagesets by group id (`plant_snowdrop_ground`, `_back`, `_r0_s0` ...,
   `_front`). Add a `PlantThinning.json` entry with `kind: "petals"`, the head pivots above and rings `[0]`, `[1]`,
   `[2]`, the same pattern as `plant_daisy`.
-- **Stages:** the app today draws one plant image and scales it by stage (`GrandGardenArt.stageScale`). The stage
-  panels are drawn at full size. Use one approach, not both: the panels **or** the scaled full-bloom art. Combining
-  them shrinks a Tiny plant twice. The seed stage keeps `SeedPotView`.
+- **Stages:** ship the scaled full-bloom art only. The plant page draws `LayeredPlantView` and shows growth by
+  revealing petal rings, and the Grand Garden scales the one full-bloom image by `GrandGardenArt.stageScale`. Nothing
+  reads a per-stage image, and using the stage panels as well would shrink a Tiny plant twice. The stage panels are
+  reference, not shipped. The seed stage keeps `SeedPotView`.
 - Contrast: snowdrop petals are white with an `FL.snowdropEdge` stroke of 2.0 units on the tepal, bell and bud (it
   was 1.4, under 1 pt at the 132 pt compact stage), 3.3:1 on `appBackground` light, 3.5:1 on surface. Hellebore sepals are 3.2 to 4.0:1 on all four grounds, so the bloom reads without its edge.
 
@@ -173,9 +177,9 @@ Sizes are in points as drawn in the app. "Box" is the SVG's own unit box.
 | `visitor_wren_a/b/idle.svg` | Wren flight and resting frames | 90 (box 100) | `FL.wrenBody`, `FL.wrenWing`, `FL.wrenBar`, `FL.wrenBelly`, `FL.wrenBrow`, `FL.beak`, `Visitor.eye`, `FL.leg` |
 | `visitor_wren_sticker.svg` | Wren sticker | 22 to 108 (box 120) | as above + `FL.stickerMist`, `white` |
 | `plant_snowdrop.svg` | Snowdrop, full bloom, layered | plant size (132 to 220) (box 200) | `white`, `FL.snowdropEdge`, `FL.snowdropLeaf`, `FL.snowdropLeafVein`, `PetalKit.stem`, `PetalKit.leaf`, `Plant.groundShadow` |
-| `plant_snowdrop_stages.svg` | Snowdrop stages 0 to 4 | as above, per panel | as above |
+| `plant_snowdrop_stages.svg` | Snowdrop stages 0 to 4: reference, not shipped; ship only the layered full-bloom files | n/a | as above |
 | `plant_hellebore.svg` | Hellebore, full bloom, layered | plant size (box 200) | `FL.helleboreSepal`, `FL.helleboreEdge`, `FL.helleboreCentre`, `FL.helleboreStamen`, `FL.helleboreLeaf`, `FL.helleboreVein`, `FL.helleboreStem`, `Plant.groundShadow` |
-| `plant_hellebore_stages.svg` | Hellebore stages 0 to 4 | as above, per panel | as above |
+| `plant_hellebore_stages.svg` | Hellebore stages 0 to 4: reference, not shipped; ship only the layered full-bloom files | n/a | as above |
 | `review-light.svg`, `review-dark.svg` | Agent review sheets, not shipped | 1100 x 1360 | all of the above on `appBackground` and `appSurface` |
 | `build.py` | Generator, not shipped | n/a | the palette table `T` |
 
@@ -250,23 +254,41 @@ lists in `pot-marks.swift.txt` hold only decoration colours and do not change.
 
 ## Draft facts (for the owner's G5 fact-check, not yet checked)
 
-The plan asks for owner-checked facts. These drafts are short and simple, and still need to go through `CopySafety`
-and a source in `docs/research/`:
+The plan asks for owner-checked facts. These are still **drafts**: each needs a source and the checklist below before
+the G5 go/no-go. The app rule (`docs/research/visitor-facts.md`): one or two sentences, at most 16 words and 90
+characters, short words, `CopySafety.check` empty, no death or danger.
 
-- Robin: "Robins sing in winter too. Some even sing at night near street lights."
-- Wren: "Wrens are tiny, but their song is very loud. On cold nights, many wrens snuggle in one nest box."
-- Snowdrop: "Snowdrops bloom in late winter. Their hard leaf tips push up through cold ground."
-- Hellebore: "Hellebores bloom in winter. Their colourful parts are sepals, so they last for weeks."
+- Robin: "Robins sing in winter too. Some even sing at night near street lights." (70 / 13)
+- Wren: "Wrens are tiny but very loud singers. On cold nights, many snuggle in one nest box." (83 / 16)
+- Snowdrop: "Snowdrops bloom in late winter. Their hard leaf tips push up through cold ground." (81 / 14)
+- Hellebore: "Hellebores bloom in winter. Their bright parts are sepals, so they stay for weeks." (82 / 14)
+
+The wren line was shortened (the old one was 96 characters and 19 words). The hellebore line drops "last", which
+`CopySafety` bans, and "colourful", which no shipped string spells either way.
+
+Source-check checklist (owner, about 20 min, before G5):
+
+1. One authoritative source per fact, noted in a new table in `docs/research/visitor-facts.md` (birds) and a short
+   `docs/research/plant-facts-frost-lantern.md` (plants), same format as the visitor table.
+   - Birds: RSPB species page **and** BTO BirdFacts. Robin: winter song, night singing near street lights. Wren: loud
+     song for its size, communal roosting in nest boxes in cold weather.
+   - Plants: RHS grow guide **and** Kew plant page. Snowdrop (*Galanthus nivalis*): late-winter flowering, hardened leaf
+     tips. Hellebore: petal-like sepals, long display.
+2. Run each line through `CopySafety.check` and the 90 character / 16 word limits (add the four lines to the existing
+   fact test when the catalogue entries land).
+3. Under-13 safety: no death, cold-danger or "or they would freeze" framing (the wren line stays about snuggling).
+   **Never mention toxicity** (hellebores and snowdrops are poisonous) and **never invite picking, touching or
+   tasting**. No numbers a child cannot picture.
+4. Hedge anything regional ("Some even sing at night") rather than state it as universal.
 
 ## Open questions
 
-1. **Wren name and species.** The plan pairs the *European* robin with the *winter* wren. "Winter wren" is today the
-   North American *Troglodytes hiemalis*. The European bird is the Eurasian wren (*T. troglodytes*). The art fits both.
-   Pick the display name ("Wren" avoids the problem).
+1. **Wren name and species.** Settled: the display name is "Wren" everywhere. The plan's "winter wren" is today the
+   North American *Troglodytes hiemalis*; the art is the Eurasian wren (*T. troglodytes*), so facts use RSPB and BTO.
 2. **Hellebore species.** I drew the Lenten rose (*H. orientalis*, plum) so it does not repeat the snowdrop's white.
    The Christmas rose (*H. niger*) is white and blooms nearer December. It is a colour swap in `build.py` if wanted.
-3. **Stage art.** Should the glasshouse plants use the five stage panels, or the scaled full-bloom art like the 50 ladder
-   plants? Use one, never both (section 4).
+3. **Stage art.** Settled: the scaled full-bloom art, like the 50 ladder plants. The stage panels are reference, not
+   shipped (section 4).
 4. **Visitor count.** The brief to this lane said "3+ visitors". The plan lists two (robin and wren). Scope is frozen, so
    there are two. A third needs a plan change.
 5. **Glow Lantern overlap.** The backlog Glow Lantern (`docs/STATUS.md`) and the Shed light are kept from reading as
