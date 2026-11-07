@@ -56,7 +56,8 @@ struct SeasonsView: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("seasons.owned")
                 } else if let price = store.packDisplayPrice(pack.id) {
-                    Text(price).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                    Text("Price: \(price)").font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("seasons.price")
                     Button { ask(pack) } label: {
                         Text(busy ? "One moment…" : "\(PackCatalog.Copy.buy) \(pack.name)")
@@ -155,7 +156,8 @@ struct ShedSeasonsShelf: View {
                     Text(PackCatalog.Copy.ownedLine).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.successText)
                         .fixedSize(horizontal: false, vertical: true)
                 } else if let price = store.packDisplayPrice(pack.id) {
-                    Text(price).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                    Text("Price: \(price)").font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("shed.seasons.price")
                 }
                 Button(PackCatalog.Copy.shelfButton) { router.go(.seasons) }

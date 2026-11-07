@@ -430,12 +430,20 @@ final class TendingUITests: XCTestCase {
         app.buttons["tend-repot"].tap()
         XCTAssertTrue(app.buttons["pot-tile-terracotta"].waitForExistence(timeout: 3))
         closeNewPill()
-        let indigo = app.buttons["pot-tile-snowflakeIndigo"]
-        for _ in 0..<6 where !indigo.isHittable { app.scrollViews.firstMatch.swipeUp(velocity: .slow); sleep(1) }
-        indigo.tap()
-        XCTAssertEqual(app.buttons["repot-go"].label, "Repot into Snowflake indigo")
+        // The audit runs first, on the sheet as it opens (unscrolled), as the sixteen-pot picker audits do: after a
+        // scroll the audit misplaces the soil row's words under the footer. Words under the footer are excused.
         sleep(1); shot("pack-pots-owned-dark")
         auditPackPicker("pack-pick-owned-dark")
+        let indigo = app.buttons["pot-tile-snowflakeIndigo"]
+        let summary = element("repot-summary")
+        for _ in 0..<6 where !(indigo.isHittable && summary.exists && indigo.frame.maxY <= summary.frame.minY - 36) {
+            app.scrollViews.firstMatch.swipeUp(velocity: .slow); sleep(1)
+        }
+        XCTAssertLessThanOrEqual(indigo.frame.maxY, summary.frame.minY - 36, "the pack row scrolls clear of the footer")
+        indigo.tap()
+        XCTAssertEqual(app.buttons["repot-go"].label, "Repot into Snowflake indigo")
+        XCTAssertEqual(element("repot-summary").label, "Snowflake indigo pot, fresh loam soil")
+        shot("pack-pots-owned-dark-picked")
     }
 
     private func auditPackPicker(_ name: String) {
@@ -449,8 +457,18 @@ final class TendingUITests: XCTestCase {
             return (e.identifier.hasPrefix("pot-tile-") && tileSized) || (names.contains(e.label) && (tileSized || nameSized))
         }
         func isPill(_ e: XCUIElement) -> Bool { ["Plus", "In use"].contains(e.label) && e.frame.height < 24 }
-        audit(name, dynamicTypeApart: true, unresolvedUnderFooter: .elementDetection, excuse: { issue, e in
+        // The pack's row makes the grid taller than the first screen even at the default size, so its tiles sit under
+        // the footer's fade like the last row at accessibility sizes: unresolved clipped text there is noted too.
+        // Words scrolled under the pinned footer (and its 28 pt fade) are cut there on purpose: a clipped-text issue on
+        // an element that reaches below the footer's top is excused (and printed); anything fully above it is judged.
+        let pinned = element("repot-summary").exists ? element("repot-summary") : app.buttons["repot-go"]
+        let footerTop = pinned.frame.minY - 8 - 28
+        audit(name, dynamicTypeApart: true, unresolvedUnderFooter: [.elementDetection, .textClipped], excuse: { issue, e in
             ([.contrast, .dynamicType].contains(issue.auditType) && isTile(e)) || (issue.auditType == .dynamicType && isPill(e))
+                || (issue.auditType == .textClipped && e.frame.maxY > footerTop)
+                // The picked tile's one-line name shrinks to fit at the capped size; the audit reads the shrunk name on
+                // the whole tile (frame = tile, label = name) as clipped. VoiceOver reads the full name.
+                || (issue.auditType == .textClipped && isTile(e) && e.identifier.isEmpty)
         })
     }
 

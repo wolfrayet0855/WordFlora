@@ -40,12 +40,15 @@ final class SeasonsUITests: XCTestCase {
 
     /// Every audit type. Contrast is judged on elements fully inside the visible scroll area (below the bar's soft
     /// edge), as in the other audits; an unresolved contrast issue is printed, not failed. The page is still first.
-    private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = [],
+    /// `within`: judge only issues on elements inside this element's frame (the Shed audits look at the new shelf, not
+    /// the tools and pots above it, which TendingUITests and WordFloraUITests audit with their own rules).
+    private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = [], within: XCUIElement? = nil,
                        excuse: @escaping (XCUIAccessibilityAuditIssue, XCUIElement) -> Bool = { _, _ in false }) {
         sleep(2)
         let scroll = app.scrollViews.firstMatch.exists ? app.scrollViews.firstMatch : app.collectionViews.firstMatch
         let nav = app.navigationBars.firstMatch
         let top = nav.exists ? nav.frame.maxY + 64 : 0
+        let region = within?.frame
         let visible: CGRect? = scroll.exists ? {
             let f = scroll.frame
             return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
@@ -53,6 +56,7 @@ final class SeasonsUITests: XCTestCase {
         var findings = [String](), skipped = [String]()
         do {
             try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
+                if let r = region, let e = issue.element, !r.intersects(e.frame) { return true }
                 if issue.auditType == .contrast, let v = visible {
                     guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
                     if !v.contains(e.frame) { return true }
@@ -77,7 +81,7 @@ final class SeasonsUITests: XCTestCase {
         row.tap()
         XCTAssertTrue(app.navigationBars["Seasons"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["Frost & Lantern"].exists)
-        XCTAssertEqual(app.staticTexts["seasons.price"].label, "$2.99")
+        XCTAssertEqual(app.staticTexts["seasons.price"].label, "Price: $2.99")
         XCTAssertTrue(app.buttons["seasons.buy"].exists)
         XCTAssertTrue(app.images["Three winter pots on a snowy shelf, with lanterns and a robin"].exists)
         shot("seasons-page-light")
@@ -144,7 +148,7 @@ final class SeasonsUITests: XCTestCase {
 
     /// Kid view in the Shed: the pack's pots as soft outlines with the grown-up line; no shelf, no price, no buy button.
     func testTheShedShowsYoungPlayersOutlinesOnly() {
-        launch(age: "under13", ["-uitest-prices"])
+        launch(age: "under13", ["-uitest-prices", "-uitest-everything"])
         openShed()
         let red = element("shed-pot-lanternRed")
         scrollTo(red, max: 16)
@@ -160,34 +164,46 @@ final class SeasonsUITests: XCTestCase {
     }
 
     func testTeensSeeTheSeasonsShelfWithItsPrice() {
-        launch(age: "thirteenPlus", ["-uitest-prices"])
+        launch(age: "thirteenPlus", ["-uitest-prices", "-uitest-everything"])
         openShed()
         let shelf = app.buttons["shed.seasons.open"]
         scrollTo(shelf, max: 20)
         XCTAssertTrue(shelf.isHittable)
-        XCTAssertEqual(app.staticTexts["shed.seasons.price"].label, "$2.99")
+        XCTAssertEqual(app.staticTexts["shed.seasons.price"].label, "Price: $2.99")
         shot("shed-seasons-shelf")
-        audit("shed-seasons-shelf")
+        audit("shed-seasons-shelf", within: app.otherElements["shed.seasons"], excuse: shedPotCard)
         shelf.tap()
         XCTAssertTrue(app.navigationBars["Seasons"].waitForExistence(timeout: 5))
     }
 
     func testTheShedShelfAtAccessibilityXXXLDark() {
         XCUIDevice.shared.appearance = .dark
-        launch(age: "eighteenPlus", ["-uitest-prices", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])
+        launch(age: "eighteenPlus", ["-uitest-prices", "-uitest-everything", "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])
         openShed()
         let shelf = app.buttons["shed.seasons.open"]
         scrollTo(shelf, max: 40)
         XCTAssertTrue(shelf.isHittable)
         shot("shed-seasons-shelf-axxxl-dark")
-        audit("shed-seasons-shelf-axxxl-dark")
+        audit("shed-seasons-shelf-axxxl-dark", within: app.otherElements["shed.seasons"], excuse: shedPotCard)
+    }
+
+    /// The Shed's pot cards above the shelf keep their words at xxxLarge and draw the pot art under the name, as in
+    /// TendingUITests' Shed audit: contrast and Dynamic Type are excused on those cards only (by id, or by a pot name
+    /// in a card-sized frame). The shelf itself is judged in full.
+    private func shedPotCard(_ issue: XCUIAccessibilityAuditIssue, _ e: XCUIElement) -> Bool {
+        guard [.contrast, .dynamicType].contains(issue.auditType) else { return false }
+        if e.identifier.hasPrefix("shed-pot-") && e.identifier != "shed-pot-hint" { return true }
+        let names: Set<String> = ["Plain blue", "Terracotta", "Sage glaze", "Sunflower", "Mint", "Blossom", "Rose pink",
+                                  "Living stones", "Flytrap", "Starlight", "Jade vine", "Rainbow bark", "Dewdrop", "Honey stripe",
+                                  "Moonlit", "Meadow", "Frosted glass", "Lantern red", "Snowflake indigo"]
+        return e.frame.width < 100 && e.identifier.isEmpty && (names.contains(e.label) || e.label.count < 30 && e.frame.height < 40)
     }
 
     // MARK: Dormant framework
 
     /// No product from the store and not owned: no Seasons row, no shelf, no pack outlines, no Lantern Keeper card.
     func testNoProductMeansNoSeasonsSurfaces() {
-        launch(age: "eighteenPlus")
+        launch(age: "eighteenPlus", ["-uitest-everything"])
         openSettings()
         scrollTo(app.buttons["settings.plus"])
         XCTAssertFalse(app.buttons["settings.seasons"].exists)
@@ -201,7 +217,7 @@ final class SeasonsUITests: XCTestCase {
 
     /// Live pack: Lantern Keeper is on the Badges page (earned by play; nothing is sold there).
     func testLanternKeeperShowsWhileThePackIsLive() {
-        launch(age: "eighteenPlus", ["-uitest-prices"])
+        launch(age: "eighteenPlus", ["-uitest-prices", "-uitest-everything"])
         app.buttons["Badges"].tap()
         XCTAssertTrue(app.navigationBars["Badges"].waitForExistence(timeout: 5))
         let card = app.descendants(matching: .any).matching(NSPredicate(format: "label CONTAINS 'Lantern Keeper'")).firstMatch
