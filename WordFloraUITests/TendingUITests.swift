@@ -40,6 +40,10 @@ final class TendingUITests: XCTestCase {
         XCTAssertTrue(tile.isHittable, plantName)
         tile.tap()
         XCTAssertTrue(app.buttons["tend-water"].waitForExistence(timeout: 5))
+        // The first look at a found plant's fact card earns the bronze Wild Discovery badge; its moment sits over the
+        // plant for 2.6 s and a tap on the badge closes it, so taps on the plant wait until it has gone.
+        let moment = element("badgeMoment")
+        if moment.waitForExistence(timeout: 4) { XCTAssertTrue(moment.waitForNonExistence(timeout: 10), "the badge moment goes") }
     }
 
     private func element(_ id: String) -> XCUIElement { app.descendants(matching: .any)[id].firstMatch }

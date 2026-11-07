@@ -84,6 +84,8 @@ struct BadgeMomentView: View {
                         .rotationEffect(.degrees(pops && !shown ? -12 : 0))
                         .opacity(shown ? 1 : 0)
                         .animation(pops ? .timingCurve(0.34, 1.56, 0.64, 1, duration: 0.45).delay(0.05) : .easeOut(duration: 0.3), value: shown)
+                        .contentShape(Circle())
+                        .onTapGesture { onDismiss() }
                         .accessibilityHidden(true)
                     VStack(spacing: 4) {
                         Text(title).font(Theme.font(.title2, weight: .heavy))
@@ -94,12 +96,14 @@ struct BadgeMomentView: View {
                     .fixedSize(horizontal: false, vertical: true)
                     .padding(.horizontal, 20).padding(.vertical, 12)
                     .background(Color(hex: 0x142014).opacity(0.94), in: RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .onTapGesture { onDismiss() }
                     .padding(.horizontal, 24)
                     .opacity(shown ? 1 : 0)
                     .animation(.easeOut(duration: 0.4).delay(0.4), value: shown)
                 }
-                .contentShape(Rectangle())
-                .onTapGesture { onDismiss() }
+                // Only the badge and its name take a tap (it closes the moment). The clear band either side of them
+                // let taps through so the screen behind keeps them (a whole-width tap area ate the Life panel's tab).
                 .padding(.top, max(0, centre.y - 75))
                 .frame(maxWidth: .infinity)
             }
