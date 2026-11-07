@@ -423,12 +423,12 @@ def snowdrop_stem(x0, hx, hy, s):
 
 
 def snowdrop_petal(hx, hy, s, deg):
-    return ('<ellipse cx="0" cy="%s" rx="%s" ry="%s" transform="translate(%s %s) rotate(%s)" fill="#FFFFFF" stroke="%s" stroke-width="1.4"/>' % (
+    return ('<ellipse cx="0" cy="%s" rx="%s" ry="%s" transform="translate(%s %s) rotate(%s)" fill="#FFFFFF" stroke="%s" stroke-width="2"/>' % (
         f(12 * s), f(5.6 * s), f(12 * s), f(hx), f(hy), f(deg), c("FL.snowdropEdge")))
 
 
 def snowdrop_bell(hx, hy, s):
-    return ('<ellipse cx="%s" cy="%s" rx="%s" ry="%s" fill="#FFFFFF" stroke="%s" stroke-width="1.2"/>'
+    return ('<ellipse cx="%s" cy="%s" rx="%s" ry="%s" fill="#FFFFFF" stroke="%s" stroke-width="2"/>'
             '<path d="M%s %s L%s %s L%s %s" stroke="%s" stroke-width="%s" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' % (
                 f(hx), f(hy + 10 * s), f(4.2 * s), f(7 * s), c("FL.snowdropEdge"),
                 f(hx - 2.6 * s), f(hy + 13 * s), f(hx), f(hy + 15.6 * s), f(hx + 2.6 * s), f(hy + 13 * s), c("PetalKit.stem"), f(1.8 * s)))
@@ -457,7 +457,7 @@ def snowdrop_stage(st, prefix):
             '<path d="M100 176 V128" stroke="%s" stroke-width="3.2" stroke-linecap="round"/>' % c("PetalKit.stem")
     if st == 2:
         bud = ('<path d="M100 176 V100" stroke="%s" stroke-width="3.4" stroke-linecap="round"/>'
-               '<path d="M100 76 C107 84 107 98 100 102 C93 98 93 84 100 76 Z" fill="#FFFFFF" stroke="%s" stroke-width="1.4"/>'
+               '<path d="M100 76 C107 84 107 98 100 102 C93 98 93 84 100 76 Z" fill="#FFFFFF" stroke="%s" stroke-width="2"/>'
                '<path d="M100 104 C104 98 104 90 100 88" stroke="%s" stroke-width="2.6" fill="none" stroke-linecap="round"/>') % (
             c("PetalKit.stem"), c("FL.snowdropEdge"), c("PetalKit.leaf"))
         return ground(36) + strap_leaf(96, 176, 78, 116, -5, 4) + strap_leaf(104, 176, 124, 120, 6, 4) + bud
@@ -663,7 +663,7 @@ def scene_svg(dark):
              '<path d="M0 742 Q110 724 210 744 T393 736" stroke="%s" stroke-width="10" fill="none" stroke-linecap="round" opacity=".7"/>'
              '<path d="M30 800 Q150 782 260 800" stroke="%s" stroke-width="8" fill="none" stroke-linecap="round" opacity=".6"/></g>' % (snow, shade, shade))
     tufts = []
-    for x, y, s in [(52, 700, 0.36), (338, 694, 0.34)]:
+    for x, y, s in [(52, 700, 0.45), (338, 694, 0.425)]:  # 1.25x the first draft, so the clumps hold on snow
         tufts.append(plant_at(snowdrop_full, x - 100 * s, y - 180 * s, 200 * s))
     o.append('<g id="snowdrops">%s</g>' % "".join(tufts))
     return "".join(o)

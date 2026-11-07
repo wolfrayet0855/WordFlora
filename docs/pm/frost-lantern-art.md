@@ -90,7 +90,8 @@ imagesets with `preserves-vector-representation`, like the others.
 - 393 x 852. Scale to fill the width, bottom aligned, behind everything on Home and Garden. Hide it from VoiceOver.
 - Light is a winter dusk (pale blue to lilac). Dark is a night sky with a crescent moon and stars. The detail (hills,
   firs, a snow-capped fence, two lantern posts, a lantern string, snowdrops in the bank) sits in the lower 40 %. The
-  top 55 % is calm sky.
+  top 55 % is calm sky. The two snowdrop clumps are drawn at 0.45 and 0.425 of the plant box (1.25x the first draft)
+  with the 2.0 edge, so they hold on white snow.
 - Named groups: `sky`, `moon`, `stars` (dark only), `hills`, `firs`, `fence`, `lanterns`, `snowbank`, `snowdrops`.
   Snowfall comes from the weather layer, as the plan says. The art has no flakes, so under Reduce Motion and Low Power
   the scene is simply still. Optional motion: the lantern halos may breathe between their two opacities over about 4 s
@@ -136,8 +137,8 @@ imagesets with `preserves-vector-representation`, like the others.
 - **Stages:** the app today draws one plant image and scales it by stage (`GrandGardenArt.stageScale`). The stage
   panels are drawn at full size. Use one approach, not both: the panels **or** the scaled full-bloom art. Combining
   them shrinks a Tiny plant twice. The seed stage keeps `SeedPotView`.
-- Contrast: snowdrop petals are white with an `FL.snowdropEdge` stroke (3.3:1 on `appBackground` light, 3.5:1 on
-  surface). Hellebore sepals are 3.2 to 4.0:1 on all four grounds, so the bloom reads without its edge.
+- Contrast: snowdrop petals are white with an `FL.snowdropEdge` stroke of 2.0 units on the tepal, bell and bud (it
+  was 1.4, under 1 pt at the 132 pt compact stage), 3.3:1 on `appBackground` light, 3.5:1 on surface. Hellebore sepals are 3.2 to 4.0:1 on all four grounds, so the bloom reads without its edge.
 
 ## Asset manifest
 
