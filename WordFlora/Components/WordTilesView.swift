@@ -18,6 +18,9 @@ enum TileLayout {
         var lettersPerRow: Int
         var fontSize: CGFloat
         var cornerRadius: CGFloat { min(10, (side / 4).rounded()) }
+        /// The most room a letter takes: a heavy rounded W at `fontSize` is about 0.8 x side wide, and its line about
+        /// 1.2 x `fontSize` tall.
+        var letterBox: CGSize { CGSize(width: (side * 0.8).rounded(), height: (fontSize * 1.2).rounded()) }
         func rowWidth(letters: Int) -> CGFloat { CGFloat(letters) * side + CGFloat(max(0, letters - 1)) * gap }
     }
 
@@ -107,9 +110,13 @@ struct WordTilesView: View {
                 shape.fill(Color(hex: PetalKit.marigold).opacity(wash))
                 // A blank's outline is at least 3:1 on the cream and on the tile, so the word's length is easy to count.
                 shape.stroke(shown ? Color.appAccent : Color.appPrimaryText.opacity(PuzzleInk.blankOutline), lineWidth: 2)
+                // A text style, not a fixed size: Apple's audit fails a fixed-size letter as "Dynamic Type partially
+                // unsupported". The letter shrinks to a box about the size the old 0.7 x side glyph took, so the
+                // tiles look the same at every text size.
                 Text(shown ? String(ch) : "")
-                    .font(.system(size: m.fontSize, weight: .heavy, design: .rounded))
-                    .lineLimit(1).minimumScaleFactor(0.5)
+                    .font(.system(.title, design: .rounded, weight: .heavy))
+                    .lineLimit(1).minimumScaleFactor(0.2)
+                    .frame(maxWidth: m.letterBox.width, maxHeight: m.letterBox.height)
                     .foregroundStyle(Color.appPrimaryText)
                     .transition(.scale.combined(with: .opacity))
             }
