@@ -643,7 +643,7 @@ def scene_svg(dark):
         o.append('<g id="stars">%s</g>' % "".join('<circle cx="%s" cy="%s" r="1.3" fill="#E8EEF8" fill-opacity=".7"/>' % (f(x), f(y)) for x, y in stars))
     o.append('<g id="hills"><path d="M0 560 Q70 520 150 548 T300 534 T393 540 V852 H0 Z" fill="%s"/>'
              '<path d="M0 600 Q90 570 196 590 T393 584 V852 H0 Z" fill="%s"/></g>' % (c("FL.hillD") if dark else c("FL.hillL"), shade))
-    o.append('<g id="firs">%s%s%s</g>' % (fir(44, 600, 92, dark), fir(352, 596, 110, dark), fir(312, 604, 70, dark)))
+    o.append('<g id="firs">%s%s%s</g>' % (fir(44, 600, 92, dark), fir(377, 596, 110, dark), fir(312, 604, 70, dark)))
     # fence
     fence = []
     post = c("FL.postDark") if dark else c("FL.post")
