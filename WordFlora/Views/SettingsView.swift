@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var importing = false
     @State private var backupMessage: (text: String, ok: Bool)?
     @State private var showGuide = false
+    @State private var seasonsGate: ParentalGate.Challenge?
 
     var body: some View {
         @Bindable var s = app.settings
@@ -78,6 +79,16 @@ struct SettingsView: View {
             Section(PlusEntry.sectionTitle(ageBand: s.ageBand)) {
                 Button { router.go(.plus) } label: { Label(PlusEntry.rowTitle(ageBand: s.ageBand), systemImage: "sparkles") }
                     .accessibilityIdentifier("settings.plus")
+                // Seasons: only while a pack is live (offered or owned); behind the grown-up question for under 13.
+                if PackCatalog.all.contains(where: { app.entitlements.packIsLive($0.id) }) {
+                    Button { openSeasons() } label: {
+                        Label { Text(PackCatalog.Copy.seasonsTitle) } icon: {
+                            Image("seasons-row-glyph").renderingMode(.template).resizable().scaledToFit()
+                                .frame(width: 22, height: 22)
+                        }
+                    }
+                    .accessibilityIdentifier("settings.seasons")
+                }
                 FamilyShareNudgeRow()
                 if app.entitlements.state.hasCloudSync {
                     Label(app.syncNeedsRestart ? "iCloud sync starts the next time you open WordFlora" : "iCloud sync is on", systemImage: "icloud.fill")
@@ -119,6 +130,15 @@ struct SettingsView: View {
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $seasonsGate) { challenge in
+            ParentalGateSheet(challenge: challenge, onPass: { seasonsGate = nil; router.go(.seasons) }, onCancel: { seasonsGate = nil })
+        }
+    }
+
+    private func openSeasons() {
+        if ParentalGate.isRequired(ageBand: app.settings.ageBand) {
+            seasonsGate = ParentalGate.challenge(seed: UInt64(Date().timeIntervalSince1970))
+        } else { router.go(.seasons) }
     }
 
     private func prepareBackup() {

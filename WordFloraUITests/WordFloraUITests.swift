@@ -920,7 +920,8 @@ final class ParentalGateLinkUITests: XCTestCase {
         scrollTo(button)
         XCTAssertTrue(button.exists, "the grown-ups' note sits in the For grown-ups section")
         XCTAssertTrue(app.staticTexts["For grown-ups"].exists)
-        XCTAssertTrue(app.staticTexts[FamilyCopy.line].exists || note.exists)
+        let line = app.staticTexts.matching(NSPredicate(format: "label == %@", FamilyCopy.line)).firstMatch
+        XCTAssertTrue(line.exists || note.exists, "the grown-ups' line is on screen")
         XCTAssertFalse(app.buttons["familyShare.restore"].exists, "no Restore line for a young player")
         shot("settings-family-grownups")
         expectGateThenCancel(after: button)

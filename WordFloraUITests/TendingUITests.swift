@@ -396,6 +396,64 @@ final class TendingUITests: XCTestCase {
         }
     }
 
+    // MARK: Frost & Lantern pots in the picker (G3)
+
+    /// Kid view at AX XXXL: the pack's row shows soft outlines with "A grown-up can find this in Settings." (no price,
+    /// no lock, no buy button), then the audit. `-uitest-prices` makes the pack "offered", as the store would.
+    func testPackPotOutlinesForAYoungPlayerAtAccessibilityXXXL() {
+        open("Daisy", plantId: "daisy", extra: ["-uitest-prices", "-uitest-age=under13",
+                                                "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])
+        app.buttons["tend-repot"].tap()
+        XCTAssertTrue(app.buttons["pot-tile-terracotta"].waitForExistence(timeout: 3))
+        closeNewPill()
+        let red = app.buttons["pot-tile-lanternRed"]
+        let go = app.buttons["repot-go"]
+        for _ in 0..<10 where !(red.isHittable && red.frame.maxY <= go.frame.minY) { app.scrollViews.firstMatch.swipeUp(velocity: .slow); sleep(1) }
+        XCTAssertTrue(red.isHittable)
+        XCTAssertEqual(red.label, "Lantern red pot, Seasons")
+        XCTAssertTrue(app.buttons["pot-tile-frostedGlass"].exists); XCTAssertTrue(app.buttons["pot-tile-snowflakeIndigo"].exists)
+        red.tap()
+        let hint = element("pot-hint")
+        XCTAssertTrue(hint.waitForExistence(timeout: 3))
+        XCTAssertTrue(hint.label.contains("Lantern red is part of Frost & Lantern."), hint.label)
+        XCTAssertTrue(hint.label.contains("A grown-up can find this in Settings."), hint.label)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS '$'")).firstMatch.exists, "no price")
+        XCTAssertEqual(go.label, "Repot with fresh soil", "a pack pot not owned cannot be picked")
+        sleep(1); shot("pack-pots-under13-axxxl")
+        auditPackPicker("pack-pick-under13-axxxl")
+    }
+
+    /// Owned (dark, default size): a pack pot is picked like any other and the button names it.
+    func testOwnedPackPotIsPickedInDarkMode() {
+        XCUIDevice.shared.appearance = .dark
+        open("Daisy", plantId: "daisy", extra: ["-uitest-prices", "-uitest-pack-owned"])
+        app.buttons["tend-repot"].tap()
+        XCTAssertTrue(app.buttons["pot-tile-terracotta"].waitForExistence(timeout: 3))
+        closeNewPill()
+        let indigo = app.buttons["pot-tile-snowflakeIndigo"]
+        for _ in 0..<6 where !indigo.isHittable { app.scrollViews.firstMatch.swipeUp(velocity: .slow); sleep(1) }
+        indigo.tap()
+        XCTAssertEqual(app.buttons["repot-go"].label, "Repot into Snowflake indigo")
+        sleep(1); shot("pack-pots-owned-dark")
+        auditPackPicker("pack-pick-owned-dark")
+    }
+
+    private func auditPackPicker(_ name: String) {
+        let tiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'pot-tile-'")).allElementsBoundByIndex
+        let tileSize = tiles.first?.frame.size ?? .zero
+        let names = Set(PotNames.all + ["Frosted glass", "Lantern red", "Snowflake indigo"])
+        // The same tile excuses as the sixteen-pot picker audit (see auditPotPicker), now with the pack's names.
+        func isTile(_ e: XCUIElement) -> Bool {
+            let tileSized = abs(e.frame.width - tileSize.width) < 1 && abs(e.frame.height - tileSize.height) < 1
+            let nameSized = e.frame.width <= tileSize.width && e.frame.height < 30
+            return (e.identifier.hasPrefix("pot-tile-") && tileSized) || (names.contains(e.label) && (tileSized || nameSized))
+        }
+        func isPill(_ e: XCUIElement) -> Bool { ["Plus", "In use"].contains(e.label) && e.frame.height < 24 }
+        audit(name, dynamicTypeApart: true, unresolvedUnderFooter: .elementDetection, excuse: { issue, e in
+            ([.contrast, .dynamicType].contains(issue.auditType) && isTile(e)) || (issue.auditType == .dynamicType && isPill(e))
+        })
+    }
+
     /// Closes the "New pots in your shed!" pill when it shows (the first opening after pots are recorded).
     private func closeNewPill() {
         let close = app.buttons["pot-new-close"]

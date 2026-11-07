@@ -44,9 +44,11 @@ final class PotCatalogTests: XCTestCase {
 
     func testEveryPotHasItsOwnPatternSoNoneDependsOnHueAlone() {
         XCTAssertEqual(Set(PotCatalog.all.map(\.decoration.kind)).count, 16)
-        XCTAssertEqual(Set(Pot.Decoration.Kind.allCases).count, 16)
+        // Sixteen ladder patterns plus the three Frost & Lantern ones; every pot, pack pots too, has its own.
+        XCTAssertEqual(Set(Pot.Decoration.Kind.allCases).count, 19)
+        XCTAssertEqual(Set((PotCatalog.all + PotCatalog.packPots).map(\.decoration.kind)).count, 19)
         XCTAssertEqual(PotCatalog.plainBlue.decoration.kind, .none)
-        for pot in PotCatalog.all where pot.decoration.kind != .none {
+        for pot in PotCatalog.all + PotCatalog.packPots where pot.decoration.kind != .none {
             XCTAssertFalse(PotCatalog.marks(for: pot.decoration.kind).isEmpty, pot.id)
             let maxIndex = PotCatalog.marks(for: pot.decoration.kind).map(\.color).max() ?? 0
             XCTAssertLessThan(maxIndex, pot.decoration.colors.count, "\(pot.id) uses a colour it does not have")
@@ -258,6 +260,7 @@ final class PotCatalogTests: XCTestCase {
                                 case .level(let n): return finished.contains(n)
                                 case .gardenDays(let n): return days >= n
                                 case .plus: return plus
+                                case .pack, .seasonBlooms: return false      // not in the old rules
                                 }
                             }()
                             guard ownedV1 else { continue }

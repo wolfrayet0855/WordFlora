@@ -99,7 +99,15 @@ struct WordFloraApp: App {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
         // The Plus page with the local StoreKit file's prices, whatever the simulator's store returns.
-        if uiTesting && args.contains("-uitest-prices") { model.entitlements.debugPreviewPrices(UITestPrices.local) }
+        if uiTesting && args.contains("-uitest-prices") {
+            model.entitlements.debugPreviewPrices(UITestPrices.local)
+            model.entitlements.debugPreviewPackPrices(UITestPrices.packs)       // the pack is "offered": its surfaces show
+        }
+        // Frost & Lantern owned (bought or family-shared): its two pots can be picked.
+        if uiTesting && args.contains("-uitest-pack-owned") {
+            var ids = model.entitlements.state.activeProductIDs; ids.insert(PackCatalog.frostLantern.productID)
+            model.entitlements.debugForce(EntitlementState(activeProductIDs: ids))
+        }
         // Plus Forever owned, alone or beside a subscription that is still renewing (the "charged twice" note).
         if uiTesting && args.contains("-uitest-plus-forever") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID]))
@@ -244,4 +252,5 @@ struct WordFloraApp: App {
 enum UITestPrices {
     static let local: [PlusChoice: Decimal] = [.yearly: Decimal(string: "12.99")!, .monthly: Decimal(string: "3.99")!,
                                                .lifetime: Decimal(string: "34.99")!]
+    static let packs: [String: Decimal] = [PackCatalog.frostLanternId: Decimal(string: "2.99")!]
 }

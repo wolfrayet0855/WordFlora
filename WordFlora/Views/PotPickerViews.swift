@@ -93,9 +93,14 @@ struct RepotSheet: View {
     var reduceMotionOverride = false
     private var reduceMotion: Bool { systemReduceMotion || reduceMotionOverride }
 
+    /// A live seasonal pack's pots, in their own row under the sixteen.
+    var packPots: [Pot] = []
+
     init(plantName: String, imageName: String, currentId: String, soil: SoilType, stats: PotCatalog.Stats, hasPlus: Bool,
-         reduceMotionOverride: Bool = false, record: @escaping () -> [String] = { [] }, go: @escaping (Pot, SoilType) -> Void) {
+         packPots: [Pot] = [], reduceMotionOverride: Bool = false, record: @escaping () -> [String] = { [] },
+         go: @escaping (Pot, SoilType) -> Void) {
         self.plantName = plantName; self.imageName = imageName; self.currentId = currentId
+        self.packPots = packPots
         self.reduceMotionOverride = reduceMotionOverride
         self.stats = stats; self.hasPlus = hasPlus; self.record = record; self.go = go
         _picked = State(initialValue: PotCatalog.pot(id: currentId).id)
@@ -112,7 +117,8 @@ struct RepotSheet: View {
                         .padding(.top, 12)
                         .transition(reduceMotion ? .opacity : .opacity.combined(with: .offset(y: 6)))
                 }
-                PotPickGrid(currentId: currentId, picked: $picked, hinted: $hinted, newIds: newIds, stats: stats, hasPlus: hasPlus)
+                PotPickGrid(currentId: currentId, picked: $picked, hinted: $hinted, newIds: newIds, stats: stats, hasPlus: hasPlus,
+                            packPots: packPots)
                     .padding(.top, 14)
                 SoilPicker(picked: $pickedSoil).padding(.top, 20)
                 // At accessibility sizes the summary scrolls with the sheet, so the pinned footer is only the button
@@ -288,6 +294,8 @@ struct PotPickGrid: View {
     var newIds: Set<String> = []
     let stats: PotCatalog.Stats
     let hasPlus: Bool
+    /// The live pack's pots (`AppModel.visiblePackPots`); empty while the store has no pack.
+    var packPots: [Pot] = []
 
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.repotReduceMotion) private var reduceMotion
@@ -305,6 +313,18 @@ struct PotPickGrid: View {
             ForEach(rows, id: \.first?.id) { row in
                 GridRow { ForEach(row) { tile($0) } }
             }
+            // A live seasonal pack: its own row under the ladder, with the pack's name (no price, no lock).
+            if !packPots.isEmpty {
+                GridRow {
+                    PackRowTitle(name: PackCatalog.frostLantern.name).gridCellColumns(PotCatalog.gridColumns)
+                }
+                GridRow {
+                    ForEach(packPots) { tile($0) }
+                    ForEach(0..<max(0, PotCatalog.gridColumns - packPots.count), id: \.self) { _ in
+                        Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
+                    }
+                }
+            }
         }
         .animation(reduceMotion ? .easeInOut(duration: 0.15) : .spring(response: 0.25, dampingFraction: 0.8), value: picked)
         .animation(.easeInOut(duration: reduceMotion ? 0.15 : 0.2), value: hinted)
@@ -317,7 +337,9 @@ struct PotPickGrid: View {
         let isHinted = hinted == pot.id
         let isNew = newIds.contains(pot.id)
         let choosable = PotCatalog.canChoose(pot, currentId: currentId, stats: stats, hasPlus: hasPlus)
-        let toEarn: Bool = { if case .toEarn = s { return !isCurrent }; return false }()
+        // A pack pot not owned looks like a pot to earn (the soft outline, no lock, no price), with no line 2.
+        let packSoft: Bool = { if case .pack = s { return !isCurrent }; return false }()
+        let toEarn: Bool = { if case .toEarn = s { return !isCurrent }; return packSoft }()
         let plus: Bool = { if case .plus = s { return !isCurrent }; return false }()
         let isAX = typeSize.isAccessibilitySize
         let shape = RoundedRectangle(cornerRadius: 16, style: .continuous)
@@ -336,7 +358,7 @@ struct PotPickGrid: View {
                         PotInUsePill()
                     } else if plus {
                         PotPlusPill()
-                    } else if toEarn && !isAX {
+                    } else if toEarn && !packSoft && !isAX {
                         Text(PotCatalog.goalLine(pot)).font(Theme.font(.caption2, weight: .bold)).foregroundStyle(Color.secondaryText)
                             .lineLimit(1).minimumScaleFactor(0.75)
                     }
@@ -382,10 +404,27 @@ struct PotPickGrid: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(PotCatalog.tileLabel(pot, state: isCurrent ? .owned : s, inUse: isCurrent, isNew: isNew))
-        .accessibilityValue(toEarn ? PotCatalog.goalLine(pot) : "")
-        .accessibilityHint(toEarn ? PotCatalog.Copy.hintToEarn : plus ? PotCatalog.Copy.hintPlus : "")
+        .accessibilityValue(toEarn && !packSoft ? PotCatalog.goalLine(pot) : "")
+        .accessibilityHint(packSoft ? PotCatalog.Copy.hintPack : toEarn ? PotCatalog.Copy.hintToEarn : plus ? PotCatalog.Copy.hintPlus : "")
         .accessibilityAddTraits(isPicked ? .isSelected : [])
         .accessibilityIdentifier("pot-tile-\(pot.id)")
+    }
+}
+
+/// The name over a seasonal pack's row of pots ("Frost & Lantern"), with the Seasons glyph. Grows with every text size.
+struct PackRowTitle: View {
+    let name: String
+    var body: some View {
+        Label { Text(name) } icon: {
+            Image("seasons-row-glyph").renderingMode(.template).resizable().scaledToFit().frame(width: 18, height: 18)
+                .accessibilityHidden(true)
+        }
+        .font(Theme.font(.subheadline, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+        .fixedSize(horizontal: false, vertical: true)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, 6)
+        .accessibilityAddTraits(.isHeader)
+        .accessibilityIdentifier("pot-pack-title")
     }
 }
 
@@ -536,7 +575,7 @@ struct PotHintCard: View {
     var body: some View {
         let s = PotCatalog.state(of: pot, stats: stats, hasPlus: hasPlus)
         let lines = PotCatalog.hintLines(pot, state: s, stats: stats)
-        let toEarn: Bool = { if case .toEarn = s { return true }; return false }()
+        let toEarn: Bool = { switch s { case .toEarn, .pack: return true; default: return false } }()
         HStack(alignment: .center, spacing: 12) {
             PotArtView(pot: pot, style: toEarn ? .toEarn : .full, width: 28)
             VStack(alignment: .leading, spacing: 2) {
@@ -586,6 +625,8 @@ struct ShedPotsSection: View {
     let users: (Pot) -> [String]
     /// Records the pots earned by play; true when some were new, which shows "New pots in your shed!" this once.
     var record: () -> Bool = { false }
+    /// A live seasonal pack's pots, in their own row under the sixteen.
+    var packPots: [Pot] = []
 
     @State private var message: String?
     @State private var newPots = false
@@ -602,6 +643,12 @@ struct ShedPotsSection: View {
             if newPots { PotNewLine() }
             LazyVGrid(columns: columns, spacing: 8) {
                 ForEach(PotCatalog.all) { card($0) }
+            }
+            if !packPots.isEmpty {
+                PackRowTitle(name: PackCatalog.frostLantern.name)
+                LazyVGrid(columns: columns, spacing: 8) {
+                    ForEach(packPots) { card($0) }
+                }
             }
             if let message {
                 Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
@@ -638,12 +685,13 @@ struct ShedPotsSection: View {
         let s = PotCatalog.state(of: pot, stats: stats, hasPlus: hasPlus)
         let progress = PotCatalog.progress(pot, stats: stats)
         let progressText = PotCatalog.progressLine(pot, stats: stats)
-        let toEarn: Bool = { if case .toEarn = s { return true }; return false }()
+        let toEarn: Bool = { switch s { case .toEarn, .pack: return true; default: return false } }()
         let names = users(pot)
         let label: String = {
             switch s {
             case .owned: return "\(pot.voiceName) pot. \(useLine(names))"
             case .plus: return "\(pot.voiceName) pot, Plus. \(PotCatalog.Copy.plusCard)"
+            case .pack: return "\(pot.voiceName) pot. \(PotCatalog.packLine(pot))"
             case .toEarn: return "\(pot.voiceName) pot, not earned yet. \(PotCatalog.goalLine(pot)). \(progressText)"
             }
         }()
@@ -662,6 +710,8 @@ struct ShedPotsSection: View {
                     case .plus:
                         cardLine(typeSize.isAccessibilitySize ? PotCatalog.Copy.plusCardShort : PotCatalog.Copy.plusCard,
                                  color: Color.secondaryText)
+                    case .pack:
+                        cardLine(PackCatalog.Copy.seasonsTitle, color: Color.secondaryText)
                     case .toEarn:
                         cardLine(PotCatalog.goalLine(pot), color: Color.secondaryText)
                         ProgressView(value: progress?.fraction ?? 0).tint(PotPalette.ok).frame(maxWidth: 70)
@@ -679,7 +729,7 @@ struct ShedPotsSection: View {
                 switch s {
                 case .owned: PotCheckBadge(size: 20).padding(4)
                 case .plus: PotPlusTag().padding(4)
-                case .toEarn: EmptyView()
+                case .toEarn, .pack: EmptyView()
                 }
             }
             .contentShape(RoundedRectangle(cornerRadius: Theme.cardRadius))
@@ -700,6 +750,7 @@ struct ShedPotsSection: View {
         switch s {
         case .owned: return pot.unlock == .free ? pot.hint : PotCatalog.Copy.earned
         case .plus: return "\(PotCatalog.plusLine(pot)) \(PotCatalog.Copy.plusSettings)"
+        case .pack: return "\(PotCatalog.packLine(pot)) \(PotCatalog.packHint)"
         case .toEarn(let h): return "\(h) \(PotCatalog.tipLine(pot, stats: stats))"
         }
     }

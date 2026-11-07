@@ -272,7 +272,10 @@ final class AppModel {
         if repotOutcome == .happy { unlocks += badges.recordMark(.soilMatches, item: plant.plantId, now: date, quiet: quiet) }   // each plant once
         if tidy { unlocks += badges.record(.tidyTrims, now: date, quiet: quiet) }       // Pruning Pro: a trim at the right time
         unlocks += badges.recordDay(.tendDays, day: BadgeFacts.dayNumber(date, calendar: cal), now: date, quiet: quiet)
-        if result.stageUp { unlocks += recordCollectionFacts(now: date, quiet: quiet) }     // in flower, full bloom
+        if result.stageUp {
+            unlocks += recordCollectionFacts(now: date, quiet: quiet)     // in flower, full bloom
+            unlocks += Self.recordLanternKeeperGrowth(plant, into: &badges, on: date, quiet: quiet)
+        }
         // The tidy trim's line stays up on its own first (at least 1.2 s) before a badge moment.
         enqueueBadgeMoments(unlocks, after: tidy ? 1.6 : 1.0); p.badgesJSON = badges.json
         try? context.save()
@@ -606,7 +609,10 @@ final class AppModel {
             let levelsDone = (1...5).filter { lvl in let inLvl = all.filter { $0.level == lvl }; return inLvl.count == 10 && inLvl.allSatisfy { $0.earnedCount > 0 } }.count
             unlocks += badges.record(.levelSets, value: levelsDone, now: t, quiet: quiet)
             if game.missesThisRound == 0 { unlocks += badges.record(.perfectBlooms, now: t, quiet: quiet) }
-            if game.isDaily { unlocks += badges.record(.dailyBloomsDone, now: t, quiet: quiet) }
+            if game.isDaily {
+                unlocks += badges.record(.dailyBloomsDone, now: t, quiet: quiet)
+                unlocks += recordSeasonBloom(into: &badges, on: t, quiet: quiet)    // the season's earned pot
+            }
             recordQuest(.wordFound(letters: game.currentWord.filter(\.isLetter).count))
             unlocks += badges.record(.wordsSolved, now: t, quiet: quiet)
             if BadgeFacts.isSteady(misses: game.missesThisRound) { unlocks += badges.record(.steadySolves, now: t, quiet: quiet) }

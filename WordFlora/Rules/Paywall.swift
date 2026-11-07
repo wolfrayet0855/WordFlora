@@ -34,6 +34,8 @@ struct EntitlementState: Equatable {
     /// Plus Forever owned (bought or family-shared, not refunded). It wins over any subscription state.
     var hasLifetime: Bool { activeProductIDs.contains(PlusPlan.lifetimeID) }
     var hasActiveSubscription: Bool { !activeProductIDs.isDisjoint(with: PlusPlan.allProductIDs) }
+    /// Seasonal packs owned now (bought or family-shared, not refunded). Plus never includes them.
+    var ownedPacks: Set<String> { PackCatalog.owned(activeProductIDs: activeProductIDs) }
     /// False once every live subscription has auto-renew turned off (StoreKit's renewal info). Unknown counts as on.
     var subscriptionRenews = true
     /// When the live subscription's current period ends (the latest one, if there are two).

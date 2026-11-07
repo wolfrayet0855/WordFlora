@@ -18,6 +18,12 @@ enum BadgeCounter: String, CaseIterable, Codable {
     case tidyTrims
     /// Gentle Net: hellos to a visitor resting on a flower. Accumulates; never goes down.
     case gentleHellos
+    /// Lantern Keeper (Frost & Lantern, earned by play only): marks "grow.<plantId>.<stage>", one per growth stage a
+    /// plant reaches while it sits in the Frosted glass pot (G5 adds season visitors). High-water mark count.
+    case lanternKeeper
+    /// The season's earned pot (Frosted glass): marks "in.<day>" / "out.<day>" for Daily Bloom days (`PackCatalog`).
+    /// Feeds a pot, not a badge (`potOnly`).
+    case seasonBlooms
 
     // Collection: worked out from the garden and the album each time (`BadgeFacts`), kept as best-so-far values.
     case rarePlants, desertPlants, waterPlants, treePlants, floweringPlants, stickers
@@ -33,7 +39,8 @@ enum BadgeCounter: String, CaseIterable, Codable {
         switch self {
         case .levelSets, .plantsOwned, .streak, .visitorSpecies,
              .rarePlants, .desertPlants, .waterPlants, .treePlants, .floweringPlants, .stickers,
-             .levelReached, .fullBlooms, .soilMatches, .rareSpecies, .storiesRead, .factsRead, .shedUpgrades, .badgeShares:
+             .levelReached, .fullBlooms, .soilMatches, .rareSpecies, .storiesRead, .factsRead, .shedUpgrades, .badgeShares,
+             .lanternKeeper, .seasonBlooms:
             return true
         default: return false
         }
@@ -43,6 +50,8 @@ enum BadgeCounter: String, CaseIterable, Codable {
     /// badge that moved to a new counter keeps its `unlocked` dates, so its card shows the higher of the two.
     /// `prunes`: Pruning Pro moved to `tidyTrims`. `butterflyPlays`: Gentle Net moved to `gentleHellos`.
     static let retired: Set<BadgeCounter> = [.prunes, .butterflyPlays]
+    /// Counters that track a pot's progress rather than a badge (kept in the JSON so they merge and back up).
+    static let potOnly: Set<BadgeCounter> = [.seasonBlooms]
 }
 
 struct BadgeDef: Codable, Equatable, Identifiable {
@@ -139,6 +148,10 @@ struct BadgeState: Equatable {
 
     func isMarked(_ counter: BadgeCounter, item: String) -> Bool { progressByCounter[Self.markKey(counter, item)] != nil }
     func marks(of counter: BadgeCounter) -> Int { progressByCounter.keys.filter { $0.hasPrefix("mark.\(counter.rawValue).") }.count }
+    /// Marks of one kind, by the start of their item ("in." counts the featured-season Daily Bloom days).
+    func marks(of counter: BadgeCounter, itemPrefix: String) -> Int {
+        progressByCounter.keys.filter { $0.hasPrefix("mark.\(counter.rawValue).\(itemPrefix)") }.count
+    }
     private static func markKey(_ c: BadgeCounter, _ item: String) -> String { "mark.\(c.rawValue).\(item)" }
 
     /// The highest tier earned for a badge (0 when none yet).

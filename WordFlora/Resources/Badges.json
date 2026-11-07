@@ -454,5 +454,17 @@
     ],
     "title": "Sharer",
     "blurb": "Share your badge cards"
+  },
+  {
+    "id": "lantern_keeper",
+    "family": "tending",
+    "counter": "lanternKeeper",
+    "thresholds": [
+      1,
+      4,
+      8
+    ],
+    "title": "Lantern Keeper",
+    "blurb": "Grow plants in the Frosted glass pot"
   }
 ]

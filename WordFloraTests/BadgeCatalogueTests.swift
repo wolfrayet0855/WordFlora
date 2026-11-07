@@ -26,11 +26,11 @@ final class BadgeCatalogueTests: XCTestCase {
         "shed_keeper": ("shedUpgrades", [3, 6, 12]), "sharer": ("badgeShares", [1, 5, 20]),
     ]
     static let builtBefore = ["level_sets", "plant_collector", "feeder", "green_thumb", "master_repotter", "pruning_pro", "streak",
-                              "perfect_bloom", "resurrected", "daily_bloom", "visitor_friend", "gentle_net", "weathered", "quick_bloom"]
+                              "perfect_bloom", "resurrected", "daily_bloom", "visitor_friend", "gentle_net", "weathered", "quick_bloom", "lantern_keeper"]
 
     func testTheCatalogueHoldsAllThirtySixDesignedBadgesWeatheredAndQuickBloom() throws {
         let defs = try BadgeCatalog.load()
-        XCTAssertEqual(defs.count, 38)
+        XCTAssertEqual(defs.count, 39)      // + Lantern Keeper (Frost & Lantern, G3)
         XCTAssertEqual(Set(defs.map(\.id)), Set(Self.designed.keys).union(Self.builtBefore))
         for (id, want) in Self.designed {
             let d = try XCTUnwrap(defs.first { $0.id == id }, id)
@@ -40,7 +40,9 @@ final class BadgeCatalogueTests: XCTestCase {
         // One counter per badge, and every counter is used by a badge, apart from the retired ones (still counted and
         // kept in the JSON, read by no badge: Pruning Pro moved from `prunes` to `tidyTrims`).
         XCTAssertEqual(Set(defs.map(\.counter)).count, defs.count)
-        XCTAssertEqual(Set(defs.map(\.counter)), BadgeCatalog.knownCounters.subtracting(BadgeCounter.retired.map(\.rawValue)))
+        XCTAssertEqual(Set(defs.map(\.counter)), BadgeCatalog.knownCounters.subtracting(BadgeCounter.retired.map(\.rawValue))
+                                                     .subtracting(BadgeCounter.potOnly.map(\.rawValue)))
+        XCTAssertEqual(BadgeCounter.potOnly, [.seasonBlooms], "the season pot counts Daily Bloom marks, no badge reads them")
         XCTAssertEqual(BadgeCounter.retired, [.prunes, .butterflyPlays])
         XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.counter, "tidyTrims")
         XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.thresholds, [5, 20, 50])

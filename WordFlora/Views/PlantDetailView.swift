@@ -584,6 +584,7 @@ struct PlantDetailView: View {
     private func repotSheet(_ plant: PlantCollectible) -> some View {
         RepotSheet(plantName: displayName(plant), imageName: plant.imageName, currentId: plant.potId,
                    soil: SoilType(rawValue: plant.soilType) ?? .loam, stats: app.potStats, hasPlus: app.hasPlusForPots,
+                   packPots: app.visiblePackPots(currentId: plant.potId),
                    reduceMotionOverride: app.settings.reduceMotionOverride,
                    record: { app.recordEarnedPots() }) { pot, soil in
             showRepot = false

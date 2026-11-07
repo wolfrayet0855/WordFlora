@@ -50,6 +50,7 @@ struct RootView: View {
                     case .shed: ShedView()
                     case .badges: BadgesView()
                     case .plus: PlusView()
+                    case .seasons: SeasonsView()
                     case .settings: SettingsView()
                     case .levelMap: LevelMapView()
                     case .visitorsBook: VisitorsBookView()

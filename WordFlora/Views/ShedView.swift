@@ -29,8 +29,13 @@ struct ShedView: View {
                 }
                 ShedPotsSection(stats: app.potStats, hasPlus: app.hasPlusForPots, users: { pot in
                     app.plantsUsing(pot).map { $0.nickname.isEmpty ? $0.name : $0.nickname }
-                }, record: { !app.recordEarnedPots().isEmpty })
+                }, record: { !app.recordEarnedPots().isEmpty }, packPots: app.visiblePackPots())
                 .padding(.top, 6)
+                // 13 and up: the Seasons shelf may show the price. Never for under 13, unknown age or Quiet Garden.
+                if ShedSeasonsShelf.isShown(ageBand: app.settings.ageBand, quietGarden: app.settings.quietGarden,
+                                            live: app.entitlements.packIsLive(PackCatalog.frostLantern.id)) {
+                    ShedSeasonsShelf(pack: PackCatalog.frostLantern).padding(.top, 10)
+                }
             }
             .padding(.horizontal, Space.gutter).padding(.top, Space.xs).padding(.bottom, 40)
         }
