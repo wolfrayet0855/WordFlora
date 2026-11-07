@@ -83,9 +83,10 @@ extension AppModel {
     /// A faded bloom shows on this plant today: in flower, Prune ready now, and one of its cue days.
     /// `fadedBloomTestOverride` (UI tests only) makes every day a cue day; the other rules still apply.
     func showsFadedBloom(_ plant: PlantCollectible) -> Bool {
-        let ready = actionState(.prune, plant: plant).isReady
-        if fadedBloomTestOverride { return ready && plant.stage >= BadgeFacts.floweringStage }
-        return FadedBloom.shows(seed: fadedBloomSeed, plantId: plant.plantId, day: fadedBloomToday, stage: plant.stage, pruneReady: ready)
+        // The cheap rules first (the page and the garden grid ask on every render); Prune's state last.
+        guard plant.stage >= BadgeFacts.floweringStage else { return false }
+        guard fadedBloomTestOverride || FadedBloom.isCueDay(seed: fadedBloomSeed, plantId: plant.plantId, day: fadedBloomToday) else { return false }
+        return actionState(.prune, plant: plant).isReady
     }
 
     /// Where the faded bloom sits on the plant art (fractions of its size).
