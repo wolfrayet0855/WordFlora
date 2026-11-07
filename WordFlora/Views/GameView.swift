@@ -38,8 +38,15 @@ struct GameView: View {
     @Environment(\.scenePhase) private var scenePhase
 
     private var vm: GameViewModel { app.game }
-    /// The resting and break cards are modal: only the flower shows, dimmed, behind them (as in the mockup).
-    private var cardIsModal: Bool { showBreak || showRestCard }
+    /// Every card over the round is modal (rest, break, resting, rested and the win): only the flower shows, dimmed,
+    /// behind it, as in the mockup, and the card sits in the middle of the screen clear of the top bar.
+    private var cardIsModal: Bool {
+        showBreak || showRestCard || showEarned || vm.phase == .restingOffer || vm.phase == .rested
+    }
+    /// The flower grows into the free space (170 to 236 pt); at accessibility text sizes it may give some back.
+    private var flowerMinHeight: CGFloat { dynamicTypeSize.isAccessibilitySize ? 130 : 170 }
+    /// Help's measured width, so the centred title keeps clear of Home and Help.
+    @State private var helpWidth: CGFloat = Theme.minTap
     private var correctCount: Int { vm.guessedLetters.filter { vm.currentWord.contains($0) }.count }
 
     var body: some View {
@@ -47,24 +54,27 @@ struct GameView: View {
             Color.appBackground.ignoresSafeArea()
             VStack(spacing: 10) {
                 topBar.modifier(BehindModalCard(active: cardIsModal, minHeight: Theme.minTap))
-                // Still behind the resting and break cards: a sway that never ends kept the app from going idle
+                Spacer(minLength: 0).frame(maxHeight: Space.section)
+                // Still behind the modal cards: a sway that never ends kept the app from going idle
                 // while a card sat open, and the accessibility audit then measured the card's text mid-layout.
                 FlowerView(petals: vm.petalsRemaining, resting: vm.phase == .restingOffer || vm.phase == .rested, sway: !cardIsModal,
                            bloomRing: vm.speedRing?.fill)
-                    .frame(height: 170)
+                    .frame(minHeight: flowerMinHeight, maxHeight: 236)
+                    .layoutPriority(1)
                     .overlay(alignment: .bottom) { if showTakeYourTime { takeYourTime.transition(.opacity) } }
                     .animation(.easeInOut(duration: 0.6), value: vm.speedRing?.outcome)
                 VStack(spacing: 10) {
                     hintCard
                     WordTilesView(word: vm.currentWord, guessed: vm.guessedLetters, revealAll: vm.phase == .rested, pop: tilePop)
-                        .padding(.horizontal, 8)
                     if tutorial && vm.guessedLetters.isEmpty {
                         Text("Tap a letter to guess").font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText)
                             .symbolEffect(.pulse)
                     }
                 }
+                // The clue and tiles sit on the 16 pt gutter like every other screen; only the keyboard keeps 12.
+                .padding(.horizontal, Space.gutter - 12)
                 .modifier(BehindModalCard(active: cardIsModal))
-                Spacer(minLength: 4)
+                Spacer(minLength: Space.s)
                 KeyboardView(state: { vm.keyState(for: $0) }, onTap: tap, enabled: vm.phase == .playing)
                     .padding(.bottom, 8)
                     .modifier(BehindModalCard(active: cardIsModal))
@@ -137,33 +147,65 @@ struct GameView: View {
 
     // MARK: Pieces
 
+    /// The title is centred on the screen (not between Home and Help, which differ in width) and semibold, so it
+    /// reads above Help; Help is a filled capsule so it looks like something to press (puzzle-experience-review V7, V12).
     private var topBar: some View {
-        HStack {
-            if tutorial {
-                Color.clear.frame(width: Theme.minTap, height: Theme.minTap)
-            } else {
-                Button { router.home() } label: { Image(systemName: "house.fill").frame(width: Theme.minTap, height: Theme.minTap) }
-                    .accessibilityLabel("Home")
-            }
-            Spacer()
-            Text(tutorial ? "Your first word" : daily ? "Daily Bloom" : "Level \(level ?? vm.currentLevel)").font(Theme.font(.headline))
+        ZStack {
+            Text(tutorial ? "Your first word" : daily ? "Daily Bloom" : "Level \(level ?? vm.currentLevel)")
+                .font(Theme.font(.headline, weight: .semibold))
                 .lineLimit(2).multilineTextAlignment(.center)
-            Spacer()
-            Button { vm.useHelp() } label: {
-                // At accessibility sizes the word would break mid-word ("Hel-p"); the bulb alone keeps the label "Help".
-                Group {
-                    if dynamicTypeSize.isAccessibilitySize { Image(systemName: "lightbulb.fill") }
-                    else { Label("Help", systemImage: "lightbulb.fill").labelStyle(.titleAndIcon) }
+                .frame(maxWidth: .infinity)
+                .padding(.horizontal, max(helpWidth, Theme.minTap) + Space.xs)
+                .accessibilitySortPriority(2)
+            HStack {
+                if tutorial {
+                    Color.clear.frame(width: Theme.minTap, height: Theme.minTap)
+                } else {
+                    Button { router.home() } label: { Image(systemName: "house.fill").frame(width: Theme.minTap, height: Theme.minTap) }
+                        .accessibilityLabel("Home")
+                        .accessibilitySortPriority(3)
                 }
-                .font(Theme.font(.subheadline, weight: .semibold))
-                .padding(.horizontal, 10).frame(minWidth: Theme.minTap, minHeight: Theme.minTap)
+                Spacer()
+                helpButton
+                    .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { helpWidth = $0 }
+                    .accessibilitySortPriority(1)
             }
-            .accessibilityLabel("Help")
-            .disabled(!vm.canUseHelp)
-            .symbolEffect(.pulse, isActive: helpPulse)
-            .accessibilityHint("Gives a free clue")
         }
+        // VoiceOver still reads Home, the title, then Help.
+        .accessibilityElement(children: .contain)
         .foregroundStyle(Color.appPrimaryText)
+    }
+
+    private var helpButton: some View {
+        Button { vm.useHelp() } label: {
+            // At accessibility sizes the word would break mid-word ("Hel-p"); the bulb alone keeps the label "Help".
+            Group {
+                if dynamicTypeSize.isAccessibilitySize {
+                    Image(systemName: "lightbulb.fill").foregroundStyle(Color.accentText)
+                } else {
+                    Label {
+                        Text("Help").foregroundStyle(Color.appPrimaryText)
+                    } icon: {
+                        Image(systemName: "lightbulb.fill").foregroundStyle(Color.accentText)
+                    }
+                    .labelStyle(.titleAndIcon)
+                }
+            }
+            .font(Theme.font(.subheadline, weight: .semibold))
+            .padding(.horizontal, Space.m)
+            .frame(minWidth: Theme.minTap - Space.s, minHeight: 36)
+            .background(Color.tileGardenFill, in: Capsule())
+            // The capsule is 36 pt to look at; the hit area stays 44 pt.
+            .frame(minWidth: Theme.minTap, minHeight: Theme.minTap)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        // Used up: the capsule fades but keeps its shape, so the bar does not change.
+        .opacity(vm.canUseHelp ? 1 : 0.4)
+        .accessibilityLabel("Help")
+        .disabled(!vm.canUseHelp)
+        .symbolEffect(.pulse, isActive: helpPulse)
+        .accessibilityHint("Gives a free clue")
     }
 
     /// The ring closed first: the word carries on at its own pace, with the same reward.
@@ -235,7 +277,7 @@ struct GameView: View {
     }
 
     private var restingOffer: some View {
-        dimmed {
+        dimmed(centered: true) {
             VStack(spacing: 14) {
                 Image("rose_of_jericho").resizable().scaledToFit().frame(height: 80)
                 Text("This one's resting").font(Theme.font(.title2, weight: .bold))
@@ -247,7 +289,7 @@ struct GameView: View {
     }
 
     private var restedCard: some View {
-        dimmed {
+        dimmed(centered: true) {
             VStack(spacing: 12) {
                 Text("This one's resting.").font(Theme.font(.title3, weight: .bold))
                 Text("Here's the word:").font(Theme.font(.callout))
@@ -265,7 +307,7 @@ struct GameView: View {
     }
 
     private var earnedCard: some View {
-        dimmed(dim: false) {
+        dimmed(dim: false, centered: true) {
             VStack(spacing: 12) {
                 if vm.leveledUp { Label("Level up! New plants to find", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.accentText) }
                 if let name = vm.earnedPlantName {
