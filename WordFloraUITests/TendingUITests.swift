@@ -396,6 +396,45 @@ final class TendingUITests: XCTestCase {
         }
     }
 
+    // MARK: The tend buttons keep whole words (TendRowLayout; owner screenshot "Trimme / d")
+
+    /// Six buttons (Show everything brings Prune and Mist): two rows of three at the default size and at xxxLarge,
+    /// one full-width tile each in the page at AX XXXL; then the audit. Word widths are checked in TendRowLayoutTests.
+    func testSixTendButtonsKeepWholeWords() {
+        let kinds = ["water", "feed", "sun", "prune", "mist", "repot"]
+        for (name, extra) in [("default", [String]()),
+                              ("xxxl", ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryExtraExtraExtraLarge"]),
+                              ("ax5", ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])] {
+            open("Daisy", plantId: "daisy", extra: ["-uitest-everything"] + extra)
+            let buttons = kinds.map { app.buttons["tend-\($0)"] }
+            for b in buttons { XCTAssertTrue(b.exists, "\(name): \(b.identifier)") }
+            let screen = app.windows.firstMatch.frame
+            if name == "ax5" {
+                // One column: each tile spans the content width, one below another.
+                for b in buttons.prefix(2) { XCTAssertGreaterThan(b.frame.width, screen.width - 2 * 16 - 2, name) }
+                XCTAssertGreaterThan(buttons[1].frame.minY, buttons[0].frame.maxY - 1, "\(name): stacked")
+            } else {
+                let ys = Set(buttons.map { Int($0.frame.minY.rounded()) }), xs = Set(buttons.map { Int($0.frame.minX.rounded()) })
+                XCTAssertEqual(ys.count, 2, "\(name): two rows, got \(ys.sorted())")
+                XCTAssertEqual(xs.count, 3, "\(name): three columns, got \(xs.sorted())")
+                for b in buttons { XCTAssertLessThanOrEqual(b.frame.maxX, screen.maxX + 0.5, "\(name): \(b.identifier) on screen") }
+            }
+            sleep(1); shot("tend-row-\(name)")
+            if name != "xxxl" { audit("tend-row-\(name)", dynamicTypeApart: true) }
+            app.terminate()
+        }
+    }
+
+    /// Quiet Garden uses the same bar: Prune and Mist need no tool there, so it is two rows of three too.
+    func testQuietGardenUsesTheSameTendRows() {
+        open("Daisy", plantId: "daisy", extra: ["-uitest-quiet", "-uitest-everything"])
+        let buttons = ["water", "feed", "sun", "prune", "mist", "repot"].map { app.buttons["tend-\($0)"] }
+        for b in buttons { XCTAssertTrue(b.exists, b.identifier) }
+        XCTAssertEqual(Set(buttons.map { Int($0.frame.minY.rounded()) }).count, 2)
+        sleep(1); shot("tend-row-quiet")
+        audit("tend-row-quiet", dynamicTypeApart: true)
+    }
+
     // MARK: Frost & Lantern pots in the picker (G3)
 
     /// Kid view at AX XXXL: the pack's row shows soft outlines with "A grown-up can find this in Settings." (no price,
