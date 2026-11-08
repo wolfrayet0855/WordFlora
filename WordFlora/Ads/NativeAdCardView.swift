@@ -9,7 +9,9 @@ struct ShedSponsoredSection: View {
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
 
     var body: some View {
-        Group {
+        // A VStack, not a Group: with no card yet a Group is empty and its `.task` (the load) would never run.
+        VStack(alignment: .leading, spacing: 0) {
+            Color.clear.frame(height: 0).accessibilityHidden(true)
             if app.shedShowsSponsored(reduceMotion: systemReduceMotion), let content = app.adFormats.nativeContent {
                 VStack(alignment: .leading, spacing: Space.m) {
                     VStack(alignment: .leading, spacing: 2) {
