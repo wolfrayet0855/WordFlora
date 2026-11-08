@@ -293,7 +293,7 @@ final class WordFloraUITests: XCTestCase {
         app.buttons["Garden"].tap()
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
         XCTAssertTrue(app.buttons["Hide Life panel"].waitForExistence(timeout: 5))
-        sleep(1)
+        sleep(3)                                   // the panel opens itself with an animation; audit the settled page
         audit("plant-life-open-ax")
     }
 
@@ -618,7 +618,9 @@ final class WordFloraUITests: XCTestCase {
 
     func testAuditRainyPlant() {
         openClover(["-uitest-rain=3"])
-        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5)); audit("plant-rain")
+        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5))
+        sleep(5)                                   // the rained-off petals drift down and rest before the audit
+        audit("plant-rain")
     }
 
     func testAuditMoreScreens() {
@@ -1087,16 +1089,22 @@ final class PlusForeverUITests: XCTestCase {
             let f = scroll.frame
             return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
         }() : nil
-        do {
-            try app.performAccessibilityAudit(for: .all) { issue in
-                if issue.auditType == .contrast, let v = visible {
-                    guard let e = issue.element else { skipped += 1; return true }
-                    if !v.contains(e.frame) { return true }
+        // Dynamic Type and clipped text run apart, after the rest, as in the Seasons and TextFit audits (both grow the
+        // text and reflow the page mid-check).
+        let passes: [XCUIAccessibilityAuditType] = [XCUIAccessibilityAuditType.all.subtracting([.dynamicType, .textClipped]),
+                                                    .textClipped, .dynamicType]
+        for types in passes {
+            do {
+                try app.performAccessibilityAudit(for: types) { issue in
+                    if issue.auditType == .contrast, let v = visible {
+                        guard let e = issue.element else { skipped += 1; return true }
+                        if !v.contains(e.frame) { return true }
+                    }
+                    findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
+                    return true
                 }
-                findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
-                return true
-            }
-        } catch { findings.append("\(name): audit failed to run: \(error)") }
+            } catch { findings.append("\(name): audit failed to run: \(error)") }
+        }
         if skipped > 0 { print("\(name): contrast on \(skipped) clipped, unresolved element(s) not judged") }
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
@@ -1106,7 +1114,8 @@ final class PlusForeverUITests: XCTestCase {
         let lifetime = app.buttons["plus.lifetime"]
         XCTAssertTrue(lifetime.waitForExistence(timeout: 8))
         XCTAssertTrue(lifetime.label.contains("Plus Forever"), lifetime.label)
-        XCTAssertTrue(lifetime.label.contains("Pay once, keep Plus on this Apple ID. No renewals."), lifetime.label)
+        // The card lost its sentence in the Plus pass (Fable delta): it reads "Plus Forever, <price> once".
+        XCTAssertTrue(lifetime.label.contains("once"), lifetime.label)
         XCTAssertFalse(lifetime.isSelected, "Plus Forever is never the default")
         let yearly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Yearly'")).firstMatch
         let monthly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Monthly'")).firstMatch
