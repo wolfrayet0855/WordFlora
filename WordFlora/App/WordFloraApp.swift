@@ -53,12 +53,6 @@ struct WordFloraApp: App {
         }
         let model = AppModel(container: container, settings: settings, bank: bank, storeEnabled: !uiTesting, launchedWithCloud: openedWithCloud,
                              cloudOpenFailed: wantsCloud && !openedWithCloud, storeDegraded: degraded)
-        #if DEBUG
-        // Settles the App Group question on a device (docs/pm/plus-flow-fable-review.md N6): a URL and "homeKey: group"
-        // on the second run mean the group works. Remove once the owner has run it.
-        print("appGroup:", FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedDefaults.groupID) as Any,
-              "homeKey:", SharedDefaults.store.string(forKey: SharedContainer.homeKey) as Any)
-        #endif
         if uiTesting && args.contains("-uitest-gardened") {
             // A garden with one found plant and some supplies, for tending UI tests.
             model.plants().first?.earnedCount = 1
