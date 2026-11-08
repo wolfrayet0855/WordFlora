@@ -125,9 +125,14 @@ struct HomeView: View {
 
                         if let note = weeklyNote {
                             WeeklyNoteCard(summary: note, quiet: app.settings.quietGarden, canShare: app.canShareWeek,
-                                           onLovely: { animate { weeklyNote = nil } },
-                                           onVisit: { weeklyNote = nil; router.go(.garden) })
+                                           onLovely: { app.markWeeklyNoteSeen(note.weekKey); animate { weeklyNote = nil } },
+                                           onVisit: { app.markWeeklyNoteSeen(note.weekKey); weeklyNote = nil; router.go(.garden) })
                                 .transition(.opacity)
+                                // Seen once it has stayed on screen a moment; leaving Home first cancels this.
+                                .task(id: note.weekKey) {
+                                    try? await Task.sleep(for: .seconds(1.5))
+                                    if !Task.isCancelled && router.path.isEmpty { app.markWeeklyNoteSeen(note.weekKey) }
+                                }
                         }
 
                         if app.showWelcomeBack || app.plusOffer != nil || weather.card != nil || weather.banner != nil {
@@ -317,12 +322,13 @@ struct HomeView: View {
 
     private func closeNudge() { showNudge = false }
 
-    /// The weekly note waits while a weather card or banner, or the welcome card, is up (a later visit this week).
+    /// The weekly note waits while a weather card or banner, the welcome card or the Plus card is up (a later visit this
+    /// week), and while another screen is open over Home (a widget tap opens straight onto a plant).
     private func showWeeklyNoteIfDue() {
-        guard weeklyNote == nil else { return }
+        guard weeklyNote == nil, router.path.isEmpty else { return }
         let w = app.homeWeather
-        weeklyNote = app.takeWeeklyNote(otherCardShowing: w.card != nil || w.banner != nil || app.showWelcomeBack,
-                                        nudgeShowing: showNudge)
+        weeklyNote = app.dueWeeklyNote(otherCardShowing: w.card != nil || w.banner != nil || app.showWelcomeBack || app.plusOffer != nil,
+                                       nudgeShowing: showNudge)
     }
 
     /// The honest ad note follows the 3 minute window: judged as Home appears or the window starts, and dropped when

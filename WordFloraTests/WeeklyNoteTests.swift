@@ -207,10 +207,13 @@ final class WeeklyNoteTests: XCTestCase {
         app.context.insert(GameRecord(wordGuessed: "ROSE", triviaQuestion: "", won: true, petalsRemaining: 5, plantEarned: "Rose", level: 1, date: midWeek))
         try app.context.save()
 
-        XCTAssertNil(app.takeWeeklyNote(otherCardShowing: true), "the weather card holds it")
-        let note = try XCTUnwrap(app.takeWeeklyNote(otherCardShowing: false))
+        XCTAssertNil(app.dueWeeklyNote(otherCardShowing: true), "the weather card holds it")
+        let note = try XCTUnwrap(app.dueWeeklyNote(otherCardShowing: false))
         XCTAssertEqual(note.words, 1); XCTAssertEqual(note.newPlants, ["Rose"])
-        XCTAssertNil(app.takeWeeklyNote(otherCardShowing: false), "once a week")
+        XCTAssertEqual(app.settings.weeklyNoteSeenWeek, 0, "not used up until the card has been on screen")
+        XCTAssertNotNil(app.dueWeeklyNote(otherCardShowing: false), "a launch onto a plant leaves it for the next Home visit")
+        app.markWeeklyNoteSeen(note.weekKey)
+        XCTAssertNil(app.dueWeeklyNote(otherCardShowing: false), "once a week")
         XCTAssertEqual(AppSettings(defaults: suite).weeklyNoteSeenWeek, WeeklyNote.weekKey(now, calendar: c), "kept across launches")
     }
 
@@ -221,7 +224,7 @@ final class WeeklyNoteTests: XCTestCase {
         app.context.insert(GameRecord(wordGuessed: "ROSE", triviaQuestion: "", won: true, petalsRemaining: 5, plantEarned: nil, level: 1,
                                       date: c.date(byAdding: .day, value: 1, to: WeeklyNote.pastWeek(now, calendar: c).lowerBound)!))
         app.profile?.createdAt = c.date(byAdding: .day, value: -3, to: now)!
-        XCTAssertNil(app.takeWeeklyNote(otherCardShowing: false))
+        XCTAssertNil(app.dueWeeklyNote(otherCardShowing: false))
         XCTAssertEqual(app.settings.weeklyNoteSeenWeek, 0, "nothing shown, nothing recorded")
     }
 }

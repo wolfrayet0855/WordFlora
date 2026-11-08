@@ -19,15 +19,15 @@ extension AppModel {
         return WeeklyNote.summary(rounds: rounds, friendsSeenAt: album.seenAt, now: now(), calendar: calendar)
     }
 
-    /// Called as Home appears. Returns the note to show and records its week at once (shown at most once a week), or nil.
-    /// A weather card, weather banner or welcome card holds it for a later Home visit the same week.
-    func takeWeeklyNote(otherCardShowing: Bool, nudgeShowing: Bool = false) -> WeeklyNote.Summary? {
+    /// Called as Home appears with nothing pushed over it. Returns the note to show, or nil. It is not recorded here:
+    /// the card records its week once it has been on screen (`markWeeklyNoteSeen`), so a launch that goes straight on to
+    /// a plant (a widget tap) does not use up the week's note. A weather card, weather banner, welcome card or Plus card
+    /// holds it for a later Home visit the same week.
+    func dueWeeklyNote(otherCardShowing: Bool, nudgeShowing: Bool = false) -> WeeklyNote.Summary? {
         let c = weeklyNoteContext(otherCardShowing: otherCardShowing, nudgeShowing: nudgeShowing)
         guard WeeklyNote.mayShow(c) else { return nil }
         let summary = weeklySummary(calendar: c.calendar)
-        guard WeeklyNote.shouldShow(c, summary: summary) else { return nil }
-        markWeeklyNoteSeen(summary.weekKey)
-        return summary
+        return WeeklyNote.shouldShow(c, summary: summary) ? summary : nil
     }
 
     func markWeeklyNoteSeen(_ weekKey: Int) { settings.weeklyNoteSeenWeek = weekKey }
