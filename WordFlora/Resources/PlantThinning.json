@@ -8426,6 +8426,683 @@
     200.0
    ]
   },
+  "plant_hellebore": {
+   "heads": [
+    {
+     "pivot": [
+      102.0,
+      74.0
+     ],
+     "rings": [
+      0
+     ]
+    },
+    {
+     "pivot": [
+      60.0,
+      104.0
+     ],
+     "rings": [
+      1
+     ]
+    },
+    {
+     "pivot": [
+      144.0,
+      100.0
+     ],
+     "rings": [
+      2
+     ]
+    }
+   ],
+   "kind": "petals",
+   "layers": [
+    {
+     "image": "plant_hellebore_ground",
+     "kind": "ground"
+    },
+    {
+     "image": "plant_hellebore_back",
+     "kind": "static"
+    },
+    {
+     "kind": "petals",
+     "petals": [
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       3
+      ],
+      [
+       0,
+       4
+      ],
+      [
+       0,
+       0
+      ],
+      [
+       0,
+       1
+      ],
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       3
+      ],
+      [
+       1,
+       4
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       3
+      ],
+      [
+       2,
+       4
+      ],
+      [
+       2,
+       0
+      ],
+      [
+       2,
+       1
+      ]
+     ]
+    },
+    {
+     "image": "plant_hellebore_front",
+     "kind": "static"
+    }
+   ],
+   "maxFallPerPip": 5,
+   "note": "Glasshouse plant (Frost & Lantern): three heads, five sepals each.",
+   "petalCount": 15,
+   "rings": [
+    {
+     "fall": {
+      "1": [
+       0
+      ],
+      "2": [
+       3
+      ],
+      "3": [
+       1
+      ],
+      "4": [
+       4
+      ],
+      "5": [
+       2
+      ]
+     },
+     "keepOrder": [
+      0,
+      3,
+      1,
+      4,
+      2
+     ],
+     "layout": "radial",
+     "petals": [
+      {
+       "angle": -152.0,
+       "centre": [
+        95.9,
+        85.48
+       ],
+       "elements": [
+        43
+       ],
+       "radius": 26.5,
+       "sprite": 0,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": -80.0,
+       "centre": [
+        89.2,
+        71.74
+       ],
+       "elements": [
+        46
+       ],
+       "radius": 26.5,
+       "sprite": 1,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": -8.0,
+       "centre": [
+        100.19,
+        61.13
+       ],
+       "elements": [
+        34
+       ],
+       "radius": 26.5,
+       "sprite": 2,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 64.0,
+       "centre": [
+        113.68,
+        68.3
+       ],
+       "elements": [
+        37
+       ],
+       "radius": 26.5,
+       "sprite": 3,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 136.0,
+       "centre": [
+        111.03,
+        83.35
+       ],
+       "elements": [
+        40
+       ],
+       "radius": 26.5,
+       "sprite": 4,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      }
+     ],
+     "pivot": [
+      102.0,
+      74.0
+     ],
+     "radius": 26.5,
+     "sprites": [
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r0_s0"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r0_s1"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r0_s2"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r0_s3"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r0_s4"
+      }
+     ],
+     "type": "tagged",
+     "visible": {
+      "0": [],
+      "1": [
+       0
+      ],
+      "2": [
+       0,
+       3
+      ],
+      "3": [
+       0,
+       1,
+       3
+      ],
+      "4": [
+       0,
+       1,
+       3,
+       4
+      ],
+      "5": [
+       0,
+       1,
+       2,
+       3,
+       4
+      ]
+     }
+    },
+    {
+     "fall": {
+      "1": [
+       0
+      ],
+      "2": [
+       3
+      ],
+      "3": [
+       1
+      ],
+      "4": [
+       4
+      ],
+      "5": [
+       2
+      ]
+     },
+     "keepOrder": [
+      0,
+      3,
+      1,
+      4,
+      2
+     ],
+     "layout": "radial",
+     "petals": [
+      {
+       "angle": -152.0,
+       "centre": [
+        55.12,
+        113.18
+       ],
+       "elements": [
+        58
+       ],
+       "radius": 21.2,
+       "sprite": 0,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": -80.0,
+       "centre": [
+        49.76,
+        102.19
+       ],
+       "elements": [
+        61
+       ],
+       "radius": 21.2,
+       "sprite": 1,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": -8.0,
+       "centre": [
+        58.55,
+        93.7
+       ],
+       "elements": [
+        49
+       ],
+       "radius": 21.2,
+       "sprite": 2,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 64.0,
+       "centre": [
+        69.35,
+        99.44
+       ],
+       "elements": [
+        52
+       ],
+       "radius": 21.2,
+       "sprite": 3,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 136.0,
+       "centre": [
+        67.22,
+        111.48
+       ],
+       "elements": [
+        55
+       ],
+       "radius": 21.2,
+       "sprite": 4,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      }
+     ],
+     "pivot": [
+      60.0,
+      104.0
+     ],
+     "radius": 21.2,
+     "sprites": [
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r1_s0"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r1_s1"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r1_s2"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r1_s3"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r1_s4"
+      }
+     ],
+     "type": "tagged",
+     "visible": {
+      "0": [],
+      "1": [
+       0
+      ],
+      "2": [
+       0,
+       3
+      ],
+      "3": [
+       0,
+       1,
+       3
+      ],
+      "4": [
+       0,
+       1,
+       3,
+       4
+      ],
+      "5": [
+       0,
+       1,
+       2,
+       3,
+       4
+      ]
+     }
+    },
+    {
+     "fall": {
+      "1": [
+       0
+      ],
+      "2": [
+       3
+      ],
+      "3": [
+       1
+      ],
+      "4": [
+       4
+      ],
+      "5": [
+       2
+      ]
+     },
+     "keepOrder": [
+      0,
+      3,
+      1,
+      4,
+      2
+     ],
+     "layout": "radial",
+     "petals": [
+      {
+       "angle": -152.0,
+       "centre": [
+        139.0,
+        109.41
+       ],
+       "elements": [
+        73
+       ],
+       "radius": 21.73,
+       "sprite": 0,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": -80.0,
+       "centre": [
+        133.5,
+        98.15
+       ],
+       "elements": [
+        76
+       ],
+       "radius": 21.73,
+       "sprite": 1,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": -8.0,
+       "centre": [
+        142.52,
+        89.44
+       ],
+       "elements": [
+        64
+       ],
+       "radius": 21.73,
+       "sprite": 2,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 64.0,
+       "centre": [
+        153.58,
+        95.33
+       ],
+       "elements": [
+        67
+       ],
+       "radius": 21.73,
+       "sprite": 3,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 136.0,
+       "centre": [
+        151.41,
+        107.67
+       ],
+       "elements": [
+        70
+       ],
+       "radius": 21.73,
+       "sprite": 4,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      }
+     ],
+     "pivot": [
+      144.0,
+      100.0
+     ],
+     "radius": 21.73,
+     "sprites": [
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r2_s0"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r2_s1"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r2_s2"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r2_s3"
+      },
+      {
+       "fill": "#C46B8C",
+       "image": "plant_hellebore_r2_s4"
+      }
+     ],
+     "type": "tagged",
+     "visible": {
+      "0": [],
+      "1": [
+       0
+      ],
+      "2": [
+       0,
+       3
+      ],
+      "3": [
+       0,
+       1,
+       3
+      ],
+      "4": [
+       0,
+       1,
+       3,
+       4
+      ],
+      "5": [
+       0,
+       1,
+       2,
+       3,
+       4
+      ]
+     }
+    }
+   ],
+   "viewBox": [
+    0.0,
+    0.0,
+    200.0,
+    200.0
+   ]
+  },
   "plant_hibiscus": {
    "heads": [
     {
@@ -20990,6 +21667,481 @@
     0.0,
     200.0,
     200.0
+   ]
+  },
+  "plant_snowdrop": {
+   "heads": [
+    {
+     "pivot": [
+      118.0,
+      64.0
+     ],
+     "rings": [
+      0
+     ]
+    },
+    {
+     "pivot": [
+      72.0,
+      80.0
+     ],
+     "rings": [
+      1
+     ]
+    },
+    {
+     "pivot": [
+      138.0,
+      94.0
+     ],
+     "rings": [
+      2
+     ]
+    }
+   ],
+   "kind": "petals",
+   "layers": [
+    {
+     "image": "plant_snowdrop_ground",
+     "kind": "ground"
+    },
+    {
+     "image": "plant_snowdrop_back",
+     "kind": "static"
+    },
+    {
+     "kind": "petals",
+     "petals": [
+      [
+       0,
+       1
+      ],
+      [
+       0,
+       2
+      ],
+      [
+       0,
+       0
+      ],
+      [
+       1,
+       2
+      ],
+      [
+       1,
+       0
+      ],
+      [
+       1,
+       1
+      ],
+      [
+       2,
+       1
+      ],
+      [
+       2,
+       2
+      ],
+      [
+       2,
+       0
+      ]
+     ]
+    },
+    {
+     "image": "plant_snowdrop_front",
+     "kind": "static"
+    }
+   ],
+   "maxFallPerPip": 5,
+   "note": "Glasshouse plant (Frost & Lantern): three nodding heads, three outer tepals each.",
+   "petalCount": 9,
+   "rings": [
+    {
+     "fall": {
+      "1": [
+       0
+      ],
+      "2": [],
+      "3": [],
+      "4": [
+       1
+      ],
+      "5": [
+       2
+      ]
+     },
+     "keepOrder": [
+      0,
+      1,
+      2
+     ],
+     "layout": "radial",
+     "petals": [
+      {
+       "angle": -174.0,
+       "centre": [
+        116.75,
+        75.93
+       ],
+       "elements": [
+        17
+       ],
+       "radius": 24.0,
+       "sprite": 0,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 98.0,
+       "centre": [
+        129.88,
+        65.67
+       ],
+       "elements": [
+        13
+       ],
+       "radius": 24.0,
+       "sprite": 1,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 142.0,
+       "centre": [
+        125.39,
+        73.46
+       ],
+       "elements": [
+        15
+       ],
+       "radius": 24.0,
+       "sprite": 2,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      }
+     ],
+     "pivot": [
+      118.0,
+      64.0
+     ],
+     "radius": 24.0,
+     "sprites": [
+      {
+       "fill": "#FFFFFF",
+       "image": "plant_snowdrop_r0_s0"
+      },
+      {
+       "fill": "#FFFFFF",
+       "image": "plant_snowdrop_r0_s1"
+      },
+      {
+       "fill": "#FFFFFF",
+       "image": "plant_snowdrop_r0_s2"
+      }
+     ],
+     "type": "tagged",
+     "visible": {
+      "0": [],
+      "1": [
+       0
+      ],
+      "2": [
+       0
+      ],
+      "3": [
+       0
+      ],
+      "4": [
+       0,
+       1
+      ],
+      "5": [
+       0,
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "fall": {
+      "1": [
+       0
+      ],
+      "2": [],
+      "3": [],
+      "4": [
+       1
+      ],
+      "5": [
+       2
+      ]
+     },
+     "keepOrder": [
+      0,
+      1,
+      2
+     ],
+     "layout": "radial",
+     "petals": [
+      {
+       "angle": -142.0,
+       "centre": [
+        65.2,
+        88.7
+       ],
+       "elements": [
+        21
+       ],
+       "radius": 22.08,
+       "sprite": 0,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": -98.0,
+       "centre": [
+        61.07,
+        81.54
+       ],
+       "elements": [
+        23
+       ],
+       "radius": 22.08,
+       "sprite": 1,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 174.0,
+       "centre": [
+        73.15,
+        90.98
+       ],
+       "elements": [
+        19
+       ],
+       "radius": 22.08,
+       "sprite": 2,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      }
+     ],
+     "pivot": [
+      72.0,
+      80.0
+     ],
+     "radius": 22.08,
+     "sprites": [
+      {
+       "fill": "#FFFFFF",
+       "image": "plant_snowdrop_r1_s0"
+      },
+      {
+       "fill": "#FFFFFF",
+       "image": "plant_snowdrop_r1_s1"
+      },
+      {
+       "fill": "#FFFFFF",
+       "image": "plant_snowdrop_r1_s2"
+      }
+     ],
+     "type": "tagged",
+     "visible": {
+      "0": [],
+      "1": [
+       0
+      ],
+      "2": [
+       0
+      ],
+      "3": [
+       0
+      ],
+      "4": [
+       0,
+       1
+      ],
+      "5": [
+       0,
+       1,
+       2
+      ]
+     }
+    },
+    {
+     "fall": {
+      "1": [
+       0
+      ],
+      "2": [],
+      "3": [],
+      "4": [
+       1
+      ],
+      "5": [
+       2
+      ]
+     },
+     "keepOrder": [
+      0,
+      1,
+      2
+     ],
+     "layout": "radial",
+     "petals": [
+      {
+       "angle": -174.0,
+       "centre": [
+        136.9,
+        104.5
+       ],
+       "elements": [
+        29
+       ],
+       "radius": 21.12,
+       "sprite": 0,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 98.0,
+       "centre": [
+        148.46,
+        95.47
+       ],
+       "elements": [
+        25
+       ],
+       "radius": 21.12,
+       "sprite": 1,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      },
+      {
+       "angle": 142.0,
+       "centre": [
+        144.5,
+        102.32
+       ],
+       "elements": [
+        27
+       ],
+       "radius": 21.12,
+       "sprite": 2,
+       "transform": [
+        1.0,
+        0.0,
+        0.0,
+        1.0,
+        0.0,
+        0.0
+       ]
+      }
+     ],
+     "pivot": [
+      138.0,
+      94.0
+     ],
+     "radius": 21.12,
+     "sprites": [
+      {
+       "fill": "#FFFFFF",
+       "image": "plant_snowdrop_r2_s0"
+      },
+      {
+       "fill": "#FFFFFF",
+       "image": "plant_snowdrop_r2_s1"
+      },
+      {
+       "fill": "#FFFFFF",
+       "image": "plant_snowdrop_r2_s2"
+      }
+     ],
+     "type": "tagged",
+     "visible": {
+      "0": [],
+      "1": [
+       0
+      ],
+      "2": [
+       0
+      ],
+      "3": [
+       0
+      ],
+      "4": [
+       0,
+       1
+      ],
+      "5": [
+       0,
+       1,
+       2
+      ]
+     }
+    }
+   ],
+   "viewBox": [
+    0.0,
+    0.0,
+    200.0,
+    200.0
+   ],
+   "warnings": [
+    "ring 0 has only 3 petals",
+    "ring 1 has only 3 petals",
+    "ring 2 has only 3 petals"
    ]
   },
   "plant_strawberry": {
