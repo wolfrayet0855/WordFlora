@@ -141,6 +141,7 @@ struct FieldNotesPage: View {
             Text(met ? visitor.name : FieldNotesCopy.unmetTitle)
                 .font(.system(Self.nameStyle(typeSize), design: .rounded, weight: .bold)).foregroundStyle(FieldNotesPalette.ink)
                 .fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity, alignment: .leading)   // room to grow: the audit read a self-sized name as fixed
             if met {
                 if let metOn {
                     Text(FieldNotesCopy.metOn(metOn)).font(.system(.footnote, design: .rounded, weight: .semibold))

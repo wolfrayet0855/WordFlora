@@ -34,14 +34,18 @@ struct PlusView: View {
                 FlowerView(petals: 8).frame(height: 120).accessibilityHidden(true)
                 Text(PlusPlan.groupName).font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)                    // full width, as the gate title (AX5 dynamicType read)
                     .accessibilityAddTraits(.isHeader)
 
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(PaywallCopy.benefits, id: \.self) { b in
                         HStack(spacing: 10) {
                             Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.successText).accessibilityHidden(true)
+                            // Full width beside the tick: a line sized to its own width ("No ads, ever" filled it at
+                            // AX XXXL) was read by the audit as text that cannot grow.
                             Text(b).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                                 .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 }.frame(maxWidth: .infinity, alignment: .leading)
