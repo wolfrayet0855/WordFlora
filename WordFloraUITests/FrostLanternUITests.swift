@@ -95,7 +95,8 @@ final class FrostLanternUITests: XCTestCase {
     // MARK: Glasshouse plants
 
     private func openGlasshouse(_ id: String) {
-        openGarden()
+        // Back from a plant page lands on My Garden, not Home: open it from Home only when it is not already showing.
+        if !app.navigationBars["My Garden"].exists { openGarden() }
         let tile = element("glasshouse.\(id)")
         scrollTo(tile)
         XCTAssertTrue(tile.waitForExistence(timeout: 5))
@@ -129,8 +130,9 @@ final class FrostLanternUITests: XCTestCase {
         for dark in [false, true] {
             launch(["-uitest-winter-friends"], size: Self.axxxl, dark: dark)
             app.buttons["Visitors"].tap()
+            // At AX XXXL the twelve cards take one column, so the winter friends sit far below the fold.
             let robin = element("visitor-robin")
-            scrollTo(robin)
+            scrollTo(robin, max: 45)
             XCTAssertTrue(robin.waitForExistence(timeout: 5))
             XCTAssertTrue(element("visitor-unmet-wren").exists)
             shot("g5-album-\(dark ? "dark" : "light")")
