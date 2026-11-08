@@ -274,9 +274,20 @@ final class RestCardUITests: XCTestCase {
     // MARK: accessibility audit (the same helper as WordFloraUITests)
 
     /// Text a scroll view clips at its edge is measured against whatever covers it; only text fully inside the
-    /// scroll view is judged for contrast.
+    /// scroll view is judged for contrast. Clipped text and Dynamic Type run apart, after the rest, as in
+    /// TextFitScreensUITests, SeasonsUITests and TendingUITests: the Dynamic Type check grows the text and the centred
+    /// card reflows, and a clip check in the same pass judged "That's enough for now" in that grown layout.
     private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = []) {
         waitForTheSceneToHold()
+        let all = XCUIAccessibilityAuditType.all.subtracting(ignoring)
+        auditOnce(name, types: all.subtracting([.dynamicType, .textClipped]))
+        for (suffix, type) in [("-textClipped", XCUIAccessibilityAuditType.textClipped), ("-dynamicType", .dynamicType)] where all.contains(type) {
+            sleep(1)                                    // the previous pass's resizing settles first
+            auditOnce(name + suffix, types: type)
+        }
+    }
+
+    private func auditOnce(_ name: String, types: XCUIAccessibilityAuditType) {
         var findings = [String]()
         let scroll = app.scrollViews.firstMatch
         let nav = app.navigationBars.firstMatch
@@ -287,7 +298,7 @@ final class RestCardUITests: XCTestCase {
         }() : nil
         var skipped = [String]()
         do {
-            try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
+            try app.performAccessibilityAudit(for: types) { issue in
                 if issue.auditType == .contrast, let v = visible {
                     // A clipped element often comes back unresolved (nil); it cannot be judged, so it is noted, not failed.
                     guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
