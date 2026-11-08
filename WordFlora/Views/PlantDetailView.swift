@@ -671,8 +671,8 @@ struct PlantDetailView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + life) { tends.finish(id: play.id) }
         } else if action == .mist {
             mists += 1
-            // A soft hiss (the water sound, quiet) on the ambient session; Calm has no sound. The soft haptic stays.
-            if !app.settings.calmMode { app.play(.water, volume: 0.35) }
+            // The soft mist hiss (wf-mist-hiss) on the ambient session; Calm has no sound. The soft haptic stays.
+            if !app.settings.calmMode { app.play(.mist) }
         } else {
             app.play(.snip)
         }

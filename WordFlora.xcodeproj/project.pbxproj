@@ -58,6 +58,7 @@
 		1581D6A2E8210D4686510D56 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 153A01FF2679CA86ABE5DFBE /* Foundation.framework */; };
 		170893E1A2616D1CEACC9A9D /* wf-earned.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 5510B1B69285FC4D97F91D07 /* wf-earned.m4a */; };
 		19FC1E7D0E23F1EEAA3D062F /* wf-thunder.m4a in Resources */ = {isa = PBXBuildFile; fileRef = DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */; };
+		D03CEB1293512209BCD81A89 /* wf-mist-hiss.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 53191EDC1CF8694F21A98DA9 /* wf-mist-hiss.m4a */; };
 		55375551216352E2369FAA25 /* wf-wind-loop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 537C16CD40328D0046A80DC6 /* wf-wind-loop.m4a */; };
 		2FF1472D05417CBB04C31AC2 /* wf-storm-loop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = A845D68363E9AD512C1E6F94 /* wf-storm-loop.m4a */; };
 		8CC51C8EC6CC117619BA0C88 /* wf-drought-loop.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 61F78EE0C062B99EFBEB7092 /* wf-drought-loop.m4a */; };
@@ -573,6 +574,7 @@
 		DA61364BB027900BC30E6C17 /* wf-badgeGold.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-badgeGold.m4a"; sourceTree = "<group>"; };
 		DBDCE1A9248AD5C4EDCBE08A /* GardenBackupTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenBackupTests.swift; sourceTree = "<group>"; };
 		DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-thunder.m4a"; sourceTree = "<group>"; };
+		53191EDC1CF8694F21A98DA9 /* wf-mist-hiss.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-mist-hiss.m4a"; sourceTree = "<group>"; };
 		537C16CD40328D0046A80DC6 /* wf-wind-loop.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-wind-loop.m4a"; sourceTree = "<group>"; };
 		A845D68363E9AD512C1E6F94 /* wf-storm-loop.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-storm-loop.m4a"; sourceTree = "<group>"; };
 		61F78EE0C062B99EFBEB7092 /* wf-drought-loop.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-drought-loop.m4a"; sourceTree = "<group>"; };
@@ -1110,6 +1112,7 @@
 				9BB89B0B7D5A508F1A4C13B4 /* wf-word.m4a */,
 				FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */,
 				DD76257658C1FFE632EE32A6 /* wf-thunder.m4a */,
+				53191EDC1CF8694F21A98DA9 /* wf-mist-hiss.m4a */,
 				537C16CD40328D0046A80DC6 /* wf-wind-loop.m4a */,
 				A845D68363E9AD512C1E6F94 /* wf-storm-loop.m4a */,
 				61F78EE0C062B99EFBEB7092 /* wf-drought-loop.m4a */,
@@ -1326,6 +1329,7 @@
 				EDB86ADCB596F2390F8642F7 /* wf-word.m4a in Resources */,
 				BA042FFFFC29EF40C286AF09 /* wf-wrong.m4a in Resources */,
 				19FC1E7D0E23F1EEAA3D062F /* wf-thunder.m4a in Resources */,
+				D03CEB1293512209BCD81A89 /* wf-mist-hiss.m4a in Resources */,
 				55375551216352E2369FAA25 /* wf-wind-loop.m4a in Resources */,
 				2FF1472D05417CBB04C31AC2 /* wf-storm-loop.m4a in Resources */,
 				8CC51C8EC6CC117619BA0C88 /* wf-drought-loop.m4a in Resources */,

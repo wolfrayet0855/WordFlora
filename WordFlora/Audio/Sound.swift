@@ -7,7 +7,7 @@ import AVFoundation
 /// one-line change below plus the file in Resources/Sounds.
 enum SoundEvent: CaseIterable {
     case key, correct, wrong, word, earned, levelUp, rest, wake, water, soil, sun, snip, butterfly
-    case badgeBronze, badgeSilver, badgeGold, button, ambient, thunder
+    case badgeBronze, badgeSilver, badgeGold, button, ambient, thunder, mist
 
     static func badge(tier: Int) -> SoundEvent {
         switch tier { case 2: return .badgeSilver; case 3...: return .badgeGold; default: return .badgeBronze }
@@ -36,7 +36,7 @@ enum SoundCatalog {
         .water: SoundSpec(file: "wf-water", ext: "m4a", gainDb: -5.6),
         .soil: SoundSpec(file: "wf-soil", ext: "m4a", gainDb: -3.3),
         .sun: SoundSpec(file: "wf-sun", ext: "m4a", gainDb: -4.4),
-        .snip: SoundSpec(file: "wf-snip", ext: "m4a", gainDb: 0.9),
+        .snip: SoundSpec(file: "wf-snip", ext: "m4a", gainDb: 0),       // the +0.9 boost dropped (audio rulings)
         .butterfly: SoundSpec(file: "wf-butterfly", ext: "m4a", gainDb: -5.9),
         .badgeBronze: SoundSpec(file: "wf-badgeBronze", ext: "m4a", gainDb: -2.5),
         .badgeSilver: SoundSpec(file: "wf-badgeSilver", ext: "m4a", gainDb: -3.5),
@@ -45,6 +45,8 @@ enum SoundCatalog {
         .ambient: SoundSpec(file: "wf-ambient", ext: "caf", gainDb: -0.6),
         // Procedural (tools/make_thunder.py), about -26 LUFS: kept well under the action sounds on purpose, never boosted.
         .thunder: SoundSpec(file: "wf-thunder", ext: "m4a", gainDb: 0, ducksAmbient: true),
+        // Procedural (tools/make_mist_hiss.py), about -28 LUFS in-app: a quiet airy spray, never boosted.
+        .mist: SoundSpec(file: "wf-mist-hiss", ext: "m4a", gainDb: 0),
     ]
 
     static let ambientVolume: Float = 0.25
