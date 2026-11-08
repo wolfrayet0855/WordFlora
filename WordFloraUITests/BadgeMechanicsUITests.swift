@@ -90,7 +90,7 @@ final class BadgeMechanicsUITests: XCTestCase {
         openBook()
         XCTAssertEqual(element("book.notebookCount").label, "My field notes: 3 pages of 12", "opening the book marks nothing")
         let page = element("book.page.monarch")
-        XCTAssertTrue(page.label.hasPrefix("Monarch. Met on "), page.label)
+        XCTAssertTrue(page.label.hasPrefix("Monarch. Seen on "), page.label)
         XCTAssertFalse(page.label.contains("Leaf stamp"))
         XCTAssertTrue(element("book.stamped.ladybug").exists, "pages stamped before keep their stamp")
         XCTAssertTrue(app.buttons["book.listen.monarch"].exists)

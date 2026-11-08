@@ -38,8 +38,10 @@ struct VisitorsBookView: View {
                 if showStickers {
                     header(EndgameCopy.bookStickers, EndgameCopy.bookStickersCount(owned.count, of: WeatherSticker.allCases.count))
                         .padding(.top, 8)
-                    let cols = typeSize.isAccessibilitySize ? 2 : 4
-                    Grid(horizontalSpacing: 12, verticalSpacing: 12) {
+                    // Four a row, three from xLarge, two at AX1 to AX3, one from AX4, so every name stays whole
+                    // ("Snowflake" broke from xLarge in four columns; GridColumns, TextFitLayoutTests).
+                    let cols = GridColumns.count(.stickers, for: typeSize)
+                    Grid(horizontalSpacing: GridColumns.spacing(.stickers), verticalSpacing: 12) {
                         ForEach(Array(stride(from: 0, to: WeatherSticker.allCases.count, by: cols)), id: \.self) { start in
                             GridRow {
                                 ForEach(Array(WeatherSticker.allCases[start..<min(start + cols, WeatherSticker.allCases.count)])) { s in
@@ -116,7 +118,7 @@ struct VisitorsBookView: View {
 
     private func header(_ title: String, _ line: String) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(title.uppercased()).font(Theme.font(.footnote, weight: .heavy)).tracking(1.4).foregroundStyle(Color.secondaryText)
+            Text(title.uppercased()).font(Theme.font(.footnote, weight: .heavy)).tracking(1.2).foregroundStyle(Color.secondaryText)
                 .accessibilityLabel(title).accessibilityAddTraits(.isHeader)
             Text(line).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
         }

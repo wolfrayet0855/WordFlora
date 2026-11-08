@@ -17,8 +17,9 @@ enum FieldNotesCopy {
     static let notebookTitle = "My field notes"
     static let blurb = "Fill your notebook with friend facts"
 
-    /// "Met on 4 Nov" from `StickerAlbum.seenAt` (the caller formats the date, day and short month).
-    static func metOn(_ date: String) -> String { "Met on \(date)" }
+    /// "Seen on 4 Nov" from `StickerAlbum.seenAt`, which keeps the latest meeting (the caller formats the date, day
+    /// and short month). Not "Met on": that would read as the first meeting, and the date moves on each time.
+    static func metOn(_ date: String) -> String { "Seen on \(date)" }
 
     /// The notebook's page count, shown under the title. Never shown in Quiet Garden.
     static func pages(_ n: Int, of total: Int) -> String { n == 1 ? "1 page of \(total)" : "\(n) pages of \(total)" }
@@ -27,9 +28,10 @@ enum FieldNotesCopy {
     static let listenHint = "Reads the fact out loud"
     static let readItHint = "Adds a leaf stamp to this page"
     static let stampLabel = "Leaf stamp"
-    /// The whole page reads as one element: name, met date, fact, then whether it has its stamp.
-    static func pageLabel(name: String, met: String, fact: String, stamped: Bool) -> String {
-        "\(name). \(metOn(met)). \(fact)" + (stamped ? " \(stampLabel)." : "")
+    /// The whole page reads as one element: name, the date it was seen (when the album has one), fact, then whether it
+    /// has its stamp. Friends met before dates were kept have none, so that sentence is left out.
+    static func pageLabel(name: String, met: String?, fact: String, stamped: Bool) -> String {
+        "\(name)." + (met.map { " \(metOn($0))." } ?? "") + " \(fact)" + (stamped ? " \(stampLabel)." : "")
     }
     /// A friend not met yet.
     static let unmetLabel = "A new friend. Meet this friend to fill this page."
@@ -39,6 +41,7 @@ enum FieldNotesCopy {
         [listen, readIt, stamped, pageAdded, unmetPage, unmetTitle, notebookTitle, blurb,
          metOn("4 Nov"), pages(1, of: 12), pages(4, of: 12), listenHint, readItHint, stampLabel, unmetLabel,
          pageLabel(name: "Monarch", met: "4 Nov", fact: "Monarchs fly a long way every year.", stamped: true),
-         pageLabel(name: "Monarch", met: "4 Nov", fact: "Monarchs fly a long way every year.", stamped: false)]
+         pageLabel(name: "Monarch", met: "4 Nov", fact: "Monarchs fly a long way every year.", stamped: false),
+         pageLabel(name: "Monarch", met: nil, fact: "Monarchs fly a long way every year.", stamped: false)]
     }
 }

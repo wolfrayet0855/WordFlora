@@ -82,7 +82,7 @@ struct NotebookPaper: View {
     }
 }
 
-/// One friend's page in the Visitors' book. A met friend: sepia sticker, name, "Met on <date>", the fact, then Listen and
+/// One friend's page in the Visitors' book. A met friend: sepia sticker, name, "Seen on <date>", the fact, then Listen and
 /// "I read it!" (or "Stamped"). Not met: a faint outline and "Meet this friend to fill this page." with no buttons.
 struct FieldNotesPage: View {
     let visitor: VisitorSpecies
@@ -107,6 +107,11 @@ struct FieldNotesPage: View {
 
     private var large: Bool { typeSize.isAccessibilitySize }
 
+    /// The page's side padding: it clears the 18 pt spine and its holes; tighter at the accessibility sizes.
+    static func leading(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 26 : 34 }
+    static func trailing(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 14 : 18 }
+    static func nameStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size.isAccessibilitySize ? .subheadline : .title3 }
+
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             paperPage
@@ -128,8 +133,11 @@ struct FieldNotesPage: View {
                     .frame(maxWidth: 220)
                 Spacer(minLength: 0)
             }
+            // A step smaller at the accessibility sizes, so "Hummingbird" stays whole (TextFitLayoutTests); still bold
+            // and first on the page.
             Text(met ? visitor.name : FieldNotesCopy.unmetTitle)
-                .font(.system(.title3, design: .rounded, weight: .bold)).foregroundStyle(FieldNotesPalette.ink)
+                .font(.system(Self.nameStyle(typeSize), design: .rounded, weight: .bold)).foregroundStyle(FieldNotesPalette.ink)
+                .fixedSize(horizontal: false, vertical: true)
             if met {
                 if let metOn {
                     Text(FieldNotesCopy.metOn(metOn)).font(.system(.footnote, design: .rounded, weight: .semibold))
@@ -148,12 +156,12 @@ struct FieldNotesPage: View {
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
-        .padding(.leading, 34).padding(.trailing, 18).padding(.vertical, 18)
+        .padding(.leading, Self.leading(typeSize)).padding(.trailing, Self.trailing(typeSize)).padding(.vertical, 18)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(NotebookPaper())
         .brightness(scheme == .dark ? -0.06 : 0)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(met ? FieldNotesCopy.pageLabel(name: visitor.name, met: metOn ?? "", fact: visitor.fact ?? "", stamped: stamped)
+        .accessibilityLabel(met ? FieldNotesCopy.pageLabel(name: visitor.name, met: metOn, fact: visitor.fact ?? "", stamped: stamped)
                                 : FieldNotesCopy.unmetLabel)
         .accessibilityIdentifier("book.page.\(visitor.id)")
     }
