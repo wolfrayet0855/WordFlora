@@ -204,6 +204,85 @@ final class EngagementUITests: XCTestCase {
         audit("b-win-card-axxxl-dark")
     }
 
+    // MARK: A. Weekly garden note
+
+    private var note: XCUIElement { element("weeklyNote") }
+    private var noteText: XCUIElement { element("weeklyNote.text") }
+
+    private func openWithNote(_ extra: [String] = []) {
+        launch(["-uitest-weekly-note"] + extra)
+        XCTAssertTrue(noteText.waitForExistence(timeout: 6), "the weekly note shows on Home")
+    }
+
+    func testWeeklyNoteShowsThePastWeek() {
+        openWithNote()
+        let label = noteText.label
+        XCTAssertTrue(label.hasPrefix("Your week in the garden."), label)
+        for row in ["You grew 12 words.", "You solved 2 Daily Blooms.", "New plants: ", "You said hello to 3 friends."] {
+            XCTAssertTrue(label.contains(row), "\(row) in \(label)")
+        }
+        XCTAssertTrue(app.buttons["weeklyNote.lovely"].exists)
+        XCTAssertTrue(app.buttons["weeklyNote.visit"].exists)
+        XCTAssertTrue(element("weeklyNote.share").waitForExistence(timeout: 3), "18+: Share my week")
+        XCTAssertFalse(element("plus-offer-card").exists, "a note visit holds the Plus card back")
+        shot("a-note-light")
+    }
+
+    func testLovelyClosesAndTheNoteDoesNotReturnThisWeek() {
+        openWithNote()
+        app.buttons["weeklyNote.lovely"].tap()
+        XCTAssertTrue(note.waitForNonExistence(timeout: 3))
+        app.buttons["Garden"].tap()
+        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
+        sleep(1)
+        XCTAssertFalse(note.exists, "shown once a week")
+    }
+
+    func testVisitMyGardenGoesToTheGarden() {
+        openWithNote()
+        app.buttons["weeklyNote.visit"].tap()
+        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
+        XCTAssertFalse(note.exists)
+    }
+
+    func testUnderThirteenHasNoShareMyWeek() {
+        openWithNote(["-uitest-age=under13"])
+        XCTAssertFalse(element("weeklyNote.share").exists)
+        XCTAssertTrue(noteText.label.contains("You grew 12 words."))
+    }
+
+    func testQuietGardenShowsNamesOnly() {
+        openWithNote(["-uitest-quiet"])
+        let label = noteText.label
+        XCTAssertTrue(label.contains("New in your garden: "), label)
+        XCTAssertNil(label.rangeOfCharacter(from: .decimalDigits), "no numbers in Quiet Garden: \(label)")
+        XCTAssertFalse(element("weeklyNote.share").exists)
+        shot("a-note-quiet")
+    }
+
+    func testAuditWeeklyNote() {
+        openWithNote()
+        sleep(1)
+        audit("a-note")
+    }
+
+    func testAuditWeeklyNoteAtAXXXLLightAndDark() {
+        openWithNote(Self.axXXXL)
+        sleep(1)
+        audit("a-note-axxxl")
+        let share = element("weeklyNote.share")
+        scrollTo(share)
+        XCTAssertTrue(share.isHittable, "Share my week is reachable")
+        XCUIDevice.shared.appearance = .dark
+        sleep(1)
+        shot("a-note-axxxl-dark")
+        audit("a-note-axxxl-dark")
+    }
+
     func testAuditPlantPageWidgetRow() {
         openPlant("Daisy", plantId: "daisy")
         scrollTo(app.buttons["plant.showOnWidget"])

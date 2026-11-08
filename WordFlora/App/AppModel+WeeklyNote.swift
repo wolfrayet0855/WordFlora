@@ -14,7 +14,7 @@ extension AppModel {
 
     /// The past week's summary, from the stored rounds and the album.
     func weeklySummary(calendar: Calendar = WeeklyNote.calendar()) -> WeeklyNote.Summary {
-        let records = (try? context.fetch(FetchDescriptor<GameRecord>(predicate: #Predicate { $0.won }))) ?? []
+        let records = (try? context.fetch(FetchDescriptor<GameRecord>(predicate: #Predicate { $0.won == true }))) ?? []
         let rounds = records.map { WeeklyNote.Round(date: $0.date, won: $0.won, isDaily: $0.isDaily, plantEarned: $0.plantEarned) }
         return WeeklyNote.summary(rounds: rounds, friendsSeenAt: album.seenAt, now: now(), calendar: calendar)
     }

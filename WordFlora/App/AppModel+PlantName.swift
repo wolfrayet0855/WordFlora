@@ -27,13 +27,7 @@ extension AppModel {
     /// Whether a WordFlora widget is on the Home Screen (no permission needed). Unknown counts as yes, so the line
     /// never asks to add a widget that may already be there.
     func hasGardenWidget() async -> Bool {
-        await withCheckedContinuation { done in
-            WidgetCenter.shared.getCurrentConfigurations { result in
-                switch result {
-                case .success(let widgets): done.resume(returning: !widgets.isEmpty)
-                case .failure: done.resume(returning: true)
-                }
-            }
-        }
+        guard let widgets = try? await WidgetCenter.shared.currentConfigurations() else { return true }
+        return !widgets.isEmpty
     }
 }
