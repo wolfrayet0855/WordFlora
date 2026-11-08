@@ -1,29 +1,31 @@
 import SwiftUI
 
 /// The weekly garden note on Home (WeeklyNote): a soft tinted header (leaf, title, the week's closing line) over the
-/// week's rows. The card holds words only; its actions sit below it (`WeeklyNoteActions`). VoiceOver reads the whole
-/// card as one element, then the actions.
+/// week's tiles (WeeklyNoteCopy.tiles): a big centred number with a small label on a soft tint, the new plants with
+/// their own art. Tiles sit in a row, stacked at accessibility sizes. The card holds words only; its actions sit below
+/// it (`WeeklyNoteActions`). VoiceOver reads the whole card as one element, then the actions.
 struct WeeklyNoteCard: View {
     let summary: WeeklyNote.Summary
     let quiet: Bool
+    /// The asset names of the week's new plants' art (`PlantCollectible.imageName`), in `summary.newPlants` order.
+    var plantArt: [String] = []
 
     @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .title3) private var iconSize: CGFloat = 20
+    @ScaledMetric(relativeTo: .title) private var artSize: CGFloat = 30
 
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 20, style: .continuous) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             header
-            VStack(alignment: .leading, spacing: 8) {
-                ForEach(WeeklyNoteCopy.rows(summary, quiet: quiet), id: \.self) { row in
-                    Text(row).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
+            let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 10))
+                                                      : AnyLayout(HStackLayout(alignment: .top, spacing: 10))
+            layout {
+                ForEach(WeeklyNoteCopy.tiles(summary, quiet: quiet), id: \.kind) { tile($0) }
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 12)
-            .padding(.bottom, 16)
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(12)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.appSurface, in: shape)
@@ -56,6 +58,39 @@ struct WeeklyNoteCard: View {
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(LinearGradient(colors: [Color.levelTint1, Color.bloomFill], startPoint: .leading, endPoint: .trailing))
+    }
+
+    /// One tile: the plant art (new plants only), the big number (never in Quiet Garden), the label. Full ink on every
+    /// tint, so the text stays above 4.5:1 in light and dark.
+    private func tile(_ t: WeeklyNoteCopy.Tile) -> some View {
+        VStack(spacing: 4) {
+            if t.kind == .plants, !plantArt.isEmpty {
+                HStack(spacing: -artSize * 0.25) {
+                    ForEach(Array(plantArt.prefix(3).enumerated()), id: \.offset) { _, name in
+                        Image(name).resizable().scaledToFit().frame(width: artSize, height: artSize)
+                    }
+                }
+                .accessibilityHidden(true)
+            }
+            if let number = t.number {
+                Text(number).font(Theme.font(.title, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+            }
+            Text(t.label).font(Theme.font(.footnote, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+        }
+        .padding(.vertical, 12)
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(tint(t.kind), in: RoundedRectangle(cornerRadius: 16, style: .continuous))
+    }
+
+    private func tint(_ kind: WeeklyNoteCopy.Tile.Kind) -> Color {
+        switch kind {
+        case .words: return .tileGardenFill
+        case .plants: return .bloomFill
+        case .friends: return .tileVisitorsFill
+        }
     }
 }
 
@@ -112,12 +147,15 @@ struct CelebrateButtonStyle: ButtonStyle {
     }
 }
 
-/// The Celebrate splash: a full-screen bloom with petals (CelebrationBurst, so Reduce Motion gives the still arc and
-/// Calm mode or Quiet Garden the slow drift), one soft haptic, and Done.
+/// The Celebrate splash: the garden's own plant art (`art`, up to three) with petals around it (CelebrationBurst, so
+/// Reduce Motion gives the still arc and Calm mode or Quiet Garden the slow drift), one soft haptic, and Done.
 struct WeeklyCelebrateView: View {
+    /// Plant art asset names: the week's new plants, else a plant from the player's garden (HomeView picks).
+    let art: [String]
     let onDone: () -> Void
 
     @Environment(AppModel.self) private var app
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var shown = false
 
     var body: some View {
@@ -126,9 +164,15 @@ struct WeeklyCelebrateView: View {
             CelebrationBurst(requested: [.large], origin: .fromTop(ScreenInsets.top + 120), seed: 31)
             ScrollView {
                 VStack(spacing: 20) {
-                    FlowerView(petals: 8, sway: false)
-                        .frame(width: 140, height: 168)
-                        .accessibilityHidden(true)
+                    let size: CGFloat = typeSize.isAccessibilitySize ? 96 : 140
+                    HStack(alignment: .bottom, spacing: -size * 0.2) {
+                        ForEach(Array(art.prefix(3).enumerated()), id: \.offset) { i, name in
+                            Image(name).resizable().scaledToFit()
+                                .frame(width: i == 1 ? size : size * 0.78, height: i == 1 ? size : size * 0.78)
+                                .zIndex(i == 1 ? 1 : 0)
+                        }
+                    }
+                    .accessibilityHidden(true)
                     Text(WeeklyNoteCopy.celebrateTitle)
                         .font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                         .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
@@ -155,7 +199,8 @@ struct WeeklyCelebrateView: View {
 
 #Preview("Weekly note") {
     VStack(spacing: 12) {
-        WeeklyNoteCard(summary: WeeklyNote.Summary(words: 12, dailyBlooms: 2, newPlants: ["Clover", "Daisy"], friends: 3), quiet: false)
+        WeeklyNoteCard(summary: WeeklyNote.Summary(words: 12, dailyBlooms: 2, newPlants: ["Clover", "Daisy"], friends: 3), quiet: false,
+                       plantArt: ["plant_clover", "plant_daisy"])
         WeeklyNoteActions(summary: WeeklyNote.Summary(words: 12), canShare: true, onCelebrate: {})
     }
     .padding()

@@ -32,6 +32,18 @@ extension AppModel {
 
     func markWeeklyNoteSeen(_ weekKey: Int) { settings.weeklyNoteSeenWeek = weekKey }
 
+    /// The art for the note: the week's new plants' own images (in `newPlants` order), and for the Celebrate splash those
+    /// or, in a week with no new plant, the player's grown plants (else the daisy). Always the app's plant artwork.
+    func weeklyNoteArt(_ summary: WeeklyNote.Summary) -> (plants: [String], celebrate: [String]) {
+        let all = plants()
+        var byName: [String: String] = [:]
+        for p in all where !p.imageName.isEmpty { byName[p.name] = byName[p.name] ?? p.imageName }
+        let new = summary.newPlants.compactMap { byName[$0] }
+        let grown = all.filter { $0.earnedCount > 0 && !$0.imageName.isEmpty }.map(\.imageName)
+        let celebrate = !new.isEmpty ? new : (grown.isEmpty ? ["plant_daisy"] : Array(grown.suffix(3)))
+        return (new, Array(celebrate.prefix(3)))
+    }
+
     /// "Share my week": 13 and up, never in Quiet Garden.
     var canShareWeek: Bool { WeeklyNote.shareAllowed(ageBand: settings.ageBand, quietGarden: settings.quietGarden) }
 }

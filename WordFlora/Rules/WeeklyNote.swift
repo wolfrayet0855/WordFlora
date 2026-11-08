@@ -167,13 +167,38 @@ enum WeeklyNoteCopy {
         return r
     }
 
-    /// VoiceOver reads the card as one element: the title, then the rows in order, then the closing line.
-    static func accessibilityLabel(_ s: WeeklyNote.Summary, quiet: Bool) -> String {
-        title + ". " + bodyLabel(s, quiet: quiet)
+    /// One hero tile on the card: a big number (nil in Quiet Garden) over a small label, and the sentence VoiceOver reads.
+    struct Tile: Equatable {
+        enum Kind: Equatable { case words, plants, friends }
+        var kind: Kind
+        var number: String?
+        var label: String
+        var spoken: String
     }
 
-    /// What VoiceOver reads after the title (the header): the rows in order, then the closing line.
-    static func bodyLabel(_ s: WeeklyNote.Summary, quiet: Bool) -> String {
-        (rows(s, quiet: quiet) + [closing(weekKey: s.weekKey)]).joined(separator: " ")
+    static func wordsLabel(_ n: Int) -> String { n == 1 ? "word grown" : "words grown" }
+    static func plantsLabel(_ n: Int) -> String { n == 1 ? "new plant" : "new plants" }
+    static func friendsLabel(_ n: Int) -> String { n == 1 ? "friend said hello" : "friends said hello" }
+    static let quietPlantsLabel = "New in your garden"
+
+    /// The card's tiles in order: words grown, new plants, friends said hello; a tile with 0 is hidden. Daily Blooms are
+    /// counted in the words. Quiet Garden: one plants tile with the names and no number.
+    static func tiles(_ s: WeeklyNote.Summary, quiet: Bool) -> [Tile] {
+        if quiet {
+            return s.newPlants.isEmpty ? [] : [Tile(kind: .plants, number: nil, label: quietPlantsLabel + ": " + list(s.newPlants),
+                                                    spoken: quietPlants(s.newPlants))]
+        }
+        var t = [Tile]()
+        if s.words > 0 { t.append(Tile(kind: .words, number: "\(s.words)", label: wordsLabel(s.words), spoken: words(s.words))) }
+        if !s.newPlants.isEmpty {
+            t.append(Tile(kind: .plants, number: "\(s.newPlants.count)", label: plantsLabel(s.newPlants.count), spoken: plants(s.newPlants)))
+        }
+        if s.friends > 0 { t.append(Tile(kind: .friends, number: "\(s.friends)", label: friendsLabel(s.friends), spoken: friends(s.friends))) }
+        return t
+    }
+
+    /// VoiceOver reads the card as one element: the title, then each tile's sentence in order, then the closing line.
+    static func accessibilityLabel(_ s: WeeklyNote.Summary, quiet: Bool) -> String {
+        ([title + "."] + tiles(s, quiet: quiet).map(\.spoken) + [closing(weekKey: s.weekKey)]).joined(separator: " ")
     }
 }
