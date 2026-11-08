@@ -190,7 +190,7 @@ final class TextFitScreensUITests: XCTestCase {
             scrollTo(cloud)
             XCTAssertTrue(cloud.exists, name)
             if name == "free" {
-                XCTAssertTrue(cloud.label.contains("needs Plus"), cloud.label)
+                XCTAssertTrue(cloud.label.contains("comes with Plus"), cloud.label)
             } else {
                 XCTAssertTrue(row.label.contains("WordFlora Plus is on"), row.label)
                 XCTAssertTrue(row.label.contains("Yearly"), row.label)

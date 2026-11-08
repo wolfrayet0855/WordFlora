@@ -88,6 +88,11 @@ final class PaywallRulesTests: XCTestCase {
     func testRestoreAndPageLines() {
         XCTAssertEqual(PaywallCopy.restoredOn, "Your purchases are back.", "Plus or a pack: one line for both")
         XCTAssertEqual(PaywallCopy.restoredNone, "No purchases found for this Apple ID.")
+        // Not reaching the App Store never reads as "nothing found".
+        XCTAssertEqual(PaywallCopy.restoreLine(reached: false, found: false), "Couldn't reach the App Store. Try again.")
+        XCTAssertEqual(PaywallCopy.restoreLine(reached: true, found: false), PaywallCopy.restoredNone)
+        XCTAssertEqual(PaywallCopy.restoreLine(reached: false, found: true), PaywallCopy.restoredOn)
+        XCTAssertEqual(CopySafety.check(PaywallCopy.restoreFailed), [])
         XCTAssertEqual(PaywallCopy.restore, "Restore purchases", "the one Restore button keeps its name")
         for line in [PaywallCopy.loadFailed, PaywallCopy.tryAgain, PaywallCopy.loadingPrices, PaywallCopy.ownedSubscription,
                      PaywallCopy.failed, PaywallCopy.renewal, PaywallCopy.trialCTA, PaywallCopy.ownedLifetimeDetail] {
@@ -143,13 +148,27 @@ final class PaywallRulesTests: XCTestCase {
         XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: .couldNotDetermine), .startsNextLaunch)
         XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: nil), .startsNextLaunch)
         XCTAssertEqual(S.on.title, "iCloud sync is on")
-        XCTAssertEqual(S.needsPlus.title, "iCloud sync is off (needs Plus)")
+        XCTAssertEqual(S.needsPlus.title, "iCloud sync comes with Plus")
         XCTAssertNil(S.startsNextLaunch.footnote)
         for line in S.Copy.all {
             XCTAssertEqual(CopySafety.check(line), [], line)
             XCTAssertFalse(line.lowercased().contains("last"), line)
         }
-        XCTAssertTrue(S.Copy.synced(Date.now.addingTimeInterval(-300)).hasPrefix("Synced "))
+        // Numeric times, never "last week" (CopySafety bans "last"): a few minutes, a day, a week, a month.
+        let now = Date(timeIntervalSince1970: 1_900_000_000)
+        let day: TimeInterval = 86_400
+        let agos: [TimeInterval] = [300, day, 7 * day, 9 * day, 32 * day, 400 * day]
+        for ago in agos {
+            let line = S.Copy.synced(now.addingTimeInterval(-ago), now: now)
+            XCTAssertTrue(line.hasPrefix("Synced "), line)
+            XCTAssertEqual(CopySafety.check(line), [], line)
+            XCTAssertFalse(line.lowercased().contains("last"), line)
+        }
+        XCTAssertEqual(S.Copy.synced(now.addingTimeInterval(-7 * day), now: now), "Synced 1 week ago")
+        // The account comes first: signed out after this launch opened the CloudKit store is not "on".
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: true, cloudOpenFailed: false, account: .noAccount), .needsSignIn)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: true, cloudOpenFailed: false, account: .restricted), .unavailable)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: true, cloudOpenFailed: false, account: nil), .on)
     }
 
     @MainActor
@@ -217,16 +236,14 @@ final class PaywallRulesTests: XCTestCase {
         }
     }
 
-    // MARK: Settings entry (owner ruling: young or unknown ages see "For grown-ups" and one calm line on Plus)
+    // MARK: Settings entry (owner ruling: young or unknown ages see "WordFlora Plus" and one calm line on Plus)
     func testPlusEntryIsForGrownUpsForYoungOrUnknownAgesOnly() {
         for band: AgeBand? in [.under13, nil] {
-            XCTAssertEqual(PlusEntry.sectionTitle(ageBand: band), "For grown-ups")
             XCTAssertEqual(PlusEntry.rowTitle(ageBand: band), "WordFlora Plus")
             XCTAssertEqual(PlusEntry.intro(ageBand: band),
                            "WordFlora is complete without Plus. Plus removes ads for grown-up players and syncs the garden with iCloud.")
         }
         for band: AgeBand? in [.thirteenPlus, .eighteenPlus] {
-            XCTAssertEqual(PlusEntry.sectionTitle(ageBand: band), "WordFlora Plus")
             XCTAssertEqual(PlusEntry.rowTitle(ageBand: band), "Remove ads and sync with iCloud")
             XCTAssertNil(PlusEntry.intro(ageBand: band))
         }

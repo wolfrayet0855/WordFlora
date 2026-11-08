@@ -2,7 +2,7 @@ import Foundation
 
 /// A calm Family Sharing note, never on Home and never a popup.
 /// - Under 13 and unknown age without Plus (owner, 2026-11-07): a note addressed to the grown-up, only inside the
-///   "For grown-ups" section of Settings, on at most one day a week, off in Quiet Garden. Its one button asks the
+///   "Purchases" section of Settings, on at most one day a week, off in Quiet Garden. Its one button asks the
 ///   grown-up question (`ParentalGate`) before the Plus page opens. No countdown, no pressure line for the child.
 /// - 13 and up: nothing. The Restore line it used to carry is retired (owner, 2026-11-07: one Restore purchases
 ///   in the whole app, in WordFlora Settings; docs/pm/plus-flow-fable-review.md N1). The benefits already say "Share it with your family".
@@ -14,7 +14,7 @@ enum FamilyShareNudge {
         case grownUp
     }
 
-    /// Where the row sits. The grown-ups' note lives only in the Settings "For grown-ups" section.
+    /// Where the row sits. The grown-ups' note lives only in the Settings "Purchases" section.
     enum Placement: Equatable { case settings, plusPage }
 
     /// The grown-ups' note shows on at most one day in seven.

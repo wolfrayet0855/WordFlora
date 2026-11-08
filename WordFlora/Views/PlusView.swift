@@ -330,10 +330,13 @@ struct ParentalGateSheet: View {
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity)
                     .accessibilityAddTraits(.isHeader)
+                // Full width, as the title: a wrapped centred line sized to its own width was read as clipped.
                 Text(ParentalGate.Copy.prompt).font(Theme.font(.callout)).multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
                 Text(challenge.question).font(Theme.font(.title, weight: .heavy))
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
                 TextField("Answer", text: $answer).keyboardType(.numberPad).textFieldStyle(.roundedBorder)
                     .font(Theme.font(.body))
                     .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : 160).multilineTextAlignment(.center)
@@ -371,15 +374,18 @@ struct GatedLink: View {
     @State private var gate: ParentalGate.Challenge?
     private let title: String
     private let url: URL
+    private let systemImage: String?
 
-    init(_ title: String, url: URL) { self.title = title; self.url = url }
+    init(_ title: String, url: URL, systemImage: String? = nil) { self.title = title; self.url = url; self.systemImage = systemImage }
 
     var body: some View {
-        Button(title) {
+        Button {
             switch ParentalGate.outbound(url, ageBand: app.settings.ageBand) {
             case .open(let u): openURL(u)
             case .askFirst: gate = ParentalGate.challenge(seed: UInt64(Date().timeIntervalSince1970))
             }
+        } label: {
+            if let systemImage { Label(title, systemImage: systemImage) } else { Text(title) }
         }
         .sheet(item: $gate) { challenge in
             ParentalGateSheet(challenge: challenge, onPass: { gate = nil; openURL(url) }, onCancel: { gate = nil })

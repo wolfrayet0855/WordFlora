@@ -6,6 +6,7 @@ struct SettingsView: View {
     @Environment(GameRouter.self) private var router
     @State private var reminderDenied = false
     @State private var restoring = false
+    @Environment(\.dynamicTypeSize) private var typeSize
     @State private var restoreMessage: String?
     @State private var exportDoc: GardenBackupDocument?
     @State private var exporting = false
@@ -74,14 +75,18 @@ struct SettingsView: View {
             Section("Garden") {
                 Toggle("Show everything", isOn: $s.showEverything)
             }
-            Section {
+            Section(PlusEntry.purchasesTitle) {
                 // Once Plus is on the row says so, with the plan ("WordFlora Plus is on · Yearly"), for every age.
                 let state = app.entitlements.state
                 Button { router.go(.plus) } label: {
-                    HStack {
+                    // Side by side, the plan under the title at the accessibility sizes.
+                    let rowLayout = typeSize.isAccessibilitySize
+                        ? AnyLayout(VStackLayout(alignment: .leading, spacing: 4)) : AnyLayout(HStackLayout())
+                    rowLayout {
                         Label(PlusEntry.rowTitle(ageBand: s.ageBand, hasPlus: state.hasPlus), systemImage: "sparkles")
+                            .fixedSize(horizontal: false, vertical: true)
                         if state.hasPlus, let short = PaywallCopy.planShort(state) {
-                            Spacer(minLength: 8)
+                            if !typeSize.isAccessibilitySize { Spacer(minLength: 8) }
                             Text(short).foregroundStyle(Color.secondaryText)
                         }
                     }
@@ -115,15 +120,12 @@ struct SettingsView: View {
                 // Only with a live subscription (none for Plus Forever alone or a free player); behind the grown-up
                 // question for under 13 and unknown ages, like every link that leaves the app.
                 if state.hasActiveSubscription {
-                    GatedLink("Manage subscription", url: Links.manageSubscriptions)
+                    GatedLink("Manage subscription", url: Links.manageSubscriptions, systemImage: "creditcard")
                         .accessibilityIdentifier("settings.manageSubscription")
                 }
                 FamilyShareNudgeRow()
-                cloudRow
-            } header: {
-                Text(PlusEntry.purchasesTitle).font(Theme.font(.footnote, weight: .semibold))
-                    .fixedSize(horizontal: false, vertical: true)
-                    .accessibilityAddTraits(.isHeader)
+                // Not before StoreKit has answered, so a paying player never sees "comes with Plus" for a moment at launch.
+                if app.entitlements.hasLoaded { cloudRow }
             }
             Section("Your garden") {
                 Button { prepareBackup() } label: { Label(GardenBackup.Copy.backupTitle, systemImage: "square.and.arrow.up") }
@@ -169,32 +171,36 @@ struct SettingsView: View {
         guard !restoring else { return }
         restoring = true; restoreMessage = nil
         Task {
-            await app.entitlements.restore()
+            let reached = await app.entitlements.restore()
             app.updateSyncFlag()
             restoring = false
             let state = app.entitlements.state
-            let line = state.hasPlus || !state.ownedPacks.isEmpty ? PaywallCopy.restoredOn : PaywallCopy.restoredNone
+            let line = PaywallCopy.restoreLine(reached: reached, found: state.hasPlus || !state.ownedPacks.isEmpty)
             restoreMessage = line
             AccessibilityNotification.Announcement(line).post()
         }
     }
 
-    /// iCloud sync as a status row (not a caption), for everyone: on, starts next time, needs Plus, needs a sign-in, or
+    /// iCloud sync as a status row (not a caption), for everyone: on, starts next time, comes with Plus, needs a sign-in, or
     /// unavailable, with what to do and, when this launch syncs, "Synced 5 minutes ago" (docs/pm/plus-flow-fable-review.md N4).
     private var cloudRow: some View {
         let status = app.cloudSyncStatus
-        return VStack(alignment: .leading, spacing: 4) {
-            Label(status.title, systemImage: status.symbol)
-                .font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
-                .fixedSize(horizontal: false, vertical: true)
-            if status == .on, let at = app.cloudSync?.syncedAt {
-                Text(CloudSyncStatus.Copy.synced(at)).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
-                    .accessibilityIdentifier("settings.cloudSync.synced")
-            }
-            if let note = status.footnote {
-                Text(note).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+        // The small print sits in the label's text column, under the title (not at the row's edge).
+        return Label {
+            VStack(alignment: .leading, spacing: 4) {
+                Text(status.title).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
+                if status == .on, let at = app.cloudSync?.syncedAt {
+                    Text(CloudSyncStatus.Copy.synced(at)).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                        .accessibilityIdentifier("settings.cloudSync.synced")
+                }
+                if let note = status.footnote {
+                    Text(note).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
+        } icon: {
+            Image(systemName: status.symbol).foregroundStyle(Color.appPrimaryText)
         }
         .accessibilityElement(children: .combine)
         .accessibilityIdentifier("settings.cloudSync")

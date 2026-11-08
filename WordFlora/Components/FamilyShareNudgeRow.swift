@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// The Family Sharing note (FamilyShareNudge decides who sees it): the grown-ups' note for under 13 and unknown age,
-/// only in Settings' "For grown-ups" section, on at most one day a week; its button asks the grown-up question before
+/// only in Settings' "Purchases" section, on at most one day a week; its button asks the grown-up question before
 /// the Plus page opens. Nothing for 13 and up (the one Restore purchases is in WordFlora Settings).
 struct FamilyShareNudgeRow: View {
     @Environment(AppModel.self) private var app

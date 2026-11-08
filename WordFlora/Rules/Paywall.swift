@@ -165,6 +165,13 @@ enum PaywallCopy {
     /// any season pack, so one line covers them all. Never gated: it never charges.
     static let restoredOn = "Your purchases are back."
     static let restoredNone = "No purchases found for this Apple ID."
+    /// Restore could not reach the App Store (offline, a cancelled sign-in): never "No purchases found" then.
+    static let restoreFailed = "Couldn't reach the App Store. Try again."
+
+    /// The one line after Restore purchases.
+    static func restoreLine(reached: Bool, found: Bool) -> String {
+        found ? restoredOn : (reached ? restoredNone : restoreFailed)
+    }
 
     /// Plus Forever's one honest line, on its row and under the button.
     static let lifetimeLine = "Pay once, keep Plus on this Apple ID. No renewals."
@@ -195,7 +202,7 @@ enum PaywallCopy {
          ownedLifetime, ownedLifetimeDetail, paysTwice, subscriptionEnds(on: "December 1, 2026"), cancelSubscription,
          renewal, trialCTA, priceLine("$12.99", choice: .yearly), priceLine("$3.99", choice: .monthly),
          priceLine("$34.99", choice: .lifetime), loadFailed, tryAgain, loadingPrices, ownedSubscription,
-         restore, pendingSlow, awaitingApproval, failed, restoredOn, restoredNone, PlusEntry.isOn, "Yearly", "Monthly", "Forever",
+         restore, pendingSlow, awaitingApproval, failed, restoredOn, restoredNone, restoreFailed, PlusEntry.isOn, PlusEntry.purchasesTitle, "Yearly", "Monthly", "Forever",
          justOn(adsWereOn: true, syncNeedsRestart: true), justOn(adsWereOn: true, syncNeedsRestart: false),
          justOn(adsWereOn: false, syncNeedsRestart: true), justOn(adsWereOn: false, syncNeedsRestart: false),
          planLine(plan: .yearly, renews: true, endsAt: Date(timeIntervalSince1970: 1_826_000_000)),
@@ -235,8 +242,8 @@ enum ParentalGate {
     static func isRequired(ageBand: AgeBand?) -> Bool { ageBand == nil || ageBand == .under13 }
 }
 
-/// The Settings way into Plus. Young players and unknown ages see it as "For grown-ups", and Plus opens with one calm
-/// line saying the game is complete without it. Teen and adult players see the usual row. The purchase itself still
+/// The Settings way into Plus, in the "Purchases" section for every age. Young players and unknown ages see the row as
+/// "WordFlora Plus" (no ad or price pitch), and Plus opens with one calm line saying the game is complete without it. Teen and adult players see the usual row. The purchase itself still
 /// asks a grown-up first (ParentalGate); nothing changes on the play screens.
 enum PlusEntry {
     static let grownUps = "For grown-ups"
@@ -249,7 +256,6 @@ enum PlusEntry {
     /// Restore purchases and, for a live subscription, Manage subscription. The rows keep their own grown-up gates.
     static let purchasesTitle = "Purchases"
 
-    static func sectionTitle(ageBand: AgeBand?) -> String { ParentalGate.isRequired(ageBand: ageBand) ? grownUps : PlusPlan.groupName }
     static func rowTitle(ageBand: AgeBand?, hasPlus: Bool = false) -> String {
         if hasPlus { return isOn }
         return ParentalGate.isRequired(ageBand: ageBand) ? PlusPlan.groupName : "Remove ads and sync with iCloud"

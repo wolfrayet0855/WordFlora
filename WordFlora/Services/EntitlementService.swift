@@ -140,9 +140,14 @@ final class EntitlementService {
         } catch { return .failed }
     }
 
-    func restore() async {
-        try? await AppStore.sync()
+    /// False when the App Store could not be reached (offline, cancelled sign-in, an error); what was found is read
+    /// either way.
+    @discardableResult
+    func restore() async -> Bool {
+        var reached = true
+        do { try await AppStore.sync() } catch { reached = false }
         await refresh()
+        return reached
     }
 
     // MARK: Seasonal packs (non-consumables; ownership is read from the transactions above every time)

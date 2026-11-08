@@ -871,6 +871,22 @@ final class ParentalGateLinkUITests: XCTestCase {
         XCTAssertEqual(app.state, .runningForeground)
     }
 
+    /// Under 13 with a live subscription: Manage subscription in Settings > Purchases asks a grown-up first (it leaves
+    /// the app); Restore purchases opens no gate (it never charges).
+    func testUnder13ManageSubscriptionInSettingsAsksAGrownUpFirst() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-age=under13", "-uitest-plus"]
+        app.launch()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        let manage = app.buttons["settings.manageSubscription"]
+        scrollTo(manage)
+        XCTAssertTrue(manage.exists, "a live subscription shows Manage subscription")
+        expectGateThenCancel(after: manage)
+        let restore = app.buttons["settings.restore"]
+        scrollTo(restore)
+        XCTAssertTrue(restore.exists)
+    }
+
     func testUnder13SettingsLinksAskAGrownUpFirst() {
         launch(age: "under13")
         expectGateThenCancel(after: app.buttons["Privacy Policy"])
