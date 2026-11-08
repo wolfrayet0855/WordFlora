@@ -135,14 +135,15 @@ struct HomeView: View {
                                 }
                         }
 
-                        if app.showWelcomeBack || app.plusOffer != nil || weather.card != nil || weather.banner != nil {
+                        if app.showWelcomeBack || (app.plusOffer != nil && weeklyNote == nil) || weather.card != nil || weather.banner != nil {
                             VStack(spacing: 10) {
                                 if let k = weather.banner { WeatherBanner(kind: k, onPuzzle: { weatherPuzzle = true }, refreshToken: weatherPuzzleClosed).transition(.opacity) }
                                 if let k = weather.card {
                                     ForecastCard(kind: k) { animate { app.dismissForecastCard() } }.transition(.opacity)
                                 }
                                 if app.showWelcomeBack { welcomeCard.transition(.opacity) }
-                                if app.plusOffer != nil { plusOfferCard.transition(.opacity) }
+                                // One card at a time: the Plus card never sits beside the weekly note.
+                                if app.plusOffer != nil && weeklyNote == nil { plusOfferCard.transition(.opacity) }
                             }
                         }
 
