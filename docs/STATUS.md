@@ -640,3 +640,65 @@ Decisions (mine, small): aspect fill anchored to the bottom (the sky takes the c
 Verified by typecheck only (no simulator, no xcodebuild: the lock was held): the app as one module (swiftc, simulator SDK), every unit test file against it except `StoreKitConfigTests` (StoreKitTest is not on the plain swiftc path; that file is unchanged), and the UI test target. Nothing has run yet. Planned for the lock turn: `FrostLanternTests` (new), `PlantThinningTests`, `PackCatalogTests`, `ButterflyAndBadgeTests`, `BadgeMechanicsTests`, `ReconcileTests`, `GardenBackupTests`, then the full unit suite; UI `FrostLanternUITests` (new: Home and Garden audits light and dark at AX XXXL, glasshouse pages at stages 0 and 4, album), `SeasonsUITests`, `HomeLayoutUITests`, `WordFloraUITests` (Garden, Visitors, plant page), `TendingUITests`, `WeatherUITests`, `EndgameUITests`. Shots to `docs/pm/shots/g5/`.
 
 Open: owner's look at the shots (Home, Garden, album, both plants at stages 0 and 4, light and dark); the snowdrop at the 132 pt compact stage; lantern halo breathing (optional in the art doc) not built; a scene on/off switch if wanted.
+
+## Gate G6: regression, hold, merge and v1.0-rc1 (2026-11-08)
+
+What ran: the combined hold on the integration branch (G4a, G4b, G5, engagement, polish pass 2), then the G6 regression on the hold branch `worktree-agent-ad2c0f0e0aef65236`. Final hold tip 5588896 (f08a8a6 plus 40 commits: 34 owner-fix cherry-picks, 2 runner test fixes, 4 evidence and shots commits). Unit suite: 1393 passed, 0 failed, 1 skipped (the first run had 2 G5 reds, fixed by 2822fa0). UI sets in the light and dark lanes, one simulator, lock `/private/tmp/claude-501/wf-build.lock` held by the runner.
+
+UI first run: 274 passed, 49 failed. The reds were two light lanes run on f08a8a6 (before later fixes) and 37 dark-named tests on one simulator set dark with `xcrun simctl ui appearance dark`. Every red rerun alone is green on the final tip. Per-class numbers (`docs/pm/evidence-g6/phase2/per-class-counts.txt`):
+
+| Class | First pass | First fail | Final pass | Final fail |
+|---|---|---|---|---|
+| AdFormatsG4bUITests | 14 | 12 | 26 | 0 |
+| AdFormatsUITests | 8 | 5 | 13 | 0 |
+| BadgeMechanicsUITests | 6 | 2 | 8 | 0 |
+| BadgesUITests | 4 | 0 | 4 | 0 |
+| ButterflyNetUITests | 13 | 0 | 13 | 0 |
+| CelebrationUITests | 5 | 0 | 5 | 0 |
+| DailyQuestUITests | 6 | 0 | 6 | 0 |
+| EndgameUITests | 13 | 2 | 15 | 0 |
+| EngagementUITests | 20 | 4 | 24 | 0 |
+| FadedBloomShotUITests | 1 | 0 | 1 | 0 |
+| FidelityScreensUITests | 7 | 0 | 7 | 0 |
+| FrostLanternUITests | 3 | 3 | 9 | 1 (see note) |
+| GuideUITests | 12 | 5 | 17 | 0 |
+| HomeLayoutUITests | 4 | 0 | 4 | 0 |
+| ParentalGateLinkUITests | 6 | 0 | 6 | 0 |
+| PlusForeverUITests | 4 | 2 | 6 | 0 |
+| QuietGardenOfferUITests | 9 | 0 | 9 | 0 |
+| RestCardHintUITests | 4 | 0 | 4 | 0 |
+| RestCardUITests | 15 | 1 | 16 | 0 |
+| SeasonsUITests | 11 | 1 | 12 | 0 |
+| SpeedBloomUITests | 10 | 0 | 10 | 0 |
+| TendingUITests | 30 | 0 | 30 | 0 |
+| TextFitScreensUITests | 10 | 2 | 13 | 0 |
+| WeatherUITests | 26 | 0 | 26 | 0 |
+| WordFloraUITests | 33 | 8 | 41 | 0 |
+
+Note: the one FrostLanternUITests "final fail" is `testGlasshousePlantPagesAtStageZeroAndFour`, which no longer exists (split by 4b1d4d8 into four StageZero/StageFour Light/Dark tests, all green alone in light5); its last result was a 4-minute stall, not a red on the final tip.
+
+Excused by ruling: single key letters may shrink (cf88685); Field Notes page names step down a text style at accessibility sizes (d0d78f8); the Seasons teen shelf audit runs with the snow held still; element-less clipped text behind the medium wake sheet is skipped (7cc7ca4).
+
+Real app fixes (app code only; `WordFlora/Models` untouched, no stored-field change):
+- Shed sponsored card loads on Shed appear and carries one id (8c52d9d, 899d555).
+- Return cue: Skip pinned in a footer, Home hidden from VoiceOver under the cue (707bb8f, 6b5eb95).
+- 44 pt targets for "Go ad-free" and "Report an ad".
+- Wake sheet tiles take full height; the sheet opens at the large detent with three rows (863bcab, 53b3d99).
+- Winter scene is decorative (385437a).
+- Shorter pack line (8797e77).
+- Plus benefit lines and Field Notes names take the full width (e0272bc).
+- Rest card label may wrap (c5dda37).
+- Grown-up sheet: pinned footer at accessibility sizes (4a4d7af); title2 at every size with a non-breaking hyphen (d2393f4).
+- Snowdrop thinning and pack store text (2822fa0).
+
+Screenshots: `docs/pm/shots/g6/` (61 real dark screens).
+
+Release proof: FAIL case verified (no `Config/Ads.local.xcconfig`; "Check ad ids" flagged all 10 keys as Google test ids; build failed as required; `check-ad-ids-test.sh` 0 failed). PASS case: pending: final proof runner. Bundle string scan of the Release binary: pending: final proof runner. Real ad ids are never written in any file or log.
+
+Evidence: `docs/pm/evidence-g6/phase1` and `docs/pm/evidence-g6/phase2`, screenshots in `docs/pm/shots/g6`.
+
+Review: `docs/pm/g6-fixes-review.md`. Verdict ready to merge, no blockers. Two should-fix items: (1) redo the merge rehearsal at the frozen tip with `git merge --no-ff` (done: branch `merge-rehearsal-g6`, `docs/pm/merge-recipe.md`); (2) check the grown-up sheet on an iPhone SE at AX5 with the number pad up on a device (Part C of `docs/pm/g6-device-checklist.md`).
+
+Merge: hold tip 5588896 into 3-feat-content-and-polish as c04329c (fast apply per `docs/pm/merge-recipe.md`: `merge --no-ff --no-commit`, then the docs from the rehearsal). Unit on the merged tip: pending: final proof runner. Tag `v1.0-rc1` at [fill: sha].
+
+Still device-only: widgets (13 items), audio and haptics, Settings and Restore, iCloud status and sync, the grown-up gates, the weekly note, name your plant, real ads, StoreKit sandbox, the SE AX5 gate check. Owner items: `docs/pm/owner-final-checklist.md`.
