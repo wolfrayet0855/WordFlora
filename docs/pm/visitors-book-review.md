@@ -48,7 +48,10 @@ Fix: at accessibility sizes use `.title3` bold and horizontal padding 16 instead
   (and 78 pt at xxLarge on 375), so it breaks before any accessibility size.
 - 2 columns at AX: cells are about 174 pt; "Snowflake" is about 175 pt at AX4 and 203 pt at AX5; "Ladybird" is about
   173 pt at AX5.
-Fix: `let cols = typeSize >= .accessibility4 ? 1 : (typeSize.isAccessibilitySize ? 2 : (typeSize >= .xxLarge ? 3 : 4))`.
+Measured (docs/pm/toolbar-fit-review.md section 7): "Snowflake" breaks from xxLarge on 393 pt and from xLarge on
+375 pt; "Ladybird" and "Rainbow" break at xxxLarge on 375 pt and at AX5 in two columns.
+Fix: `let cols = typeSize >= .accessibility4 ? 1 : (typeSize.isAccessibilitySize ? 2 : (typeSize >= .xLarge ? 3 : 4))`
+(three columns give about 106-112 pt per name, enough for "Snowflake" at xxxLarge, 91 pt).
 
 ## Medium
 
