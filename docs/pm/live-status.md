@@ -1,0 +1,44 @@
+# Live status (lead updates this at every check-in)
+
+Updated 2026-11-07 19:10.
+
+## Gates
+| Gate | State |
+|---|---|
+| G0–G2b, art lane | Merged |
+| G3 pack + Mist Maker | Features done (last: 35a19a3, adds `PlantCollectible.lastMistedAt`). 19:15: unit tests 1185/1185 green; UI TendingUITests 28/28; Seasons/BadgeMechanics/ParentalGate/PlusForever group running. Next: tool-bar fix (title "Trim", two rows of three at larger text, layout test, before/after shots). Not merged yet. |
+| CloudKit deploy | Owner: check Production for the fields; plan doc coming (`docs/setup/cloudkit-deploy-straight-to-prod.md`). |
+| G4a AdMob hardening | Starts when G3 merges. Brief ready: `docs/pm/g4a-builder-brief.md`. |
+| G5, G4b, G6, submit | Queued. Target Thu 11-19, slip allowed to Mon 11-23. |
+
+## Agents running
+| Agent | Task | Output |
+|---|---|---|
+| G3 builder | Finish regression, fix six-button tool bar ("Trimmed" wraps), hand back | commits in its worktree |
+| Audio review (Sonnet) | Level/clipping/loop check of all sounds, mist hiss advice | `docs/pm/audio-review.md` |
+| Tool-bar fit review (Opus) | Width maths, other rows that might wrap | `docs/pm/toolbar-fit-review.md` |
+| CloudKit plan (Fable) | Straight-to-prod steps and TestFlight-skip risks | `docs/setup/cloudkit-deploy-straight-to-prod.md` |
+| Visitors book review (Opus) | UX/a11y bugs in the Visitors page | `docs/pm/visitors-book-review.md` |
+| PM check-in (Fable) | 19:00 review | `docs/pm/pm-checkin-2026-11-07-19.md` |
+
+## Done since 18:00
+- Docs helper: G4a brief, faded-bloom offsets, AdMob console one-pager, setup and privacy docs refreshed, winter facts aligned.
+- Fact check: all four facts confirmed (`docs/research/frost-lantern-facts-check.md`).
+- Cleanup: 15 orphaned timers killed, 1.9 GB freed, `mediaanalysisd` killed on the Mac.
+
+## Owner decisions open
+1. Mist hiss: keep the water sound at 35% or make a real hiss (audio review will advise).
+2. Eight untracked `tools/out/weather/*.wav` files: ignore, commit or delete.
+3. Slow test `testRepotSheetScreensLikeTheMockup` (over 120 s): raise its allowance or have it sped up (lead default: speed up).
+4. TestFlight: skip or keep one internal build (Fable recommendation pending).
+
+## Owner tasks
+- CloudKit: confirm Production has the fields; deploy after G3 merge if not.
+- App Store Connect: `pack_frost_lantern` product (Family Sharing on), `plus_lifetime` Family Sharing on.
+- Done: AdMob console checklist, fact check.
+
+## Scope admitted since freeze release (2026-11-07 evening)
+- Appearance follows system (Settings picker removed), in G3 branch.
+- Tool bar fit: two rows of three, "Trim", AX single column (G3 branch, per docs/pm/toolbar-fit-review.md).
+- Text-fit pass (new, after G3 merge, before G4a): Visitors stickers, Shed pot cards (drop the xxxLarge cap, fewer columns), My Garden cards, Repot sheet, Shed tool effect line. Owner rule: every word fits at every text size.
+- Text-fit pass also takes Visitors book review V1-V11 (docs/pm/visitors-book-review.md): V1-V4 word wrapping, V5 "Seen on <date>" copy, V6 rarity chip contrast, V7/V8 VoiceOver, V9-V11 polish.
