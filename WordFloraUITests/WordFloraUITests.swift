@@ -109,7 +109,11 @@ final class WordFloraUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 8))
         app.buttons["Play"].tap()
         for n in 1...2 {
-            XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
+            let l = app.buttons["L"]
+            XCTAssertTrue(l.waitForExistence(timeout: 5))
+            // After "Next word" the card fades out over the keys; a tap before they are hittable is lost (seen at AX XXXL).
+            for _ in 0..<10 where !l.isHittable { usleep(300_000) }
+            XCTAssertTrue(l.isHittable, "the keyboard is back for word \(n)")
             tapLetters("LOTUS")
             let next = app.buttons["Next word"]
             XCTAssertTrue(next.waitForExistence(timeout: 6), "word \(n)")
