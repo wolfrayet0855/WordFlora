@@ -473,8 +473,12 @@ struct GameView: View {
                                 .accessibilityElement(children: .combine)
                                 .accessibilityIdentifier("restCard.adNote")
                         }
-                        Button(RestCardCopy.enough) { showRestCard = false; app.markRestExit(); router.home() }
-                            .buttonStyle(SecondaryButtonStyle()).accessibilityIdentifier("restCard.enough")
+                        // An explicit label that may wrap, as the grown-up sheet's Continue: the audit read the
+                        // button's one-line label as clipped.
+                        Button { showRestCard = false; app.markRestExit(); router.home() } label: {
+                            Text(RestCardCopy.enough).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                        }
+                        .buttonStyle(SecondaryButtonStyle()).accessibilityIdentifier("restCard.enough")
                     }
                     .padding(.top, 6)
                     hintRow
