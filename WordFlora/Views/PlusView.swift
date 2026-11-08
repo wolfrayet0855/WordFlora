@@ -374,7 +374,10 @@ struct ParentalGateSheet: View {
                 Button {
                     if ParentalGate.check(answer: answer, against: challenge) { onPass() } else { wrong = true }
                 } label: {
+                    // Room above and below the word: at AX5 its line (about 66 pt) filled the button exactly and the
+                    // audit read it as clipped.
                     Text("Continue").multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 8)
                 }
                 .buttonStyle(PrimaryButtonStyle())
                 Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
