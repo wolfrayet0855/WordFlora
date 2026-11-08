@@ -90,4 +90,139 @@ final class EngagementUITests: XCTestCase {
         winTheDaily()
         XCTAssertTrue(app.buttons["Share your Daily Bloom"].waitForExistence(timeout: 3))
     }
+
+    // MARK: B. Make it yours
+
+    private func scrollTo(_ e: XCUIElement) {
+        for _ in 0..<10 where !(e.exists && e.isHittable) { app.swipeUp() }
+    }
+
+    /// The plant page for one found plant (as TendingUITests.open), waiting out the first-look badge moment.
+    private func openPlant(_ plantName: String, plantId: String, extra: [String] = []) {
+        launch(["-uitest-plant=\(plantId)"] + extra)
+        app.buttons["Garden"].tap()
+        let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", plantName)).firstMatch
+        _ = tile.waitForExistence(timeout: 3)
+        scrollTo(tile)
+        tile.tap()
+        XCTAssertTrue(app.buttons["tend-water"].waitForExistence(timeout: 5))
+        let moment = element("badgeMoment")
+        if moment.waitForExistence(timeout: 4) { XCTAssertTrue(moment.waitForNonExistence(timeout: 10), "the badge moment goes") }
+    }
+
+    func testNewPlantCardOffersANameAndThePlantSaysHello() {
+        winAPlant()
+        let give = app.buttons["plantName.give"]
+        XCTAssertTrue(give.waitForExistence(timeout: 3))
+        shot("b-win-give-name")
+        give.tap()
+        let alert = app.alerts["Name your plant"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 3))
+        let field = alert.textFields.firstMatch
+        let species = field.placeholderValue ?? ""
+        XCTAssertFalse(species.isEmpty, "the box shows the species name as its placeholder")
+        XCTAssertTrue(alert.buttons["Not now"].exists)
+        field.typeText("Sunny")
+        alert.buttons["Save"].tap()
+        XCTAssertTrue(app.staticTexts["Hello! I love the name Sunny."].waitForExistence(timeout: 3))
+        XCTAssertFalse(give.exists, "never a second prompt")
+        shot("b-win-named")
+        let cont = app.buttons["Continue"]
+        scrollTo(cont)
+        cont.tap()
+        XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 5))
+        app.buttons["Home"].tap()
+        app.buttons["Garden"].tap()
+        let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", species)).firstMatch
+        XCTAssertTrue(tile.waitForExistence(timeout: 3), species)
+        scrollTo(tile)
+        tile.tap()
+        XCTAssertTrue(app.navigationBars["Sunny"].waitForExistence(timeout: 5), "the plant page title reads the new name")
+    }
+
+    func testNotNowKeepsTheButtonAndSavesNothing() {
+        winAPlant()
+        app.buttons["plantName.give"].tap()
+        let alert = app.alerts["Name your plant"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 3))
+        alert.buttons["Not now"].tap()
+        XCTAssertTrue(app.buttons["plantName.give"].waitForExistence(timeout: 2))
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH %@", "Hello! I love")).firstMatch.exists)
+    }
+
+    func testPencilNameOfOnlyEmojiGoesBackToTheSpeciesName() {
+        openPlant("Daisy", plantId: "daisy")
+        app.buttons["Rename"].tap()
+        let alert = app.alerts["Name your plant"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 3))
+        alert.textFields.firstMatch.typeText("  Sunny  ")
+        alert.buttons["Save"].tap()
+        XCTAssertTrue(app.navigationBars["Sunny"].waitForExistence(timeout: 3), "trimmed")
+        app.buttons["Rename"].tap()
+        XCTAssertTrue(alert.waitForExistence(timeout: 3))
+        let field = alert.textFields.firstMatch
+        field.typeText(String(repeating: XCUIKeyboardKey.delete.rawValue, count: 12) + " !!! ?")
+        alert.buttons["Save"].tap()
+        XCTAssertTrue(app.navigationBars["Daisy"].waitForExistence(timeout: 3), "no letters: back to the species name")
+    }
+
+    func testShowOnMyWidgetFlipsToOnYourWidget() {
+        openPlant("Daisy", plantId: "daisy")
+        let pin = app.buttons["plant.showOnWidget"]
+        scrollTo(pin)
+        XCTAssertTrue(pin.exists)
+        pin.tap()
+        let on = element("plant.onWidget")
+        XCTAssertTrue(on.waitForExistence(timeout: 3))
+        XCTAssertEqual(on.label, "On your widget")
+        XCTAssertFalse(app.buttons["plant.showOnWidget"].exists, "pinned: not a button")
+        let line = element("plant.widgetLine")
+        XCTAssertTrue(line.waitForExistence(timeout: 3))
+        XCTAssertTrue(line.label.contains("Daisy"), line.label)
+        shot("b-plant-on-widget")
+    }
+
+    func testAuditWinCardWithTheNameButton() {
+        winAPlant()
+        XCTAssertTrue(app.buttons["plantName.give"].waitForExistence(timeout: 3))
+        sleep(1)
+        audit("b-win-card")
+    }
+
+    func testAuditWinCardWithTheNameButtonAtAXXXL() {
+        winAPlant(Self.axXXXL)
+        XCTAssertTrue(app.staticTexts["New plant found!"].exists)
+        sleep(1)
+        audit("b-win-card-axxxl")
+        let cont = app.buttons["Continue"]
+        scrollTo(cont)
+        XCTAssertTrue(cont.isHittable, "Continue is still reachable by scrolling")
+        XCTAssertTrue(app.buttons["plantName.give"].exists)
+        XCUIDevice.shared.appearance = .dark
+        sleep(1)
+        shot("b-win-card-axxxl-dark")
+        audit("b-win-card-axxxl-dark")
+    }
+
+    func testAuditPlantPageWidgetRow() {
+        openPlant("Daisy", plantId: "daisy")
+        scrollTo(app.buttons["plant.showOnWidget"])
+        sleep(1)
+        audit("b-plant-widget-row")
+    }
+
+    func testAuditPlantPageWidgetRowAtAXXXL() {
+        openPlant("Daisy", plantId: "daisy", extra: Self.axXXXL)
+        let pin = app.buttons["plant.showOnWidget"]
+        scrollTo(pin)
+        sleep(1)
+        audit("b-plant-widget-row-axxxl")
+        pin.tap()
+        XCTAssertTrue(element("plant.onWidget").waitForExistence(timeout: 3))
+        scrollTo(element("plant.widgetLine"))
+        XCUIDevice.shared.appearance = .dark
+        sleep(1)
+        shot("b-plant-widget-row-axxxl-dark")
+        audit("b-plant-widget-row-axxxl-dark")
+    }
 }

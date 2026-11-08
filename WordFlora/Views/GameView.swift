@@ -324,6 +324,7 @@ struct GameView: View {
                         PlantCard(plant: plant, standalone: true).frame(maxWidth: PlantCard.foundWidth(dynamicTypeSize))
                         Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
                             .fixedSize(horizontal: false, vertical: true)
+                        if vm.earnedPlantIsNew { NameOnArrivalRow(plant: plant) }      // Make it yours (PlantName)
                     }
                 } else {
                     // No plant this round: the word counts toward the next one.
