@@ -483,10 +483,13 @@ struct PlantDetailView: View {
                 .frame(maxWidth: .infinity).multilineTextAlignment(.center)
         }
 
-        if app.canOfferRewarded && !quiet && (app.profile?.water ?? 0) == 0 {
-            Button { Task { if await app.watchRewardedAd() { run(.water, kind: .water, plant) } } } label: {
-                Label("Watch a short video for 2 drops", systemImage: "play.rectangle.fill")
-            }.buttonStyle(SecondaryButtonStyle())
+        // R1: the perk path (video for 13 and over without Plus, the rain barrel for Plus, under 13 and unknown age).
+        // The Garden card shares the same three-a-day cap. Quiet Garden never uses drops (the path is hidden there).
+        if !quiet {
+            RewardedPromptRow.forPath(app.perkPath(.water), adTitle: AdPerkCopy.Water.adTitle, freeTitle: AdPerkCopy.Water.freeTitle,
+                                      hasPlus: app.entitlements.state.hasPlus, identifier: "plant.waterPerk") {
+                Task { if await app.watchRewarded(.water) { run(.water, kind: .water, plant) } }
+            }
         }
 
         if GardenAIProvider.isModelBacked() {
