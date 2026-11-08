@@ -3,7 +3,7 @@ import CloudKit
 import CoreData
 
 /// What WordFlora Settings says about iCloud sync, from facts the app has (docs/pm/plus-flow-fable-review.md N4).
-/// Shown to everyone: free players see that sync needs Plus, which answers the question before they buy.
+/// Shown to everyone: free players see that sync comes with Plus, which answers the question before they buy.
 enum CloudSyncStatus: Equatable {
     case needsPlus, startsNextLaunch, on, needsSignIn, unavailable
 
@@ -11,9 +11,11 @@ enum CloudSyncStatus: Equatable {
     /// `account`: the iCloud account status, when it has been read (nil before, or without Plus).
     static func status(hasPlus: Bool, launchedWithCloud: Bool, cloudOpenFailed: Bool, account: CKAccountStatus?) -> CloudSyncStatus {
         guard hasPlus else { return .needsPlus }
-        if launchedWithCloud { return .on }
+        // The account first: a player who signed out of iCloud after this launch opened the CloudKit store is not syncing.
         if account == .noAccount { return .needsSignIn }
-        if cloudOpenFailed || account == .restricted { return .unavailable }
+        if account == .restricted { return .unavailable }
+        if launchedWithCloud { return .on }
+        if cloudOpenFailed { return .unavailable }
         return .startsNextLaunch
     }
 
@@ -45,7 +47,7 @@ enum CloudSyncStatus: Equatable {
     }
 
     enum Copy {
-        static let needsPlus = "iCloud sync is off (needs Plus)"
+        static let needsPlus = "iCloud sync comes with Plus"
         static let startsNextLaunch = "iCloud sync starts next time you open WordFlora"
         static let on = "iCloud sync is on"
         static let needsSignIn = "iCloud sync needs an iCloud sign-in"
@@ -53,9 +55,13 @@ enum CloudSyncStatus: Equatable {
         static let onFootnote = "Your garden shows up on any iPhone signed in to the same iCloud account."
         static let needsSignInFootnote = "Sign in to iCloud in the Settings app, then reopen WordFlora."
         static let unavailableFootnote = "Check that WordFlora may use iCloud in the Settings app (Apple Account > iCloud), then reopen WordFlora."
-        /// "Synced 5 minutes ago", "Synced yesterday". Never "Last synced" (CopySafety bans "last").
-        static func synced(_ date: Date) -> String {
-            "Synced \(date.formatted(.relative(presentation: .named)))"
+        /// "Synced 5 minutes ago", "Synced 1 week ago": numeric, because the named style says "last week" (CopySafety
+        /// bans "last"), as would "Last synced".
+        static func synced(_ date: Date, now: Date = .now) -> String {
+            let f = RelativeDateTimeFormatter()
+            f.dateTimeStyle = .numeric
+            f.unitsStyle = .full
+            return "Synced \(f.localizedString(for: min(date, now), relativeTo: now))"
         }
         static var all: [String] {
             [needsPlus, startsNextLaunch, on, needsSignIn, unavailable, onFootnote, needsSignInFootnote, unavailableFootnote,
@@ -76,9 +82,11 @@ final class CloudSyncMonitor {
     private(set) var lastFailed = false
     @ObservationIgnored private let defaults: UserDefaults
     @ObservationIgnored nonisolated(unsafe) private var token: NSObjectProtocol?
+    @ObservationIgnored nonisolated(unsafe) private let center: NotificationCenter
 
     init(center: NotificationCenter = .default, defaults: UserDefaults = SharedDefaults.store, listen: Bool = true) {
         self.defaults = defaults
+        self.center = center
         syncedAt = defaults.object(forKey: Self.key) as? Date
         guard listen else { return }
         token = center.addObserver(forName: NSPersistentCloudKitContainer.eventChangedNotification, object: nil, queue: .main) { [weak self] n in
@@ -89,7 +97,7 @@ final class CloudSyncMonitor {
         }
     }
 
-    deinit { if let token { NotificationCenter.default.removeObserver(token) } }
+    deinit { if let token { center.removeObserver(token) } }
 
     /// A finished import or export: a success moves the time on; a failure changes nothing on screen (it retries).
     func record(end: Date, ok: Bool) {
