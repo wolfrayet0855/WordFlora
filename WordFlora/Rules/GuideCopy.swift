@@ -162,6 +162,8 @@ struct GuidePager: Equatable {
 /// How the guide looks for this player (README "Motion"): Reduce Motion from the system or the in-app override, and
 /// Calm mode, keep the art still; Calm and Quiet Garden use the quiet line on page 4; Quiet Garden shows no points.
 enum GuideLook {
+    /// The soft fade at the foot of a Guide page, in points (instead of a hard clip).
+    static let bottomFade: CGFloat = 24
     static func still(systemReduceMotion: Bool, reduceMotionOverride: Bool, calm: Bool) -> Bool {
         systemReduceMotion || reduceMotionOverride || calm
     }

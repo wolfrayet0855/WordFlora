@@ -203,6 +203,7 @@ private struct FirstGardenTipView: View {
     @State private var toast: String?
     @State private var pour: TendPlay?
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .title2) private var tipIcon: CGFloat = 44
 
     private var plant: PlantCollectible? { app.plants().first { $0.earnedCount > 0 } }
@@ -223,7 +224,7 @@ private struct FirstGardenTipView: View {
                     .accessibilityAddTraits(.isHeader)
                 if let plant {
                     // The water pour plays here once, over the plant, when the free drink is poured.
-                    PlantCard(plant: plant).frame(maxWidth: 220)
+                    PlantCard(plant: plant, standalone: true).frame(maxWidth: PlantCard.foundWidth(typeSize))
                         .tendMotion(pour, size: 92, calm: reduceMotion)
                         .overlay(alignment: .top) { TendAnimationView(play: pour, size: 92, calm: reduceMotion).padding(.top, 12) }
                         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: pour?.id ?? 0) { old, new in new > old && app.settings.hapticsOn }
@@ -243,7 +244,7 @@ private struct FirstGardenTipView: View {
                             .frame(width: tipIcon, height: tipIcon)
                             .background(Color.appAccent, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
                             .accessibilityHidden(true)
-                        (Text("The water button").bold() + Text(" gives your plant a drink. Your first drink is free!"))
+                        (Text("The water button").bold() + Text(" gives your plant a drink. Your first drink is ready!"))
                             .font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText)
                             .fixedSize(horizontal: false, vertical: true)
                     }

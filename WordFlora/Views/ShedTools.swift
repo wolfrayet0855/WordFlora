@@ -196,7 +196,7 @@ struct ToolTile: View {
             if owned && !quiet { TierPips(tier: tier, tint: tint.icon) }
             Text(line).font(Theme.font(.footnote, weight: .bold))
                 .foregroundStyle(owned ? Color.appPrimaryText : Color.secondaryText)
-                .lineLimit(typeSize.isAccessibilitySize ? nil : 2)
+                .fixedSize(horizontal: false, vertical: true)
             if ready {
                 Label(ShedCopy.upgradeReady, systemImage: "arrow.up").font(Theme.font(.caption, weight: .heavy)).foregroundStyle(Color.ink)
                     .padding(.horizontal, 10).padding(.vertical, 3).background(Color.appAccent, in: Capsule())
