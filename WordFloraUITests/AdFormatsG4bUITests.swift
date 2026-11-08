@@ -262,7 +262,9 @@ final class AdFormatsG4bUITests: XCTestCase {
         audit(tag("cue", size: size, dark: dark))
         scrollTo(skip)
         XCTAssertTrue(skip.isHittable, "Skip is reachable at every size")
+        Thread.sleep(forTimeInterval: 1)              // let the scroll settle: a tap on a moving scroll only stops it
         skip.tap()
+        if cue.waitForExistence(timeout: 1), skip.isHittable { skip.tap() }
         XCTAssertFalse(cue.waitForExistence(timeout: 2))
     }
 
