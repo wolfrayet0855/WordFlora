@@ -352,8 +352,9 @@ final class WordFloraUITests: XCTestCase {
         app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-plus"]
         app.launch()
         app.buttons["Settings"].tap()
-        scrollTo(app.buttons["Remove ads and sync with iCloud"])
-        app.buttons["Remove ads and sync with iCloud"].tap()
+        // With Plus on, the row says so ("WordFlora Plus is on · <plan>").
+        scrollTo(app.buttons["settings.plus"])
+        app.buttons["settings.plus"].tap()
         XCTAssertTrue(app.staticTexts["You have WordFlora Plus"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Subscribe"].exists)
     }
