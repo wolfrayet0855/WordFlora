@@ -39,3 +39,6 @@ Items here are parked, not cut. Each needs the owner's go before it is built.
 - Garden bed ramp-in (the garden bed starts at full level with no ramp).
 - Calm trims the effect volumes (master 0.8 to about 0.57).
 - Ads: Unity Ads bidder, a rewarded value test, the Declared Age Range API.
+
+- Gate: post a VoiceOver announcement when the wrong-answer line appears (PlusView.swift ~377) (1.1, from G6 fixes review).
+- Shed: the zero-height sponsored-section spacer adds a 12 pt gap at the bottom when an ad is present; move the .task to ShedView or pad -12 (1.1, cosmetic).

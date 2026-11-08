@@ -157,3 +157,5 @@ Full plan: `docs/setup/screenshot-plan.md`. Summary: 8 shots per size, same orde
 **Slip date Mon 2026-11-23** if: a blocker in Part C, the G4b formats are not green (ship them off by a compile-time flag only with the lead's approval), the G5 art falls back (pack to 1.1, submit can move earlier), the Paid Apps Agreement is not Active, or CloudKit Production is not confirmed. Slip order of cuts needs owner approval; none applied here.
 
 After submit: do not change `Models/`; watch AdMob Ad review center weekly for the first month; check app-open show rate and rewarded completion per unit.
+
+- Device: grown-up sheet on an iPhone SE at the largest text size with the number pad up (pinned footer: answer field, Continue and Cancel reachable).
