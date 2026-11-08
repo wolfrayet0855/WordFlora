@@ -597,6 +597,9 @@ final class AppModel {
             await ads.prepare(treatment: t, isStillAllowed: { self.mayStillLoadAds })
             adSession.consentResolved = ads.canRequestAds
             guard mayStillLoadAds else { return false }
+            // Consent declined or not resolved: the SDK never started, so a video row would do nothing. Hide the
+            // video rows for this visit (the free rows for Plus, under 13 and unknown age are not on this path).
+            guard ads.started else { adSession.rewardedLoadFailed = true; return false }
             let outcome = await ads.showRewarded(perk, isStillAllowed: { self.mayStillLoadAds })
             if outcome.shown { recordFullScreen(kind: .rewarded(perk)) }
             adSession.rewardedLoadFailed = ads.rewardedLoadFailed
