@@ -24,8 +24,8 @@ struct GardenBannerSlot: View {
                 }
                 .frame(height: height)
                 HStack(spacing: 16) {
-                    Button(AdFormatCopy.Banner.goAdFree) { router.go(.plus) }
-                    Link(AdFormatCopy.Banner.report, destination: Links.reportAd)
+                    Button(AdFormatCopy.Banner.goAdFree) { router.go(.plus) }.tapTarget()
+                    Link(AdFormatCopy.Banner.report, destination: Links.reportAd).tapTarget()
                 }
                 .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
                 .multilineTextAlignment(.center)
