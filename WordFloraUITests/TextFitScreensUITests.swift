@@ -64,6 +64,12 @@ final class TextFitScreensUITests: XCTestCase {
                     guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
                     if let v = visible, !v.contains(e.frame) { return true }
                 }
+                // The audit does not scroll: a control half below the visible area (the grown-up sheet's Cancel at AX5,
+                // under the sheet's bottom edge) reads as clipped text. Judged once it is fully in view, as the other
+                // suites treat words under a pinned footer; the test scrolls to Cancel and taps it.
+                if issue.auditType == .textClipped, let e = issue.element, let v = visible, !v.insetBy(dx: -1, dy: -1).contains(e.frame) {
+                    skipped.append("\(issue.compactDescription) on '\(e.label)' (partly out of view)"); return true
+                }
                 findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' [\(issue.element?.identifier ?? "")] \(issue.element.map { "\($0.frame)" } ?? "")")
                 return true
             }

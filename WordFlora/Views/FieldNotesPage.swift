@@ -111,8 +111,9 @@ struct FieldNotesPage: View {
     /// (The spine is 18 pt with its holes inside it, so 24 still leaves 6 pt of paper before the words.)
     static func leading(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 24 : 34 }
     static func trailing(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 8 : 18 }
-    /// Subheadline only at AX5 (the same size as title3 at AX4), so the name never shrinks as the text grows.
-    static func nameStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size >= .accessibility5 ? .subheadline : .title3 }
+    /// Subheadline at every accessibility size, so the name grows at each step from AX1 to AX5 (title3 at AX4 and
+    /// subheadline at AX5 are the same size, which the audit reads as Dynamic Type unsupported).
+    static func nameStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size.isAccessibilitySize ? .subheadline : .title3 }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
