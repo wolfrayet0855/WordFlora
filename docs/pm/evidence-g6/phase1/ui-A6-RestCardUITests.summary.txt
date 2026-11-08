@@ -1,0 +1,29 @@
+Test Case '-[WordFloraUITests.CelebrationUITests testABadgeEarnedInARoundPopsWhenTheCardClosesAndGoesOnATap]' passed (20.579 seconds).
+Test Case '-[WordFloraUITests.CelebrationUITests testBurstsNeverBlockTheScreenOrFailTheAudit]' passed (44.426 seconds).
+Test Case '-[WordFloraUITests.CelebrationUITests testIntroFrames]' passed (25.348 seconds).
+Test Case '-[WordFloraUITests.CelebrationUITests testTheBadgeMomentPassesTheAuditAndCloses]' passed (12.958 seconds).
+Test Case '-[WordFloraUITests.CelebrationUITests testTheIntroSkipsToTheAgeQuestionOnATap]' passed (14.906 seconds).
+	 Executed 5 tests, with 0 failures (0 unexpected) in 118.217 (118.229) seconds
+Test Case '-[WordFloraUITests.HomeLayoutUITests testAccessibilitySizesUseOneColumnOfEqualRows]' passed (9.968 seconds).
+Test Case '-[WordFloraUITests.HomeLayoutUITests testDefaultSizeIsATwoColumnGridWithAFullWidthBadgesTile]' passed (14.655 seconds).
+Test Case '-[WordFloraUITests.HomeLayoutUITests testLabelsStayOnOneLineAtDefaultSizeWithLockedTiles]' passed (15.388 seconds).
+Test Case '-[WordFloraUITests.HomeLayoutUITests testLabelsStayOnOneLineAtExtraExtraExtraLarge]' passed (29.358 seconds).
+	 Executed 4 tests, with 0 failures (0 unexpected) in 69.369 (69.374) seconds
+Test Case '-[WordFloraUITests.RestCardUITests testAFreeAdultBackSoonIsToldOnPlayAndAnAdThatCannotPlayBringsTheNudge]' passed (38.542 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testAFreePlayerWhoMayGetAnAdIsToldUnderOneMore]' passed (36.756 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testAuditBreakCard]' passed (42.986 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testAuditNudgeCard]' passed (53.008 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/RestCardUITests.swift:315: error: -[WordFloraUITests.RestCardUITests testAuditRestCard] : XCTAssertTrue failed - rest-card-textClipped: 131072 - Text clipped | 9 'That's enough for now' (43.5, 586.5, 315.0, 53.0)
+Test Case '-[WordFloraUITests.RestCardUITests testAuditRestCard]' failed (48.252 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testBreakCardButtonsCanBeReachedAtALargeTextSize]' passed (17.005 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testCalmPlayersBackSoonCanVisitTheGarden]' passed (38.933 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testEveryRestCardButtonCanBeReachedAtALargeTextSize]' passed (37.250 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testPlusPlayersBackSoonGetTheNudgeAndPlayAnywayPlays]' passed (35.399 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testPlusPlayersSeeNoAdNoteAndNoPlusRow]' passed (34.448 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testQuietGardenBackSoonCanTryTheDailyBloom]' passed (33.148 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testThatsEnoughGoesHome]' passed (30.108 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testTheBreakCardHasNoAdNoteAndNoPlusRow]' passed (17.173 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testTheGoAdFreeRowOpensPlus]' passed (30.809 seconds).
+	 Executed 14 tests, with 1 failure (0 unexpected) in 493.817 (493.842) seconds
+	 Executed 23 tests, with 1 failure (0 unexpected) in 681.402 (681.454) seconds
+	 Executed 23 tests, with 1 failure (0 unexpected) in 681.402 (681.457) seconds

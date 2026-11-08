@@ -1,0 +1,23 @@
+Test Case '-[WordFloraUITests.AdFormatsUITests testAnAdultWithADryCanWatchesAVideoForTwoDrops]' passed (28.479 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsUITests.swift:132: error: -[WordFloraUITests.AdFormatsUITests testAuditGardenLightAXXXL] : XCTAssertTrue failed - garden-light-axxxl: 1 - Contrast failed | '0 of 50 plants found' [] (16.0, 664.6666666666666, 257.66666666666663, 116.66666666666674)
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditGardenLightAXXXL]' failed (24.008 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsUITests.swift:132: error: -[WordFloraUITests.AdFormatsUITests testAuditGardenLightDefault] : XCTAssertTrue failed - garden-light-default: 4 - Hit area is too small | 'Go ad-free' [] (128.0, 821.6666666666666, 60.0, 14.333333333333371)
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditGardenLightDefault]' failed (29.247 seconds).
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeLightAXXXL]' passed (71.943 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsUITests.swift:132: error: -[WordFloraUITests.AdFormatsUITests testAuditWakeLightDefault] : XCTAssertTrue failed - wake-light-default: 2 - Potentially inaccessible text | '' [] 
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeLightDefault]' failed (40.947 seconds).
+Test Case '-[WordFloraUITests.AdFormatsUITests testPlusGetsTheFreeRowIncludedWithPlus]' passed (15.090 seconds).
+Test Case '-[WordFloraUITests.AdFormatsUITests testQuietGardenHasNoWaterRow]' passed (18.854 seconds).
+Test Case '-[WordFloraUITests.AdFormatsUITests testTheGentleWakeRowAppearsOnlyAfterOneStillDreamingTry]' passed (68.850 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsUITests.swift:46: error: -[WordFloraUITests.AdFormatsUITests testUnderThirteenGetsTheRainBarrelWithNoVideo] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsUITests testUnderThirteenGetsTheRainBarrelWithNoVideo]' failed (27.798 seconds).
+	 Executed 9 tests, with 4 failures (0 unexpected) in 325.217 (325.238) seconds
+Test Case '-[WordFloraUITests.FadedBloomShotUITests testFadedBloomOnLithopsAloeVeraAndClover]' passed (79.693 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 79.693 (79.695) seconds
+Test Case '-[WordFloraUITests.RestCardHintUITests testAnAdultWatchesAVideoForAWhisperAndTheNextWordGetsAFourthHelp]' passed (46.504 seconds).
+Test Case '-[WordFloraUITests.RestCardHintUITests testQuietGardenHasNoHintRowForAnyone]' passed (35.686 seconds).
+Test Case '-[WordFloraUITests.RestCardHintUITests testTheHintRowHidesUnderTheShortAdNote]' passed (34.550 seconds).
+Test Case '-[WordFloraUITests.RestCardHintUITests testUnderThirteenGetsTheFreeHintRow]' passed (32.602 seconds).
+	 Executed 4 tests, with 0 failures (0 unexpected) in 149.342 (149.348) seconds
+	 Executed 14 tests, with 4 failures (0 unexpected) in 554.252 (554.287) seconds
+	 Executed 14 tests, with 4 failures (0 unexpected) in 554.252 (554.291) seconds

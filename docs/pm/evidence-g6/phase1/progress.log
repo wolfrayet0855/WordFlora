@@ -1,0 +1,81 @@
+[09:44:32] waiting for lock
+[09:44:32] lock taken
+[09:50:04] sims booted (erased, mediaanalysisd disabled); wait 150 s
+[09:52:34] PHASE build-for-testing
+[09:55:46] build rc=0 passed=0 failed=0 skipped=0
+[09:55:46] PHASE unit
+[09:58:07] unit rc=65 passed=1391 failed=2 skipped=1
+    Test Case '-[WordFloraTests.PackCatalogTests testTheProductIsInTheLocalStoreKitFile]' failed (0.857 seconds).
+    Test Case '-[WordFloraTests.PlantThinningTests testThinningIsMonotonicAndZeroPipsIsBare]' failed (0.018 seconds).
+[09:58:07] UNIT DONE
+[09:58:07] PHASE lanes
+[10:07:41] ui-B1-A rc=65 passed=13 failed=8 skipped=0
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightAXXXL]' failed (32.195 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightDefault]' failed (17.403 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditGardenBannerLightDefault]' failed (19.133 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightAXXXL]' failed (13.700 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightDefault]' failed (13.903 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testCalmNeverShowsAVideoCard]' failed (14.207 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoSponsoredSectionForUnderThirteenOrPlus]' failed (12.502 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst]' failed (14.059 seconds).
+[10:08:11] guard tripped: load 17.45/14.82 swap 1950MB free 46%
+[10:08:11] lane B paused
+[10:17:21] ui-A1-W rc=65 passed=29 failed=7 skipped=0
+    Test Case '-[WordFloraUITests.WordFloraUITests testAuditRainyPlant]' failed (24.561 seconds).
+    Test Case '-[WordFloraUITests.WordFloraUITests testAuditThePlantPageWithTheLifePanelOpenAtALargeTextSize]' failed (25.494 seconds).
+    Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX1InLight]' failed (46.516 seconds).
+    Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX3InLight]' failed (38.239 seconds).
+    Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX5InLight]' failed (38.496 seconds).
+    Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtTheDefaultSizeInLight]' failed (33.596 seconds).
+    Test Case '-[WordFloraUITests.WordFloraUITests testSubscriberSeesThankYouNotPlans]' failed (47.207 seconds).
+[10:19:59] ui-B2-AdFormatsUITests rc=65 passed=10 failed=4 skipped=0
+    Test Case '-[WordFloraUITests.AdFormatsUITests testAuditGardenLightAXXXL]' failed (24.008 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsUITests testAuditGardenLightDefault]' failed (29.247 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeLightDefault]' failed (40.947 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsUITests testUnderThirteenGetsTheRainBarrelWithNoVideo]' failed (27.798 seconds).
+[10:33:25] ui-B3-W rc=0 passed=25 failed=0 skipped=0
+[10:33:55] guard tripped: load 28.83/23.97 swap 2561MB free 51%
+[10:33:55] lane B paused
+[10:35:25] guard tripped: load 18.29/16.49 swap 2529MB free 50%
+[10:35:25] lane B paused
+[10:36:55] guard tripped: load 18.44/17.42 swap 2529MB free 49%
+[10:36:55] lane B paused
+[10:37:48] ui-A2-FidelityScreensUITests rc=65 passed=11 failed=2 skipped=0
+    Test Case '-[WordFloraUITests.PlusForeverUITests testPlusForeverIsTheThirdRowAndYearlyStaysTheDefault]' failed (26.100 seconds).
+    Test Case '-[WordFloraUITests.PlusForeverUITests testThePlusPagePassesTheAuditAtAccessibilityXXXL]' failed (43.506 seconds).
+[10:49:10] ui-B4-E rc=65 passed=11 failed=2 skipped=0
+    Test Case '-[WordFloraUITests.EndgameUITests testGoldenBloomsRanksReplayAndTheVisitorsBook]' failed (142.525 seconds).
+    Test Case '-[WordFloraUITests.EndgameUITests testTheShedSetsOutTomorrowsHelperForFree]' failed (21.454 seconds).
+[11:03:36] ui-A3-T rc=0 passed=26 failed=0 skipped=0
+[11:14:04] ui-A4-GuideUITests rc=65 passed=19 failed=5 skipped=0
+    Test Case '-[WordFloraUITests.GuideUITests testScreenshotsLight]' failed (15.147 seconds).
+    Test Case '-[WordFloraUITests.GuideUITests testSkipOnPageFourGoesToTheFirstWord]' failed (14.854 seconds).
+    Test Case '-[WordFloraUITests.GuideUITests testSkipOnPageOneGoesToTheFirstWord]' failed (13.907 seconds).
+    Test Case '-[WordFloraUITests.GuideUITests testSkipOnPageSevenGoesToTheFirstWord]' failed (13.883 seconds).
+    Test Case '-[WordFloraUITests.GuideUITests testTheFirstAgeTapCountsWhileTheQuestionFadesIn]' failed (10.651 seconds).
+[11:21:29] ui-A5-E rc=65 passed=17 failed=4 skipped=0
+    Test Case '-[WordFloraUITests.EngagementUITests testAuditPlantPageWidgetRow]' failed (35.653 seconds).
+    Test Case '-[WordFloraUITests.EngagementUITests testAuditWeeklyNoteAtAXXXL]' failed (11.045 seconds).
+    Test Case '-[WordFloraUITests.EngagementUITests testNewPlantCardOffersANameAndThePlantSaysHello]' failed (31.046 seconds).
+    Test Case '-[WordFloraUITests.EngagementUITests testWeeklyNoteShowsThePastWeek]' failed (8.295 seconds).
+[11:30:34] ui-B5-T rc=65 passed=10 failed=2 skipped=0
+    Test Case '-[WordFloraUITests.TextFitScreensUITests testPlusPageAtDefaultAndAX5]' failed (248.536 seconds).
+    Test Case '-[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable]' failed (125.687 seconds).
+[11:31:04] guard tripped: load 5.42/5.48 swap 4069MB free 55%
+[11:31:04] lane B paused
+[11:32:34] guard tripped: load 5.55/4.43 swap 4005MB free 54%
+[11:32:34] lane B paused
+[11:33:41] ui-A6-RestCardUITests rc=65 passed=22 failed=1 skipped=0
+    Test Case '-[WordFloraUITests.RestCardUITests testAuditRestCard]' failed (48.252 seconds).
+[11:49:32] ui-A7-DailyQuestUITests rc=0 passed=14 failed=0 skipped=0
+[11:49:32] LANE A DONE
+[11:51:41] ui-B6-B rc=0 passed=12 failed=0 skipped=0
+[12:01:28] ui-B7-SeasonsUITests rc=65 passed=11 failed=3 skipped=0
+    Test Case '-[WordFloraUITests.FrostLanternUITests testAlbumShowsTheWinterFriends]' failed (34.469 seconds).
+    Test Case '-[WordFloraUITests.FrostLanternUITests testGlasshousePlantPagesAtStageZeroAndFour]' failed (63.151 seconds).
+    Test Case '-[WordFloraUITests.SeasonsUITests testTeensSeeTheSeasonsShelfWithItsPrice]' failed (52.814 seconds).
+[12:08:17] ui-B8-SpeedBloomUITests rc=0 passed=16 failed=0 skipped=0
+[12:08:17] LANE B DONE
+[12:08:17] PHASE dark
+[12:08:48] cleanup done, lock released
+phase 1 stopped 12:08:50

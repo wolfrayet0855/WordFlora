@@ -1,0 +1,20 @@
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testAdultsSeeTheSameLinksWithNoGateOnScreen]' passed (20.186 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13FamilyNoteIsForGrownUpsBehindTheGate]' passed (46.099 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13ManageSubscriptionInSettingsAsksAGrownUpFirst]' passed (24.106 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13PlusForeverAndCodesAskAGrownUpFirst]' passed (37.292 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13PlusLinksAskAGrownUpFirst]' passed (35.845 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13SettingsLinksAskAGrownUpFirst]' passed (33.311 seconds).
+	 Executed 6 tests, with 0 failures (0 unexpected) in 196.839 (196.854) seconds
+Test Case '-[WordFloraUITests.SpeedBloomUITests testAuditTakeYourTimeAtDefaultAndAccessibilitySizes]' passed (24.176 seconds).
+Test Case '-[WordFloraUITests.SpeedBloomUITests testAuditTheGameWithSpeedBloomOn]' passed (9.653 seconds).
+Test Case '-[WordFloraUITests.SpeedBloomUITests testAuditTheGameWithSpeedBloomOnAtAnAccessibilitySize]' passed (10.795 seconds).
+Test Case '-[WordFloraUITests.SpeedBloomUITests testNoRingForUnderThirteenInCalmOrBelowLevelFour]' passed (40.563 seconds).
+Test Case '-[WordFloraUITests.SpeedBloomUITests testQuickBloomIsOnTheShelfOnlyWhenSpeedBloomIsOn]' passed (16.437 seconds).
+Test Case '-[WordFloraUITests.SpeedBloomUITests testTheRingHoldsWhileHelpIsUsed]' passed (18.965 seconds).
+Test Case '-[WordFloraUITests.SpeedBloomUITests testTheToggleIsHiddenUnderThirteenInCalmAndInQuietGarden]' passed (23.889 seconds).
+Test Case '-[WordFloraUITests.SpeedBloomUITests testTheToggleIsOfferedToGrownUpsOffByDefaultAndExtraTimeAppearsOnceItIsOn]' passed (10.242 seconds).
+Test Case '-[WordFloraUITests.SpeedBloomUITests testTheToggleIsOfferedToThirteenPlus]' passed (7.608 seconds).
+Test Case '-[WordFloraUITests.SpeedBloomUITests testWhenTheRingClosesTheWordCarriesOnWithNothingTakenAway]' passed (13.191 seconds).
+	 Executed 10 tests, with 0 failures (0 unexpected) in 175.519 (175.534) seconds
+	 Executed 16 tests, with 0 failures (0 unexpected) in 372.358 (372.392) seconds
+	 Executed 16 tests, with 0 failures (0 unexpected) in 372.358 (372.395) seconds

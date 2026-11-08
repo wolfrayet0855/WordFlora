@@ -1,0 +1,19 @@
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testAFadedBloomCueThenATidyTrimEarnsPruningPro]' passed (566.444 seconds).
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testAuditTheMistButtonAtAccessibilityLLight]' passed (30.913 seconds).
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testIReadItStampsThePageAndEarnsFieldNotes]' passed (26.206 seconds).
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testMistAFernEarnsMistMakerAndIsMistyToday]' passed (26.705 seconds).
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testQuietGardenHidesIReadItAndTheCount]' passed (15.140 seconds).
+	 Executed 5 tests, with 0 failures (0 unexpected) in 665.408 (665.417) seconds
+Test Case '-[WordFloraUITests.BadgesUITests testAnEarnedBadgeOpensWithItsShareButtonAndPassesTheAudit]' passed (34.549 seconds).
+Test Case '-[WordFloraUITests.BadgesUITests testEveryBadgeIsOnThePageAndTheGridKeepsTwoColumns]' passed (17.497 seconds).
+Test Case '-[WordFloraUITests.BadgesUITests testUnderThirteenSeesNoShareButtonAndNoSharerBadge]' passed (29.702 seconds).
+	 Executed 3 tests, with 0 failures (0 unexpected) in 81.748 (81.752) seconds
+Test Case '-[WordFloraUITests.DailyQuestUITests testCalmShowsTheSameCardWithAStillCheckMark]' passed (7.393 seconds).
+Test Case '-[WordFloraUITests.DailyQuestUITests testKidsAndPlusOwnersNeverSeeTheFamilyLine]' passed (50.594 seconds).
+Test Case '-[WordFloraUITests.DailyQuestUITests testOneRestorePurchasesInSettingsAndNoneOnThePlusPage]' passed (32.466 seconds).
+Test Case '-[WordFloraUITests.DailyQuestUITests testQuietGardenHasNoQuest]' passed (7.342 seconds).
+Test Case '-[WordFloraUITests.DailyQuestUITests testThePetalRowIsAPlayButtonAndThePlantStillSaysHello]' passed (25.845 seconds).
+Test Case '-[WordFloraUITests.DailyQuestUITests testTheQuestCardCountsAVisitToTheVisitorsPage]' passed (25.512 seconds).
+	 Executed 6 tests, with 0 failures (0 unexpected) in 149.152 (149.159) seconds
+	 Executed 14 tests, with 0 failures (0 unexpected) in 896.308 (896.333) seconds
+	 Executed 14 tests, with 0 failures (0 unexpected) in 896.308 (896.336) seconds

@@ -1,0 +1,19 @@
+Test Case '-[WordFloraUITests.FidelityScreensUITests testBadgesSettingsPlusDailyAndAgeScreens]' passed (168.503 seconds).
+Test Case '-[WordFloraUITests.FidelityScreensUITests testCardScreens]' passed (133.697 seconds).
+Test Case '-[WordFloraUITests.FidelityScreensUITests testHomeScreens]' passed (72.221 seconds).
+Test Case '-[WordFloraUITests.FidelityScreensUITests testPlantPageScreens]' passed (82.999 seconds).
+Test Case '-[WordFloraUITests.FidelityScreensUITests testPotPickerAndGameScreens]' passed (121.347 seconds).
+Test Case '-[WordFloraUITests.FidelityScreensUITests testPuzzleScreens]' passed (235.857 seconds).
+Test Case '-[WordFloraUITests.FidelityScreensUITests testShedVisitorsAndLevelScreens]' passed (168.251 seconds).
+	 Executed 7 tests, with 0 failures (0 unexpected) in 982.875 (982.887) seconds
+Test Case '-[WordFloraUITests.PlusForeverUITests testOwnersWhoseSubscriptionWillNotRenewSeeOnlyTheEndDate]' passed (28.791 seconds).
+Test Case '-[WordFloraUITests.PlusForeverUITests testOwnersWithASubscriptionAreToldToCancelIt]' passed (31.101 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:1102: error: -[WordFloraUITests.PlusForeverUITests testPlusForeverIsTheThirdRowAndYearlyStaysTheDefault] : XCTAssertTrue failed - Plus Forever, $34.99 once
+Test Case '-[WordFloraUITests.PlusForeverUITests testPlusForeverIsTheThirdRowAndYearlyStaysTheDefault]' failed (26.100 seconds).
+Test Case '-[WordFloraUITests.PlusForeverUITests testPlusForeverOwnersSeeThankYouAndNoPlans]' passed (30.195 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:1094: error: -[WordFloraUITests.PlusForeverUITests testThePlusPagePassesTheAuditAtAccessibilityXXXL] : XCTAssertTrue failed - plus-axxxl-top: 65536 - Dynamic Type font sizes are partially unsupported | 'No ads, ever' (88.33333333333333, 429.6666666666667, 277.6666666666665, 63.33333333333326)
+Test Case '-[WordFloraUITests.PlusForeverUITests testThePlusPagePassesTheAuditAtAccessibilityXXXL]' failed (43.506 seconds).
+Test Case '-[WordFloraUITests.PlusForeverUITests testThePlusPagePassesTheAuditWithThreeRows]' passed (31.589 seconds).
+	 Executed 6 tests, with 2 failures (0 unexpected) in 191.282 (191.292) seconds
+	 Executed 13 tests, with 2 failures (0 unexpected) in 1174.157 (1174.183) seconds
+	 Executed 13 tests, with 2 failures (0 unexpected) in 1174.157 (1174.186) seconds

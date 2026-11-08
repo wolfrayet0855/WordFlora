@@ -1,0 +1,18 @@
+Test Case '-[WordFloraUITests.EndgameUITests testAPlantFromThePuzzleWordGetsTheNewPlantMoment]' passed (74.437 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testCalmModeShowsNoHelpers]' passed (11.053 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/EndgameUITests.swift:69: error: -[WordFloraUITests.EndgameUITests testGoldenBloomsRanksReplayAndTheVisitorsBook] : XCTAssertTrue failed - visitors-book: 65536 - Dynamic Type font sizes are partially unsupported | 'A new friend' (50.0, 714.0, 118.33333333333331, 24.0)
+Test Case '-[WordFloraUITests.EndgameUITests testGoldenBloomsRanksReplayAndTheVisitorsBook]' failed (142.525 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testTheGoldCrownMoment]' passed (22.870 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testTheGoldenPlantPage]' passed (13.201 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testTheGrandGardenPlaysOnceThenWhatGrowsNext]' passed (37.895 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testTheHarderPuzzleHasAFreePeekAndADailyCap]' passed (47.408 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testTheHarderPuzzlesPictureClueIsReadyAfterTwoPeeks]' passed (79.083 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testTheLevelMapBloomsAlongFullBloomLevels]' passed (26.747 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testThePuzzleAtAnAccessibilitySize]' passed (64.402 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testThePuzzleNamesItsRewardAndSkipIsAsBigAsStart]' passed (32.612 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testTheShedHelpersAtAnAccessibilitySize]' passed (17.783 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/EndgameUITests.swift:112: error: -[WordFloraUITests.EndgameUITests testTheShedSetsOutTomorrowsHelperForFree] : XCTAssertFalse failed
+Test Case '-[WordFloraUITests.EndgameUITests testTheShedSetsOutTomorrowsHelperForFree]' failed (21.454 seconds).
+	 Executed 13 tests, with 2 failures (0 unexpected) in 591.470 (591.488) seconds
+	 Executed 13 tests, with 2 failures (0 unexpected) in 591.470 (591.490) seconds
+	 Executed 13 tests, with 2 failures (0 unexpected) in 591.470 (591.492) seconds

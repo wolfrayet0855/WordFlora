@@ -1,0 +1,21 @@
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/FrostLanternUITests.swift:134: error: -[WordFloraUITests.FrostLanternUITests testAlbumShowsTheWinterFriends] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.FrostLanternUITests testAlbumShowsTheWinterFriends]' failed (34.469 seconds).
+Test Case '-[WordFloraUITests.FrostLanternUITests testGlasshousePlantPageAudit]' passed (100.540 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/FrostLanternUITests.swift:63: error: -[WordFloraUITests.FrostLanternUITests testGlasshousePlantPagesAtStageZeroAndFour] : Failed to tap "Garden" Button: No matches found for Elements matching predicate '"Garden" IN identifiers' from input {(
+Test Case '-[WordFloraUITests.FrostLanternUITests testGlasshousePlantPagesAtStageZeroAndFour]' failed (63.151 seconds).
+Test Case '-[WordFloraUITests.FrostLanternUITests testOwnersSeeTheSceneOnHomeAndGarden]' passed (10.050 seconds).
+Test Case '-[WordFloraUITests.FrostLanternUITests testWithoutThePackNothingShows]' passed (8.495 seconds).
+	 Executed 5 tests, with 2 failures (0 unexpected) in 216.705 (216.714) seconds
+Test Case '-[WordFloraUITests.SeasonsUITests testAdultsSeeTheSeasonsRowAndThePage]' passed (25.800 seconds).
+Test Case '-[WordFloraUITests.SeasonsUITests testLanternKeeperShowsWhileThePackIsLive]' passed (33.747 seconds).
+Test Case '-[WordFloraUITests.SeasonsUITests testNoProductMeansNoSeasonsSurfaces]' passed (45.805 seconds).
+Test Case '-[WordFloraUITests.SeasonsUITests testOwnersSeeThePackIsTheirs]' passed (26.290 seconds).
+Test Case '-[WordFloraUITests.SeasonsUITests testSnowFallsOnThePlantPageInAPackPot]' passed (40.758 seconds).
+Test Case '-[WordFloraUITests.SeasonsUITests testSnowIsAStillFrameUnderReduceMotion]' passed (17.386 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/SeasonsUITests.swift:80: error: -[WordFloraUITests.SeasonsUITests testTeensSeeTheSeasonsShelfWithItsPrice] : XCTAssertTrue failed - shed-seasons-shelf: 131072 - Text clipped | 'Three winter pots, a snowy lantern garden, two winter friends and two glasshouse plants. Pay once, no renewals.' [] (32.0, 701.1631682398641, 312.6666666666667, 57.99999999999966)
+Test Case '-[WordFloraUITests.SeasonsUITests testTeensSeeTheSeasonsShelfWithItsPrice]' failed (52.814 seconds).
+Test Case '-[WordFloraUITests.SeasonsUITests testTheSeasonsRowIsBehindTheGrownUpQuestionForUnder13]' passed (29.486 seconds).
+Test Case '-[WordFloraUITests.SeasonsUITests testTheShedShowsYoungPlayersOutlinesOnly]' passed (21.962 seconds).
+	 Executed 9 tests, with 1 failure (0 unexpected) in 294.047 (294.058) seconds
+	 Executed 14 tests, with 3 failures (0 unexpected) in 510.752 (510.775) seconds
+	 Executed 14 tests, with 3 failures (0 unexpected) in 510.752 (510.779) seconds

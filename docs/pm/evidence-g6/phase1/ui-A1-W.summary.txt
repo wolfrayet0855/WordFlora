@@ -1,0 +1,46 @@
+Test Case '-[WordFloraUITests.WordFloraUITests testAfterTheFirstPlantEveryThirdWordBringsTheNext]' passed (30.542 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testARainyDayReadsFewerLovePetalsAndAHelloBringsThemBack]' passed (25.449 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testASeedOffersTheWakeSheetWithTwoChallengesAndAPlainClose]' passed (23.794 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditGameAndResting]' passed (22.952 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditGardenSettingsAndPlus]' passed (39.496 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditHome]' passed (13.865 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditMoreScreens]' passed (38.988 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditPaywallAndOnboarding]' passed (40.992 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:497: error: -[WordFloraUITests.WordFloraUITests testAuditRainyPlant] : XCTAssertTrue failed - plant-rain: 131072 - Text clipped | 0 '' 
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditRainyPlant]' failed (24.561 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:497: error: -[WordFloraUITests.WordFloraUITests testAuditThePlantPageWithTheLifePanelOpenAtALargeTextSize] : XCTAssertTrue failed - plant-life-open-ax: 1 - Contrast failed | 48 'Water' (84.0, 439.0, 96.0, 39.666666666666686)
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditThePlantPageWithTheLifePanelOpenAtALargeTextSize]' failed (25.494 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditVisitorsAndShed]' passed (43.288 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testButterflyGameStartsAndCanBeFinishedWithARewardingSummary]' passed (59.240 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testCalmModeGameHasADoneButtonAndNoTimeBar]' passed (13.511 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testFirstSessionFlowFromIntroToHome]' passed (28.393 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testGardenOpensFromHome]' passed (10.044 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testHelpRevealsASecondClue]' passed (9.497 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testHomeShowsPlayAndGarden]' passed (8.308 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:497: error: -[WordFloraUITests.WordFloraUITests testKeyMarksAtAX1InLight] : XCTAssertTrue failed - keys-ax1-light-unused: 65536 - Dynamic Type font sizes are partially unsupported | 48 'E' (96.99999999999999, 628.5, 18.33333333333333, 37.0)
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX1InLight]' failed (46.516 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:497: error: -[WordFloraUITests.WordFloraUITests testKeyMarksAtAX3InLight] : XCTAssertTrue failed - keys-ax3-light-unused: 65536 - Dynamic Type font sizes are partially unsupported | 48 'J' (266.16666666666663, 696.0, 22.0, 46.0)
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX3InLight]' failed (38.239 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:497: error: -[WordFloraUITests.WordFloraUITests testKeyMarksAtAX5InLight] : XCTAssertTrue failed - keys-ax5-light-unused: 65536 - Dynamic Type font sizes are partially unsupported | 48 'O' (319.3333333333333, 626.8333333333333, 29.66666666666663, 46.0)
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX5InLight]' failed (38.496 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:497: error: -[WordFloraUITests.WordFloraUITests testKeyMarksAtTheDefaultSizeInLight] : XCTAssertTrue failed - keys-default-light-unused: 65536 - Dynamic Type font sizes are partially unsupported | 48 'Simpler clue' (32.0, 442.0, 111.66666666666666, 44.0)
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtTheDefaultSizeInLight]' failed (33.596 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testLevelMapGardenPath]' passed (17.971 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testLifePanelOpensItselfOnlyAfterAChangeSinceTheLastVisit]' passed (49.472 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testLifePanelStartsClosedAndOpensOnATap]' passed (29.489 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testPaywallShowsBothPlansHonestlyAndSubscriberStateHidesThem]' passed (32.797 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testPlantPageScreens]' passed (119.942 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testSettingsAndLevelMapOpen]' passed (14.258 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testShedAndBadgesOpenWhenEverythingIsShown]' passed (19.390 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testShedInQuietGardenShowsNoPricesOrPoints]' passed (15.796 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testSolvingAWordShowsANewPlant]' passed (19.400 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:356: error: -[WordFloraUITests.WordFloraUITests testSubscriberSeesThankYouNotPlans] : Failed to tap "Remove ads and sync with iCloud" Button: No matches found for Elements matching predicate '"Remove ads and sync with iCloud" IN identifiers' from input {(
+Test Case '-[WordFloraUITests.WordFloraUITests testSubscriberSeesThankYouNotPlans]' failed (47.207 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testTendingAPlantShowsGentleFeedback]' passed (24.139 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testTheWinCardCanGoTendTheGarden]' passed (21.451 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testVisitorsInQuietGardenHaveNoFriendOfTheDay]' passed (11.508 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testVisitorsPageOpensFromHomeWithSoftOutlinesAndAFact]' passed (21.788 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testWrongGuessesEndWithARestingReveal]' passed (19.694 seconds).
+	 Executed 36 tests, with 7 failures (0 unexpected) in 1079.561 (1079.612) seconds
+	 Executed 36 tests, with 7 failures (0 unexpected) in 1079.561 (1079.614) seconds
+	 Executed 36 tests, with 7 failures (0 unexpected) in 1079.561 (1079.617) seconds
