@@ -71,7 +71,9 @@ final class AdsService {
         #if DEBUG
         if fake { started = true; return }
         #endif
-        guard !offline, !started, !preparing else { return }
+        guard !offline else { return }
+        if started { Self.configure(treatment); return }        // a started SDK follows a changed treatment (teen/adult)
+        guard !preparing else { return }
         preparing = true
         defer { preparing = false }
         for step in lastPlan {
@@ -217,22 +219,25 @@ final class AdsService {
     /// `shown`: a full-screen ad appeared (counted in the budgets). `earned`: the player finished it (the reward).
     func showRewarded(_ perk: RewardedPerk = .water, isStillAllowed: () -> Bool = { true }) async -> RewardedOutcome {
         guard started, !suspended, isStillAllowed() else { return RewardedOutcome() }
+        // Only R3's video starts from one of our own sheets (the wake sheet); every other ad refuses any sheet.
+        let overOwnSheet = perk == .wake
         #if DEBUG
         if fake {
-            let r = await fakePresent(reward: !fakeWithholdsReward)
+            let r = await fakePresent(reward: !fakeWithholdsReward, allowOwnSheet: overOwnSheet)
             return RewardedOutcome(shown: r.shown, earned: r.earned)
         }
         #endif
         let unit = AdUnit.rewarded(perk)
         if rewarded[unit] == nil { await preloadRewarded(unit) }
-        guard isStillAllowed(), !suspended, let ad = rewarded[unit], let vc = Self.presentationAnchor() else { return RewardedOutcome() }
+        guard isStillAllowed(), !suspended, let ad = rewarded[unit],
+              let vc = Self.presentationAnchor(allowOwnSheet: overOwnSheet) else { return RewardedOutcome() }
         rewarded[unit] = nil
         var earned = false
         let shown = await present { delegate in
             ad.fullScreenContentDelegate = delegate
             ad.present(from: vc) { earned = true }
         }
-        Task { await preloadRewarded(.rewarded) }
+        Task { await preloadRewarded(unit) }                                     // the same perk's unit, ready next time
         return RewardedOutcome(shown: shown, earned: earned)
     }
 
@@ -255,19 +260,20 @@ final class AdsService {
     }
 
     /// Where a full-screen ad may be presented, or nil when it must not be (Plus flow review, `AdBlock.sheetUp`):
-    /// the app is not active (a StoreKit purchase, the tracking prompt or a system sheet is up), or the chain of
-    /// presented controllers holds anything that is not one of our own SwiftUI sheets (the consent form, the offer
-    /// code sheet, manage subscriptions, a share sheet...). `topmost` alone would put the ad on top of that sheet.
-    static func presentationAnchor() -> UIViewController? {
+    /// the app is not active (a StoreKit purchase, the tracking prompt or a system sheet is up), or any controller is
+    /// presented at all (the consent form, the offer code sheet, manage subscriptions, the grown-up question...).
+    /// `allowOwnSheet` is true only for R3, whose video starts from our own wake sheet: then our own SwiftUI sheets
+    /// are allowed and anything else still refuses. `topmost` alone would put the ad on top of any sheet.
+    static func presentationAnchor(allowOwnSheet: Bool = false) -> UIViewController? {
         guard UIApplication.shared.applicationState == .active, let root = keyWindowRoot() else { return nil }
-        return anchor(from: root)
+        return anchor(from: root, allowOwnSheet: allowOwnSheet)
     }
 
     /// Pure walk of the presented chain (tests pass plain controllers).
-    static func anchor(from root: UIViewController) -> UIViewController? {
+    static func anchor(from root: UIViewController, allowOwnSheet: Bool = false) -> UIViewController? {
         var top = root
         while let next = top.presentedViewController {
-            guard isOwnSheet(next), !next.isBeingDismissed else { return nil }
+            guard allowOwnSheet, isOwnSheet(next), !next.isBeingDismissed else { return nil }
             top = next
         }
         return top
@@ -290,7 +296,8 @@ final class AdsService {
         #endif
     }
 
-    /// True when a full-screen ad could be presented right now (fed into `AdInputs.sheetUp`).
+    /// True when an interstitial could be presented right now. The model leaves `AdInputs.sheetUp` false and relies on
+    /// this check right before presenting (the stronger, later check); `sheetUp` is exercised by the policy tests.
     static var canPresentFullScreen: Bool { presentationAnchor() != nil }
 
     // MARK: Fake presenter (UI tests, Debug only; ruling H6: compiled out of Release)
@@ -307,7 +314,7 @@ final class AdsService {
         let id = unitID(.bannerGardenCollapsible)
         guard id.contains(AdUnit.googleTestPublisher) else { return nil }        // never a real id
         MobileAds.shared.requestConfiguration.maxAdContentRating = .general
-        await MobileAds.shared.start()
+        _ = await MobileAds.shared.start()
         let banner = BannerView(adSize: currentOrientationAnchoredAdaptiveBanner(width: root.view.bounds.width))
         banner.adUnitID = id
         banner.rootViewController = root
@@ -328,8 +335,8 @@ final class AdsService {
         func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) { result = (false, false) }
     }
 
-    private func fakePresent(reward: Bool) async -> (shown: Bool, earned: Bool) {
-        guard let vc = Self.presentationAnchor() else { return (false, false) }
+    private func fakePresent(reward: Bool, allowOwnSheet: Bool = false) async -> (shown: Bool, earned: Bool) {
+        guard let vc = Self.presentationAnchor(allowOwnSheet: allowOwnSheet) else { return (false, false) }
         return await withCheckedContinuation { continuation in
             let host = FakeAdHost { continuation.resume(returning: (true, reward)) }
             host.modalPresentationStyle = .fullScreen
@@ -397,9 +404,18 @@ struct AdBannerView: UIViewRepresentable {
     var unit: AdUnit = .banner
     var height: Binding<CGFloat>? = nil
 
+    /// The banner's width: the key window less the 20 pt side margins.
+    static var width: CGFloat {
+        let scene = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first
+        return (scene?.keyWindow?.bounds.width ?? scene?.screen.bounds.width ?? 390) - 40
+    }
+
+    /// The anchored adaptive height for this width, known before any ad loads (Google computes it from the width
+    /// alone), so Home and Garden reserve a slot that never clips the ad and never jumps when it arrives.
+    static var slotHeight: CGFloat { currentOrientationAnchoredAdaptiveBanner(width: width).size.height }
+
     func makeUIView(context: Context) -> BannerView {
-        let width = UIScreen.main.bounds.width - 40
-        let banner = BannerView(adSize: currentOrientationAnchoredAdaptiveBanner(width: width))
+        let banner = BannerView(adSize: currentOrientationAnchoredAdaptiveBanner(width: Self.width))
         banner.adUnitID = AdsService.unitID(unit)
         banner.rootViewController = AdsService.rootViewController()
         let h = banner.adSize.size.height

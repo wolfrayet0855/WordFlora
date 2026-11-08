@@ -250,9 +250,50 @@ final class AdsServiceWiringTests: XCTestCase {
 
     // MARK: No stored field
 
+    /// The SwiftData schema's stored attributes equal the G3 list exactly (the one CloudKit deploy already happened).
     func testThePlayerProfileHasNoNewStoredField() throws {
-        let names = Set(Mirror(reflecting: PlayerProfile()).children.compactMap(\.label).map { $0.hasPrefix("_") ? String($0.dropFirst()) : $0 })
-        for ad in ["lastAdAt", "adsToday", "adsDay", "rewardedToday", "rewardedDay"] { XCTAssertTrue(names.contains(ad), ad) }
-        for banned in ["adLedger", "whisperBanked", "appOpenToday", "adWater"] { XCTAssertFalse(names.contains(banned), banned) }
+        let g3: Set<String> = [
+            "currentLevel", "plantsEarnedThisLevel", "roseOfJerichoCount", "gamesPlayed", "water", "soil", "lastTrickleAt",
+            "widgetPlantID", "streak", "bestStreak", "streakFreezes", "lastPlayedDay", "seenIds", "earnedPotIds", "roundsSinceAd",
+            "ageBand", "roseSeedProgress", "wordsTowardPlant", "lastRoundId", "gardenDays", "lastGraceDay", "shedPoints",
+            "toolsJSON", "activeToolId", "badgesJSON", "albumJSON", "butterflyPlaysJSON", "glowLanterns", "lastAdAt", "adsToday",
+            "adsDay", "rewardedToday", "rewardedDay", "weatherSeed", "weatherStartDay", "weatherHighWaterDay", "weatherShelterDay",
+            "weatherRescuedDays", "weatherPuzzleDay", "weatherPuzzleCount", "wildWeather", "weatherGatedFromDay", "weatherSeenAt",
+            "weatherKitAt", "crownSeenAt", "goldCrownSeenAt", "guideSeen", "questDay", "questProgress", "questDone", "createdAt",
+        ]
+        let entity = try XCTUnwrap(Schema([PlayerProfile.self]).entitiesByName["PlayerProfile"])
+        XCTAssertEqual(Set(entity.attributes.map(\.name)), g3)
+        XCTAssertTrue(entity.relationships.isEmpty)
+    }
+
+    // MARK: M1: consent declined
+
+    func testAVideoRowHidesForTheVisitWhenTheSDKCannotStart() async throws {
+        let app = try makeApp(.eighteenPlus)                    // offline: the SDK never starts, as after a declined consent
+        XCTAssertEqual(app.perkPath(.water), .ad(.adult))
+        let granted = await app.watchRewarded(.water)
+        XCTAssertFalse(granted)
+        XCTAssertEqual(app.perkPath(.water), .hidden, "no dead video row")
+        XCTAssertFalse(app.canOfferRewarded)
+        for (band, plus) in [(AgeBand.under13, false), (.eighteenPlus, true)] {
+            let free = try makeApp(band, plus: plus)
+            XCTAssertEqual(free.perkPath(.water), .free, "free rows are not on this path")
+        }
+    }
+
+    // MARK: M2: only R3 may sit over our own sheet
+
+    func testOnlyTheWakeVideoMayBePresentedOverOurOwnSheet() {
+        let window = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        let root = UIViewController(); window.rootViewController = root; window.makeKeyAndVisible()
+        let sheet = UIHostingController(rootView: Text("wake"))
+        root.present(sheet, animated: false)
+        XCTAssertNil(AdsService.anchor(from: root), "an interstitial or water/hint video refuses any sheet")
+        XCTAssertTrue(AdsService.anchor(from: root, allowOwnSheet: true) === sheet, "R3 presents over the wake sheet")
+        sheet.dismiss(animated: false)
+        let foreign = UIViewController()
+        root.present(foreign, animated: false)
+        XCTAssertNil(AdsService.anchor(from: root, allowOwnSheet: true), "never over someone else's sheet")
+        foreign.dismiss(animated: false)
     }
 }
