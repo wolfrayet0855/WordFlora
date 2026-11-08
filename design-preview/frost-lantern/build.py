@@ -413,14 +413,25 @@ def strap_leaf(x0, y0, x1, y1, bend, w):
                 f(x0), f(y0 - 4), f(mx), f(my), f(x1), f(y1 + 6), c("FL.snowdropLeafVein")))
 
 
-SNOWDROP_HEADS = [(118, 72, 1.0), (70, 88, 0.9), (140, 104, 0.85)]
+SNOWDROP_HEADS = [(118, 64, 1.0), (72, 80, 0.92), (138, 94, 0.88)]
+SNOWDROP_BASES = (100, 94, 106)
+SNOWDROP_TILT = 38    # each bell swings out, away from its stem, so it nods instead of hanging (degrees)
+SNOWDROP_FLARE = 44   # the outer tepals open this far from the middle one (was 28, a closed hanging bell)
+
+
+def snowdrop_tilt(x0, hx):
+    return -SNOWDROP_TILT if hx >= x0 else SNOWDROP_TILT
 
 
 def snowdrop_stem(x0, hx, hy, s):
-    return ('<path d="M%s 176 C%s 140 %s 100 %s %s Q%s %s %s %s" stroke="%s" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
-            '<ellipse cx="%s" cy="%s" rx="%s" ry="%s" fill="%s"/>' % (
-                f(x0), f(x0), f(hx - 14 * s), f(hx - 12 * s), f(hy - 8 * s), f(hx - 8 * s), f(hy - 16 * s), f(hx), f(hy - 6 * s),
-                c("PetalKit.stem"), f(hx), f(hy - 3 * s), f(3.4 * s), f(4.4 * s), c("PetalKit.leaf")))
+    # Rises in one smooth line, then a short arch onto the ovary from the stem's own side: no shepherd's crook.
+    d = 1 if hx >= x0 else -1
+    ax, ay = hx - d * 8 * s, hy - 11 * s
+    return ('<path d="M%s 176 C%s 140 %s %s %s %s Q%s %s %s %s" stroke="%s" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+            '<ellipse cx="%s" cy="%s" rx="%s" ry="%s" transform="rotate(%s %s %s)" fill="%s"/>' % (
+                f(x0), f(x0), f(ax), f(ay + 30 * s), f(ax), f(ay), f(hx - d * 3 * s), f(hy - 13 * s), f(hx), f(hy - 6 * s),
+                c("PetalKit.stem"), f(hx), f(hy - 3 * s), f(3.4 * s), f(4.4 * s), f(snowdrop_tilt(x0, hx)), f(hx), f(hy - 3 * s),
+                c("PetalKit.leaf")))
 
 
 def snowdrop_petal(hx, hy, s, deg):
@@ -428,22 +439,29 @@ def snowdrop_petal(hx, hy, s, deg):
         f(12 * s), f(5.6 * s), f(12 * s), f(hx), f(hy), f(deg), c("FL.snowdropEdge")))
 
 
-def snowdrop_bell(hx, hy, s):
-    return ('<ellipse cx="%s" cy="%s" rx="%s" ry="%s" fill="#FFFFFF" stroke="%s" stroke-width="2"/>'
-            '<path d="M%s %s L%s %s L%s %s" stroke="%s" stroke-width="%s" fill="none" stroke-linecap="round" stroke-linejoin="round"/>' % (
-                f(hx), f(hy + 10 * s), f(4.2 * s), f(7 * s), c("FL.snowdropEdge"),
+def snowdrop_bell(hx, hy, s, tilt=0):
+    return ('<g transform="rotate(%s %s %s)"><ellipse cx="%s" cy="%s" rx="%s" ry="%s" fill="#FFFFFF" stroke="%s" stroke-width="2"/>'
+            '<path d="M%s %s L%s %s L%s %s" stroke="%s" stroke-width="%s" fill="none" stroke-linecap="round" stroke-linejoin="round"/></g>' % (
+                f(tilt), f(hx), f(hy), f(hx), f(hy + 10 * s), f(4.2 * s), f(7 * s), c("FL.snowdropEdge"),
                 f(hx - 2.6 * s), f(hy + 13 * s), f(hx), f(hy + 15.6 * s), f(hx + 2.6 * s), f(hy + 13 * s), c("PetalKit.stem"), f(1.8 * s)))
 
 
+def snowdrop_head(hx, hy, s, x0, ids=None):
+    t = snowdrop_tilt(x0, hx)
+    tepals = [snowdrop_petal(hx, hy, s, d + t) for d in (-SNOWDROP_FLARE, 0, SNOWDROP_FLARE)]
+    if ids:
+        tepals = ['<g id="%s">%s</g>' % (i, p) for i, p in zip(ids, tepals)]
+    return tepals, snowdrop_bell(hx, hy, s, t)
+
+
 def snowdrop_full(prefix=""):
-    back = [strap_leaf(96, 176, 74, 104, -6, 4.2), strap_leaf(104, 176, 128, 112, 8, 4.2), strap_leaf(100, 176, 98, 124, 2, 3.6)]
-    for (hx, hy, s), x0 in zip(SNOWDROP_HEADS, (100, 94, 106)):
+    back = [strap_leaf(96, 176, 86, 94, -3, 4.4), strap_leaf(104, 176, 116, 100, 4, 4.4), strap_leaf(100, 176, 100, 110, 1, 3.8)]
+    petals, front = [], []
+    for r, ((hx, hy, s), x0) in enumerate(zip(SNOWDROP_HEADS, SNOWDROP_BASES)):
         back.append(snowdrop_stem(x0, hx, hy, s))
-    petals = []
-    for r, (hx, hy, s) in enumerate(SNOWDROP_HEADS):
-        for i, deg in enumerate((-28, 0, 28)):
-            petals.append('<g id="%sr%d_s%d">%s</g>' % (prefix, r, i, snowdrop_petal(hx, hy, s, deg)))
-    front = [snowdrop_bell(hx, hy, s) for hx, hy, s in SNOWDROP_HEADS]
+        tepals, bell = snowdrop_head(hx, hy, s, x0, ["%sr%d_s%d" % (prefix, r, i) for i in range(3)])
+        petals += tepals
+        front.append(bell)
     return ('<g id="%sground">%s</g><g id="%sback">%s</g><g id="%spetals">%s</g><g id="%sfront">%s</g>' % (
         prefix, ground(), prefix, "".join(back), prefix, "".join(petals), prefix, "".join(front)))
 
@@ -466,7 +484,8 @@ def snowdrop_stage(st, prefix):
     hx, hy, s = SNOWDROP_HEADS[0]
     o = ground(42) + strap_leaf(96, 176, 74, 108, -6, 4.2) + strap_leaf(104, 176, 128, 114, 8, 4.2)
     o += snowdrop_stem(100, hx, hy, s)
-    o += "".join(snowdrop_petal(hx, hy, s, d) for d in (-28, 0, 28)) + snowdrop_bell(hx, hy, s)
+    tepals, bell = snowdrop_head(hx, hy, s, 100)
+    o += "".join(tepals) + bell
     return o
 
 
