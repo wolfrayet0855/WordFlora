@@ -4,7 +4,7 @@ Source: `git diff main -- WordFlora/Models` on branch `3-feat-content-and-polish
 
 SwiftData's CloudKit mirroring stores a model `X` as record type `CD_X` and a property `p` as field `CD_p`. A Swift `Bool` is stored as an `Int(64)`, and an array as a CloudKit list.
 
-## Record type `CD_PlantCollectible` (6 new fields)
+## Record type `CD_PlantCollectible` (7 new fields)
 
 | Swift property | Swift type | CloudKit field | CloudKit type | Default |
 |---|---|---|---|---|
@@ -14,6 +14,7 @@ SwiftData's CloudKit mirroring stores a model `X` as record type `CD_X` and a pr
 | `goldenDayKey` | `Int` | `CD_goldenDayKey` | Int(64) | `0` |
 | `lifeSeenKey` | `String` | `CD_lifeSeenKey` | String | `""` |
 | `lifeSeenAt` | `Date` | `CD_lifeSeenAt` | Date/Time | `distantPast` |
+| `lastMistedAt` | `Date?` | `CD_lastMistedAt` | Date/Time | nil (optional, like `lastPrunedAt`) |
 
 ## Record type `CD_PlayerProfile` (19 new fields)
 
@@ -43,6 +44,8 @@ SwiftData may store arrays of value types as encoded data (Bytes) instead of a l
 
 Release candidate 2 (2026-11-06): the merged grown-ups row, hello reply, friend of the day, daily quest, petal notes, Family Sharing line, badge catalogue, Speed bloom, Quiet Garden offer, Living Touch and widget hello add no stored model field beyond the three `quest*` fields above. New badge counters live inside `PlayerProfile.badgesJSON` (already synced), the friend of the day is worked out from the weather seed and the day (nothing stored), and the Speed bloom switches and the Quiet Garden choice are device settings (UserDefaults / App Group), not CloudKit.
 
+`lastMistedAt` (Mist Maker, G3, commit 35a19a3) is the newest field and the last one the plan adds; G4 and G5 add no stored fields. It records the last Mist of a plant (one mist per plant per calendar day) and `DataReconciler` merges it by max. It is optional, so older records and older builds read it as nil.
+
 ## How to deploy (owner)
 
 1. Run a debug build with iCloud sync on, signed into iCloud, on the new build. Open the garden, play a round, open a plant page and the Shed, so a `PlayerProfile` and a `PlantCollectible` record are saved. This makes CloudKit add the fields above to the **Development** schema (see `owner-setup-steps.md`, B8).
@@ -54,3 +57,19 @@ Release candidate 2 (2026-11-06): the merged grown-ups row, hello reply, friend 
 - `DataReconciler` merges every field above with the rule written on its declaration (max, union, min of non-nil, later stamp wins, OR/AND), so a sync never lowers an earned value.
 - `GardenBackup` carries the new fields as optionals; backups written before them still decode (tests in `GardenBackupTests`).
 - See `docs/STATUS.md`, "Final QA", for the test run.
+
+## Console check (before and after the deploy)
+
+Full click-by-click steps, including how to read Production, are in `docs/setup/cloudkit-deploy-straight-to-prod.md` (part 1b "Check Production, click by click", and the Development check in step 5 there). In short: Console > `iCloud.beta.WordFlora` > Schema > Record Types, in **Development** first (it must already list every field above, including `CD_lastMistedAt` on `CD_PlantCollectible`), then in **Production** (a missing field there means the deploy is still to do). Production can only receive what Development already has.
+
+## Deploy ledger (owner fills in)
+
+One row per deploy or check. Result: what the Console showed (fields present or missing) and whether Deploy Schema Changes was pressed. Never paste container secrets or account ids here.
+
+| Date | Who | Environment | Result |
+|---|---|---|---|
+| | | Development (check) | |
+| | | Production (check) | |
+| | | Deploy Development to Production | |
+| | | Production (re-check after deploy) | |
+| | | | |
