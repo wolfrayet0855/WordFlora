@@ -97,7 +97,7 @@ Use the name "Plus Forever". "Grand Garden" is already taken by the endgame (`Gr
 **First pack: "Frost & Lantern" (winter)**
 - Pots: Frosted Glass (earned), Lantern Red with a paper-lantern band, and Snowflake Indigo.
 - Scene: a snowy evening garden with warm lanterns. It uses the weather layer for snowfall and goes still under Reduce Motion.
-- Visitors: European robin and winter wren. The facts need a fact-check.
+- Visitors: European robin and wren. The facts need a fact-check.
 - Glasshouse plants: snowdrop and hellebore (Christmas rose).
 - Badge: "Lantern Keeper".
 - Second pack: "Spring Rain" (cherry blossom).

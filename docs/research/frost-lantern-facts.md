@@ -42,8 +42,8 @@ through that exact regex in a script: no hits.
 
 ## Wren (Eurasian wren, *Troglodytes troglodytes*; "wren" in the UK)
 
-Species: the art is the Eurasian wren. The Audubon page for "Winter Wren" now describes *Nannus hiemalis* (the North
-American species), so do not cite Audubon or Cornell "Winter Wren" for these facts. Use the name "Wren".
+Species: the art is the Eurasian wren. The Audubon page for the North American species now describes *Nannus hiemalis*,
+so do not cite Audubon or Cornell pages for that species for these facts. Use the name "Wren".
 
 - W1 "A wren is tiny, but its song is remarkably loud." (48 / 10)
   - BTO BirdFacts: full song is "remarkably loud!" for such a tiny bird; adults average 9.9 g [verified]. Sussex Wildlife
@@ -52,7 +52,7 @@ American species), so do not cite Audubon or Cornell "Winter Wren" for these fac
   - Do not use "loudest bird for its size" or "10 times louder than a cockerel": the second is [citation needed].
   - https://www.bto.org/understanding-birds/birdfacts/wren , https://sussexwildlifetrust.org.uk/news/a-bundle-of-winter-wrens
 - W2 "Wrens sometimes huddle together to share warmth in a snug winter roost." (71 / 12)
-  - Sussex Wildlife Trust: in winter wrens share roosts and huddle to conserve heat; most are small groups [verified].
+  - Sussex Wildlife Trust: in winter, wrens share roosts and huddle to conserve heat; most are small groups [verified].
     Wikipedia: in severe weather wrens roost in small groups in snug holes and old nests [reported, uncited there].
     RSPB not reachable [reported].
   - The draft's "nest box" is NOT confirmed: BTO, Sussex WT, Wikipedia and Audubon do not mention nest boxes. Roosts in

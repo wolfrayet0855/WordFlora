@@ -14,7 +14,7 @@ table `T` or a stroke width in `build.py` plus `python3 build.py`; "builder" mea
 | 4 | Snowflake indigo vs Starlight 1.07:1 in grey | `FL.indigoBody` `#4A4FAE` -> `#6A70D0`, `FL.indigoShade` -> `#4A4FAE` (the old body), rim unchanged. Starlight distance 1.08 -> 1.49; still 3:1+ on all four grounds. Copy the hex into `PotCatalog`. | Art, then builder | 10 |
 | 5 | Snowdrop petal edge is a hairline at 132 pt | `FL.snowdropEdge` stroke 1.4 -> 2.0 (tepal, bell and bud in `build.py`). | Art | 5 |
 | 6 | Badge snowflake nearly vanishes at 44 pt | Scale the flake 1.4x about its centre; the lantern carries the icon anyway. | Art | 10 |
-| 7 | Sheet labels the wren "Winter wren" (a North American species) | Display name "Wren" everywhere. | Copy | 2 |
+| 7 | Sheet labels the wren with the North American species name | Display name "Wren" everywhere. | Copy | 2 |
 
 ## 1. Dark snow bank (2.0:1)
 
@@ -54,7 +54,7 @@ Checklist before the G5 go/no-go (owner, about 20 min):
    `docs/research/plant-facts-frost-lantern.md` (plants), same format as the visitor table.
    - Robin: RSPB "Robin" species page and BTO BirdFacts (winter song, night singing under street lights).
    - Wren: RSPB "Wren" and BTO BirdFacts (loud song for its size; communal roosting in nest boxes in cold weather).
-     If the display name stays "Winter wren", use Cornell "All About Birds" instead, since that is *T. hiemalis*.
+     Cornell "All About Birds" covers the North American species (*T. hiemalis*), so it is not a source for the Eurasian wren.
    - Snowdrop: RHS "Galanthus" grow guide and Kew "Galanthus nivalis" plant page (late-winter flowering, hardened
      leaf tips).
    - Hellebore: RHS "Hellebores" grow guide and Kew (petaloid sepals, long display).

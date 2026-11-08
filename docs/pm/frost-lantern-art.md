@@ -112,7 +112,7 @@ imagesets with `preserves-vector-representation`, like the others.
 
 ### Visitors: European robin and wren
 
-The wren's display name is "Wren" everywhere (never "Winter wren", which is the North American *T. hiemalis*; the
+The wren's display name is "Wren" everywhere (never the North American species name, *T. hiemalis*; the
 art is the Eurasian wren, *T. troglodytes*).
 
 | File | Use | Size |
@@ -258,13 +258,15 @@ The plan asks for owner-checked facts. These are still **drafts**: each needs a 
 the G5 go/no-go. The app rule (`docs/research/visitor-facts.md`): one or two sentences, at most 16 words and 90
 characters, short words, `CopySafety.check` empty, no death or danger.
 
-- Robin: "Robins sing in winter too. Some even sing at night near street lights." (70 / 13)
-- Wren: "Wrens are tiny but very loud singers. On cold nights, many snuggle in one nest box." (83 / 16)
-- Snowdrop: "Snowdrops bloom in late winter. Their hard leaf tips push up through cold ground." (81 / 14)
-- Hellebore: "Hellebores bloom in winter. Their bright parts are sepals, so they stay for weeks." (82 / 14)
+- Robin: "Robins sing through the winter, not just in spring." (52 / 9)
+- Wren: "A wren is tiny, but its song is remarkably loud." (48 / 10)
+- Snowdrop: "Snowdrops often bloom in January and February." (46 / 7)
+- Hellebore: "Hellebore flowers have petal-like parts called sepals that stay on for weeks." (77 / 12)
 
-The wren line was shortened (the old one was 96 characters and 19 words). The hellebore line drops "last", which
-`CopySafety` bans, and "colourful", which no shipped string spells either way.
+These are the lines chosen in `docs/research/frost-lantern-facts.md` (with the 2026-11-07 robin ruling); each is under
+90 characters and 16 words and passes `CopySafety`. The earlier drafts (wren 96 characters and 19 words, then 83 / 16
+with an unconfirmed nest-box claim; hellebore with the banned word "last") are replaced. The hellebore line has no
+"last" and no "colourful".
 
 Source-check checklist (owner, about 20 min, before G5):
 
@@ -283,7 +285,7 @@ Source-check checklist (owner, about 20 min, before G5):
 
 ## Open questions
 
-1. **Wren name and species.** Settled: the display name is "Wren" everywhere. The plan's "winter wren" is today the
+1. **Wren name and species.** Settled: the display name is "Wren" everywhere. The plan's older name for it is today the
    North American *Troglodytes hiemalis*; the art is the Eurasian wren (*T. troglodytes*), so facts use RSPB and BTO.
 2. **Hellebore species.** I drew the Lenten rose (*H. orientalis*, plum) so it does not repeat the snowdrop's white.
    The Christmas rose (*H. niger*) is white and blooms nearer December. It is a colour swap in `build.py` if wanted.

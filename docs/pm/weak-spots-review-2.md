@@ -19,7 +19,7 @@ bug fix, a wording change, a check or a 1.1 backlog note. Anything that would re
 table: RSPB "Robin" (winter song), Kew "Common snowdrop" (flowering months), RHS "Hellebores" (sepals). The wren needs
 nothing. If a page contradicts a line, use the backup already in the doc (R2, S2, H2), all CopySafety-clean.
 
-**Wren species:** handled. The display name "Wren" everywhere, no "Winter wren", BTO/Sussex sources only, and W1 is
+**Wren species:** handled. The display name "Wren" everywhere, no North American species name, BTO/Sussex sources only, and W1 is
 true of both species. One residual: the research doc must never carry Audubon or Cornell URLs in the wren rows (it
 does not today; keep it so). The builder adds the four lines to the existing fact test when the G5 entries land
 (research doc, rule 2), so a later edit cannot slip past CopySafety.
