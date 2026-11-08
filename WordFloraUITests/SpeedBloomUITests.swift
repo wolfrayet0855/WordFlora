@@ -85,7 +85,9 @@ final class SpeedBloomUITests: XCTestCase {
         XCTAssertTrue(app.buttons["L"].isEnabled, "the round goes on")
         shot("speedbloom-take-your-time")
         for ch in "LOTUS" { app.buttons[String(ch)].tap() }
-        XCTAssertTrue(app.buttons["Continue"].waitForExistence(timeout: 6))
+        // The win card's button is "Next word" since polish pass 2 ("Continue" on the Daily Bloom and the tutorial).
+        let next = app.buttons.matching(NSPredicate(format: "label IN %@", ["Continue", "Next word"])).firstMatch
+        XCTAssertTrue(next.waitForExistence(timeout: 6))
     }
 
     func testTheRingHoldsWhileHelpIsUsed() {
