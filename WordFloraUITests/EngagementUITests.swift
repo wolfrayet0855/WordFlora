@@ -238,73 +238,110 @@ final class EngagementUITests: XCTestCase {
 
     // MARK: A. Weekly garden note
 
-    private var note: XCUIElement { element("weeklyNote") }
-    private var noteText: XCUIElement { element("weeklyNote.text") }
+    private var note: XCUIElement { element("weeklyNote.card") }
+    private var celebrate: XCUIElement { app.buttons["weeklyNote.celebrate"] }
 
     private func openWithNote(_ extra: [String] = []) {
         launch(["-uitest-weekly-note"] + extra)
-        XCTAssertTrue(noteText.waitForExistence(timeout: 6), "the weekly note shows on Home")
+        XCTAssertTrue(note.waitForExistence(timeout: 6), "the weekly note shows on Home")
     }
 
-    func testWeeklyNoteShowsThePastWeek() {
-        openWithNote()
-        let title = element("weeklyNote.title")
-        XCTAssertEqual(title.label, "Your week in the garden")
-        XCTAssertTrue(title.exists)
-        let label = noteText.label
-        for row in ["You grew 12 words.", "You solved 2 Daily Blooms.", "New plants: ", "You said hello to 3 friends."] {
-            XCTAssertTrue(label.contains(row), "\(row) in \(label)")
-        }
-        XCTAssertTrue(app.buttons["weeklyNote.lovely"].exists)
-        XCTAssertTrue(app.buttons["weeklyNote.visit"].exists)
-        XCTAssertTrue(element("weeklyNote.share").waitForExistence(timeout: 3), "18+: Share my week")
-        XCTAssertFalse(element("plus-offer-card").exists, "a note visit holds the Plus card back")
-        shot("a-note-light")
+    /// Celebrate opens the flower splash; Done closes only the splash, and the note stays for this visit.
+    private func celebrateAndClose() {
+        celebrate.tap()
+        let done = app.buttons["weeklyNote.celebrateDone"]
+        XCTAssertTrue(done.waitForExistence(timeout: 4), "the Celebrate splash shows")
+        done.tap()
+        XCTAssertTrue(done.waitForNonExistence(timeout: 4))
+        XCTAssertTrue(note.exists, "the note stays after Done")
+        XCTAssertTrue(celebrate.exists)
     }
 
-    /// One card at a time: on a note visit the daily quest waits; after Lovely it comes back on the next Home visit.
-    func testTheDailyQuestWaitsOnANoteVisit() {
-        openWithNote(["-uitest-quest=findWords"])
-        XCTAssertFalse(element("home.quest").exists, "the quest card waits while the weekly note shows")
-        app.buttons["weeklyNote.lovely"].tap()
-        XCTAssertTrue(note.waitForNonExistence(timeout: 3))
-        XCTAssertTrue(element("home.quest").waitForExistence(timeout: 3), "the quest returns once the note closes")
-    }
-
-    func testLovelyClosesAndTheNoteDoesNotReturnThisWeek() {
-        openWithNote()
-        app.buttons["weeklyNote.lovely"].tap()
-        XCTAssertTrue(note.waitForNonExistence(timeout: 3))
+    /// Garden and back: a note seen this week has gone from Home.
+    private func leaveAndComeBack() {
         app.buttons["Garden"].tap()
         XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
         app.navigationBars.buttons.firstMatch.tap()
         XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
         sleep(1)
+    }
+
+    func testWeeklyNoteShowsThePastWeek() {
+        openWithNote()
+        let label = note.label
+        XCTAssertTrue(label.hasPrefix("Your week in the garden"), label)
+        for row in ["You grew 12 words.", "New plants: ", "You said hello to 3 friends."] {
+            XCTAssertTrue(label.contains(row), "\(row) in \(label)")
+        }
+        // The tiles are inside the one card element: their numbers and labels are not separate VoiceOver stops.
+        XCTAssertFalse(app.staticTexts["words grown"].exists)
+        XCTAssertTrue(celebrate.exists)
+        XCTAssertFalse(app.buttons["weeklyNote.lovely"].exists)
+        XCTAssertFalse(app.buttons["weeklyNote.visit"].exists)
+        XCTAssertTrue(element("weeklyNote.share").waitForExistence(timeout: 3), "18+: Share my week")
+        XCTAssertGreaterThan(celebrate.frame.minY, note.frame.maxY, "the actions sit below the card")
+        XCTAssertFalse(element("plus-offer-card").exists, "a note visit holds the Plus card back")
+        shot("a-note-light")
+    }
+
+    /// One card at a time: the daily quest waits all through a note visit, Celebrate included; it returns on the next one.
+    func testTheDailyQuestWaitsOnANoteVisit() {
+        openWithNote(["-uitest-quest=findWords"])
+        XCTAssertFalse(element("home.quest").exists, "the quest card waits while the weekly note shows")
+        celebrateAndClose()
+        XCTAssertFalse(element("home.quest").exists, "the note is still up, so the quest still waits")
+        leaveAndComeBack()
+        XCTAssertFalse(note.exists)
+        XCTAssertTrue(element("home.quest").waitForExistence(timeout: 3), "the quest returns on the next Home visit")
+    }
+
+    /// Done keeps the note, so a 13+ player can celebrate and then share; it does not return after leaving Home.
+    func testCelebrateThenShareAndTheNoteDoesNotReturnThisWeek() {
+        openWithNote()
+        celebrate.tap()
+        let done = app.buttons["weeklyNote.celebrateDone"]
+        XCTAssertTrue(done.waitForExistence(timeout: 4))
+        sleep(1)
+        shot("a-note-celebrate")
+        done.tap()
+        XCTAssertTrue(done.waitForNonExistence(timeout: 4))
+        XCTAssertTrue(note.exists, "the note stays after Done")
+        XCTAssertTrue(element("weeklyNote.share").waitForExistence(timeout: 3), "Share my week is still there after celebrating")
+        leaveAndComeBack()
         XCTAssertFalse(note.exists, "shown once a week")
     }
 
-    func testVisitMyGardenGoesToTheGarden() {
+    /// Seen after a moment on screen: going to the garden and back, the note has gone.
+    func testTheNoteIsGoneAfterAVisitToTheGarden() {
         openWithNote()
-        app.buttons["weeklyNote.visit"].tap()
-        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
-        app.navigationBars.buttons.firstMatch.tap()
-        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
+        sleep(2)
+        leaveAndComeBack()
         XCTAssertFalse(note.exists)
     }
 
     func testUnderThirteenHasNoShareMyWeek() {
         openWithNote(["-uitest-age=under13"])
         XCTAssertFalse(element("weeklyNote.share").exists)
-        XCTAssertTrue(noteText.label.contains("You grew 12 words."))
+        XCTAssertTrue(celebrate.exists)
+        XCTAssertTrue(note.label.contains("You grew 12 words."))
     }
 
     func testQuietGardenShowsNamesOnly() {
         openWithNote(["-uitest-quiet"])
-        let label = noteText.label
+        let label = note.label
         XCTAssertTrue(label.contains("New in your garden: "), label)
         XCTAssertNil(label.rangeOfCharacter(from: .decimalDigits), "no numbers in Quiet Garden: \(label)")
         XCTAssertFalse(element("weeklyNote.share").exists)
+        XCTAssertTrue(celebrate.exists)
         shot("a-note-quiet")
+    }
+
+    func testCelebrateUnderReduceMotionShowsAStillBloom() {
+        openWithNote(["-uitest-reduce-motion"])
+        celebrate.tap()
+        XCTAssertTrue(app.buttons["weeklyNote.celebrateDone"].waitForExistence(timeout: 4))
+        shot("a-note-celebrate-reduce-motion")
+        audit("a-note-celebrate-reduce-motion")
     }
 
     func testAuditWeeklyNote() {
@@ -322,15 +359,24 @@ final class EngagementUITests: XCTestCase {
         let share = element("weeklyNote.share")
         scrollTo(share)
         XCTAssertTrue(share.isHittable, "Share my week is reachable")
+        scrollTo(celebrate)
+        XCTAssertTrue(celebrate.isHittable, "Celebrate is reachable")
     }
 
     /// Dark is set before launch: switching the appearance mid-test did not reach the app on these simulators.
+    /// The note is audited unscrolled; the celebration is audited after the scroll to Celebrate, by what is visible.
     func testAuditWeeklyNoteAtAXXXLDark() {
         XCUIDevice.shared.appearance = .dark
         openWithNote(Self.axXXXL)
         sleep(1)
         shot("a-note-axxxl-dark")
         audit("a-note-axxxl-dark")
+        scrollTo(celebrate)
+        celebrate.tap()
+        XCTAssertTrue(app.buttons["weeklyNote.celebrateDone"].waitForExistence(timeout: 4))
+        sleep(1)
+        shot("a-note-celebrate-axxxl-dark")
+        auditScrolled("a-note-celebrate-axxxl-dark")
     }
 
     func testAuditPlantPageWidgetRow() {

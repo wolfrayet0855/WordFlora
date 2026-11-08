@@ -92,7 +92,7 @@ no audit excuse added. One branch per task, merged on its own. Keep `mediaanalys
 - the past week has at least one positive item (see below). **No card if nothing happened**, never a "you were away" line;
 - not while the nudge card shows; when a weather card or banner shows, the note waits for the next Home visit that week
   (show it once the weather card is gone). On a note visit the Plus offer card is held back (as with the forecast card).
-- Shown at most once per week: shown = stored at first display; "Lovely" or "Visit my garden" just closes it.
+- Shown at most once per week: shown = stored at first display; Celebrate also marks it seen; it stays for that visit and is gone on the next Home visit.
 
 **Content (computed, `WeeklyNote.Summary`):** past week = `[weekStart - 7 days, weekStart)`.
 - `words`: count of `GameRecord` with `won == true` and `date` in range (Daily Bloom wins included).
@@ -112,7 +112,8 @@ no audit excuse added. One branch per task, merged on its own. Keep `mediaanalys
 - Friends: "You said hello to 1 friend." / "You said hello to 3 friends."
 - Closing line, picked by week number: "Your garden is glad you came by." / "Every word helps your garden grow." /
   "Thank you for all the care this week."
-- Buttons: "Lovely" (closes), "Visit my garden" (closes, goes to Garden), "Share my week" (13+ only).
+- Actions sit below the card (owner, 2026-11-08): "Celebrate" (a short petal splash with Done; Reduce Motion gives the
+  still arc, Calm and Quiet Garden the slow drift; Done closes only the splash, so the player can then share) and "Share my week" (13+ only).
 - Quiet Garden: no numbers at all. Only "New in your garden: Daisy and Clover." plus the closing line. If no plant
   arrived, no card.
 - VoiceOver: the card is one element with the title as a header and the rows read in order, then the buttons. Label
@@ -136,7 +137,7 @@ UI test flag `-uitest-weekly-note` (fixture: garden 10 days old, 12 wins, 2 new 
 6 vs 7 days; empty week = no card; zero rows hidden; singular/plural; "and N more" at 3+ plants; Quiet Garden names
 only and no card without plants; seen week stops a second show; weather card defers it; share allowed per age band
 (under 13 and nil = hidden); CopySafety on every string for counts 0-99 and long plant names). UI `WeeklyNoteUITests`:
-card shows with the fixture, Lovely closes and it does not return on relaunch, Visit my garden goes to Garden, share
+card shows with the fixture, Celebrate opens the splash, Done keeps the note and it does not return this week, share
 hidden with `-uitest-age=under13`, audits at default and AX XXXL, dark screenshot.
 
 ### Task B: Make it yours (about 6.5 h)

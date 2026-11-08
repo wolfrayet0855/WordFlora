@@ -91,6 +91,10 @@ struct HomeView: View {
     @State private var weatherPuzzleClosed = 0
     /// The weekly garden note for this visit (WeeklyNote); recorded as seen when it first shows.
     @State private var weeklyNote: WeeklyNote.Summary?
+    /// The weekly note's Celebrate splash is up. Done closes only the splash: the note stays for this visit.
+    @State private var weeklyCelebrate = false
+    /// The note's plant art, looked up once when the note shows (AppModel.weeklyNoteArt).
+    @State private var weeklyArt: (plants: [String], celebrate: [String]) = ([], [])
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     private let reportsLayout = LineProbe.enabled
 
@@ -126,15 +130,17 @@ struct HomeView: View {
                         if let chip = weather.chip { WeatherChip(text: chip, kind: weather.chipKind) }
 
                         if let note = weeklyNote {
-                            WeeklyNoteCard(summary: note, quiet: app.settings.quietGarden, canShare: app.canShareWeek,
-                                           onLovely: { app.markWeeklyNoteSeen(note.weekKey); animate { weeklyNote = nil } },
-                                           onVisit: { app.markWeeklyNoteSeen(note.weekKey); weeklyNote = nil; router.go(.garden) })
-                                .transition(.opacity)
-                                // Seen once it has stayed on screen a moment; leaving Home first cancels this.
-                                .task(id: note.weekKey) {
-                                    try? await Task.sleep(for: .seconds(1.5))
-                                    if !Task.isCancelled && router.path.isEmpty { app.markWeeklyNoteSeen(note.weekKey) }
-                                }
+                            VStack(spacing: 10) {
+                                WeeklyNoteCard(summary: note, quiet: app.settings.quietGarden, plantArt: weeklyArt.plants)
+                                WeeklyNoteActions(summary: note, canShare: app.canShareWeek,
+                                                  onCelebrate: { app.markWeeklyNoteSeen(note.weekKey); weeklyCelebrate = true })
+                            }
+                            .transition(.opacity)
+                            // Seen once it has stayed on screen a moment; leaving Home first cancels this.
+                            .task(id: note.weekKey) {
+                                try? await Task.sleep(for: .seconds(1.5))
+                                if !Task.isCancelled && router.path.isEmpty { app.markWeeklyNoteSeen(note.weekKey) }
+                            }
                         }
 
                         if app.showWelcomeBack || (app.plusOffer != nil && weeklyNote == nil) || weather.card != nil || weather.banner != nil {
@@ -198,6 +204,10 @@ struct HomeView: View {
             playAdNote = app.returnVisit == .adMayPlay
         }
         .grandGardenCeremony()
+        .onChange(of: router.path.isEmpty) { _, onHome in if !onHome { dropSeenWeeklyNote() } }
+        .fullScreenCover(isPresented: $weeklyCelebrate) {
+            WeeklyCelebrateView(art: weeklyArt.celebrate) { weeklyCelebrate = false }.environment(app)
+        }
         .fullScreenCover(isPresented: $weatherPuzzle, onDismiss: { weatherPuzzleClosed += 1 }) { WeatherPuzzleSheet { weatherPuzzle = false }.environment(app) }
         .navigationBarHidden(true)
         .overlay(alignment: .bottomLeading) { layoutReport }
@@ -333,6 +343,13 @@ struct HomeView: View {
         let w = app.homeWeather
         weeklyNote = app.dueWeeklyNote(otherCardShowing: w.card != nil || w.banner != nil || app.showWelcomeBack || app.plusOffer != nil,
                                        nudgeShowing: showNudge)
+        if let weeklyNote { weeklyArt = app.weeklyNoteArt(weeklyNote) }
+    }
+
+    /// A note already seen this week stays for that one visit only: once another screen opens over Home, it has gone
+    /// (closing the Celebrate splash is not a new visit, so the note stays for Share my week).
+    private func dropSeenWeeklyNote() {
+        if let note = weeklyNote, app.settings.weeklyNoteSeenWeek == note.weekKey { weeklyNote = nil }
     }
 
     /// The honest ad note follows the 3 minute window: judged as Home appears or the window starts, and dropped when
