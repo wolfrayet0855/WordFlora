@@ -253,3 +253,6 @@ Final message must contain: commit hashes in order, test counts and reds with re
 ## Worktree note
 
 `Config/Ads.local.xcconfig` is git-ignored. Symlink or copy it from the main checkout into the worktree for Release builds, never commit it.
+
+## Appended 2026-11-07 (lead): Plus flow items for G4a
+From docs/pm/plus-flow-fable-review.md (4022c3e): (1) the full-screen ad guard: `topmost` must follow presentedViewController so no ad is presented over a sheet; (2) AdPolicy blocks `.paywall` and `.sheetUp` surfaces; (3) H5: release cached ads when Plus becomes active. The Plus page has no ad view of its own; the owner saw the Home banner around the purchase.
