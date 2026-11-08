@@ -38,8 +38,9 @@ final class PotCatalogTests: XCTestCase {
         XCTAssertEqual(PotCatalog.all.map(\.id), Self.order)
         XCTAssertEqual(Set(PotCatalog.all.map(\.id)).count, 16)
         XCTAssertEqual(Set(PotCatalog.all.map(\.name)).count, 16)
-        XCTAssertEqual(PotCatalog.gridColumns, 4, "a 4 x 4 grid")
-        XCTAssertEqual(PotCatalog.all.count, PotCatalog.gridColumns * 4)
+        XCTAssertEqual(GridColumns.count(.repotTiles, for: .large), 4, "a 4 x 4 grid at the default size")
+        XCTAssertEqual(GridColumns.count(.shedPots, for: .large), 4)
+        XCTAssertEqual(PotCatalog.all.count, 4 * 4)
     }
 
     func testEveryPotHasItsOwnPatternSoNoneDependsOnHueAlone() {
