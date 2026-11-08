@@ -152,7 +152,8 @@ struct SeasonFriendsSection: View {
                 }
                 let rows = stride(from: 0, to: friends.count, by: columns).map { Array(friends[$0 ..< min($0 + columns, friends.count)]) }
                 VStack(spacing: 12) {
-                    ForEach(rows, id: \.first!.id) { row in
+                    // Each row is named by its friends' ids (rows are never empty, but no force unwrap).
+                    ForEach(rows, id: \.friendIds) { row in
                         HStack(spacing: 12) {
                             ForEach(row, id: \.id) { card($0) }
                             if row.count < columns { Color.clear.frame(maxWidth: .infinity) }
@@ -201,6 +202,11 @@ struct SeasonFriendsSection: View {
         .accessibilityAddTraits(met || owned ? .isButton : [])
         .accessibilityIdentifier(met ? "visitor-\(v.id)" : "visitor-unmet-\(v.id)")
     }
+}
+
+private extension Array where Element == VisitorSpecies {
+    /// A row's stable id: its friends' ids in order.
+    var friendIds: [String] { map(\.id) }
 }
 
 /// The Seasons page: what the full pack holds besides its pots (a grown-up's view, behind the gate for young players).
