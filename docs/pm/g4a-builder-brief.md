@@ -247,3 +247,9 @@ Do not edit the three "Review rulings" sections; they are the record.
 Exit: never-for-under-13 table and fuzz green; B1 spy green; AdUnitIDTests green; R1 to R3 UI green; Release build-phase check proven (fails with the local file hidden, passes with it); no `Models/` diff; Release bundle has no test ids and no fake-presenter strings; faded-bloom screenshots attached; full unit suite; the UI classes you touched (`WordFloraUITests` Garden / Settings / Plus, `RestCardUITests`, `AdFormatsUITests`, wake tests, `HomeLayoutUITests` banner slot, `ParentalGateLinkUITests`).
 
 Final message must contain: commit hashes in order, test counts and reds with reasons, the collapsible test id outcome, privacy report outcome and any tracking domains added, the grep-for-attribution result (prints 0), the sentence "no stored field added" with the empty `Models/` diff, and open items for G4b. Do not write the report to a file.
+
+---
+
+## Worktree note
+
+`Config/Ads.local.xcconfig` is git-ignored. Symlink or copy it from the main checkout into the worktree for Release builds, never commit it.
