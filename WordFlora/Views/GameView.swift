@@ -23,6 +23,11 @@ struct GameView: View {
     @State private var showBreak = false
     /// Whether "One more" may lead to an ad, captured once as the resting card opens so its note never flickers.
     @State private var adNoteOnOneMore = false
+    /// R2 on the resting card, captured as the card opens (and again after a hint video), like the ad note.
+    @State private var hintPath: PerkPath = .hidden
+    @State private var whisperOnCard = false
+    @State private var watchingHint = false
+    @State private var rewardToastText: String?
     /// Whether the card offers the quiet "Go ad-free" row, also captured once as the card opens: the card then does
     /// not redraw when the ad rules' inputs (store state, settings) update behind it.
     @State private var goAdFreeOnCard = false
@@ -209,6 +214,13 @@ struct GameView: View {
             .padding(.horizontal, Space.m)
             .frame(minWidth: Theme.minTap - Space.s, minHeight: 36)
             .background(Color.tileGardenFill, in: Capsule())
+            .overlay(alignment: .topTrailing) {
+                if vm.whisperReady {
+                    Image(systemName: "leaf.fill").font(.caption2).foregroundStyle(Color.successText)
+                        .offset(x: 2, y: -2).accessibilityHidden(true)
+                        .accessibilityIdentifier("help.whisperDot")
+                }
+            }
             // The capsule is 36 pt to look at; the hit area stays 44 pt.
             .frame(minWidth: Theme.minTap, minHeight: Theme.minTap)
             .contentShape(Rectangle())
@@ -219,7 +231,7 @@ struct GameView: View {
         .accessibilityLabel("Help")
         .disabled(!vm.canUseHelp)
         .symbolEffect(.pulse, isActive: helpPulse)
-        .accessibilityHint("Gives a free clue")
+        .accessibilityHint(vm.whisperReady ? AdPerkCopy.Hint.helpHint : "Gives a free clue")
     }
 
     /// The ring closed first: the word carries on at its own pace, with the same reward.
@@ -465,6 +477,7 @@ struct GameView: View {
                             .buttonStyle(SecondaryButtonStyle()).accessibilityIdentifier("restCard.enough")
                     }
                     .padding(.top, 6)
+                    hintRow
                     if goAdFreeOnCard { goAdFreeRow.padding(.top, 2) }
                 }
                 .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
@@ -472,6 +485,7 @@ struct GameView: View {
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
             .accessibilityIdentifier("restCard")
+            .rewardToast($rewardToastText)
         }
     }
 
@@ -568,6 +582,35 @@ struct GameView: View {
         }
     }
 
+    /// R2 (docs/pm/admob-full-spec.md section 2, rulings): a whisper for the next garden word. Hidden after a loss, on
+    /// the Daily Bloom card, in Quiet Garden for everyone, and while "A short ad may play first." shows; a banked whisper
+    /// shows a line instead of a button.
+    @ViewBuilder private var hintRow: some View {
+        if whisperOnCard {
+            Label(AdPerkCopy.Hint.banked, systemImage: "leaf.fill")
+                .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("restCard.whisperBanked")
+        } else {
+            RewardedPromptRow.forPath(hintPath, adTitle: AdPerkCopy.Hint.adTitle, freeTitle: AdPerkCopy.Hint.freeTitle,
+                                      adSubtitle: AdPerkCopy.Hint.subtitle, freeSubtitle: AdPerkCopy.Hint.subtitle,
+                                      hasPlus: app.entitlements.state.hasPlus, identifier: "restCard.hint", busy: watchingHint) {
+                guard !watchingHint else { return }
+                watchingHint = true
+                Task {
+                    if await app.watchRewarded(.hint) { rewardToastText = AdPerkCopy.Hint.toast }
+                    // After a rewarded ad the gap holds the interstitial, so the note is worked out again (never lies).
+                    adNoteOnOneMore = app.adWouldPlayOnOneMore
+                    whisperOnCard = app.whisperBanked
+                    hintPath = app.perkPath(.hint)
+                    watchingHint = false
+                }
+            }
+            .disabled(watchingHint)
+        }
+    }
+
     static func tutorialEntry(in bank: WordBank) -> WordEntry {
         bank.entries.first { $0.id == "l1-seed" } ?? bank.entries.first { $0.level == 1 && $0.kind == .vocab } ?? bank.entries[0]
     }
@@ -583,6 +626,10 @@ struct GameView: View {
         if vm.sessionBeat {
             adNoteOnOneMore = app.adWouldPlayOnOneMore
             goAdFreeOnCard = app.showBanner
+            whisperOnCard = app.whisperBanked
+            hintPath = app.perkPath(.hint)
+            // B5: the card says an ad may play, so load it now and "One more" never waits.
+            if adNoteOnOneMore { Task { await app.ads.preloadInterstitial() } }
             openCard { showRestCard = true }
         } else if daily { router.home() } else { vm.startRound() }
     }
