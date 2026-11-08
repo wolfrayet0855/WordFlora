@@ -129,24 +129,25 @@ final class DailyQuestUITests: XCTestCase {
         app.buttons["Settings"].tap()
     }
 
-    func testGrownUpsSeeTheFamilyLineInSettingsAndOnPlus() {
+    /// Owner, 2026-11-07: one Restore purchases button, on the Plus page; none in WordFlora Settings and no family line
+    /// for 13 and up (docs/pm/plus-flow-fable-review.md N1).
+    func testGrownUpsSeeNoFamilyLineAndThePlusPageHasOneRestore() {
         app.launchArguments = ["-uitest", "-uitest-onboarded"]             // a grown-up (18+)
         app.launch()
         openSettings()
-        let line = element("familyShare.nudge")
-        scrollTo(line)
-        XCTAssertTrue(line.exists)
-        XCTAssertTrue(app.staticTexts["Already have Plus on a family phone?"].exists)
-        XCTAssertTrue(element("familyShare.restore").exists)
-        audit("family-settings", within: line)
-        app.buttons["settings.plus"].tap()
-        let onPlus = element("familyShare.nudge")
-        XCTAssertTrue(onPlus.waitForExistence(timeout: 5))
-        scrollTo(onPlus)
-        // On the Plus page the line only: the page's own Restore purchases button is right below it.
-        XCTAssertTrue(app.staticTexts["Already have Plus on a family phone? Restore purchases is below."].exists)
-        XCTAssertFalse(element("familyShare.restore").exists, "one Restore button on the Plus page")
-        audit("family-plus", within: onPlus)
+        let plusRow = app.buttons["settings.plus"]
+        scrollTo(plusRow)
+        for _ in 0..<2 { app.swipeUp() }
+        XCTAssertFalse(element("familyShare.nudge").exists)
+        XCTAssertFalse(app.buttons["Restore purchases"].exists, "no Restore on the Settings page")
+        scrollTo(plusRow)
+        plusRow.tap()
+        let restore = app.buttons["plus.restore"]
+        XCTAssertTrue(restore.waitForExistence(timeout: 5))
+        scrollTo(restore)
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == 'Restore purchases'")).count, 1, "exactly one Restore purchases")
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'family phone'")).firstMatch.exists)
+        audit("plus-one-restore", within: restore)
     }
 
     func testKidsAndPlusOwnersNeverSeeTheFamilyLine() {

@@ -7,19 +7,14 @@ final class FamilyShareNudgeTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 2_000_000_000)
     private var cal: Calendar { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "America/New_York")!; return c }
 
-    func testShownToTeensAndAdultsWithoutPlus() {
-        XCTAssertTrue(FamilyShareNudge.isShown(ageBand: .eighteenPlus, hasPlus: false, quietGarden: false))
-        XCTAssertTrue(FamilyShareNudge.isShown(ageBand: .thirteenPlus, hasPlus: false, quietGarden: false))
-    }
-
-    func testKidsAndUnknownAgeNeverSeeTheRestoreLine() {
-        XCTAssertFalse(FamilyShareNudge.isShown(ageBand: .under13, hasPlus: false, quietGarden: false))
-        XCTAssertFalse(FamilyShareNudge.isShown(ageBand: nil, hasPlus: false, quietGarden: false))
-    }
-
-    func testPlusOwnersAndQuietGardenDoNotSeeIt() {
-        XCTAssertFalse(FamilyShareNudge.isShown(ageBand: .eighteenPlus, hasPlus: true, quietGarden: false))
-        XCTAssertFalse(FamilyShareNudge.isShown(ageBand: .eighteenPlus, hasPlus: false, quietGarden: true))
+    /// 13 and up see no family line anywhere: the one Restore purchases button is on the Plus page (owner, 2026-11-07).
+    func testTeensAndAdultsSeeNoFamilyLine() {
+        for band: AgeBand in [.thirteenPlus, .eighteenPlus] {
+            for placement in [FamilyShareNudge.Placement.settings, .plusPage] {
+                XCTAssertEqual(FamilyShareNudge.audience(ageBand: band, hasPlus: false, quietGarden: false, placement: placement,
+                                                         lastGrownUpShownAt: nil, now: now, calendar: cal), .none)
+            }
+        }
     }
 
     /// One row per age band and situation: who sees which note, where.
@@ -27,9 +22,9 @@ final class FamilyShareNudgeTests: XCTestCase {
         typealias A = FamilyShareNudge.Audience
         struct Row { var band: AgeBand?; var plus: Bool; var quiet: Bool; var settings: A; var plusPage: A }
         let rows: [Row] = [
-            // 13 and up: today's Restore line in both places.
-            Row(band: .eighteenPlus, plus: false, quiet: false, settings: .player, plusPage: .player),
-            Row(band: .thirteenPlus, plus: false, quiet: false, settings: .player, plusPage: .player),
+            // 13 and up: nothing (the Restore line is retired).
+            Row(band: .eighteenPlus, plus: false, quiet: false, settings: .none, plusPage: .none),
+            Row(band: .thirteenPlus, plus: false, quiet: false, settings: .none, plusPage: .none),
             Row(band: .eighteenPlus, plus: true, quiet: false, settings: .none, plusPage: .none),
             Row(band: .thirteenPlus, plus: false, quiet: true, settings: .none, plusPage: .none),
             // Under 13 and unknown age: the grown-ups' note, Settings only (the For grown-ups section).
@@ -70,7 +65,7 @@ final class FamilyShareNudgeTests: XCTestCase {
         }
         for band: AgeBand in [.thirteenPlus, .eighteenPlus] {
             XCTAssertEqual(FamilyShareNudge.audience(ageBand: band, hasPlus: false, quietGarden: false, placement: .settings,
-                                                     lastGrownUpShownAt: now.addingTimeInterval(-day), now: now, calendar: cal), .player)
+                                                     lastGrownUpShownAt: now.addingTimeInterval(-day), now: now, calendar: cal), .none)
         }
     }
 
@@ -86,9 +81,7 @@ final class FamilyShareNudgeTests: XCTestCase {
 
     func testCopyIsCalmAndForGrownUps() {
         for line in FamilyShareNudge.Copy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
-        XCTAssertEqual(FamilyShareNudge.Copy.line + " " + FamilyShareNudge.Copy.button + ".",
-                       "Already have Plus on a family phone? Restore purchases.")
-        XCTAssertEqual(FamilyShareNudge.Copy.plusPageLine, "Already have Plus on a family phone? Restore purchases is below.")
+        XCTAssertEqual(FamilyShareNudge.Copy.all, [FamilyShareNudge.Copy.grownUpLine, FamilyShareNudge.Copy.grownUpButton])
         let grownUp = FamilyShareNudge.Copy.grownUpLine + " " + FamilyShareNudge.Copy.grownUpButton
         XCTAssertTrue(FamilyShareNudge.Copy.grownUpLine.contains("Grown-ups:"), "addressed to the grown-up")
         // No pressure or "ask your parents" lines, no countdowns, no prices.

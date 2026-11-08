@@ -1,17 +1,15 @@
 import Foundation
 
 /// A calm Family Sharing note, never on Home and never a popup.
-/// - 13 and up without Plus: "Already have Plus on a family phone? Restore purchases." in Settings > WordFlora Plus,
-///   and on the Plus screen the same line as text only, pointing at the page's Restore button below it.
 /// - Under 13 and unknown age without Plus (owner, 2026-11-07): a note addressed to the grown-up, only inside the
 ///   "For grown-ups" section of Settings, on at most one day a week, off in Quiet Garden. Its one button asks the
 ///   grown-up question (`ParentalGate`) before the Plus page opens. No countdown, no pressure line for the child.
-/// Plus owners and Quiet Garden see neither.
+/// - 13 and up: nothing. The Restore line it used to carry is retired (owner, 2026-11-07: one Restore purchases
+///   button, on the Plus page; docs/pm/plus-flow-fable-review.md N1). The benefits already say "Share it with your family".
+/// Plus owners and Quiet Garden see nothing.
 enum FamilyShareNudge {
     enum Audience: Equatable {
         case none
-        /// 13 and up: the Restore line.
-        case player
         /// Under 13 and unknown age: the grown-ups' note, behind the grown-up question.
         case grownUp
     }
@@ -24,9 +22,7 @@ enum FamilyShareNudge {
 
     static func audience(ageBand: AgeBand?, hasPlus: Bool, quietGarden: Bool, placement: Placement,
                          lastGrownUpShownAt: Date?, now: Date, calendar: Calendar = .current) -> Audience {
-        guard !hasPlus, !quietGarden else { return .none }
-        if ageBand == .thirteenPlus || ageBand == .eighteenPlus { return .player }
-        guard placement == .settings else { return .none }
+        guard !hasPlus, !quietGarden, ParentalGate.isRequired(ageBand: ageBand), placement == .settings else { return .none }
         return grownUpDue(lastShownAt: lastGrownUpShownAt, now: now, calendar: calendar) ? .grownUp : .none
     }
 
@@ -39,21 +35,10 @@ enum FamilyShareNudge {
         return days >= grownUpGapDays
     }
 
-    /// The 13 and up Restore line (today's rule).
-    static func isShown(ageBand: AgeBand?, hasPlus: Bool, quietGarden: Bool) -> Bool {
-        audience(ageBand: ageBand, hasPlus: hasPlus, quietGarden: quietGarden, placement: .plusPage,
-                 lastGrownUpShownAt: nil, now: .now) == .player
-    }
-
     enum Copy {
-        static let line = "Already have Plus on a family phone?"
-        static let button = "Restore purchases"
-        /// The Plus page shows the line only, pointing at the page's own Restore button (so the page never has two
-        /// buttons with the same name; plus-page-review finding 12, lead ruling).
-        static let plusPageLine = "Already have Plus on a family phone? Restore purchases is below."
         /// The grown-ups' note (under 13 and unknown age). Written to the grown-up, never to the child.
         static let grownUpLine = "Plus covers the whole family. Grown-ups: turn on Family Sharing in Apple Family settings and everyone in your family gets Plus, ads off, garden synced."
         static let grownUpButton = "About Plus for families"
-        static var all: [String] { [line, button, plusPageLine, grownUpLine, grownUpButton] }
+        static var all: [String] { [grownUpLine, grownUpButton] }
     }
 }
