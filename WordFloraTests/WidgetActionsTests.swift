@@ -227,6 +227,43 @@ final class WidgetActionsTests: XCTestCase {
         XCTAssertEqual(WidgetCopy.percent(0.404), "40 percent")
     }
 
+    // MARK: typed names (diff review 2, B1)
+    func testUnder13NeverSeesATypedNameAndTheLockScreenUsesTheSpecies() {
+        let ps = plants(["rose"]); ps[0].nickname = "Bella"
+        let teen = WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal).hero!
+        XCTAssertEqual(teen.name, "Bella"); XCTAssertTrue(teen.hasTypedName)
+        XCTAssertEqual(teen.shownName(hideTyped: true), ps[0].name, "locked: the species name")
+        XCTAssertEqual(teen.shownName(hideTyped: false), "Bella")
+        let kid = WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal, typedNames: false).hero!
+        XCTAssertEqual(kid.name, ps[0].name); XCTAssertFalse(kid.hasTypedName)
+        let d = UserDefaults(suiteName: "wf-widget-names-\(UUID().uuidString)")!
+        XCTAssertTrue(WidgetActions.showsTypedNames(in: d))
+        d.set("under13", forKey: "ageBand"); XCTAssertFalse(WidgetActions.showsTypedNames(in: d))
+        d.set("thirteenPlus", forKey: "ageBand"); XCTAssertTrue(WidgetActions.showsTypedNames(in: d))
+    }
+
+    // MARK: midnight refresh (calendar, not +24 h)
+    func calendar(_ tz: String) -> Calendar { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: tz)!; return c }
+    func date(_ c: Calendar, _ y: Int, _ m: Int, _ d: Int, _ h: Int) -> Date { c.date(from: DateComponents(year: y, month: m, day: d, hour: h))! }
+
+    func testNextMidnightAcrossTheNewYear() {
+        let c = calendar("Europe/London")
+        XCTAssertEqual(WidgetActions.nextMidnight(after: date(c, 2026, 12, 31, 22), calendar: c), date(c, 2027, 1, 1, 0))
+    }
+
+    func testNextMidnightOnDaylightSavingDays() {
+        let ny = calendar("America/New_York")
+        // 2026-03-08 is 23 hours long in New York: start of day + 24 h would land at 1 am.
+        XCTAssertEqual(WidgetActions.nextMidnight(after: date(ny, 2026, 3, 8, 12), calendar: ny), date(ny, 2026, 3, 9, 0))
+        XCTAssertNotEqual(ny.startOfDay(for: date(ny, 2026, 3, 8, 12)).addingTimeInterval(86_400), date(ny, 2026, 3, 9, 0))
+        // 2026-11-01 is 25 hours long.
+        XCTAssertEqual(WidgetActions.nextMidnight(after: date(ny, 2026, 11, 1, 12), calendar: ny), date(ny, 2026, 11, 2, 0))
+        // A day with no midnight (Sao Paulo, 2018-11-04 started at 1 am): the first moment of that day.
+        let sp = calendar("America/Sao_Paulo")
+        let m = WidgetActions.nextMidnight(after: date(sp, 2018, 11, 3, 20), calendar: sp)
+        XCTAssertEqual(sp.component(.day, from: m), 4); XCTAssertEqual(m, sp.startOfDay(for: date(sp, 2018, 11, 4, 12)))
+    }
+
     // MARK: deep links
     func testWidgetLinksOpenTheRightScreens() {
         let r = GameRouter()

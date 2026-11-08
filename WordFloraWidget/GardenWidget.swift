@@ -88,7 +88,7 @@ struct GardenProvider: TimelineProvider {
             var refresh = now.addingTimeInterval(6 * 3600)
             if let drop = entry.snapshot.nextTrickle?.addingTimeInterval(60), drop > now, drop < refresh { refresh = drop }
             // Midnight too: the weather line, "Watered today" and "Said hello" follow the day.
-            let midnight = Calendar.current.startOfDay(for: now).addingTimeInterval(86_400 + 60)
+            let midnight = WidgetActions.nextMidnight(after: now, calendar: .current).addingTimeInterval(60)
             let later = [midnight, refresh].filter { $0 > now && $0 <= refresh }.sorted().map { load(at: $0) }
             completion(Timeline(entries: [entry] + later, policy: .after(refresh)))
         }
@@ -102,7 +102,8 @@ struct GardenProvider: TimelineProvider {
         let context = container.mainContext
         let d = SharedDefaults.store
         var entry = GardenEntry(date: date, snapshot: WidgetActions.snapshot(context: context, now: date, calm: calm, calendar: .current,
-                                                                             exempt: SharedDefaults.loveExempt(in: d)), quiet: quiet)
+                                                                             exempt: SharedDefaults.loveExempt(in: d),
+                                                                             typedNames: WidgetActions.showsTypedNames(in: d)), quiet: quiet)
         if let p = (try? context.fetch(FetchDescriptor<PlayerProfile>()))?.first {
             let c = GardenWeather.widgetContext(profile: p, today: WeatherDay.key(date), quietGarden: quiet,
                                                 calmMode: SharedDefaults.calmMode(in: d), weatherOn: SharedDefaults.gardenWeather(in: d))
@@ -129,18 +130,13 @@ struct GardenWidget: Widget {
 
 struct GardenWidgetView: View {
     let entry: GardenEntry
-    /// Only for rendering checks outside WidgetKit (the family environment value cannot be set there).
-    var familyOverride: WidgetFamily?
     @Environment(\.widgetFamily) private var family
     @Environment(\.dynamicTypeSize) private var typeSize
-
-    init(entry: GardenEntry, familyOverride: WidgetFamily? = nil) {
-        self.entry = entry
-        self.familyOverride = familyOverride
-    }
+    /// `.privacy` while the phone is locked: a typed plant name gives way to the species name on the Lock Screen.
+    @Environment(\.redactionReasons) private var redaction
 
     var body: some View {
-        switch familyOverride ?? family {
+        switch family {
         case .accessoryCircular: circular
         case .accessoryRectangular: rectangular
         case .accessoryInline: inline
@@ -220,6 +216,9 @@ struct GardenWidgetView: View {
         Group {
             if let s = hero {
                 // The first layout whose words all fit: drop the chip, then the name; the plant art shrinks before any word.
+                // WIDGET-ONLY EXCEPTION (diff review 2, B2): ViewThatFits(in: .vertical) and minimumScaleFactor are allowed
+                // here and in the medium right column only because they drop optional rows and never switch row/column
+                // layout. The app itself picks layouts from the size category, never by measuring.
                 ViewThatFits(in: .vertical) {
                     VStack(spacing: 4) { plantImage(s, ideal: 36, max: 74); name(s); chip; waterButton(s) }
                     VStack(spacing: 4) { plantImage(s, ideal: 36, max: 74); name(s); waterButton(s) }
@@ -280,7 +279,9 @@ struct GardenWidgetView: View {
                 Gauge(value: s.growthFraction) { Image(systemName: "leaf.fill") }
                     .gaugeStyle(.accessoryCircularCapacity)
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(WidgetCopy.circularLabel(name: s.name))
+                    // No name is drawn here, so nothing can trigger a locked render: the label always uses the species
+                    // name, never a typed one (VoiceOver on a locked phone).
+                    .accessibilityLabel(WidgetCopy.circularLabel(name: s.shownName(hideTyped: true)))
                     .accessibilityValue(WidgetCopy.percent(s.growthFraction))
             } else { Image(systemName: "leaf.fill").accessibilityLabel(WidgetCopy.appName) }
         }
@@ -291,7 +292,8 @@ struct GardenWidgetView: View {
             if let s = hero {
                 VStack(alignment: .leading, spacing: 2) {
                     // At the accessibility sizes the name takes the room the chip had (layout chosen by size, not measured).
-                    Text(s.name).font(.headline).lineLimit(typeSize.isAccessibilitySize ? 2 : 1).minimumScaleFactor(0.8)
+                    Text(s.shownName(hideTyped: locked)).font(.headline).lineLimit(typeSize.isAccessibilitySize ? 2 : 1).minimumScaleFactor(0.8)
+                        .privacySensitive(s.hasTypedName && !locked)
                     if !typeSize.isAccessibilitySize { Text(entry.weatherChip ?? WidgetCopy.growing).font(.caption) }
                     Gauge(value: s.growthFraction) { EmptyView() }.gaugeStyle(.accessoryLinearCapacity).accessibilityHidden(true)
                 }
@@ -299,8 +301,15 @@ struct GardenWidgetView: View {
         }
     }
 
+    /// While the phone is locked (`.privacy` redaction) a typed plant name is swapped for the species name. Marking the
+    /// typed name `privacySensitive` is what makes WidgetKit draw that locked version.
+    private var locked: Bool { redaction.contains(.privacy) }
+
     private var inline: some View {
-        Label(WidgetCopy.inline(name: hero?.name, chip: entry.weatherChip), systemImage: "leaf.fill")
+        Label {
+            Text(WidgetCopy.inline(name: hero?.shownName(hideTyped: locked), chip: entry.weatherChip))
+                .privacySensitive(hero?.hasTypedName == true && !locked)
+        } icon: { Image(systemName: "leaf.fill") }
     }
 
     private var empty: some View {

@@ -23,6 +23,22 @@ enum WidgetActions {
         var isSeed = false
         /// The app's own seed for the plant's lines today (`AppModel.helloLine`), so the widget says what the app said.
         var voiceSeed = 0
+        /// The species name ("Rose"), shown instead of a typed name while the phone is locked.
+        var speciesName = ""
+        /// `name` is a name the player typed (a nickname), so the Lock Screen hides it while locked.
+        var hasTypedName: Bool { !speciesName.isEmpty && speciesName != name }
+        /// The name to show: the species name when `hideTyped` (Lock Screen while locked), else `name`.
+        func shownName(hideTyped: Bool) -> String { hideTyped && hasTypedName ? speciesName : name }
+    }
+
+    /// A typed plant name is never shown for under 13, on any widget family (the species name is used instead).
+    static func showsTypedNames(in d: UserDefaults) -> Bool { d.string(forKey: "ageBand") != "under13" }
+
+    /// The widget's midnight refresh: the next local midnight by the calendar (safe across daylight saving and the
+    /// new year; a day is not always 24 hours). On a day with no midnight, the first moment after it.
+    static func nextMidnight(after now: Date, calendar: Calendar) -> Date {
+        calendar.nextDate(after: now, matching: DateComponents(hour: 0, minute: 0, second: 0), matchingPolicy: .nextTime)
+            ?? calendar.startOfDay(for: now).addingTimeInterval(86_400)
     }
 
     struct GardenSnapshot: Equatable {
@@ -41,7 +57,8 @@ enum WidgetActions {
     static func galleryShowsSample(isPreview: Bool, snapshot: GardenSnapshot) -> Bool { isPreview && snapshot.hero == nil }
 
     @MainActor
-    static func snapshot(context: ModelContext, now: Date, calm: Bool, calendar: Calendar = .current, exempt: Bool = false) -> GardenSnapshot {
+    static func snapshot(context: ModelContext, now: Date, calm: Bool, calendar: Calendar = .current, exempt: Bool = false,
+                         typedNames: Bool = true) -> GardenSnapshot {
         let profile = (try? context.fetch(FetchDescriptor<PlayerProfile>()))?.first
         let earned = ((try? context.fetch(FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.level), SortDescriptor(\.name)]))) ?? [])
             .filter { $0.earnedCount > 0 }
@@ -64,13 +81,14 @@ enum WidgetActions {
         func snap(_ p: PlantCollectible) -> PlantSnapshot {
             let eco = Economy.default
             let cost = eco.levelBaseCost * eco.levelCostMultipliers[max(0, min(4, p.level - 1))]
-            return PlantSnapshot(plantId: p.plantId, name: p.nickname.isEmpty ? p.name : p.nickname, imageName: p.imageName, stage: p.stage,
+            return PlantSnapshot(plantId: p.plantId, name: !typedNames || p.nickname.isEmpty ? p.name : p.nickname,
+                                 imageName: p.imageName, stage: p.stage,
                                  thirsty: TendingEngine.isThirsty(p, now: now, calm: calm), growthFraction: min(1, Double(p.growthPoints) / cost),
                                  waterDone: TendingEngine.isDone(.water, plant: p, now: now, calendar: calendar, economy: eco),
                                  wateredToday: TendingEngine.waterings(p, now: now, calendar: calendar) > 0,
                                  saidHelloToday: TendingEngine.isToday(p.lastLovedAt, now: now, calendar: calendar),
                                  isSeed: LoveEngine.state(lastLoved: p.lastLovedAt, now: now, exempt: exempt).isSeed,
-                                 voiceSeed: Int(now.timeIntervalSince1970 / 86_400) &+ p.earnedCount)
+                                 voiceSeed: Int(now.timeIntervalSince1970 / 86_400) &+ p.earnedCount, speciesName: p.name)
         }
         let others = earned.filter { $0.plantId != hero.plantId }.prefix(2).map(snap)
         return GardenSnapshot(hero: snap(hero), others: Array(others), water: water, nextTrickle: next)
