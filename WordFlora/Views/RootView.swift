@@ -40,7 +40,9 @@ struct RootView: View {
     private func mainStack(router path: Binding<[GameRoute]>) -> some View {
         NavigationStack(path: path) {
             HomeView()
-                .accessibilityHidden(app.shownBadge != nil)      // the stack's pages need it themselves (GameView does too)
+                // The stack's pages need it themselves (GameView does too). The return cue is modal too: what it
+                // covers on Home is hidden from VoiceOver while it is up.
+                .accessibilityHidden(app.shownBadge != nil || app.adFormats.cue != .hidden)
                 .navigationDestination(for: GameRoute.self) { route in
                     switch route {
                     case .garden: GardenView()
