@@ -112,20 +112,25 @@ final class AdFormatsUITests: XCTestCase {
 
     private func auditOnce(_ name: String, types: XCUIAccessibilityAuditType) {
         var findings = [String](), skipped = [String]()
-        let scroll = app.scrollViews.firstMatch, nav = app.navigationBars.firstMatch
-        let top = nav.exists ? nav.frame.maxY + 64 : 0
+        // With the wake sheet up, the area to judge is the sheet's own scroll view (at the medium detent its lower
+        // tile can sit under the sheet's bottom edge until scrolled), not the plant page's behind it.
+        let sheetUp = app.buttons["wake-butterflies"].exists
+        let scroll = sheetUp ? app.scrollViews.containing(.button, identifier: "wake-butterflies").firstMatch : app.scrollViews.firstMatch
+        let nav = app.navigationBars.firstMatch
+        let top = sheetUp ? 0 : (nav.exists ? nav.frame.maxY + 64 : 0)
         // The Garden's banner slot is a bottom inset over the scroll view: a plant card scrolled under it is covered by
         // the slot, not visible, so the visible area ends where the slot begins.
         // The banner view at the slot's top ("gardenBanner", or its fake label in `-uitest-ads-fake`).
         let slot = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'gardenBanner'")).firstMatch
+        let screen = app.windows.firstMatch.frame
         let visible: CGRect? = scroll.exists ? {
-            let f = scroll.frame
+            let f = scroll.frame.intersection(screen.isEmpty ? scroll.frame : screen)
             let bottom = slot.exists ? min(f.maxY, slot.frame.minY) : f.maxY
             return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: bottom - max(f.minY, top))
         }() : nil
         // The wake sheet opens at the medium detent: the plant page shows dimmed above it and is not reachable by
         // VoiceOver while the sheet is modal, which the audit reports as text with no element. Not our sheet's text.
-        let sheetAtMedium = app.buttons["wake-butterflies"].exists
+        let sheetAtMedium = sheetUp
         do {
             try app.performAccessibilityAudit(for: types) { issue in
                 if sheetAtMedium, issue.element == nil || (issue.element?.label ?? "").isEmpty,
