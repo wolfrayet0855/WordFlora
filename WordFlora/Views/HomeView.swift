@@ -91,7 +91,7 @@ struct HomeView: View {
     @State private var weatherPuzzleClosed = 0
     /// The weekly garden note for this visit (WeeklyNote); recorded as seen when it first shows.
     @State private var weeklyNote: WeeklyNote.Summary?
-    /// The weekly note's Celebrate splash is up; closing it closes the note too.
+    /// The weekly note's Celebrate splash is up. Done closes only the splash: the note stays for this visit.
     @State private var weeklyCelebrate = false
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     private let reportsLayout = LineProbe.enabled
@@ -202,7 +202,7 @@ struct HomeView: View {
         }
         .grandGardenCeremony()
         .fullScreenCover(isPresented: $weeklyCelebrate) {
-            WeeklyCelebrateView { weeklyCelebrate = false; animate { weeklyNote = nil } }.environment(app)
+            WeeklyCelebrateView { weeklyCelebrate = false }.environment(app)
         }
         .fullScreenCover(isPresented: $weatherPuzzle, onDismiss: { weatherPuzzleClosed += 1 }) { WeatherPuzzleSheet { weatherPuzzle = false }.environment(app) }
         .navigationBarHidden(true)

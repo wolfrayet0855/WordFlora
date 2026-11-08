@@ -240,14 +240,24 @@ final class EngagementUITests: XCTestCase {
         XCTAssertTrue(note.waitForExistence(timeout: 6), "the weekly note shows on Home")
     }
 
-    /// Celebrate opens the flower splash; Done closes it and the note with it.
+    /// Celebrate opens the flower splash; Done closes only the splash, and the note stays for this visit.
     private func celebrateAndClose() {
         celebrate.tap()
         let done = app.buttons["weeklyNote.celebrateDone"]
         XCTAssertTrue(done.waitForExistence(timeout: 4), "the Celebrate splash shows")
         done.tap()
         XCTAssertTrue(done.waitForNonExistence(timeout: 4))
-        XCTAssertTrue(note.waitForNonExistence(timeout: 3), "the note closes with the splash")
+        XCTAssertTrue(note.exists, "the note stays after Done")
+        XCTAssertTrue(celebrate.exists)
+    }
+
+    /// Garden and back: a note seen this week has gone from Home.
+    private func leaveAndComeBack() {
+        app.buttons["Garden"].tap()
+        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
+        app.navigationBars.buttons.firstMatch.tap()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
+        sleep(1)
     }
 
     func testWeeklyNoteShowsThePastWeek() {
@@ -266,27 +276,30 @@ final class EngagementUITests: XCTestCase {
         shot("a-note-light")
     }
 
-    /// One card at a time: on a note visit the daily quest waits; once Celebrate closes the note it comes back.
+    /// One card at a time: the daily quest waits all through a note visit, Celebrate included; it returns on the next one.
     func testTheDailyQuestWaitsOnANoteVisit() {
         openWithNote(["-uitest-quest=findWords"])
         XCTAssertFalse(element("home.quest").exists, "the quest card waits while the weekly note shows")
         celebrateAndClose()
-        XCTAssertTrue(element("home.quest").waitForExistence(timeout: 3), "the quest returns once the note closes")
+        XCTAssertFalse(element("home.quest").exists, "the note is still up, so the quest still waits")
+        leaveAndComeBack()
+        XCTAssertFalse(note.exists)
+        XCTAssertTrue(element("home.quest").waitForExistence(timeout: 3), "the quest returns on the next Home visit")
     }
 
-    func testCelebrateClosesAndTheNoteDoesNotReturnThisWeek() {
+    /// Done keeps the note, so a 13+ player can celebrate and then share; it does not return after leaving Home.
+    func testCelebrateThenShareAndTheNoteDoesNotReturnThisWeek() {
         openWithNote()
         celebrate.tap()
-        XCTAssertTrue(app.buttons["weeklyNote.celebrateDone"].waitForExistence(timeout: 4))
+        let done = app.buttons["weeklyNote.celebrateDone"]
+        XCTAssertTrue(done.waitForExistence(timeout: 4))
         sleep(1)
         shot("a-note-celebrate")
-        app.buttons["weeklyNote.celebrateDone"].tap()
-        XCTAssertTrue(note.waitForNonExistence(timeout: 4))
-        app.buttons["Garden"].tap()
-        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
-        app.navigationBars.buttons.firstMatch.tap()
-        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
-        sleep(1)
+        done.tap()
+        XCTAssertTrue(done.waitForNonExistence(timeout: 4))
+        XCTAssertTrue(note.exists, "the note stays after Done")
+        XCTAssertTrue(element("weeklyNote.share").waitForExistence(timeout: 3), "Share my week is still there after celebrating")
+        leaveAndComeBack()
         XCTAssertFalse(note.exists, "shown once a week")
     }
 
@@ -294,11 +307,7 @@ final class EngagementUITests: XCTestCase {
     func testTheNoteIsGoneAfterAVisitToTheGarden() {
         openWithNote()
         sleep(2)
-        app.buttons["Garden"].tap()
-        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
-        app.navigationBars.buttons.firstMatch.tap()
-        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
-        sleep(1)
+        leaveAndComeBack()
         XCTAssertFalse(note.exists)
     }
 
