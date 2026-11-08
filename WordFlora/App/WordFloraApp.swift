@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import WidgetKit
 import TipKit
+import UserNotifications
 
 @main
 struct WordFloraApp: App {
@@ -272,6 +273,11 @@ struct WordFloraApp: App {
             model.ads.fakeWithholdsReward = args.contains("-uitest-ads-fake-withhold")
         }
         #endif
+        #if DEBUG
+        if uiTesting { AdFormatsUITestFixtures.apply(args: args, to: model) }
+        #endif
+        // A tap on a reminder opens the app for something specific: no return cue then (foreground display unchanged).
+        UNUserNotificationCenter.current().delegate = AdLinkLaunch.notificationDelegate
         if uiTesting && !args.contains("-uitest-ads") && !args.contains("-uitest-ads-offline") && !model.ads.isFake {
             model.adsEnabled = false
         }
@@ -294,7 +300,7 @@ struct WordFloraApp: App {
                 .environment(app)
                 .environment(router)
                 .modelContainer(app.container)
-                .onOpenURL { url in if app.onboarding.isComplete { router.open(url) } }
+                .onOpenURL { url in app.noteAdLinkLaunch(); if app.onboarding.isComplete { router.open(url) } }
                 // Plus that arrives while the app is open (Ask to Buy approved, a family share, a code, a refund) sets
                 // the sync flag now, not one launch late.
                 .onChange(of: app.entitlements.state.hasCloudSync) { _, _ in app.updateSyncFlag() }
@@ -311,6 +317,11 @@ struct WordFloraApp: App {
                     // runs again so cached ads are released when the treatment is none (H5).
                     if phase == .background { app.noteAdBackground() }
                     if phase == .active { app.noteAdActive() }
+                }
+                // G4b: the return cue and app-open ad (from a cold launch too, hence `initial`), after any link lands.
+                .onChange(of: scenePhase, initial: true) { _, phase in
+                    if phase == .active { app.adFormatsSceneActive(route: { router.path.last }) }
+                    if phase == .background { app.adFormatsSceneBackground() }
                 }
         }
     }

@@ -14,6 +14,8 @@ final class AppModel {
     private(set) var badges = BadgeState(defs: [])
     let entitlements: EntitlementService
     let ads = AdsService()
+    /// G4b: the return cue and app-open ad, the native Shed card and the collapsible Garden banner (AppModel+AdFormats).
+    let adFormats = AdFormatsService()
     let reminders: ReminderScheduler
     private var lastPeakAt: Date?
     /// Master switch used by UI tests; real launches always have ads available (subject to every rule in AdGate).

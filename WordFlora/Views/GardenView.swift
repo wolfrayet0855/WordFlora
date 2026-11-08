@@ -41,12 +41,7 @@ struct GardenView: View {
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.card)
         }
         .background(Color.appBackground.ignoresSafeArea())
-        .safeAreaInset(edge: .bottom) {
-            if app.showBanner && app.decide(.banner(.garden)).isYes && app.ads.started {
-                AdBannerView(unit: .bannerGarden, height: $bannerHeight)
-                    .frame(height: bannerHeight).frame(maxWidth: .infinity).background(Color.appBackground)
-            }
-        }
+        .safeAreaInset(edge: .bottom) { GardenBannerSlot(height: $bannerHeight) }     // G4b: collapsible first, then plain
         .task { await app.prepareBannerIfAllowed() }
         .onAppear { app.markWeatherSeen() }      // witnessed first: opening the garden on a weather day starts its look
         .navigationTitle("My Garden")
