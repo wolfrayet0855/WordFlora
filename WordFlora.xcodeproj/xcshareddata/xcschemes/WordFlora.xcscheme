@@ -79,7 +79,14 @@
             ReferencedContainer = "container:WordFlora.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-         <StoreKitConfigurationFileReference
+      <EnvironmentVariables>
+         <EnvironmentVariable
+            key = "Development"
+            value = ""
+            isEnabled = "YES">
+         </EnvironmentVariable>
+      </EnvironmentVariables>
+      <StoreKitConfigurationFileReference
          identifier = "../../Config/WordFlora.storekit">
       </StoreKitConfigurationFileReference>
    </LaunchAction>
