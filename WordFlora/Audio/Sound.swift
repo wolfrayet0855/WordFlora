@@ -111,10 +111,15 @@ final class SoundPlayer: SoundPlaying {
         return Jitter(volumeScale: Float(0.95 + a * 0.10), rate: Float(0.97 + b * 0.06))
     }
 
-    /// Ambient: obeys the silent switch and mixes with the player's own music or podcast.
-    static func configureSession() {
-        try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default, options: [])
-        try? AVAudioSession.sharedInstance().setActive(true)
+    /// Ambient: obeys the silent switch and mixes with the player's own music or podcast. Off the main thread: the
+    /// session warned that activating it there can stall the UI (it is thread-safe; a player activates it anyway).
+    /// `offMain: false` (Read aloud handing back): at once, so a next `speak` cannot be overtaken by it.
+    static func configureSession(offMain: Bool = true) {
+        let apply = {
+            try? AVAudioSession.sharedInstance().setCategory(.ambient, mode: .default, options: [])
+            try? AVAudioSession.sharedInstance().setActive(true)
+        }
+        if offMain { DispatchQueue.global(qos: .userInitiated).async(execute: apply) } else { apply() }
     }
 
     func play(_ event: SoundEvent, volume: Float) {
