@@ -61,7 +61,7 @@ MADE TO BE COMFORTABLE
 - Everything in the game can be played for free.
 
 FREE, WITH OPTIONAL PLUS
-WordFlora is free with ads for grown-up players; WordFlora Plus removes ads and syncs your garden with iCloud. Players under 13 never see ads. Family Sharing covers up to six people.
+WordFlora is free with ads for players 13 and over (13-17 see non-personalised ads; never under 13; never Plus); WordFlora Plus removes ads and syncs your garden with iCloud. Players under 13 never see ads. Family Sharing covers up to six people.
 Choose Yearly ($12.99 a year, with a 3-day free trial for new subscribers), Monthly ($3.99 a month) or Plus Forever (a one-time $34.99, no renewals). Prices are in US dollars and vary by region. [VERIFY: prices in the final build and ASC match]
 An optional pack, Frost & Lantern, adds winter pots, a snowy lantern garden, two winter visitors and two glasshouse plants as a one-time purchase. [ASSUMPTION: final wording follows what G5 ships; if G5 falls back to the starter pack, edit this paragraph and the IAP description]
 
