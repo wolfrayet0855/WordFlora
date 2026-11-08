@@ -57,6 +57,8 @@ struct RootView: View {
                     }
                 }
         }
+        // No ad of any kind while the Plus or Seasons page is the current screen (Plus flow review, AdBlock.paywall).
+        .onChange(of: path.wrappedValue, initial: true) { _, p in app.adOnPaywall = p.last == .plus || p.last == .seasons }
     }
 }
 

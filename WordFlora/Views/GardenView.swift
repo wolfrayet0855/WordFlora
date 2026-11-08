@@ -8,10 +8,13 @@ struct GardenView: View {
     @Query(sort: [SortDescriptor(\PlantCollectible.level), SortDescriptor(\PlantCollectible.name)]) private var plants: [PlantCollectible]
 
     private let levelNames = ["Seedling", "Sprout", "Bloom", "Grove", "Ancient"]
+    /// B4: the banner's real anchored adaptive height, reported by the created banner (never a fixed 60 pt).
+    @State private var bannerHeight: CGFloat = AdBannerView.slotHeight
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                waterCard
                 Text("\(plants.filter { $0.earnedCount > 0 }.count) of \(plants.count) plants found")
                     .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
                 ForEach(1...5, id: \.self) { level in
@@ -39,12 +42,46 @@ struct GardenView: View {
         }
         .background(Color.appBackground.ignoresSafeArea())
         .safeAreaInset(edge: .bottom) {
-            if app.showBanner && app.ads.started { AdBannerView().frame(height: 60).frame(maxWidth: .infinity).background(Color.appBackground) }
+            if app.showBanner && app.decide(.banner(.garden)).isYes && app.ads.started {
+                AdBannerView(unit: .bannerGarden, height: $bannerHeight)
+                    .frame(height: bannerHeight).frame(maxWidth: .infinity).background(Color.appBackground)
+            }
         }
         .task { await app.prepareBannerIfAllowed() }
         .onAppear { app.markWeatherSeen() }      // witnessed first: opening the garden on a weather day starts its look
         .navigationTitle("My Garden")
         .navigationBarTitleDisplayMode(.inline)
+        .rewardToast($toast)
+    }
+
+    @State private var toast: String?
+    @State private var watching = false
+
+    /// R1: the can is dry and the perk applies (never in Quiet Garden). A video row for 13 and over without Plus, the
+    /// rain barrel (free) for Plus, under 13 and an unknown age; the plant page's water button shares the same cap.
+    @ViewBuilder private var waterCard: some View {
+        let path = app.perkPath(.water)
+        if path != .hidden {
+            Card {
+                VStack(alignment: .leading, spacing: Space.m) {
+                    Text(AdPerkCopy.Water.dryCan)
+                        .font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                    RewardedPromptRow.forPath(path, adTitle: AdPerkCopy.Water.adTitle, freeTitle: AdPerkCopy.Water.freeTitle,
+                                              hasPlus: app.entitlements.state.hasPlus, identifier: "garden.waterPerk", busy: watching) {
+                        guard !watching else { return }
+                        watching = true
+                        Task {
+                            if await app.watchRewarded(.water) { toast = AdPerkCopy.Water.toast }
+                            watching = false
+                        }
+                    }
+                    .disabled(watching)
+                }
+            }
+            .accessibilityElement(children: .contain)
+            .accessibilityIdentifier("garden.waterCard")
+        }
     }
 
     private func tile(_ plant: PlantCollectible) -> some View {

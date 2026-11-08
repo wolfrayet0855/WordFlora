@@ -81,6 +81,8 @@ struct HomeView: View {
     @State private var labelLines: [String: Int] = [:]
     /// "A short ad may play first." under Play, in the 3 minutes after "That's enough for now" (AdGate.returnVisit).
     @State private var playAdNote = false
+    /// B4: the Home banner slot at the anchored adaptive height (known before the ad loads, so the page never jumps).
+    @State private var bannerHeight: CGFloat = AdBannerView.slotHeight
     @State private var showNudge = false
     @State private var playStarting = false
     /// This visit showed a forecast or the weather, so the ad banner stays away (spec section 8).
@@ -529,9 +531,9 @@ struct HomeView: View {
         if app.showBanner && !weatherVisit {
             VStack(spacing: 2) {
                 Group {
-                    if app.ads.started { AdBannerView() } else { Color.clear }
+                    if app.ads.started { AdBannerView(height: $bannerHeight) } else { Color.clear }
                 }
-                .frame(height: 50)
+                .frame(height: bannerHeight)                 // B4: the adaptive height, never a fixed 50 pt
                 HStack(spacing: 16) {
                     Button("Go ad-free") { router.go(.plus) }
                     Link("Report an ad", destination: Links.reportAd)

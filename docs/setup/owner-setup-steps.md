@@ -384,7 +384,7 @@ Build to a device (no signing errors), open Settings > [name] > iCloud > Apps us
 
 ## C. Google AdMob
 
-**Goal:** account, iOS app, 3 ad units, correct child-directed and consent configuration, app-ads.txt.
+**Goal:** account, iOS app, the ad units below (created by 2026-11-07), correct child-directed and consent configuration, app-ads.txt.
 
 **Prerequisites:** Google account; legal name/address; bank/payments info; developer website (needed for app-ads.txt); app ID from B.
 
@@ -403,13 +403,20 @@ Time: 1.5-2.5 hours; payments verification and app-ads.txt crawl take days.
 
 ### C3. Create ad units
 For each: Apps > WordFlora > **Ad units** > **Add ad unit**.
-| Format | Name to enter | Notes |
-|---|---|---|
-| Banner | `WordFlora_Banner_Home` | Home and Garden only; use one unit or two (`..._Garden`) if you want per-screen reporting |
-| Interstitial | `WordFlora_Interstitial_RoundBreak` | Between rounds after the 3rd round (spec section 16). Leave frequency capping to the app/remote config. |
-| Rewarded | `WordFlora_Rewarded_Water` | 2 water per ad, max 3/day. Reward: Amount `2`, Item `Water` |
+Updated 2026-11-07 (owner decision: reuse the units that exist, create no more). Eight ad units exist: the three original ones and five created 2026-11-07. The Garden banner **reuses the Home banner unit**; there is no separate Garden unit (the app has a Garden key that falls back to the Home id). Click-path: `docs/setup/admob-console-one-pager.md`.
 
-Copy each **Ad unit ID**: `ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ` (slash). The spec does not need mediation, so skip mediation groups.
+| Format (console) | Name | xcconfig key | Status | Notes |
+|---|---|---|---|---|
+| Banner | `WordFlora_Banner_Home` | `ADMOB_BANNER_ID` | exists | Home **and Garden** (reuse). Auto-refresh 60 s |
+| Banner | `WordFlora_Banner_Garden_Collapsible` | `ADMOB_BANNER_GARDEN_COLLAPSIBLE_ID` | new, 2026-11-07 | The app adds the collapsible extra to the first Garden request per visit (G4b). Auto-refresh **off** |
+| Interstitial | `WordFlora_Interstitial_RoundBreak` | `ADMOB_INTERSTITIAL_ID` | exists | Between rounds after the 3rd round (spec section 16). The app's compile-time caps are the real rule; a console cap is only a backstop |
+| Rewarded (not Rewarded interstitial) | `WordFlora_Rewarded_Water` | `ADMOB_REWARDED_ID` | exists | R1, 2 drops, 3 a day. Reward item `Drops`, amount `2` (the app ignores the console amount and uses its own) |
+| Rewarded | `WordFlora_Rewarded_Hint` | `ADMOB_REWARDED_HINT_ID` | new, 2026-11-07 | R2, one whisper. Reward item `Whisper`, amount `1` |
+| Rewarded | `WordFlora_Rewarded_Wake` | `ADMOB_REWARDED_WAKE_ID` | new, 2026-11-07 | R3, wake a seed. Reward item `Wake`, amount `1` |
+| App open | `WordFlora_AppOpen_Return` | `ADMOB_APPOPEN_ID` | new, 2026-11-07 | Return cue after 4 h away (G4b) |
+| Native advanced | `WordFlora_Native_Shed` | `ADMOB_NATIVE_ID` | new, 2026-11-07 | Shed card (G4b). Leave image and video ad types on |
+
+Copy each **Ad unit ID**: `ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ` (slash). Real ids live only in the ignored local file `Config/Ads.local.xcconfig` under `[config=Release]`; it has no line for a Garden unit (reuse). Frequency capping is compile-time in the app (there is no remote config); per-unit console caps are an optional backstop: App open 1 per user per day, Interstitial 6 per day, none on Rewarded or Banner.
 Pitfall: new ad units can take up to about an hour (sometimes a day) to serve real ads; "no fill" in the meantime is normal. Never click your own live ads.
 
 ### C4. Info.plist keys (hand to developer; Xcode edits, not you)
@@ -472,21 +479,24 @@ Pitfall: using a subdomain or a path like `/docs/` fails; only the root counts. 
 In App Store Connect > App Privacy (see D3). AdMob typically collects: Device ID (IDFA when ATT allowed; also IDFV), Product Interaction, Advertising Data, Coarse Location (IP-derived), Other Usage Data, Crash/Performance Data, Diagnostics. Used for Third-Party Advertising; Linked to user? Google lists these for its SDK: see https://developers.google.com/admob/ios/privacy/data-disclosure **(not fetched; verify there)**. Tracking = yes only when personalised ads are enabled (non-child users who consent).
 
 ### C10. Mediation
-Not needed. Skip. (Do not add other ad networks; every network adds privacy-label and app-ads.txt entries.)
+Mediation groups exist with the **AdMob Network only**, one per format: Banner, Interstitial, Rewarded, App open, Native (ready for Unity in 1.1). Do not add other ad networks for 1.0; every network adds privacy-label and app-ads.txt entries.
 
 ### C: send back
 ```
 AdMob publisher ID:    pub-XXXXXXXXXXXXXXXX
 AdMob App ID:          ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY
-Banner unit ID:        ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
-Interstitial unit ID:  ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
-Rewarded unit ID:      ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Banner unit ID (Home, also Garden):     ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Collapsible Garden banner unit ID:      ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Interstitial unit ID:                   ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Rewarded water, hint and wake unit IDs: three ids, same shape
+App open unit ID:                       ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Native advanced unit ID:                ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
 Test device ID(s):     (from Xcode console)
 GDPR message published: yes/no
 US states message published: yes/no
 app-ads.txt URL:       https://.../app-ads.txt
 ```
-(The publisher ID and ad unit IDs are not secrets, they ship in the app.)
+(Eight distinct unit ids plus the app id; all eight are already in the local file. They ship in the app and are not secrets, but they stay out of the repository and out of reports: refer to them by key name or last 4 digits.)
 
 ### C: how to test
 Debug build with sample IDs: see banner, interstitial, rewarded test ads. Then switch ONE build to your real IDs on a registered test device and confirm "test ad" labelled ads or "no fill" without errors. Check UMP form in simulated EEA.
@@ -600,7 +610,7 @@ PLUS, PURCHASES AND THE PARENTAL GATE
 - Plus Forever and the pack are non-consumable and come back with Restore purchases. Nothing in the game is blocked behind a purchase except cosmetic pots, the pack content, ad removal and iCloud sync.
 
 ADS
-- Ads (banner on Home and Garden, an interstitial after a round you choose to continue, and an optional rewarded ad for water) begin from the third session, never the first two, and are never shown to under 13 or to anyone who has not answered the age question (the ad SDK is not even started for them). Plus (monthly, yearly or Plus Forever) removes all ads. A reviewer who tries the app for one session will therefore see no ads, and the "Go ad-free" line appears only once ads can. To see one: pick "18 or older", play across three launches. You will first see the Google consent form where required, then the App Tracking Transparency prompt, then ads. Every ad request is G rated. In review builds ad serving may be in test mode [ASSUMPTION: depends on the G4 serving flip]. "Report an ad" is under Settings > Privacy and ads.
+- Ads begin from the third session, and only for players who say they are 13 or over and do not have Plus: a banner on Home and Garden, an interstitial after a round the player chooses to continue, and optional rewarded videos (2 water drops, a hint for the next word, or waking a sleeping seed). Players 13 to 17 get non-personalised, G-rated ads and never see a tracking prompt. Under 13 and anyone who has not answered the age question never see any ad, and the ad SDK never starts for them. Rewarded videos are always optional and every reward also exists without an ad (water trickles back, the hint ladder is free, both wake challenges are free); under 13, unknown age and Plus get those rewards with no video at all. Plus (monthly, yearly or Plus Forever) removes all ads. A reviewer who tries the app for one or two sessions will therefore see no ads (a grace of three sessions), and the "Go ad-free" line under the Home banner, which opens the Plus page, appears only once ads can. To see one: pick "18 or older", play across three launches. You will first see the Google consent form where required, then the App Tracking Transparency prompt, then ads. Every ad request is G rated. In review builds ad serving may be in test mode [ASSUMPTION: depends on the G4 serving flip]. "Report an ad" is under Settings > Privacy and ads.
 
 WILD WEATHER AND QUIET GARDEN
 - Garden weather is cosmetic. Now and then weather visits the garden and plants look a little different for a few days; care, a weather puzzle or time brings them back. Nothing earned is ever removed: found plants, growth stages, pots, badges and the level stay. Weather is date-driven, so a reviewer may see none on the day; the Settings text explains it.
