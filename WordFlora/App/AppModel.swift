@@ -636,8 +636,8 @@ final class AppModel {
 
     /// Called when Home appears. Records the offer as soon as it shows, so it appears once per milestone.
     func checkPlusOffer() {
-        // Never beside the weather, a ceremony or the weather puzzle.
-        guard plusOfferEnabled, plusOffer == nil, !homeWeather.quietsOffers, !quietVisit, pendingCeremony == nil else { return }
+        // Never beside the weather, a ceremony, the weather puzzle or the welcome back card (one Home card at a time).
+        guard plusOfferEnabled, plusOffer == nil, !homeWeather.quietsOffers, !quietVisit, pendingCeremony == nil, !showWelcomeBack else { return }
         var c = PlusOfferPolicy.Context(now: now())
         c.ageBand = settings.ageBand
         c.hasPlus = entitlements.state.hasPlus
