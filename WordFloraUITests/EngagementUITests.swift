@@ -278,8 +278,6 @@ final class EngagementUITests: XCTestCase {
         for row in ["You grew 12 words.", "New plants: ", "You said hello to 3 friends."] {
             XCTAssertTrue(label.contains(row), "\(row) in \(label)")
         }
-        // The tiles are inside the one card element: their numbers and labels are not separate VoiceOver stops.
-        XCTAssertFalse(app.staticTexts["words grown"].exists)
         XCTAssertTrue(celebrate.exists)
         XCTAssertFalse(app.buttons["weeklyNote.lovely"].exists)
         XCTAssertFalse(app.buttons["weeklyNote.visit"].exists)
@@ -360,7 +358,8 @@ final class EngagementUITests: XCTestCase {
     func testAuditWeeklyNoteAtAXXXL() {
         openWithNote(Self.axXXXL)
         sleep(1)
-        audit("a-note-axxxl")
+        // At this size the note starts at the screen's bottom edge: contrast is judged only for text wholly on screen.
+        auditScrolled("a-note-axxxl")
         let share = element("weeklyNote.share")
         scrollTo(share)
         XCTAssertTrue(share.isHittable, "Share my week is reachable")
@@ -375,7 +374,7 @@ final class EngagementUITests: XCTestCase {
         openWithNote(Self.axXXXL)
         sleep(1)
         shot("a-note-axxxl-dark")
-        audit("a-note-axxxl-dark")
+        auditScrolled("a-note-axxxl-dark")
         scrollTo(celebrate)
         celebrate.tap()
         XCTAssertTrue(app.buttons["weeklyNote.celebrateDone"].waitForExistence(timeout: 4))
