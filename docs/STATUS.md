@@ -576,3 +576,24 @@ Brief: `docs/pm/textfit-builder-brief.md`; Plus delta: `docs/pm/plus-flow-fable-
 | SE (375 pt) | Plus page default and AX5, light and dark: green, every word whole |
 
 Found on the way: the UI tests' `UICTContentSizeCategoryExtraExtraExtraLarge` is not a size name (the raw value is `UICTContentSizeCategoryXXXL`), so G3's xxxl tend-row test never ran at xxxLarge; fixed in both files. Shots: `docs/pm/shots/textfit/` (downscaled), full size in the session scratchpad.
+
+## Polish pass 2: falling snow, snowdrop, win card, hello toast, "Some energy" (2026-11-07, from `3-feat-content-and-polish` tip `b21f103`)
+
+Specs: `docs/pm/frost-lantern-snow-and-plant-review.md`, `docs/pm/celebration-and-love-review.md`. Worktree `agent-a0f8716ff1989be39`. The text-fit pass (`agent-a2bea51afc81e7059`) merges first; this branch rebases onto it when the lead says so. Conflicts are expected in `GameView` (`earnedCard`, the `onChange(of: vm.phase)` win block), `PlantDetailView` (`stage`, `toastView`), `SeasonsView` (`PackCardArt`), `project.pbxproj` (3 new files) and the UI tests. The edits are kept small and anchored by function name.
+
+**Built (commits)**
+- `6f8f33f` Snowdrop pose patch in `design-preview/frost-lantern/build.py`. Heads are lifted, stems arch from their own side with no crook, bells tilt 38 degrees outward, tepals open to 44 degrees, and the leaves stand upright. It regenerated only the 9 files the review predicted (build.py plus 8 SVGs). The pack card imageset is refreshed. The G5 pivots are now (118,64), (72,80), (138,94) in `frost-lantern-art.md` and `g5-asset-readiness.md`.
+- `94383e3`, `4f86044` Falling snow. `Rules/Snowfall.swift` holds the pure maths and `Components/SnowfallView.swift` is the view, built like `RainCanvas`. The card gets 22 flakes in `PackCardArt` (Seasons page and Shed shelf). The plant page gets 18 when the plant's pot is a pack pot and the sky is free (no garden weather, no rain, not Quiet Garden): layer 0 behind the plant, layers 1 and 2 in front, fading over the 24 pt above the ground. Flakes are `#8FA9C4` in light mode and `#F4F8FC` in dark. Calm halves the count and slows the fall to 0.7x. Reduce Motion (system or the app switch) and Low Power Mode show one still frame. The view is hidden from VoiceOver, takes no taps and never appears in the puzzle. A new UI fixture `-uitest-pot=<id>` puts every found plant in that pot.
+- `f2118c6` `LifeStats.loveLines[2]` is now "Some energy" instead of "Hellos help". The test and two mock strings are updated, and "Ready for a hello" is kept.
+- `fad7555` The hello toast tick uses `LifePalette.toastTick` (`dyn(0x9BCB3C, 0x2E7D32)`, 6.0:1 light and 4.1:1 dark on the slab) with the `.body` semibold font.
+- `a1553eb` The win card without a plant: `WordsToPlantPips` (in `PetalPipRow.swift`) fills the word's pip with a spring pop, a `PetalPuff` and a soft 0.5 haptic 0.35 s after the card appears. Reduce Motion cross-fades the pip and Calm or Quiet Garden settle it without a bounce. `PlantProgressCopy.nextLine` shows "One more word and a new plant arrives!" on the word before a plant. The primary button is "Next word", with a secondary "Tend my garden" (`winCard.tendGarden`, not shown in the tutorial) that closes the card and goes home and then to the garden.
+
+**Decisions**
+- Snow layers split 10 / 7 / 5 (shares 0.45 / 0.30 / rest) instead of the review's 11 / 7 / 4. The owner asked for falling snowflakes, so the near layer (the 5 biggest flakes) is drawn as six-arm glyphs 6 to 9 pt across, each arm with one small V so it reads as a flake and not an asterisk. Far and mid flakes stay soft dots. The glyphs turn slowly, and a still frame is used under Reduce Motion.
+- The no-plant card keeps "Continue" on the Daily Bloom (it goes home after the card, so "Next word" would be wrong) and in the tutorial (it hands off). "Tend my garden" still shows on the Daily Bloom.
+- The optional dim colour change (review A, `Color.black.opacity(0.45)`) was not taken because it is out of scope for this pass.
+
+**Tests planned** (own sim `WF P2 iPhone 17`, iOS 26.5, under the build lock)
+- Unit: `SnowfallTests` (10 new), plus the `GameViewModelTests` copy test extended and 2 new tests (pips, toast tick), `LifeStatsTests`. Then the whole `WordFloraTests`.
+- UI: `SeasonsUITests` (3 new snow tests: card light/dark with audits, still frame, plant page in Frosted glass light/dark), `WordFloraUITests.testAfterTheFirstPlantEveryThirdWordBringsTheNext` (Next word, Tend my garden, next line), 2 new win card tests (Tend my garden goes to the garden, AX XXXL dark), the puzzle-shots loop, `RestCardUITests`, `CelebrationUITests`, `SpeedBloomUITests`, and a dark plant page look for the toast.
+- Shots go to `docs/pm/shots/polish2/`.
