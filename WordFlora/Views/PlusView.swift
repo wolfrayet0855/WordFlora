@@ -320,12 +320,12 @@ struct ParentalGateSheet: View {
     @State private var wrong = false
     @Environment(\.dynamicTypeSize) private var typeSize
 
-    /// At the accessibility sizes the title steps down and the sides tighten, so "grown-ups" stays whole (the
-    /// audit read it clipped at AX5; TextFitLayoutTests measures it).
-    /// The title steps down through the accessibility sizes so "grown-ups" never breaks at its hyphen.
-    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle {
-        size >= .accessibility4 ? .subheadline : (size.isAccessibilitySize ? .headline : .title2)
-    }
+    /// One text style at every size: a step down at the accessibility sizes read as "Dynamic Type partially
+    /// unsupported" in the audit. "grown-ups" is drawn with a non-breaking hyphen, so it never splits at the hyphen;
+    /// the title wraps at its space instead ("For" / "grown-ups"). TextFitLayoutTests measures "grown-ups" whole.
+    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle { .title2 }
+    /// The title as drawn: hyphens made non-breaking (VoiceOver still reads the plain copy).
+    static let drawnTitle = ParentalGate.Copy.title.replacingOccurrences(of: "-", with: "\u{2011}")
     static func padding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 12 : 24 }
 
     /// The question. At the accessibility sizes it is two set lines ("What is" / "16 × 9?"), so it never wraps on its
@@ -363,9 +363,10 @@ struct ParentalGateSheet: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                Text(ParentalGate.Copy.title).font(Theme.font(Self.titleStyle(typeSize), weight: .bold))
+                Text(Self.drawnTitle).font(Theme.font(Self.titleStyle(typeSize), weight: .bold))
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity)
+                    .accessibilityLabel(ParentalGate.Copy.title)
                     .accessibilityAddTraits(.isHeader)
                 // Full width, as the title: a wrapped centred line sized to its own width was read as clipped.
                 Text(ParentalGate.Copy.prompt).font(Theme.font(.callout)).multilineTextAlignment(.center)
