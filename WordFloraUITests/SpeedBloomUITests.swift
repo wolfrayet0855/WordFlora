@@ -21,13 +21,20 @@ final class SpeedBloomUITests: XCTestCase {
     }
 
     private func audit(_ name: String, ignoring: XCUIAccessibilityAuditType = []) {
-        var findings = [String]()
+        var findings = [String](), excused = [String]()
         do {
             try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
+                // A keyboard key's single letter shrinks to fit its fixed box at large sizes (all-pages review,
+                // section 4: single glyphs may shrink; the key's Large Content Viewer shows it full size). Only
+                // Dynamic Type on a one-letter element is excused, and it is printed.
+                if issue.auditType == .dynamicType, let e = issue.element, e.label.count == 1, e.label.first?.isLetter == true {
+                    excused.append(e.label); return true
+                }
                 findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
                 return true
             }
         } catch { findings.append("\(name): audit failed to run: \(error)") }
+        if !excused.isEmpty { print("\(name): single-glyph keys shrunk to fit, excused: \(excused.joined(separator: " "))") }
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
 
