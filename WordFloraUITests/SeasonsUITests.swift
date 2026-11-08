@@ -174,7 +174,9 @@ final class SeasonsUITests: XCTestCase {
     }
 
     func testTeensSeeTheSeasonsShelfWithItsPrice() {
-        launch(age: "thirteenPlus", ["-uitest-prices", "-uitest-everything"])
+        // The pack card's falling snow never lets the app go idle while it is on screen, and the audit then measured the
+        // shelf's words mid-layout (every one read as clipped). The app's Reduce Motion switch holds the snow still.
+        launch(age: "thirteenPlus", ["-uitest-prices", "-uitest-everything", "-uitest-reduce-motion"])
         openShed()
         let shelf = app.buttons["shed.seasons.open"]
         scrollTo(shelf, max: 20)
