@@ -20,8 +20,8 @@ struct AppOpenCueHost: View {
 
 /// Full screen on the app background: a still pot and sprout, "Welcome back" / "to your garden", the "Ad" chip and
 /// "A short ad, then your garden", three still dots, and a full-width "Skip to my garden" button (52 pt at least).
-/// One layout at every text size: the column scrolls at the largest sizes, so nothing is clipped and Skip is always
-/// reachable. Text styles only, no line limit.
+/// One layout at every text size: the words scroll at the largest sizes, so nothing is clipped, and Skip is pinned
+/// below them, always on screen. Text styles only, no line limit.
 struct AppOpenCueView: View {
     let skip: () -> Void
 
@@ -57,30 +57,38 @@ struct AppOpenCueView: View {
                     }
                     .accessibilityHidden(true)
                     Spacer(minLength: Space.section)
-                    Button(action: skip) {
-                        Text(AdFormatCopy.Cue.skip)
-                            .font(Theme.font(.body, weight: .bold))
-                            .foregroundStyle(Color.appPrimaryText)
-                            .multilineTextAlignment(.center)
-                            .fixedSize(horizontal: false, vertical: true)
-                            .padding(.horizontal, Space.card).padding(.vertical, Space.m)
-                            .frame(maxWidth: .infinity, minHeight: 52)
-                            .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appPrimaryText.opacity(0.3), lineWidth: 1.5))
-                            .contentShape(RoundedRectangle(cornerRadius: Theme.cardRadius))
-                    }
-                    .buttonStyle(.plain)
-                    .accessibilityIdentifier("appOpenCue.skip")
                 }
                 .padding(.horizontal, Space.gutter)
-                .padding(.bottom, Space.section)
                 .frame(maxWidth: .infinity, minHeight: geo.size.height)
             }
+            // Skip is pinned below the scrolling words, so it is on screen and tappable at every text size.
+            .safeAreaInset(edge: .bottom, spacing: 0) { skipFooter }
         }
         .background(Color.appBackground.ignoresSafeArea())
         .contentShape(Rectangle())                         // nothing under the cue can be touched
         .accessibilityElement(children: .contain)
         .accessibilityAddTraits(.isModal)
         .accessibilityIdentifier("appOpenCue")
+    }
+
+    /// "Skip to my garden": full width, 52 pt at least, wraps and grows with the text, never scrolls away.
+    private var skipFooter: some View {
+        Button(action: skip) {
+            Text(AdFormatCopy.Cue.skip)
+                .font(Theme.font(.body, weight: .bold))
+                .foregroundStyle(Color.appPrimaryText)
+                .multilineTextAlignment(.center)
+                .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, Space.card).padding(.vertical, Space.m)
+                .frame(maxWidth: .infinity, minHeight: 52)
+                .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appPrimaryText.opacity(0.3), lineWidth: 1.5))
+                .contentShape(RoundedRectangle(cornerRadius: Theme.cardRadius))
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("appOpenCue.skip")
+        .padding(.horizontal, Space.gutter).padding(.top, Space.m).padding(.bottom, Space.s)
+        .frame(maxWidth: .infinity)
+        .background(Color.appBackground)
     }
 
     /// The "Ad" chip beside its line; the line wraps beside the chip at large sizes.

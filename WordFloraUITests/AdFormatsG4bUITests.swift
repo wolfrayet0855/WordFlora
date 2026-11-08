@@ -254,18 +254,16 @@ final class AdFormatsG4bUITests: XCTestCase {
         "\(what)-\(dark ? "dark" : "light")-\(size == Self.large ? "default" : "axxxl")"
     }
 
-    /// The cue, then Skip reachable by scrolling at the largest size.
+    /// The cue, then one tap on Skip, which is pinned on screen at every size.
     private func auditCue(size: String, dark: Bool) {
         launchForAudit(["-uitest-appopen-never"], size: size, dark: dark)
         goAwayAndComeBack()
         XCTAssertTrue(cue.waitForExistence(timeout: 5))
         audit(tag("cue", size: size, dark: dark))
-        scrollTo(skip)
-        XCTAssertTrue(skip.isHittable, "Skip is reachable at every size")
-        Thread.sleep(forTimeInterval: 1)              // let the scroll settle: a tap on a moving scroll only stops it
+        XCTAssertTrue(skip.isHittable, "Skip is on screen at every size, with no scrolling")
+        XCTAssertGreaterThanOrEqual(skip.frame.height, 52)
         skip.tap()
-        if cue.waitForExistence(timeout: 1), skip.isHittable { skip.tap() }
-        XCTAssertFalse(cue.waitForExistence(timeout: 2))
+        XCTAssertFalse(cue.waitForExistence(timeout: 2), "one tap on Skip lifts the cue")
     }
 
     /// The Shed scrolled to the sponsored card (header, badge, headline, media, body, call to action).
