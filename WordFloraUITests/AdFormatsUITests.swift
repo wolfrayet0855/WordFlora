@@ -180,6 +180,85 @@ final class AdFormatsUITests: XCTestCase {
     func testAuditWakeDarkAXXXL() { auditWake(size: Self.axXXXL, dark: true) }
 }
 
+/// R2 on the resting card (needs the M5 GameView patch, `tools/dev/g4a_m5_gameview.py`). The card opens after three
+/// regular words. `-uitest-sessions=1` keeps the interstitial in its grace period, so "A short ad may play first." is
+/// absent and the hint row can show (R2 hides under that note; with `-uitest-sessions=3` the note shows instead).
+final class RestCardHintUITests: XCTestCase {
+    let app = XCUIApplication()
+
+    override func setUp() {
+        continueAfterFailure = false
+        executionTimeAllowance = 360                     // three whole words first, as in RestCardUITests
+    }
+
+    private func element(_ id: String) -> XCUIElement { app.descendants(matching: .any)[id].firstMatch }
+
+    private func openRestCard(_ extra: [String]) {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-word=LOTUS", "-uitest-ads-fake", "-uitest-daytime"] + extra
+        app.launch()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 8))
+        app.buttons["Play"].tap()
+        for n in 1...3 {
+            XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5), "word \(n)")
+            for ch in "LOTUS" { app.buttons[String(ch)].tap() }
+            let next = app.buttons["Continue"]
+            XCTAssertTrue(next.waitForExistence(timeout: 8), "word \(n)")
+            for _ in 0..<6 where !next.isHittable { app.swipeUp() }
+            next.tap()
+        }
+        XCTAssertTrue(app.staticTexts["The garden is resting"].waitForExistence(timeout: 5))
+        XCTAssertTrue(element("restCard").waitForExistence(timeout: 5))
+    }
+
+    func testAnAdultWatchesAVideoForAWhisperAndTheNextWordGetsAFourthHelp() {
+        openRestCard(["-uitest-sessions=1"])
+        XCTAssertFalse(element("restCard.adNote").exists)
+        let row = element("restCard.hint")
+        for _ in 0..<6 where !row.isHittable { app.swipeUp() }
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        XCTAssertTrue(row.label.contains("Watch a short video for a hint"), row.label)
+        XCTAssertTrue(row.label.contains("A whisper for your next word"), row.label)
+        row.tap()
+        let ad = element("fakeAd")
+        XCTAssertTrue(ad.waitForExistence(timeout: 5)); ad.tap()
+        XCTAssertTrue(element("restCard.whisperBanked").waitForExistence(timeout: 5), "the row becomes the banked line")
+        XCTAssertFalse(element("restCard.hint").exists)
+        XCTAssertFalse(element("restCard.adNote").exists, "the note is worked out again and stays honest")
+        let oneMore = app.buttons["restCard.oneMore"]
+        for _ in 0..<6 where !oneMore.isHittable { app.swipeUp() }
+        oneMore.tap()
+        XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 8))
+        XCTAssertTrue(element("help.whisperDot").waitForExistence(timeout: 3), "the leaf dot while a whisper is banked")
+        let help = app.buttons["Help"]
+        for _ in 0..<3 { help.tap() }                      // second clue, vowel O, first letter L
+        XCTAssertNotEqual(app.buttons["T"].value as? String, "in the word", "the whisper comes after the three free rungs")
+        help.tap()                                         // the whisper: T, the first of the most frequent consonants
+        XCTAssertEqual(app.buttons["T"].value as? String, "in the word")
+        XCTAssertFalse(element("help.whisperDot").exists, "the whisper is spent")
+    }
+
+    func testUnderThirteenGetsTheFreeHintRow() {
+        openRestCard(["-uitest-sessions=3", "-uitest-age=under13"])
+        let row = element("restCard.hint")
+        for _ in 0..<6 where !row.isHittable { app.swipeUp() }
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        XCTAssertTrue(row.label.contains("Ask the garden for a hint"), row.label)
+        XCTAssertFalse(row.label.contains("video"))
+        XCTAssertFalse(row.label.contains("Plus"))
+    }
+
+    func testTheHintRowHidesUnderTheShortAdNote() {
+        openRestCard(["-uitest-sessions=3"])
+        XCTAssertTrue(element("restCard.adNote").waitForExistence(timeout: 5))
+        XCTAssertFalse(element("restCard.hint").exists, "never two ad prompts on one card")
+    }
+
+    func testQuietGardenHasNoHintRowForAnyone() {
+        openRestCard(["-uitest-sessions=1", "-uitest-quiet"])
+        XCTAssertFalse(element("restCard.hint").waitForExistence(timeout: 3))
+    }
+}
+
 /// Faded bloom placement check (docs/pm/faded-bloom-offsets.md): the cue forced on for lithops and aloe vera (nudged)
 /// and clover (unchanged). Shots go to SCREENSHOT_DIR (and the result bundle) for a look by eye.
 final class FadedBloomShotUITests: XCTestCase {
