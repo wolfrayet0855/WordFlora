@@ -576,3 +576,17 @@ Brief: `docs/pm/textfit-builder-brief.md`; Plus delta: `docs/pm/plus-flow-fable-
 | SE (375 pt) | Plus page default and AX5, light and dark: green, every word whole |
 
 Found on the way: the UI tests' `UICTContentSizeCategoryExtraExtraExtraLarge` is not a size name (the raw value is `UICTContentSizeCategoryXXXL`), so G3's xxxl tend-row test never ran at xxxLarge; fixed in both files. Shots: `docs/pm/shots/textfit/` (downscaled), full size in the session scratchpad.
+
+## Gate G4a: AdMob hardening, ad policy, rewarded perks (2026-11-08, on `3-feat-content-and-polish` tip `c97d4a4`)
+
+What landed (no stored field; `WordFlora/Models` untouched):
+- Faded bloom: per-plant nudges for 15 low or narrow plants (`FadedBloom.spotFix`, keyed by plant id without `plant_`), applied where the spot is placed; the seeded pick is unchanged.
+- `Rules/AdPolicy.swift`: one `decide(format, inputs)` for every format, the age-and-Plus treatment checked first (under 13, unknown age and Plus: `.none`; 13 to 17 `.teen`; 18+ `.adult`), calm guarantees, the ruled caps (pushed 6/day and 2/visit, full-screen 8/day and 4/visit, gaps 600/30/1800 s), `.paywall` and `.sheetUp` blocks, perk paths (free for Plus, under 13, unknown age; free paths read only the per-perk cap, H7). `Rules/AdBudget.swift`: `AdCaps` literals (Debug-only `-adcaps` / `-uitest-adcaps-fast`) and the device `AdLedger` (App Group key `adLedger`).
+- Ad ids: nine unit keys in `Config/Ads.xcconfig` (Debug test ids, Garden = `$(ADMOB_BANNER_ID)`) and `Info.plist`; `AdUnit` same-format fallback chain (app open and native: empty id switches the format off). Release build phase "Check ad ids" (`tools/ads/check-ad-ids.sh`) fails on a missing local file, a test id, an empty or unresolved id; `ADS_CHECK_SKIP=1` only with `CODE_SIGNING_ALLOWED=NO`.
+- `AdsService`: prepare by treatment with a pure plan (teen: consent tagged under the age of consent, never tracking), spy counters, `releaseAll()` when the treatment becomes none (H5), no full-screen ad over a sheet that is not ours or while the app is inactive, `startIfConsentAlreadyResolved` (H1), per-perk rewarded units, Debug-only fake presenter (`-uitest-ads-fake`, H6). B4 Garden banner at its real height on the Garden key.
+- Perks: R1 water card on My Garden ("Your watering can is dry."), R3 gentle wake row on the wake sheet, the whisper rung in `HelpLadder` and `GameViewModel`; shared `RewardedPromptRow` and reward toast; every line in `AdPerkCopy.all` (CopySafety).
+- Docs: owner steps C3, C10, send back and D8; spec cleanup; privacy label B2 note (no tracking domain to add).
+
+Tests: `AdPolicyTests`, `AdUnitIDTests` (+ `AdUnitIDBundleTests`), `FadedBloomOffsetTests`, `AdsServiceWiringTests`, `AdFormatsUITests`. The pure ones ran green on a macOS harness before the lock; the app and every unit test file typecheck as one module. Simulator results go in the final report.
+
+Open: R2 resting-card row, B5 preload and the whisper dot on Help (GameView), R1 free path on the plant page (PlantDetailView) wait for the engagement merge; the lock run (unit suite, touched UI classes, Release check proof, faded-bloom shots, collapsible test id). G4b: app open, collapsible, native callers; extend the service spy for them.
