@@ -377,10 +377,26 @@ struct ParentalGateSheet: View {
             .padding(Self.padding(typeSize))
             // Clear of the sheet's grabber and the scroll edge's soft fade, which the audit read as clipping the title.
             .padding(.top, typeSize.isAccessibilitySize ? 16 : 0)
+            // Room under Cancel so the last button never sits on the sheet's bottom edge (home indicator).
+            .padding(.bottom, typeSize.isAccessibilitySize ? 40 : 0)
         }
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
+        // The sheet's soft scroll edges faded whichever line sat at the top or bottom edge, and the audit read that line
+        // as clipped (the title, the question, Cancel, then Continue at AX5). Plain edges: every line is whole or scrolls.
+        .modifier(PlainScrollEdges())
         .presentationDetents(typeSize.isAccessibilitySize ? [.large] : [.medium, .large])
+    }
+}
+
+/// Turns off the iOS 26 soft scroll edge effect (nothing to do on earlier systems).
+private struct PlainScrollEdges: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content.scrollEdgeEffectHidden(true, for: .all)
+        } else {
+            content
+        }
     }
 }
 
