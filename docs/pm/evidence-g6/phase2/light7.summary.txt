@@ -1,0 +1,11 @@
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testAdultsSeeTheSameLinksWithNoGateOnScreen]' passed (19.606 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13FamilyNoteIsForGrownUpsBehindTheGate]' passed (46.048 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13ManageSubscriptionInSettingsAsksAGrownUpFirst]' passed (23.997 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13PlusForeverAndCodesAskAGrownUpFirst]' passed (37.589 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13PlusLinksAskAGrownUpFirst]' passed (36.505 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13SettingsLinksAskAGrownUpFirst]' passed (32.403 seconds).
+	 Executed 6 tests, with 0 failures (0 unexpected) in 196.148 (196.162) seconds
+Test Case '-[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable]' passed (175.333 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 175.333 (175.335) seconds
+	 Executed 7 tests, with 0 failures (0 unexpected) in 371.481 (371.500) seconds
+	 Executed 7 tests, with 0 failures (0 unexpected) in 371.481 (371.503) seconds

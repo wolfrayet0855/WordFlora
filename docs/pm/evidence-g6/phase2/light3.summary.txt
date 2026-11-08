@@ -1,0 +1,34 @@
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:266: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightAXXXL] : XCTAssertFalse failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightAXXXL]' failed (21.893 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightDefault]' passed (21.805 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditGardenBannerLightDefault]' passed (18.241 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:275: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightAXXXL] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightAXXXL]' failed (64.850 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:275: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightDefault] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightDefault]' failed (44.102 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testCalmNeverShowsAVideoCard]' passed (28.537 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueForPlus]' passed (13.746 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueForUnderThirteen]' passed (13.461 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueInCalm]' passed (14.049 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueInQuietGarden]' passed (14.144 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueOnAColdLaunchFromALink]' passed (9.396 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueOverAWordInProgress]' passed (17.800 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueOverOnboarding]' passed (12.740 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueWhenALinkOpensTheApp]' passed (18.711 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoSponsoredSectionForUnderThirteenOrPlus]' passed (54.941 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheCueCanShowOnAColdLaunchAfterFourHoursAway]' passed (7.655 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheFakeAppOpenAdPlaysOverTheCueOnceADay]' passed (29.292 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheGardenBannerIsCollapsibleOnceAVisitThenPlain]' passed (14.494 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheReturnCueShowsTheAdChipAndSkipGoesBackToTheScreenLeft]' passed (20.008 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:151: error: -[WordFloraUITests.AdFormatsG4bUITests testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst]' failed (20.204 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testVoiceOverAndAccessibilitySizesGetThePlainBanner]' passed (19.031 seconds).
+	 Executed 21 tests, with 4 failures (0 unexpected) in 479.099 (479.143) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsUITests.swift:152: error: -[WordFloraUITests.AdFormatsUITests testAuditWakeLightDefault] : XCTAssertTrue failed - wake-light-default-textClipped: 131072 - Text clipped | '' [] 
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeLightDefault]' failed (39.306 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 39.306 (39.308) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/FrostLanternUITests.swift:59: error: -[WordFloraUITests.FrostLanternUITests testSceneAuditsLightAndDarkAtAXXXL] : XCTAssertTrue failed - g5-home-light-axxxl: 8 - Element has no description | '' []
+Test Case '-[WordFloraUITests.FrostLanternUITests testSceneAuditsLightAndDarkAtAXXXL]' failed (16.599 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 16.599 (16.602) seconds
+	 Executed 23 tests, with 6 failures (0 unexpected) in 535.004 (535.059) seconds
+	 Executed 23 tests, with 6 failures (0 unexpected) in 535.004 (535.062) seconds

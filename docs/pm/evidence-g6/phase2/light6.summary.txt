@@ -1,0 +1,38 @@
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightAXXXL]' passed (21.669 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightDefault]' passed (20.596 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditGardenBannerLightDefault]' passed (18.293 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightAXXXL]' passed (69.957 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightDefault]' passed (36.192 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testCalmNeverShowsAVideoCard]' passed (28.799 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueForPlus]' passed (13.693 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueForUnderThirteen]' passed (13.509 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueInCalm]' passed (14.141 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueInQuietGarden]' passed (14.043 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueOnAColdLaunchFromALink]' passed (9.552 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueOverAWordInProgress]' passed (17.846 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueOverOnboarding]' passed (12.847 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueWhenALinkOpensTheApp]' passed (18.810 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoSponsoredSectionForUnderThirteenOrPlus]' passed (55.379 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheCueCanShowOnAColdLaunchAfterFourHoursAway]' passed (7.605 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheFakeAppOpenAdPlaysOverTheCueOnceADay]' passed (29.300 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheGardenBannerIsCollapsibleOnceAVisitThenPlain]' passed (14.761 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheReturnCueShowsTheAdChipAndSkipGoesBackToTheScreenLeft]' passed (19.940 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst]' passed (19.998 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testVoiceOverAndAccessibilitySizesGetThePlainBanner]' passed (18.846 seconds).
+	 Executed 21 tests, with 0 failures (0 unexpected) in 475.777 (475.820) seconds
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeLightDefault]' passed (44.444 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 44.444 (44.447) seconds
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testAdultsSeeTheSameLinksWithNoGateOnScreen]' passed (18.092 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13FamilyNoteIsForGrownUpsBehindTheGate]' passed (46.201 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13ManageSubscriptionInSettingsAsksAGrownUpFirst]' passed (23.790 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13PlusForeverAndCodesAskAGrownUpFirst]' passed (36.801 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13PlusLinksAskAGrownUpFirst]' passed (35.060 seconds).
+Test Case '-[WordFloraUITests.ParentalGateLinkUITests testUnder13SettingsLinksAskAGrownUpFirst]' passed (32.637 seconds).
+	 Executed 6 tests, with 0 failures (0 unexpected) in 192.581 (192.595) seconds
+Test Case '-[WordFloraUITests.SeasonsUITests testTeensSeeTheSeasonsShelfWithItsPrice]' passed (38.844 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 38.844 (38.847) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/TextFitScreensUITests.swift:85: error: -[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable] : XCTAssertTrue failed - gate-ax5-light-dynamicType: 65536 - Dynamic Type font sizes are partially unsupported | 'For grown-ups' [] (35.33333333333334, 90.0, 331.33333333333337, 58.66666666666666)
+Test Case '-[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable]' failed (113.792 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 113.792 (113.794) seconds
+	 Executed 30 tests, with 1 failure (0 unexpected) in 865.438 (865.511) seconds
+	 Executed 30 tests, with 1 failure (0 unexpected) in 865.438 (865.514) seconds

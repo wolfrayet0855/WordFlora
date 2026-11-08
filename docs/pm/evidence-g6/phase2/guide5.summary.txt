@@ -1,0 +1,7 @@
+Test Case '-[WordFloraUITests.GuideUITests testScreenshotsLight]' passed (30.291 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testSkipOnPageFourGoesToTheFirstWord]' passed (15.619 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testSkipOnPageOneGoesToTheFirstWord]' passed (11.080 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testSkipOnPageSevenGoesToTheFirstWord]' passed (19.949 seconds).
+	 Executed 4 tests, with 0 failures (0 unexpected) in 76.938 (76.949) seconds
+	 Executed 4 tests, with 0 failures (0 unexpected) in 76.938 (76.953) seconds
+	 Executed 4 tests, with 0 failures (0 unexpected) in 76.938 (76.957) seconds
