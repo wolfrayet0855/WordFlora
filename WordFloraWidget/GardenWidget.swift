@@ -129,11 +129,18 @@ struct GardenWidget: Widget {
 
 struct GardenWidgetView: View {
     let entry: GardenEntry
+    /// Only for rendering checks outside WidgetKit (the family environment value cannot be set there).
+    var familyOverride: WidgetFamily?
     @Environment(\.widgetFamily) private var family
     @Environment(\.dynamicTypeSize) private var typeSize
 
+    init(entry: GardenEntry, familyOverride: WidgetFamily? = nil) {
+        self.entry = entry
+        self.familyOverride = familyOverride
+    }
+
     var body: some View {
-        switch family {
+        switch familyOverride ?? family {
         case .accessoryCircular: circular
         case .accessoryRectangular: rectangular
         case .accessoryInline: inline
