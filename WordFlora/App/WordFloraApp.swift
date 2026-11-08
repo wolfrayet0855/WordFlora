@@ -11,7 +11,12 @@ struct WordFloraApp: App {
 
     init() {
         let args = CommandLine.arguments
+        // The UI test switch (fresh defaults, Plus, age, fixtures) exists in Debug only.
+        #if DEBUG
         let uiTesting = args.contains("-uitest")
+        #else
+        let uiTesting = false
+        #endif
 
         let wantsCloud = !uiTesting && SharedDefaults.store.bool(forKey: "cloudSyncEnabled")
         var openedWithCloud = false
