@@ -571,12 +571,14 @@ struct PlantDetailView: View {
                         .fixedSize(horizontal: false, vertical: true)       // every tile as tall as the tallest
                 } else {
                     // Rows of three (or two): every word keeps a whole line (TendRowLayout).
-                    Grid(horizontalSpacing: gap, verticalSpacing: gap) {
+                    // Top-aligned rows, sized once for the whole grid: the tiles in a row fill the row's height (the
+                    // tallest tile's), so a two-line caption never leaves its neighbours standing lower (xxxLarge).
+                    Grid(alignment: .top, horizontalSpacing: gap, verticalSpacing: gap) {
                         ForEach(Array(stride(from: 0, to: kinds.count, by: columns)), id: \.self) { i in
                             GridRow { ForEach(kinds[i..<min(i + columns, kinds.count)], id: \.self) { tendButton($0, plant) } }
-                                .fixedSize(horizontal: false, vertical: true)
                         }
                     }
+                    .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
