@@ -108,8 +108,9 @@ struct FieldNotesPage: View {
     private var large: Bool { typeSize.isAccessibilitySize }
 
     /// The page's side padding: it clears the 18 pt spine and its holes; tighter at the accessibility sizes.
-    static func leading(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 26 : 34 }
-    static func trailing(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 14 : 18 }
+    /// (The spine is 18 pt with its holes inside it, so 24 still leaves 6 pt of paper before the words.)
+    static func leading(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 24 : 34 }
+    static func trailing(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 8 : 18 }
     static func nameStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size.isAccessibilitySize ? .subheadline : .title3 }
 
     var body: some View {

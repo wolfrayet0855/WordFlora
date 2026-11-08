@@ -707,11 +707,14 @@ struct ShedPotsSection: View {
         }
     }
 
-    /// The same on the card, except four a row: a plant's name does not fit a quarter of the row ("Passionflower"),
-    /// so one plant reads "In use" there (VoiceOver still names it).
+    /// The same on the card, except four a row and one a row at the accessibility sizes: a plant's name does not fit
+    /// there ("Passionflower"), so one plant reads "In use" (VoiceOver still names it).
     private func cardUseLine(_ names: [String]) -> String {
-        names.count == 1 && GridColumns.count(.shedPots, for: typeSize) == 4 ? PotCatalog.Copy.current : useLine(names)
+        names.count == 1 && Self.namesUser(typeSize) == false ? PotCatalog.Copy.current : useLine(names)
     }
+
+    /// Whether a card's use line names its one plant: only two a row (xLarge to xxxLarge).
+    static func namesUser(_ size: DynamicTypeSize) -> Bool { GridColumns.count(.shedPots, for: size) == 2 }
 
     private func card(_ pot: Pot) -> some View {
         let s = PotCatalog.state(of: pot, stats: stats, hasPlus: hasPlus)

@@ -714,7 +714,7 @@ struct VisitorDetailSheet: View {
 
     /// The title a step smaller and the sides tighter at the accessibility sizes, so "Hummingbird" stays whole.
     static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size.isAccessibilitySize ? .title3 : .title }
-    static func sidePadding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 16 : 24 }
+    static func sidePadding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 12 : 24 }
 
     var body: some View {
         let count = app.album.count(of: visitor.id)
