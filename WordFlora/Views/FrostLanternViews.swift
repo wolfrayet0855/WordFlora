@@ -32,7 +32,7 @@ private struct FrostLanternBackground: ViewModifier {
         content
             .environment(\.winterSceneOn, on)
             .background {
-                if on { WinterSceneBackdrop().ignoresSafeArea() } else { Color.appBackground.ignoresSafeArea() }
+                if on { WinterSceneBackdrop().ignoresSafeArea().accessibilityHidden(true) } else { Color.appBackground.ignoresSafeArea() }
             }
     }
 }
@@ -83,7 +83,11 @@ struct WinterSceneBackdrop: View {
         .onAppear { visible = true }
         .onDisappear { visible = false }
         .allowsHitTesting(false)
-        .accessibilityHidden(true)      // no identifier: an id would expose the hidden scene to the audit again
+        // Decorative: one element with nothing inside it, hidden from VoiceOver. It still carries a description, so if
+        // the system ever exposes the container (the audit found it as an unnamed "Other"), it is never unnamed.
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(FrostLanternCopy.sceneLabel)
+        .accessibilityHidden(true)
     }
 }
 
