@@ -1390,7 +1390,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/tools/build/check-ad-ids.sh",
+				"$(SRCROOT)/tools/ads/check-ad-ids.sh",
 				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
 			);
 			name = "Check ad ids";
@@ -1401,7 +1401,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/bin/sh \"${SRCROOT}/tools/build/check-ad-ids.sh\"\n";
+			shellScript = "/bin/sh \"${SRCROOT}/tools/ads/check-ad-ids.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */

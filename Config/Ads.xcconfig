@@ -1,7 +1,7 @@
 // AdMob identifiers. These are Google's public TEST ids so debug builds never serve real ads.
 // Put real ids in Config/Ads.local.xcconfig (git-ignored) to override for release builds.
 // Nine unit keys plus the app id. A Release build fails its "Check ad ids" build phase if the local file is missing
-// or any Release id is a Google test id (tools/build/check-ad-ids.sh).
+// or any Release id is a Google test id (tools/ads/check-ad-ids.sh).
 ADMOB_APP_ID = ca-app-pub-3940256099942544~1458002511
 // Anchored adaptive banner test id (the app requests an adaptive size).
 ADMOB_BANNER_ID = ca-app-pub-3940256099942544/2435281174

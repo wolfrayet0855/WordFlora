@@ -51,6 +51,6 @@ enum AdUnit: String, CaseIterable {
     }
 
     /// Google's published test publisher number. Debug builds carry only test ids; a Release build that carries one
-    /// fails its build phase (`tools/build/check-ad-ids.sh`).
+    /// fails its build phase (`tools/ads/check-ad-ids.sh`).
     static let googleTestPublisher = "3940256099942544"
 }
