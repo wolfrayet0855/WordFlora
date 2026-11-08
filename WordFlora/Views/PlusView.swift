@@ -6,12 +6,16 @@ struct PlusView: View {
     @Environment(AppModel.self) private var app
     @State private var selected: PlusChoice = .yearly
     @State private var busy = false
+    @State private var retrying = false
     @State private var message: String?
     @State private var gate: ParentalGate.Challenge?
     /// What a passed grown-up question goes on to do: buy, redeem a code, or open subscription management.
     @State private var afterGate: GatedAction = .purchase
     @State private var showManageSubscriptions = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    /// Counts the moments Plus turned on here (the haptic's trigger).
+    @State private var turnedOn = 0
 
     private enum GatedAction { case purchase, redeem, manageSubscriptions }
 
@@ -27,27 +31,42 @@ struct PlusView: View {
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .accessibilityIdentifier("plus.grownUpsIntro")
                 }
-                FlowerView(petals: 8).frame(height: 120)
-                Text("WordFlora Plus").font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                FlowerView(petals: 8).frame(height: 120).accessibilityHidden(true)
+                Text(PlusPlan.groupName).font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
 
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(PaywallCopy.benefits, id: \.self) { b in
                         HStack(spacing: 10) {
-                            Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.successText)
+                            Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.successText).accessibilityHidden(true)
                             Text(b).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                     }
                 }.frame(maxWidth: .infinity, alignment: .leading)
 
-                if store.state.hasPlus { activeCard } else { plans }
-                FamilyShareNudgeRow(placement: .plusPage)
+                if store.state.hasPlus {
+                    activeCard.transition(reduceMotion ? .opacity : .scale(scale: 0.96).combined(with: .opacity))
+                } else { plans }
+                // Outside the plans, so a message (a restore that turned Plus on) stays in view when the plans go.
+                if let message {
+                    Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("plus.message")
+                }
 
                 VStack(spacing: 2) {
-                    Button("Restore purchases") { Task { await store.restore(); app.updateSyncFlag() } }.tapTarget()
+                    // Restore purchases lives in WordFlora Settings only (owner, 2026-11-07): one for the whole app.
                     Button(PaywallCopy.redeem) { ask(then: .redeem) }.tapTarget()
                         .accessibilityIdentifier("plus.redeem")
-                    GatedLink("Manage subscription", url: Links.manageSubscriptions).tapTarget()
-                    HStack(spacing: 8) {
+                    // Only with a live subscription: a non-subscriber has nothing to manage.
+                    if store.state.hasActiveSubscription {
+                        GatedLink("Manage subscription", url: Links.manageSubscriptions).tapTarget()
+                    }
+                    // Side by side, one under the other at the accessibility sizes.
+                    let links = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 2)) : AnyLayout(HStackLayout(spacing: 8))
+                    links {
                         GatedLink("Terms of Use", url: Links.terms).tapTarget()
                         GatedLink("Privacy Policy", url: Links.privacy).tapTarget()
                     }
@@ -55,6 +74,8 @@ struct PlusView: View {
                 .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.card).padding(.bottom, Space.section)
+            // The plans give way to the active card with a soft spring (a fade with Reduce Motion).
+            .animation(reduceMotion ? .easeOut(duration: 0.2) : .spring(response: 0.4, dampingFraction: 0.8), value: store.state.hasPlus)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Plus")
@@ -64,30 +85,66 @@ struct PlusView: View {
             ParentalGateSheet(challenge: challenge, onPass: { gate = nil; run(afterGate) }, onCancel: { gate = nil })
         }
         .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
+        .onChange(of: message) { _, new in if let new { AccessibilityNotification.Announcement(new).post() } }
+        .sensoryFeedback(.success, trigger: turnedOn) { _, _ in app.settings.hapticsOn }
     }
+
+    private var reduceMotion: Bool { systemReduceMotion || app.settings.reduceMotionOverride }
 
     // MARK: Plans
 
     @ViewBuilder private var plans: some View {
         if store.loadFailed && !store.offersAnything {
-            Card { Text("We couldn't load the plans. Check your connection and try again.").font(Theme.font(.callout)) }
-            Button("Try again") { Task { await store.loadProducts() } }.buttonStyle(SecondaryButtonStyle())
+            Card {
+                Text(PaywallCopy.loadFailed).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            Button { retry() } label: {
+                HStack(spacing: 8) {
+                    if retrying { ProgressView().accessibilityHidden(true) }
+                    Text(PaywallCopy.tryAgain)
+                }
+            }
+            .buttonStyle(SecondaryButtonStyle()).disabled(retrying)
+            .accessibilityIdentifier("plus.tryAgain")
         } else {
             let yearlyPrice = store.price(for: .yearly).map { ($0 as NSDecimalNumber).doubleValue } ?? 0
             let monthlyPrice = store.price(for: .monthly).map { ($0 as NSDecimalNumber).doubleValue } ?? 0
             VStack(spacing: 12) {
-                planCard(.yearly, extra: yearlyPrice > 0 ? "About \(perMonthText(yearlyPrice)) a month · save \(PaywallMath.savingsPercent(yearly: yearlyPrice, monthly: monthlyPrice))%" : nil)
+                planCard(.yearly, extra: yearlyPrice > 0 ? yearlyExtra(yearly: yearlyPrice, monthly: monthlyPrice) : nil)
                 planCard(.monthly, extra: nil)
                 // While the store loads every row waits (as the plans do); once it answers without Plus Forever, no row.
                 if store.offers(.lifetime) || !store.offersAnything { lifetimeCard }
             }
-            let price = store.displayPrice(for: selected) ?? ""
-            let copy = PaywallCopy.make(choice: selected, displayPrice: price, trialEligible: store.trialEligible && selected == .yearly)
-            Button { ask(then: .purchase) } label: { Text(busy ? "One moment…" : copy.cta) }
-                .buttonStyle(PrimaryButtonStyle()).disabled(busy || !store.offers(selected))
-            Text(copy.finePrint).font(Theme.font(.caption)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText)
-            if let message { Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.successText).multilineTextAlignment(.center) }
+            if store.offers(selected) {
+                let price = store.displayPrice(for: selected) ?? ""
+                let copy = PaywallCopy.make(choice: selected, displayPrice: price, trialEligible: store.trialEligible && selected == .yearly)
+                Button { ask(then: .purchase) } label: {
+                    Text(busy ? "One moment…" : copy.cta).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                        .padding(.horizontal, 12).padding(.vertical, 6)
+                }
+                .buttonStyle(PrimaryButtonStyle()).disabled(busy)
+                Text(copy.finePrint).font(Theme.font(.caption)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("plus.finePrint")
+            } else {
+                // The prices are still on their way: no button that does nothing and no fine print without a price.
+                HStack(spacing: 10) {
+                    ProgressView().accessibilityHidden(true)
+                    Text(PaywallCopy.loadingPrices).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("plus.loading")
+            }
         }
+    }
+
+    /// "About $1.08 a month", and "· save 73%" only once the monthly price is known.
+    private func yearlyExtra(yearly: Double, monthly: Double) -> String {
+        let perMonth = "About \(perMonthText(yearly)) a month"
+        return monthly > 0 ? "\(perMonth) · save \(PaywallMath.savingsPercent(yearly: yearly, monthly: monthly))%" : perMonth
     }
 
     /// Formatted in the store's own currency, never a hard-coded "$".
@@ -103,19 +160,21 @@ struct PlusView: View {
         if plan == .yearly && store.trialEligible { lines.append(("3 days free to start", .successText)) }
         if let extra { lines.append((extra, .secondaryText)) }
         return choiceCard(choice, title: copy.headline, badge: plan == .yearly ? copy.detail : nil,
-                          lines: lines, price: shown.map { $0 + (plan == .yearly ? "/yr" : "/mo") } ?? "")
+                          lines: lines, price: shown.map { PaywallCopy.priceLine($0, choice: choice) })
     }
 
     /// Plus Forever: the third choice, under the two plans. Same card and type sizes, no badge, never the default.
     private var lifetimeCard: some View {
+        // "$34.99 once" says it; the fine print under the button carries the full line when it is picked.
         choiceCard(.lifetime, title: PlusPlan.lifetimeName, badge: nil,
-                   lines: [(PaywallCopy.lifetimeLine, .secondaryText)], price: store.displayPrice(for: .lifetime) ?? "")
+                   lines: [],
+                   price: store.displayPrice(for: .lifetime).map { PaywallCopy.priceLine($0, choice: .lifetime) })
             .accessibilityIdentifier("plus.lifetime")
     }
 
     /// One layout at every text size: the words and the price stack on the left and wrap, the choice circle sits on
-    /// the right, so nothing is pushed off the screen at the largest accessibility sizes.
-    private func choiceCard(_ choice: PlusChoice, title: String, badge: String?, lines: [(String, Color)], price: String) -> some View {
+    /// the right, so nothing is pushed off the screen at the largest accessibility sizes. No price line while loading.
+    private func choiceCard(_ choice: PlusChoice, title: String, badge: String?, lines: [(String, Color)], price: String?) -> some View {
         let isSelected = selected == choice
         return Button { selected = choice } label: {
             HStack(alignment: .center, spacing: 10) {
@@ -136,10 +195,15 @@ struct PlusView: View {
                     ForEach(lines, id: \.0) { line in
                         Text(line.0).font(Theme.font(.caption)).foregroundStyle(line.1).fixedSize(horizontal: false, vertical: true)
                     }
-                    Text(price).font(Theme.font(.headline)).fixedSize(horizontal: false, vertical: true)
+                    if let price {
+                        Text(price).font(Theme.font(.headline)).fixedSize(horizontal: false, vertical: true)
+                    }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                Image(systemName: isSelected ? "largecircle.fill.circle" : "circle").foregroundStyle(isSelected ? Color.successText : Color.appPrimaryText.opacity(0.3))
+                // At least 3:1 against the card in both modes (PuzzleInk.blankOutline); the card says "Selected" itself.
+                Image(systemName: isSelected ? "largecircle.fill.circle" : "circle")
+                    .foregroundStyle(isSelected ? Color.successText : Color.appPrimaryText.opacity(PuzzleInk.blankOutline))
+                    .accessibilityHidden(true)
             }
             .foregroundStyle(Color.appPrimaryText)
             .padding(Space.card).frame(maxWidth: .infinity)
@@ -155,9 +219,15 @@ struct PlusView: View {
         let lifetime = store.state.hasLifetime
         return Card {
             VStack(alignment: .leading, spacing: 6) {
-                Label(lifetime ? PaywallCopy.ownedLifetime : "You have WordFlora Plus", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.successText)
-                Text(lifetime ? PaywallCopy.ownedLifetimeDetail : "Ads are off and your garden can sync across your devices. Thank you for supporting WordFlora.").font(Theme.font(.callout))
+                Label(lifetime ? PaywallCopy.ownedLifetime : PaywallCopy.ownedSubscription, systemImage: "sparkles")
+                    .font(Theme.font(.headline)).foregroundStyle(Color.successText)
                     .fixedSize(horizontal: false, vertical: true)
+                // Which plan, and until when ("Yearly plan · renews Nov 7, 2027"); Plus Forever: "Paid once. No renewals."
+                Text(lifetime ? PaywallCopy.ownedLifetimeDetail
+                              : PaywallCopy.planLine(plan: store.state.activePlan ?? .yearly, renews: store.state.subscriptionRenews,
+                                                     endsAt: store.state.subscriptionEndsAt))
+                    .font(Theme.font(.callout)).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("plus.planLine")
                 // Apple never cancels a subscription when Plus Forever is bought, so say it plainly.
                 if store.state.paysTwice {
                     Text(PaywallCopy.paysTwice).font(Theme.font(.callout, weight: .semibold))
@@ -175,7 +245,12 @@ struct PlusView: View {
         }
     }
 
-    // MARK: Purchase and parental gate
+    // MARK: Purchase, restore and parental gate
+
+    private func retry() {
+        retrying = true
+        Task { await store.loadProducts(); retrying = false }
+    }
 
     /// Young players and unknown ages answer the grown-up question before any purchase, code or store sheet.
     private func ask(then action: GatedAction) {
@@ -211,10 +286,18 @@ struct PlusView: View {
             let outcome = await store.purchase(selected)
             busy = false
             switch outcome {
-            case .success: message = selected == .lifetime ? PaywallCopy.welcomeLifetime : "Welcome to WordFlora Plus!"; app.updateSyncFlag()
-            case .pending: message = "Almost there. If Plus is not on in a moment, tap Restore purchases."
+            // Plus is on: one clear moment (the card springs in, a success haptic, a line VoiceOver reads too).
+            case .success:
+                app.updateSyncFlag()
+                withAnimation(reduceMotion ? .easeOut(duration: 0.2) : .spring(response: 0.4, dampingFraction: 0.8)) {
+                    message = PaywallCopy.justOn(adsWereOn: !ParentalGate.isRequired(ageBand: app.settings.ageBand),
+                                                 syncNeedsRestart: app.syncNeedsRestart)
+                }
+                turnedOn += 1
+            case .pending: message = PaywallCopy.pendingSlow
+            case .awaitingApproval: message = PaywallCopy.awaitingApproval
             case .cancelled: message = nil
-            case .failed: message = "We couldn't confirm that purchase. If you see a charge, tap Restore purchases."
+            case .failed: message = PaywallCopy.failed
             }
         }
     }
@@ -222,28 +305,82 @@ struct PlusView: View {
 }
 
 extension ParentalGate.Challenge: Identifiable { var id: String { question } }
-/// The grown-up question, used before a purchase and before any link that leaves the app.
+/// The grown-up question, used before a purchase and before any link that leaves the app. It scrolls, so Continue and
+/// Cancel stay reachable at every text size, with the number pad up too; full height at the accessibility sizes.
 struct ParentalGateSheet: View {
     let challenge: ParentalGate.Challenge
     let onPass: () -> Void
     let onCancel: () -> Void
     @State private var answer = ""
     @State private var wrong = false
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// At the accessibility sizes the title steps down and the sides tighten, so "grown-ups" stays whole (the
+    /// audit read it clipped at AX5; TextFitLayoutTests measures it).
+    /// The title steps down through the accessibility sizes so "grown-ups" never breaks at its hyphen.
+    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle {
+        size >= .accessibility4 ? .subheadline : (size.isAccessibilitySize ? .headline : .title2)
+    }
+    static func padding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 12 : 24 }
+
+    /// The question. At the accessibility sizes it is two set lines ("What is" / "16 × 9?"), so it never wraps on its
+    /// own; VoiceOver hears it once.
+    @ViewBuilder private var question: some View {
+        let q = challenge.question
+        if typeSize.isAccessibilitySize, q.hasPrefix("What is ") {
+            VStack(spacing: 0) {
+                Text("What is")
+                Text(String(q.dropFirst("What is ".count)))
+            }
+            .font(Theme.font(.title, weight: .heavy))
+            .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(q)
+        } else {
+            Text(q).font(Theme.font(.title, weight: .heavy))
+                .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity)
+        }
+    }
 
     var body: some View {
-        VStack(spacing: 16) {
-            Text(ParentalGate.Copy.title).font(Theme.font(.title2, weight: .bold))
-            Text(ParentalGate.Copy.prompt).font(Theme.font(.callout)).multilineTextAlignment(.center)
-            Text(challenge.question).font(Theme.font(.title, weight: .heavy))
-            TextField("Answer", text: $answer).keyboardType(.numberPad).textFieldStyle(.roundedBorder).frame(maxWidth: 160).multilineTextAlignment(.center)
-                .accessibilityIdentifier("parentalGate.answer")
-            if wrong { Text(ParentalGate.Copy.wrong).font(Theme.font(.footnote)).foregroundStyle(Color.appDanger) }
-            Button("Continue") {
-                if ParentalGate.check(answer: answer, against: challenge) { onPass() } else { wrong = true }
-            }.buttonStyle(PrimaryButtonStyle())
-            Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
+        ScrollView {
+            VStack(spacing: 16) {
+                Text(ParentalGate.Copy.title).font(Theme.font(Self.titleStyle(typeSize), weight: .bold))
+                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
+                    .accessibilityAddTraits(.isHeader)
+                // Full width, as the title: a wrapped centred line sized to its own width was read as clipped.
+                Text(ParentalGate.Copy.prompt).font(Theme.font(.callout)).multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
+                question
+                TextField("Answer", text: $answer).keyboardType(.numberPad).textFieldStyle(.roundedBorder)
+                    .font(Theme.font(.body))
+                    .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : 160).multilineTextAlignment(.center)
+                    .accessibilityIdentifier("parentalGate.answer")
+                if wrong {
+                    // Ink with an icon, not the danger red (3.69:1 on white in light mode).
+                    Label(ParentalGate.Copy.wrong, systemImage: "exclamationmark.circle")
+                        .font(Theme.font(.footnote, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("parentalGate.wrong")
+                }
+                Button {
+                    if ParentalGate.check(answer: answer, against: challenge) { onPass() } else { wrong = true }
+                } label: {
+                    Text("Continue").multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                }
+                .buttonStyle(PrimaryButtonStyle())
+                Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
+            }
+            .padding(Self.padding(typeSize))
+            // Clear of the sheet's grabber and the scroll edge's soft fade, which the audit read as clipping the title.
+            .padding(.top, typeSize.isAccessibilitySize ? 16 : 0)
         }
-        .padding(24).presentationDetents([.medium])
+        .scrollBounceBehavior(.basedOnSize)
+        .scrollDismissesKeyboard(.interactively)
+        .presentationDetents(typeSize.isAccessibilitySize ? [.large] : [.medium, .large])
     }
 }
 
@@ -255,15 +392,18 @@ struct GatedLink: View {
     @State private var gate: ParentalGate.Challenge?
     private let title: String
     private let url: URL
+    private let systemImage: String?
 
-    init(_ title: String, url: URL) { self.title = title; self.url = url }
+    init(_ title: String, url: URL, systemImage: String? = nil) { self.title = title; self.url = url; self.systemImage = systemImage }
 
     var body: some View {
-        Button(title) {
+        Button {
             switch ParentalGate.outbound(url, ageBand: app.settings.ageBand) {
             case .open(let u): openURL(u)
             case .askFirst: gate = ParentalGate.challenge(seed: UInt64(Date().timeIntervalSince1970))
             }
+        } label: {
+            if let systemImage { Label(title, systemImage: systemImage) } else { Text(title) }
         }
         .sheet(item: $gate) { challenge in
             ParentalGateSheet(challenge: challenge, onPass: { gate = nil; openURL(url) }, onCancel: { gate = nil })

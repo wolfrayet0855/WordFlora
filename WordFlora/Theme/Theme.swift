@@ -74,14 +74,26 @@ struct WordmarkView: View {
 }
 
 struct PrimaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(Theme.font(.title3, weight: .bold))
-            .foregroundStyle(Color.ink)
-            .frame(maxWidth: .infinity, minHeight: 56)
-            .background(Color.appAccent, in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+    func makeBody(configuration: Configuration) -> some View { Look(configuration: configuration) }
+
+    /// A disabled button dims its fill only; the ink label keeps full strength. Measured over the page background:
+    /// ink on the half-strength accent is 9.1:1 in light mode; in dark mode the dimmed fill darkens toward the page, so it
+    /// stays at 70% (ink 4.96:1; at 50% it was 3.24:1).
+    static func disabledFill(dark: Bool) -> Double { dark ? 0.7 : 0.5 }
+
+    private struct Look: View {
+        let configuration: ButtonStyleConfiguration
+        @Environment(\.isEnabled) private var isEnabled
+        @Environment(\.colorScheme) private var scheme
+        var body: some View {
+            configuration.label
+                .font(Theme.font(.title3, weight: .bold))
+                .foregroundStyle(Color.ink)
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .background(Color.appAccent.opacity(isEnabled ? 1 : PrimaryButtonStyle.disabledFill(dark: scheme == .dark)), in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
+                .scaleEffect(configuration.isPressed ? 0.97 : 1)
+                .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+        }
     }
 }
 

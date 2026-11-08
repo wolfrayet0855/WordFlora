@@ -543,3 +543,36 @@ Shots: `docs/pm/shots/g3-toolbar/` (before: "Trimme / d" in a row of six; after:
 - **Tend buttons keep whole words** (owner screenshot "Trimme / d" once Mist made six buttons; `docs/pm/toolbar-fit-review.md`): the Prune done title is "Trim" (the check badge and "Trim in 2 days" say it is done). Below the accessibility sizes the pinned buttons sit in rows of three when there are five or six (3 + 3 / 3 + 2) at every size, four stay one row up to Large then 2 + 2; at accessibility sizes each button is a full-width tile (icon beside title and caption) at the top of the page's scroll content, the toast stays pinned. The AX3+ shrink-and-hide branch is gone, so captions always show; no caps, no ViewThatFits, layout from the text size only (`TendRowLayout`). Quiet Garden uses the same rows. `TendRowLayoutTests` measures every title and caption word (ready, done, supply, seed) with SF Rounded at 375, 393 and 402 pt from xSmall to AX XXXL; `TendingUITests` checks the rows, the AX column and Quiet Garden with audits. Shots: `scratchpad/g3-toolbar/before` (Trimme / d) and `after`.
 - **Appearance follows the system** (owner): the Theme picker and the stored `appearance` are gone (an old saved value is ignored); "Show everything" stays, in a "Garden" section. `-uitest-dark` is removed; UI tests set the device appearance.
 - **Audio rulings** (`docs/pm/audio-review-rulings.md`): the Mist button plays `wf-mist-hiss` (`SoundEvent.mist`, 0 dB, silent in Calm; generator `tools/make_mist_hiss.py`) instead of the quiet water sound; `wf-snip` loses its +0.9 dB boost.
+
+## Text-fit and polish pass, then the Plus flow (2026-11-07, from `3-feat-content-and-polish` tip `5a73610`)
+Brief: `docs/pm/textfit-builder-brief.md`; Plus delta: `docs/pm/plus-flow-fable-review.md` (supersedes T22). Owner rule: every word fits at every text size. No new stored field (`Models/` diff empty); one UserDefaults key in the App Group (`cloudSyncedAt`).
+
+**Text fit**
+- `GridColumns` (Theme/Spacing.swift): columns from the size category only, shared by the views and the layout test. Garden and Badges 2, 1 at AX; Shed pots and repot tiles 4 up to Large, 2 to xxxLarge, one a row (pot beside its words) at AX; soil chips 2, 1 from AX3 ("Compost" never fit a quarter of the row); Visitors' book stickers 4, 3 from xLarge, 2 at AX1-3, 1 from AX4.
+- Every `.dynamicTypeSize` cap, `minimumScaleFactor` on words, reading `lineLimit` and `ViewThatFits` in the touched screens is gone (Soil and Pots headers, plant page resource chips, Name story chips, pot tags, tool line, game title). Plus tag hidden at AX on Shed cards ("A Plus pot" says it); New / In use / Plus pills scale.
+- Fits found by the layout test and fixed: Shed card use line says "In use" for one plant at 4 columns and one a row (VoiceOver keeps the name); botanical names caption2 from xxxLarge ("pseudotruncatella"); Name story name steps down at AX (title, title3, subheadline, footnote, serif bold); found-plant cards full width at AX with a footnote name and 8 pt card margins; Field Notes padding 24 / 8 and subheadline name at AX; visitor detail title3 with 12 pt sides at AX.
+- Visitors V1-V11: play card stacks at AX, the Easier switch under its label, "Seen on <date>", page label without a date when there is none, unmet label says when the friend comes, chip wash 0.06, unmet outline 0.55, ring grows with the number, header tracking 1.2. Butterfly game: navy bar and white title on the evening sky; the reward row in words.
+- Crown label in a rounded box; Guide pager fades its last 24 pt (keeps the clip for page slides) with a visible scroll indicator; game card titles through `cardTitle`; onboarding tip "Your first drink is ready!".
+- `PrimaryButtonStyle` dims the fill only when disabled (light 50%, dark 70%: ink 9.11:1 / 4.96:1).
+
+**Plus page and Plus flow**
+- T5-T27 as in the brief (trial needs a free-trial intro offer; Ask to Buy is `awaitingApproval`; scrolling grown-up sheet, full height at AX; loading state, failed state with spinner; 24-hour renewal line; prices in words; restore feedback on Plus and Seasons; messages in ink and announced; non-breaking hyphen; every line in `PaywallCopy.all`).
+- Fable delta and the owner's final rule: one Restore purchases in the whole app, a row in WordFlora Settings' Plus section (`settings.restore`, never gated, message under the row and announced; the 13+ family line is retired; the Plus page and the Seasons page have none, since Restore brings Plus, Plus Forever and packs back; result "Your purchases are back." or "No purchases found for this Apple ID."; the pending and failed lines say "tap Restore purchases in Settings"); Plus Forever card without its sentence; Manage subscription only with a live subscription; intro without the Family Sharing sentence; "Plus is on. Ads are off. ..." moment with a spring, a success haptic and VoiceOver; the active card's plan line ("Yearly plan · renews ..."); Plus Forever "Paid once. No renewals."; Settings row "WordFlora Plus is on" with Yearly / Monthly / Forever; the sync flag follows the entitlement while the app is open; iCloud status row for everyone (off, needs Plus / starts next time / on / needs a sign-in / unavailable) with "Synced <relative time>" from the CloudKit mirroring events when they come (verify on a device).
+- Audio session set up off the main thread at launch. Debug print of the App Group URL and `storeHome` (N6): remove after the owner runs it.
+- UI flags: `-uitest-store-slow`, `-uitest-store-fail`, `-uitest-album-all`, `-uitest-cloud=on|signin|unavailable`.
+
+**Tests**: `TextFitLayoutTests` (12 tests: every word of every touched grid and card at 375, 393 and 402 pt, xSmall to AX5), `TextFitScreensUITests` (shots and audits at AX XXXL light and dark), Paywall / Family / CloudSync unit tests.
+
+**Results** (`WF G3 iPhone 17`, 402 pt, iOS 26.5, erased before the UI batches; one xcodebuild at a time)
+
+| Run | Result |
+|---|---|
+| Unit (`WordFloraTests`) | 1207 run, 1207 pass (`TextFitLayoutTests` 12 of 12 again in the final hold) |
+| `TendingUITests` (full, final hold 1) | 29/30; the red was G3's tend rows at real xxxLarge (second row not top-aligned); fixed in 2ed4b59, the three tend-row tests then 3/3 |
+| `TextFitScreensUITests` | all green across the runs except the grown-up sheet at AX5: the audit reads a different line as clipped after each fix (title, question, Cancel, now Continue at the sheet's bottom edge). Open, see the hand-off. Visitors page/book/detail last passed before 6227903 changed the Field Notes name back; not rerun after |
+| `DailyQuestUITests` | 6/6 (one Restore purchases, in Settings) |
+| `ParentalGateLinkUITests` | 6/6 (incl. under-13 Manage subscription in Settings) |
+| `SeasonsUITests` | 9/9 (shelf test green once its audit ran the resizing checks apart) |
+| SE (375 pt) | Plus page default and AX5, light and dark: green, every word whole |
+
+Found on the way: the UI tests' `UICTContentSizeCategoryExtraExtraExtraLarge` is not a size name (the raw value is `UICTContentSizeCategoryXXXL`), so G3's xxxl tend-row test never ran at xxxLarge; fixed in both files. Shots: `docs/pm/shots/textfit/` (downscaled), full size in the session scratchpad.

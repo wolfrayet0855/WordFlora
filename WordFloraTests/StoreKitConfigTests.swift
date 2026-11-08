@@ -169,7 +169,7 @@ final class StoreKitConfigTests: XCTestCase {
         let svc = EntitlementService(startListening: false)
         await svc.loadProducts()
         let outcome = await svc.purchase(.lifetime)
-        XCTAssertEqual(outcome, .pending)
+        XCTAssertEqual(outcome, .awaitingApproval, "Ask to Buy: sent to a grown-up")
         XCTAssertFalse(svc.state.hasPlus)
         let waiting = try XCTUnwrap(session.allTransactions().first { $0.productIdentifier == PlusPlan.lifetimeID })
         try session.approveAskToBuyTransaction(identifier: waiting.identifier)

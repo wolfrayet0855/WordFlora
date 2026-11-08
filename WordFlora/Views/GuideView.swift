@@ -45,7 +45,14 @@ struct GuideView: View {
                     .transition(pageTransition)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .clipped()
+            // Keeps a sliding page inside the pager (as a clip did), and fades the last 24 pt instead of a hard edge,
+            // so words that run on below read as "there is more" (the page's scroll indicator shows it too).
+            .mask {
+                VStack(spacing: 0) {
+                    Color.black
+                    LinearGradient(colors: [.black, .clear], startPoint: .top, endPoint: .bottom).frame(height: GuideLook.bottomFade)
+                }
+            }
             .contentShape(Rectangle())
             .simultaneousGesture(swipe)
             footer
@@ -277,6 +284,7 @@ private struct GuidePageView: View {
                 .frame(minHeight: geo.size.height)
             }
             .scrollBounceBehavior(.basedOnSize)
+            .scrollIndicators(.visible)
         }
     }
 }

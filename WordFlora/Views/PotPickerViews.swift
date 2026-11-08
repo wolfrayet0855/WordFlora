@@ -12,19 +12,22 @@ enum PotPalette {
     static let ok = dyn(0x3E7A22, 0xA8D84A)
 }
 
-/// The small amber "Plus" tag with a sparkle. No lock, no price.
+/// The small amber "Plus" tag with a sparkle. No lock, no price. It grows with the text; at the accessibility sizes it
+/// is not drawn (it would cover the pot), and the card's own line says "A Plus pot" instead.
 struct PotPlusTag: View {
+    @Environment(\.dynamicTypeSize) private var typeSize
     var body: some View {
-        HStack(spacing: 2) {
-            Image(systemName: "sparkle").font(.system(size: 8, weight: .heavy))
-            Text(PotCatalog.Copy.plusTag).font(Theme.font(.caption2, weight: .heavy))
+        if !typeSize.isAccessibilitySize {
+            HStack(spacing: 2) {
+                Image(systemName: "sparkle").imageScale(.small)
+                Text(PotCatalog.Copy.plusTag)
+            }
+            .font(Theme.font(.caption2, weight: .heavy))
+            .foregroundStyle(PotPalette.plusInk)
+            .padding(.horizontal, 6).padding(.vertical, 1)
+            .background(PotPalette.plus, in: Capsule())
+            .accessibilityHidden(true)
         }
-        .foregroundStyle(PotPalette.plusInk)
-        .padding(.horizontal, 6).padding(.vertical, 1)
-        .background(PotPalette.plus, in: Capsule())
-        // A tag, not a label: at accessibility text sizes it would cover the pot and its name.
-        .dynamicTypeSize(...DynamicTypeSize.large)
-        .accessibilityHidden(true)
     }
 }
 
@@ -37,7 +40,6 @@ struct PotCheckBadge: View {
             .frame(width: size, height: size)
             .background(PotPalette.ring, in: Circle())
             .overlay(Circle().stroke(Color.appSurface, lineWidth: 2))
-            .dynamicTypeSize(...DynamicTypeSize.large)
             .accessibilityHidden(true)
     }
 }
@@ -245,7 +247,6 @@ struct PotNewTag: View {
         Text(PotCatalog.Copy.newTag).font(Theme.font(.caption2, weight: .black)).foregroundStyle(Color.appPrimaryText)
             .padding(.horizontal, 6).padding(.vertical, 1)
             .background(Color.tileGardenFill, in: Capsule())
-            .dynamicTypeSize(...DynamicTypeSize.large)
             .accessibilityHidden(true)
     }
 }
@@ -255,14 +256,14 @@ struct PotNewTag: View {
 struct PotPlusPill: View {
     var body: some View {
         HStack(spacing: 3) {
-            Image(systemName: "sparkle").font(.system(size: 8, weight: .heavy))
-            Text(PotCatalog.Copy.plusTag).font(Theme.font(.caption2, weight: .heavy))
+            Image(systemName: "sparkle").imageScale(.small)
+            Text(PotCatalog.Copy.plusTag)
         }
+        .font(Theme.font(.caption2, weight: .heavy))
         .foregroundStyle(Color.accentText)
         .padding(.horizontal, 7).padding(.vertical, 1)
         .background(Color.tileBadgesFill, in: Capsule())
         .overlay(Capsule().strokeBorder(Color.accentText.opacity(0.55), lineWidth: 1.2))
-        .dynamicTypeSize(...DynamicTypeSize.large)
     }
 }
 
@@ -274,7 +275,6 @@ struct PotInUsePill: View {
             .font(Theme.font(.caption2, weight: .heavy)).foregroundStyle(Color.successText)
             .padding(.horizontal, 7)
             .overlay(Capsule().strokeBorder(Color.successText, lineWidth: 1.2))
-            .dynamicTypeSize(...DynamicTypeSize.large)
     }
 
     private struct InUseLabelStyle: LabelStyle {
@@ -284,8 +284,9 @@ struct PotInUsePill: View {
     }
 }
 
-/// All sixteen pots in a 4 x 4 grid at every text size. Every tile is the same height: a one-line name that
-/// shrinks to fit, then line 2 says the state (the goal for a pot to earn, "Plus", "In use", or nothing).
+/// The sixteen pots: four a row up to Large, two above, and at the accessibility sizes one a row with the pot beside its
+/// words (GridColumns), so every name keeps whole words at every text size. The tiles in a row share one height (at
+/// least `tileHeight`): the name, then line 2 says the state (the goal for a pot to earn, "Plus", "In use", or nothing).
 /// The picked pot has a green ring and a check; a tapped pot that cannot be picked gets a double ink outline.
 struct PotPickGrid: View {
     let currentId: String
@@ -301,27 +302,28 @@ struct PotPickGrid: View {
     @Environment(\.repotReduceMotion) private var reduceMotion
 
     static let tileHeight: CGFloat = 108
-    static let tileHeightAX: CGFloat = 104
+    /// A one-a-row tile (accessibility sizes) is at least this tall.
+    static let rowHeight: CGFloat = 64
 
     var body: some View {
-        // An eager grid (not lazy): all sixteen tiles are always laid out, so the 4 x 4 checks see every row even when
-        // the header takes the first screen at the largest text sizes.
-        let rows = stride(from: 0, to: PotCatalog.all.count, by: PotCatalog.gridColumns).map {
-            Array(PotCatalog.all[$0..<min($0 + PotCatalog.gridColumns, PotCatalog.all.count)])
-        }
-        Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-            ForEach(rows, id: \.first?.id) { row in
+        // An eager grid (not lazy): all the tiles are always laid out, so the grid checks see every row even when the
+        // header takes the first screen at the largest text sizes.
+        let columns = GridColumns.count(.repotTiles, for: typeSize)
+        Grid(horizontalSpacing: GridColumns.spacing(.repotTiles), verticalSpacing: 8) {
+            ForEach(GridColumns.rows(PotCatalog.all, .repotTiles, for: typeSize), id: \.first?.id) { row in
                 GridRow { ForEach(row) { tile($0) } }
             }
-            // A live seasonal pack: its own row under the ladder, with the pack's name (no price, no lock).
+            // A live seasonal pack: its own rows under the ladder, with the pack's name (no price, no lock).
             if !packPots.isEmpty {
                 GridRow {
-                    PackRowTitle(name: PackCatalog.frostLantern.name).gridCellColumns(PotCatalog.gridColumns)
+                    PackRowTitle(name: PackCatalog.frostLantern.name).gridCellColumns(columns)
                 }
-                GridRow {
-                    ForEach(packPots) { tile($0) }
-                    ForEach(0..<max(0, PotCatalog.gridColumns - packPots.count), id: \.self) { _ in
-                        Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
+                ForEach(GridColumns.rows(packPots, .repotTiles, for: typeSize), id: \.first?.id) { row in
+                    GridRow {
+                        ForEach(row) { tile($0) }
+                        ForEach(0..<max(0, columns - row.count), id: \.self) { _ in
+                            Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
+                        }
                     }
                 }
             }
@@ -341,35 +343,46 @@ struct PotPickGrid: View {
         let packSoft: Bool = { if case .pack = s { return !isCurrent }; return false }()
         let toEarn: Bool = { if case .toEarn = s { return !isCurrent }; return packSoft }()
         let plus: Bool = { if case .plus = s { return !isCurrent }; return false }()
-        let isAX = typeSize.isAccessibilitySize
+        let row = GridColumns.isRow(.repotTiles, for: typeSize)
         let shape = RoundedRectangle(cornerRadius: 16, style: .continuous)
+        let art = PotArtView(pot: pot, style: toEarn ? .toEarn : .full, width: 48).frame(height: 42, alignment: .bottom)
+        let words = VStack(alignment: row ? .leading : .center, spacing: 3) {
+            Text(pot.name)
+                .font(Theme.font(.caption, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                .multilineTextAlignment(row ? .leading : .center)
+                .fixedSize(horizontal: false, vertical: true)
+            if isCurrent {
+                PotInUsePill()
+            } else if plus {
+                PotPlusPill()
+            } else if toEarn && !packSoft {
+                Text(PotCatalog.goalLine(pot)).font(Theme.font(.caption2, weight: .bold)).foregroundStyle(Color.secondaryText)
+                    .multilineTextAlignment(row ? .leading : .center)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
         return Button {
             if choosable { picked = pot.id; hinted = nil } else { hinted = isHinted ? nil : pot.id }
         } label: {
-            VStack(spacing: 0) {
-                PotArtView(pot: pot, style: toEarn ? .toEarn : .full, width: 48)
-                    .frame(height: 42, alignment: .bottom)
-                Text(pot.name)
-                    .font(Theme.font(.caption, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
-                    .lineLimit(1).minimumScaleFactor(0.6).allowsTightening(true)
-                    .padding(.top, 7)
-                Group {
-                    if isCurrent {
-                        PotInUsePill()
-                    } else if plus {
-                        PotPlusPill()
-                    } else if toEarn && !packSoft && !isAX {
-                        Text(PotCatalog.goalLine(pot)).font(Theme.font(.caption2, weight: .bold)).foregroundStyle(Color.secondaryText)
-                            .lineLimit(1).minimumScaleFactor(0.75)
+            Group {
+                if row {
+                    HStack(spacing: GridColumns.rowGap) {
+                        art.frame(width: GridColumns.rowArt(.repotTiles))
+                        words.frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(.leading, GridColumns.rowPadding).padding(.trailing, GridColumns.rowPadding + GridColumns.rowBadge)
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity, minHeight: Self.rowHeight, maxHeight: .infinity, alignment: .leading)
+                } else {
+                    VStack(spacing: 0) {
+                        art
+                        words.padding(.top, 7)
+                        Spacer(minLength: 0)
+                    }
+                    .padding(.top, 13).padding(.bottom, 8).padding(.horizontal, GridColumns.cellPadding(.repotTiles))
+                    .frame(maxWidth: .infinity, minHeight: Self.tileHeight, maxHeight: .infinity, alignment: .top)
                 }
-                .padding(.top, 3)
-                Spacer(minLength: 0)
             }
-            .padding(.top, 13).padding(.horizontal, 4)
-            .frame(maxWidth: .infinity)
-            .frame(height: isAX ? Self.tileHeightAX : Self.tileHeight)
-            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)       // the tile words stop growing here; VoiceOver reads it all
             .background {
                 if toEarn && !isHinted {
                     // The soft tile: ink at 6% over the sheet's background (no colorset of its own).
@@ -445,12 +458,13 @@ struct SoilPicker: View {
     }
 
     var body: some View {
-        let columns = Array(repeating: GridItem(.flexible(), spacing: 8), count: typeSize.isAccessibilitySize ? 2 : 4)
+        let columns = Array(repeating: GridItem(.flexible(), spacing: GridColumns.spacing(.soilChips)),
+                            count: GridColumns.count(.soilChips, for: typeSize))
+        // The heading and its line side by side, stacked at the accessibility sizes (chosen from the size, not measured).
+        let header = typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 2)) : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 8))
         VStack(alignment: .leading, spacing: 10) {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .firstTextBaseline, spacing: 8) { title; sub }
-                VStack(alignment: .leading, spacing: 2) { title; sub }
-            }
+            header { title; sub }
             LazyVGrid(columns: columns, spacing: 8) {
                 ForEach(SoilType.allCases, id: \.self) { chip($0) }
             }
@@ -471,13 +485,13 @@ struct SoilPicker: View {
         let shape = RoundedRectangle(cornerRadius: 14, style: .continuous)
         let isPicked = picked == soil
         return Button { picked = soil } label: {
-            HStack(spacing: 6) {
-                Circle().fill(Self.dot(soil)).frame(width: 10, height: 10)
+            HStack(spacing: GridColumns.soilDotGap) {
+                Circle().fill(Self.dot(soil)).frame(width: GridColumns.soilDot, height: GridColumns.soilDot)
                     .overlay(Circle().stroke(Color.appPrimaryText.opacity(0.35), lineWidth: 1))
                 Text(soil.rawValue.capitalized).font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
-                    .lineLimit(1).minimumScaleFactor(0.8)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            .padding(.horizontal, 6)
+            .padding(.horizontal, GridColumns.cellPadding(.soilChips)).padding(.vertical, 6)
             .frame(maxWidth: .infinity, minHeight: 44)
             .background(Color.appSurface, in: shape)
             .overlay {
@@ -615,9 +629,10 @@ struct RepotButtonStyle: ButtonStyle {
 
 // MARK: Shed: Pots
 
-/// The Shed's "Pots" grid below Tools (design-preview/pots, sections 3 and 6): sixteen cards, 4 x 4 at every text
-/// size (the text stops growing at xxxLarge so a card stays readable; VoiceOver reads it all). Earned pots carry a check and "Yours to use" or who uses them; pots to earn show the goal and a
-/// gentle progress bar; Plus pots show the tag. Nothing is locked or for sale here.
+/// The Shed's "Pots" grid below Tools (design-preview/pots, sections 3 and 6): sixteen cards, four a row up to Large,
+/// two above, one a row (the pot beside its words) at the accessibility sizes (GridColumns), so every word stays whole.
+/// Earned pots carry a check and "Yours to use" or who uses them; pots to earn show the goal and a gentle progress bar;
+/// Plus pots show the tag. Nothing is locked or for sale here.
 struct ShedPotsSection: View {
     let stats: PotCatalog.Stats
     let hasPlus: Bool
@@ -633,22 +648,17 @@ struct ShedPotsSection: View {
     @Environment(\.dynamicTypeSize) private var typeSize
 
     var body: some View {
-        let columns = Array(repeating: GridItem(.flexible(), spacing: 6, alignment: .top), count: PotCatalog.gridColumns)
+        // The heading and its line side by side, stacked at the accessibility sizes (chosen from the size, not measured).
+        let header = typeSize.isAccessibilitySize
+            ? AnyLayout(VStackLayout(alignment: .leading, spacing: 2)) : AnyLayout(HStackLayout(alignment: .firstTextBaseline, spacing: 8))
         VStack(alignment: .leading, spacing: 8) {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .firstTextBaseline) { title; Spacer(minLength: 8); sub }
-                VStack(alignment: .leading, spacing: 2) { title; sub }
-            }
+            header { title; if !typeSize.isAccessibilitySize { Spacer(minLength: 8) }; sub }
             .padding(.top, 8)
             if newPots { PotNewLine() }
-            LazyVGrid(columns: columns, spacing: 8) {
-                ForEach(PotCatalog.all) { card($0) }
-            }
+            grid(PotCatalog.all)
             if !packPots.isEmpty {
                 PackRowTitle(name: PackCatalog.frostLantern.name)
-                LazyVGrid(columns: columns, spacing: 8) {
-                    ForEach(packPots) { card($0) }
-                }
+                grid(packPots)
             }
             if let message {
                 Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
@@ -673,6 +683,22 @@ struct ShedPotsSection: View {
             .fixedSize(horizontal: false, vertical: true)
     }
 
+    /// The cards in an eager grid, so the cards in a row share one height.
+    private func grid(_ pots: [Pot]) -> some View {
+        let columns = GridColumns.count(.shedPots, for: typeSize)
+        return Grid(horizontalSpacing: GridColumns.spacing(.shedPots), verticalSpacing: 8) {
+            ForEach(GridColumns.rows(pots, .shedPots, for: typeSize), id: \.first?.id) { row in
+                GridRow {
+                    ForEach(row) { card($0) }
+                    ForEach(0..<max(0, columns - row.count), id: \.self) { _ in
+                        Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
+                    }
+                }
+            }
+        }
+    }
+
+    /// Who uses the pot, as VoiceOver hears it ("In use by Passionflower").
     private func useLine(_ names: [String]) -> String {
         switch names.count {
         case 0: return PotCatalog.Copy.yours
@@ -680,6 +706,15 @@ struct ShedPotsSection: View {
         default: return "In use by \(names.count) plants"
         }
     }
+
+    /// The same on the card, except four a row and one a row at the accessibility sizes: a plant's name does not fit
+    /// there ("Passionflower"), so one plant reads "In use" (VoiceOver still names it).
+    private func cardUseLine(_ names: [String]) -> String {
+        names.count == 1 && Self.namesUser(typeSize) == false ? PotCatalog.Copy.current : useLine(names)
+    }
+
+    /// Whether a card's use line names its one plant: only two a row (xLarge to xxxLarge).
+    static func namesUser(_ size: DynamicTypeSize) -> Bool { GridColumns.count(.shedPots, for: size) == 2 }
 
     private func card(_ pot: Pot) -> some View {
         let s = PotCatalog.state(of: pot, stats: stats, hasPlus: hasPlus)
@@ -695,34 +730,45 @@ struct ShedPotsSection: View {
             case .toEarn: return "\(pot.voiceName) pot, not earned yet. \(PotCatalog.goalLine(pot)). \(progressText)"
             }
         }()
+        let row = GridColumns.isRow(.shedPots, for: typeSize)
+        let words = VStack(alignment: row ? .leading : .center, spacing: 3) {
+            Text(pot.name).font(Theme.font(.footnote, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                .multilineTextAlignment(row ? .leading : .center)
+                .fixedSize(horizontal: false, vertical: true)
+            switch s {
+            case .owned:
+                cardLine(cardUseLine(names), color: PotPalette.ok, leading: row)
+            case .plus:
+                cardLine(typeSize.isAccessibilitySize ? PotCatalog.Copy.plusCardShort : PotCatalog.Copy.plusCard,
+                         color: Color.secondaryText, leading: row)
+            case .pack:
+                cardLine(PackCatalog.Copy.seasonsTitle, color: Color.secondaryText, leading: row)
+            case .toEarn:
+                cardLine(PotCatalog.goalLine(pot), color: Color.secondaryText, leading: row)
+                ProgressView(value: progress?.fraction ?? 0).tint(PotPalette.ok).frame(maxWidth: row ? 140 : 70)
+                cardLine(progressText, color: Color.secondaryText, small: true, leading: row)
+            }
+        }
+        let art = PotArtView(pot: pot, style: toEarn ? .toEarn : .full, width: 60)
         return Button { message = tapLine(pot, s) } label: {
-            VStack(spacing: 3) {
-                PotArtView(pot: pot, style: toEarn ? .toEarn : .full, width: 60)
-                    .padding(.top, 10)         // clears the check badge and Plus tag in the corner
-                Text(pot.name).font(Theme.font(.footnote, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
-                    // As on the pick tiles: a one-word name shrinks to fit instead of breaking inside the word.
-                    .multilineTextAlignment(.center).lineLimit(pot.name.contains(" ") ? 2 : 1).minimumScaleFactor(0.5)
-                    .fixedSize(horizontal: false, vertical: true)
-                Group {
-                    switch s {
-                    case .owned:
-                        cardLine(useLine(names), color: PotPalette.ok)
-                    case .plus:
-                        cardLine(typeSize.isAccessibilitySize ? PotCatalog.Copy.plusCardShort : PotCatalog.Copy.plusCard,
-                                 color: Color.secondaryText)
-                    case .pack:
-                        cardLine(PackCatalog.Copy.seasonsTitle, color: Color.secondaryText)
-                    case .toEarn:
-                        cardLine(PotCatalog.goalLine(pot), color: Color.secondaryText)
-                        ProgressView(value: progress?.fraction ?? 0).tint(PotPalette.ok).frame(maxWidth: 70)
-                        cardLine(progressText, color: Color.secondaryText, small: true)
+            Group {
+                if row {
+                    HStack(spacing: GridColumns.rowGap) {
+                        art.frame(width: GridColumns.rowArt(.shedPots))
+                        words.frame(maxWidth: .infinity, alignment: .leading)
                     }
+                    .padding(.leading, GridColumns.rowPadding).padding(.trailing, GridColumns.rowPadding + GridColumns.rowBadge)
+                    .padding(.vertical, 12)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .leading)
+                } else {
+                    VStack(spacing: 3) {
+                        art.padding(.top, 10)         // clears the check badge and Plus tag in the corner
+                        words
+                    }
+                    .padding(.horizontal, GridColumns.cellPadding(.shedPots)).padding(.top, 8).padding(.bottom, 8)
+                    .frame(maxWidth: .infinity, minHeight: 132, maxHeight: .infinity, alignment: .top)
                 }
             }
-            // Four cards a row: the words stop growing at xxxLarge so they stay whole; VoiceOver reads the full card.
-            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-            .padding(.horizontal, 4).padding(.top, 8).padding(.bottom, 8)
-            .frame(maxWidth: .infinity, minHeight: 132, alignment: .top)
             .background(toEarn ? Color.appSurface.opacity(0.55) : Color.appSurface, in: RoundedRectangle(cornerRadius: Theme.cardRadius))
             .overlay(RoundedRectangle(cornerRadius: Theme.cardRadius).stroke(Color.appPrimaryText.opacity(toEarn ? 0.14 : 0.08), lineWidth: toEarn ? 1.5 : 1))
             .overlay(alignment: .topTrailing) {
@@ -741,9 +787,9 @@ struct ShedPotsSection: View {
         .accessibilityIdentifier("shed-pot-\(pot.id)")
     }
 
-    private func cardLine(_ text: String, color: Color, small: Bool = false) -> some View {
+    private func cardLine(_ text: String, color: Color, small: Bool = false, leading: Bool = false) -> some View {
         Text(text).font(Theme.font(small ? .caption2 : .caption, weight: .bold)).foregroundStyle(color)
-            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+            .multilineTextAlignment(leading ? .leading : .center).fixedSize(horizontal: false, vertical: true)
     }
 
     private func tapLine(_ pot: Pot, _ s: PotState) -> String {

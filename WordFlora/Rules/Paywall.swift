@@ -34,6 +34,8 @@ struct EntitlementState: Equatable {
     /// Plus Forever owned (bought or family-shared, not refunded). It wins over any subscription state.
     var hasLifetime: Bool { activeProductIDs.contains(PlusPlan.lifetimeID) }
     var hasActiveSubscription: Bool { !activeProductIDs.isDisjoint(with: PlusPlan.allProductIDs) }
+    /// The live subscription plan (yearly wins if both somehow exist); nil for Plus Forever alone or no Plus.
+    var activePlan: PlusPlan? { PlusPlan.allCases.first { activeProductIDs.contains($0.productID) } }
     /// Seasonal packs owned now (bought or family-shared, not refunded). Plus never includes them.
     var ownedPacks: Set<String> { PackCatalog.owned(activeProductIDs: activeProductIDs) }
     /// False once every live subscription has auto-renew turned off (StoreKit's renewal info). Unknown counts as on.
@@ -100,16 +102,75 @@ enum PaywallCopy {
     static let benefits = ["No ads, ever", "Sync your garden with iCloud", "Share it with your family"]
 
     static func make(plan: PlusPlan, displayPrice: String, trialEligible: Bool) -> Copy {
-        let renew = "Your subscription renews automatically until you cancel. Cancel anytime in Settings."
+        // Apple's 24-hour rule and where to cancel, as the store listing says it (not the app's own Settings).
+        let renew = renewal
         switch plan {
         case .yearly:
             let trial = trialEligible
             return Copy(headline: "Yearly", detail: "Best value",
-                        cta: trial ? "Start 3-day free trial" : "Subscribe",
+                        cta: trial ? trialCTA : "Subscribe",
                         finePrint: trial ? "3 days free, then \(displayPrice) per year. \(renew)" : "\(displayPrice) per year. \(renew)")
         case .monthly:
             return Copy(headline: "Monthly", detail: "Flexible", cta: "Subscribe", finePrint: "\(displayPrice) per month. \(renew)")
         }
+    }
+
+    static let renewal = "Renews automatically unless cancelled at least 24 hours before the end of the period. Cancel anytime in your App Store account settings."
+    /// A non-breaking hyphen, so "3-day" never splits at the largest text sizes.
+    static let trialCTA = "Start 3\u{2011}day free trial"
+
+    /// A plan's price in words on its card ("$12.99 a year", "$3.99 a month", "$34.99 once"), never "/yr".
+    static func priceLine(_ price: String, choice: PlusChoice) -> String {
+        switch choice {
+        case .yearly: return "\(price) a year"
+        case .monthly: return "\(price) a month"
+        case .lifetime: return "\(price) once"
+        }
+    }
+
+    // The page's other lines (all checked by CopySafety through `all`).
+    static let loadFailed = "We couldn't load the plans. Check your connection and try again."
+    static let tryAgain = "Try again"
+    static let loadingPrices = "Loading prices"
+    static let ownedSubscription = "You have WordFlora Plus"
+
+    /// The moment Plus turns on, on the Plus page (said to VoiceOver too).
+    static func justOn(adsWereOn: Bool, syncNeedsRestart: Bool) -> String {
+        var s = "Plus is on."
+        if adsWereOn { s += " Ads are off." }
+        s += syncNeedsRestart ? " iCloud sync starts next time you open WordFlora." : " Your garden syncs with iCloud."
+        return s
+    }
+
+    /// The active card's plan line: "Yearly plan · renews Nov 7, 2027", or the end date when auto-renew is off.
+    static func planLine(plan: PlusPlan, renews: Bool, endsAt: Date?) -> String {
+        let name = plan == .yearly ? "Yearly plan" : "Monthly plan"
+        guard let endsAt else { return name }
+        let day = endsAt.formatted(date: .abbreviated, time: .omitted)
+        return renews ? "\(name) · renews \(day)" : "\(name) · ends \(day). Auto-renew is off."
+    }
+
+    /// The Settings row's short plan name beside "WordFlora Plus is on". Plus Forever wins.
+    static func planShort(_ state: EntitlementState) -> String? {
+        if state.hasLifetime { return "Forever" }
+        switch state.activePlan { case .yearly: return "Yearly"; case .monthly: return "Monthly"; case nil: return nil }
+    }
+    static let restore = "Restore purchases"
+    /// The purchase went through but Plus had not shown up yet.
+    static let pendingSlow = "Almost there. If Plus is not on in a moment, tap Restore purchases in Settings."
+    /// Ask to Buy (StoreKit pending): a grown-up must approve, maybe hours later.
+    static let awaitingApproval = "Sent to a grown-up to approve. Plus turns on once it's approved."
+    static let failed = "We couldn't confirm that purchase. If you see a charge, tap Restore purchases in Settings."
+    /// After the app's one Restore purchases (WordFlora Settings, Plus section): it brings back Plus, Plus Forever and
+    /// any season pack, so one line covers them all. Never gated: it never charges.
+    static let restoredOn = "Your purchases are back."
+    static let restoredNone = "No purchases found for this Apple ID."
+    /// Restore could not reach the App Store (offline, a cancelled sign-in): never "No purchases found" then.
+    static let restoreFailed = "Couldn't reach the App Store. Try again."
+
+    /// The one line after Restore purchases.
+    static func restoreLine(reached: Bool, found: Bool) -> String {
+        found ? restoredOn : (reached ? restoredNone : restoreFailed)
     }
 
     /// Plus Forever's one honest line, on its row and under the button.
@@ -127,20 +188,25 @@ enum PaywallCopy {
 
     static let redeem = "Redeem a code"
     static let ownedLifetime = "You have Plus Forever"
-    static let ownedLifetimeDetail = "Ads are off and your garden can sync across your devices, with no renewals. Thank you for supporting WordFlora."
+    static let ownedLifetimeDetail = "Paid once. No renewals."
     static let paysTwice = "You still have a subscription. Cancel it so you aren't charged twice."
     /// Plus Forever beside a subscription whose auto-renew is already off: nothing more to do, just the end date.
     static func subscriptionEnds(on date: String) -> String {
         "Your subscription ends on \(date) and will not renew. Plus Forever keeps going after that."
     }
     static let cancelSubscription = "Cancel the subscription"
-    static let welcomeLifetime = "Welcome to Plus Forever!"
 
-    /// Every Plus page line added for Plus Forever and codes, for the copy checks.
+    /// Every Plus page line outside the plan copy, for the copy checks.
     static var all: [String] {
         [lifetimeLine, lifetime(displayPrice: "$34.99").finePrint, lifetime(displayPrice: "").cta, redeem,
          ownedLifetime, ownedLifetimeDetail, paysTwice, subscriptionEnds(on: "December 1, 2026"), cancelSubscription,
-         welcomeLifetime]
+         renewal, trialCTA, priceLine("$12.99", choice: .yearly), priceLine("$3.99", choice: .monthly),
+         priceLine("$34.99", choice: .lifetime), loadFailed, tryAgain, loadingPrices, ownedSubscription,
+         restore, pendingSlow, awaitingApproval, failed, restoredOn, restoredNone, restoreFailed, PlusEntry.isOn, PlusEntry.purchasesTitle, "Yearly", "Monthly", "Forever",
+         justOn(adsWereOn: true, syncNeedsRestart: true), justOn(adsWereOn: true, syncNeedsRestart: false),
+         justOn(adsWereOn: false, syncNeedsRestart: true), justOn(adsWereOn: false, syncNeedsRestart: false),
+         planLine(plan: .yearly, renews: true, endsAt: Date(timeIntervalSince1970: 1_826_000_000)),
+         planLine(plan: .monthly, renews: false, endsAt: Date(timeIntervalSince1970: 1_826_000_000)), planLine(plan: .yearly, renews: true, endsAt: nil)]
     }
 }
 
@@ -176,16 +242,23 @@ enum ParentalGate {
     static func isRequired(ageBand: AgeBand?) -> Bool { ageBand == nil || ageBand == .under13 }
 }
 
-/// The Settings way into Plus. Young players and unknown ages see it as "For grown-ups", and Plus opens with one calm
-/// line saying the game is complete without it. Teen and adult players see the usual row. The purchase itself still
+/// The Settings way into Plus, in the "Purchases" section for every age. Young players and unknown ages see the row as
+/// "WordFlora Plus" (no ad or price pitch), and Plus opens with one calm line saying the game is complete without it. Teen and adult players see the usual row. The purchase itself still
 /// asks a grown-up first (ParentalGate); nothing changes on the play screens.
 enum PlusEntry {
     static let grownUps = "For grown-ups"
-    static let introLine = "WordFlora is complete without Plus. Plus removes ads for grown-up players and syncs the garden with iCloud. Family Sharing covers up to six people."
+    static let introLine = "WordFlora is complete without Plus. Plus removes ads for grown-up players and syncs the garden with iCloud."
 
-    static func sectionTitle(ageBand: AgeBand?) -> String { ParentalGate.isRequired(ageBand: ageBand) ? grownUps : PlusPlan.groupName }
-    static func rowTitle(ageBand: AgeBand?) -> String {
-        ParentalGate.isRequired(ageBand: ageBand) ? PlusPlan.groupName : "Remove ads and sync with iCloud"
+    /// Once Plus is on, every age sees the same row: it says so (the owner could not tell after buying).
+    static let isOn = "WordFlora Plus is on"
+
+    /// Settings groups everything bought under one header, for every age (owner, 2026-11-07): the Plus row, Seasons,
+    /// Restore purchases and, for a live subscription, Manage subscription. The rows keep their own grown-up gates.
+    static let purchasesTitle = "Purchases"
+
+    static func rowTitle(ageBand: AgeBand?, hasPlus: Bool = false) -> String {
+        if hasPlus { return isOn }
+        return ParentalGate.isRequired(ageBand: ageBand) ? PlusPlan.groupName : "Remove ads and sync with iCloud"
     }
     static func intro(ageBand: AgeBand?) -> String? { ParentalGate.isRequired(ageBand: ageBand) ? introLine : nil }
 }

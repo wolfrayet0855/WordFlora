@@ -94,7 +94,7 @@ final class ReadAloud: NSObject, AVSpeechSynthesizerDelegate {
     private func finish() {
         pending = 0
         SoundPlayer.shared.duckAmbient(false)
-        SoundPlayer.configureSession()
+        SoundPlayer.configureSession(offMain: false)
     }
 
     nonisolated func speechSynthesizer(_ s: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {

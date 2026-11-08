@@ -191,11 +191,14 @@ private struct GrandGardenPage: View {
                 VStack(spacing: 14) {
                     GardenerCrownView().frame(maxWidth: 260).padding(.top, 18)
                         .background(Circle().fill(crownGold.opacity(0.22)).blur(radius: 30).accessibilityHidden(true))
+                    // A rounded box, not a capsule: at AX5 the words wrap to several lines and a capsule's round ends
+                    // would cut into them.
                     Label(EndgameCopy.crownEarned, systemImage: "sparkles")
                         .font(Theme.font(.subheadline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                         .padding(.horizontal, 14).padding(.vertical, 8)
-                        .background(Color.appSurface, in: Capsule())
-                        .overlay(Capsule().stroke(crownGold, lineWidth: 2))
+                        .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 22, style: .continuous))
+                        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous).stroke(crownGold, lineWidth: 2))
                     // A soft card under the words, so falling petals never pass behind the text.
                     VStack(spacing: 8) {
                         Text(EndgameCopy.everyPlantFound)

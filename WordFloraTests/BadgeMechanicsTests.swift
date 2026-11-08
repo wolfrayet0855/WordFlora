@@ -265,7 +265,7 @@ final class BadgeMechanicsTests: XCTestCase {
         for line in lines {
             XCTAssertEqual(CopySafety.check(line), [], line)
             for w in alsoAvoid { XCTAssertFalse(line.lowercased().contains(w), "\(line) has \(w)") }
-            if !line.contains(". Met on ") { XCTAssertLessThanOrEqual(line.count, 60, line) }
+            if !line.contains(". Seen on ") { XCTAssertLessThanOrEqual(line.count, 60, line) }
         }
         XCTAssertEqual(FieldNotesCopy.pages(1, of: 12), "1 page of 12")
         XCTAssertEqual(FieldNotesCopy.pages(4, of: 12), "4 pages of 12")

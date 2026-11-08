@@ -164,8 +164,7 @@ enum PotCatalog {
                                      unlock: .pack(PackCatalog.frostLanternId), hint: packHint, a11y: "Indigo pot with white snowflakes")
     static let packPots: [Pot] = [frostedGlass, lanternRed, snowflakeIndigo]
 
-    /// The pick grid and the Shed grid: 4 x 4 at every text size.
-    static let gridColumns = 4
+    // The pick grid and the Shed grid choose their columns from the text size: GridColumns (Theme/Spacing.swift).
 
     /// Empty (never chosen) and unknown ids are plain blue. Pack pots are found too, so one already on a plant keeps
     /// drawing after the pack is no longer owned.

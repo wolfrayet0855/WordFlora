@@ -19,10 +19,7 @@ struct SeasonsView: View {
                 if packs.isEmpty {
                     Text("Nothing here right now.").font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                 }
-                Button(PackCatalog.Copy.restore) { Task { await store.restore() } }
-                    .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText).tapTarget()
-                    .frame(maxWidth: .infinity)
-                    .accessibilityIdentifier("seasons.restore")
+                // No Restore here: the app's one Restore purchases is in WordFlora Settings, and it brings packs back too.
             }
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.card).padding(.bottom, Space.section)
         }
@@ -30,6 +27,7 @@ struct SeasonsView: View {
         .navigationTitle(PackCatalog.Copy.seasonsTitle)
         .navigationBarTitleDisplayMode(.inline)
         .task { await store.loadPackProducts() }
+        .onChange(of: message) { _, new in if let new { AccessibilityNotification.Announcement(new).post() } }
         .sheet(item: $gate) { challenge in
             ParentalGateSheet(challenge: challenge, onPass: { gate = nil; buy(PackCatalog.frostLantern.id) }, onCancel: { gate = nil })
         }
@@ -95,6 +93,7 @@ struct SeasonsView: View {
             switch outcome {
             case .success: message = PackCatalog.Copy.welcome
             case .pending: message = PackCatalog.Copy.pending
+            case .awaitingApproval: message = PackCatalog.Copy.awaitingApproval
             case .cancelled: message = nil
             case .failed: message = PackCatalog.Copy.failed
             }

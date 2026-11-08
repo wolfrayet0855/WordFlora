@@ -50,7 +50,7 @@ catalogue as vector PDFs. Each file's header comment gives its colours and ancho
 ### Behaviour
 - In `VisitorsBookView`, each **met** friend (in `StickerAlbum.seenAt`) gets one notebook page. Weather stickers keep
   their own pages and never count.
-- The page shows the sticker in sepia, the name, "Met on 4 Nov" and the fact. Under the page: **Listen** and
+- The page shows the sticker in sepia, the name, "Seen on 4 Nov" (the latest meeting) and the fact. Under the page: **Listen** and
   **I read it!**
 - The page is collected, and the leaf stamp lands, **only** when:
   1. `ReadAloud` reports `didFinish` for this page's fact (not `didCancel`, and not if the page changed while it was
@@ -71,7 +71,7 @@ catalogue as vector PDFs. Each file's header comment gives its colours and ancho
 | `leaf-stamp.svg` | Stamp, 120 x 120 | Drawn at 84 pt, bottom trailing corner, inset 22 pt from the side and 34 pt from the bottom, 90 % opacity. The -12 degree tilt is part of the art. The specks are a mask, so the page shows through. |
 | Sticker | The existing `<species>-sticker` art | 108 pt, centred in the window. Sepia: `.grayscale(0.25)` and `.colorMultiply(Color(hex: 0xF3E2C2))`, about CSS `sepia(.4) saturate(.85)`. The friend should still look like itself (an orange monarch), not brown. |
 
-- Text: name in `.title3` rounded bold `#5B4A32`, "Met on" in `.footnote` at 80 %, fact in `.body` rounded
+- Text: name in `.title3` rounded bold `#5B4A32`, "Seen on" in `.footnote` at 80 %, fact in `.body` rounded
   `#5B4A32` on the 28 pt rules. Use system rounded, not a handwriting font, so Dynamic Type and reading level hold
   (the preview's Chalkboard face is only for the mockup). `#5B4A32` on `#F6EBD3` has a contrast of about 7.9:1.
 - Dark mode: the page stays paper. Draw it at `.brightness(-0.06)` (92 %) so it does not glare, and keep the text
@@ -94,7 +94,7 @@ catalogue as vector PDFs. Each file's header comment gives its colours and ancho
 - Calm: as above, plus the small badge moment.
 
 ### Accessibility
-- Each page is one element: `FieldNotesCopy.pageLabel(name:met:fact:stamped:)`, for example "Monarch. Met on
+- Each page is one element: `FieldNotesCopy.pageLabel(name:met:fact:stamped:)`, for example "Monarch. Seen on
   4 Nov. Monarchs fly ... Leaf stamp."
 - Listen: label "Listen", hint "Reads the fact out loud". **Hidden while VoiceOver runs** (`ReadAloud.shouldOffer`
   is false), so I read it! is the path there.
@@ -114,7 +114,7 @@ catalogue as vector PDFs. Each file's header comment gives its colours and ancho
 | `unmetTitle` | A new friend |
 | `notebookTitle` | My field notes |
 | `blurb` | Fill your notebook with friend facts |
-| `metOn(_:)` | Met on 4 Nov |
+| `metOn(_:)` | Seen on 4 Nov |
 | `pages(_:of:)` | 1 page of 12 / 4 pages of 12 (not in Quiet Garden) |
 | `listenHint`, `readItHint` | Reads the fact out loud / Adds a leaf stamp to this page |
 | `stampLabel`, `unmetLabel`, `pageLabel(...)` | VoiceOver, see above |

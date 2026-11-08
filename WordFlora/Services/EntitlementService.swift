@@ -6,7 +6,17 @@ import StoreKit
 @Observable
 @MainActor
 final class EntitlementService {
-    enum PurchaseOutcome: Equatable { case success, pending, cancelled, failed }
+    /// `awaitingApproval`: StoreKit's `.pending` (Ask to Buy, a grown-up must approve, maybe hours later).
+    /// `pending`: the purchase went through but the entitlement had not shown up yet when we stopped waiting.
+    enum PurchaseOutcome: Equatable { case success, pending, awaitingApproval, cancelled, failed }
+
+    /// The yearly plan's introductory offer is a free trial (pay-as-you-go and pay-up-front offers are not).
+    nonisolated static func offersFreeTrial(paymentMode: Product.SubscriptionOffer.PaymentMode?) -> Bool {
+        paymentMode == .freeTrial
+    }
+
+    /// What a StoreKit purchase result means for the page (the slow-entitlement wait is `pending`, decided after).
+    nonisolated static func outcome(storeKitPending: Bool) -> PurchaseOutcome { storeKitPending ? .awaitingApproval : .pending }
 
     private(set) var state = EntitlementState()
     private(set) var products: [PlusPlan: Product] = [:]
@@ -32,7 +42,16 @@ final class EntitlementService {
 
     deinit { listener?.cancel() }
 
+    /// UI tests only (`-uitest-store-slow`): the store takes this long to answer, so the loading state can be seen.
+    private(set) var debugLoadDelay: UInt64 = 0
+    func debugSlowStore(seconds: UInt64) { debugLoadDelay = seconds }
+    /// UI tests only (`-uitest-store-fail`): the store answers with an error, for the failed state.
+    private(set) var debugFailLoad = false
+    func debugFailStore() { debugFailLoad = true }
+
     func loadProducts() async {
+        if debugLoadDelay > 0 { try? await Task.sleep(nanoseconds: debugLoadDelay * 1_000_000_000) }
+        if debugFailLoad { try? await Task.sleep(nanoseconds: 800_000_000); loadFailed = true; return }
         do {
             let found = try await Product.products(for: PlusPlan.plusProductIDs)
             var map = [PlusPlan: Product]()
@@ -40,8 +59,13 @@ final class EntitlementService {
             products = map
             lifetimeProduct = found.first { $0.id == PlusPlan.lifetimeID }
             loadFailed = map.isEmpty && lifetimeProduct == nil
-            if let yearly = map[.yearly], let sub = yearly.subscription {
+            // Trial words only when the yearly plan really has a free-trial introductory offer and this Apple ID can
+            // still take it (eligibility alone is true for anyone new to the group, offer or not).
+            if let yearly = map[.yearly], let sub = yearly.subscription,
+               Self.offersFreeTrial(paymentMode: sub.introductoryOffer?.paymentMode) {
                 trialEligible = await sub.isEligibleForIntroOffer
+            } else {
+                trialEligible = false
             }
         } catch {
             loadFailed = true
@@ -109,16 +133,21 @@ final class EntitlementService {
                 // Never report success while Plus is still off: StoreKit can take a moment to publish the entitlement.
                 for _ in 0..<10 where !isLive(choice) { try? await Task.sleep(nanoseconds: 200_000_000); await refresh() }
                 return isLive(choice) ? .success : .pending
-            case .pending: return .pending            // Ask to Buy: the listener finishes it when approved
+            case .pending: return Self.outcome(storeKitPending: true)   // Ask to Buy: the listener finishes it when approved
             case .userCancelled: return .cancelled
             @unknown default: return .failed
             }
         } catch { return .failed }
     }
 
-    func restore() async {
-        try? await AppStore.sync()
+    /// False when the App Store could not be reached (offline, cancelled sign-in, an error); what was found is read
+    /// either way.
+    @discardableResult
+    func restore() async -> Bool {
+        var reached = true
+        do { try await AppStore.sync() } catch { reached = false }
         await refresh()
+        return reached
     }
 
     // MARK: Seasonal packs (non-consumables; ownership is read from the transactions above every time)
@@ -160,7 +189,7 @@ final class EntitlementService {
                 await refresh()
                 for _ in 0..<10 where !ownsPack(id) { try? await Task.sleep(nanoseconds: 200_000_000); await refresh() }
                 return ownsPack(id) ? .success : .pending
-            case .pending: return .pending
+            case .pending: return Self.outcome(storeKitPending: true)
             case .userCancelled: return .cancelled
             @unknown default: return .failed
             }

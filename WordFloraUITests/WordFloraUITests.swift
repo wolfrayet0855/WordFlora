@@ -871,6 +871,22 @@ final class ParentalGateLinkUITests: XCTestCase {
         XCTAssertEqual(app.state, .runningForeground)
     }
 
+    /// Under 13 with a live subscription: Manage subscription in Settings > Purchases asks a grown-up first (it leaves
+    /// the app); Restore purchases opens no gate (it never charges).
+    func testUnder13ManageSubscriptionInSettingsAsksAGrownUpFirst() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-age=under13", "-uitest-plus"]
+        app.launch()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        let manage = app.buttons["settings.manageSubscription"]
+        scrollTo(manage)
+        XCTAssertTrue(manage.exists, "a live subscription shows Manage subscription")
+        expectGateThenCancel(after: manage)
+        let restore = app.buttons["settings.restore"]
+        scrollTo(restore)
+        XCTAssertTrue(restore.exists)
+    }
+
     func testUnder13SettingsLinksAskAGrownUpFirst() {
         launch(age: "under13")
         expectGateThenCancel(after: app.buttons["Privacy Policy"])
@@ -883,13 +899,15 @@ final class ParentalGateLinkUITests: XCTestCase {
         scrollTo(row)
         XCTAssertEqual(row.label, "WordFlora Plus", "no ad or price pitch on the young player's row")
         XCTAssertFalse(app.buttons["Remove ads and sync with iCloud"].exists)
-        XCTAssertTrue(app.staticTexts["For grown-ups"].exists, "the section is for grown-ups")
+        XCTAssertTrue(app.staticTexts["Purchases"].exists, "everything bought sits under Purchases")
         row.tap()
         XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].label.hasPrefix("WordFlora is complete without Plus."))
         shot("plus-grown-ups")
         expectGateThenCancel(after: app.buttons["Terms of Use"])
-        expectGateThenCancel(after: app.buttons["Manage subscription"])
+        // No subscription, so nothing to manage: the link only shows with a live subscription (the paysTwice
+        // "Cancel the subscription" button, behind the gate too, is checked with the owned states).
+        XCTAssertFalse(app.buttons["Manage subscription"].exists)
         expectGateThenCancel(after: app.buttons["plus.redeem"])
     }
 
@@ -918,8 +936,8 @@ final class ParentalGateLinkUITests: XCTestCase {
         let note = app.otherElements["familyShare.grownUps"]
         let button = app.buttons["familyShare.grownUpsButton"]
         scrollTo(button)
-        XCTAssertTrue(button.exists, "the grown-ups' note sits in the For grown-ups section")
-        XCTAssertTrue(app.staticTexts["For grown-ups"].exists)
+        XCTAssertTrue(button.exists, "the grown-ups' note sits in the Purchases section")
+        XCTAssertTrue(app.staticTexts["Purchases"].exists)
         let line = app.staticTexts.matching(NSPredicate(format: "label == %@", FamilyCopy.line)).firstMatch
         XCTAssertTrue(line.exists || note.exists, "the grown-ups' line is on screen")
         XCTAssertFalse(app.buttons["familyShare.restore"].exists, "no Restore line for a young player")
@@ -956,9 +974,9 @@ final class ParentalGateLinkUITests: XCTestCase {
         scrollTo(app.buttons["Privacy Policy"])
         XCTAssertTrue(app.buttons["Privacy Policy"].exists)
         XCTAssertTrue(app.buttons["Report an ad"].exists)
-        XCTAssertFalse(app.staticTexts["For grown-ups"].exists)
         let row = app.buttons["settings.plus"]
         scrollTo(row)
+        XCTAssertTrue(app.staticTexts["Purchases"].exists, "the same Purchases header for every age")
         XCTAssertEqual(row.label, "Remove ads and sync with iCloud", "the grown-up row is unchanged")
         row.tap()
         XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))

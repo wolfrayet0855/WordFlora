@@ -175,8 +175,9 @@ enum VisitorsCopy {
         }
     }
 
-    static func cardLabel(name: String, rarity: VisitorCatalog.Rarity, met: Int, seen: String?) -> String {
-        guard met > 0 else { return "\(notMet), \(rarity.label.lowercased())" }
+    /// An unmet card also says when the friend comes ("Comes out in the evening"), as the card shows.
+    static func cardLabel(name: String, rarity: VisitorCatalog.Rarity, met: Int, seen: String?, nightOnly: Bool = false) -> String {
+        guard met > 0 else { return "\(notMet), \(rarity.label.lowercased()). \(notMetHint(nightOnly: nightOnly))" }
         return [name, rarity.label.lowercased(), metCount(met).lowercased(), seen?.lowercased()].compactMap { $0 }.joined(separator: ", ")
     }
 
@@ -186,7 +187,7 @@ enum VisitorsCopy {
                      metCount(1), metCount(4), metSentence(1), metSentence(3), funFact, notMetDetail, done, newFriend, newFriendTitle("Monarch"),
                      saidHello(2), caughtPill("Monarch"), summaryTitle(friends: 0), summaryTitle(friends: 1), summaryTitle(friends: 4),
                      newInAlbum(1), newInAlbum(3), "Seen today", "Seen yesterday", "Seen 5 days ago",
-                     cardLabel(name: "Monarch", rarity: .uncommon, met: 3, seen: "Seen today"), cardLabel(name: "Luna Moth", rarity: .rare, met: 0, seen: nil)]
+                     cardLabel(name: "Monarch", rarity: .uncommon, met: 3, seen: "Seen today"), cardLabel(name: "Luna Moth", rarity: .rare, met: 0, seen: nil, nightOnly: true)]
         lines += [quickWings, playBlurbQuick, easierToggle, easierFootnote, flyingLabel("Monarch"), netHint, swingAction, sceneLabel]
         for r in [VisitorCatalog.Rarity.common, .uncommon, .rare] { lines += [r.label, newFriendLine(r)] }
         return lines

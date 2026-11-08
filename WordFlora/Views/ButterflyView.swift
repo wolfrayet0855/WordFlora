@@ -55,8 +55,11 @@ struct ButterflyView: View {
         .navigationBarTitleDisplayMode(.inline)
         // The bar is solid in the app's own scheme: in dark mode the system title is white, so it gets the evening sky's
         // navy behind it instead of the pale day sky (white on pale blue failed the contrast audit).
-        .toolbarBackground(colorScheme == .dark ? Color(hex: 0x1F2A4A) : Color(hex: 0xBFE6F5), for: .navigationBar)
+        // On the evening sky the bar is navy in light mode too, with the dark bar's white title (a near-black title on
+        // navy was about 2:1).
+        .toolbarBackground(colorScheme == .dark || evening ? Color(hex: 0x1F2A4A) : Color(hex: 0xBFE6F5), for: .navigationBar)
         .toolbarBackground(.visible, for: .navigationBar)
+        .toolbarColorScheme(evening ? .dark : nil, for: .navigationBar)
         .toolbar {
             if let game, game.calm, summary == nil {
                 ToolbarItem(placement: .confirmationAction) {
@@ -286,12 +289,12 @@ struct ButterflyView: View {
                         }
                     }
                     if !app.settings.quietGarden && (s.water + s.shedPoints + s.scoops) > 0 {
-                        HStack(spacing: 14) {
-                            if s.water > 0 { Label("\(s.water)", systemImage: "drop.fill").accessibilityLabel("\(s.water) water") }
-                            if s.shedPoints > 0 { Label("\(s.shedPoints)", systemImage: "star.fill").accessibilityLabel(ShedCopy.points(s.shedPoints)) }
-                            if s.scoops > 0 { Label("\(s.scoops)", systemImage: "shippingbox.fill").accessibilityLabel("\(s.scoops) soil") }
-                        }.font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
-                        .accessibilityElement(children: .contain).accessibilityIdentifier("butterfly.summary.rewards")
+                        // In words ("1 water · 6 shed points · 1 soil"), not bare icons and numbers.
+                        Text([s.water > 0 ? "\(s.water) water" : nil, s.shedPoints > 0 ? ShedCopy.points(s.shedPoints) : nil,
+                              s.scoops > 0 ? "\(s.scoops) soil" : nil].compactMap { $0 }.joined(separator: " · "))
+                            .font(Theme.font(.footnote, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                            .accessibilityIdentifier("butterfly.summary.rewards")
                     }
                     Button("Play again") { summary = nil; game = nil; start() }.buttonStyle(PrimaryButtonStyle())
                     Button(VisitorsCopy.done) { router.back() }.buttonStyle(SecondaryButtonStyle())
@@ -461,6 +464,8 @@ struct VisitorsView: View {
     @State private var detail: VisitorSpecies?
 
     /// Two cards a row, one at accessibility text sizes.
+    /// The count ring grows with its number, so "12" stays inside it at every text size.
+    @ScaledMetric(relativeTo: .title3) private var ring: CGFloat = 62
     private var albumColumns: Int { typeSize.isAccessibilitySize ? 1 : 2 }
     private var albumRows: [[VisitorSpecies]] {
         stride(from: 0, to: VisitorCatalog.all.count, by: albumColumns).map {
@@ -479,7 +484,7 @@ struct VisitorsView: View {
                 Button { router.go(.visitorsBook) } label: { Label(EndgameCopy.visitorsBook, systemImage: "book.fill") }
                     .buttonStyle(SecondaryButtonStyle())
                     .accessibilityIdentifier("visitors.book")
-                Text(VisitorsCopy.album.uppercased()).font(Theme.font(.footnote, weight: .heavy)).tracking(1.5)
+                Text(VisitorsCopy.album.uppercased()).font(Theme.font(.footnote, weight: .heavy)).tracking(1.2)
                     .foregroundStyle(Color.secondaryText).padding(.top, 4).accessibilityAddTraits(.isHeader)
                     .accessibilityLabel(VisitorsCopy.album)
                 // Twelve cards, laid out eagerly (not a lazy grid): every card stays measurable when large text pushes
@@ -510,7 +515,7 @@ struct VisitorsView: View {
                 Circle().trim(from: 0, to: CGFloat(met) / CGFloat(max(1, total)))
                     .stroke(Color.tileVisitorsIcon, style: StrokeStyle(lineWidth: 9, lineCap: .round)).rotationEffect(.degrees(-90))
             }
-            .frame(width: 62, height: 62)
+            .frame(width: ring, height: ring)
             // The number sits over the ring as its own text, so its contrast is judged against the card behind it,
             // not against the ring. The line beside it says the same, so VoiceOver skips it.
             .overlay { Text("\(met)").font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText).accessibilityHidden(true) }
@@ -543,7 +548,11 @@ struct VisitorsView: View {
     private var playCard: some View {
         Card {
             VStack(alignment: .leading, spacing: 14) {
-                HStack(alignment: .top, spacing: 14) {
+                // The monarch beside the words, above them at the accessibility sizes so the words get the card's
+                // whole width ("Hummingbird" broke beside it at AX4 and AX5).
+                let imageRow = typeSize.isAccessibilitySize
+                    ? AnyLayout(VStackLayout(alignment: .leading, spacing: 10)) : AnyLayout(HStackLayout(alignment: .top, spacing: 14))
+                imageRow {
                     Image("visitor_monarch_a").resizable().scaledToFit().frame(width: 60, height: 60).accessibilityHidden(true)
                     VStack(alignment: .leading, spacing: 4) {
                         // The Quick wings chip sits beside the title, and under it at accessibility text sizes.
@@ -565,6 +574,7 @@ struct VisitorsView: View {
                             let friend = VisitorSpawner.friendOfTheDay(seed: app.profile?.weatherSeed ?? 0, day: app.weatherToday)
                             Text(VisitorsCopy.friendOfTheDay(friend.name))
                                 .font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                                .fixedSize(horizontal: false, vertical: true)
                                 .accessibilityIdentifier("visitors.friendOfTheDay")
                         }
                     }
@@ -575,16 +585,25 @@ struct VisitorsView: View {
         }
     }
 
-    /// One layout at every size: the switch row, then its note; both use text styles and wrap.
+    /// The switch row, then its note; both use text styles and wrap. At the accessibility sizes the words take their own
+    /// line and the switch sits under them (beside a switch "butterflies" broke from AX3).
     private var easierSwitch: some View {
         @Bindable var s = app.settings
+        let label = Text(VisitorsCopy.easierToggle).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+            .fixedSize(horizontal: false, vertical: true)
         return VStack(alignment: .leading, spacing: 4) {
-            Toggle(isOn: $s.easierButterflies) {
-                Text(VisitorsCopy.easierToggle).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
-                    .fixedSize(horizontal: false, vertical: true)
+            if typeSize.isAccessibilitySize {
+                label
+                Toggle(VisitorsCopy.easierToggle, isOn: $s.easierButterflies)
+                    .labelsHidden()
+                    .accessibilityLabel(VisitorsCopy.easierToggle)
+                    .tint(Color.successText)
+                    .accessibilityIdentifier("visitors.easierButterflies")
+            } else {
+                Toggle(isOn: $s.easierButterflies) { label }
+                    .tint(Color.successText)
+                    .accessibilityIdentifier("visitors.easierButterflies")
             }
-            .tint(Color.successText)
-            .accessibilityIdentifier("visitors.easierButterflies")
             Text(VisitorsCopy.easierFootnote).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
                 .accessibilityIdentifier("visitors.easierButterfliesNote")
@@ -638,13 +657,13 @@ struct VisitorsView: View {
             .background(met ? Color.appSurface : Color.appSurface.opacity(0.5), in: shape)
             .overlay {
                 if met { shape.stroke(Color.appPrimaryText.opacity(0.08)) }
-                else { shape.strokeBorder(Color.appPrimaryText.opacity(0.3), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4])) }
+                else { shape.strokeBorder(Color.appPrimaryText.opacity(PuzzleInk.blankOutline), style: StrokeStyle(lineWidth: 1.5, dash: [5, 4])) }
             }
             .contentShape(shape)
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel(VisitorsCopy.cardLabel(name: v.name, rarity: v.rarity, met: count, seen: seen))
+        .accessibilityLabel(VisitorsCopy.cardLabel(name: v.name, rarity: v.rarity, met: count, seen: seen, nightOnly: v.nightOnly))
         .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier(met ? "visitor-\(v.id)" : "visitor-unmet-\(v.id)")
     }
@@ -678,7 +697,7 @@ struct RarityChip: View {
     var body: some View {
         Text(rarity.label).font(Theme.font(.caption, weight: .bold)).foregroundStyle(tint)
             .padding(.horizontal, 10).padding(.vertical, 3)
-            .background(tint.opacity(0.14), in: Capsule())
+            .background(tint.opacity(0.06), in: Capsule())      // a light wash keeps "Often seen" above 4.5:1
             .fixedSize(horizontal: false, vertical: true)
             .multilineTextAlignment(.center)
     }
@@ -691,6 +710,13 @@ struct VisitorDetailSheet: View {
     let visitor: VisitorSpecies
     @Environment(AppModel.self) private var app
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// The title a step smaller only at AX5 (title3 there is still larger than title at AX4, so the text never shrinks as
+    /// the size grows, which the audit reads as Dynamic Type unsupported), and the sides tighter at the accessibility
+    /// sizes, so "Hummingbird" stays whole.
+    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size >= .accessibility5 ? .title3 : .title }
+    static func sidePadding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 12 : 24 }
 
     var body: some View {
         let count = app.album.count(of: visitor.id)
@@ -698,7 +724,9 @@ struct VisitorDetailSheet: View {
         ScrollView {
             VStack(spacing: 12) {
                 VisitorSticker(id: visitor.id, met: met, size: 150)
-                Text(met ? visitor.name : VisitorsCopy.notMet).font(Theme.font(.title, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                Text(met ? visitor.name : VisitorsCopy.notMet).font(Theme.font(Self.titleStyle(typeSize), weight: .bold))
+                    .foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                     .accessibilityAddTraits(.isHeader)
                 RarityChip(rarity: visitor.rarity)
                 if met {
@@ -722,7 +750,7 @@ struct VisitorDetailSheet: View {
                 Button(VisitorsCopy.done) { dismiss() }.buttonStyle(PrimaryButtonStyle()).padding(.top, 6)
             }
             .fixedSize(horizontal: false, vertical: true)
-            .padding(.horizontal, 24).padding(.top, 28).padding(.bottom, 20)
+            .padding(.horizontal, Self.sidePadding(typeSize)).padding(.top, 28).padding(.bottom, 20)
         }
         .scrollBounceBehavior(.basedOnSize)
         .background(Color.appBackground.ignoresSafeArea())

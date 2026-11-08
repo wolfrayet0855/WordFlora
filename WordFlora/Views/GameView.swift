@@ -153,7 +153,7 @@ struct GameView: View {
         ZStack {
             Text(tutorial ? "Your first word" : daily ? "Daily Bloom" : "Level \(level ?? vm.currentLevel)")
                 .font(Theme.font(.headline, weight: .semibold))
-                .lineLimit(2).multilineTextAlignment(.center)
+                .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                 .frame(maxWidth: .infinity)
                 .padding(.horizontal, max(helpWidth, Theme.minTap) + Space.xs)
                 .accessibilitySortPriority(2)
@@ -284,8 +284,9 @@ struct GameView: View {
         dimmed(centered: true) {
             VStack(spacing: 14) {
                 Image("rose_of_jericho").resizable().scaledToFit().frame(height: 80)
-                Text("This one's resting").font(Theme.font(.title2, weight: .bold))
+                cardTitle("This one's resting")
                 Text("Your Rose of Jericho can wake it up with 4 petals.").font(Theme.font(.callout)).multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                 Button("Wake it up") { app.wakeFlower() }.buttonStyle(PrimaryButtonStyle())
                 Button("Show me the word") { vm.declineWake() }.buttonStyle(SecondaryButtonStyle())
             }
@@ -295,10 +296,13 @@ struct GameView: View {
     private var restedCard: some View {
         dimmed(centered: true) {
             VStack(spacing: 12) {
-                Text("This one's resting.").font(Theme.font(.title3, weight: .bold))
+                cardTitle("This one's resting.")
                 Text("Here's the word:").font(Theme.font(.callout))
                 WordTilesView(word: vm.currentWord, guessed: [], revealAll: true)
-                if let fact = vm.factAfterRound { Text(fact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85)) }
+                if let fact = vm.factAfterRound {
+                    Text(fact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
+                        .fixedSize(horizontal: false, vertical: true)
+                }
                 if let hint = vm.roseHint {
                     Label(hint, systemImage: "sparkles").font(Theme.font(.footnote)).multilineTextAlignment(.center).foregroundStyle(Color.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
@@ -315,14 +319,15 @@ struct GameView: View {
             VStack(spacing: 12) {
                 if vm.leveledUp { Label("Level up! New plants to find", systemImage: "sparkles").font(Theme.font(.headline)).foregroundStyle(Color.accentText) }
                 if let name = vm.earnedPlantName {
-                    Text(vm.earnedPlantIsNew ? "New plant found!" : "Your garden grew").font(Theme.font(.title2, weight: .bold))
+                    cardTitle(vm.earnedPlantIsNew ? "New plant found!" : "Your garden grew")
                     if let plant = app.plants().first(where: { $0.name == name }) {
-                        PlantCard(plant: plant).frame(maxWidth: 220)
+                        PlantCard(plant: plant, standalone: true).frame(maxWidth: PlantCard.foundWidth(dynamicTypeSize))
                         Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
+                            .fixedSize(horizontal: false, vertical: true)
                     }
                 } else {
                     // No plant this round: the word counts toward the next one.
-                    Text(PlantProgressCopy.winTitle).font(Theme.font(.title2, weight: .bold))
+                    cardTitle(PlantProgressCopy.winTitle)
                     // HOOK (progress meter): the visual words-toward-plant meter (mocked separately) goes here.
                     Text(PlantProgressCopy.winLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant))
                         .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
@@ -483,9 +488,13 @@ struct GameView: View {
     /// Dim (unless the win's own dim is already up), then the card on top so text is never covered.
     /// `padding` is the card's inner padding (the resting and break cards bring their own, under a full-bleed header);
     /// `centered` keeps a short card in the middle of the screen while a tall one still scrolls.
+    /// Around a dimmed card: 24 pt, 8 at the accessibility sizes so the words get the width.
+    static func cardMargin(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? Space.s : Space.section }
+
     private func dimmed<C: View>(dim: Bool = true, padding: CGFloat = 20, centered: Bool = false, @ViewBuilder _ content: () -> C) -> some View {
         let shape = RoundedRectangle(cornerRadius: 24, style: .continuous)
-        let card = content().padding(padding).background(Color.appBackground, in: shape).clipShape(shape).padding(Space.section)
+        let card = content().padding(padding).background(Color.appBackground, in: shape).clipShape(shape)
+            .padding(Self.cardMargin(dynamicTypeSize))
         return ZStack {
             if dim { Color.black.opacity(0.45).ignoresSafeArea() }
             if centered {

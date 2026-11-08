@@ -187,7 +187,7 @@ struct WeatherPuzzleSheet: View {
                     Text(WeatherPuzzleCopy.plantFoundTitle).font(Theme.font(.title2, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                         .accessibilityAddTraits(.isHeader).accessibilityIdentifier("weatherPuzzle.plantFound")
                     if let name = solved?.plantArrived, let plant = app.plants().first(where: { $0.name == name }) {
-                        PlantCard(plant: plant).frame(maxWidth: 220)
+                        PlantCard(plant: plant, standalone: true).frame(maxWidth: PlantCard.foundWidth(typeSize))
                         Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center)
                             .foregroundStyle(Color.appPrimaryText).fixedSize(horizontal: false, vertical: true)
                     }

@@ -4,6 +4,7 @@ import SwiftData
 struct GardenView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
+    @Environment(\.dynamicTypeSize) private var typeSize
     @Query(sort: [SortDescriptor(\PlantCollectible.level), SortDescriptor(\PlantCollectible.name)]) private var plants: [PlantCollectible]
 
     private let levelNames = ["Seedling", "Sprout", "Bloom", "Grove", "Ancient"]
@@ -19,12 +20,14 @@ struct GardenView: View {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Level \(level) · \(levelNames[level - 1])")
                                 .font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
-                            // Two columns in a Grid (not a lazy grid), so both cards in a row share the row's height.
-                            Grid(horizontalSpacing: Space.m, verticalSpacing: Space.m) {
-                                ForEach(Array(stride(from: 0, to: inLevel.count, by: 2)), id: \.self) { i in
+                            // A Grid (not a lazy grid), so the cards in a row share the row's height. Two columns,
+                            // one at the accessibility sizes so every name keeps whole words (GridColumns).
+                            let columns = GridColumns.count(.garden, for: typeSize)
+                            Grid(horizontalSpacing: GridColumns.spacing(.garden), verticalSpacing: Space.m) {
+                                ForEach(Array(GridColumns.rows(inLevel, .garden, for: typeSize).enumerated()), id: \.offset) { _, row in
                                     GridRow {
-                                        tile(inLevel[i])
-                                        if i + 1 < inLevel.count { tile(inLevel[i + 1]) } else { Color.clear.gridCellUnsizedAxes([.horizontal, .vertical]) }
+                                        ForEach(row) { tile($0) }
+                                        ForEach(0..<(columns - row.count), id: \.self) { _ in Color.clear.gridCellUnsizedAxes([.horizontal, .vertical]) }
                                     }
                                 }
                             }

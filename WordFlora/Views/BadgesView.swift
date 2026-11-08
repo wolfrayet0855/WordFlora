@@ -3,6 +3,7 @@ import SwiftUI
 struct BadgesView: View {
     @Environment(AppModel.self) private var app
     @State private var open: BadgeDef?
+    @Environment(\.dynamicTypeSize) private var typeSize
 
     private static let catalog: [BadgeDef] = (try? BadgeCatalog.load()) ?? []
     /// Lantern Keeper (Frost & Lantern) shows while its pack is live or once earned.
@@ -21,12 +22,14 @@ struct BadgesView: View {
     var body: some View {
         let all = defs
         ScrollView {
-            // Two columns in a Grid (not a lazy grid), so both cards in a row share the row's height and line up.
-            Grid(horizontalSpacing: Space.m, verticalSpacing: Space.m) {
-                ForEach(Array(stride(from: 0, to: all.count, by: 2)), id: \.self) { i in
+            // A Grid (not a lazy grid), so the cards in a row share the row's height and line up. Two columns, one at
+            // the accessibility sizes so every badge name keeps whole words (GridColumns).
+            let columns = GridColumns.count(.badges, for: typeSize)
+            Grid(horizontalSpacing: GridColumns.spacing(.badges), verticalSpacing: Space.m) {
+                ForEach(Array(GridColumns.rows(all, .badges, for: typeSize).enumerated()), id: \.offset) { _, row in
                     GridRow {
-                        card(all[i])
-                        if i + 1 < all.count { card(all[i + 1]) } else { Color.clear.gridCellUnsizedAxes([.horizontal, .vertical]) }
+                        ForEach(row, id: \.id) { card($0) }
+                        ForEach(0..<(columns - row.count), id: \.self) { _ in Color.clear.gridCellUnsizedAxes([.horizontal, .vertical]) }
                     }
                 }
             }

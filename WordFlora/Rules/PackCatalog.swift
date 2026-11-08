@@ -81,7 +81,6 @@ enum PackCatalog {
         static let seasonsRowSub = "Seasonal pots and more"
         static let ownedLine = "You have this pack. Its pots are in your Shed."
         static let buy = "Buy"
-        static let restore = "Restore purchases"
         static let notPlus = "Packs are separate from Plus."
         static let badgeLine = "The Lantern Keeper badge is earned by play: grow plants in the Frosted glass pot."
         static let keepLine = "A pack pot already on a plant stays on it."
@@ -89,12 +88,14 @@ enum PackCatalog {
         static let shelfButton = "Take a look"
         static let cardLabel = "Three winter pots on a snowy shelf, with lanterns and a robin"
         static let welcome = "Frost & Lantern is yours. Its pots are in your Shed."
-        static let pending = "Almost there. If the pots are not there in a moment, tap Restore purchases."
-        static let failed = "We couldn't confirm that purchase. If you see a charge, tap Restore purchases."
+        static let pending = "Almost there. If the pots are not there in a moment, tap Restore purchases in Settings."
+        static let failed = "We couldn't confirm that purchase. If you see a charge, tap Restore purchases in Settings."
+        /// Ask to Buy: a grown-up must approve first, maybe much later.
+        static let awaitingApproval = "Sent to a grown-up to approve. The pots arrive once it's approved."
         static var all: [String] {
-            [seasonsTitle, seasonsRowSub, ownedLine, buy, restore, notPlus, badgeLine, keepLine, shelfTitle, shelfButton,
-             cardLabel, welcome, pending, failed, frostLantern.line, frostLantern.name, PotCatalog.packHint,
-             PotCatalog.frostedGlass.hint]
+            [seasonsTitle, seasonsRowSub, ownedLine, buy, notPlus, badgeLine, keepLine, shelfTitle, shelfButton,
+             cardLabel, welcome, pending, failed, awaitingApproval, frostLantern.line,
+             frostLantern.name, PotCatalog.packHint, PotCatalog.frostedGlass.hint]
         }
     }
 }

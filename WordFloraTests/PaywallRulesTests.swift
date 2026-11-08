@@ -32,7 +32,7 @@ final class PaywallRulesTests: XCTestCase {
     // MARK: copy
     func testTrialWordingOnlyWhenEligibleAndOnlyForYearly() {
         let eligible = PaywallCopy.make(plan: .yearly, displayPrice: "$12.99", trialEligible: true)
-        XCTAssertEqual(eligible.cta, "Start 3-day free trial")
+        XCTAssertEqual(eligible.cta, "Start 3\u{2011}day free trial", "a non-breaking hyphen keeps 3-day together")
         XCTAssertTrue(eligible.finePrint.contains("then $12.99 per year"))
 
         let notEligible = PaywallCopy.make(plan: .yearly, displayPrice: "$12.99", trialEligible: false)
@@ -48,9 +48,142 @@ final class PaywallRulesTests: XCTestCase {
     func testFinePrintStatesRenewalAndHowToCancel() {
         for plan in [PlusPlan.yearly, .monthly] {
             let c = PaywallCopy.make(plan: plan, displayPrice: "$1.00", trialEligible: false)
-            XCTAssertTrue(c.finePrint.contains("renews automatically"), c.finePrint)
-            XCTAssertTrue(c.finePrint.contains("Cancel anytime in Settings"), c.finePrint)
+            XCTAssertTrue(c.finePrint.contains("Renews automatically unless cancelled at least 24 hours before the end of the period."), c.finePrint)
+            XCTAssertTrue(c.finePrint.contains("Cancel anytime in your App Store account settings."), c.finePrint)
         }
+    }
+
+    // MARK: text-fit and polish pass (docs/pm/plus-page-review.md)
+
+    /// Trial words need a free-trial introductory offer on the yearly plan; eligibility alone is not enough.
+    func testTrialNeedsAFreeTrialOffer() {
+        XCTAssertFalse(EntitlementService.offersFreeTrial(paymentMode: nil), "no offer")
+        XCTAssertFalse(EntitlementService.offersFreeTrial(paymentMode: .payAsYouGo), "a paid intro offer is not a trial")
+        XCTAssertFalse(EntitlementService.offersFreeTrial(paymentMode: .payUpFront))
+        XCTAssertTrue(EntitlementService.offersFreeTrial(paymentMode: .freeTrial))
+        // With no trial the page says nothing about free days.
+        let none = PaywallCopy.make(choice: .yearly, displayPrice: "$12.99", trialEligible: false)
+        XCTAssertFalse((none.cta + none.finePrint).lowercased().contains("free"))
+        XCTAssertFalse(none.finePrint.contains("3 days"))
+    }
+
+    /// StoreKit's pending (Ask to Buy) is its own outcome with its own words; the slow-entitlement wait keeps its line.
+    func testAskToBuyIsAwaitingApproval() {
+        XCTAssertEqual(EntitlementService.outcome(storeKitPending: true), .awaitingApproval)
+        XCTAssertEqual(EntitlementService.outcome(storeKitPending: false), .pending)
+        XCTAssertEqual(PaywallCopy.awaitingApproval, "Sent to a grown-up to approve. Plus turns on once it's approved.")
+        XCTAssertFalse(PaywallCopy.awaitingApproval.contains("Restore"), "no tapping Restore while a grown-up decides")
+        XCTAssertEqual(PaywallCopy.pendingSlow, "Almost there. If Plus is not on in a moment, tap Restore purchases in Settings.")
+        XCTAssertFalse(PackCatalog.Copy.awaitingApproval.contains("Restore"))
+        for line in PackCatalog.Copy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
+    }
+
+    func testPricesAreInWords() {
+        XCTAssertEqual(PaywallCopy.priceLine("$12.99", choice: .yearly), "$12.99 a year")
+        XCTAssertEqual(PaywallCopy.priceLine("$3.99", choice: .monthly), "$3.99 a month")
+        XCTAssertEqual(PaywallCopy.priceLine("$34.99", choice: .lifetime), "$34.99 once")
+        for choice in PlusChoice.allCases { XCTAssertFalse(PaywallCopy.priceLine("$1", choice: choice).contains("/")) }
+    }
+
+    func testRestoreAndPageLines() {
+        XCTAssertEqual(PaywallCopy.restoredOn, "Your purchases are back.", "Plus or a pack: one line for both")
+        XCTAssertEqual(PaywallCopy.restoredNone, "No purchases found for this Apple ID.")
+        // Not reaching the App Store never reads as "nothing found".
+        XCTAssertEqual(PaywallCopy.restoreLine(reached: false, found: false), "Couldn't reach the App Store. Try again.")
+        XCTAssertEqual(PaywallCopy.restoreLine(reached: true, found: false), PaywallCopy.restoredNone)
+        XCTAssertEqual(PaywallCopy.restoreLine(reached: false, found: true), PaywallCopy.restoredOn)
+        XCTAssertEqual(CopySafety.check(PaywallCopy.restoreFailed), [])
+        XCTAssertEqual(PaywallCopy.restore, "Restore purchases", "the one Restore button keeps its name")
+        for line in [PaywallCopy.loadFailed, PaywallCopy.tryAgain, PaywallCopy.loadingPrices, PaywallCopy.ownedSubscription,
+                     PaywallCopy.failed, PaywallCopy.renewal, PaywallCopy.trialCTA, PaywallCopy.ownedLifetimeDetail] {
+            XCTAssertTrue(PaywallCopy.all.contains(line), line)
+        }
+        for line in PaywallCopy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
+    }
+
+    // MARK: You have Plus (docs/pm/plus-flow-fable-review.md N3)
+
+    func testJustOnSaysWhatChanged() {
+        XCTAssertEqual(PaywallCopy.justOn(adsWereOn: true, syncNeedsRestart: true), "Plus is on. Ads are off. iCloud sync starts next time you open WordFlora.")
+        XCTAssertEqual(PaywallCopy.justOn(adsWereOn: false, syncNeedsRestart: false), "Plus is on. Your garden syncs with iCloud.")
+        XCTAssertEqual(PaywallCopy.ownedLifetimeDetail, "Paid once. No renewals.")
+    }
+
+    func testActivePlanAndPlanLine() {
+        XCTAssertEqual(EntitlementState(activeProductIDs: ["plus_yearly"]).activePlan, .yearly)
+        XCTAssertEqual(EntitlementState(activeProductIDs: ["plus_monthly"]).activePlan, .monthly)
+        XCTAssertEqual(EntitlementState(activeProductIDs: ["plus_monthly", "plus_yearly"]).activePlan, .yearly, "yearly wins")
+        XCTAssertNil(EntitlementState(activeProductIDs: ["plus_lifetime"]).activePlan)
+        XCTAssertNil(EntitlementState().activePlan)
+        let end = Date(timeIntervalSince1970: 1_826_000_000)
+        XCTAssertEqual(PaywallCopy.planLine(plan: .yearly, renews: true, endsAt: nil), "Yearly plan")
+        let renews = PaywallCopy.planLine(plan: .yearly, renews: true, endsAt: end)
+        XCTAssertTrue(renews.hasPrefix("Yearly plan · renews "), renews)
+        let ends = PaywallCopy.planLine(plan: .monthly, renews: false, endsAt: end)
+        XCTAssertTrue(ends.hasPrefix("Monthly plan · ends ") && ends.hasSuffix(". Auto-renew is off."), ends)
+    }
+
+    func testSettingsRowSaysPlusIsOnForEveryAge() {
+        XCTAssertEqual(PlusEntry.purchasesTitle, "Purchases")
+        XCTAssertEqual(CopySafety.check(PlusEntry.purchasesTitle), [])
+        for band: AgeBand? in [.under13, nil, .thirteenPlus, .eighteenPlus] {
+            XCTAssertEqual(PlusEntry.rowTitle(ageBand: band, hasPlus: true), "WordFlora Plus is on")
+        }
+        XCTAssertEqual(PaywallCopy.planShort(EntitlementState(activeProductIDs: ["plus_yearly"])), "Yearly")
+        XCTAssertEqual(PaywallCopy.planShort(EntitlementState(activeProductIDs: ["plus_monthly"])), "Monthly")
+        XCTAssertEqual(PaywallCopy.planShort(EntitlementState(activeProductIDs: ["plus_lifetime", "plus_yearly"])), "Forever", "Plus Forever wins")
+        XCTAssertNil(PaywallCopy.planShort(EntitlementState()))
+    }
+
+    // MARK: iCloud sync status (N4)
+
+    func testCloudSyncStatusTable() {
+        typealias S = CloudSyncStatus
+        XCTAssertEqual(S.status(hasPlus: false, launchedWithCloud: false, cloudOpenFailed: false, account: nil), .needsPlus)
+        XCTAssertEqual(S.status(hasPlus: false, launchedWithCloud: true, cloudOpenFailed: false, account: .available), .needsPlus)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: true, cloudOpenFailed: false, account: .available), .on)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: .noAccount), .needsSignIn)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: true, account: .available), .unavailable)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: .restricted), .unavailable)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: .couldNotDetermine), .startsNextLaunch)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: nil), .startsNextLaunch)
+        XCTAssertEqual(S.on.title, "iCloud sync is on")
+        XCTAssertEqual(S.needsPlus.title, "iCloud sync comes with Plus")
+        XCTAssertNil(S.startsNextLaunch.footnote)
+        for line in S.Copy.all {
+            XCTAssertEqual(CopySafety.check(line), [], line)
+            XCTAssertFalse(line.lowercased().contains("last"), line)
+        }
+        // Numeric times, never "last week" (CopySafety bans "last"): a few minutes, a day, a week, a month.
+        let now = Date(timeIntervalSince1970: 1_900_000_000)
+        let day: TimeInterval = 86_400
+        let agos: [TimeInterval] = [300, day, 7 * day, 9 * day, 32 * day, 400 * day]
+        for ago in agos {
+            let line = S.Copy.synced(now.addingTimeInterval(-ago), now: now)
+            XCTAssertTrue(line.hasPrefix("Synced "), line)
+            XCTAssertEqual(CopySafety.check(line), [], line)
+            XCTAssertFalse(line.lowercased().contains("last"), line)
+        }
+        XCTAssertEqual(S.Copy.synced(now.addingTimeInterval(-7 * day), now: now), "Synced 1 week ago")
+        // The account comes first: signed out after this launch opened the CloudKit store is not "on".
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: true, cloudOpenFailed: false, account: .noAccount), .needsSignIn)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: true, cloudOpenFailed: false, account: .restricted), .unavailable)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: true, cloudOpenFailed: false, account: nil), .on)
+    }
+
+    @MainActor
+    func testCloudSyncMonitorKeepsTheLatestSuccess() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "textfit.cloudsync.test"))
+        defaults.removePersistentDomain(forName: "textfit.cloudsync.test")
+        let m = CloudSyncMonitor(defaults: defaults, listen: false)
+        XCTAssertNil(m.syncedAt, "no event, no time")
+        let t = Date(timeIntervalSince1970: 1_800_000_000)
+        m.record(end: t, ok: true)
+        XCTAssertEqual(m.syncedAt, t); XCTAssertFalse(m.lastFailed)
+        m.record(end: t.addingTimeInterval(60), ok: false)
+        XCTAssertEqual(m.syncedAt, t, "a failed export does not move the time"); XCTAssertTrue(m.lastFailed)
+        XCTAssertEqual(CloudSyncMonitor(defaults: defaults, listen: false).syncedAt, t, "kept across launches")
+        defaults.removePersistentDomain(forName: "textfit.cloudsync.test")
     }
 
     func testAllPaywallCopyPassesTheCopyLinter() {
@@ -103,16 +236,14 @@ final class PaywallRulesTests: XCTestCase {
         }
     }
 
-    // MARK: Settings entry (owner ruling: young or unknown ages see "For grown-ups" and one calm line on Plus)
+    // MARK: Settings entry (owner ruling: young or unknown ages see "WordFlora Plus" and one calm line on Plus)
     func testPlusEntryIsForGrownUpsForYoungOrUnknownAgesOnly() {
         for band: AgeBand? in [.under13, nil] {
-            XCTAssertEqual(PlusEntry.sectionTitle(ageBand: band), "For grown-ups")
             XCTAssertEqual(PlusEntry.rowTitle(ageBand: band), "WordFlora Plus")
             XCTAssertEqual(PlusEntry.intro(ageBand: band),
-                           "WordFlora is complete without Plus. Plus removes ads for grown-up players and syncs the garden with iCloud. Family Sharing covers up to six people.")
+                           "WordFlora is complete without Plus. Plus removes ads for grown-up players and syncs the garden with iCloud.")
         }
         for band: AgeBand? in [.thirteenPlus, .eighteenPlus] {
-            XCTAssertEqual(PlusEntry.sectionTitle(ageBand: band), "WordFlora Plus")
             XCTAssertEqual(PlusEntry.rowTitle(ageBand: band), "Remove ads and sync with iCloud")
             XCTAssertNil(PlusEntry.intro(ageBand: band))
         }
