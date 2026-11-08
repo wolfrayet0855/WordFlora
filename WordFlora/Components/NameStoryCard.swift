@@ -51,6 +51,21 @@ struct NameStoryCard: View {
     let content: Content
     @State private var expanded = false
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// The plant's name steps down through the accessibility sizes, so the longest name ("Passionflower", serif bold)
+    /// stays whole on a 375 pt phone (TextFitLayoutTests). It stays bold, serif and first on the card.
+    static func nameStyle(_ size: DynamicTypeSize) -> Font.TextStyle {
+        switch size {
+        case .accessibility5: return .footnote
+        case .accessibility4: return .subheadline
+        case .accessibility3: return .title3
+        case .accessibility1, .accessibility2: return .title
+        default: return .largeTitle
+        }
+    }
+    /// The card's words sit inside these side paddings (the story text and the card), for the layout test.
+    static let sidePadding: CGFloat = 18
 
     init(content: Content) { self.content = content }
     init(plant: PlantInfo) { self.content = Content(plant: plant) }
@@ -106,7 +121,7 @@ struct NameStoryCard: View {
             }
             .padding(.top, 8)
         }
-        .padding(.horizontal, 18).padding(.top, 16).padding(.bottom, 10)
+        .padding(.horizontal, Self.sidePadding).padding(.top, 16).padding(.bottom, 10)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(alignment: .topTrailing) {
             Circle()
@@ -124,7 +139,7 @@ struct NameStoryCard: View {
     private var storyText: some View {
         VStack(alignment: .leading, spacing: 0) {
             Text(content.name)
-                .font(.system(.largeTitle, design: .serif, weight: .bold))
+                .font(.system(Self.nameStyle(typeSize), design: .serif, weight: .bold))
                 .foregroundStyle(Color.appPrimaryText)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 2)
@@ -134,11 +149,12 @@ struct NameStoryCard: View {
                 .padding(.top, 2).padding(.bottom, 10)
 
             if let chip = content.chip {
-                ViewThatFits(in: .horizontal) {
-                    HStack(spacing: 8) { chipViews(chip) }
-                    VStack(alignment: .leading, spacing: 6) { chipViews(chip) }
-                }
-                .padding(.bottom, 10)
+                // In a row up to Large, stacked above it (chosen from the size, not measured): the longest pair,
+                // "lion's tooth" to "Dandelion", fills the card's width from xLarge.
+                let layout = typeSize >= .xLarge
+                    ? AnyLayout(VStackLayout(alignment: .leading, spacing: 6)) : AnyLayout(HStackLayout(spacing: 8))
+                layout { chipViews(chip) }
+                    .padding(.bottom, 10)
             }
 
             VStack(alignment: .leading, spacing: 2) {

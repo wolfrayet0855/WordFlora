@@ -519,11 +519,10 @@ struct PlantDetailView: View {
 
     private var resources: some View {
         let p = app.profile
-        return ViewThatFits {
-            HStack(spacing: 10) { chips(p) }
-            VStack(spacing: 8) { chips(p) }
-        }
-        .frame(maxWidth: .infinity)
+        // In a row, stacked at the accessibility sizes (chosen from the size, not measured).
+        let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 8)) : AnyLayout(HStackLayout(spacing: 10))
+        return layout { chips(p) }
+            .frame(maxWidth: .infinity)
     }
 
     @ViewBuilder private func chips(_ p: PlayerProfile?) -> some View {
