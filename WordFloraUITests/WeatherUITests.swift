@@ -228,7 +228,10 @@ final class WeatherUITests: XCTestCase {
     }
 
     func testTheCardWithReduceMotionAndDark() {
-        launch(["-uitest-forecast=hotDay", "-uitest-reduce-motion", "-uitest-dark"])
+        // Light and dark follow the system: the device appearance sets dark.
+        XCUIDevice.shared.appearance = .dark
+        defer { XCUIDevice.shared.appearance = .light }
+        launch(["-uitest-forecast=hotDay", "-uitest-reduce-motion"])
         XCTAssertTrue(card.waitForExistence(timeout: 5))
         shot("weather-card-dark-still")
         app.buttons["weather-gotit"].tap()

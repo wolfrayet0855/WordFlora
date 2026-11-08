@@ -30,6 +30,9 @@ final class PlantCollectible {
     var lastRepotGrowthAt: Date?
     var soilBoostUntil: Date?
     var lastPrunedAt: Date?
+    /// The last Mist (Mist Maker): one mist per plant per calendar day. Optional like `lastPrunedAt`, so lightweight
+    /// migration and CloudKit both accept it (`CD_lastMistedAt`); merged by max.
+    var lastMistedAt: Date?
     var soilType: String = ""
     var nickname: String = ""
     var createdAt: Date = Date.now

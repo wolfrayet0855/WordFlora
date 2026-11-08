@@ -11,6 +11,8 @@ enum GameRoute: Hashable {
     case visitors
     case badges
     case plus
+    /// Settings > Plus > Seasons (behind the grown-up question for under 13 and unknown ages).
+    case seasons
     case visitorsBook
 }
 

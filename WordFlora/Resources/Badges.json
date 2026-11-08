@@ -290,14 +290,14 @@
   {
     "id": "mist_maker",
     "family": "tending",
-    "counter": "mists",
+    "counter": "mistSprays",
     "thresholds": [
       10,
       40,
       100
     ],
     "title": "Mist Maker",
-    "blurb": "Gather free drops with the mister"
+    "blurb": "Mist your plants' leaves"
   },
   {
     "id": "sun_seeker",
@@ -454,5 +454,17 @@
     ],
     "title": "Sharer",
     "blurb": "Share your badge cards"
+  },
+  {
+    "id": "lantern_keeper",
+    "family": "tending",
+    "counter": "lanternKeeper",
+    "thresholds": [
+      1,
+      4,
+      8
+    ],
+    "title": "Lantern Keeper",
+    "blurb": "Grow plants in the Frosted glass pot"
   }
 ]

@@ -34,27 +34,53 @@ struct EntitlementState: Equatable {
     /// Plus Forever owned (bought or family-shared, not refunded). It wins over any subscription state.
     var hasLifetime: Bool { activeProductIDs.contains(PlusPlan.lifetimeID) }
     var hasActiveSubscription: Bool { !activeProductIDs.isDisjoint(with: PlusPlan.allProductIDs) }
-    /// Someone who owns Plus Forever and still has a renewing subscription is paying twice; the page says so.
-    var paysTwice: Bool { hasLifetime && hasActiveSubscription }
+    /// Seasonal packs owned now (bought or family-shared, not refunded). Plus never includes them.
+    var ownedPacks: Set<String> { PackCatalog.owned(activeProductIDs: activeProductIDs) }
+    /// False once every live subscription has auto-renew turned off (StoreKit's renewal info). Unknown counts as on.
+    var subscriptionRenews = true
+    /// When the live subscription's current period ends (the latest one, if there are two).
+    var subscriptionEndsAt: Date?
+    /// Someone who owns Plus Forever and still has a subscription that will renew is paying twice; the page says so.
+    /// With auto-renew already off nothing more is charged, so the page only says when the subscription ends.
+    var paysTwice: Bool { hasLifetime && hasActiveSubscription && subscriptionRenews }
+    /// Plus Forever beside a subscription that will not renew: the day it ends, for one calm line (nil otherwise).
+    var subscriptionEndsBesideLifetime: Date? {
+        hasLifetime && hasActiveSubscription && !subscriptionRenews ? subscriptionEndsAt : nil
+    }
 
-    init(activeProductIDs: Set<String> = []) { self.activeProductIDs = activeProductIDs }
+    init(activeProductIDs: Set<String> = [], subscriptionRenews: Bool = true, subscriptionEndsAt: Date? = nil) {
+        self.activeProductIDs = activeProductIDs
+        self.subscriptionRenews = subscriptionRenews
+        self.subscriptionEndsAt = subscriptionEndsAt
+    }
 
     /// One transaction as the entitlement rules see it (StoreKit's `Transaction`, reduced to what matters).
     struct Entry: Equatable {
         var productID: String
         var revoked = false
         var expiresAt: Date?
+        /// A subscription's renewal info `willAutoRenew`; nil when unknown (and for non-consumables).
+        var willAutoRenew: Bool? = nil
     }
 
     /// Plus from the player's current transactions: refunded or revoked ones never count, an expired subscription
     /// does not count, and Plus Forever never expires.
     init(entries: [Entry], now: Date) {
         var ids = Set<String>()
+        var renews = false, anySub = false
+        var ends: Date?
         for e in entries where !e.revoked {
             if e.productID != PlusPlan.lifetimeID, let end = e.expiresAt, end <= now { continue }
             ids.insert(e.productID)
+            if PlusPlan.allProductIDs.contains(e.productID) {
+                anySub = true
+                if e.willAutoRenew != false { renews = true }
+                if let end = e.expiresAt { ends = max(ends ?? end, end) }
+            }
         }
         self.activeProductIDs = ids
+        self.subscriptionRenews = anySub ? renews : true
+        self.subscriptionEndsAt = ends
     }
 }
 
@@ -103,13 +129,18 @@ enum PaywallCopy {
     static let ownedLifetime = "You have Plus Forever"
     static let ownedLifetimeDetail = "Ads are off and your garden can sync across your devices, with no renewals. Thank you for supporting WordFlora."
     static let paysTwice = "You still have a subscription. Cancel it so you aren't charged twice."
+    /// Plus Forever beside a subscription whose auto-renew is already off: nothing more to do, just the end date.
+    static func subscriptionEnds(on date: String) -> String {
+        "Your subscription ends on \(date) and will not renew. Plus Forever keeps going after that."
+    }
     static let cancelSubscription = "Cancel the subscription"
     static let welcomeLifetime = "Welcome to Plus Forever!"
 
     /// Every Plus page line added for Plus Forever and codes, for the copy checks.
     static var all: [String] {
         [lifetimeLine, lifetime(displayPrice: "$34.99").finePrint, lifetime(displayPrice: "").cta, redeem,
-         ownedLifetime, ownedLifetimeDetail, paysTwice, cancelSubscription, welcomeLifetime]
+         ownedLifetime, ownedLifetimeDetail, paysTwice, subscriptionEnds(on: "December 1, 2026"), cancelSubscription,
+         welcomeLifetime]
     }
 }
 

@@ -5,8 +5,48 @@ import Foundation
 /// only ever grows, so a restored older backup or a moved goal never takes a pot away.
 extension AppModel {
     var potStats: PotCatalog.Stats {
-        PotCatalog.stats(plants: plants().map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) },
-                         gardenDays: profile?.gardenDays ?? 0, earnedPotIds: profile?.earnedPotIds ?? [])
+        var s = PotCatalog.stats(plants: plants().map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) },
+                                 gardenDays: profile?.gardenDays ?? 0, earnedPotIds: profile?.earnedPotIds ?? [])
+        s.ownedPacks = entitlements.state.ownedPacks
+        s.seasonHalfDays = PackCatalog.seasonHalfDays(featuredDays: badges.marks(of: .seasonBlooms, itemPrefix: "in."),
+                                                      otherDays: badges.marks(of: .seasonBlooms, itemPrefix: "out."))
+        return s
+    }
+
+    // MARK: Seasonal packs (PackCatalog)
+
+    /// The pack pots to show in the pick grid and the Shed: every pot of a live pack (offered or owned), plus a pack
+    /// pot already on this plant (it stays, even with the pack gone from the store). Empty while the store has no pack.
+    func visiblePackPots(currentId: String? = nil) -> [Pot] {
+        PotCatalog.packPots.filter { pot in
+            if pot.id == currentId { return true }
+            guard let pack = PackCatalog.pack(ofPot: pot.id) else { return false }
+            return entitlements.packIsLive(pack.id)
+        }
+    }
+
+    /// A pack's badge shows on the Badges page while the pack is live or once a tier is earned.
+    func showsPackBadge(_ badgeId: String) -> Bool {
+        guard let pack = PackCatalog.all.first(where: { $0.badgeId == badgeId }) else { return true }
+        return entitlements.packIsLive(pack.id) || badges.tier(of: badgeId) > 0
+    }
+
+    /// A Daily Bloom done: one mark toward the season's earned pot while its pack is live (a whole day in season,
+    /// half a day otherwise). Quiet Garden counts nothing, like every badge counter.
+    func recordSeasonBloom(into state: inout BadgeState, on date: Date, quiet: Bool) -> [BadgeUnlock] {
+        var unlocks = [BadgeUnlock]()
+        for pack in PackCatalog.all where pack.earnedPotId != nil && entitlements.packIsLive(pack.id) {
+            let item = PackCatalog.bloomMarkItem(day: BadgeFacts.dayNumber(date, calendar: .current),
+                                                 featured: PackCatalog.isFeatured(pack, on: date))
+            unlocks += state.recordMark(.seasonBlooms, item: item, now: date, quiet: quiet)
+        }
+        return unlocks
+    }
+
+    /// Lantern Keeper: a plant in the Frosted glass pot reached a new stage (each plant and stage once).
+    static func recordLanternKeeperGrowth(_ plant: PlantCollectible, into state: inout BadgeState, on date: Date, quiet: Bool) -> [BadgeUnlock] {
+        guard plant.potId == PotCatalog.frostedGlass.id else { return [] }
+        return state.recordMark(.lanternKeeper, item: "grow.\(plant.plantId).\(plant.stage)", now: date, quiet: quiet)
     }
 
     var hasPlusForPots: Bool { entitlements.state.hasPlus }

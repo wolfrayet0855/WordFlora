@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var importing = false
     @State private var backupMessage: (text: String, ok: Bool)?
     @State private var showGuide = false
+    @State private var seasonsGate: ParentalGate.Challenge?
 
     var body: some View {
         @Bindable var s = app.settings
@@ -67,17 +68,23 @@ struct SettingsView: View {
                 Text("At most one a day, never at night, and they stop on their own if you take a break.").font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 if reminderDenied { Text("Notifications are off for WordFlora. You can allow them in your device settings.").font(.footnote).foregroundStyle(Color.appDanger) }
             }
-            Section("Appearance") {
-                Picker("Theme", selection: $s.appearance) {
-                    Text("System").tag(AppSettings.Appearance.system)
-                    Text("Light").tag(AppSettings.Appearance.light)
-                    Text("Dark").tag(AppSettings.Appearance.dark)
-                }.pickerStyle(.segmented)
+            // Light and dark follow the system (owner ruling 2026-11-07): no theme picker.
+            Section("Garden") {
                 Toggle("Show everything", isOn: $s.showEverything)
             }
             Section(PlusEntry.sectionTitle(ageBand: s.ageBand)) {
                 Button { router.go(.plus) } label: { Label(PlusEntry.rowTitle(ageBand: s.ageBand), systemImage: "sparkles") }
                     .accessibilityIdentifier("settings.plus")
+                // Seasons: only while a pack is live (offered or owned); behind the grown-up question for under 13.
+                if PackCatalog.all.contains(where: { app.entitlements.packIsLive($0.id) }) {
+                    Button { openSeasons() } label: {
+                        Label { Text(PackCatalog.Copy.seasonsTitle) } icon: {
+                            Image("seasons-row-glyph").renderingMode(.template).resizable().scaledToFit()
+                                .frame(width: 22, height: 22)
+                        }
+                    }
+                    .accessibilityIdentifier("settings.seasons")
+                }
                 FamilyShareNudgeRow()
                 if app.entitlements.state.hasCloudSync {
                     Label(app.syncNeedsRestart ? "iCloud sync starts the next time you open WordFlora" : "iCloud sync is on", systemImage: "icloud.fill")
@@ -115,10 +122,18 @@ struct SettingsView: View {
         .fullScreenCover(isPresented: $showGuide) {
             GuideView(mode: .replay) { showGuide = false }
                 .environment(app)
-                .preferredColorScheme(app.settings.colorScheme)
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
+        .sheet(item: $seasonsGate) { challenge in
+            ParentalGateSheet(challenge: challenge, onPass: { seasonsGate = nil; router.go(.seasons) }, onCancel: { seasonsGate = nil })
+        }
+    }
+
+    private func openSeasons() {
+        if ParentalGate.isRequired(ageBand: app.settings.ageBand) {
+            seasonsGate = ParentalGate.challenge(seed: UInt64(Date().timeIntervalSince1970))
+        } else { router.go(.seasons) }
     }
 
     private func prepareBackup() {

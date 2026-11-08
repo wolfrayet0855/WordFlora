@@ -8,13 +8,13 @@ SwiftData's CloudKit mirroring stores a model `X` as record type `CD_X` and a pr
 
 | Swift property | Swift type | CloudKit field | CloudKit type | Default |
 |---|---|---|---|---|
+| `lastMistedAt` | `Date?` | `CD_lastMistedAt` | Date/Time | nil (added in gate G3, Mist Maker; the only new field of the release plan) |
 | `potId` | `String` | `CD_potId` | String | `""` |
 | `potChosenAt` | `Date` | `CD_potChosenAt` | Date/Time | `distantPast` |
 | `goldenDays` | `Int` | `CD_goldenDays` | Int(64) | `0` |
 | `goldenDayKey` | `Int` | `CD_goldenDayKey` | Int(64) | `0` |
 | `lifeSeenKey` | `String` | `CD_lifeSeenKey` | String | `""` |
 | `lifeSeenAt` | `Date` | `CD_lifeSeenAt` | Date/Time | `distantPast` |
-| `lastMistedAt` | `Date?` | `CD_lastMistedAt` | Date/Time | nil (optional, like `lastPrunedAt`) |
 
 ## Record type `CD_PlayerProfile` (19 new fields)
 
@@ -46,9 +46,11 @@ Release candidate 2 (2026-11-06): the merged grown-ups row, hello reply, friend 
 
 `lastMistedAt` (Mist Maker, G3, commit 35a19a3) is the newest field and the last one the plan adds; G4 and G5 add no stored fields. It records the last Mist of a plant (one mist per plant per calendar day) and `DataReconciler` merges it by max. It is optional, so older records and older builds read it as nil.
 
+Gate G3 (2026-11-07): `PlantCollectible.lastMistedAt` (Mist Maker) is the one new stored field. It copies `lastPrunedAt`: optional, merged by max in `DataReconciler`, an optional in `GardenBackup` so older backups read. The Frost & Lantern pack adds no field: ownership is read from StoreKit every time, the season pot's Daily Bloom marks and Lantern Keeper live in `badgesJSON`, and the Family Sharing note's last day and the Mist tip are device settings (UserDefaults).
+
 ## How to deploy (owner)
 
-1. Run a debug build with iCloud sync on, signed into iCloud, on the new build. Open the garden, play a round, open a plant page and the Shed, so a `PlayerProfile` and a `PlantCollectible` record are saved. This makes CloudKit add the fields above to the **Development** schema (see `owner-setup-steps.md`, B8).
+1. Run a debug build with iCloud sync on, signed into iCloud, on the new build. Open the garden, play a round, open a plant page, Mist a plant (needs the mister in the Shed) and open the Shed, so a `PlayerProfile` and a `PlantCollectible` record are saved. This makes CloudKit add the fields above to the **Development** schema (see `owner-setup-steps.md`, B8).
 2. In the CloudKit Console (container `iCloud.beta.WordFlora`), Development > Schema > Record Types: check that `CD_PlantCollectible` and `CD_PlayerProfile` list every field above.
 3. Deploy Schema Changes to **Production** before the build that carries these fields reaches TestFlight or the App Store. A production app cannot add fields itself; without the deploy, saves of these records fail on Production.
 

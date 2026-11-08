@@ -28,6 +28,21 @@
       "productID" : "plus_lifetime",
       "referenceName" : "Plus Lifetime",
       "type" : "NonConsumable"
+    },
+    {
+      "displayPrice" : "2.99",
+      "familyShareable" : true,
+      "internalID" : "6745000004",
+      "localizations" : [
+        {
+          "description" : "Three winter pots and a badge. Pay once, no renewals.",
+          "displayName" : "Frost & Lantern",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "pack_frost_lantern",
+      "referenceName" : "Frost & Lantern Pack",
+      "type" : "NonConsumable"
     }
   ],
   "settings" : {

@@ -201,6 +201,24 @@ final class ReconcileTests: XCTestCase {
         XCTAssertEqual(run(oldFirst: false), Date(timeIntervalSince1970: 100))
     }
 
+    /// Mist Maker's `lastMistedAt` merges like `lastPrunedAt`: the later mist wins both ways; nil never clears one.
+    func testLastMistedAtMergesToTheLaterMist() {
+        func fern(_ t: Double?) -> PlantCollectible {
+            let p = PlantCollectible(name: "Fern", botanicalName: "f", botanicalFact: "f", level: 1, imageName: "plant_fern", plantId: "fern")
+            p.lastMistedAt = t.map { Date(timeIntervalSince1970: $0) }
+            return p
+        }
+        XCTAssertNil(fern(nil).lastMistedAt, "a plant that was never misted")
+        var k = fern(100); DataReconciler.merge(fern(200), into: k)
+        XCTAssertEqual(k.lastMistedAt, Date(timeIntervalSince1970: 200))
+        k = fern(200); DataReconciler.merge(fern(100), into: k)
+        XCTAssertEqual(k.lastMistedAt, Date(timeIntervalSince1970: 200))
+        k = fern(150); DataReconciler.merge(fern(nil), into: k)
+        XCTAssertEqual(k.lastMistedAt, Date(timeIntervalSince1970: 150))
+        k = fern(nil); DataReconciler.merge(fern(150), into: k)
+        XCTAssertEqual(k.lastMistedAt, Date(timeIntervalSince1970: 150))
+    }
+
     func testLifeSeenKeyMergeTakesTheLaterVisit() {
         func rose(_ key: String, at t: Double?) -> PlantCollectible {
             let p = PlantCollectible(name: "Rose", botanicalName: "r", botanicalFact: "f", level: 1, imageName: "plant_rose", plantId: "rose")

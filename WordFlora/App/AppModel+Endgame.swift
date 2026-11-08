@@ -38,12 +38,12 @@ extension AppModel {
 
     // MARK: Golden blooms (G-4)
 
-    /// Tending (water, feed, sun or prune; not a hello or a repot) a full-bloom plant once every plant is found adds one
+    /// Tending (water, feed, sun, prune or mist; not a hello or a repot) a full-bloom plant once every plant is found adds one
     /// golden day, at most one a day. Returns true when this tend made the plant golden.
     func recordGoldenDay(_ plant: PlantCollectible, tending action: TendAction, at date: Date) -> Bool {
         let tending: Bool
         switch action {
-        case .water, .feed, .sun, .prune: tending = true
+        case .water, .feed, .sun, .prune, .mist: tending = true
         case .repot: tending = false
         }
         guard EndgamePolicy.countsTowardGolden(allFound: allPlantsFoundNow, stage: plant.stage, isTending: tending) else { return false }

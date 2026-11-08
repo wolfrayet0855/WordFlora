@@ -156,7 +156,10 @@ final class AppModel {
         set { profile?.toolsJSON = newValue.json; try? context.save() }
     }
 
-    enum TendAction: Equatable { case water, feed, sun, prune, repot(SoilType) }
+    enum TendAction: Equatable { case water, feed, sun, prune, mist, repot(SoilType) }
+
+    /// The Mist button shows once the mister is in the Shed, with Show everything, or in Quiet Garden (no tool needed).
+    var showsMist: Bool { inventory.tier(of: .mister) > 0 || settings.showEverything || settings.quietGarden }
 
     struct TendOutcome: Equatable {
         var applied: Bool
@@ -168,13 +171,8 @@ final class AppModel {
 
     func refreshFreeDrops() {
         guard let p = profile else { return }
-        let inv = inventory, before = p.water
-        ToolEngine.applyTrickle(p, inventory: inv, now: now(), economy: .default)   // the mister speeds the drops
-        // Mist Maker: the free drops that come while the mister is in the Shed.
-        if inv.tier(of: .mister) > 0, p.water > before {
-            enqueueBadgeMoments(badges.record(.mists, amount: p.water - before, now: now(), quiet: settings.quietGarden))
-            p.badgesJSON = badges.json
-        }
+        ToolEngine.applyTrickle(p, inventory: inventory, now: now(), economy: .default)   // the mister speeds the drops
+        // Mist Maker counts real mists now (`.mistSprays` in `tend`); the old `mists` drop count stays in the JSON only.
         try? context.save()
     }
 
@@ -257,6 +255,7 @@ final class AppModel {
         case .feed: result = ToolEngine.addSoil(plant, profile: p, inventory: inv, now: date, calendar: cal, economy: eco, quiet: quiet)
         case .sun: result = ToolEngine.sunWithLamp(plant, profile: p, inventory: lampOrBasic(inv), now: date, calendar: cal, economy: eco, quiet: quiet)
         case .prune: result = ToolEngine.prune(plant, inventory: inv, now: date, calendar: cal, economy: eco, quiet: quiet)
+        case .mist: result = ToolEngine.mist(plant, inventory: inv, traits: traits(of: plant), now: date, calendar: cal, economy: eco, quiet: quiet)
         case .repot(let soil):
             let r = ToolEngine.repot(plant, to: soil, profile: p, now: date, calendar: cal, economy: eco, quiet: quiet)
             result = r.applied ? TendResult(applied: true, gpGained: r.tend.gpGained, stageUp: r.tend.stageUp) : .blocked(.noSoil)
@@ -267,12 +266,15 @@ final class AppModel {
 
         plant.lastLovedAt = date
         let turnedGolden = recordGoldenDay(plant, tending: action, at: date)
-        let counter: BadgeCounter = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return .suns } }()
+        let counter: BadgeCounter = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return .suns; case .mist: return .mistSprays } }()
         var unlocks = badges.record(counter, now: date, quiet: quiet)
         if repotOutcome == .happy { unlocks += badges.recordMark(.soilMatches, item: plant.plantId, now: date, quiet: quiet) }   // each plant once
         if tidy { unlocks += badges.record(.tidyTrims, now: date, quiet: quiet) }       // Pruning Pro: a trim at the right time
         unlocks += badges.recordDay(.tendDays, day: BadgeFacts.dayNumber(date, calendar: cal), now: date, quiet: quiet)
-        if result.stageUp { unlocks += recordCollectionFacts(now: date, quiet: quiet) }     // in flower, full bloom
+        if result.stageUp {
+            unlocks += recordCollectionFacts(now: date, quiet: quiet)     // in flower, full bloom
+            unlocks += Self.recordLanternKeeperGrowth(plant, into: &badges, on: date, quiet: quiet)
+        }
         // The tidy trim's line stays up on its own first (at least 1.2 s) before a badge moment.
         enqueueBadgeMoments(unlocks, after: tidy ? 1.6 : 1.0); p.badgesJSON = badges.json
         try? context.save()
@@ -281,7 +283,12 @@ final class AppModel {
         let name = plant.nickname.isEmpty ? plant.name : plant.nickname
         if turnedGolden { return TendOutcome(applied: true, message: EndgameCopy.goldenLine(name: name), tidy: tidy) }
         let day = Int(date.timeIntervalSince1970 / 86_400) &+ plant.earnedCount
-        let event: PlantVoice.Event = { switch action { case .water: return .water; case .feed, .repot: return .soil; case .sun: return .sun; case .prune: return .prune } }()
+        let event: PlantVoice.Event = { switch action { case .water, .mist: return .water; case .feed, .repot: return .soil; case .sun: return .sun; case .prune: return .prune } }()
+        if case .mist = action, !result.stageUp {
+            // Mist Maker's own lines: "Fern loves misty air!" for the +2 plants, else "Daisy has fresh, misty leaves."
+            let line = ToolEngine.mistGrowth(traits: traits(of: plant)) > 1 ? MistMakerCopy.loves(name: name) : MistMakerCopy.misted(name: name)
+            return TendOutcome(applied: true, message: line)
+        }
         if result.stageUp { return TendOutcome(applied: true, stageUp: true, message: "\(name) grew a little! " + PlantVoice.line(plantId: plant.plantId, event: .grew, daySeed: day), tidy: tidy) }
         if tidy {
             let line = PruningProCopy.tidy + " " + PruningProCopy.fact
@@ -346,6 +353,12 @@ final class AppModel {
                 return ActionState(status: .done, label: "Prune", line: Self.message(for: .cooldown, action: action, name: name))
             }
             return ActionState(status: .ready, label: "Prune", line: nil)
+        case .mist:
+            if !quiet && inventory.tier(of: .mister) == 0 { return ActionState(status: .needsSupply, label: MistMakerCopy.button, line: MistMakerCopy.needMister) }
+            if let last = plant.lastMistedAt, cal.isDate(last, inSameDayAs: date) {
+                return ActionState(status: .done, label: MistMakerCopy.doneLabel, line: MistMakerCopy.done(name: name))
+            }
+            return ActionState(status: .ready, label: MistMakerCopy.button, line: nil)
         case .repot:
             if !quiet && (p?.soil ?? 0) == 0 { return ActionState(status: .needsSupply, label: "Repot", line: Self.message(for: .noSoil, action: action, name: name)) }
             return ActionState(status: .ready, label: "Repot", line: nil)
@@ -369,8 +382,9 @@ final class AppModel {
             case .sun: return TendCopy.done(.sun, name: name)
             case .feed, .repot: return TendCopy.done(.feed, name: name)
             case .prune: return TendCopy.trimmed(name: name)
+            case .mist: return MistMakerCopy.done(name: name)
             }
-        case .notOwned: return TendCopy.needShears
+        case .notOwned: return action == .mist ? MistMakerCopy.needMister : TendCopy.needShears
         case .cooldown: return TendCopy.trimmed(name: name)
         case nil: return "Not right now."
         }
@@ -606,7 +620,10 @@ final class AppModel {
             let levelsDone = (1...5).filter { lvl in let inLvl = all.filter { $0.level == lvl }; return inLvl.count == 10 && inLvl.allSatisfy { $0.earnedCount > 0 } }.count
             unlocks += badges.record(.levelSets, value: levelsDone, now: t, quiet: quiet)
             if game.missesThisRound == 0 { unlocks += badges.record(.perfectBlooms, now: t, quiet: quiet) }
-            if game.isDaily { unlocks += badges.record(.dailyBloomsDone, now: t, quiet: quiet) }
+            if game.isDaily {
+                unlocks += badges.record(.dailyBloomsDone, now: t, quiet: quiet)
+                unlocks += recordSeasonBloom(into: &badges, on: t, quiet: quiet)    // the season's earned pot
+            }
             recordQuest(.wordFound(letters: game.currentWord.filter(\.isLetter).count))
             unlocks += badges.record(.wordsSolved, now: t, quiet: quiet)
             if BadgeFacts.isSteady(misses: game.missesThisRound) { unlocks += badges.record(.steadySolves, now: t, quiet: quiet) }

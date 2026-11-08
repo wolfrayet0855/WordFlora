@@ -482,7 +482,7 @@ final class WordFloraUITests: XCTestCase {
         }
         func open(_ word: String, probes: Bool = false) {
             app.terminate()
-            app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-word=\(word)"] + (dark ? ["-uitest-dark"] : [])
+            app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-word=\(word)"]
                 + (probes ? ["-uitest-key-probes"] : []) + (size.map { ["-UIPreferredContentSizeCategoryName", $0] } ?? [])
             app.launch()
             app.buttons["Play"].tap()
@@ -634,9 +634,9 @@ final class FidelityScreensUITests: XCTestCase {
         let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
     }
 
-    /// light, dark (device and app switch, as the device switch does not always reach a fresh app), largest text size.
+    /// light, dark (the device appearance; the app follows the system), largest text size.
     private static let looks: [(String, XCUIDevice.Appearance, [String])] = [
-        ("light", .light, []), ("dark", .dark, ["-uitest-dark"]),
+        ("light", .light, []), ("dark", .dark, []),
         ("ax5", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]),
     ]
 
@@ -911,6 +911,46 @@ final class ParentalGateLinkUITests: XCTestCase {
         expectGateThenCancel(after: app.buttons["Redeem a code"])
     }
 
+    /// Under 13: the Family Sharing note is for the grown-up, inside "For grown-ups" in Settings only; its button asks
+    /// the grown-up question first; shown two days ago, it stays away (once a week at most); never on the Plus page.
+    func testUnder13FamilyNoteIsForGrownUpsBehindTheGate() {
+        launch(age: "under13")
+        let note = app.otherElements["familyShare.grownUps"]
+        let button = app.buttons["familyShare.grownUpsButton"]
+        scrollTo(button)
+        XCTAssertTrue(button.exists, "the grown-ups' note sits in the For grown-ups section")
+        XCTAssertTrue(app.staticTexts["For grown-ups"].exists)
+        let line = app.staticTexts.matching(NSPredicate(format: "label == %@", FamilyCopy.line)).firstMatch
+        XCTAssertTrue(line.exists || note.exists, "the grown-ups' line is on screen")
+        XCTAssertFalse(app.buttons["familyShare.restore"].exists, "no Restore line for a young player")
+        shot("settings-family-grownups")
+        expectGateThenCancel(after: button)
+        // Through the gate, the Plus page opens; it carries no second note.
+        scrollTo(button); button.tap()
+        let answer = app.textFields["parentalGate.answer"]
+        XCTAssertTrue(answer.waitForExistence(timeout: 3))
+        let q = app.staticTexts.matching(NSPredicate(format: "label BEGINSWITH 'What is '")).firstMatch.label
+        let nums = q.components(separatedBy: CharacterSet.decimalDigits.inverted).compactMap(Int.init)
+        answer.tap(); answer.typeText("\(nums[0] * nums[1])")
+        app.buttons["Continue"].tap()
+        XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.buttons["familyShare.grownUpsButton"].exists)
+        XCTAssertFalse(app.buttons["familyShare.restore"].exists)
+
+        app.terminate()
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-age=under13", "-uitest-family-note-seen"]
+        app.launch()
+        app.buttons["Settings"].tap()
+        XCTAssertTrue(app.navigationBars["Settings"].waitForExistence(timeout: 5))
+        scrollTo(app.buttons["settings.plus"])
+        for _ in 0..<3 { app.swipeUp() }
+        XCTAssertFalse(app.buttons["familyShare.grownUpsButton"].exists, "shown two days ago: not again this week")
+    }
+
+    private enum FamilyCopy {
+        static let line = "Plus covers the whole family. Grown-ups: turn on Family Sharing in Apple Family settings and everyone in your family gets Plus, ads off, garden synced."
+    }
+
     func testAdultsSeeTheSameLinksWithNoGateOnScreen() {
         launch(age: "eighteenPlus")
         scrollTo(app.buttons["Privacy Policy"])
@@ -1069,5 +1109,18 @@ final class PlusForeverUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Cancel the subscription"].exists)
         shot("plus-pays-twice")
         audit("plus-pays-twice")
+    }
+
+    /// Auto-renew already off: no "charged twice" note and no cancel button, just when the subscription ends.
+    func testOwnersWhoseSubscriptionWillNotRenewSeeOnlyTheEndDate() {
+        openPlus(["-uitest-plus-ending"])
+        XCTAssertTrue(app.staticTexts["You have Plus Forever"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["plus.paysTwice"].exists)
+        XCTAssertFalse(app.buttons["Cancel the subscription"].exists)
+        let line = app.staticTexts["plus.subscriptionEnds"]
+        XCTAssertTrue(line.exists)
+        XCTAssertTrue(line.label.hasPrefix("Your subscription ends on "), line.label)
+        shot("plus-subscription-ends")
+        audit("plus-subscription-ends")
     }
 }

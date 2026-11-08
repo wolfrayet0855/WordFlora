@@ -295,7 +295,7 @@ final class EndgameUITests: XCTestCase {
 
     func testTheGrandGardenAtAnAccessibilitySizeInDark() {
         XCUIDevice.shared.appearance = .dark
-        launch(["-uitest-crown", "-uitest-dark", "-uitest-reduce-motion"], size: Self.axSize)
+        launch(["-uitest-crown", "-uitest-reduce-motion"], size: Self.axSize)
         XCTAssertTrue(element("grandGarden.title").waitForExistence(timeout: 8))
         sleep(2)                                // the full-screen cover has finished sliding in
         audit("grand-garden-ax-dark")
@@ -392,7 +392,7 @@ final class EndgameUITests: XCTestCase {
 
     func testTheLevelMapGarlandIsStillWithReduceMotionInDark() {
         XCUIDevice.shared.appearance = .dark
-        launch(["-uitest-golden", "-uitest-reduce-motion", "-uitest-dark"])
+        launch(["-uitest-golden", "-uitest-reduce-motion"])
         let levels = app.buttons["tile-Levels"]
         XCTAssertTrue(levels.waitForExistence(timeout: 8))
         levels.tap()

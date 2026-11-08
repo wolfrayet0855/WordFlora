@@ -102,7 +102,7 @@ final class TendAnimationTests: XCTestCase {
         XCTAssertFalse(f.lit); XCTAssertEqual(f.badge, .check)
         XCTAssertEqual(f.title, "Fed today"); XCTAssertEqual(f.caption, "More tomorrow")
         XCTAssertEqual(f.hint, "Pip is well fed today. More soil tomorrow.")
-        XCTAssertEqual(TendButtonLook(kind: .prune, state: state(.done, "Prune", "x")).title, "Trimmed")
+        XCTAssertEqual(TendButtonLook(kind: .prune, state: state(.done, "Prune", "x")).title, "Trim")
     }
 
     func testNeedsASupplyShowsTheReasonAndTheTapSaysTheNextStep() {

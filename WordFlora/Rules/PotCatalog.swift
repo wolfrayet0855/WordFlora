@@ -12,12 +12,20 @@ struct Pot: Equatable, Hashable, Identifiable {
         /// Garden Days (different days played, any days) at least this many. Garden Days never go down.
         case gardenDays(Int)
         case plus
+        /// Part of a seasonal pack (`PackCatalog`), owned while StoreKit says the pack is owned. Like `.plus`, never
+        /// earned by play, never recorded, and a pack pot already on a plant stays on it.
+        case pack(String)
+        /// A season pot earned by play: the Daily Bloom on this many days while its season is featured (out of season
+        /// a Daily Bloom day counts half). Counted by marks in `badgesJSON` (`.seasonBlooms`), so it never goes down.
+        case seasonBlooms(Int)
     }
 
     struct Decoration: Equatable, Hashable {
         enum Kind: String, CaseIterable, Hashable {
             case none, rings, drip, flower, stars, hearts, dots, stripes, moon, flowerBand
             case blossoms, pebbles, zigzag, vine, bark, drops
+            // Frost & Lantern (docs/pm/frost-lantern-art.md, design-preview/frost-lantern/pot-marks.swift.txt).
+            case frost, lanterns, snowflakes
         }
         var kind: Kind
         var colors: [UInt32]
@@ -46,6 +54,8 @@ enum PotState: Equatable {
     case owned
     case toEarn(hint: String)
     case plus(hint: String)
+    /// A seasonal pack pot that is not owned: a soft outline and where a grown-up finds it. No price, no lock.
+    case pack(hint: String)
 }
 
 /// One mark of a pot's pattern in the shared 120 x 100 pot box (the same box as `TendScene.drawPot`).
@@ -136,11 +146,33 @@ enum PotCatalog {
             hint: plusHint, a11y: "Cream pot with a band of grass and tiny flowers"),
     ]
 
+    /// Mirrors `plusHint` for a pack pot: where a grown-up finds it, never a price.
+    static let packHint = "A grown-up can find this in Settings."
+
+    /// The Frost & Lantern pots (docs/pm/frost-lantern-art.md, fixed hex values): Frosted glass is earned by play, the
+    /// other two come with the pack. Kept apart from `all`, so the sixteen-pot ladder, its 4 x 4 grid and the earned
+    /// record never change; they show in their own row only while the pack is live (`PackCatalog`).
+    static let frostedGlass = Pot(id: "frostedGlass", name: "Frosted glass", body: 0xB7D6E6, rim: 0x548BAC, shade: 0x93BCD2,
+                                  decoration: .init(kind: .frost, colors: [0xFFFFFF, 0x3F7596]), unlock: .seasonBlooms(5),
+                                  hint: "Do the Daily Bloom on 5 winter days to earn this pot. Other days count too, a little slower.",
+                                  a11y: "Icy blue pot with frost ferns")
+    static let lanternRed = Pot(id: "lanternRed", name: "Lantern red", body: 0xB5403A, rim: 0xD9665A, shade: 0x93302B,
+                                decoration: .init(kind: .lanterns, colors: [0xF5C858, 0xFFF0C2, 0x5E211C, 0x8A2A25]),
+                                unlock: .pack(PackCatalog.frostLanternId), hint: packHint, a11y: "Red pot with a band of paper lanterns")
+    static let snowflakeIndigo = Pot(id: "snowflakeIndigo", name: "Snowflake indigo", body: 0x6A70D0, rim: 0x7F86D9, shade: 0x4A4FAE,
+                                     decoration: .init(kind: .snowflakes, colors: [0xFFFFFF, 0xCFE6F0]),
+                                     unlock: .pack(PackCatalog.frostLanternId), hint: packHint, a11y: "Indigo pot with white snowflakes")
+    static let packPots: [Pot] = [frostedGlass, lanternRed, snowflakeIndigo]
+
     /// The pick grid and the Shed grid: 4 x 4 at every text size.
     static let gridColumns = 4
 
-    /// Empty (never chosen) and unknown ids are plain blue.
-    static func pot(id: String) -> Pot { all.first { $0.id == id } ?? plainBlue }
+    /// Empty (never chosen) and unknown ids are plain blue. Pack pots are found too, so one already on a plant keeps
+    /// drawing after the pack is no longer owned.
+    static func pot(id: String) -> Pot { all.first { $0.id == id } ?? packPots.first { $0.id == id } ?? plainBlue }
+
+    /// A pot from a seasonal pack (bought or the season's earned one).
+    static func isPackPot(_ pot: Pot) -> Bool { packPots.contains { $0.id == pot.id } }
 
     // MARK: Unlocks (computed from play, plus the ever-growing record of pots earned before)
 
@@ -154,6 +186,11 @@ enum PotCatalog {
         var gardenDays = 0
         /// Pots recorded as earned (`PlayerProfile.earnedPotIds`). A pot in here stays owned whatever the numbers say.
         var earnedPotIds: Set<String> = []
+        /// Seasonal packs StoreKit says are owned now (read every time, never stored).
+        var ownedPacks: Set<String> = []
+        /// A season pot's Daily Bloom progress in half days (`PackCatalog.seasonHalfDays`): a featured-season day is 2,
+        /// any other day 1. From marks in `badgesJSON`, so it never goes down.
+        var seasonHalfDays = 0
         var levelsFinished: Int { finishedLevels.count }
     }
 
@@ -179,17 +216,24 @@ enum PotCatalog {
         case .plants(let n): return s.plantsGrown >= n
         case .level(let n): return s.finishedLevels.contains(n)
         case .gardenDays(let n): return s.gardenDays >= n
-        case .plus: return false
+        case .plus, .pack: return false
+        case .seasonBlooms(let n): return s.seasonHalfDays >= 2 * n
         }
     }
 
-    /// Earned by play: the pot's rule or one of its earlier rules passes. Plus pots are never earned by play.
+    static func isBought(_ unlock: Pot.Unlock) -> Bool {
+        switch unlock { case .plus, .pack: return true; default: return false }
+    }
+
+    /// Earned by play: the pot's rule or one of its earlier rules passes. Plus and pack pots are never earned by play.
     static func earnedByPlay(_ pot: Pot, _ s: Stats) -> Bool {
-        pot.unlock != .plus && (passes(pot.unlock, s) || pot.legacy.contains { passes($0, s) })
+        !isBought(pot.unlock) && (passes(pot.unlock, s) || pot.legacy.contains { passes($0, s) })
     }
 
     static func state(of pot: Pot, stats s: Stats, hasPlus: Bool) -> PotState {
         if pot.unlock == .plus { return hasPlus ? .owned : .plus(hint: pot.hint) }
+        // Plus does not include packs: only owning the pack does.
+        if case .pack(let id) = pot.unlock { return s.ownedPacks.contains(id) ? .owned : .pack(hint: pot.hint) }
         return earnedByPlay(pot, s) || s.earnedPotIds.contains(pot.id) ? .owned : .toEarn(hint: pot.hint)
     }
 
@@ -221,7 +265,8 @@ enum PotCatalog {
             let now = s.finishedLevels.contains(n) ? plantsPerLevel : min(s.plantsInLevel[n] ?? 0, plantsPerLevel)
             return Progress(now: now, goal: plantsPerLevel)
         case .gardenDays(let n): return Progress(now: min(s.gardenDays, n), goal: n)
-        case .free, .plus: return nil
+        case .seasonBlooms(let n): return Progress(now: min(s.seasonHalfDays / 2, n), goal: n)
+        case .free, .plus, .pack: return nil
         }
     }
 
@@ -249,6 +294,7 @@ enum PotCatalog {
         /// VoiceOver hints on pick tiles that are not chosen on tap.
         static let hintToEarn = "Shows how to earn it"
         static let hintPlus = "Shows where to find Plus"
+        static let hintPack = "Shows where a grown-up can find it"
         // The repot sheet v2 (design-preview/repot-sheet/notes.md).
         /// The one line under "Repot Daisy" in the sheet's header.
         static let repotSub = "Pick a pot. Changing pots is free."
@@ -258,7 +304,7 @@ enum PotCatalog {
         static let soilSub = "Plants have favorite soils."
         static var all: [String] {
             [earned, current, pickTitle, pickSub, plusTag, plusKeep, plusSettings, progressFirst, yours, plusCard, plusCardShort,
-             shedTitle, shedSub, shedFooter, freshSoil, newPots, hintToEarn, hintPlus, repotSub, newTag, soilTitle, soilSub]
+             shedTitle, shedSub, shedFooter, freshSoil, newPots, hintToEarn, hintPlus, hintPack, repotSub, newTag, soilTitle, soilSub]
         }
     }
 
@@ -271,7 +317,8 @@ enum PotCatalog {
         case .plants(let n): return n == 1 ? "Grow one plant" : "Grow \(n) plants"
         case .level(let n): return "Finish level \(n)"
         case .gardenDays(let n): return "Play on \(n) days"
-        case .free, .plus: return ""
+        case .seasonBlooms(let n): return "Daily Bloom on \(n) days"
+        case .free, .plus, .pack: return ""
         }
     }
 
@@ -281,6 +328,7 @@ enum PotCatalog {
         switch pot.unlock {
         case .level(let n): return "\(p.now) of \(p.goal) plants in level \(n)"
         case .gardenDays: return "\(p.now) of \(p.goal) garden days"
+        case .seasonBlooms: return "\(p.now) of \(p.goal) Daily Bloom days"
         default: return "\(p.now) of \(p.goal) plants grown"
         }
     }
@@ -301,6 +349,12 @@ enum PotCatalog {
     /// The first line of the hint when a Plus pot is tapped.
     static func plusLine(_ pot: Pot) -> String { "\(pot.name) is part of WordFlora Plus." }
 
+    /// The first line of the hint when a pack pot that is not owned is tapped ("Lantern red is part of Frost & Lantern.").
+    static func packLine(_ pot: Pot) -> String {
+        guard case .pack(let id) = pot.unlock, let pack = PackCatalog.pack(id: id) else { return packHint }
+        return "\(pot.name) is part of \(pack.name)."
+    }
+
     /// The repot button names a new pot; with the pot in use it reads "Repot with fresh soil".
     static func repotTitle(picked: Pot, currentId: String) -> String {
         picked.id == pot(id: currentId).id ? Copy.freshSoil : "Repot into \(picked.name)"
@@ -314,6 +368,7 @@ enum PotCatalog {
     static func hintLines(_ pot: Pot, state: PotState, stats: Stats) -> (title: String, detail: String) {
         switch state {
         case .plus: return (plusLine(pot), Copy.plusSettings)
+        case .pack: return (packLine(pot), packHint)
         case .toEarn: return ("\(goalLine(pot)) to earn \(pot.name).", tipLine(pot, stats: stats))
         case .owned: return (Copy.earned, "")
         }
@@ -329,6 +384,7 @@ enum PotCatalog {
             case .owned: base = "\(name) pot"
             case .toEarn: base = "\(name) pot, not earned yet"
             case .plus: base = "\(name) pot, Plus"
+            case .pack: base = "\(name) pot, \(PackCatalog.Copy.seasonsTitle)"
             }
         }
         return isNew ? base + ", new" : base
@@ -421,6 +477,138 @@ enum PotCatalog {
         case .drops:
             return dropSpots.map { PotMark(shape: .teardrop(cx: $0.0, cy: $0.1, scale: $0.2)) }
                 + [(60.0, 54.0), (80, 70)].map { PotMark(shape: .sparkle(cx: $0.0, cy: $0.1, scale: 0.5), color: 1, ghost: .hidden) }
+        case .frost:  // Frosted glass, colours 0xFFFFFF, 0x3F7596
+            return [
+                PotMark(shape: .rect(x: 18, y: 80, width: 84, height: 20), opacity: 0.85),
+                PotMark(shape: .circle(cx: 22, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .circle(cx: 30, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .circle(cx: 38, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .circle(cx: 46, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .circle(cx: 54, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .circle(cx: 62, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .circle(cx: 70, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .circle(cx: 78, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .circle(cx: 86, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .circle(cx: 94, cy: 80, r: 4.5), opacity: 0.85),
+                PotMark(shape: .capsule(x: 36.8, y: 56, width: 2.4, height: 26), color: 1),
+                PotMark(shape: .petal(cx: 38, cy: 62, distance: 5, rx: 1.9, ry: 5, degrees: -52), color: 1),
+                PotMark(shape: .petal(cx: 38, cy: 62, distance: 5, rx: 1.9, ry: 5, degrees: 52), color: 1),
+                PotMark(shape: .petal(cx: 38, cy: 70, distance: 5, rx: 1.9, ry: 5, degrees: -52), color: 1),
+                PotMark(shape: .petal(cx: 38, cy: 70, distance: 5, rx: 1.9, ry: 5, degrees: 52), color: 1),
+                PotMark(shape: .petal(cx: 38, cy: 78, distance: 5, rx: 1.9, ry: 5, degrees: -52), color: 1),
+                PotMark(shape: .petal(cx: 38, cy: 78, distance: 5, rx: 1.9, ry: 5, degrees: 52), color: 1),
+                PotMark(shape: .capsule(x: 58.8, y: 46, width: 2.4, height: 36), color: 1),
+                PotMark(shape: .petal(cx: 60, cy: 52, distance: 5, rx: 1.9, ry: 5, degrees: -52), color: 1),
+                PotMark(shape: .petal(cx: 60, cy: 52, distance: 5, rx: 1.9, ry: 5, degrees: 52), color: 1),
+                PotMark(shape: .petal(cx: 60, cy: 60, distance: 5, rx: 1.9, ry: 5, degrees: -52), color: 1),
+                PotMark(shape: .petal(cx: 60, cy: 60, distance: 5, rx: 1.9, ry: 5, degrees: 52), color: 1),
+                PotMark(shape: .petal(cx: 60, cy: 68, distance: 5, rx: 1.9, ry: 5, degrees: -52), color: 1),
+                PotMark(shape: .petal(cx: 60, cy: 68, distance: 5, rx: 1.9, ry: 5, degrees: 52), color: 1),
+                PotMark(shape: .petal(cx: 60, cy: 76, distance: 5, rx: 1.9, ry: 5, degrees: -52), color: 1),
+                PotMark(shape: .petal(cx: 60, cy: 76, distance: 5, rx: 1.9, ry: 5, degrees: 52), color: 1),
+                PotMark(shape: .capsule(x: 80.8, y: 58, width: 2.4, height: 24), color: 1),
+                PotMark(shape: .petal(cx: 82, cy: 64, distance: 5, rx: 1.9, ry: 5, degrees: -52), color: 1),
+                PotMark(shape: .petal(cx: 82, cy: 64, distance: 5, rx: 1.9, ry: 5, degrees: 52), color: 1),
+                PotMark(shape: .petal(cx: 82, cy: 72, distance: 5, rx: 1.9, ry: 5, degrees: -52), color: 1),
+                PotMark(shape: .petal(cx: 82, cy: 72, distance: 5, rx: 1.9, ry: 5, degrees: 52), color: 1),
+                PotMark(shape: .sparkle(cx: 32, cy: 34, scale: 0.6), ghost: .hidden),
+                PotMark(shape: .sparkle(cx: 90, cy: 38, scale: 0.45), ghost: .hidden),
+            ]
+        case .lanterns:  // Lantern red, colours 0xF5C858, 0xFFF0C2, 0x5E211C, 0x8A2A25
+            return [
+                PotMark(shape: .rect(x: 18, y: 40, width: 84, height: 30), color: 3, ghost: .hidden),
+                PotMark(shape: .rect(x: 18, y: 31, width: 84, height: 2.4), color: 1),
+                PotMark(shape: .capsule(x: 32.8, y: 32, width: 2.4, height: 9), color: 2),
+                PotMark(shape: .petal(cx: 34, cy: 55, distance: 0, rx: 10, ry: 12, degrees: 0)),
+                PotMark(shape: .capsule(x: 28.4, y: 46, width: 1.8, height: 18), color: 2, opacity: 0.35, ghost: .hidden),
+                PotMark(shape: .capsule(x: 37.8, y: 46, width: 1.8, height: 18), color: 2, opacity: 0.35, ghost: .hidden),
+                PotMark(shape: .circle(cx: 34, cy: 55, r: 3.4), color: 1, ghost: .fill),
+                PotMark(shape: .rect(x: 28, y: 41, width: 12, height: 4), color: 2),
+                PotMark(shape: .rect(x: 29, y: 66, width: 10, height: 3.5), color: 2),
+                PotMark(shape: .capsule(x: 32.7, y: 69.5, width: 2.6, height: 9)),
+                PotMark(shape: .capsule(x: 58.8, y: 32, width: 2.4, height: 9), color: 2),
+                PotMark(shape: .petal(cx: 60, cy: 55, distance: 0, rx: 10, ry: 12, degrees: 0), color: 1),
+                PotMark(shape: .capsule(x: 54.4, y: 46, width: 1.8, height: 18), color: 2, opacity: 0.35, ghost: .hidden),
+                PotMark(shape: .capsule(x: 63.8, y: 46, width: 1.8, height: 18), color: 2, opacity: 0.35, ghost: .hidden),
+                PotMark(shape: .circle(cx: 60, cy: 55, r: 3.4), ghost: .fill),
+                PotMark(shape: .rect(x: 54, y: 41, width: 12, height: 4), color: 2),
+                PotMark(shape: .rect(x: 55, y: 66, width: 10, height: 3.5), color: 2),
+                PotMark(shape: .capsule(x: 58.7, y: 69.5, width: 2.6, height: 9)),
+                PotMark(shape: .capsule(x: 84.8, y: 32, width: 2.4, height: 9), color: 2),
+                PotMark(shape: .petal(cx: 86, cy: 55, distance: 0, rx: 10, ry: 12, degrees: 0)),
+                PotMark(shape: .capsule(x: 80.4, y: 46, width: 1.8, height: 18), color: 2, opacity: 0.35, ghost: .hidden),
+                PotMark(shape: .capsule(x: 89.8, y: 46, width: 1.8, height: 18), color: 2, opacity: 0.35, ghost: .hidden),
+                PotMark(shape: .circle(cx: 86, cy: 55, r: 3.4), color: 1, ghost: .fill),
+                PotMark(shape: .rect(x: 80, y: 41, width: 12, height: 4), color: 2),
+                PotMark(shape: .rect(x: 81, y: 66, width: 10, height: 3.5), color: 2),
+                PotMark(shape: .capsule(x: 84.7, y: 69.5, width: 2.6, height: 9)),
+            ]
+        case .snowflakes:  // Snowflake indigo, colours 0xFFFFFF, 0xCFE6F0
+            return [
+                PotMark(shape: .petal(cx: 40, cy: 46, distance: 6, rx: 1.5, ry: 6, degrees: 0)),
+                PotMark(shape: .petal(cx: 40, cy: 46, distance: 6, rx: 1.5, ry: 6, degrees: 60)),
+                PotMark(shape: .petal(cx: 40, cy: 46, distance: 6, rx: 1.5, ry: 6, degrees: 120)),
+                PotMark(shape: .petal(cx: 40, cy: 46, distance: 6, rx: 1.5, ry: 6, degrees: 180)),
+                PotMark(shape: .petal(cx: 40, cy: 46, distance: 6, rx: 1.5, ry: 6, degrees: 240)),
+                PotMark(shape: .petal(cx: 40, cy: 46, distance: 6, rx: 1.5, ry: 6, degrees: 300)),
+                PotMark(shape: .circle(cx: 40, cy: 46, r: 2.4)),
+                PotMark(shape: .petal(cx: 40, cy: 38, distance: 2.4, rx: 0.9, ry: 2.6, degrees: -50), ghost: .hidden),
+                PotMark(shape: .petal(cx: 40, cy: 38, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 50), ghost: .hidden),
+                PotMark(shape: .petal(cx: 46.93, cy: 42, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 10), ghost: .hidden),
+                PotMark(shape: .petal(cx: 46.93, cy: 42, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 110), ghost: .hidden),
+                PotMark(shape: .petal(cx: 46.93, cy: 50, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 70), ghost: .hidden),
+                PotMark(shape: .petal(cx: 46.93, cy: 50, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 170), ghost: .hidden),
+                PotMark(shape: .petal(cx: 40, cy: 54, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 130), ghost: .hidden),
+                PotMark(shape: .petal(cx: 40, cy: 54, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 230), ghost: .hidden),
+                PotMark(shape: .petal(cx: 33.07, cy: 50, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 190), ghost: .hidden),
+                PotMark(shape: .petal(cx: 33.07, cy: 50, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 290), ghost: .hidden),
+                PotMark(shape: .petal(cx: 33.07, cy: 42, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 250), ghost: .hidden),
+                PotMark(shape: .petal(cx: 33.07, cy: 42, distance: 2.4, rx: 0.9, ry: 2.6, degrees: 350), ghost: .hidden),
+                PotMark(shape: .petal(cx: 79, cy: 60, distance: 6.6, rx: 1.65, ry: 6.6, degrees: 0)),
+                PotMark(shape: .petal(cx: 79, cy: 60, distance: 6.6, rx: 1.65, ry: 6.6, degrees: 60)),
+                PotMark(shape: .petal(cx: 79, cy: 60, distance: 6.6, rx: 1.65, ry: 6.6, degrees: 120)),
+                PotMark(shape: .petal(cx: 79, cy: 60, distance: 6.6, rx: 1.65, ry: 6.6, degrees: 180)),
+                PotMark(shape: .petal(cx: 79, cy: 60, distance: 6.6, rx: 1.65, ry: 6.6, degrees: 240)),
+                PotMark(shape: .petal(cx: 79, cy: 60, distance: 6.6, rx: 1.65, ry: 6.6, degrees: 300)),
+                PotMark(shape: .circle(cx: 79, cy: 60, r: 2.64)),
+                PotMark(shape: .petal(cx: 79, cy: 51.2, distance: 2.64, rx: 0.99, ry: 2.86, degrees: -50), ghost: .hidden),
+                PotMark(shape: .petal(cx: 79, cy: 51.2, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 50), ghost: .hidden),
+                PotMark(shape: .petal(cx: 86.62, cy: 55.6, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 10), ghost: .hidden),
+                PotMark(shape: .petal(cx: 86.62, cy: 55.6, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 110), ghost: .hidden),
+                PotMark(shape: .petal(cx: 86.62, cy: 64.4, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 70), ghost: .hidden),
+                PotMark(shape: .petal(cx: 86.62, cy: 64.4, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 170), ghost: .hidden),
+                PotMark(shape: .petal(cx: 79, cy: 68.8, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 130), ghost: .hidden),
+                PotMark(shape: .petal(cx: 79, cy: 68.8, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 230), ghost: .hidden),
+                PotMark(shape: .petal(cx: 71.38, cy: 64.4, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 190), ghost: .hidden),
+                PotMark(shape: .petal(cx: 71.38, cy: 64.4, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 290), ghost: .hidden),
+                PotMark(shape: .petal(cx: 71.38, cy: 55.6, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 250), ghost: .hidden),
+                PotMark(shape: .petal(cx: 71.38, cy: 55.6, distance: 2.64, rx: 0.99, ry: 2.86, degrees: 350), ghost: .hidden),
+                PotMark(shape: .petal(cx: 50, cy: 80, distance: 4.8, rx: 1.2, ry: 4.8, degrees: 0)),
+                PotMark(shape: .petal(cx: 50, cy: 80, distance: 4.8, rx: 1.2, ry: 4.8, degrees: 60)),
+                PotMark(shape: .petal(cx: 50, cy: 80, distance: 4.8, rx: 1.2, ry: 4.8, degrees: 120)),
+                PotMark(shape: .petal(cx: 50, cy: 80, distance: 4.8, rx: 1.2, ry: 4.8, degrees: 180)),
+                PotMark(shape: .petal(cx: 50, cy: 80, distance: 4.8, rx: 1.2, ry: 4.8, degrees: 240)),
+                PotMark(shape: .petal(cx: 50, cy: 80, distance: 4.8, rx: 1.2, ry: 4.8, degrees: 300)),
+                PotMark(shape: .circle(cx: 50, cy: 80, r: 1.92)),
+                PotMark(shape: .petal(cx: 50, cy: 73.6, distance: 1.92, rx: 0.72, ry: 2.08, degrees: -50), ghost: .hidden),
+                PotMark(shape: .petal(cx: 50, cy: 73.6, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 50), ghost: .hidden),
+                PotMark(shape: .petal(cx: 55.54, cy: 76.8, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 10), ghost: .hidden),
+                PotMark(shape: .petal(cx: 55.54, cy: 76.8, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 110), ghost: .hidden),
+                PotMark(shape: .petal(cx: 55.54, cy: 83.2, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 70), ghost: .hidden),
+                PotMark(shape: .petal(cx: 55.54, cy: 83.2, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 170), ghost: .hidden),
+                PotMark(shape: .petal(cx: 50, cy: 86.4, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 130), ghost: .hidden),
+                PotMark(shape: .petal(cx: 50, cy: 86.4, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 230), ghost: .hidden),
+                PotMark(shape: .petal(cx: 44.46, cy: 83.2, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 190), ghost: .hidden),
+                PotMark(shape: .petal(cx: 44.46, cy: 83.2, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 290), ghost: .hidden),
+                PotMark(shape: .petal(cx: 44.46, cy: 76.8, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 250), ghost: .hidden),
+                PotMark(shape: .petal(cx: 44.46, cy: 76.8, distance: 1.92, rx: 0.72, ry: 2.08, degrees: 350), ghost: .hidden),
+                PotMark(shape: .circle(cx: 28, cy: 66, r: 1.7), color: 1, opacity: 0.85, ghost: .hidden),
+                PotMark(shape: .circle(cx: 64, cy: 34, r: 1.7), color: 1, opacity: 0.85, ghost: .hidden),
+                PotMark(shape: .circle(cx: 94, cy: 40, r: 1.7), color: 1, opacity: 0.85, ghost: .hidden),
+                PotMark(shape: .circle(cx: 72, cy: 88, r: 1.7), color: 1, opacity: 0.85, ghost: .hidden),
+                PotMark(shape: .circle(cx: 90, cy: 82, r: 1.7), color: 1, opacity: 0.85, ghost: .hidden),
+                PotMark(shape: .circle(cx: 30, cy: 34, r: 1.7), color: 1, opacity: 0.85, ghost: .hidden),
+            ]
         }
     }
 }

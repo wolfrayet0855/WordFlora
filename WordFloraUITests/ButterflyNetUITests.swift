@@ -22,7 +22,7 @@ final class ButterflyNetUITests: XCTestCase {
     private func launch(_ extra: [String], size: String? = nil, dark: Bool = false) {
         XCUIDevice.shared.appearance = dark ? .dark : .light
         app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-everything", "-uitest-daytime",
-                               "-uitest-butterfly-seed=7"] + extra + (dark ? ["-uitest-dark"] : [])
+                               "-uitest-butterfly-seed=7"] + extra
             + (size.map { ["-UIPreferredContentSizeCategoryName", $0] } ?? [])
         app.launch()
     }

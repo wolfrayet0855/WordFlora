@@ -93,6 +93,34 @@ final class StoreKitConfigTests: XCTestCase {
         XCTAssertNil(lifetime.subscription)
     }
 
+    // MARK: Frost & Lantern (pack_frost_lantern)
+
+    func testFrostAndLanternLoadsAsAFamilySharedNonConsumable() async throws {
+        let svc = EntitlementService(startListening: false)
+        await svc.loadPackProducts()
+        let pack = try XCTUnwrap(svc.packProducts[PackCatalog.frostLanternId])
+        XCTAssertEqual(pack.id, "pack_frost_lantern"); XCTAssertEqual(pack.type, .nonConsumable)
+        XCTAssertEqual(pack.price, UITestPrices.packs[PackCatalog.frostLanternId])
+        XCTAssertEqual(pack.displayName, "Frost & Lantern"); XCTAssertTrue(pack.isFamilyShareable)
+        XCTAssertTrue(svc.packIsLive(PackCatalog.frostLanternId), "offered, so its surfaces show")
+    }
+
+    func testBuyingThePackOwnsItsPotsAndARefundTakesThemBack() async throws {
+        let svc = EntitlementService(startListening: false)
+        await svc.loadPackProducts()
+        XCTAssertFalse(svc.ownsPack(PackCatalog.frostLanternId))
+        let outcome = await svc.purchasePack(PackCatalog.frostLanternId)
+        XCTAssertEqual(outcome, .success)
+        XCTAssertTrue(svc.ownsPack(PackCatalog.frostLanternId))
+        XCTAssertFalse(svc.state.hasPlus, "a pack is not Plus")
+        var stats = PotCatalog.Stats(); stats.ownedPacks = svc.state.ownedPacks
+        XCTAssertEqual(PotCatalog.state(of: PotCatalog.lanternRed, stats: stats, hasPlus: false), .owned)
+        let txn = try XCTUnwrap(session.allTransactions().first { $0.productIdentifier == "pack_frost_lantern" })
+        try session.refundTransaction(identifier: txn.identifier)
+        try await waitFor(svc) { $0.ownedPacks.isEmpty }
+        XCTAssertFalse(svc.ownsPack(PackCatalog.frostLanternId))
+    }
+
     /// The UI tests' price preview (`-uitest-prices`) shows exactly the local config's prices.
     func testTheUITestPricePreviewMatchesTheLocalConfig() async throws {
         let products = try await Product.products(for: PlusPlan.plusProductIDs)

@@ -19,7 +19,7 @@ final class BadgeMechanicsUITests: XCTestCase {
 
     private func launch(_ extra: [String], size: String? = nil, dark: Bool = false) {
         if dark { XCUIDevice.shared.appearance = .dark }
-        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-everything"] + extra + (dark ? ["-uitest-dark"] : [])
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-everything"] + extra
             + (size.map { ["-UIPreferredContentSizeCategoryName", $0] } ?? [])
         app.launch()
     }
@@ -176,6 +176,80 @@ final class BadgeMechanicsUITests: XCTestCase {
         XCTAssertFalse(cue.exists, "the trim starts the shears' rest, so the cue goes")
         XCTAssertFalse(element("plant-love").label.contains("ready for a trim"))
         shot("tidytrim-snipped")
+    }
+
+    // MARK: Mist Maker (G3, `-uitest-mist`: the mister owned, nine mists already)
+
+    private func openFern(size: String? = nil, dark: Bool = false) {
+        if dark { XCUIDevice.shared.appearance = .dark }
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-plant=fern", "-uitest-mist"]
+            + (size.map { ["-UIPreferredContentSizeCategoryName", $0] } ?? [])
+        app.launch()
+        app.buttons["Garden"].tap()
+        let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Fern'")).firstMatch
+        XCTAssertTrue(tile.waitForExistence(timeout: 5))
+        for _ in 0..<10 where !tile.isHittable { app.swipeUp() }
+        tile.tap()
+        XCTAssertTrue(app.buttons["tend-water"].waitForExistence(timeout: 5))
+        letTheBadgeMomentPass()
+    }
+
+    func testMistAFernEarnsMistMakerAndIsMistyToday() {
+        openFern()
+        let mist = app.buttons["tend-mist"]
+        XCTAssertTrue(mist.exists, "the Mist button shows with the mister")
+        XCTAssertEqual(mist.label, "Mist Fern")
+        let prune = app.buttons["tend-prune"], repot = app.buttons["tend-repot"]
+        if prune.exists { XCTAssertLessThan(prune.frame.minX, mist.frame.minX, "Mist sits after Prune") }
+        XCTAssertLessThan(mist.frame.minX, repot.frame.minX, "and before Repot")
+        XCTAssertTrue(element("mist-tip").exists, "the tip shows the first time")
+        XCTAssertEqual(element("mist-tip").label, "Some plants love a little mist on their leaves.")
+        mist.tap()
+        let toast = element("tend-toast")
+        XCTAssertTrue(toast.waitForExistence(timeout: 3))
+        XCTAssertTrue(toast.label.contains("Fern loves misty air!") || toast.label.contains("grew a little"), toast.label)
+        let moment = element("badgeMoment")
+        XCTAssertTrue(moment.waitForExistence(timeout: 6), "a tenth mist earns the bronze Mist Maker badge")
+        XCTAssertTrue(moment.label.contains("Mist Maker"), moment.label)
+        shot("mist-badge-moment")
+        letTheBadgeMomentPass()
+        XCTAssertEqual(mist.label, "Fern is misty today")
+        mist.tap()
+        XCTAssertTrue(toast.waitForExistence(timeout: 3))
+        XCTAssertTrue(toast.label.contains("Fern is fresh and misty today. More mist tomorrow!"), toast.label)
+        shot("mist-done")
+    }
+
+    /// AX XXXL dark: the tend buttons are full-width tiles in the page (TendRowLayout); Mist passes the audit.
+    func testAuditTheMistButtonAtAXXXLInDark() {
+        openFern(size: Self.axXXXL, dark: true)
+        let mist = app.buttons["tend-mist"]
+        // Big tiles: scroll gently until the whole Mist tile sits inside the scroll area (a full swipe can jump past it).
+        let scroll = app.scrollViews.firstMatch
+        for _ in 0..<12 where !(mist.isHittable && mist.frame.minY >= scroll.frame.minY && mist.frame.maxY <= scroll.frame.maxY) {
+            let start = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.6))
+            let step: CGFloat = mist.frame.minY < scroll.frame.minY ? 160 : -160
+            start.press(forDuration: 0.1, thenDragTo: start.withOffset(CGVector(dx: 0, dy: step)))
+            sleep(1)
+        }
+        XCTAssertTrue(mist.isHittable)
+        XCTAssertGreaterThanOrEqual(mist.frame.height, 44)
+        let screen = app.windows.firstMatch.frame
+        XCTAssertLessThanOrEqual(mist.frame.maxX, screen.maxX)
+        shot("mist-ax5-dark")
+        audit("mist-ax5-dark")
+        mist.tap()
+        sleep(3)
+        audit("mist-ax5-dark-done")
+    }
+
+    func testAuditTheMistButtonAtAccessibilityLLight() {
+        openFern(size: "UICTContentSizeCategoryAccessibilityL")
+        let mist = app.buttons["tend-mist"]
+        scrollTo(mist)
+        XCTAssertTrue(mist.isHittable)
+        shot("mist-axl-light")
+        audit("mist-axl-light")
     }
 
     func testAuditTheTidyTrimCueAtAXXXLInDark() {

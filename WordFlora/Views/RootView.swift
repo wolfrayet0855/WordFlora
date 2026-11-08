@@ -27,7 +27,6 @@ struct RootView: View {
             }
         }
         .tint(Color.successText)
-        .preferredColorScheme(app.settings.colorScheme)
     }
 
     /// `-uitest-celebrate=<level>` (small, medium, large, calm, reduceMotion) draws that burst over the app.
@@ -50,6 +49,7 @@ struct RootView: View {
                     case .shed: ShedView()
                     case .badges: BadgesView()
                     case .plus: PlusView()
+                    case .seasons: SeasonsView()
                     case .settings: SettingsView()
                     case .levelMap: LevelMapView()
                     case .visitorsBook: VisitorsBookView()

@@ -18,7 +18,7 @@ final class BadgeCatalogueTests: XCTestCase {
         "word_whiz": ("wordsSolved", [10, 100, 500]), "steady_hands": ("steadySolves", [5, 25, 100]),
         "level_up": ("levelReached", [2, 4, 5]), "long_word": ("longWords", [3, 15, 50]),
         "morning_garden": ("morningDays", [3, 15, 50]), "first_bloom": ("fullBlooms", [1, 5, 20]),
-        "mist_maker": ("mists", [10, 40, 100]), "sun_seeker": ("suns", [10, 40, 100]),
+        "mist_maker": ("mistSprays", [10, 40, 100]), "sun_seeker": ("suns", [10, 40, 100]),
         "soil_scientist": ("soilMatches", [3, 10, 30]), "steady_gardener": ("tendDays", [7, 30, 100]),
         "first_butterfly": ("catches", [1, 10, 50]), "dusk_visitor": ("duskCatches", [1, 3, 5]),
         "rare_visitor": ("rareSpecies", [1, 2, 3]), "wild_discovery": ("storiesRead", [1, 5, 15]),
@@ -26,11 +26,11 @@ final class BadgeCatalogueTests: XCTestCase {
         "shed_keeper": ("shedUpgrades", [3, 6, 12]), "sharer": ("badgeShares", [1, 5, 20]),
     ]
     static let builtBefore = ["level_sets", "plant_collector", "feeder", "green_thumb", "master_repotter", "pruning_pro", "streak",
-                              "perfect_bloom", "resurrected", "daily_bloom", "visitor_friend", "gentle_net", "weathered", "quick_bloom"]
+                              "perfect_bloom", "resurrected", "daily_bloom", "visitor_friend", "gentle_net", "weathered", "quick_bloom", "lantern_keeper"]
 
     func testTheCatalogueHoldsAllThirtySixDesignedBadgesWeatheredAndQuickBloom() throws {
         let defs = try BadgeCatalog.load()
-        XCTAssertEqual(defs.count, 38)
+        XCTAssertEqual(defs.count, 39)      // + Lantern Keeper (Frost & Lantern, G3)
         XCTAssertEqual(Set(defs.map(\.id)), Set(Self.designed.keys).union(Self.builtBefore))
         for (id, want) in Self.designed {
             let d = try XCTUnwrap(defs.first { $0.id == id }, id)
@@ -40,8 +40,10 @@ final class BadgeCatalogueTests: XCTestCase {
         // One counter per badge, and every counter is used by a badge, apart from the retired ones (still counted and
         // kept in the JSON, read by no badge: Pruning Pro moved from `prunes` to `tidyTrims`).
         XCTAssertEqual(Set(defs.map(\.counter)).count, defs.count)
-        XCTAssertEqual(Set(defs.map(\.counter)), BadgeCatalog.knownCounters.subtracting(BadgeCounter.retired.map(\.rawValue)))
-        XCTAssertEqual(BadgeCounter.retired, [.prunes, .butterflyPlays])
+        XCTAssertEqual(Set(defs.map(\.counter)), BadgeCatalog.knownCounters.subtracting(BadgeCounter.retired.map(\.rawValue))
+                                                     .subtracting(BadgeCounter.potOnly.map(\.rawValue)))
+        XCTAssertEqual(BadgeCounter.potOnly, [.seasonBlooms], "the season pot counts Daily Bloom marks, no badge reads them")
+        XCTAssertEqual(BadgeCounter.retired, [.prunes, .butterflyPlays, .mists])
         XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.counter, "tidyTrims")
         XCTAssertEqual(defs.first { $0.id == "pruning_pro" }?.thresholds, [5, 20, 50])
     }
@@ -304,14 +306,13 @@ final class BadgeCatalogueTests: XCTestCase {
         app.profile?.shedPoints = 200
         XCTAssertTrue(app.upgradeTool(.can))
         XCTAssertEqual(app.badges.progress(of: .shedUpgrades), 1)
-        // Free drops count for Mist Maker once the mister is in the Shed.
+        // Mist Maker now counts real mists (MistMakerTests); the mister's free drops still come but count nothing.
         var inv = app.inventory; inv.unlock(.mister); app.inventory = inv
         app.profile?.water = 0; app.profile?.lastTrickleAt = clock
         clock = clock.addingTimeInterval(3 * 86_400)
         app.refreshFreeDrops()
-        let drops = app.profile?.water ?? 0
-        XCTAssertGreaterThan(drops, 0)
-        XCTAssertEqual(app.badges.progress(of: .mists), drops)
+        XCTAssertGreaterThan(app.profile?.water ?? 0, 0)
+        XCTAssertEqual(app.badges.progress(of: .mists), 0)
     }
 
     func testReadingCountsFactCardsAndVisitorFacts() throws {

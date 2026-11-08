@@ -5,12 +5,14 @@ struct BadgesView: View {
     @State private var open: BadgeDef?
 
     private static let catalog: [BadgeDef] = (try? BadgeCatalog.load()) ?? []
+    /// Lantern Keeper (Frost & Lantern) shows while its pack is live or once earned.
     /// The Sharer badge only shows to players who can share (13 and up, age known). Quick Bloom shows only once Speed
     /// bloom is on or the badge is earned, so the shelf never suggests the toggle.
     private var defs: [BadgeDef] {
         let state = app.badges
         return Self.catalog.filter { def in
             (def.counter != BadgeCounter.badgeShares.rawValue || app.canShareBadges)
+                && app.showsPackBadge(def.id)       // a season pack's badge only while the pack is live (or once earned)
                 && (def.id != SpeedBloom.badgeId
                     || SpeedBloom.showsBadge(app.settings.speedBloomPrefs, earnedAnyTier: state.unlockedDate(badge: def.id, tier: 1) != nil))
         }

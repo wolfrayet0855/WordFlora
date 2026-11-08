@@ -99,13 +99,31 @@ struct WordFloraApp: App {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
         // The Plus page with the local StoreKit file's prices, whatever the simulator's store returns.
-        if uiTesting && args.contains("-uitest-prices") { model.entitlements.debugPreviewPrices(UITestPrices.local) }
+        if uiTesting && args.contains("-uitest-prices") {
+            model.entitlements.debugPreviewPrices(UITestPrices.local)
+            model.entitlements.debugPreviewPackPrices(UITestPrices.packs)       // the pack is "offered": its surfaces show
+        }
+        // Frost & Lantern owned (bought or family-shared): its two pots can be picked.
+        if uiTesting && args.contains("-uitest-pack-owned") {
+            var ids = model.entitlements.state.activeProductIDs; ids.insert(PackCatalog.frostLantern.productID)
+            model.entitlements.debugForce(EntitlementState(activeProductIDs: ids))
+        }
         // Plus Forever owned, alone or beside a subscription that is still renewing (the "charged twice" note).
         if uiTesting && args.contains("-uitest-plus-forever") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID]))
         }
         if uiTesting && args.contains("-uitest-plus-twice") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID, "plus_yearly"]))
+        }
+        // The grown-ups' Family Sharing note was shown two days ago (so not again this week).
+        if uiTesting && args.contains("-uitest-family-note-seen") {
+            model.settings.familyNudgeShownAt = Date.now.addingTimeInterval(-2 * 86_400)
+        }
+        // Plus Forever beside a subscription whose auto-renew is already off (it ends in 20 days): the end-date line.
+        if uiTesting && args.contains("-uitest-plus-ending") {
+            model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID, "plus_yearly"],
+                                                           subscriptionRenews: false,
+                                                           subscriptionEndsAt: Date.now.addingTimeInterval(20 * 86_400)))
         }
         if uiTesting && args.contains("-uitest-everything") { model.settings.showEverything = true; model.syncToolUnlocks() }
         // Visitors and Shed tests: a few friends in the album, shed points, Calm mode or Quiet Garden.
@@ -123,6 +141,12 @@ struct WordFloraApp: App {
             model.profile?.albumJSON = album.json
             try? model.context.save()
             for id in ["ladybug", "honeybee", "luna"] { model.collectFieldNote(id) }      // three of four: no tier yet
+        }
+        if uiTesting && args.contains("-uitest-mist") {
+            // Mist Maker: the mister in the Shed (the Mist button shows) and nine mists already, so the next earns bronze.
+            var inv = model.inventory; inv.unlock(.mister); model.inventory = inv
+            model.updateBadges(announce: false) { state, _, t in state.record(.mistSprays, amount: 9, now: t) }
+            try? model.context.save()
         }
         if uiTesting && args.contains("-uitest-tidytrim") {
             // Pruning Pro: the found plant (`-uitest-plant=`, or the first) in flower, the shears owned, every day a
@@ -190,7 +214,7 @@ struct WordFloraApp: App {
         if uiTesting && args.contains("-uitest-gentlenet") {
             model.updateBadges(announce: false) { state, _, t in state.record(.gentleHellos, amount: 9, now: t) }
         }
-        if uiTesting && args.contains("-uitest-dark") { model.settings.appearance = .dark }
+        // `-uitest-dark` is gone: light and dark follow the system, so UI tests set XCUIDevice.shared.appearance.
         if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-sessions=") }).flatMap({ Int($0.dropFirst("-uitest-sessions=".count)) }) {
             model.settings.completedSessions = n            // past the first sessions, so the ad rules can say yes
         }
@@ -234,4 +258,5 @@ struct WordFloraApp: App {
 enum UITestPrices {
     static let local: [PlusChoice: Decimal] = [.yearly: Decimal(string: "12.99")!, .monthly: Decimal(string: "3.99")!,
                                                .lifetime: Decimal(string: "34.99")!]
+    static let packs: [String: Decimal] = [PackCatalog.frostLanternId: Decimal(string: "2.99")!]
 }

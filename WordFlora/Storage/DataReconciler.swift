@@ -94,6 +94,7 @@ enum DataReconciler {
         k.lastTendedAt = [k.lastTendedAt, o.lastTendedAt].compactMap { $0 }.max()
         k.lastSunnyAt = [k.lastSunnyAt, o.lastSunnyAt].compactMap { $0 }.max()
         k.lastPrunedAt = [k.lastPrunedAt, o.lastPrunedAt].compactMap { $0 }.max()
+        k.lastMistedAt = [k.lastMistedAt, o.lastMistedAt].compactMap { $0 }.max()
         k.lastLovedAt = [k.lastLovedAt, o.lastLovedAt].compactMap { $0 }.max()
         k.lastShownPips = max(k.lastShownPips, o.lastShownPips)
         k.lastFedAt = [k.lastFedAt, o.lastFedAt].compactMap { $0 }.max()

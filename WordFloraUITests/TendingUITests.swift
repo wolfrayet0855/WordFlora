@@ -396,6 +396,121 @@ final class TendingUITests: XCTestCase {
         }
     }
 
+    // MARK: The tend buttons keep whole words (TendRowLayout; owner screenshot "Trimme / d")
+
+    /// Six buttons (Show everything brings Prune and Mist): two rows of three at the default size and at xxxLarge,
+    /// one full-width tile each in the page at AX XXXL; then the audit. Word widths are checked in TendRowLayoutTests.
+    func testSixTendButtonsKeepWholeWords() {
+        let kinds = ["water", "feed", "sun", "prune", "mist", "repot"]
+        for (name, extra) in [("default", [String]()),
+                              ("xxxl", ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryExtraExtraExtraLarge"]),
+                              ("ax5", ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])] {
+            open("Daisy", plantId: "daisy", extra: ["-uitest-everything"] + extra)
+            let buttons = kinds.map { app.buttons["tend-\($0)"] }
+            for b in buttons { XCTAssertTrue(b.exists, "\(name): \(b.identifier)") }
+            let screen = app.windows.firstMatch.frame
+            if name == "ax5" {
+                // One column: each tile spans the content width, one below another.
+                for b in buttons.prefix(2) { XCTAssertGreaterThan(b.frame.width, screen.width - 2 * 16 - 2, name) }
+                XCTAssertGreaterThan(buttons[1].frame.minY, buttons[0].frame.maxY - 1, "\(name): stacked")
+            } else {
+                let ys = Set(buttons.map { Int($0.frame.minY.rounded()) }), xs = Set(buttons.map { Int($0.frame.minX.rounded()) })
+                XCTAssertEqual(ys.count, 2, "\(name): two rows, got \(ys.sorted())")
+                XCTAssertEqual(xs.count, 3, "\(name): three columns, got \(xs.sorted())")
+                for b in buttons { XCTAssertLessThanOrEqual(b.frame.maxX, screen.maxX + 0.5, "\(name): \(b.identifier) on screen") }
+            }
+            sleep(1); shot("tend-row-\(name)")
+            if name != "xxxl" { audit("tend-row-\(name)", dynamicTypeApart: true) }
+            app.terminate()
+        }
+    }
+
+    /// Quiet Garden uses the same bar: Prune and Mist need no tool there, so it is two rows of three too.
+    func testQuietGardenUsesTheSameTendRows() {
+        open("Daisy", plantId: "daisy", extra: ["-uitest-quiet", "-uitest-everything"])
+        let buttons = ["water", "feed", "sun", "prune", "mist", "repot"].map { app.buttons["tend-\($0)"] }
+        for b in buttons { XCTAssertTrue(b.exists, b.identifier) }
+        XCTAssertEqual(Set(buttons.map { Int($0.frame.minY.rounded()) }).count, 2)
+        sleep(1); shot("tend-row-quiet")
+        audit("tend-row-quiet", dynamicTypeApart: true)
+    }
+
+    // MARK: Frost & Lantern pots in the picker (G3)
+
+    /// Kid view at AX XXXL: the pack's row shows soft outlines with "A grown-up can find this in Settings." (no price,
+    /// no lock, no buy button), then the audit. `-uitest-prices` makes the pack "offered", as the store would.
+    func testPackPotOutlinesForAYoungPlayerAtAccessibilityXXXL() {
+        open("Daisy", plantId: "daisy", extra: ["-uitest-prices", "-uitest-age=under13",
+                                                "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])
+        app.buttons["tend-repot"].tap()
+        XCTAssertTrue(app.buttons["pot-tile-terracotta"].waitForExistence(timeout: 3))
+        closeNewPill()
+        let red = app.buttons["pot-tile-lanternRed"]
+        let go = app.buttons["repot-go"]
+        for _ in 0..<10 where !(red.isHittable && red.frame.maxY <= go.frame.minY) { app.scrollViews.firstMatch.swipeUp(velocity: .slow); sleep(1) }
+        XCTAssertTrue(red.isHittable)
+        XCTAssertEqual(red.label, "Lantern red pot, Seasons")
+        XCTAssertTrue(app.buttons["pot-tile-frostedGlass"].exists); XCTAssertTrue(app.buttons["pot-tile-snowflakeIndigo"].exists)
+        red.tap()
+        let hint = element("pot-hint")
+        XCTAssertTrue(hint.waitForExistence(timeout: 3))
+        XCTAssertTrue(hint.label.contains("Lantern red is part of Frost & Lantern."), hint.label)
+        XCTAssertTrue(hint.label.contains("A grown-up can find this in Settings."), hint.label)
+        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS '$'")).firstMatch.exists, "no price")
+        XCTAssertEqual(go.label, "Repot with fresh soil", "a pack pot not owned cannot be picked")
+        sleep(1); shot("pack-pots-under13-axxxl")
+        auditPackPicker("pack-pick-under13-axxxl")
+    }
+
+    /// Owned (dark, default size): a pack pot is picked like any other and the button names it.
+    func testOwnedPackPotIsPickedInDarkMode() {
+        XCUIDevice.shared.appearance = .dark
+        open("Daisy", plantId: "daisy", extra: ["-uitest-prices", "-uitest-pack-owned"])
+        app.buttons["tend-repot"].tap()
+        XCTAssertTrue(app.buttons["pot-tile-terracotta"].waitForExistence(timeout: 3))
+        closeNewPill()
+        // The audit runs first, on the sheet as it opens (unscrolled), as the sixteen-pot picker audits do: after a
+        // scroll the audit misplaces the soil row's words under the footer. Words under the footer are excused.
+        sleep(1); shot("pack-pots-owned-dark")
+        auditPackPicker("pack-pick-owned-dark")
+        let indigo = app.buttons["pot-tile-snowflakeIndigo"]
+        let summary = element("repot-summary")
+        for _ in 0..<6 where !(indigo.isHittable && summary.exists && indigo.frame.maxY <= summary.frame.minY - 36) {
+            app.scrollViews.firstMatch.swipeUp(velocity: .slow); sleep(1)
+        }
+        XCTAssertLessThanOrEqual(indigo.frame.maxY, summary.frame.minY - 36, "the pack row scrolls clear of the footer")
+        indigo.tap()
+        XCTAssertEqual(app.buttons["repot-go"].label, "Repot into Snowflake indigo")
+        XCTAssertEqual(element("repot-summary").label, "Snowflake indigo pot, fresh loam soil")
+        shot("pack-pots-owned-dark-picked")
+    }
+
+    private func auditPackPicker(_ name: String) {
+        let tiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'pot-tile-'")).allElementsBoundByIndex
+        let tileSize = tiles.first?.frame.size ?? .zero
+        let names = Set(PotNames.all + ["Frosted glass", "Lantern red", "Snowflake indigo"])
+        // The same tile excuses as the sixteen-pot picker audit (see auditPotPicker), now with the pack's names.
+        func isTile(_ e: XCUIElement) -> Bool {
+            let tileSized = abs(e.frame.width - tileSize.width) < 1 && abs(e.frame.height - tileSize.height) < 1
+            let nameSized = e.frame.width <= tileSize.width && e.frame.height < 30
+            return (e.identifier.hasPrefix("pot-tile-") && tileSized) || (names.contains(e.label) && (tileSized || nameSized))
+        }
+        func isPill(_ e: XCUIElement) -> Bool { ["Plus", "In use"].contains(e.label) && e.frame.height < 24 }
+        // The pack's row makes the grid taller than the first screen even at the default size, so its tiles sit under
+        // the footer's fade like the last row at accessibility sizes: unresolved clipped text there is noted too.
+        // Words scrolled under the pinned footer (and its 28 pt fade) are cut there on purpose: a clipped-text issue on
+        // an element that reaches below the footer's top is excused (and printed); anything fully above it is judged.
+        let pinned = element("repot-summary").exists ? element("repot-summary") : app.buttons["repot-go"]
+        let footerTop = pinned.frame.minY - 8 - 28
+        audit(name, dynamicTypeApart: true, unresolvedUnderFooter: [.elementDetection, .textClipped], excuse: { issue, e in
+            ([.contrast, .dynamicType].contains(issue.auditType) && isTile(e)) || (issue.auditType == .dynamicType && isPill(e))
+                || (issue.auditType == .textClipped && e.frame.maxY > footerTop)
+                // The picked tile's one-line name shrinks to fit at the capped size; the audit reads the shrunk name on
+                // the whole tile (frame = tile, label = name) as clipped. VoiceOver reads the full name.
+                || (issue.auditType == .textClipped && isTile(e) && e.identifier.isEmpty)
+        })
+    }
+
     /// Closes the "New pots in your shed!" pill when it shows (the first opening after pots are recorded).
     private func closeNewPill() {
         let close = app.buttons["pot-new-close"]
@@ -466,8 +581,7 @@ final class TendingUITests: XCTestCase {
     func testPotScreensPartWayUpTheLadder() {
         executionTimeAllowance = 300          // three looks, two launches each, scrolling the whole Shed: about 2 minutes
         let looks: [(String, XCUIDevice.Appearance, [String])] = [
-            // The app's own dark setting too: the device switch does not always reach a freshly launched app in time.
-            ("light", .light, []), ("dark", .dark, ["-uitest-dark"]),
+            ("light", .light, []), ("dark", .dark, []),
             ("axl", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]),
         ]
         for (name, look, extra) in looks {
@@ -502,12 +616,12 @@ final class TendingUITests: XCTestCase {
     /// tapped and the soil row in view (E). Part way up the ladder, as in the mockup.
     /// One test per look, so each stays well inside the time allowance (the four launches together ran past it).
     func testRepotSheetScreensLikeTheMockupLight() { repotSheetLooksLikeTheMockup("light", .light, []) }
-    func testRepotSheetScreensLikeTheMockupDark() { repotSheetLooksLikeTheMockup("dark", .dark, ["-uitest-dark"]) }
+    func testRepotSheetScreensLikeTheMockupDark() { repotSheetLooksLikeTheMockup("dark", .dark, []) }
     func testRepotSheetScreensLikeTheMockupAccessibilityL() {
         repotSheetLooksLikeTheMockup("axl", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
     }
     func testRepotSheetScreensLikeTheMockupDarkReduceMotion() {
-        repotSheetLooksLikeTheMockup("reduce-dark", .dark, ["-uitest-dark", "-uitest-reduce-motion"])
+        repotSheetLooksLikeTheMockup("reduce-dark", .dark, ["-uitest-reduce-motion"])
     }
 
     private func repotSheetLooksLikeTheMockup(_ name: String, _ look: XCUIDevice.Appearance, _ extra: [String]) {

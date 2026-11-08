@@ -143,6 +143,21 @@ enum ToolEngine {
         return r
     }
 
+    /// Mist Maker: plants with these catalogue traits love humid air and grow 2 from a mist instead of 1.
+    static let mistLovers: Set<String> = ["tropical", "epiphyte", "shade"]
+    static func mistGrowth(traits: Set<String>) -> Int { traits.isDisjoint(with: mistLovers) ? 1 : 2 }
+
+    /// One mist per plant per calendar day (safe across daylight saving, like sun), free: no drop or scoop. Needs the
+    /// mister, except in Quiet Garden (like Prune there). `lastMistedAt` follows `lastPrunedAt`'s pattern.
+    static func mist(_ plant: PlantCollectible, inventory: ToolInventory, traits: Set<String>, now: Date, calendar: Calendar,
+                     economy: Economy, quiet: Bool = false) -> TendResult {
+        if !quiet { guard inventory.tier(of: .mister) > 0 else { return .blocked(.notOwned) } }
+        if let last = plant.lastMistedAt, calendar.isDate(last, inSameDayAs: now) { return .blocked(.doneForToday) }
+        let r = TendingEngine.applyGrowth(plant, desired: mistGrowth(traits: traits), now: now, calendar: calendar, economy: economy)
+        if r.applied { plant.lastMistedAt = now }
+        return r
+    }
+
     /// Costs one scoop. A preferred soil is "happy" (growth boost); anything else is simply neutral, never harmful.
     /// The happy growth comes once a day; another happy repot the same day still refreshes the soil.
     static func repot(_ plant: PlantCollectible, to soil: SoilType, profile: PlayerProfile, now: Date,

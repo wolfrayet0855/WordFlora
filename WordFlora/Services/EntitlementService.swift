@@ -27,7 +27,7 @@ final class EntitlementService {
                 await self?.refresh()
             }
         }
-        Task { [weak self] in await self?.refresh() }
+        Task { [weak self] in await self?.refresh(); await self?.loadPackProducts() }
     }
 
     deinit { listener?.cancel() }
@@ -53,7 +53,14 @@ final class EntitlementService {
         var entries = [EntitlementState.Entry]()
         for await result in Transaction.currentEntitlements {
             guard case .verified(let t) = result else { continue }
-            entries.append(.init(productID: t.productID, revoked: t.revocationDate != nil, expiresAt: t.expirationDate))
+            // Renewal info tells a subscription that will renew from one whose auto-renew is already off.
+            var willAutoRenew: Bool?
+            if t.productType == .autoRenewable, let status = await t.subscriptionStatus,
+               case .verified(let info) = status.renewalInfo {
+                willAutoRenew = info.willAutoRenew
+            }
+            entries.append(.init(productID: t.productID, revoked: t.revocationDate != nil, expiresAt: t.expirationDate,
+                                 willAutoRenew: willAutoRenew))
         }
         state = EntitlementState(entries: entries, now: .now)
         hasLoaded = true
@@ -112,6 +119,52 @@ final class EntitlementService {
     func restore() async {
         try? await AppStore.sync()
         await refresh()
+    }
+
+    // MARK: Seasonal packs (non-consumables; ownership is read from the transactions above every time)
+
+    /// The packs the store offers, by pack id. Empty until `loadPackProducts` answers (or when the store has none:
+    /// the dormant framework shows nothing).
+    private(set) var packProducts: [String: Product] = [:]
+    /// UI tests only (`-uitest-prices`): the local file's pack prices, so the Seasons surfaces can be checked.
+    private(set) var previewPackPrices: [String: Decimal]?
+    func debugPreviewPackPrices(_ p: [String: Decimal]) { previewPackPrices = p }
+
+    func loadPackProducts() async {
+        guard let found = try? await Product.products(for: PackCatalog.productIDs) else { return }
+        var map = [String: Product]()
+        for p in found { if let pack = PackCatalog.pack(productID: p.id) { map[pack.id] = p } }
+        packProducts = map
+    }
+
+    func offersPack(_ id: String) -> Bool { packDisplayPrice(id) != nil }
+    func ownsPack(_ id: String) -> Bool { state.ownedPacks.contains(id) }
+    /// A pack's surfaces show while the store offers it or the player owns it.
+    func packIsLive(_ id: String) -> Bool {
+        guard let pack = PackCatalog.pack(id: id) else { return false }
+        return PackCatalog.isLive(pack, offered: offersPack(id), owned: ownsPack(id))
+    }
+
+    func packDisplayPrice(_ id: String) -> String? {
+        if let p = packProducts[id] { return p.displayPrice }
+        return previewPackPrices?[id].map { $0.formatted(.currency(code: "USD")) }
+    }
+
+    func purchasePack(_ id: String) async -> PurchaseOutcome {
+        guard let product = packProducts[id] else { return .failed }
+        do {
+            switch try await product.purchase() {
+            case .success(let verification):
+                guard case .verified(let t) = verification else { return .failed }
+                await t.finish()
+                await refresh()
+                for _ in 0..<10 where !ownsPack(id) { try? await Task.sleep(nanoseconds: 200_000_000); await refresh() }
+                return ownsPack(id) ? .success : .pending
+            case .pending: return .pending
+            case .userCancelled: return .cancelled
+            @unknown default: return .failed
+            }
+        } catch { return .failed }
     }
 
     /// Test and preview hook: pretend a subscription is active.
