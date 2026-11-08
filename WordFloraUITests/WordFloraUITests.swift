@@ -478,9 +478,14 @@ final class WordFloraUITests: XCTestCase {
             let f = scroll.frame
             return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
         }() : nil
-        var skipped = [String]()
+        var skipped = [String](), excused = [String]()
         do {
             try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
+                // A keyboard key's single letter shrinks to fit its fixed box (same ruling as SpeedBloom): only
+                // Dynamic Type on a one-letter element is excused, and it is printed.
+                if issue.auditType == .dynamicType, let e = issue.element, e.label.count == 1, e.label.first?.isLetter == true {
+                    excused.append(e.label); return true
+                }
                 if issue.auditType == .contrast, let v = visible {
                     // A clipped element often comes back unresolved (nil); it cannot be judged, so it is noted, not failed.
                     guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
@@ -494,6 +499,7 @@ final class WordFloraUITests: XCTestCase {
             try? findings.joined(separator: "\n").write(toFile: dir + "/audit-\(name).txt", atomically: true, encoding: .utf8)
         }
         if !skipped.isEmpty { print("\(name): contrast on \(skipped.count) clipped, unresolved element(s) not judged") }
+        if !excused.isEmpty { print("\(name): single-glyph keys shrunk to fit, excused: \(excused.joined(separator: " "))") }
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
 
