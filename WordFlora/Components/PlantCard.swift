@@ -8,7 +8,11 @@ struct PlantCard: View {
     /// Pruning Pro: a faded bloom shows on this plant today (the only cue on the card: no badge, dot or number).
     var fadedBloom = false
 
+    @Environment(\.dynamicTypeSize) private var typeSize
+
     private var earned: Bool { plant.earnedCount > 0 }
+
+    static func botanicalStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size >= .xxxLarge ? .caption2 : .caption }
 
     var body: some View {
         VStack(spacing: compact ? 4 : 8) {
@@ -31,9 +35,11 @@ struct PlantCard: View {
             Text(earned ? plant.name : "Not found yet")
                 .font(Theme.font(compact ? .footnote : .subheadline, weight: .bold))
                 .foregroundStyle(Color.appPrimaryText)
-                .lineLimit(3).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             if earned && !compact {
-                Text(plant.botanicalName).font(Theme.font(.caption)).italic()
+                // One step smaller from xxxLarge, so the longest Latin word ("pseudotruncatella") stays whole in two
+                // columns and, at AX5, in one (TextFitLayoutTests).
+                Text(plant.botanicalName).font(Theme.font(Self.botanicalStyle(typeSize))).italic()
                     .foregroundStyle(Color.secondaryText).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             }
             if plant.earnedCount > 1 {
