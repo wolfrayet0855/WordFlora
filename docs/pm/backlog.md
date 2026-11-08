@@ -22,3 +22,20 @@ Items here are parked, not cut. Each needs the owner's go before it is built.
   Mist Maker (new field `PlantCollectible.lastMistedAt: Date?`, approved by Fable; copy the lastPrunedAt pattern).
 - 1.2: Wild Discovery, after a mockup; cut the list to 10 wildflowers with facts already sourced.
 - About 10 days in total. Owner approval needed before starting.
+
+## 1.1 ideas collected 2026-11-07/08 (parked, owner go needed for each)
+- Subscriber-to-Plus-Forever upgrade path on the Plus page.
+- Read the trial length from the store offer instead of fixed copy.
+- Real first-met date per visitor.
+- A Stop state for Listen.
+- "Talk together" questions for under-13s.
+- Garden postcard image share (13 and up).
+- Widget states per weather.
+- First-bloom ceremony.
+- Sunday thank-you letters from plants.
+- Petal song echo.
+- SPM split of `Rules/` so unit tests run without a simulator.
+- Weather sounds resume after an interruption and stop on headphone unplug.
+- Garden bed ramp-in (the garden bed starts at full level with no ramp).
+- Calm trims the effect volumes (master 0.8 to about 0.57).
+- Ads: Unity Ads bidder, a rewarded value test, the Declared Age Range API.
