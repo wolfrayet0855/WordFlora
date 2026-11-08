@@ -323,7 +323,8 @@ final class EngagementUITests: XCTestCase {
     func testAuditPlantPageWidgetRow() {
         openPlant("Daisy", plantId: "daisy")
         sleep(1)
-        audit("b-plant-top")
+        // The page's own scroll ends at the pinned tend bar: text half under it is judged by what is visible.
+        auditScrolled("b-plant-top")
         scrollTo(app.buttons["plant.showOnWidget"])
         sleep(1)
         auditScrolled("b-plant-widget-row")
