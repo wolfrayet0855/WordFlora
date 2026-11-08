@@ -724,6 +724,7 @@ struct VisitorDetailSheet: View {
                 VisitorSticker(id: visitor.id, met: met, size: 150)
                 Text(met ? visitor.name : VisitorsCopy.notMet).font(Theme.font(Self.titleStyle(typeSize), weight: .bold))
                     .foregroundStyle(Color.appPrimaryText).multilineTextAlignment(.center)
+                    .fixedSize(horizontal: false, vertical: true)
                     .accessibilityAddTraits(.isHeader)
                 RarityChip(rarity: visitor.rarity)
                 if met {
