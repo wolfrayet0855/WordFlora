@@ -1,8 +1,8 @@
 import Foundation
 
 /// A calm Family Sharing note, never on Home and never a popup.
-/// - 13 and up without Plus: "Already have Plus on a family phone? Restore purchases." in Settings > WordFlora Plus
-///   and on the Plus screen (owner approved for this release; unchanged).
+/// - 13 and up without Plus: "Already have Plus on a family phone? Restore purchases." in Settings > WordFlora Plus,
+///   and on the Plus screen the same line as text only, pointing at the page's Restore button below it.
 /// - Under 13 and unknown age without Plus (owner, 2026-11-07): a note addressed to the grown-up, only inside the
 ///   "For grown-ups" section of Settings, on at most one day a week, off in Quiet Garden. Its one button asks the
 ///   grown-up question (`ParentalGate`) before the Plus page opens. No countdown, no pressure line for the child.
@@ -48,9 +48,12 @@ enum FamilyShareNudge {
     enum Copy {
         static let line = "Already have Plus on a family phone?"
         static let button = "Restore purchases"
+        /// The Plus page shows the line only, pointing at the page's own Restore button (so the page never has two
+        /// buttons with the same name; plus-page-review finding 12, lead ruling).
+        static let plusPageLine = "Already have Plus on a family phone? Restore purchases is below."
         /// The grown-ups' note (under 13 and unknown age). Written to the grown-up, never to the child.
         static let grownUpLine = "Plus covers the whole family. Grown-ups: turn on Family Sharing in Apple Family settings and everyone in your family gets Plus, ads off, garden synced."
         static let grownUpButton = "About Plus for families"
-        static var all: [String] { [line, button, grownUpLine, grownUpButton] }
+        static var all: [String] { [line, button, plusPageLine, grownUpLine, grownUpButton] }
     }
 }

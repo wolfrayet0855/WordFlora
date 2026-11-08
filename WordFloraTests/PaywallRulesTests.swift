@@ -32,7 +32,7 @@ final class PaywallRulesTests: XCTestCase {
     // MARK: copy
     func testTrialWordingOnlyWhenEligibleAndOnlyForYearly() {
         let eligible = PaywallCopy.make(plan: .yearly, displayPrice: "$12.99", trialEligible: true)
-        XCTAssertEqual(eligible.cta, "Start 3-day free trial")
+        XCTAssertEqual(eligible.cta, "Start 3\u{2011}day free trial", "a non-breaking hyphen keeps 3-day together")
         XCTAssertTrue(eligible.finePrint.contains("then $12.99 per year"))
 
         let notEligible = PaywallCopy.make(plan: .yearly, displayPrice: "$12.99", trialEligible: false)
@@ -48,8 +48,50 @@ final class PaywallRulesTests: XCTestCase {
     func testFinePrintStatesRenewalAndHowToCancel() {
         for plan in [PlusPlan.yearly, .monthly] {
             let c = PaywallCopy.make(plan: plan, displayPrice: "$1.00", trialEligible: false)
-            XCTAssertTrue(c.finePrint.contains("renews automatically"), c.finePrint)
-            XCTAssertTrue(c.finePrint.contains("Cancel anytime in Settings"), c.finePrint)
+            XCTAssertTrue(c.finePrint.contains("Renews automatically unless cancelled at least 24 hours before the end of the period."), c.finePrint)
+            XCTAssertTrue(c.finePrint.contains("Cancel anytime in your App Store account settings."), c.finePrint)
+        }
+    }
+
+    // MARK: text-fit and polish pass (docs/pm/plus-page-review.md)
+
+    /// Trial words need a free-trial introductory offer on the yearly plan; eligibility alone is not enough.
+    func testTrialNeedsAFreeTrialOffer() {
+        XCTAssertFalse(EntitlementService.offersFreeTrial(paymentMode: nil), "no offer")
+        XCTAssertFalse(EntitlementService.offersFreeTrial(paymentMode: .payAsYouGo), "a paid intro offer is not a trial")
+        XCTAssertFalse(EntitlementService.offersFreeTrial(paymentMode: .payUpFront))
+        XCTAssertTrue(EntitlementService.offersFreeTrial(paymentMode: .freeTrial))
+        // With no trial the page says nothing about free days.
+        let none = PaywallCopy.make(choice: .yearly, displayPrice: "$12.99", trialEligible: false)
+        XCTAssertFalse((none.cta + none.finePrint).lowercased().contains("free"))
+        XCTAssertFalse(none.finePrint.contains("3 days"))
+    }
+
+    /// StoreKit's pending (Ask to Buy) is its own outcome with its own words; the slow-entitlement wait keeps its line.
+    func testAskToBuyIsAwaitingApproval() {
+        XCTAssertEqual(EntitlementService.outcome(storeKitPending: true), .awaitingApproval)
+        XCTAssertEqual(EntitlementService.outcome(storeKitPending: false), .pending)
+        XCTAssertEqual(PaywallCopy.awaitingApproval, "Sent to a grown-up to approve. Plus turns on once it's approved.")
+        XCTAssertFalse(PaywallCopy.awaitingApproval.contains("Restore"), "no tapping Restore while a grown-up decides")
+        XCTAssertEqual(PaywallCopy.pendingSlow, "Almost there. If Plus is not on in a moment, tap Restore purchases.")
+        XCTAssertFalse(PackCatalog.Copy.awaitingApproval.contains("Restore"))
+        for line in PackCatalog.Copy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
+    }
+
+    func testPricesAreInWords() {
+        XCTAssertEqual(PaywallCopy.priceLine("$12.99", choice: .yearly), "$12.99 a year")
+        XCTAssertEqual(PaywallCopy.priceLine("$3.99", choice: .monthly), "$3.99 a month")
+        XCTAssertEqual(PaywallCopy.priceLine("$34.99", choice: .lifetime), "$34.99 once")
+        for choice in PlusChoice.allCases { XCTAssertFalse(PaywallCopy.priceLine("$1", choice: choice).contains("/")) }
+    }
+
+    func testRestoreAndPageLines() {
+        XCTAssertEqual(PaywallCopy.restoredOn, "Plus is on.")
+        XCTAssertEqual(PaywallCopy.restoredNone, "No purchases found for this Apple ID.")
+        XCTAssertEqual(PaywallCopy.restore, FamilyShareNudge.Copy.button, "the one Restore button keeps its name")
+        for line in [PaywallCopy.loadFailed, PaywallCopy.tryAgain, PaywallCopy.loadingPrices, PaywallCopy.ownedSubscription,
+                     PaywallCopy.ownedSubscriptionDetail, PaywallCopy.failed, PaywallCopy.renewal, PaywallCopy.trialCTA] {
+            XCTAssertTrue(PaywallCopy.all.contains(line), line)
         }
     }
 

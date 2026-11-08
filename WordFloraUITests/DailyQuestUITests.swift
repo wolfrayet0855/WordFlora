@@ -143,6 +143,9 @@ final class DailyQuestUITests: XCTestCase {
         let onPlus = element("familyShare.nudge")
         XCTAssertTrue(onPlus.waitForExistence(timeout: 5))
         scrollTo(onPlus)
+        // On the Plus page the line only: the page's own Restore purchases button is right below it.
+        XCTAssertTrue(app.staticTexts["Already have Plus on a family phone? Restore purchases is below."].exists)
+        XCTAssertFalse(element("familyShare.restore").exists, "one Restore button on the Plus page")
         audit("family-plus", within: onPlus)
     }
 

@@ -91,10 +91,15 @@ enum PackCatalog {
         static let welcome = "Frost & Lantern is yours. Its pots are in your Shed."
         static let pending = "Almost there. If the pots are not there in a moment, tap Restore purchases."
         static let failed = "We couldn't confirm that purchase. If you see a charge, tap Restore purchases."
+        /// Ask to Buy: a grown-up must approve first, maybe much later.
+        static let awaitingApproval = "Sent to a grown-up to approve. The pots arrive once it's approved."
+        /// After Restore purchases: a pack came back, or nothing was found.
+        static let restoredPack = "Your pack is back. Its pots are in your Shed."
+        static let restoredNone = PaywallCopy.restoredNone
         static var all: [String] {
             [seasonsTitle, seasonsRowSub, ownedLine, buy, restore, notPlus, badgeLine, keepLine, shelfTitle, shelfButton,
-             cardLabel, welcome, pending, failed, frostLantern.line, frostLantern.name, PotCatalog.packHint,
-             PotCatalog.frostedGlass.hint]
+             cardLabel, welcome, pending, failed, awaitingApproval, restoredPack, restoredNone, frostLantern.line,
+             frostLantern.name, PotCatalog.packHint, PotCatalog.frostedGlass.hint]
         }
     }
 }

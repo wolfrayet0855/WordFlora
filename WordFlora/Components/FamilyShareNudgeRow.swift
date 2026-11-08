@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// The Family Sharing note (FamilyShareNudge decides who sees which).
-/// 13 and up: "Already have Plus on a family phone? Restore purchases." in Settings > WordFlora Plus and on the Plus
-/// screen; the button is the usual Restore.
+/// 13 and up: "Already have Plus on a family phone? Restore purchases." in Settings > WordFlora Plus (the button is the
+/// usual Restore); on the Plus screen the line only, pointing at the page's Restore button.
 /// Under 13 and unknown age: the grown-ups' note, only in Settings' "For grown-ups" section, on at most one day a
 /// week; its button asks the grown-up question before the Plus page opens.
 struct FamilyShareNudgeRow: View {
@@ -24,7 +24,10 @@ struct FamilyShareNudgeRow: View {
         case .player:
             // One fixed layout: a ViewThatFits that swapped from a row to a stack as the text grew was judged
             // "Dynamic Type partially unsupported" by the accessibility audit on the Plus screen.
-            VStack(alignment: .leading, spacing: 2) { line(FamilyShareNudge.Copy.line); restoreButton }
+            // On the Plus page the line alone: the page's own Restore purchases button sits just below it.
+            VStack(alignment: .leading, spacing: 2) {
+                if placement == .plusPage { line(FamilyShareNudge.Copy.plusPageLine) } else { line(FamilyShareNudge.Copy.line); restoreButton }
+            }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityElement(children: .contain)
                 .accessibilityIdentifier("familyShare.nudge")

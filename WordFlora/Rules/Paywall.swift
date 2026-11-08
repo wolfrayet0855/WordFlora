@@ -100,17 +100,46 @@ enum PaywallCopy {
     static let benefits = ["No ads, ever", "Sync your garden with iCloud", "Share it with your family"]
 
     static func make(plan: PlusPlan, displayPrice: String, trialEligible: Bool) -> Copy {
-        let renew = "Your subscription renews automatically until you cancel. Cancel anytime in Settings."
+        // Apple's 24-hour rule and where to cancel, as the store listing says it (not the app's own Settings).
+        let renew = renewal
         switch plan {
         case .yearly:
             let trial = trialEligible
             return Copy(headline: "Yearly", detail: "Best value",
-                        cta: trial ? "Start 3-day free trial" : "Subscribe",
+                        cta: trial ? trialCTA : "Subscribe",
                         finePrint: trial ? "3 days free, then \(displayPrice) per year. \(renew)" : "\(displayPrice) per year. \(renew)")
         case .monthly:
             return Copy(headline: "Monthly", detail: "Flexible", cta: "Subscribe", finePrint: "\(displayPrice) per month. \(renew)")
         }
     }
+
+    static let renewal = "Renews automatically unless cancelled at least 24 hours before the end of the period. Cancel anytime in your App Store account settings."
+    /// A non-breaking hyphen, so "3-day" never splits at the largest text sizes.
+    static let trialCTA = "Start 3\u{2011}day free trial"
+
+    /// A plan's price in words on its card ("$12.99 a year", "$3.99 a month", "$34.99 once"), never "/yr".
+    static func priceLine(_ price: String, choice: PlusChoice) -> String {
+        switch choice {
+        case .yearly: return "\(price) a year"
+        case .monthly: return "\(price) a month"
+        case .lifetime: return "\(price) once"
+        }
+    }
+
+    // The page's other lines (all checked by CopySafety through `all`).
+    static let loadFailed = "We couldn't load the plans. Check your connection and try again."
+    static let tryAgain = "Try again"
+    static let loadingPrices = "Loading prices"
+    static let ownedSubscription = "You have WordFlora Plus"
+    static let ownedSubscriptionDetail = "Ads are off and your garden can sync across your devices. Thank you for supporting WordFlora."
+    static let restore = "Restore purchases"
+    /// The purchase went through but Plus had not shown up yet.
+    static let pendingSlow = "Almost there. If Plus is not on in a moment, tap Restore purchases."
+    /// Ask to Buy (StoreKit pending): a grown-up must approve, maybe hours later.
+    static let awaitingApproval = "Sent to a grown-up to approve. Plus turns on once it's approved."
+    static let failed = "We couldn't confirm that purchase. If you see a charge, tap Restore purchases."
+    static let restoredOn = "Plus is on."
+    static let restoredNone = "No purchases found for this Apple ID."
 
     /// Plus Forever's one honest line, on its row and under the button.
     static let lifetimeLine = "Pay once, keep Plus on this Apple ID. No renewals."
@@ -134,13 +163,15 @@ enum PaywallCopy {
         "Your subscription ends on \(date) and will not renew. Plus Forever keeps going after that."
     }
     static let cancelSubscription = "Cancel the subscription"
-    static let welcomeLifetime = "Welcome to Plus Forever!"
 
-    /// Every Plus page line added for Plus Forever and codes, for the copy checks.
+    /// Every Plus page line outside the plan copy, for the copy checks.
     static var all: [String] {
         [lifetimeLine, lifetime(displayPrice: "$34.99").finePrint, lifetime(displayPrice: "").cta, redeem,
          ownedLifetime, ownedLifetimeDetail, paysTwice, subscriptionEnds(on: "December 1, 2026"), cancelSubscription,
-         welcomeLifetime]
+         renewal, trialCTA, priceLine("$12.99", choice: .yearly), priceLine("$3.99", choice: .monthly),
+         priceLine("$34.99", choice: .lifetime), loadFailed, tryAgain, loadingPrices, ownedSubscription,
+         ownedSubscriptionDetail, restore, pendingSlow, awaitingApproval, failed, restoredOn, restoredNone,
+         FamilyShareNudge.Copy.plusPageLine]
     }
 }
 

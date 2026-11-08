@@ -74,14 +74,22 @@ struct WordmarkView: View {
 }
 
 struct PrimaryButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(Theme.font(.title3, weight: .bold))
-            .foregroundStyle(Color.ink)
-            .frame(maxWidth: .infinity, minHeight: 56)
-            .background(Color.appAccent, in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
-            .scaleEffect(configuration.isPressed ? 0.97 : 1)
-            .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+    func makeBody(configuration: Configuration) -> some View { Look(configuration: configuration) }
+
+    /// A disabled button dims its fill only: the ink label keeps full strength (ink on the accent is 5.38:1 light and
+    /// 6.62:1 dark, and would fail at half opacity).
+    private struct Look: View {
+        let configuration: ButtonStyleConfiguration
+        @Environment(\.isEnabled) private var isEnabled
+        var body: some View {
+            configuration.label
+                .font(Theme.font(.title3, weight: .bold))
+                .foregroundStyle(Color.ink)
+                .frame(maxWidth: .infinity, minHeight: 56)
+                .background(Color.appAccent.opacity(isEnabled ? 1 : 0.5), in: RoundedRectangle(cornerRadius: Theme.cornerRadius))
+                .scaleEffect(configuration.isPressed ? 0.97 : 1)
+                .animation(.spring(response: 0.25, dampingFraction: 0.7), value: configuration.isPressed)
+        }
     }
 }
 

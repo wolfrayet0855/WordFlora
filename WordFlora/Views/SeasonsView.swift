@@ -6,6 +6,8 @@ import SwiftUI
 struct SeasonsView: View {
     @Environment(AppModel.self) private var app
     @State private var busy = false
+    @State private var restoring = false
+    @State private var restoreMessage: String?
     @State private var message: String?
     @State private var gate: ParentalGate.Challenge?
 
@@ -19,10 +21,22 @@ struct SeasonsView: View {
                 if packs.isEmpty {
                     Text("Nothing here right now.").font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                 }
-                Button(PackCatalog.Copy.restore) { Task { await store.restore() } }
-                    .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText).tapTarget()
-                    .frame(maxWidth: .infinity)
-                    .accessibilityIdentifier("seasons.restore")
+                Button { restore(packs) } label: {
+                    HStack(spacing: 6) {
+                        if restoring { ProgressView().accessibilityHidden(true) }
+                        Text(PackCatalog.Copy.restore)
+                    }
+                }
+                .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText).tapTarget()
+                .disabled(restoring)
+                .frame(maxWidth: .infinity)
+                .accessibilityIdentifier("seasons.restore")
+                if let restoreMessage {
+                    Text(restoreMessage).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                        .frame(maxWidth: .infinity)
+                        .accessibilityIdentifier("seasons.restoreMessage")
+                }
             }
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.card).padding(.bottom, Space.section)
         }
@@ -30,6 +44,8 @@ struct SeasonsView: View {
         .navigationTitle(PackCatalog.Copy.seasonsTitle)
         .navigationBarTitleDisplayMode(.inline)
         .task { await store.loadPackProducts() }
+        .onChange(of: restoreMessage) { _, new in if let new { AccessibilityNotification.Announcement(new).post() } }
+        .onChange(of: message) { _, new in if let new { AccessibilityNotification.Announcement(new).post() } }
         .sheet(item: $gate) { challenge in
             ParentalGateSheet(challenge: challenge, onPass: { gate = nil; buy(PackCatalog.frostLantern.id) }, onCancel: { gate = nil })
         }
@@ -80,6 +96,17 @@ struct SeasonsView: View {
         .accessibilityIdentifier("seasons.pack.\(pack.id)")
     }
 
+    /// One sync at a time, then a line that says whether a pack came back.
+    private func restore(_ packs: [SeasonPack]) {
+        guard !restoring else { return }
+        restoring = true; restoreMessage = nil
+        Task {
+            await store.restore()
+            restoring = false
+            restoreMessage = packs.contains { store.ownsPack($0.id) } ? PackCatalog.Copy.restoredPack : PackCatalog.Copy.restoredNone
+        }
+    }
+
     /// Young players and unknown ages answer the grown-up question before the purchase.
     private func ask(_ pack: SeasonPack) {
         if ParentalGate.isRequired(ageBand: app.settings.ageBand) {
@@ -95,6 +122,7 @@ struct SeasonsView: View {
             switch outcome {
             case .success: message = PackCatalog.Copy.welcome
             case .pending: message = PackCatalog.Copy.pending
+            case .awaitingApproval: message = PackCatalog.Copy.awaitingApproval
             case .cancelled: message = nil
             case .failed: message = PackCatalog.Copy.failed
             }

@@ -88,6 +88,7 @@ final class FamilyShareNudgeTests: XCTestCase {
         for line in FamilyShareNudge.Copy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
         XCTAssertEqual(FamilyShareNudge.Copy.line + " " + FamilyShareNudge.Copy.button + ".",
                        "Already have Plus on a family phone? Restore purchases.")
+        XCTAssertEqual(FamilyShareNudge.Copy.plusPageLine, "Already have Plus on a family phone? Restore purchases is below.")
         let grownUp = FamilyShareNudge.Copy.grownUpLine + " " + FamilyShareNudge.Copy.grownUpButton
         XCTAssertTrue(FamilyShareNudge.Copy.grownUpLine.contains("Grown-ups:"), "addressed to the grown-up")
         // No pressure or "ask your parents" lines, no countdowns, no prices.
