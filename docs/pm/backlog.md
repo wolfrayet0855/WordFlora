@@ -22,3 +22,6 @@ Items here are parked, not cut. Each needs the owner's go before it is built.
   Mist Maker (new field `PlantCollectible.lastMistedAt: Date?`, approved by Fable; copy the lastPrunedAt pattern).
 - 1.2: Wild Discovery, after a mockup; cut the list to 10 wildflowers with facts already sourced.
 - About 10 days in total. Owner approval needed before starting.
+
+## Plus (owner, 2026-11-08)
+- Plus page after purchase: a more modern, tasteful confirmation (deferred to 1.1).
