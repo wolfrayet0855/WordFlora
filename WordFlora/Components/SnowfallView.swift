@@ -37,7 +37,7 @@ struct SnowfallView: View {
     private func draw(_ ctx: GraphicsContext, _ size: CGSize, time: Double) {
         let color = Self.flakeColor(dark: colorScheme == .dark)
         let flakes = Snowfall.flakes(count: count, size: size, time: time, calm: calm, layers: layers,
-                                     groundY: groundY.map(Double.init))
+                                     groundY: groundY.map { Double($0) })
         for L in layers where L >= 0 && L < Snowfall.layers.count {
             let layer = Snowfall.layers[L]
             // One path per layer; only flakes fading near the ground get their own draw call.
