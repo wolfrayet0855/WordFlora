@@ -269,6 +269,7 @@
 		D3A2B4BA77495A79674750BD /* GameRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A6305635D642316CCE8610F /* GameRecord.swift */; };
 		D51839FD5EE99D7181E304F0 /* LoveEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2004661176B5B7000630E9F /* LoveEngine.swift */; };
 		5E1D0A11C0FFEE0000000001 /* LoveEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = C2004661176B5B7000630E9F /* LoveEngine.swift */; };
+		5E1D0A11C0FFEE0000000002 /* PlantVoice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2732222DBF50FDA29A7C62BE /* PlantVoice.swift */; };
 		D61844C609FE7631DFFBF7CF /* Plants.json in Resources */ = {isa = PBXBuildFile; fileRef = 437318BFC10E7CDE04AF1603 /* Plants.json */; };
 		D6E3215F0B7EB9ED5C2DD218 /* WordDifficulty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 909E3EE9D33E5BC4BBD0BBE2 /* WordDifficulty.swift */; };
 		D7CEF9FF813CBF12C7375099 /* wf-badgeBronze.m4a in Resources */ = {isa = PBXBuildFile; fileRef = FBB3484DBA881E17BA5D174F /* wf-badgeBronze.m4a */; };
@@ -1518,6 +1519,7 @@
 				53C1F3AF73A761947FD0F913 /* Weather.swift in Sources */,
 				D55C44CB05C3419C83BA8983 /* GardenWeather.swift in Sources */,
 				5E1D0A11C0FFEE0000000001 /* LoveEngine.swift in Sources */,
+				5E1D0A11C0FFEE0000000002 /* PlantVoice.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

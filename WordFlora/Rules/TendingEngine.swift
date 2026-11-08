@@ -105,6 +105,21 @@ enum TendingEngine {
         profile.lastTrickleAt = profile.water >= economy.trickleCap ? now : profile.lastTrickleAt.addingTimeInterval(Double(n) * interval)
     }
 
+    /// The drop count `applyTrickle` would give at `now`, without writing anything (the widget's displayed count).
+    static func projectedWater(_ profile: PlayerProfile, now: Date, economy: Economy) -> Int {
+        guard profile.water < economy.trickleCap else { return profile.water }
+        let n = Int(now.timeIntervalSince(profile.lastTrickleAt) / (economy.trickleHours * 3600))
+        return n > 0 ? profile.water + min(n, economy.trickleCap - profile.water) : profile.water
+    }
+
+    /// When the next free drop arrives after `now`, or nil when the can is at the trickle cap by then.
+    static func nextTrickle(_ profile: PlayerProfile, now: Date, economy: Economy) -> Date? {
+        guard projectedWater(profile, now: now, economy: economy) < economy.trickleCap else { return nil }
+        let interval = economy.trickleHours * 3600
+        let n = max(0, Int(now.timeIntervalSince(profile.lastTrickleAt) / interval))
+        return profile.lastTrickleAt.addingTimeInterval(Double(n + 1) * interval)
+    }
+
     /// Shared by tools (prune, happy repot), which pace themselves; no cost handling here.
     static func applyGrowth(_ plant: PlantCollectible, desired: Int, now: Date, calendar: Calendar, economy: Economy) -> TendResult {
         grow(plant, by: desired, now: now, calendar: calendar)

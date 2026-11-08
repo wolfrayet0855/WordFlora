@@ -118,6 +118,152 @@ final class WidgetActionsTests: XCTestCase {
         d.set("thirteenPlus", forKey: "ageBand"); XCTAssertFalse(SharedDefaults.loveExempt(in: d))
     }
 
+    // MARK: buttons that answer (computed state, never stored)
+    func testWaterStateFlipsAfterTwoWidgetDrinks() {
+        _ = plants(["rose"]); profile.widgetPlantID = "rose"
+        var h = WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal).hero!
+        XCTAssertFalse(h.wateredToday); XCTAssertFalse(h.waterDone)
+        WidgetActions.water(plantId: "rose", context: ctx, now: t0, calendar: cal, quiet: false)
+        h = WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal).hero!
+        XCTAssertTrue(h.wateredToday); XCTAssertFalse(h.waterDone, "one drink: the button still works")
+        WidgetActions.water(plantId: "rose", context: ctx, now: t0, calendar: cal, quiet: false)
+        h = WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal).hero!
+        XCTAssertTrue(h.waterDone, "two drinks: Watered today")
+        XCTAssertFalse(WidgetActions.snapshot(context: ctx, now: t0.addingTimeInterval(86_400), calm: true, calendar: cal).hero!.waterDone,
+                       "a new day, a new drink")
+    }
+
+    func testHelloStateFlipsAfterAWidgetHello() {
+        let ps = plants(["rose"]); ps[0].lastLovedAt = t0.addingTimeInterval(-30 * 3600)
+        XCTAssertFalse(WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal).hero!.saidHelloToday)
+        WidgetActions.hello(plantId: "rose", context: ctx, now: t0, exempt: false)
+        XCTAssertTrue(WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal).hero!.saidHelloToday)
+    }
+
+    func testASeedLinksToThePlantOnlyWhenNotExempt() {
+        let ps = plants(["rose"]); ps[0].lastLovedAt = t0.addingTimeInterval(-30 * 86_400)
+        XCTAssertTrue(WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal, exempt: false).hero!.isSeed)
+        XCTAssertFalse(WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal, exempt: true).hero!.isSeed,
+                       "under 13, Calm and Quiet Garden never have seeds")
+    }
+
+    // MARK: trickle freshness
+    func testShownDropCountIncludesFreeDropsThatAreDueWithoutWriting() {
+        _ = plants(["rose"]); profile.water = 0
+        let s = WidgetActions.snapshot(context: ctx, now: t0.addingTimeInterval(9 * 3600), calm: true, calendar: cal)
+        XCTAssertEqual(s.water, 2)                                        // two 4 h drops are in the can
+        XCTAssertEqual(profile.water, 0, "the snapshot never writes")
+        XCTAssertEqual(profile.lastTrickleAt, t0)
+    }
+
+    func testProjectedWaterMatchesApplyTrickle() {
+        let eco = Economy.default
+        for (start, hours) in [(0, 3.0), (0, 4.5), (1, 13.0), (eco.trickleCap - 1, 30.0), (eco.trickleCap + 2, 10.0)] {
+            let p = PlayerProfile(); p.water = start; p.lastTrickleAt = t0
+            let now = t0.addingTimeInterval(hours * 3600)
+            let projected = TendingEngine.projectedWater(p, now: now, economy: eco)
+            TendingEngine.applyTrickle(p, now: now, economy: eco)
+            XCTAssertEqual(projected, p.water, "start \(start), \(hours) h")
+        }
+    }
+
+    func testNextTrickleIsTheNextDropAndNilWhenFull() {
+        let eco = Economy.default
+        let p = PlayerProfile(); p.water = 0; p.lastTrickleAt = t0
+        XCTAssertEqual(TendingEngine.nextTrickle(p, now: t0.addingTimeInterval(3600), economy: eco), t0.addingTimeInterval(eco.trickleHours * 3600))
+        XCTAssertEqual(TendingEngine.nextTrickle(p, now: t0.addingTimeInterval(eco.trickleHours * 3600 + 60), economy: eco),
+                       t0.addingTimeInterval(2 * eco.trickleHours * 3600))
+        p.water = eco.trickleCap
+        XCTAssertNil(TendingEngine.nextTrickle(p, now: t0, economy: eco))
+        _ = plants(["rose"]); profile.water = 0
+        XCTAssertNotNil(WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal).nextTrickle)
+    }
+
+    // MARK: the plant answers (medium line)
+    func testLinePicksWeatherThenHelloThenWaterThenDefault() {
+        var s = WidgetActions.sample.hero!; s.voiceSeed = 7
+        XCTAssertEqual(WidgetActions.line(for: s, weather: nil), WidgetCopy.defaultLine)
+        s.wateredToday = true
+        XCTAssertEqual(WidgetActions.line(for: s, weather: nil), PlantVoice.line(plantId: "rose", event: .water, daySeed: 7))
+        s.saidHelloToday = true
+        XCTAssertEqual(WidgetActions.line(for: s, weather: nil), PlantVoice.helloLine(plantId: "rose", daySeed: 7, tap: 0))
+        XCTAssertEqual(WidgetActions.line(for: s, weather: "Tomorrow: windy"), "Tomorrow: windy")
+        XCTAssertEqual(WidgetActions.line(for: s, weather: nil), WidgetActions.line(for: s, weather: nil), "stable for the day")
+    }
+
+    func testTheWidgetLineUsesTheAppsOwnSeed() {
+        let ps = plants(["rose"]); ps[0].lastLovedAt = t0
+        let h = WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal).hero!
+        XCTAssertEqual(h.voiceSeed, Int(t0.timeIntervalSince1970 / 86_400) &+ ps[0].earnedCount)   // AppModel.helloLine's seed
+    }
+
+    // MARK: gallery, empty state, copy
+    func testGalleryShowsTheSampleOnlyInAPreviewWithNoPlant() {
+        let none = WidgetActions.GardenSnapshot(hero: nil, others: [], water: 0)
+        XCTAssertTrue(WidgetActions.galleryShowsSample(isPreview: true, snapshot: none))
+        XCTAssertFalse(WidgetActions.galleryShowsSample(isPreview: false, snapshot: none))
+        XCTAssertFalse(WidgetActions.galleryShowsSample(isPreview: true, snapshot: WidgetActions.sample))
+        XCTAssertNotNil(WidgetActions.sample.hero)
+    }
+
+    func testEmptyWidgetIsCalmWhenTheStoreIsNotReady() {
+        XCTAssertEqual(WidgetCopy.emptyLine(unavailable: true), GardenFallback.widgetLine)
+        XCTAssertEqual(WidgetCopy.emptyLine(unavailable: false), WidgetCopy.firstPlant)
+        let r = GameRouter()
+        r.open(WidgetCopy.emptyURL(unavailable: true)); XCTAssertTrue(r.path.isEmpty, "opens the app on Home")
+        r.open(WidgetCopy.emptyURL(unavailable: false)); XCTAssertEqual(r.path, [.game(daily: false, level: nil)])
+    }
+
+    func testEveryWidgetWordPassesCopySafety() {
+        for line in WidgetCopy.all() { XCTAssertEqual(CopySafety.check(line), [], line) }
+        for trait in PlantVoice.Trait.allCases {
+            for line in PlantVoice.lines(trait: trait, event: .water) + PlantVoice.lines(trait: trait, event: .hello) {
+                XCTAssertEqual(CopySafety.check(line), [], line)
+            }
+        }
+        XCTAssertEqual(WidgetCopy.inline(name: "Daisy", chip: nil), "Daisy: growing nicely")
+        XCTAssertEqual(WidgetCopy.inline(name: "Daisy", chip: "Tomorrow: windy"), "Daisy: Tomorrow: windy")
+        XCTAssertEqual(WidgetCopy.waterLabel(name: "Daisy", water: 1, quiet: false), "Water Daisy. 1 drop in your can")
+        XCTAssertEqual(WidgetCopy.percent(0.404), "40 percent")
+    }
+
+    // MARK: typed names (diff review 2, B1)
+    func testUnder13NeverSeesATypedNameAndTheLockScreenUsesTheSpecies() {
+        let ps = plants(["rose"]); ps[0].nickname = "Bella"
+        let teen = WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal).hero!
+        XCTAssertEqual(teen.name, "Bella"); XCTAssertTrue(teen.hasTypedName)
+        XCTAssertEqual(teen.shownName(hideTyped: true), ps[0].name, "locked: the species name")
+        XCTAssertEqual(teen.shownName(hideTyped: false), "Bella")
+        let kid = WidgetActions.snapshot(context: ctx, now: t0, calm: true, calendar: cal, typedNames: false).hero!
+        XCTAssertEqual(kid.name, ps[0].name); XCTAssertFalse(kid.hasTypedName)
+        let d = UserDefaults(suiteName: "wf-widget-names-\(UUID().uuidString)")!
+        XCTAssertTrue(WidgetActions.showsTypedNames(in: d))
+        d.set("under13", forKey: "ageBand"); XCTAssertFalse(WidgetActions.showsTypedNames(in: d))
+        d.set("thirteenPlus", forKey: "ageBand"); XCTAssertTrue(WidgetActions.showsTypedNames(in: d))
+    }
+
+    // MARK: midnight refresh (calendar, not +24 h)
+    func calendar(_ tz: String) -> Calendar { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: tz)!; return c }
+    func date(_ c: Calendar, _ y: Int, _ m: Int, _ d: Int, _ h: Int) -> Date { c.date(from: DateComponents(year: y, month: m, day: d, hour: h))! }
+
+    func testNextMidnightAcrossTheNewYear() {
+        let c = calendar("Europe/London")
+        XCTAssertEqual(WidgetActions.nextMidnight(after: date(c, 2026, 12, 31, 22), calendar: c), date(c, 2027, 1, 1, 0))
+    }
+
+    func testNextMidnightOnDaylightSavingDays() {
+        let ny = calendar("America/New_York")
+        // 2026-03-08 is 23 hours long in New York: start of day + 24 h would land at 1 am.
+        XCTAssertEqual(WidgetActions.nextMidnight(after: date(ny, 2026, 3, 8, 12), calendar: ny), date(ny, 2026, 3, 9, 0))
+        XCTAssertNotEqual(ny.startOfDay(for: date(ny, 2026, 3, 8, 12)).addingTimeInterval(86_400), date(ny, 2026, 3, 9, 0))
+        // 2026-11-01 is 25 hours long.
+        XCTAssertEqual(WidgetActions.nextMidnight(after: date(ny, 2026, 11, 1, 12), calendar: ny), date(ny, 2026, 11, 2, 0))
+        // A day with no midnight (Sao Paulo, 2018-11-04 started at 1 am): the first moment of that day.
+        let sp = calendar("America/Sao_Paulo")
+        let m = WidgetActions.nextMidnight(after: date(sp, 2018, 11, 3, 20), calendar: sp)
+        XCTAssertEqual(sp.component(.day, from: m), 4); XCTAssertEqual(m, sp.startOfDay(for: date(sp, 2018, 11, 4, 12)))
+    }
+
     // MARK: deep links
     func testWidgetLinksOpenTheRightScreens() {
         let r = GameRouter()
