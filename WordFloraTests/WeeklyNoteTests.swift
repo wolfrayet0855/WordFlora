@@ -212,7 +212,8 @@ final class WeeklyNoteTests: XCTestCase {
 
     func testEveryStringPassesCopySafety() {
         let names = ["Daisy", "Lady's Slipper Orchid", "Rainbow Eucalyptus", "Monkey Puzzle Tree", "Dragon Blood Tree", "Giant Water Lily"]
-        var lines = [WeeklyNoteCopy.title, WeeklyNoteCopy.lovely, WeeklyNoteCopy.visit, WeeklyNoteCopy.share, WeeklyNoteCopy.shareHint,
+        var lines = [WeeklyNoteCopy.title, WeeklyNoteCopy.celebrate, WeeklyNoteCopy.celebrateHint, WeeklyNoteCopy.celebrateTitle,
+                     WeeklyNoteCopy.celebrateLine, WeeklyNoteCopy.celebrateDone, WeeklyNoteCopy.share, WeeklyNoteCopy.shareHint,
                      WeeklyNoteCopy.caption, WeeklyNoteCopy.shareHeader, WeeklyNoteCopy.tagline] + WeeklyNoteCopy.closings
         for n in 0...99 { lines += [WeeklyNoteCopy.words(n), WeeklyNoteCopy.daily(n), WeeklyNoteCopy.friends(n)] }
         for k in 1...names.count - 1 { lines += [WeeklyNoteCopy.plants(Array(names.prefix(k))), WeeklyNoteCopy.quietPlants(Array(names.prefix(k)))] }
