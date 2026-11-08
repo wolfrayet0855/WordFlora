@@ -67,9 +67,10 @@ struct WinterSceneBackdrop: View {
             let f = FrostLanternScene.frame(in: geo.size)
             ZStack(alignment: .topLeading) {
                 Color.appBackground
-                Image(FrostLanternScene.imageName).resizable()
+                Image(decorative: FrostLanternScene.imageName).resizable()      // decorative: never an accessibility element
                     .frame(width: f.width, height: f.height)
                     .offset(x: f.minX, y: f.minY)
+                    .accessibilityHidden(true)
                 if FrostLanternScene.snows(quietGarden: app.settings.quietGarden) {
                     SnowfallView(count: Snowfall.count(base: FrostLanternScene.snowCount, calm: calm), calm: calm,
                                  still: reduceMotion || app.settings.reduceMotionOverride || lowPower.isOn,
@@ -82,8 +83,7 @@ struct WinterSceneBackdrop: View {
         .onAppear { visible = true }
         .onDisappear { visible = false }
         .allowsHitTesting(false)
-        .accessibilityHidden(true)
-        .accessibilityIdentifier("winter.scene")
+        .accessibilityHidden(true)      // no identifier: an id would expose the hidden scene to the audit again
     }
 }
 
