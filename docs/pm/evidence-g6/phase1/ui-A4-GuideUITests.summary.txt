@@ -1,0 +1,33 @@
+Test Case '-[WordFloraUITests.GuideUITests testAccessibilityTextStacksTheButtonsAndScrolls]' passed (19.576 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testAuditGuideAtAccessibilityTextPagesFiveToEight]' passed (39.436 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testAuditGuideAtAccessibilityTextPagesOneToFour]' passed (33.111 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testAuditGuidePagesFiveToEight]' passed (38.051 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testAuditGuidePagesOneToFour]' passed (33.146 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testGuideShowsAfterTheAgeQuestionAndNextReachesTheFirstWord]' passed (31.642 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testQuietGardenChangesThePageAboutHearts]' passed (20.453 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testScreenshotsAccessibilityText]' passed (33.343 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/GuideUITests.swift:34: error: -[WordFloraUITests.GuideUITests testScreenshotsLight] : XCTAssertTrue failed - the guide follows the age question
+Test Case '-[WordFloraUITests.GuideUITests testScreenshotsLight]' failed (15.147 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testScreenshotsReduceMotion]' passed (29.640 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testShowTheGuideAgainFromSettings]' passed (32.851 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/GuideUITests.swift:34: error: -[WordFloraUITests.GuideUITests testSkipOnPageFourGoesToTheFirstWord] : XCTAssertTrue failed - the guide follows the age question
+Test Case '-[WordFloraUITests.GuideUITests testSkipOnPageFourGoesToTheFirstWord]' failed (14.854 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/GuideUITests.swift:34: error: -[WordFloraUITests.GuideUITests testSkipOnPageOneGoesToTheFirstWord] : XCTAssertTrue failed - the guide follows the age question
+Test Case '-[WordFloraUITests.GuideUITests testSkipOnPageOneGoesToTheFirstWord]' failed (13.907 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/GuideUITests.swift:34: error: -[WordFloraUITests.GuideUITests testSkipOnPageSevenGoesToTheFirstWord] : XCTAssertTrue failed - the guide follows the age question
+Test Case '-[WordFloraUITests.GuideUITests testSkipOnPageSevenGoesToTheFirstWord]' failed (13.883 seconds).
+Test Case '-[WordFloraUITests.GuideUITests testTheFirstAgeTapCountsRightAfterSkippingTheIntro]' passed (10.004 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/GuideUITests.swift:62: error: -[WordFloraUITests.GuideUITests testTheFirstAgeTapCountsWhileTheQuestionFadesIn] : XCTAssertTrue failed - the first age tap leads to the guide
+Test Case '-[WordFloraUITests.GuideUITests testTheFirstAgeTapCountsWhileTheQuestionFadesIn]' failed (10.651 seconds).
+	 Executed 16 tests, with 5 failures (0 unexpected) in 389.695 (389.723) seconds
+Test Case '-[WordFloraUITests.QuietGardenOfferUITests testAccessibilityTextWrapsAndScrolls]' passed (19.853 seconds).
+Test Case '-[WordFloraUITests.QuietGardenOfferUITests testAuditAtAccessibilitySize]' passed (23.130 seconds).
+Test Case '-[WordFloraUITests.QuietGardenOfferUITests testAuditAtDefaultSize]' passed (15.056 seconds).
+Test Case '-[WordFloraUITests.QuietGardenOfferUITests testBackReturnsToTheAgeQuestion]' passed (15.442 seconds).
+Test Case '-[WordFloraUITests.QuietGardenOfferUITests testNoThanksGoesOnToTheGuide]' passed (13.556 seconds).
+Test Case '-[WordFloraUITests.QuietGardenOfferUITests testScreenshots]' passed (59.739 seconds).
+Test Case '-[WordFloraUITests.QuietGardenOfferUITests testUnder13OpensTheOfferInPlaceOfTheAgeQuestion]' passed (12.465 seconds).
+Test Case '-[WordFloraUITests.QuietGardenOfferUITests testYesKeepsItQuietAndGoesOnToTheGuide]' passed (14.084 seconds).
+	 Executed 8 tests, with 0 failures (0 unexpected) in 173.325 (173.337) seconds
+	 Executed 24 tests, with 5 failures (0 unexpected) in 563.020 (563.063) seconds
+	 Executed 24 tests, with 5 failures (0 unexpected) in 563.020 (563.066) seconds

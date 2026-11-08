@@ -1,0 +1,15 @@
+Test Case '-[WordFloraUITests.ButterflyNetUITests testAGentleHelloUnderReduceMotionEarnsGentleNet]' passed (72.450 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testAQuickWingsShortRoundReachesTheSummaryWithRewards]' passed (16.901 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testAuditTheEasierSwitch]' passed (21.142 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testAuditTheEasierSwitchAtAXXXLInLight]' passed (23.449 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testAuditTheGameScene]' passed (63.447 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testAuditTheSummaryWithAGentleHello]' passed (53.201 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testAuditTheVisitorsCard]' passed (89.943 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testEasierButterfliesIsOfferedToThirteenPlusOnly]' passed (37.530 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testNetScreenshots]' passed (39.024 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testQuietGardenSummaryShowsNoRewardsRow]' passed (14.559 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testTheQuickWingsChipShowsForThirteenPlusOnly]' passed (31.193 seconds).
+Test Case '-[WordFloraUITests.ButterflyNetUITests testTheSceneSaysWhichPaceItPlays]' passed (41.284 seconds).
+	 Executed 12 tests, with 0 failures (0 unexpected) in 504.124 (504.143) seconds
+	 Executed 12 tests, with 0 failures (0 unexpected) in 504.124 (504.145) seconds
+	 Executed 12 tests, with 0 failures (0 unexpected) in 504.124 (504.147) seconds

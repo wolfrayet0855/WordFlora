@@ -134,7 +134,7 @@ art is the Eurasian wren, *T. troglodytes*).
 
 | File | What |
 |---|---|
-| `plant_snowdrop.svg` | Full bloom, 200 x 200 plant box, ground at y 177 like every plant. Groups follow `PlantThinning` layers: `ground`, `back` (static), `petals` with `r<head>_s<i>`, then `front`. Three nodding heads at (118,72), (70,88) and (140,104), each with 3 outer tepals (9 petals); the inner bells with their green V are in `front`. |
+| `plant_snowdrop.svg` | Full bloom, 200 x 200 plant box, ground at y 177 like every plant. Groups follow `PlantThinning` layers: `ground`, `back` (static), `petals` with `r<head>_s<i>`, then `front`. Three nodding heads at (118,64), (72,80) and (138,94), each bell tilted 38 degrees outward, each with 3 outer tepals (9 petals); the inner bells with their green V are in `front`. |
 | `plant_hellebore.svg` | Full bloom, same box. Three heads at (102,74), (60,104) and (144,100), each with 5 sepals (15 petals); the lime centres and stamens are in `front`. |
 | `plant_snowdrop_stages.svg`, `plant_hellebore_stages.svg` | **Reference, not shipped; ship only the layered full-bloom files.** Five 200 x 200 panels, stages 0 to 4 (`LifeStats.stageNames`: Tiny, Sprout, Bud, Bloom, Full bloom), for review only. Do not make imagesets from them. |
 

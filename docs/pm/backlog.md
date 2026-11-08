@@ -42,3 +42,6 @@ Items here are parked, not cut. Each needs the owner's go before it is built.
 
 - Gate: post a VoiceOver announcement when the wrong-answer line appears (PlusView.swift ~377) (1.1, from G6 fixes review).
 - Shed: the zero-height sponsored-section spacer adds a 12 pt gap at the bottom when an ad is present; move the .task to ShedView or pad -12 (1.1, cosmetic).
+
+## Plus (owner, 2026-11-08)
+- Plus page after purchase: a more modern, tasteful confirmation (deferred to 1.1).

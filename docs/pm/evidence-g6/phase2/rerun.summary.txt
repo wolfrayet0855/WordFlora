@@ -1,0 +1,60 @@
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:250: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightAXXXL] : XCTAssertTrue failed - cue-light-axxxl: 1 - Contrast failed | 'Guess words. Grow a garden.' [] (108.0, 152.66666666666666, 164.0, 232.66666666666666)
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightAXXXL]' failed (14.961 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:250: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightDefault] : XCTAssertTrue failed - cue-light-default: 1 - Contrast failed | 'Play' [] (16.0, 264.0, 370.0, 64.0)
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightDefault]' failed (14.001 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditGardenBannerLightDefault]' passed (19.014 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:275: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightAXXXL] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightAXXXL]' failed (64.779 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:275: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightDefault] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightDefault]' failed (51.354 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testCalmNeverShowsAVideoCard]' passed (29.349 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoSponsoredSectionForUnderThirteenOrPlus]' passed (58.095 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:145: error: -[WordFloraUITests.AdFormatsG4bUITests testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst]' failed (50.490 seconds).
+	 Executed 8 tests, with 5 failures (0 unexpected) in 302.043 (302.052) seconds
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditGardenLightAXXXL]' passed (31.709 seconds).
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditGardenLightDefault]' passed (33.737 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsUITests.swift:147: error: -[WordFloraUITests.AdFormatsUITests testAuditWakeLightDefault] : XCTAssertTrue failed - wake-light-default-textClipped: 131072 - Text clipped | 'Word puzzle' [] (117.4626865671642, 649.955223880597, 95.379767827529, 19.524046434494153)
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeLightDefault]' failed (40.175 seconds).
+Test Case '-[WordFloraUITests.AdFormatsUITests testUnderThirteenGetsTheRainBarrelWithNoVideo]' passed (13.768 seconds).
+	 Executed 4 tests, with 1 failure (0 unexpected) in 119.388 (119.394) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/EndgameUITests.swift:69: error: -[WordFloraUITests.EndgameUITests testGoldenBloomsRanksReplayAndTheVisitorsBook] : XCTAssertTrue failed - visitors-book-dynamicType: 65536 - Dynamic Type font sizes are partially unsupported | 'Monarch' (50.0, 363.6666666666667, 83.33333333333331, 24.0)
+Test Case '-[WordFloraUITests.EndgameUITests testGoldenBloomsRanksReplayAndTheVisitorsBook]' failed (86.584 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testTheShedSetsOutTomorrowsHelperForFree]' passed (17.815 seconds).
+	 Executed 2 tests, with 1 failure (0 unexpected) in 104.399 (104.403) seconds
+Test Case '-[WordFloraUITests.EngagementUITests testAuditPlantPageWidgetRow]' passed (28.850 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testAuditWeeklyNoteAtAXXXL]' passed (19.699 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testNewPlantCardOffersANameAndThePlantSaysHello]' passed (29.745 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testWeeklyNoteShowsThePastWeek]' passed (8.650 seconds).
+	 Executed 4 tests, with 0 failures (0 unexpected) in 86.944 (86.953) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/FrostLanternUITests.swift:136: error: -[WordFloraUITests.FrostLanternUITests testAlbumShowsTheWinterFriends] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.FrostLanternUITests testAlbumShowsTheWinterFriends]' failed (67.788 seconds).
+Test Case '-[WordFloraUITests.FrostLanternUITests testGlasshousePlantPageAudit]' passed (93.361 seconds).
+Test Case '-[WordFloraUITests.FrostLanternUITests testGlasshousePlantPagesAtStageZeroAndFour]' exceeded execution time allowance of 4 minutes. The test may have hung; check Xcode's test report for additional diagnostics. If the test requires additional time, use -[XCTestCase executionTimeAllowance] or one of xcodebuild's command-line overrides.
+Test Case '-[WordFloraUITests.FrostLanternUITests testOwnersSeeTheSceneOnHomeAndGarden]' passed (8.605 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/FrostLanternUITests.swift:59: error: -[WordFloraUITests.FrostLanternUITests testSceneAuditsLightAndDarkAtAXXXL] : XCTAssertTrue failed - g5-home-light-axxxl: 8 - Element has no description | '' [winter.scene]
+Test Case '-[WordFloraUITests.FrostLanternUITests testSceneAuditsLightAndDarkAtAXXXL]' failed (16.709 seconds).
+Test Case '-[WordFloraUITests.FrostLanternUITests testWithoutThePackNothingShows]' passed (8.381 seconds).
+	 Executed 3 tests, with 1 failure (0 unexpected) in 33.696 (33.703) seconds
+Test Case '-[WordFloraUITests.PlusForeverUITests testPlusForeverIsTheThirdRowAndYearlyStaysTheDefault]' passed (24.549 seconds).
+Test Case '-[WordFloraUITests.PlusForeverUITests testThePlusPagePassesTheAuditAtAccessibilityXXXL]' passed (58.015 seconds).
+	 Executed 2 tests, with 0 failures (0 unexpected) in 82.564 (82.569) seconds
+Test Case '-[WordFloraUITests.RestCardUITests testAuditRestCard]' passed (45.324 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 45.324 (45.327) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/SeasonsUITests.swift:80: error: -[WordFloraUITests.SeasonsUITests testTeensSeeTheSeasonsShelfWithItsPrice] : XCTAssertTrue failed - shed-seasons-shelf: 131072 - Text clipped | '' [] 
+Test Case '-[WordFloraUITests.SeasonsUITests testTeensSeeTheSeasonsShelfWithItsPrice]' failed (50.417 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 50.417 (50.419) seconds
+Test Case '-[WordFloraUITests.TextFitScreensUITests testPlusPageAtDefaultAndAX5]' passed (190.035 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/TextFitScreensUITests.swift:85: error: -[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable] : XCTAssertTrue failed - gate-ax5-light-textClipped: 131072 - Text clipped | 'Continue' [] (12.0, 724.3333129882812, 378.0, 65.66668701171875)
+Test Case '-[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable]' failed (109.296 seconds).
+	 Executed 2 tests, with 1 failure (0 unexpected) in 299.331 (299.334) seconds
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditRainyPlant]' passed (23.149 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testAuditThePlantPageWithTheLifePanelOpenAtALargeTextSize]' passed (16.799 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX1InLight]' passed (70.836 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX3InLight]' passed (69.653 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX5InLight]' passed (70.154 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtTheDefaultSizeInLight]' passed (69.689 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testSubscriberSeesThankYouNotPlans]' passed (18.158 seconds).
+	 Executed 7 tests, with 0 failures (0 unexpected) in 338.439 (338.451) seconds
+	 Executed 16 tests, with 3 failures (0 unexpected) in 849.772 (849.810) seconds
+	 Executed 16 tests, with 3 failures (0 unexpected) in 849.772 (849.812) seconds

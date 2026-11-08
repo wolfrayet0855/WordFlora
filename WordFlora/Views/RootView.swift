@@ -9,7 +9,8 @@ struct RootView: View {
         Group {
             if app.onboarding.isComplete { mainStack(router: $router.path) } else { OnboardingView() }
         }
-        .accessibilityHidden(app.shownBadge != nil)          // the badge moment is modal while it shows
+        // The badge moment and the return cue are modal while they show: what they cover is hidden from VoiceOver.
+        .accessibilityHidden(app.shownBadge != nil || app.adFormats.cue != .hidden)
         .overlay {
             if let level = Self.uiTestCelebrate {
                 // UI tests: one still frame of a burst over the screen, for the accessibility audit.
@@ -26,6 +27,7 @@ struct RootView: View {
                     .accessibilityIdentifier("degraded-store-banner")
             }
         }
+        .overlay { AppOpenCueHost() }                        // G4b: the return cue covers everything while it is up
         .tint(Color.successText)
     }
 
@@ -38,7 +40,9 @@ struct RootView: View {
     private func mainStack(router path: Binding<[GameRoute]>) -> some View {
         NavigationStack(path: path) {
             HomeView()
-                .accessibilityHidden(app.shownBadge != nil)      // the stack's pages need it themselves (GameView does too)
+                // The stack's pages need it themselves (GameView does too). The return cue is modal too: what it
+                // covers on Home is hidden from VoiceOver while it is up.
+                .accessibilityHidden(app.shownBadge != nil || app.adFormats.cue != .hidden)
                 .navigationDestination(for: GameRoute.self) { route in
                     switch route {
                     case .garden: GardenView()
@@ -57,6 +61,8 @@ struct RootView: View {
                     }
                 }
         }
+        // No ad of any kind while the Plus or Seasons page is the current screen (Plus flow review, AdBlock.paywall).
+        .onChange(of: path.wrappedValue, initial: true) { _, p in app.adOnPaywall = p.last == .plus || p.last == .seasons }
     }
 }
 

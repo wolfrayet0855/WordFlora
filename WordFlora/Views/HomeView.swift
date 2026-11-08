@@ -81,12 +81,20 @@ struct HomeView: View {
     @State private var labelLines: [String: Int] = [:]
     /// "A short ad may play first." under Play, in the 3 minutes after "That's enough for now" (AdGate.returnVisit).
     @State private var playAdNote = false
+    /// B4: the Home banner slot at the anchored adaptive height (known before the ad loads, so the page never jumps).
+    @State private var bannerHeight: CGFloat = AdBannerView.slotHeight
     @State private var showNudge = false
     @State private var playStarting = false
     /// This visit showed a forecast or the weather, so the ad banner stays away (spec section 8).
     @State private var weatherVisit = false
     @State private var weatherPuzzle = false
     @State private var weatherPuzzleClosed = 0
+    /// The weekly garden note for this visit (WeeklyNote); recorded as seen when it first shows.
+    @State private var weeklyNote: WeeklyNote.Summary?
+    /// The weekly note's Celebrate splash is up. Done closes only the splash: the note stays for this visit.
+    @State private var weeklyCelebrate = false
+    /// The note's plant art, looked up once when the note shows (AppModel.weeklyNoteArt).
+    @State private var weeklyArt: (plants: [String], celebrate: [String]) = ([], [])
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     private let reportsLayout = LineProbe.enabled
 
@@ -121,14 +129,29 @@ struct HomeView: View {
                         // Garden weather (empty in Calm mode and Quiet Garden): a chip, then the card or the banner.
                         if let chip = weather.chip { WeatherChip(text: chip, kind: weather.chipKind) }
 
-                        if app.showWelcomeBack || app.plusOffer != nil || weather.card != nil || weather.banner != nil {
+                        if let note = weeklyNote {
+                            VStack(spacing: 10) {
+                                WeeklyNoteCard(summary: note, quiet: app.settings.quietGarden, plantArt: weeklyArt.plants)
+                                WeeklyNoteActions(summary: note, canShare: app.canShareWeek,
+                                                  onCelebrate: { app.markWeeklyNoteSeen(note.weekKey); weeklyCelebrate = true })
+                            }
+                            .transition(.opacity)
+                            // Seen once it has stayed on screen a moment; leaving Home first cancels this.
+                            .task(id: note.weekKey) {
+                                try? await Task.sleep(for: .seconds(1.5))
+                                if !Task.isCancelled && router.path.isEmpty { app.markWeeklyNoteSeen(note.weekKey) }
+                            }
+                        }
+
+                        if app.showWelcomeBack || (app.plusOffer != nil && weeklyNote == nil) || weather.card != nil || weather.banner != nil {
                             VStack(spacing: 10) {
                                 if let k = weather.banner { WeatherBanner(kind: k, onPuzzle: { weatherPuzzle = true }, refreshToken: weatherPuzzleClosed).transition(.opacity) }
                                 if let k = weather.card {
                                     ForecastCard(kind: k) { animate { app.dismissForecastCard() } }.transition(.opacity)
                                 }
                                 if app.showWelcomeBack { welcomeCard.transition(.opacity) }
-                                if app.plusOffer != nil { plusOfferCard.transition(.opacity) }
+                                // One card at a time: the Plus card never sits beside the weekly note.
+                                if app.plusOffer != nil && weeklyNote == nil { plusOfferCard.transition(.opacity) }
                             }
                         }
 
@@ -136,7 +159,8 @@ struct HomeView: View {
                         playAdNoteLabel
                         if unlocked.contains(.dailyBloom) { dailyBloom.padding(.bottom, 4) }
                         // The daily tiny quest (never in Quiet Garden or the first session; AppModel+Quest).
-                        if let quest = app.dailyQuest(stats: stats) {
+                        // On a weekly-note visit the quest waits for the next visit, so Home shows one card at a time.
+                        if weeklyNote == nil, let quest = app.dailyQuest(stats: stats) {
                             DailyQuestCard(quest: quest, state: app.questState, calm: app.settings.calmMode,
                                            reduceMotion: systemReduceMotion || app.settings.reduceMotionOverride)
                                 .padding(.bottom, 4)
@@ -146,6 +170,7 @@ struct HomeView: View {
                             .textCase(.uppercase).kerning(1.4)
                             .font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.secondaryText)
                             .padding(.horizontal, 4)
+                            .sceneScrim()           // Frost & Lantern: loose text over the snow bank gets the 60 % scrim
                             .accessibilityAddTraits(.isHeader)
                         exploreGrid(unlocked)
                     }
@@ -167,16 +192,22 @@ struct HomeView: View {
                 .transition(.opacity)
             }
         }
-        .background(Color.appBackground.ignoresSafeArea())
+        .frostLanternBackground(app.showsWinterScene && !showNudge)      // the snowy lantern scene for pack owners
         .safeAreaInset(edge: .bottom) { if !showNudge { bannerArea } }
         .task(id: app.restExitAt) { await followReturnWindow() }
         .task { await app.prepareBannerIfAllowed() }
         .onAppear {
             app.refreshWeather(); app.markWeatherSeen()
             if app.homeWeather.quietsOffers { weatherVisit = true }      // no ad banner in a visit with the weather
-            app.checkPlusOffer(); playAdNote = app.returnVisit == .adMayPlay
+            showWeeklyNoteIfDue()
+            if weeklyNote == nil { app.checkPlusOffer() }     // a note visit holds the Plus card back
+            playAdNote = app.returnVisit == .adMayPlay
         }
         .grandGardenCeremony()
+        .onChange(of: router.path.isEmpty) { _, onHome in if !onHome { dropSeenWeeklyNote() } }
+        .fullScreenCover(isPresented: $weeklyCelebrate) {
+            WeeklyCelebrateView(art: weeklyArt.celebrate) { weeklyCelebrate = false }.environment(app)
+        }
         .fullScreenCover(isPresented: $weatherPuzzle, onDismiss: { weatherPuzzleClosed += 1 }) { WeatherPuzzleSheet { weatherPuzzle = false }.environment(app) }
         .navigationBarHidden(true)
         .overlay(alignment: .bottomLeading) { layoutReport }
@@ -305,6 +336,22 @@ struct HomeView: View {
 
     private func closeNudge() { showNudge = false }
 
+    /// The weekly note waits while a weather card or banner, the welcome card or the Plus card is up (a later visit this
+    /// week), and while another screen is open over Home (a widget tap opens straight onto a plant).
+    private func showWeeklyNoteIfDue() {
+        guard weeklyNote == nil, router.path.isEmpty else { return }
+        let w = app.homeWeather
+        weeklyNote = app.dueWeeklyNote(otherCardShowing: w.card != nil || w.banner != nil || app.showWelcomeBack || app.plusOffer != nil,
+                                       nudgeShowing: showNudge)
+        if let weeklyNote { weeklyArt = app.weeklyNoteArt(weeklyNote) }
+    }
+
+    /// A note already seen this week stays for that one visit only: once another screen opens over Home, it has gone
+    /// (closing the Celebrate splash is not a new visit, so the note stays for Share my week).
+    private func dropSeenWeeklyNote() {
+        if let note = weeklyNote, app.settings.weeklyNoteSeenWeek == note.weekKey { weeklyNote = nil }
+    }
+
     /// The honest ad note follows the 3 minute window: judged as Home appears or the window starts, and dropped when
     /// it ends. Nothing on screen counts down.
     private func followReturnWindow() async {
@@ -322,6 +369,7 @@ struct HomeView: View {
             Label(NudgeCardCopy.adNote, systemImage: "info.circle")
                 .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                .sceneScrim()
                 .frame(maxWidth: .infinity)
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("home.adNote")
@@ -502,12 +550,13 @@ struct HomeView: View {
         if app.showBanner && !weatherVisit {
             VStack(spacing: 2) {
                 Group {
-                    if app.ads.started { AdBannerView() } else { Color.clear }
+                    if app.ads.started { AdBannerView(height: $bannerHeight) } else { Color.clear }
                 }
-                .frame(height: 50)
+                .frame(height: bannerHeight)                 // B4: the adaptive height, never a fixed 50 pt
                 HStack(spacing: 16) {
-                    Button("Go ad-free") { router.go(.plus) }
-                    Link("Report an ad", destination: Links.reportAd)
+                    // Caption text, 44 pt tap targets (hit-area audit; as the Garden slot).
+                    Button("Go ad-free") { router.go(.plus) }.tapTarget()
+                    Link("Report an ad", destination: Links.reportAd).tapTarget()
                 }
                 .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
                 .opacity(app.ads.started ? 1 : 0)

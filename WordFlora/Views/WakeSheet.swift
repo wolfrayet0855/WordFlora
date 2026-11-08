@@ -58,6 +58,7 @@ struct WakeSheet: View {
             .padding(8)
         }
         .background(Color.appBackground.ignoresSafeArea())
+        .rewardToast($toast, announce: false)          // R3: the success view says it too, so VoiceOver hears it once
         .presentationDetents([.medium, .large], selection: $detent)
         .presentationDragIndicator(.visible)
         .onAppear { detent = needsLarge(.choose) ? .large : .medium; app.pauseBadgeMoments(.sheet, true) }
@@ -67,7 +68,13 @@ struct WakeSheet: View {
 
     private func needsLarge(_ s: Step) -> Bool {
         if typeSize.isAccessibilitySize { return true }
-        switch s { case .choose, .intro: return false; default: return true }
+        switch s {
+        // With R3's third row (gentle wake) the chooser no longer fits the medium detent: the second tile's line sat
+        // under the sheet's edge. Open it large so every tile is whole.
+        case .choose: return app.perkPath(.wake) != .hidden
+        case .intro: return false
+        default: return true
+        }
     }
 
     // MARK: Choose
@@ -85,10 +92,35 @@ struct WakeSheet: View {
                 ForEach(WakeRule.ordered(suggested: suggested), id: \.self) { c in
                     WakeTile(challenge: c, suggested: c == suggested) { step = .intro(c) }
                 }
+                gentleWakeRow
             }
             .padding(20)
         }
         .scrollBounceBehavior(.basedOnSize)
+    }
+
+    @State private var toast: String?
+    @State private var watching = false
+
+    /// R3: a third, quieter way to wake, only after one "still dreaming" try; once a day. A video for 13 and over
+    /// without Plus ("The two challenges stay free"), free for Plus, under 13 and an unknown age. It wakes the seed
+    /// like a win but grants no sticker, badge progress, water, shed points or soil.
+    @ViewBuilder private var gentleWakeRow: some View {
+        RewardedPromptRow.forPath(app.perkPath(.wake), adTitle: AdPerkCopy.Wake.adTitle, freeTitle: AdPerkCopy.Wake.freeTitle,
+                                  adSubtitle: AdPerkCopy.Wake.adSubtitle, freeSubtitle: AdPerkCopy.Wake.freeSubtitle,
+                                  hasPlus: app.entitlements.state.hasPlus, identifier: "wake.gentle", busy: watching) {
+            guard !watching else { return }
+            watching = true
+            Task {
+                if await app.watchRewarded(.wake) {
+                    app.gentleWake(plant)
+                    toast = AdPerkCopy.Wake.toast(name: name)
+                    step = .awake
+                }
+                watching = false
+            }
+        }
+        .disabled(watching)
     }
 
     // MARK: Intro
@@ -172,7 +204,9 @@ private struct WakeTile: View {
                         Text(WakeCopy.suggestedBadge).font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.ink)
                             .padding(.horizontal, 8).padding(.vertical, 3).background(Color.appAccent, in: Capsule())
                     }
+                    // The title takes its full height (it was squeezed a fraction at the default size: clipped text).
                     Text(WakeCopy.title(challenge)).font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
                     Text(WakeCopy.subtitle(challenge)).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                     if typeSize.isAccessibilitySize {
@@ -205,6 +239,7 @@ private struct WakeTile: View {
 
     private func chip(_ text: String) -> some View {
         Text(text).font(Theme.font(.caption, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 10).padding(.vertical, 4)
             .background(Color.appPrimaryText.opacity(0.07), in: Capsule())
     }

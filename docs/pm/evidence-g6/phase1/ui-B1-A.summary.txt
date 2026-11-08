@@ -1,0 +1,32 @@
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:244: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightAXXXL] : XCTAssertTrue failed - cue-light-axxxl: 1 - Contrast failed | 'Guess words. Grow a garden.' [] (108.0, 152.66666666666666, 164.0, 232.66666666666666)
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightAXXXL]' failed (32.195 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:244: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightDefault] : XCTAssertTrue failed - cue-light-default: 1 - Contrast failed | 'Play' [] (16.0, 264.0, 370.0, 64.0)
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightDefault]' failed (17.403 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:244: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditGardenBannerLightDefault] : XCTAssertTrue failed - garden-banner-light-default: 4 - Hit area is too small | 'Go ad-free' [] (128.0, 821.6666666666666, 60.0, 14.333333333333371)
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditGardenBannerLightDefault]' failed (19.133 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:40: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightAXXXL] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightAXXXL]' failed (13.700 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:40: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightDefault] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightDefault]' failed (13.903 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:40: error: -[WordFloraUITests.AdFormatsG4bUITests testCalmNeverShowsAVideoCard] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testCalmNeverShowsAVideoCard]' failed (14.207 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueForPlus]' passed (16.092 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueForUnderThirteen]' passed (18.040 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueInCalm]' passed (17.305 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueInQuietGarden]' passed (16.854 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueOnAColdLaunchFromALink]' passed (11.692 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueOverAWordInProgress]' passed (22.845 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueOverOnboarding]' passed (13.846 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoCueWhenALinkOpensTheApp]' passed (22.457 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:40: error: -[WordFloraUITests.AdFormatsG4bUITests testNoSponsoredSectionForUnderThirteenOrPlus] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testNoSponsoredSectionForUnderThirteenOrPlus]' failed (12.502 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheCueCanShowOnAColdLaunchAfterFourHoursAway]' passed (9.338 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheFakeAppOpenAdPlaysOverTheCueOnceADay]' passed (33.498 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheGardenBannerIsCollapsibleOnceAVisitThenPlain]' passed (19.790 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheReturnCueShowsTheAdChipAndSkipGoesBackToTheScreenLeft]' passed (23.897 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:40: error: -[WordFloraUITests.AdFormatsG4bUITests testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst]' failed (14.059 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testVoiceOverAndAccessibilitySizesGetThePlainBanner]' passed (30.356 seconds).
+	 Executed 21 tests, with 8 failures (0 unexpected) in 393.115 (393.143) seconds
+	 Executed 21 tests, with 8 failures (0 unexpected) in 393.115 (393.145) seconds
+	 Executed 21 tests, with 8 failures (0 unexpected) in 393.115 (393.147) seconds

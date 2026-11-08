@@ -1,0 +1,13 @@
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkAXXXL]' passed (21.844 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkDefault]' passed (21.647 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditGardenBannerDarkAXXXL]' passed (19.351 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkAXXXL]' passed (73.110 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkDefault]' passed (39.737 seconds).
+	 Executed 5 tests, with 0 failures (0 unexpected) in 175.689 (175.701) seconds
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeDarkDefault]' passed (47.447 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 47.447 (47.450) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/TextFitScreensUITests.swift:85: error: -[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable] : XCTAssertTrue failed - gate-ax5-light-dynamicType: 65536 - Dynamic Type font sizes are partially unsupported | 'For grown-ups' [] (35.33333333333334, 90.0, 331.33333333333337, 58.66666666666666)
+Test Case '-[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable]' failed (114.071 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 114.071 (114.072) seconds
+	 Executed 7 tests, with 1 failure (0 unexpected) in 337.206 (337.227) seconds
+	 Executed 7 tests, with 1 failure (0 unexpected) in 337.206 (337.229) seconds

@@ -54,6 +54,11 @@ final class AppSettings {
     var familyNudgeShownAt: Date? { didSet { defaults.set(familyNudgeShownAt, forKey: "familyNudgeShownAt") } }
     /// Mist Maker's tip ("Some plants love a little mist on their leaves.") has been shown once on this device.
     var mistTipShown: Bool { didSet { defaults.set(mistTipShown, forKey: "mistTipShown") } }
+    /// The weekly garden note's week (day number of its Monday, `WeeklyNote.weekKey`) once shown. Device-local, never synced.
+    var weeklyNoteSeenWeek: Int { didSet { defaults.set(weeklyNoteSeenWeek, forKey: "weeklyNoteSeenWeek") } }
+    /// Device-local ad counters (`AdLedger` as JSON, key `adLedger`): per-perk uses, app open, native loads, the
+    /// banked whisper. Never synced; the profile's synced day counts stay the backstop.
+    var adLedgerJSON: String { didSet { defaults.set(adLedgerJSON, forKey: "adLedger") } }
 
     /// What the Speed bloom rule reads as each round begins.
     var speedBloomPrefs: SpeedBloom.Prefs {
@@ -106,6 +111,8 @@ final class AppSettings {
         gentleNetTipShown = bool("gentleNetTipShown", false)
         familyNudgeShownAt = defaults.object(forKey: "familyNudgeShownAt") as? Date
         mistTipShown = bool("mistTipShown", false)
+        weeklyNoteSeenWeek = defaults.integer(forKey: "weeklyNoteSeenWeek")
+        adLedgerJSON = defaults.string(forKey: "adLedger") ?? ""
     }
 
     /// Applies the defaults that depend on the age answer (called once, when the player answers).

@@ -15,5 +15,8 @@ struct OpenGardenIntent: AppIntent {
     static var openAppWhenRun: Bool { true }
 
     @MainActor
-    func perform() async throws -> some IntentResult { .result() }
+    func perform() async throws -> some IntentResult {
+        AdLinkLaunch.mark()                  // opened for something specific: no return cue this time
+        return .result()
+    }
 }

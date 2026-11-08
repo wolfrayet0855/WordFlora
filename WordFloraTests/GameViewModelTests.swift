@@ -1,6 +1,7 @@
 import XCTest
 import SwiftData
 import UIKit
+import SwiftUI
 @testable import WordFlora
 
 @MainActor
@@ -250,8 +251,37 @@ final class GameViewModelTests: XCTestCase {
         XCTAssertEqual(PlantProgressCopy.winLine(toward: 2, per: 3), "2 of 3 words to your next plant.")
         XCTAssertEqual(PlantProgressCopy.homeLine(toward: 2, per: 3), "2 of 3 words to your next plant")
         XCTAssertEqual(PlantProgressCopy.homeLine(toward: 0, per: 3), "0 of 3 words to your next plant")
-        let all = [PlantProgressCopy.winTitle] + (0...3).flatMap { [PlantProgressCopy.winLine(toward: $0, per: 3), PlantProgressCopy.homeLine(toward: $0, per: 3)] }
+        // The nudge line shows only on the word before a plant.
+        XCTAssertEqual(PlantProgressCopy.nextLine(toward: 2, per: 3), "One more word and a new plant arrives!")
+        XCTAssertNil(PlantProgressCopy.nextLine(toward: 1, per: 3))
+        XCTAssertNil(PlantProgressCopy.nextLine(toward: 0, per: 3))
+        XCTAssertEqual(PlantProgressCopy.nextLine(toward: 4, per: 5), PlantProgressCopy.nextPlantLine)
+        let all = [PlantProgressCopy.winTitle, PlantProgressCopy.nextPlantLine, "Next word", "Tend my garden"]
+            + (0...3).flatMap { [PlantProgressCopy.winLine(toward: $0, per: 3), PlantProgressCopy.homeLine(toward: $0, per: 3)] }
         for line in all { XCTAssertEqual(CopySafety.check(line), [], line) }
+    }
+
+    func testTheWinCardPipFillsOnlyOnceItPops() {
+        // Word 2 of 3: the first pip is already full, the second waits for the pop, the third stays empty.
+        XCTAssertTrue(WordsToPlantPips.isOn(0, filled: 2, popped: false))
+        XCTAssertFalse(WordsToPlantPips.isOn(1, filled: 2, popped: false))
+        XCTAssertTrue(WordsToPlantPips.isOn(1, filled: 2, popped: true))
+        XCTAssertFalse(WordsToPlantPips.isOn(2, filled: 2, popped: true))
+        // The puff starts on the pip just earned: 16 pt pips, 12 pt gaps, measured from the row's centre.
+        XCTAssertEqual(WordsToPlantPips.offset(filled: 1, total: 3), -28)
+        XCTAssertEqual(WordsToPlantPips.offset(filled: 2, total: 3), 0)
+        XCTAssertEqual(WordsToPlantPips.offset(filled: 3, total: 3), 28)
+    }
+
+    func testTheHelloToastTickReadsOnTheToastInBothModes() {
+        let light = UITraitCollection(userInterfaceStyle: .light), dark = UITraitCollection(userInterfaceStyle: .dark)
+        func hex(_ c: Color, _ t: UITraitCollection) -> UInt32 {
+            var r: CGFloat = 0, g: CGFloat = 0, b: CGFloat = 0, a: CGFloat = 0
+            UIColor(c).resolvedColor(with: t).getRed(&r, green: &g, blue: &b, alpha: &a)
+            return UInt32((r * 255).rounded()) << 16 | UInt32((g * 255).rounded()) << 8 | UInt32((b * 255).rounded())
+        }
+        XCTAssertEqual(hex(LifePalette.toastTick, light), 0x9BCB3C)
+        XCTAssertEqual(hex(LifePalette.toastTick, dark), 0x2E7D32)
     }
 
     // MARK: resting (loss)

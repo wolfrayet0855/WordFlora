@@ -59,7 +59,7 @@ extension AppModel {
 
     /// Wild Discovery: the plant page's fact card was shown for this plant (each plant counts once).
     func noteFactCardRead(plantId: String) {
-        guard !plantId.isEmpty, !badges.isMarked(.storiesRead, item: plantId) else { return }
+        guard !plantId.isEmpty, !GlasshouseCatalog.isGlasshouse(plantId), !badges.isMarked(.storiesRead, item: plantId) else { return }
         updateBadges(after: 0.6) { state, quiet, t in state.recordMark(.storiesRead, item: plantId, now: t, quiet: quiet) }
     }
 
@@ -92,9 +92,9 @@ extension AppModel {
         return actionState(.prune, plant: plant).isReady
     }
 
-    /// Where the faded bloom sits on the plant art (fractions of its size).
+    /// Where the faded bloom sits on the plant art (fractions of its size), with the plant's own nudge applied.
     func fadedBloomSpot(_ plant: PlantCollectible) -> (x: Double, y: Double) {
-        FadedBloom.spot(seed: fadedBloomSeed, plantId: plant.plantId, day: fadedBloomToday)
+        FadedBloom.placedSpot(seed: fadedBloomSeed, plantId: plant.plantId, day: fadedBloomToday)
     }
 
     /// The fresh bud after a tidy trim, on later visits while the shears rest.
@@ -113,6 +113,9 @@ extension AppModel {
     /// The share button leaves the app, so it is hidden for players under 13 and when the age is not known
     /// (the same line as every other outbound path, `ParentalGate.isRequired`). The Sharer badge hides with it.
     var canShareBadges: Bool { BadgeShare.isAllowed(ageBand: settings.ageBand) }
+
+    /// Any share out of the app (Daily Bloom, a plant card, a plant fact, the weekly note): the same line as badges.
+    var canShare: Bool { ShareGate.isAllowed(ageBand: settings.ageBand) }
 
     /// Sharer: a badge card was shared (each badge and tier counts once).
     func noteBadgeShared(_ badgeId: String, tier: Int) {

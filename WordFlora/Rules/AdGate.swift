@@ -5,7 +5,7 @@ enum AdGate {
     /// `playSoonAfterEnough`: the player tapped Play on Home within `returnWindowSeconds` of "That's enough for now".
     enum Choice { case oneMore, thatsEnough, playSoonAfterEnough }
 
-    struct Context {
+    struct Context: Equatable {
         var now: Date
         var roundsSinceAd = 0
         var choice: Choice?
@@ -22,7 +22,7 @@ enum AdGate {
         /// 9 pm to 8 am local (`isNight`, the reminders' quiet hours). No interstitial plays at night: not on
         /// "One more", and not on a return soon after "That's enough" (that one gets the day-scene nudge instead).
         var isNight = false
-        // remote-config tunables
+        // compile-time defaults (no remote config; changing one is an app update)
         var frequency = 3
         var minGapSeconds = 180.0
         var maxPerDay = 6
@@ -93,6 +93,11 @@ enum AdGate {
     /// Under-13 profiles and subscribers never load any ad.
     static func mayLoadAnyAd(isUnderThirteen: Bool, hasRemoveAds: Bool) -> Bool {
         !isUnderThirteen && !hasRemoveAds
+    }
+
+    /// The same rule from the age answer itself: exactly `AdPolicy.treatment != .none` (unknown age counts as young).
+    static func mayLoadAnyAd(ageBand: AgeBand?, hasPlus: Bool) -> Bool {
+        AdPolicy.treatment(ageBand: ageBand, hasPlus: hasPlus) != .none
     }
 
     /// UMP / ATT prompts appear only immediately before an ad request that is actually allowed.

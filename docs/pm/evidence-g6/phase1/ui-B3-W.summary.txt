@@ -1,0 +1,28 @@
+Test Case '-[WordFloraUITests.WeatherUITests testAHelloMendsTheWeatherOnThePlantPage]' passed (23.665 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testAnUnder13PlayerWithCalmOffMayChooseWildWeatherButNotTheForecastReminder]' passed (19.692 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testAuditThePlantPageOnWeatherDaysHeldStill]' passed (102.991 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testAuditThePlantPageOnWeatherDaysMoving]' passed (83.334 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testAWeatheredPlantsPageOpensTheWeatherPuzzle]' passed (32.900 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testCalmModeShowsNoWeatherArtOnThePlantPage]' passed (23.795 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testCalmModeShowsNoWeatherAtAll]' passed (18.905 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testCalmShowsNoHelperStep]' passed (13.034 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testHomeWithAFoundPlantAndNoWeatherPassesTheAudit]' passed (16.465 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testQuietGardenShowsNoWeatherAndNoWeatherSettings]' passed (30.242 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testQuietGardenShowsNoWeatherArtOnThePlantPage]' passed (27.869 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheBannerAtTheLargestTextSizePassesTheAudit]' passed (26.328 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheBannerOpensTheWeatherPuzzleAndSkipComesBack]' passed (34.058 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheBannerPassesTheAudit]' passed (32.043 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheCardReadsWholeAtTheLargestTextSize]' passed (44.893 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheDayBeforeShowsTheChipAndTheCardAndGotItKeepsTheChip]' passed (15.250 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheForecastCardPassesTheAudit]' passed (24.747 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheForecastCardSetsOutTheHelperInOneTap]' passed (44.450 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheForecastOverrideCardSetsOutTheHelper]' passed (12.340 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheForecastReminderIsAnOptInBesideTheDailyReminder]' passed (18.504 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheWeatherArtHoldsStillWithReduceMotion]' passed (22.602 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheWeatherDayDrawsItsArtOnThePlantPage]' passed (24.948 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTheWeatherDayShowsASoftBanner]' passed (13.747 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testTurningGardenWeatherOffHidesTheForecast]' passed (26.200 seconds).
+Test Case '-[WordFloraUITests.WeatherUITests testWildWeatherIsOffByDefaultAndAsksBeforeTurningOn]' passed (33.097 seconds).
+	 Executed 25 tests, with 0 failures (0 unexpected) in 766.099 (766.132) seconds
+	 Executed 25 tests, with 0 failures (0 unexpected) in 766.099 (766.134) seconds
+	 Executed 25 tests, with 0 failures (0 unexpected) in 766.099 (766.136) seconds

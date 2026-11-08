@@ -34,14 +34,18 @@ struct PlusView: View {
                 FlowerView(petals: 8).frame(height: 120).accessibilityHidden(true)
                 Text(PlusPlan.groupName).font(Theme.font(.largeTitle, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)                    // full width, as the gate title (AX5 dynamicType read)
                     .accessibilityAddTraits(.isHeader)
 
                 VStack(alignment: .leading, spacing: 10) {
                     ForEach(PaywallCopy.benefits, id: \.self) { b in
                         HStack(spacing: 10) {
                             Image(systemName: "checkmark.circle.fill").foregroundStyle(Color.successText).accessibilityHidden(true)
+                            // Full width beside the tick: a line sized to its own width ("No ads, ever" filled it at
+                            // AX XXXL) was read by the audit as text that cannot grow.
                             Text(b).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                                 .fixedSize(horizontal: false, vertical: true)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
                     }
                 }.frame(maxWidth: .infinity, alignment: .leading)
@@ -94,7 +98,8 @@ struct PlusView: View {
     // MARK: Plans
 
     @ViewBuilder private var plans: some View {
-        if store.loadFailed && !store.offersAnything {
+        // Failed, or loaded with a plan missing (no endless "Loading prices"): the Try again card.
+        if store.loadFailed && !(store.offers(.yearly) && store.offers(.monthly)) {
             Card {
                 Text(PaywallCopy.loadFailed).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
@@ -315,12 +320,12 @@ struct ParentalGateSheet: View {
     @State private var wrong = false
     @Environment(\.dynamicTypeSize) private var typeSize
 
-    /// At the accessibility sizes the title steps down and the sides tighten, so "grown-ups" stays whole (the
-    /// audit read it clipped at AX5; TextFitLayoutTests measures it).
-    /// The title steps down through the accessibility sizes so "grown-ups" never breaks at its hyphen.
-    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle {
-        size >= .accessibility4 ? .subheadline : (size.isAccessibilitySize ? .headline : .title2)
-    }
+    /// One text style at every size: a step down at the accessibility sizes read as "Dynamic Type partially
+    /// unsupported" in the audit. "grown-ups" is drawn with a non-breaking hyphen, so it never splits at the hyphen;
+    /// the title wraps at its space instead ("For" / "grown-ups"). TextFitLayoutTests measures "grown-ups" whole.
+    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle { .title2 }
+    /// The title as drawn: hyphens made non-breaking (VoiceOver still reads the plain copy).
+    static let drawnTitle = ParentalGate.Copy.title.replacingOccurrences(of: "-", with: "\u{2011}")
     static func padding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 12 : 24 }
 
     /// The question. At the accessibility sizes it is two set lines ("What is" / "16 × 9?"), so it never wraps on its
@@ -343,12 +348,25 @@ struct ParentalGateSheet: View {
         }
     }
 
+    private var pinned: Bool { typeSize.isAccessibilitySize }
+
+    @ViewBuilder private var buttons: some View {
+        Button {
+            if ParentalGate.check(answer: answer, against: challenge) { onPass() } else { wrong = true }
+        } label: {
+            Text("Continue").multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+        }
+        .buttonStyle(PrimaryButtonStyle())
+        Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                Text(ParentalGate.Copy.title).font(Theme.font(Self.titleStyle(typeSize), weight: .bold))
+                Text(Self.drawnTitle).font(Theme.font(Self.titleStyle(typeSize), weight: .bold))
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity)
+                    .accessibilityLabel(ParentalGate.Copy.title)
                     .accessibilityAddTraits(.isHeader)
                 // Full width, as the title: a wrapped centred line sized to its own width was read as clipped.
                 Text(ParentalGate.Copy.prompt).font(Theme.font(.callout)).multilineTextAlignment(.center)
@@ -366,21 +384,40 @@ struct ParentalGateSheet: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("parentalGate.wrong")
                 }
-                Button {
-                    if ParentalGate.check(answer: answer, against: challenge) { onPass() } else { wrong = true }
-                } label: {
-                    Text("Continue").multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                }
-                .buttonStyle(PrimaryButtonStyle())
-                Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
+                if !pinned { buttons }
             }
             .padding(Self.padding(typeSize))
             // Clear of the sheet's grabber and the scroll edge's soft fade, which the audit read as clipping the title.
             .padding(.top, typeSize.isAccessibilitySize ? 16 : 0)
         }
+        // At the accessibility sizes the question is taller than the sheet: Continue and Cancel sit in a footer pinned
+        // under the scroll area (above the keyboard), so they are always whole and in view, never cut by the sheet's
+        // bottom edge (the audit read Continue as clipped there however tall it was).
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if pinned {
+                VStack(spacing: 8) { buttons }
+                    .padding(.horizontal, Self.padding(typeSize)).padding(.top, 10).padding(.bottom, 6)
+                    .background(Color(UIColor.systemBackground))
+                    .overlay(alignment: .top) { Divider() }
+            }
+        }
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
+        // The sheet's soft scroll edges faded whichever line sat at the top or bottom edge, and the audit read that line
+        // as clipped (the title, the question, Cancel, then Continue at AX5). Plain edges: every line is whole or scrolls.
+        .modifier(PlainScrollEdges())
         .presentationDetents(typeSize.isAccessibilitySize ? [.large] : [.medium, .large])
+    }
+}
+
+/// Turns off the iOS 26 soft scroll edge effect (nothing to do on earlier systems).
+private struct PlainScrollEdges: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26, *) {
+            content.scrollEdgeEffectHidden(true, for: .all)
+        } else {
+            content
+        }
     }
 }
 

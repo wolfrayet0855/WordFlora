@@ -1,0 +1,17 @@
+Test Case '-[WordFloraUITests.TextFitScreensUITests testBreakCardAtAX5]' passed (14.921 seconds).
+Test Case '-[WordFloraUITests.TextFitScreensUITests testButterflyGameTitle]' passed (68.587 seconds).
+Test Case '-[WordFloraUITests.TextFitScreensUITests testGrandGardenCrownLabel]' passed (47.388 seconds).
+Test Case '-[WordFloraUITests.TextFitScreensUITests testGuidePagesFadeInsteadOfClipping]' passed (44.942 seconds).
+Test Case '-[WordFloraUITests.TextFitScreensUITests testPlusLoadingAndFailedStates]' passed (107.896 seconds).
+Test Case '-[WordFloraUITests.TextFitScreensUITests testPlusOwnedStates]' passed (98.900 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/TextFitScreensUITests.swift:78: error: -[WordFloraUITests.TextFitScreensUITests testPlusPageAtDefaultAndAX5] : XCTAssertTrue failed - plus-ax5-dark-dynamicType: 65536 - Dynamic Type font sizes are partially unsupported | 'No ads, ever' [] (88.33333333333333, 429.6666666666667, 277.6666666666665, 63.33333333333326)
+Test Case '-[WordFloraUITests.TextFitScreensUITests testPlusPageAtDefaultAndAX5]' failed (248.536 seconds).
+Test Case '-[WordFloraUITests.TextFitScreensUITests testPlusPageMonthlyAndPlusForeverSelected]' passed (41.013 seconds).
+Test Case '-[WordFloraUITests.TextFitScreensUITests testQuietGardenPlantPage]' passed (148.845 seconds).
+Test Case '-[WordFloraUITests.TextFitScreensUITests testSettingsPlusRowAndICloudStates]' passed (243.896 seconds).
+Test Case '-[WordFloraUITests.TextFitScreensUITests testShedPotsToolsAndRepotSheet]' passed (344.442 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/TextFitScreensUITests.swift:78: error: -[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable] : XCTAssertTrue failed - gate-ax5-light-textClipped: 131072 - Text clipped | 'Cancel' [] (122.33333333333333, 806.0, 157.33333333333331, 63.33333333333337)
+Test Case '-[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable]' failed (125.687 seconds).
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.000) seconds
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.002) seconds
+	 Executed 0 tests, with 0 failures (0 unexpected) in 0.000 (0.003) seconds

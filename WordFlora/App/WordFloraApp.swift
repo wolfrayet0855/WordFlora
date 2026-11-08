@@ -2,6 +2,7 @@ import SwiftUI
 import SwiftData
 import WidgetKit
 import TipKit
+import UserNotifications
 
 @main
 struct WordFloraApp: App {
@@ -11,7 +12,12 @@ struct WordFloraApp: App {
 
     init() {
         let args = CommandLine.arguments
+        // The UI test switch (fresh defaults, Plus, age, fixtures) exists in Debug only.
+        #if DEBUG
         let uiTesting = args.contains("-uitest")
+        #else
+        let uiTesting = false
+        #endif
 
         let wantsCloud = !uiTesting && SharedDefaults.store.bool(forKey: "cloudSyncEnabled")
         var openedWithCloud = false
@@ -47,12 +53,6 @@ struct WordFloraApp: App {
         }
         let model = AppModel(container: container, settings: settings, bank: bank, storeEnabled: !uiTesting, launchedWithCloud: openedWithCloud,
                              cloudOpenFailed: wantsCloud && !openedWithCloud, storeDegraded: degraded)
-        #if DEBUG
-        // Settles the App Group question on a device (docs/pm/plus-flow-fable-review.md N6): a URL and "homeKey: group"
-        // on the second run mean the group works. Remove once the owner has run it.
-        print("appGroup:", FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedDefaults.groupID) as Any,
-              "homeKey:", SharedDefaults.store.string(forKey: SharedContainer.homeKey) as Any)
-        #endif
         if uiTesting && args.contains("-uitest-gardened") {
             // A garden with one found plant and some supplies, for tending UI tests.
             model.plants().first?.earnedCount = 1
@@ -102,6 +102,7 @@ struct WordFloraApp: App {
         }
         // Weather helpers, the weather puzzle and the Grand Garden (EndgameUITestFixtures lists the flags).
         if uiTesting { EndgameUITestFixtures.apply(args: args, to: model) }
+        if uiTesting { WeeklyNoteUITestFixture.apply(args: args, to: model) }
         if uiTesting && args.contains("-uitest-plus") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ["plus_yearly"]))
         }
@@ -120,12 +121,20 @@ struct WordFloraApp: App {
             default: break
             }
         }
+        #if DEBUG
+        // Store fault fixtures: Debug only, so a Release build can never be slowed or failed by a launch argument.
         if uiTesting && args.contains("-uitest-store-fail") { model.entitlements.debugFailStore() }
         if uiTesting && args.contains("-uitest-store-slow") { model.entitlements.debugSlowStore(seconds: 90) }
+        #endif
         // Frost & Lantern owned (bought or family-shared): its two pots can be picked.
         if uiTesting && args.contains("-uitest-pack-owned") {
             var ids = model.entitlements.state.activeProductIDs; ids.insert(PackCatalog.frostLantern.productID)
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ids))
+        }
+        // Every found plant already sits in this pot (Frost & Lantern's snowfall on the plant page).
+        if uiTesting, let id = args.first(where: { $0.hasPrefix("-uitest-pot=") })?.dropFirst("-uitest-pot=".count) {
+            for p in model.plants() where p.earnedCount > 0 { p.potId = String(id) }
+            try? model.context.save()
         }
         // Plus Forever owned, alone or beside a subscription that is still renewing (the "charged twice" note).
         if uiTesting && args.contains("-uitest-plus-forever") {
@@ -168,6 +177,7 @@ struct WordFloraApp: App {
             try? model.context.save()
             for id in ["ladybug", "honeybee", "luna"] { model.collectFieldNote(id) }      // three of four: no tier yet
         }
+        if uiTesting { FrostLanternUITestFixtures.apply(args, to: model) }      // G5: glasshouse rows, winter friends
         if uiTesting && args.contains("-uitest-mist") {
             // Mist Maker: the mister in the Shed (the Mist button shows) and nine mists already, so the next earns bronze.
             var inv = model.inventory; inv.unlock(.mister); model.inventory = inv
@@ -247,7 +257,25 @@ struct WordFloraApp: App {
         // `-uitest-ads-offline`: ad rules stay live but the ad SDK never starts (no consent prompt, no real ad).
         if uiTesting && args.contains("-uitest-ads-offline") { model.ads.offline = true }
         if uiTesting && args.contains("-uitest-daytime") { model.uiTestDaytime = true }
-        if uiTesting && !args.contains("-uitest-ads") && !args.contains("-uitest-ads-offline") { model.adsEnabled = false }
+        #if DEBUG
+        // Rewarded perk fixtures: an empty can (R1) and one "still dreaming" wake try already made (R3).
+        if uiTesting && args.contains("-uitest-dry") { model.profile?.water = 0; try? model.context.save() }
+        if uiTesting && args.contains("-uitest-wake-dreamed") { model.settings.wakeDreamsInARow = 1 }
+        // `-uitest-ads-fake`: a plain "TEST AD" screen stands in for Google's SDK (closes on tap; grants the reward
+        // unless `-uitest-ads-fake-withhold`). Compiled out of Release with the fake itself (ruling H6).
+        if uiTesting && args.contains("-uitest-ads-fake") {
+            model.ads.fake = true
+            model.ads.fakeWithholdsReward = args.contains("-uitest-ads-fake-withhold")
+        }
+        #endif
+        #if DEBUG
+        if uiTesting { AdFormatsUITestFixtures.apply(args: args, to: model) }
+        #endif
+        // A tap on a reminder opens the app for something specific: no return cue then (foreground display unchanged).
+        UNUserNotificationCenter.current().delegate = AdLinkLaunch.notificationDelegate
+        if uiTesting && !args.contains("-uitest-ads") && !args.contains("-uitest-ads-offline") && !model.ads.isFake {
+            model.adsEnabled = false
+        }
         if uiTesting { model.plusOfferEnabled = false }
         if uiTesting && args.contains("-uitest-badges") {
             // Badges page tests: a gold, a silver and a bronze badge already earned (no moments).
@@ -267,18 +295,28 @@ struct WordFloraApp: App {
                 .environment(app)
                 .environment(router)
                 .modelContainer(app.container)
-                .onOpenURL { url in if app.onboarding.isComplete { router.open(url) } }
+                .onOpenURL { url in app.noteAdLinkLaunch(); if app.onboarding.isComplete { router.open(url) } }
                 // Plus that arrives while the app is open (Ask to Buy approved, a family share, a code, a refund) sets
                 // the sync flag now, not one launch late.
                 .onChange(of: app.entitlements.state.hasCloudSync) { _, _ in app.updateSyncFlag() }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active { app.reconcileSyncedData(); app.checkWelcomeBack() }
                     // Keep the home-screen widget in step with what the player just did.
-                    if phase == .background || phase == .inactive { WidgetCenter.shared.reloadAllTimelines(); app.refreshReminders() }
+                    if phase == .background || phase == .inactive { app.refreshReminders() }
+                    if phase == .background { WidgetCenter.shared.reloadAllTimelines() }      // once per backgrounding
                     if phase == .active { app.refreshFreeDrops(); app.updateAmbience(); app.updateSyncFlag(); app.refreshQuestFromGarden() }
                     // (Not in UI tests: they set the row's state with -uitest-cloud, whatever the simulator's account.)
                     if phase == .active && !CommandLine.arguments.contains("-uitest") { Task { await app.refreshCloudAccount() } }
                     if phase == .background { SoundPlayer.shared.stopAmbient() }
+                    // Ad visits (spec 0.4): back after 30 min away starts fresh visit counters; the age or Plus check
+                    // runs again so cached ads are released when the treatment is none (H5).
+                    if phase == .background { app.noteAdBackground() }
+                    if phase == .active { app.noteAdActive() }
+                }
+                // G4b: the return cue and app-open ad (from a cold launch too, hence `initial`), after any link lands.
+                .onChange(of: scenePhase, initial: true) { _, phase in
+                    if phase == .active { app.adFormatsSceneActive(route: { router.path.last }) }
+                    if phase == .background { app.adFormatsSceneBackground() }
                 }
         }
     }

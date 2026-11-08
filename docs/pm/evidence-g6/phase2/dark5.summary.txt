@@ -1,0 +1,15 @@
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:268: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkAXXXL] : XCTAssertFalse failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkAXXXL]' failed (24.119 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkAXXXL]' passed (67.297 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkDefault]' passed (39.455 seconds).
+	 Executed 3 tests, with 1 failure (0 unexpected) in 130.871 (130.875) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsUITests.swift:157: error: -[WordFloraUITests.AdFormatsUITests testAuditWakeDarkDefault] : XCTAssertTrue failed - wake-dark-default-textClipped: 131072 - Text clipped | 'The two challenges stay free' [] (80.97512437810946, 787.2636815920399, 183.07794361525703, 17.283582089552056)
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeDarkDefault]' failed (44.348 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 44.348 (44.350) seconds
+Test Case '-[WordFloraUITests.FrostLanternUITests testSceneAuditsLightAndDarkAtAXXXL]' passed (55.724 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 55.724 (55.727) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/TextFitScreensUITests.swift:85: error: -[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable] : XCTAssertTrue failed - gate-ax5-light-dynamicType: 65536 - Dynamic Type font sizes are partially unsupported | 'For grown-ups' [] (35.33333333333334, 90.0, 331.33333333333337, 58.66666666666666)
+Test Case '-[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable]' failed (111.565 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 111.565 (111.567) seconds
+	 Executed 6 tests, with 3 failures (0 unexpected) in 342.508 (342.525) seconds
+	 Executed 6 tests, with 3 failures (0 unexpected) in 342.508 (342.527) seconds

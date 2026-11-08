@@ -36,6 +36,7 @@ struct ShedView: View {
                                             live: app.entitlements.packIsLive(PackCatalog.frostLantern.id)) {
                     ShedSeasonsShelf(pack: PackCatalog.frostLantern).padding(.top, 10)
                 }
+                ShedSponsoredSection()             // G4b: 13 and up without Plus only; nothing at all otherwise
             }
             .padding(.horizontal, Space.gutter).padding(.top, Space.xs).padding(.bottom, 40)
         }

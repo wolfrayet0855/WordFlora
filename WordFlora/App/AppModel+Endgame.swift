@@ -46,7 +46,8 @@ extension AppModel {
         case .water, .feed, .sun, .prune, .mist: tending = true
         case .repot: tending = false
         }
-        guard EndgamePolicy.countsTowardGolden(allFound: allPlantsFoundNow, stage: plant.stage, isTending: tending) else { return false }
+        guard !GlasshouseCatalog.isGlasshouse(plant.plantId),        // golden blooms are the ladder's endgame
+              EndgamePolicy.countsTowardGolden(allFound: allPlantsFoundNow, stage: plant.stage, isTending: tending) else { return false }
         let wasGolden = EndgamePolicy.isGolden(days: plant.goldenDays)
         let g = EndgamePolicy.goldenDays(current: plant.goldenDays, lastKey: plant.goldenDayKey, careKey: WeatherDay.key(date))
         plant.goldenDays = g.days; plant.goldenDayKey = g.key

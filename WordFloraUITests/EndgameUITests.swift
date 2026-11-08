@@ -109,7 +109,11 @@ final class EndgameUITests: XCTestCase {
         XCTAssertTrue(element("helper.windNet.out").waitForExistence(timeout: 3))
         XCTAssertFalse(app.buttons["helper.windNet.setOut"].exists)
         shot("shed-helpers-out")
-        XCTAssertFalse(app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] 'plus' OR label CONTAINS[c] 'price'")).firstMatch.exists)
+        // The helpers carry no Plus tag and no price (the pots further down the Shed have their own "Plus" tags).
+        let helperTexts = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'helper.'"))
+            .descendants(matching: .staticText)
+        XCTAssertFalse(helperTexts.matching(NSPredicate(format: "label CONTAINS[c] 'plus' OR label CONTAINS[c] 'price'")).firstMatch.exists)
+        XCTAssertFalse(element("shed.weatherChip").label.lowercased().contains("plus"))
     }
 
     func testTheShedHelpersAtAnAccessibilitySize() {
@@ -367,7 +371,16 @@ final class EndgameUITests: XCTestCase {
         scrollTo(book)
         book.tap()
         XCTAssertTrue(element("book.page.monarch").waitForExistence(timeout: 5))
-        audit("visitors-book")
+        // Each page's name steps down one text style at the accessibility sizes (title3 to subheadline) so the longest
+        // name stays whole (FieldNotesPage.nameStyle, measured in TextFitLayoutTests). The Dynamic Type check reads that
+        // deliberate step as "partially unsupported"; only the page names are excused, and only for that check.
+        // A page reads as one element whose label starts with its name and a full stop ("Monarch. ...", "A new friend. ...").
+        let pageLabels = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'book.page.'"))
+            .allElementsBoundByIndex.map(\.label)
+        audit("visitors-book", dynamicTypeApart: true) { issue in
+            guard issue.auditType == .dynamicType, let name = issue.element?.label, !name.isEmpty else { return false }
+            return pageLabels.contains { $0.hasPrefix(name + ".") }
+        }
         shot("visitors-book")
     }
 

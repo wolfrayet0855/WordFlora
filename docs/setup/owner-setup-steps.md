@@ -238,9 +238,9 @@ Description:    Three winter pots and a badge. Pay once, no renewals.
 Family Sharing: ON   (cannot be turned off again once saved)
 ```
    The App Store Connect description of pack_frost_lantern is the owner's choice; the app never displays it.
-   The description is the G3 wording ("winter pots and a badge"). If G5 ships the scene, robin and wren and the snowdrop and hellebore under this same product, change it to "Three winter pots, the Lantern Keeper badge and a snowy garden scene. Pay once, no renewals." (and the same text in `Config/WordFlora.storekit`). Never promise more than the build delivers.
+   This is the description the product was created with, and it matches `Config/WordFlora.storekit` (and `PackCatalogTests`). Optional, since G5 ships the whole pack: the owner may change the App Store Connect description to "Winter pots, a snowy garden, two birds and two plants." (54 characters, under the 55 limit). If so, change the same text in `Config/WordFlora.storekit` and the test in the same commit, so the local file always matches App Store Connect. Never promise more than the build delivers.
 3. **Availability:** the same territories as Plus. Review the auto-converted prices.
-4. **Review Information:** a screenshot of Settings > Purchases > Seasons (the pack card, its three pots, the price and the Buy button), taken from the G3/G6 build on an adult profile; and the note: "Non-consumable cosmetic pack of pots and a badge. Restore purchases is in the app's Settings, under Purchases."
+4. **Review Information:** a screenshot of Settings > Purchases > Seasons (the pack card, its three pots, the price and the Buy button), taken from the G6 build on an adult profile; and the note: "Non-consumable cosmetic pack: three pots, a winter garden background, two bird visitors and two plants that grow with care. It does not change progress. Restore purchases is in the app's Settings, under Purchases."
 5. Submit it **with the app version** next to `plus_lifetime` (app version page > **In-App Purchases and Subscriptions**) **(verify in UI)**. Not submitted if the plan's G5 fallback moves the pack to 1.1.
 
 Mirrors this local StoreKit entry (`Config/WordFlora.storekit`, used by the tests):
@@ -385,7 +385,7 @@ Build to a device (no signing errors), open Settings > [name] > iCloud > Apps us
 
 ## C. Google AdMob
 
-**Goal:** account, iOS app, 9 ad units (see C3 and docs/pm/admob-full-spec.md 5.2), correct child-directed and consent configuration, app-ads.txt.
+**Goal:** account, iOS app, the ad units below (created by 2026-11-07), correct child-directed and consent configuration, app-ads.txt.
 
 **Prerequisites:** Google account; legal name/address; bank/payments info; developer website (needed for app-ads.txt); app ID from B.
 
@@ -404,13 +404,20 @@ Time: 1.5-2.5 hours; payments verification and app-ads.txt crawl take days.
 
 ### C3. Create ad units
 For each: Apps > WordFlora > **Ad units** > **Add ad unit**.
-| Format | Name to enter | Notes |
-|---|---|---|
-| Banner | `WordFlora_Banner_Home` | Home and Garden only; use one unit or two (`..._Garden`) if you want per-screen reporting |
-| Interstitial | `WordFlora_Interstitial_RoundBreak` | Between rounds after the 3rd round (spec section 16). Leave frequency capping to the app/remote config. |
-| Rewarded | `WordFlora_Rewarded_Water` | 2 water per ad, max 3/day. Reward: Amount `2`, Item `Water` |
+Updated 2026-11-07 (owner decision: reuse the units that exist, create no more). Eight ad units exist: the three original ones and five created 2026-11-07. The Garden banner **reuses the Home banner unit**; there is no separate Garden unit (the app has a Garden key that falls back to the Home id). Click-path: `docs/setup/admob-console-one-pager.md`.
 
-Copy each **Ad unit ID**: `ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ` (slash). The spec does not need mediation, so skip mediation groups.
+| Format (console) | Name | xcconfig key | Status | Notes |
+|---|---|---|---|---|
+| Banner | `WordFlora_Banner_Home` | `ADMOB_BANNER_ID` | exists | Home **and Garden** (reuse). Auto-refresh 60 s |
+| Banner | `WordFlora_Banner_Garden_Collapsible` | `ADMOB_BANNER_GARDEN_COLLAPSIBLE_ID` | new, 2026-11-07 | The app adds the collapsible extra to the first Garden request per visit (G4b). Auto-refresh **off** |
+| Interstitial | `WordFlora_Interstitial_RoundBreak` | `ADMOB_INTERSTITIAL_ID` | exists | Between rounds after the 3rd round (spec section 16). The app's compile-time caps are the real rule; a console cap is only a backstop |
+| Rewarded (not Rewarded interstitial) | `WordFlora_Rewarded_Water` | `ADMOB_REWARDED_ID` | exists | R1, 2 drops, 3 a day. Reward item `Drops`, amount `2` (the app ignores the console amount and uses its own) |
+| Rewarded | `WordFlora_Rewarded_Hint` | `ADMOB_REWARDED_HINT_ID` | new, 2026-11-07 | R2, one whisper. Reward item `Whisper`, amount `1` |
+| Rewarded | `WordFlora_Rewarded_Wake` | `ADMOB_REWARDED_WAKE_ID` | new, 2026-11-07 | R3, wake a seed. Reward item `Wake`, amount `1` |
+| App open | `WordFlora_AppOpen_Return` | `ADMOB_APPOPEN_ID` | new, 2026-11-07 | Format must be **App open** (not Interstitial). Return cue after 4 h away, at most once a day (G4b) |
+| Native advanced | `WordFlora_Native_Shed` | `ADMOB_NATIVE_ID` | new, 2026-11-07 | Shed card (G4b). Leave image and video ad types on |
+
+Copy each **Ad unit ID**: `ca-app-pub-XXXXXXXXXXXXXXXX/ZZZZZZZZZZ` (slash). Real ids live only in the ignored local file `Config/Ads.local.xcconfig` under `[config=Release]`; it has no line for a Garden unit (reuse). Frequency capping is compile-time in the app (there is no remote config); per-unit console caps are an optional backstop: App open 1 per user per day, Interstitial 6 per day, none on Rewarded or Banner.
 Pitfall: new ad units can take up to about an hour (sometimes a day) to serve real ads; "no fill" in the meantime is normal. Never click your own live ads.
 
 ### C4. Info.plist keys (hand to developer; Xcode edits, not you)
@@ -473,21 +480,24 @@ Pitfall: using a subdomain or a path like `/docs/` fails; only the root counts. 
 In App Store Connect > App Privacy (see D3). AdMob typically collects: Device ID (IDFA when ATT allowed; also IDFV), Product Interaction, Advertising Data, Coarse Location (IP-derived), Other Usage Data, Crash/Performance Data, Diagnostics. Used for Third-Party Advertising; Linked to user? Google lists these for its SDK: see https://developers.google.com/admob/ios/privacy/data-disclosure **(not fetched; verify there)**. Tracking = yes only when personalised ads are enabled (non-child users who consent).
 
 ### C10. Mediation
-Not needed. Skip. (Do not add other ad networks; every network adds privacy-label and app-ads.txt entries.)
+Mediation groups exist with the **AdMob Network only**, one per format: Banner, Interstitial, Rewarded, App open, Native (ready for Unity in 1.1). Do not add other ad networks for 1.0; every network adds privacy-label and app-ads.txt entries.
 
 ### C: send back
 ```
 AdMob publisher ID:    pub-XXXXXXXXXXXXXXXX
 AdMob App ID:          ca-app-pub-XXXXXXXXXXXXXXXX~YYYYYYYYYY
-Banner unit ID:        ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
-Interstitial unit ID:  ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
-Rewarded unit ID:      ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Banner unit ID (Home, also Garden):     ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Collapsible Garden banner unit ID:      ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Interstitial unit ID:                   ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Rewarded water, hint and wake unit IDs: three ids, same shape
+App open unit ID:                       ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
+Native advanced unit ID:                ca-app-pub-XXXXXXXXXXXXXXXX/NNNNNNNNNN
 Test device ID(s):     (from Xcode console)
 GDPR message published: yes/no
 US states message published: yes/no
 app-ads.txt URL:       https://.../app-ads.txt
 ```
-(The publisher ID and ad unit IDs are not secrets, they ship in the app.)
+(Eight distinct unit ids plus the app id; all eight are already in the local file. They ship in the app and are not secrets, but they stay out of the repository and out of reports: refer to them by key name or last 4 digits.)
 
 ### C: how to test
 Debug build with sample IDs: see banner, interstitial, rewarded test ads. Then switch ONE build to your real IDs on a registered test device and confirm "test ad" labelled ads or "no fill" without errors. Check UMP form in simulated EEA.
@@ -569,7 +579,7 @@ Re-answer the age-rating questionnaire with weather in mind (spec Q-1): cartoon-
 ### D6b. Description lines for ads, Plus and the Terms of Use
 Add these lines to the end of the App Store description (the app uses Apple's standard license agreement, the same link as the Terms of Use button on the Plus page):
 ```
-Free with ads for players 13 and over, from the second launch (never the first); WordFlora Plus removes ads and syncs your garden with iCloud. Players under 13, and players who have not told us their age, never see ads. Family Sharing covers up to six people.
+Free with ads for players 13 and over, from their third session; WordFlora Plus removes ads and syncs your garden with iCloud. Players under 13, and players who have not told us their age, never see ads. Family Sharing covers up to six people.
 WordFlora Plus is an auto-renewing subscription (yearly with a 3-day free trial for new subscribers, or monthly), or a one-time purchase, Plus Forever. Subscriptions renew unless turned off at least 24 hours before the end of the period, and you can manage or cancel them in your App Store account settings. The Frost & Lantern seasonal pack is a separate one-time purchase and is not part of Plus.
 Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
 ```
@@ -601,7 +611,7 @@ PLUS, PURCHASES AND THE PARENTAL GATE
 - Plus Forever and the pack are non-consumable and come back with Restore purchases. Nothing in the game is blocked behind a purchase except cosmetic pots, the pack content, ad removal and iCloud sync.
 
 ADS
-- Ads (banners on Home and Garden, an interstitial after a round you choose to continue, optional rewarded ads, a return ad and a native card in the Shed) begin from the second launch (never the first), and are never shown to under 13 or to anyone who has not answered the age question (the ad SDK is not even started for them). 13 to 17 see non-personalised, G-rated ads and no tracking prompt. Plus (monthly, yearly or Plus Forever) removes all ads. A reviewer who tries the app for one launch will therefore see no ads (ad-free first launch is by design), and the "Go ad-free" line appears only once ads can. The return ad never shows in Calm mode or Quiet Garden; in Quiet Garden banners and the native card stay but no rewarded prompts appear; Calm mode keeps banners and plain rewarded rows (docs/pm/admob-full-spec.md, 0.3). To see an ad: pick "18 or older" and open the app a second time. You will first see the Google consent form where required, then the App Tracking Transparency prompt, then ads. Every ad request is G rated. In review builds ad serving may be in test mode [ASSUMPTION: depends on the G4 serving flip]. "Report an ad" is under Settings > Privacy and ads.
+- Ads begin from the second launch (never the first), and only for players who say they are 13 or over and do not have Plus: a banner on Home and Garden (the first Garden banner of a visit may be a collapsible one, never with VoiceOver or the largest text sizes), an interstitial after a round the player chooses to continue, one "Sponsored" card at the bottom of the Garden Shed, and optional rewarded videos (2 water drops, a hint for the next word, or waking a sleeping seed). A return ad may appear at most once a day after 4 hours away, behind a "Skip to my garden" screen; never on the first launch, never when the app was opened from a reminder, widget, link or shortcut, never over a word in progress, and never in Calm mode, Quiet Garden or at night. Players 13 to 17 get non-personalised, G-rated ads and never see a tracking prompt. Under 13 and anyone who has not answered the age question never see any ad, and the ad SDK never starts for them. Rewarded videos are always optional and every reward also exists without an ad (water trickles back, the hint ladder is free, both wake challenges are free); under 13, unknown age and Plus get those rewards with no video at all. Plus (monthly, yearly or Plus Forever) removes all ads. A reviewer who tries the app for one launch will therefore see no ads (ad-free first launch is by design), and the "Go ad-free" line under the Home banner, which opens the Plus page, appears only once ads can. To see one: pick "18 or older" and open the app a second time. You will first see the Google consent form where required, then the App Tracking Transparency prompt, then ads. Every ad request is G rated. In review builds ad serving may be in test mode [ASSUMPTION: depends on the G4 serving flip]. "Report an ad" is under Settings > Privacy and ads.
 
 WILD WEATHER AND QUIET GARDEN
 - Garden weather is cosmetic. Now and then weather visits the garden and plants look a little different for a few days; care, a weather puzzle or time brings them back. Nothing earned is ever removed: found plants, growth stages, pots, badges and the level stay. Weather is date-driven, so a reviewer may see none on the day; the Settings text explains it.
@@ -616,7 +626,7 @@ OTHER
 Contact for review: [OWNER: name], [OWNER: phone], [OWNER: email]. Available 9:00-18:00 [OWNER: time zone]. [ASSUMPTION: owner fills these in]
 Reviewer offer codes (optional): [OWNER: one-time code for plus_yearly or "none"].
 ```
-Keep this text in step with the app: if a rule above changes, update it before the next submission. No TestFlight pass is planned: the sandbox is used against the production build. Before pasting, in the G6 build confirm every [ASSUMPTION] line and every button label by hand.
+Keep this text in step with the app: if a rule above changes, update it before the next submission. Before pasting, in the G6 TestFlight build confirm every [ASSUMPTION] line and every button label by hand.
 
 ### D: send back
 ```
@@ -644,7 +654,7 @@ Checklist:
 - [ ] Xcode signing works for app and widget on a real device
 - [ ] Stale `beta.WordGarden-SwiftUI` specifier removed
 - [ ] CloudKit dev schema generated, production schema deployed
-- [ ] AdMob account, app, 9 ad units (keys ADMOB_BANNER_ID, ADMOB_BANNER_GARDEN_ID, ADMOB_BANNER_GARDEN_COLLAPSIBLE_ID, ADMOB_INTERSTITIAL_ID, ADMOB_REWARDED_ID, ADMOB_REWARDED_HINT_ID, ADMOB_REWARDED_WAKE_ID, ADMOB_APPOPEN_ID, ADMOB_NATIVE_ID), GDPR and US state messages published
+- [ ] AdMob account, app, 3 ad units, GDPR and US state messages published
 - [ ] app-ads.txt live
 - [ ] Privacy policy and support URLs live
 - [ ] Age rating and privacy label done (Made for Kids NOT selected)

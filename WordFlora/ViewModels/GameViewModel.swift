@@ -212,10 +212,22 @@ final class GameViewModel {
         }
     }
 
+    /// R2: the model says a whisper is banked; the model spends it when the whisper rung is used.
+    @ObservationIgnored var whisperAvailable: () -> Bool = { false }
+    @ObservationIgnored var onWhisperUsed: () -> Void = {}
+
+    /// A banked whisper adds the fourth rung in this round: never on the Daily Bloom (its result is shared, so it stays
+    /// the same for everyone) and never in the tutorial word.
+    private var whisperForRound: Bool { !isDaily && !isTutorial && !usedRungs.contains(.whisper) && whisperAvailable() }
+
+    /// The Help button's small leaf dot: a whisper is banked and can be used in this round (hidden on the Daily Bloom
+    /// and in the tutorial).
+    var whisperReady: Bool { phase == .playing && whisperForRound }
+
     /// True while the help ladder still has a rung to offer.
     var canUseHelp: Bool {
         guard phase == .playing, let e = currentEntry else { return false }
-        return HelpLadder.next(used: usedRungs, word: e.word, guessed: guessedLetters, hint2: e.hint2) != nil
+        return HelpLadder.next(used: usedRungs, word: e.word, guessed: guessedLetters, hint2: e.hint2, whisper: whisperForRound) != nil
     }
 
     var canAskSimplerClue: Bool { aiIsModelBacked && phase == .playing && simplerClue == nil && !askingClue }
@@ -243,14 +255,16 @@ final class GameViewModel {
 
     func useHelp() {
         guard phase == .playing, let e = currentEntry else { return }
-        guard let step = HelpLadder.next(used: usedRungs, word: e.word, guessed: guessedLetters, hint2: e.hint2) else { return }
+        guard let (rung, step) = HelpLadder.nextRung(used: usedRungs, word: e.word, guessed: guessedLetters, hint2: e.hint2,
+                                                       whisper: whisperForRound) else { return }
+        usedRungs.insert(rung)
         switch step {
         case .hint2(let text):
-            usedRungs.insert(.hint2); extraHint = text
+            extraHint = text
         case .reveal(let ch):
-            if "AEIOU".contains(ch) && !usedRungs.contains(.vowel) { usedRungs.insert(.vowel) } else { usedRungs.insert(.firstLetter) }
             guessedLetters.insert(ch)
         }
+        if rung == .whisper { onWhisperUsed() }
         helpersUsed += 1
         speedRing?.helpTapped()
     }
@@ -320,8 +334,9 @@ final class GameViewModel {
         }
     }
 
+    /// The ladder plants (the glasshouse plants never move the word level).
     private func allPlants() -> [PlantCollectible] {
-        (try? modelContext.fetch(FetchDescriptor<PlantCollectible>())) ?? []
+        GlasshouseCatalog.ladder((try? modelContext.fetch(FetchDescriptor<PlantCollectible>())) ?? [], id: \.plantId)
     }
     private func progress(of plants: [PlantCollectible]) -> [PlantProgress] {
         plants.map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) }

@@ -7,7 +7,8 @@ enum FieldNotes {
     /// A page can be collected for a visitor in the catalogue that has a fact and has been met. Weather stickers are not
     /// visitors, so they never count; a made-up id is ignored.
     static func canCollect(_ speciesId: String, album: StickerAlbum) -> Bool {
-        guard let v = VisitorCatalog.species(speciesId), v.fact != nil else { return false }
+        // The notebook holds the twelve friends only; a season friend's fact lives on its album card.
+        guard let v = VisitorCatalog.species(speciesId), v.fact != nil, v.packId == nil else { return false }
         return album.count(of: v.id) > 0
     }
 

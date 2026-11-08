@@ -1,0 +1,29 @@
+Test Case '-[WordFloraUITests.TendingUITests testABlockedTapSaysWhyWithoutAnEffect]' passed (25.908 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testAPlantWithNoStoryShowsDidYouKnowInTheSameCard]' passed (22.492 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testASeedsButtonsSayWakeFirst]' passed (15.250 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testATapHelloGetsAShortAnswer]' passed (18.349 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testAuditPlantPageWithCardAndButtons]' passed (40.540 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testFeedSunAndRepotEachPlayTheirEffect]' passed (35.459 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testNewPotsLineShowsOnceWhenPotsAreFirstRecorded]' passed (41.796 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testPackPotOutlinesForAYoungPlayerAtAccessibilityXXXL]' passed (102.942 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testPotScreensPartWayUpTheLadder]' passed (149.900 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testQuietGardenUsesTheSameTendRows]' passed (37.257 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testRepotSheetScreensLikeTheMockupAccessibilityL]' passed (34.945 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testRepotSheetScreensLikeTheMockupLight]' passed (33.051 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testRepotTilesHaveOneHeightAndClearTheButton]' passed (169.188 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testShedPotScreens]' passed (132.095 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testSixTendButtonsKeepWholeWords]' passed (124.372 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testTappingAPotToEarnShowsItsGoalAboveTheButton]' passed (31.805 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testTheNameStoryCardSitsUnderThePlantAndExpands]' passed (26.693 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testThePotPickerPassesTheAuditAtAccessibilityL]' passed (52.343 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testThePotPickerPassesTheAuditAtAccessibilityXXXL]' passed (53.551 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testTheRepotSheetPicksAPotAndNamesItOnTheButton]' passed (35.012 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testTheShedPotsPassTheAuditAtAccessibilityL]' passed (70.045 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testTheShedPotsPassTheAuditAtAccessibilityXXXL]' passed (101.284 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testTheShedToolsPassTheAuditAtAccessibilityL]' passed (57.003 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testTheShedToolsPassTheAuditAtAccessibilityXXXL]' passed (57.755 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testTheThirdStrokeOnThePlantSaysHello]' passed (31.703 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testWaterPlaysThePourOverThePlantThenTheToast]' passed (32.642 seconds).
+	 Executed 26 tests, with 0 failures (0 unexpected) in 1533.381 (1533.420) seconds
+	 Executed 26 tests, with 0 failures (0 unexpected) in 1533.381 (1533.422) seconds
+	 Executed 26 tests, with 0 failures (0 unexpected) in 1533.381 (1533.424) seconds

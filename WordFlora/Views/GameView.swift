@@ -14,12 +14,20 @@ struct GameView: View {
     /// The win: a dim at once, petals over it, the card at 0.7 s above them (design-preview/celebrate, confetti "large").
     @State private var winDim = false
     @State private var winBurst: [CelebrationLevel]?
+    /// A word that brings no plant: its pip on the card fills with a soft pop 0.35 s after the card appears.
+    @State private var pipPopped = false
+    @State private var pipPuff = 0
     /// The letter just found: its tiles pop with a small puff of petals.
     @State private var tilePop: TilePop?
     @State private var showRestCard = false
     @State private var showBreak = false
     /// Whether "One more" may lead to an ad, captured once as the resting card opens so its note never flickers.
     @State private var adNoteOnOneMore = false
+    /// R2 on the resting card, captured as the card opens (and again after a hint video), like the ad note.
+    @State private var hintPath: PerkPath = .hidden
+    @State private var whisperOnCard = false
+    @State private var watchingHint = false
+    @State private var rewardToastText: String?
     /// Whether the card offers the quiet "Go ad-free" row, also captured once as the card opens: the card then does
     /// not redraw when the ad rules' inputs (store state, settings) update behind it.
     @State private var goAdFreeOnCard = false
@@ -134,7 +142,18 @@ struct GameView: View {
                 if arrived || vm.isDaily { levels.append(.large) }
                 winBurst = levels.isEmpty ? nil : levels
                 withAnimation(.easeOut(duration: reduceMotion ? 0.15 : 0.3)) { winDim = true }
-                DispatchQueue.main.asyncAfter(deadline: .now() + (reduceMotion ? 0.15 : 0.7)) {
+                let cardAt = reduceMotion ? 0.15 : 0.7
+                pipPopped = false
+                if !arrived {
+                    // The word's pip fills once the card is up, with a small petal puff and one soft tap.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + cardAt + 0.35) {
+                        guard vm.phase == .won, vm.earnedPlantName == nil, showEarned else { return }
+                        pipPopped = true
+                        pipPuff += 1
+                        if app.settings.hapticsOn { UIImpactFeedbackGenerator(style: .soft).impactOccurred(intensity: 0.5) }
+                    }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + cardAt) {
                     showEarned = true
                     if arrived && app.settings.hapticsOn {      // a soft lub-dub as the new plant appears
                         let g = UIImpactFeedbackGenerator(style: .soft); g.impactOccurred(intensity: 0.6)
@@ -195,6 +214,13 @@ struct GameView: View {
             .padding(.horizontal, Space.m)
             .frame(minWidth: Theme.minTap - Space.s, minHeight: 36)
             .background(Color.tileGardenFill, in: Capsule())
+            .overlay(alignment: .topTrailing) {
+                if vm.whisperReady {
+                    Image(systemName: "leaf.fill").font(.caption2).foregroundStyle(Color.successText)
+                        .offset(x: 2, y: -2).accessibilityHidden(true)
+                        .accessibilityIdentifier("help.whisperDot")
+                }
+            }
             // The capsule is 36 pt to look at; the hit area stays 44 pt.
             .frame(minWidth: Theme.minTap, minHeight: Theme.minTap)
             .contentShape(Rectangle())
@@ -205,7 +231,7 @@ struct GameView: View {
         .accessibilityLabel("Help")
         .disabled(!vm.canUseHelp)
         .symbolEffect(.pulse, isActive: helpPulse)
-        .accessibilityHint("Gives a free clue")
+        .accessibilityHint(vm.whisperReady ? AdPerkCopy.Hint.helpHint : "Gives a free clue")
     }
 
     /// The ring closed first: the word carries on at its own pace, with the same reward.
@@ -322,16 +348,35 @@ struct GameView: View {
                     cardTitle(vm.earnedPlantIsNew ? "New plant found!" : "Your garden grew")
                     if let plant = app.plants().first(where: { $0.name == name }) {
                         PlantCard(plant: plant, standalone: true).frame(maxWidth: PlantCard.foundWidth(dynamicTypeSize))
-                        Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
+                        // Full ink: at 85% the audit reports the fact as low contrast on the dark card.
+                        Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
                             .fixedSize(horizontal: false, vertical: true)
+                        if vm.earnedPlantIsNew { NameOnArrivalRow(plant: plant) }      // Make it yours (PlantName)
                     }
                 } else {
                     // No plant this round: the word counts toward the next one.
                     cardTitle(PlantProgressCopy.winTitle)
-                    // HOOK (progress meter): the visual words-toward-plant meter (mocked separately) goes here.
-                    Text(PlantProgressCopy.winLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant))
-                        .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
-                        .fixedSize(horizontal: false, vertical: true)
+                    WordsToPlantPips(filled: vm.wordsTowardPlant, total: vm.wordsPerPlant, popped: pipPopped,
+                                     reduceMotion: reduceMotion, calm: app.settings.calmMode || app.settings.quietGarden)
+                        .padding(.vertical, 2)
+                        .overlay {
+                            // A small puff from the pip that just filled (Calm: the gentle drift; Reduce Motion: a still arc).
+                            PetalPuff(trigger: pipPuff, level: app.celebrationLevel(.small, systemReduceMotion: systemReduceMotion), arcRadius: 28)
+                                .frame(width: 120, height: 120)
+                                .offset(x: WordsToPlantPips.offset(filled: vm.wordsTowardPlant, total: vm.wordsPerPlant))
+                                .allowsHitTesting(false)
+                                .accessibilityHidden(true)
+                        }
+                    // On the word before a plant the nudge line replaces the count line (progress is said once).
+                    if let next = PlantProgressCopy.nextLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant) {
+                        Text(next)
+                            .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.successText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        Text(PlantProgressCopy.winLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant))
+                            .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                     if let fact = vm.factAfterRound {
                         Text(fact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
                             .fixedSize(horizontal: false, vertical: true)
@@ -339,20 +384,33 @@ struct GameView: View {
                 }
                 shareButton
                 if vm.roseDropped { Label("A Rose of Jericho is in your satchel", systemImage: "leaf.circle.fill").font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.successText) }
-                Button("Continue") { showEarned = false; winDim = false; winBurst = nil; app.markPeakDismissed(); afterRound() }.buttonStyle(PrimaryButtonStyle())
+                // A word with no plant names what the tap does: the next word, or a calm way out to the garden.
+                // (The Daily Bloom goes home after its card and the tutorial hands off, so they keep "Continue".)
+                Button(vm.earnedPlantName == nil && !vm.isDaily && !tutorial ? "Next word" : "Continue") { closeWinCard(); afterRound() }.buttonStyle(PrimaryButtonStyle())
+                if vm.earnedPlantName == nil && !tutorial {
+                    Button("Tend my garden") {
+                        closeWinCard(); app.pauseBadgeMoments(.round, false)
+                        router.home(); router.go(.garden)
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .accessibilityIdentifier("winCard.tendGarden")
+                }
             }
         }
     }
 
+    /// Sharing leaves the app: hidden under 13 and for an unknown age (ShareGate, as for badges).
     @ViewBuilder private var shareButton: some View {
-        if vm.isDaily {
+        if !app.canShare {
+            EmptyView()
+        } else if vm.isDaily {
             ShareLink(item: DailyShare.text(date: .now, calendar: .current, solved: true, petalsRemaining: vm.petalsRemaining,
                                             maxPetals: Economy.default.maxPetals, helpers: vm.helpersUsed, word: vm.currentWord)) {
                 Label("Share your Daily Bloom", systemImage: "square.and.arrow.up")
             }.buttonStyle(SecondaryButtonStyle())
         } else if let name = vm.earnedPlantName, let plant = app.plants().first(where: { $0.name == name }),
                   let card = PlantShareCard(plantName: plant.name, botanicalName: plant.botanicalName, imageName: plant.imageName, fact: plant.botanicalFact).rendered() {
-            ShareLink(item: card, preview: SharePreview(PlantShare.caption(plantName: plant.name, nickname: plant.nickname), image: card)) {
+            ShareLink(item: card, preview: SharePreview(PlantShare.caption(plantName: plant.name), image: card)) {
                 Label("Share this plant", systemImage: "square.and.arrow.up")
             }.buttonStyle(SecondaryButtonStyle())
         }
@@ -415,10 +473,15 @@ struct GameView: View {
                                 .accessibilityElement(children: .combine)
                                 .accessibilityIdentifier("restCard.adNote")
                         }
-                        Button(RestCardCopy.enough) { showRestCard = false; app.markRestExit(); router.home() }
-                            .buttonStyle(SecondaryButtonStyle()).accessibilityIdentifier("restCard.enough")
+                        // An explicit label that may wrap, as the grown-up sheet's Continue: the audit read the
+                        // button's one-line label as clipped.
+                        Button { showRestCard = false; app.markRestExit(); router.home() } label: {
+                            Text(RestCardCopy.enough).multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                        }
+                        .buttonStyle(SecondaryButtonStyle()).accessibilityIdentifier("restCard.enough")
                     }
                     .padding(.top, 6)
+                    hintRow
                     if goAdFreeOnCard { goAdFreeRow.padding(.top, 2) }
                 }
                 .padding(.horizontal, 20).padding(.top, 4).padding(.bottom, 20)
@@ -426,6 +489,7 @@ struct GameView: View {
             .accessibilityElement(children: .contain)
             .accessibilityAddTraits(.isModal)
             .accessibilityIdentifier("restCard")
+            .rewardToast($rewardToastText)
         }
     }
 
@@ -522,8 +586,42 @@ struct GameView: View {
         }
     }
 
+    /// R2 (docs/pm/admob-full-spec.md section 2, rulings): a whisper for the next garden word. Hidden after a loss, on
+    /// the Daily Bloom card, in Quiet Garden for everyone, and while "A short ad may play first." shows; a banked whisper
+    /// shows a line instead of a button.
+    @ViewBuilder private var hintRow: some View {
+        if whisperOnCard {
+            Label(AdPerkCopy.Hint.banked, systemImage: "leaf.fill")
+                .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                .accessibilityElement(children: .combine)
+                .accessibilityIdentifier("restCard.whisperBanked")
+        } else {
+            RewardedPromptRow.forPath(hintPath, adTitle: AdPerkCopy.Hint.adTitle, freeTitle: AdPerkCopy.Hint.freeTitle,
+                                      adSubtitle: AdPerkCopy.Hint.subtitle, freeSubtitle: AdPerkCopy.Hint.subtitle,
+                                      hasPlus: app.entitlements.state.hasPlus, identifier: "restCard.hint", busy: watchingHint) {
+                guard !watchingHint else { return }
+                watchingHint = true
+                Task {
+                    if await app.watchRewarded(.hint) { rewardToastText = AdPerkCopy.Hint.toast }
+                    // After a rewarded ad the gap holds the interstitial, so the note is worked out again (never lies).
+                    adNoteOnOneMore = app.adWouldPlayOnOneMore
+                    whisperOnCard = app.whisperBanked
+                    hintPath = app.perkPath(.hint)
+                    watchingHint = false
+                }
+            }
+            .disabled(watchingHint)
+        }
+    }
+
     static func tutorialEntry(in bank: WordBank) -> WordEntry {
         bank.entries.first { $0.id == "l1-seed" } ?? bank.entries.first { $0.level == 1 && $0.kind == .vocab } ?? bank.entries[0]
+    }
+
+    private func closeWinCard() {
+        showEarned = false; winDim = false; winBurst = nil; pipPopped = false; pipPuff = 0
+        app.markPeakDismissed()
     }
 
     private func afterRound() {
@@ -532,6 +630,10 @@ struct GameView: View {
         if vm.sessionBeat {
             adNoteOnOneMore = app.adWouldPlayOnOneMore
             goAdFreeOnCard = app.showBanner
+            whisperOnCard = app.whisperBanked
+            hintPath = app.perkPath(.hint)
+            // B5: the card says an ad may play, so load it now and "One more" never waits.
+            if adNoteOnOneMore { Task { await app.ads.preloadInterstitial() } }
             openCard { showRestCard = true }
         } else if daily { router.home() } else { vm.startRound() }
     }

@@ -39,8 +39,24 @@ final class ShareTests: XCTestCase {
     }
 
     func testPlantShareCaptionNamesThePlantAndStaysKind() {
-        let c = PlantShare.caption(plantName: "Venus Flytrap", nickname: "")
-        XCTAssertTrue(c.contains("Venus Flytrap")); XCTAssertEqual(CopySafety.check(c), [], c)
-        XCTAssertTrue(PlantShare.caption(plantName: "Rose", nickname: "Rosie").contains("Rosie"))
+        let c = PlantShare.caption(plantName: "Venus Flytrap")
+        XCTAssertEqual(c, "I found a Venus Flytrap in WordFlora!")
+        XCTAssertEqual(CopySafety.check(c), [], c)
+    }
+
+    /// The caption takes the species name only (no nickname parameter), so a typed plant name never reaches a share.
+    func testPlantShareCaptionNeverCarriesATypedName() {
+        let plant = PlantCollectible(name: "Rose", botanicalName: "Rosa gallica", botanicalFact: "", level: 1, imageName: "plant_rose")
+        plant.nickname = "Rosie"
+        XCTAssertEqual(PlantShare.caption(plantName: plant.name), "I found a Rose in WordFlora!")
+    }
+
+    /// One line for every share out of the app: hidden under 13 and for an unknown age, shown for 13-17 and 18+.
+    func testShareGateByAgeBand() {
+        let table: [(AgeBand?, Bool)] = [(nil, false), (.under13, false), (.thirteenPlus, true), (.eighteenPlus, true)]
+        for (band, allowed) in table {
+            XCTAssertEqual(ShareGate.isAllowed(ageBand: band), allowed, "\(String(describing: band))")
+            XCTAssertEqual(BadgeShare.isAllowed(ageBand: band), allowed, "badges follow the same line")
+        }
     }
 }

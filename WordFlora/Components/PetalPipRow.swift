@@ -138,3 +138,45 @@ struct PetalPipRow: View {
         }
     }
 }
+
+/// The win card's words toward the next plant: one pip per word (docs/pm/celebration-and-love-review.md, A1). The pip
+/// just earned fills with a soft spring pop once the card is up; Reduce Motion cross-fades it, Calm settles without a
+/// bounce. Leaf green, never the rose love petals: a word count must not look like love. The count line under it says
+/// the same words, so the pips are hidden from VoiceOver.
+struct WordsToPlantPips: View {
+    let filled: Int          // words toward the plant, this one included
+    let total: Int           // words per plant
+    let popped: Bool         // false while the card appears, true about 0.35 s later
+    let reduceMotion: Bool
+    let calm: Bool
+
+    static let pip: CGFloat = 16
+    static let gap: CGFloat = 12
+
+    /// Where the pip just earned sits, from the row's centre (the petal puff starts there).
+    static func offset(filled: Int, total: Int) -> CGFloat {
+        (CGFloat(filled - 1) - CGFloat(total - 1) / 2) * (pip + gap)
+    }
+
+    /// Whether pip `i` shows filled.
+    static func isOn(_ i: Int, filled: Int, popped: Bool) -> Bool {
+        i < filled && (i != filled - 1 || popped)
+    }
+
+    var body: some View {
+        HStack(spacing: Self.gap) {
+            ForEach(0..<max(total, 0), id: \.self) { i in
+                let on = Self.isOn(i, filled: filled, popped: popped)
+                ZStack {
+                    Circle().stroke(Color.appPrimaryText.opacity(0.55), lineWidth: 2)     // 55% ink: at least 3:1 on the card
+                    Circle().fill(LifePalette.leaf).opacity(on ? 1 : 0)
+                        .scaleEffect(on ? 1 : (reduceMotion ? 1 : 0.5))
+                }
+                .frame(width: Self.pip, height: Self.pip)
+                .animation(reduceMotion ? .easeInOut(duration: 0.3)
+                           : .spring(response: 0.4, dampingFraction: calm ? 0.85 : 0.55), value: on)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+}

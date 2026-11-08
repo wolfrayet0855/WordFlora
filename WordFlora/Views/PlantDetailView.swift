@@ -57,7 +57,7 @@ struct PlantDetailView: View {
         let id: Int
     }
 
-    private var plant: PlantCollectible? { app.plants().first { $0.plantId == plantId } }
+    private var plant: PlantCollectible? { app.plantRow(plantId) }      // ladder or glasshouse
     private var large: Bool { typeSize.isAccessibilitySize }
     /// Reduce Motion and Low Power Mode both get the short fade instead of the travelling effects.
     private var calm: Bool { reduceMotion || lowPower.isOn }
@@ -128,7 +128,7 @@ struct PlantDetailView: View {
         .sheet(isPresented: $showWake) { WakeSheet(plant: plant).environment(app) }   // Wake the seed
         .alert("Name your plant", isPresented: $renaming) {
             TextField("Name", text: $draftName)
-            Button("Save") { plant.nickname = String(draftName.prefix(16)); try? app.context.save() }
+            Button("Save") { app.rename(plant, to: draftName) }     // PlantName.clean: trim, 16 characters, "" for no letters
             Button("Cancel", role: .cancel) {}
         }
     }
@@ -193,6 +193,9 @@ struct PlantDetailView: View {
         // Garden weather art: Reduce Motion (system or the app's switch) and Low Power hold one still frame.
         let weatherStill = reduceMotion || app.settings.reduceMotionOverride || lowPower.isOn
         let weatherSpec = wx.map { WeatherArt.spec($0.kind, look: $0.look) }
+        // Frost & Lantern pots bring a gentle snowfall when the sky is free (no garden weather, no rain, not Quiet Garden).
+        let snows = Snowfall.showsOnStage(potId: plant.potId, quietGarden: app.settings.quietGarden, weather: wx != nil, raining: raining)
+        let snowCount = Snowfall.count(base: Snowfall.stageCount, calm: app.settings.calmMode)
 
         return ZStack(alignment: .top) {
             if raining {
@@ -211,6 +214,11 @@ struct PlantDetailView: View {
             if let wx {
                 WeatherOverlay(kind: wx.kind, look: wx.look, layer: .back, size: s, still: weatherStill, paused: paused)
                     .padding(.top, plantTop)
+            }
+            if snows {
+                SnowfallView(count: snowCount, calm: app.settings.calmMode, still: weatherStill, paused: paused,
+                             groundY: groundY, layers: [0])
+                    .frame(height: rowTop)
             }
 
             // The plant's pot stands behind it (the seed pot draws its own). The repot effect brings its own pots.
@@ -243,6 +251,11 @@ struct PlantDetailView: View {
             if let wx {
                 WeatherOverlay(kind: wx.kind, look: wx.look, layer: .front, size: s, still: weatherStill, paused: paused)
                     .padding(.top, plantTop)
+            }
+            if snows {
+                SnowfallView(count: snowCount, calm: app.settings.calmMode, still: weatherStill, paused: paused,
+                             groundY: groundY, layers: [1, 2])
+                    .frame(height: rowTop)
             }
 
             if raining && !reduceMotion {
@@ -450,7 +463,9 @@ struct PlantDetailView: View {
 
         NameStoryCard(name: plant.name, botanicalName: plant.botanicalName, fact: plant.botanicalFact,
                       story: PlantCatalog.nameStory(for: plant.plantId))
+            .shareable(app.canShare)
             .onAppear { if plant.earnedCount > 0 { app.noteFactCardRead(plantId: plant.plantId) } }     // Wild Discovery badge
+        if !GlasshouseCatalog.isGlasshouse(plant.plantId) { WidgetPinRow(plant: plant) }      // Make it yours: "Show on my widget"
 
         statusBlock(plant, snap)
 
@@ -468,10 +483,13 @@ struct PlantDetailView: View {
                 .frame(maxWidth: .infinity).multilineTextAlignment(.center)
         }
 
-        if app.canOfferRewarded && !quiet && (app.profile?.water ?? 0) == 0 {
-            Button { Task { if await app.watchRewardedAd() { run(.water, kind: .water, plant) } } } label: {
-                Label("Watch a short video for 2 drops", systemImage: "play.rectangle.fill")
-            }.buttonStyle(SecondaryButtonStyle())
+        // R1: the perk path (video for 13 and over without Plus, the rain barrel for Plus, under 13 and unknown age).
+        // The Garden card shares the same three-a-day cap. Quiet Garden never uses drops (the path is hidden there).
+        if !quiet {
+            RewardedPromptRow.forPath(app.perkPath(.water), adTitle: AdPerkCopy.Water.adTitle, freeTitle: AdPerkCopy.Water.freeTitle,
+                                      hasPlus: app.entitlements.state.hasPlus, identifier: "plant.waterPerk") {
+                Task { if await app.watchRewarded(.water) { run(.water, kind: .water, plant) } }
+            }
         }
 
         if GardenAIProvider.isModelBacked() {
@@ -628,7 +646,8 @@ struct PlantDetailView: View {
         if let toast {
             HStack(spacing: 10) {
                 Image(systemName: toast.ok ? "checkmark.circle.fill" : "moon.fill")
-                    .foregroundStyle(toast.ok ? LifePalette.leafBright : Color.appBackground.opacity(0.85))
+                    .font(Theme.font(.body, weight: .semibold))       // scales with the text, a touch larger than it
+                    .foregroundStyle(toast.ok ? LifePalette.toastTick : Color.appBackground.opacity(0.85))
                     .accessibilityHidden(true)
                 Text(toast.text).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appBackground)
                     .fixedSize(horizontal: false, vertical: true)

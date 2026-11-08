@@ -1,0 +1,63 @@
+[12:08:50] phase 2 on 058d503: waiting for lock
+[12:08:50] lock taken
+[12:09:20] guard: load 3.27/53.11 swap 849MB free 70%
+[12:10:20] guard: load 293.59/569.23 swap 849MB free 60%
+[12:11:20] guard: load 447.19/447.10 swap 849MB free 50%
+[12:12:21] guard: load 339.27/207.21 swap 849MB free 48%
+[12:13:21] guard: load 151.72/118.96 swap 849MB free 46%
+[12:14:21] guard: load 90.16/82.89 swap 849MB free 41%
+[12:15:21] guard: load 82.12/91.79 swap 785MB free 45%
+[12:16:21] guard: load 64.50/59.16 swap 785MB free 43%
+[12:17:21] guard: load 46.31/58.12 swap 785MB free 41%
+[12:18:22] guard: load 39.06/90.67 swap 1007MB free 43%
+[12:19:22] guard: load 133.43/93.66 swap 1246MB free 46%
+[12:20:22] guard: load 65.93/66.22 swap 1639MB free 38%
+[12:21:22] guard: load 43.32/28.23 swap 1428MB free 68%
+[12:22:22] guard: load 18.57/12.97 swap 1396MB free 69%
+[12:24:12] sims booted; wait 150 s
+[12:29:26] build rc=0 passed=0 failed=0 skipped=0
+[12:30:58] unit rc=0 passed=1393 failed=0 skipped=1
+[12:30:58] UNIT2 DONE
+[12:31:45] guide1 rc=0 passed=1 failed=0 skipped=0
+[12:33:07] guide5 rc=0 passed=4 failed=0 skipped=0
+[12:33:07] GUIDE DONE; waiting for /private/tmp/claude-501/-Users-computer-Desktop-workspace-WordFlora/4a7b4bed-9e4b-4277-b17d-f2a3956c6a07/scratchpad/g6/GO_DARK (rebuilds and guide reruns happen meanwhile under this lock)
+[12:59:39] dark rc=65 passed=28 failed=9 skipped=0
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkAXXXL]' failed (15.404 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkDefault]' failed (14.467 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkAXXXL]' failed (62.890 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkDefault]' failed (51.703 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeDarkDefault]' failed (41.113 seconds).
+    Test Case '-[WordFloraUITests.BadgeMechanicsUITests testAuditTheMistButtonAtAXXXLInDark]' failed (42.506 seconds).
+    Test Case '-[WordFloraUITests.BadgeMechanicsUITests testAuditTheNotebookAtAXXXLInDark]' failed (34.583 seconds).
+    Test Case '-[WordFloraUITests.FrostLanternUITests testSceneAuditsLightAndDarkAtAXXXL]' failed (16.447 seconds).
+    Test Case '-[WordFloraUITests.WordFloraUITests testTheWinCardFitsAtAccessibilityXXXLDark]' failed (21.887 seconds).
+[12:59:40] DARK DONE (light again)
+[13:32:35] rerun rc=65 passed=25 failed=11 skipped=0
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightAXXXL]' failed (14.961 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueLightDefault]' failed (14.001 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightAXXXL]' failed (64.779 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedLightDefault]' failed (51.354 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsG4bUITests testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst]' failed (50.490 seconds).
+    Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeLightDefault]' failed (40.175 seconds).
+    Test Case '-[WordFloraUITests.EndgameUITests testGoldenBloomsRanksReplayAndTheVisitorsBook]' failed (86.584 seconds).
+    Test Case '-[WordFloraUITests.FrostLanternUITests testAlbumShowsTheWinterFriends]' failed (67.788 seconds).
+    Test Case '-[WordFloraUITests.FrostLanternUITests testSceneAuditsLightAndDarkAtAXXXL]' failed (16.709 seconds).
+    Test Case '-[WordFloraUITests.SeasonsUITests testTeensSeeTheSeasonsShelfWithItsPrice]' failed (50.417 seconds).
+    Test Case '-[WordFloraUITests.TextFitScreensUITests testTheGrownUpSheetKeepsContinueAndCancelReachable]' failed (109.296 seconds).
+[13:32:35] RERUN DONE
+[13:32:35] HOLDING lock; touch /private/tmp/claude-501/-Users-computer-Desktop-workspace-WordFlora/4a7b4bed-9e4b-4277-b17d-f2a3956c6a07/scratchpad/g6/RELEASE2 to finish
+build3 rc=0 passed=0 failed=0
+light3 rc=65 passed=17 failed=6
+build4 rc=0 passed=0 failed=0
+light4 rc=65 passed=2 failed=2
+dark4 rc=65 passed=4 failed=2
+build5 rc=0 passed=0 failed=0
+light5 rc=143 passed=33 failed=3
+dark5 rc=65 passed=3 failed=3
+build6 rc=0 passed=0 failed=0
+light6 rc=65 passed=29 failed=1
+dark6 rc=65 passed=6 failed=1
+build7 rc=0 passed=0 failed=0
+unit7 rc=0 passed=1393 failed=0
+light7 rc=0 passed=7 failed=0
+dark7 rc=0 passed=1 failed=0

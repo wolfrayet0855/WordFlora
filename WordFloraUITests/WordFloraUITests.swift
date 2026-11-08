@@ -62,17 +62,71 @@ final class WordFloraUITests: XCTestCase {
             XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
             tapLetters("LOTUS")
             XCTAssertTrue(app.staticTexts["Great word!"].waitForExistence(timeout: 6), "word \(n)")
-            XCTAssertTrue(app.staticTexts["\(n) of 3 words to your next plant."].exists, "word \(n)")
+            // Progress is said once: the count line on word 1, the nudge line instead of it on word 2.
+            XCTAssertEqual(app.staticTexts["\(n) of 3 words to your next plant."].exists, n == 1, "word \(n)")
             XCTAssertFalse(app.staticTexts["New plant found!"].exists, "no plant on word \(n)")
             XCTAssertFalse(app.buttons["Share this plant"].exists, "nothing to share without a plant")
-            if n == 1 { shot("word-toward-plant") }
-            app.buttons["Continue"].tap()
+            // The nudge: the next word, or a calm way to the garden; the extra line only on the word before the plant.
+            let nextLine = app.staticTexts["One more word and a new plant arrives!"]
+            if n == 2 { XCTAssertTrue(nextLine.exists, "word 2") } else { XCTAssertFalse(nextLine.exists, "word 1") }
+            XCTAssertTrue(app.buttons["winCard.tendGarden"].exists, "word \(n)")
+            XCTAssertEqual(app.buttons["winCard.tendGarden"].label, "Tend my garden")
+            if n == 1 { sleep(1); shot("word-toward-plant") }
+            if n == 2 { sleep(1); shot("word-before-plant") }
+            app.buttons["Next word"].tap()
         }
         XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
         tapLetters("LOTUS")
         XCTAssertTrue(app.staticTexts["New plant found!"].waitForExistence(timeout: 6), "the third word brings the plant")
         XCTAssertFalse(app.staticTexts["Great word!"].exists)
         shot("third-word-plant")
+    }
+
+    /// "Tend my garden" on a word with no plant closes the card and opens the garden (the calm way out of the round).
+    func testTheWinCardCanGoTendTheGarden() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-word=LOTUS"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 8))
+        app.buttons["Play"].tap()
+        XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
+        tapLetters("LOTUS")
+        let tend = app.buttons["winCard.tendGarden"]
+        XCTAssertTrue(tend.waitForExistence(timeout: 6))
+        XCTAssertTrue(app.buttons["Next word"].exists)
+        for _ in 0..<6 where !tend.isHittable { app.swipeUp() }
+        tend.tap()
+        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["Great word!"].exists)
+    }
+
+    /// The win card at the largest text size, dark: the pips, both lines and both buttons fit and can be reached.
+    func testTheWinCardFitsAtAccessibilityXXXLDark() {
+        XCUIDevice.shared.appearance = .dark
+        defer { XCUIDevice.shared.appearance = .light }
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-word=LOTUS",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 8))
+        app.buttons["Play"].tap()
+        for n in 1...2 {
+            let l = app.buttons["L"]
+            XCTAssertTrue(l.waitForExistence(timeout: 5))
+            // After "Next word" the card fades out over the keys; a tap before they are hittable is lost (seen at AX XXXL).
+            for _ in 0..<10 where !l.isHittable { usleep(300_000) }
+            XCTAssertTrue(l.isHittable, "the keyboard is back for word \(n)")
+            tapLetters("LOTUS")
+            let next = app.buttons["Next word"]
+            XCTAssertTrue(next.waitForExistence(timeout: 6), "word \(n)")
+            if n == 2 {
+                sleep(2); shot("word-before-plant-axxxl-dark")
+                for _ in 0..<6 where !app.buttons["winCard.tendGarden"].isHittable { app.swipeUp() }
+                XCTAssertTrue(app.buttons["winCard.tendGarden"].isHittable)
+                shot("word-before-plant-axxxl-dark-buttons")
+                return
+            }
+            for _ in 0..<6 where !next.isHittable { app.swipeUp() }
+            next.tap()
+        }
     }
 
     func testWrongGuessesEndWithARestingReveal() {
@@ -243,7 +297,7 @@ final class WordFloraUITests: XCTestCase {
         app.buttons["Garden"].tap()
         app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Clover'")).firstMatch.tap()
         XCTAssertTrue(app.buttons["Hide Life panel"].waitForExistence(timeout: 5))
-        sleep(1)
+        sleep(3)                                   // the panel opens itself with an animation; audit the settled page
         audit("plant-life-open-ax")
     }
 
@@ -302,8 +356,9 @@ final class WordFloraUITests: XCTestCase {
         app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-plus"]
         app.launch()
         app.buttons["Settings"].tap()
-        scrollTo(app.buttons["Remove ads and sync with iCloud"])
-        app.buttons["Remove ads and sync with iCloud"].tap()
+        // With Plus on, the row says so ("WordFlora Plus is on · <plan>").
+        scrollTo(app.buttons["settings.plus"])
+        app.buttons["settings.plus"].tap()
         XCTAssertTrue(app.staticTexts["You have WordFlora Plus"].waitForExistence(timeout: 5))
         XCTAssertFalse(app.buttons["Subscribe"].exists)
     }
@@ -428,9 +483,14 @@ final class WordFloraUITests: XCTestCase {
             let f = scroll.frame
             return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
         }() : nil
-        var skipped = [String]()
+        var skipped = [String](), excused = [String]()
         do {
             try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
+                // A keyboard key's single letter shrinks to fit its fixed box (same ruling as SpeedBloom): only
+                // Dynamic Type on a one-letter element is excused, and it is printed.
+                if issue.auditType == .dynamicType, let e = issue.element, e.label.count == 1, e.label.first?.isLetter == true {
+                    excused.append(e.label); return true
+                }
                 if issue.auditType == .contrast, let v = visible {
                     // A clipped element often comes back unresolved (nil); it cannot be judged, so it is noted, not failed.
                     guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
@@ -444,6 +504,7 @@ final class WordFloraUITests: XCTestCase {
             try? findings.joined(separator: "\n").write(toFile: dir + "/audit-\(name).txt", atomically: true, encoding: .utf8)
         }
         if !skipped.isEmpty { print("\(name): contrast on \(skipped.count) clipped, unresolved element(s) not judged") }
+        if !excused.isEmpty { print("\(name): single-glyph keys shrunk to fit, excused: \(excused.joined(separator: " "))") }
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
 
@@ -561,7 +622,9 @@ final class WordFloraUITests: XCTestCase {
 
     func testAuditRainyPlant() {
         openClover(["-uitest-rain=3"])
-        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5)); audit("plant-rain")
+        XCTAssertTrue(app.buttons["Water"].waitForExistence(timeout: 5))
+        sleep(5)                                   // the rained-off petals drift down and rest before the audit
+        audit("plant-rain")
     }
 
     func testAuditMoreScreens() {
@@ -787,7 +850,7 @@ final class FidelityScreensUITests: XCTestCase {
             for n in 1...3 {
                 XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5), "word \(n)")
                 for ch in "LOTUS" { app.buttons[String(ch)].tap() }
-                let next = app.buttons["Continue"]
+                let next = app.buttons.matching(NSPredicate(format: "label IN %@", ["Continue", "Next word"])).firstMatch
                 XCTAssertTrue(next.waitForExistence(timeout: 8), "word \(n)")
                 if n == 1 { sleep(2); shot("puzzle-win-card-\(look.0)") }
                 for _ in 0..<6 where !next.isHittable { app.swipeUp() }
@@ -1030,16 +1093,22 @@ final class PlusForeverUITests: XCTestCase {
             let f = scroll.frame
             return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
         }() : nil
-        do {
-            try app.performAccessibilityAudit(for: .all) { issue in
-                if issue.auditType == .contrast, let v = visible {
-                    guard let e = issue.element else { skipped += 1; return true }
-                    if !v.contains(e.frame) { return true }
+        // Dynamic Type and clipped text run apart, after the rest, as in the Seasons and TextFit audits (both grow the
+        // text and reflow the page mid-check).
+        let passes: [XCUIAccessibilityAuditType] = [XCUIAccessibilityAuditType.all.subtracting([.dynamicType, .textClipped]),
+                                                    .textClipped, .dynamicType]
+        for types in passes {
+            do {
+                try app.performAccessibilityAudit(for: types) { issue in
+                    if issue.auditType == .contrast, let v = visible {
+                        guard let e = issue.element else { skipped += 1; return true }
+                        if !v.contains(e.frame) { return true }
+                    }
+                    findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
+                    return true
                 }
-                findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
-                return true
-            }
-        } catch { findings.append("\(name): audit failed to run: \(error)") }
+            } catch { findings.append("\(name): audit failed to run: \(error)") }
+        }
         if skipped > 0 { print("\(name): contrast on \(skipped) clipped, unresolved element(s) not judged") }
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
@@ -1049,7 +1118,8 @@ final class PlusForeverUITests: XCTestCase {
         let lifetime = app.buttons["plus.lifetime"]
         XCTAssertTrue(lifetime.waitForExistence(timeout: 8))
         XCTAssertTrue(lifetime.label.contains("Plus Forever"), lifetime.label)
-        XCTAssertTrue(lifetime.label.contains("Pay once, keep Plus on this Apple ID. No renewals."), lifetime.label)
+        // The card lost its sentence in the Plus pass (Fable delta): it reads "Plus Forever, <price> once".
+        XCTAssertTrue(lifetime.label.contains("once"), lifetime.label)
         XCTAssertFalse(lifetime.isSelected, "Plus Forever is never the default")
         let yearly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Yearly'")).firstMatch
         let monthly = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Monthly'")).firstMatch

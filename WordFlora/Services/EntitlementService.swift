@@ -58,7 +58,8 @@ final class EntitlementService {
             for plan in PlusPlan.allCases { if let p = found.first(where: { $0.id == plan.productID }) { map[plan] = p } }
             products = map
             lifetimeProduct = found.first { $0.id == PlusPlan.lifetimeID }
-            loadFailed = map.isEmpty && lifetimeProduct == nil
+            // A missing yearly or monthly plan counts as failed: the page would otherwise wait on it for ever.
+            loadFailed = map.count < PlusPlan.allCases.count
             // Trial words only when the yearly plan really has a free-trial introductory offer and this Apple ID can
             // still take it (eligibility alone is true for anyone new to the group, offer or not).
             if let yearly = map[.yearly], let sub = yearly.subscription,

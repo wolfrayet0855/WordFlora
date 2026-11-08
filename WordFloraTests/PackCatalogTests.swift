@@ -205,7 +205,7 @@ final class PackCatalogTests: XCTestCase {
         let defs = try BadgeCatalog.load()
         let def = try XCTUnwrap(defs.first { $0.id == "lantern_keeper" })
         XCTAssertEqual(def.counter, "lanternKeeper"); XCTAssertEqual(def.thresholds, [1, 4, 8])
-        XCTAssertEqual(def.blurb, "Grow plants in the Frosted glass pot")
+        XCTAssertEqual(def.blurb, FrostLanternCopy.badgeBlurb)
         var state = BadgeState(defs: defs)
         let plant = app.plants().first!; plant.earnedCount = 1
         plant.potId = "lanternRed"; plant.stage = 1

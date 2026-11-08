@@ -1,0 +1,14 @@
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:266: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkAXXXL] : XCTAssertFalse failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkAXXXL]' failed (21.576 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkDefault]' passed (21.836 seconds).
+	 Executed 2 tests, with 1 failure (0 unexpected) in 43.412 (43.418) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsUITests.swift:152: error: -[WordFloraUITests.AdFormatsUITests testAuditWakeDarkDefault] : XCTAssertTrue failed - wake-dark-default-textClipped: 131072 - Text clipped | '' [] 
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeDarkDefault]' failed (41.111 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 41.111 (41.113) seconds
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testAuditTheMistButtonAtAXXXLInDark]' passed (50.055 seconds).
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testAuditTheNotebookAtAXXXLInDark]' passed (57.327 seconds).
+	 Executed 2 tests, with 0 failures (0 unexpected) in 107.382 (107.385) seconds
+Test Case '-[WordFloraUITests.WordFloraUITests testTheWinCardFitsAtAccessibilityXXXLDark]' passed (24.507 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 24.507 (24.508) seconds
+	 Executed 6 tests, with 2 failures (0 unexpected) in 216.412 (216.429) seconds
+	 Executed 6 tests, with 2 failures (0 unexpected) in 216.412 (216.431) seconds

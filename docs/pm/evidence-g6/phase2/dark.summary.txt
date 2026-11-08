@@ -1,0 +1,63 @@
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:250: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkAXXXL] : XCTAssertTrue failed - cue-dark-axxxl: 1 - Contrast failed | 'Guess words. Grow a garden.' [] (108.0, 152.66666666666666, 164.0, 232.66666666666666)
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkAXXXL]' failed (15.404 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:250: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkDefault] : XCTAssertTrue failed - cue-dark-default: 1 - Contrast failed | 'One word for everyone today' [] (78.0, 374.3333333333333, 169.66666666666666, 15.666666666666686)
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditCueDarkDefault]' failed (14.467 seconds).
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditGardenBannerDarkAXXXL]' passed (18.012 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:275: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkAXXXL] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkAXXXL]' failed (62.890 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsG4bUITests.swift:275: error: -[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkDefault] : XCTAssertTrue failed
+Test Case '-[WordFloraUITests.AdFormatsG4bUITests testAuditShedDarkDefault]' failed (51.703 seconds).
+	 Executed 5 tests, with 4 failures (0 unexpected) in 162.475 (162.484) seconds
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditGardenDarkAXXXL]' passed (31.050 seconds).
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditGardenDarkDefault]' passed (33.119 seconds).
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeDarkAXXXL]' passed (45.278 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/AdFormatsUITests.swift:147: error: -[WordFloraUITests.AdFormatsUITests testAuditWakeDarkDefault] : XCTAssertTrue failed - wake-dark-default-textClipped: 131072 - Text clipped | 'Word puzzle' [] (117.4626865671642, 649.955223880597, 95.379767827529, 19.524046434494153)
+Test Case '-[WordFloraUITests.AdFormatsUITests testAuditWakeDarkDefault]' failed (41.113 seconds).
+	 Executed 4 tests, with 1 failure (0 unexpected) in 150.559 (150.566) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/BadgeMechanicsUITests.swift:73: error: -[WordFloraUITests.BadgeMechanicsUITests testAuditTheMistButtonAtAXXXLInDark] : XCTAssertTrue failed - mist-ax5-dark-done: 1 - Contrast failed | 'Let it shine' (84.0, 454.8333333333333, 220.33333333333331, 52.666666666666686)
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testAuditTheMistButtonAtAXXXLInDark]' failed (42.506 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/BadgeMechanicsUITests.swift:73: error: -[WordFloraUITests.BadgeMechanicsUITests testAuditTheNotebookAtAXXXLInDark] : XCTAssertTrue failed - fieldnotes-ax5-dark-dynamicType: 65536 - Dynamic Type font sizes are partially unsupported | 'A new friend' (40.0, 790.3382975260415, 283.0, 58.666666666666856)
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testAuditTheNotebookAtAXXXLInDark]' failed (34.583 seconds).
+Test Case '-[WordFloraUITests.BadgeMechanicsUITests testAuditTheTidyTrimCueAtAXXXLInDark]' passed (39.540 seconds).
+	 Executed 3 tests, with 2 failures (0 unexpected) in 116.628 (116.634) seconds
+Test Case '-[WordFloraUITests.BadgesUITests testTheBadgesPageAndDetailAtAnAccessibilitySizeInDarkMode]' passed (51.553 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 51.553 (51.555) seconds
+Test Case '-[WordFloraUITests.ButterflyNetUITests testAuditTheEasierSwitchAtAXXXLInDark]' passed (21.598 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 21.598 (21.600) seconds
+Test Case '-[WordFloraUITests.EndgameUITests testTheGrandGardenAtAnAccessibilitySizeInDark]' passed (21.043 seconds).
+Test Case '-[WordFloraUITests.EndgameUITests testTheLevelMapGarlandIsStillWithReduceMotionInDark]' passed (20.452 seconds).
+	 Executed 2 tests, with 0 failures (0 unexpected) in 41.495 (41.498) seconds
+Test Case '-[WordFloraUITests.EngagementUITests testAuditPlantPageWidgetRowAtAXXXLDark]' passed (35.094 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testAuditWeeklyNoteAtAXXXLDark]' passed (24.857 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testAuditWinCardWithTheNameButtonAtAXXXLDark]' passed (16.889 seconds).
+	 Executed 3 tests, with 0 failures (0 unexpected) in 76.839 (76.843) seconds
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/FrostLanternUITests.swift:59: error: -[WordFloraUITests.FrostLanternUITests testSceneAuditsLightAndDarkAtAXXXL] : XCTAssertTrue failed - g5-home-light-axxxl: 8 - Element has no description | '' [winter.scene]
+Test Case '-[WordFloraUITests.FrostLanternUITests testSceneAuditsLightAndDarkAtAXXXL]' failed (16.447 seconds).
+	 Executed 1 test, with 1 failure (0 unexpected) in 16.447 (16.450) seconds
+Test Case '-[WordFloraUITests.GuideUITests testScreenshotsDark]' passed (30.491 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 30.491 (30.493) seconds
+Test Case '-[WordFloraUITests.QuietGardenOfferUITests testAuditInDark]' passed (13.451 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 13.451 (13.453) seconds
+Test Case '-[WordFloraUITests.RestCardUITests testAuditNudgeCardDarkAtALargeTextSize]' passed (50.648 seconds).
+Test Case '-[WordFloraUITests.RestCardUITests testAuditRestCardDarkAtALargeTextSize]' passed (45.847 seconds).
+	 Executed 2 tests, with 0 failures (0 unexpected) in 96.495 (96.498) seconds
+Test Case '-[WordFloraUITests.SeasonsUITests testSnowFallsOnTheSeasonsCardLightAndDark]' passed (55.545 seconds).
+Test Case '-[WordFloraUITests.SeasonsUITests testTheSeasonsPageAtAccessibilityXXXLDark]' passed (57.851 seconds).
+Test Case '-[WordFloraUITests.SeasonsUITests testTheShedShelfAtAccessibilityXXXLDark]' passed (85.422 seconds).
+	 Executed 3 tests, with 0 failures (0 unexpected) in 198.818 (198.823) seconds
+Test Case '-[WordFloraUITests.TendingUITests testCardScreensInDarkAndLargeText]' passed (85.728 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testOwnedPackPotIsPickedInDarkMode]' passed (42.394 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testRepotSheetScreensLikeTheMockupDark]' passed (29.596 seconds).
+Test Case '-[WordFloraUITests.TendingUITests testRepotSheetScreensLikeTheMockupDarkReduceMotion]' passed (27.408 seconds).
+	 Executed 4 tests, with 0 failures (0 unexpected) in 185.126 (185.133) seconds
+Test Case '-[WordFloraUITests.WeatherUITests testTheCardWithReduceMotionAndDark]' passed (8.257 seconds).
+	 Executed 1 test, with 0 failures (0 unexpected) in 8.257 (8.259) seconds
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX1InDark]' passed (74.577 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX3InDark]' passed (73.551 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtAX5InDark]' passed (75.501 seconds).
+Test Case '-[WordFloraUITests.WordFloraUITests testKeyMarksAtTheDefaultSizeInDark]' passed (74.262 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/WordFloraUITests.swift:115: error: -[WordFloraUITests.WordFloraUITests testTheWinCardFitsAtAccessibilityXXXLDark] : XCTAssertTrue failed - word 2
+Test Case '-[WordFloraUITests.WordFloraUITests testTheWinCardFitsAtAccessibilityXXXLDark]' failed (21.887 seconds).
+	 Executed 5 tests, with 1 failure (0 unexpected) in 319.778 (319.786) seconds
+	 Executed 37 tests, with 9 failures (0 unexpected) in 1490.009 (1490.098) seconds
+	 Executed 37 tests, with 9 failures (0 unexpected) in 1490.009 (1490.100) seconds

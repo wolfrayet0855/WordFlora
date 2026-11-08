@@ -48,6 +48,54 @@ enum FadedBloom {
     /// leaves, picked with the same seeded mix so it is the same spot all day.
     static let spots: [(x: Double, y: Double)] = [(0.40, 0.26), (0.60, 0.24), (0.50, 0.20), (0.36, 0.34), (0.64, 0.32)]
     static func spot(seed: Int64, plantId: String, day: Int) -> (x: Double, y: Double) {
-        spots[Int((mixed(seed: seed, plantId: plantId, day: day) >> 16) % UInt64(spots.count))]
+        spots[spotIndex(seed: seed, plantId: plantId, day: day)]
+    }
+
+    /// Which of the five base spots is picked today (the seeded pick; the per-plant nudge below never changes it).
+    static func spotIndex(seed: Int64, plantId: String, day: Int) -> Int {
+        Int((mixed(seed: seed, plantId: plantId, day: day) >> 16) % UInt64(spots.count))
+    }
+
+    // MARK: Per-plant nudges (docs/pm/faded-bloom-offsets.md)
+
+    /// A nudge for one plant: `dy` moves the spot down, `dx` sideways, `xk` pulls it toward the centre line (1 = none).
+    struct SpotFix: Equatable {
+        var dy: Double, dx: Double, xk: Double
+        static let none = SpotFix(dy: 0, dx: 0, xk: 1)
+    }
+
+    /// Per-plant nudges so the faded bloom always lands on the plant (static check of all 50 plants, 2026-11-07).
+    /// Keyed by plant id (the asset name without "plant_", as `PlantInfo.plantId`). Low, wide or narrow plants only;
+    /// every plant not listed keeps the base spot.
+    static let spotFix: [String: SpotFix] = [
+        "lithops":          SpotFix(dy: 0.28, dx: 0,     xk: 0.4),
+        "ghost_pipe":       SpotFix(dy: 0.25, dx: 0,     xk: 0.5),
+        "giant_water_lily": SpotFix(dy: 0.33, dx: 0,     xk: 0.3),
+        "lotus":            SpotFix(dy: 0.33, dx: 0,     xk: 0.3),
+        "welwitschia":      SpotFix(dy: 0.18, dx: 0,     xk: 1),
+        "strawberry":       SpotFix(dy: 0.15, dx: 0,     xk: 1),
+        "sundew":           SpotFix(dy: 0.15, dx: 0,     xk: 0.6),
+        "aloe_vera":        SpotFix(dy: 0.08, dx: 0,     xk: 1),
+        "jasmine":          SpotFix(dy: 0.10, dx: 0.08,  xk: 1),
+        "dandelion":        SpotFix(dy: 0.05, dx: -0.10, xk: 1),
+        "corpse_flower":    SpotFix(dy: 0.06, dx: 0,     xk: 0.2),
+        "puya_raimondii":   SpotFix(dy: 0,    dx: 0,     xk: 0.25),
+        "silversword":      SpotFix(dy: 0,    dx: 0,     xk: 0.2),
+        "saguaro_cactus":   SpotFix(dy: 0,    dx: 0,     xk: 0.3),
+        "snapdragon":       SpotFix(dy: 0,    dx: 0,     xk: 0.3),
+    ]
+
+    /// The spot after the plant's nudge, kept inside the art box (0.1 to 0.9 on both axes):
+    /// `x' = clamp(0.5 + (x - 0.5) * xk + dx)`, `y' = clamp(y + dy)`.
+    static func adjusted(_ spot: (x: Double, y: Double), plantId: String, table: [String: SpotFix] = spotFix) -> (x: Double, y: Double) {
+        let f = table[plantId] ?? .none
+        return (clampToBox(0.5 + (spot.x - 0.5) * f.xk + f.dx), clampToBox(spot.y + f.dy))
+    }
+
+    static func clampToBox(_ v: Double) -> Double { min(0.9, max(0.1, v)) }
+
+    /// Where the faded bloom is drawn today: the seeded spot with the plant's nudge applied.
+    static func placedSpot(seed: Int64, plantId: String, day: Int) -> (x: Double, y: Double) {
+        adjusted(spot(seed: seed, plantId: plantId, day: day), plantId: plantId)
     }
 }

@@ -1,0 +1,12 @@
+error: Check ad ids: AdMobBannerUnitID is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids: AdMobBannerGardenUnitID is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids: AdMobBannerGardenCollapsibleUnitID is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids: AdMobInterstitialUnitID is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids: AdMobRewardedUnitID is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids: AdMobRewardedHintUnitID is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids: AdMobRewardedWakeUnitID is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids: AdMobAppOpenUnitID is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids: AdMobNativeUnitID is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids: GADApplicationIdentifier is a Google test id in a Release build (is Config/Ads.local.xcconfig missing or incomplete?).
+error: Check ad ids failed. Copy Config/Ads.local.xcconfig from the owner's checkout (never commit it), or for an unsigned simulator proof build set ADS_CHECK_SKIP=1 with CODE_SIGNING_ALLOWED=NO.
+** BUILD FAILED **

@@ -1,0 +1,28 @@
+Test Case '-[WordFloraUITests.EngagementUITests testAdultDailyBloomStillShares]' passed (18.736 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testAdultWinCardStillShares]' passed (15.848 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/EngagementUITests.swift:73: error: -[WordFloraUITests.EngagementUITests testAuditPlantPageWidgetRow] : XCTAssertTrue failed - b-plant-widget-row: 2 - Potentially inaccessible text | '' 
+Test Case '-[WordFloraUITests.EngagementUITests testAuditPlantPageWidgetRow]' failed (35.653 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testAuditPlantPageWidgetRowAtAXXXL]' passed (32.204 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testAuditWeeklyNote]' passed (12.141 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/EngagementUITests.swift:47: error: -[WordFloraUITests.EngagementUITests testAuditWeeklyNoteAtAXXXL] : XCTAssertTrue failed - a-note-axxxl: 1 - Contrast failed | 'Your week in the garden' (32.0, 857.3333333333334, 326.33333333333326, 130.66666666666652)
+Test Case '-[WordFloraUITests.EngagementUITests testAuditWeeklyNoteAtAXXXL]' failed (11.045 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testAuditWinCardWithTheNameButton]' passed (17.016 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testAuditWinCardWithTheNameButtonAtAXXXL]' passed (20.075 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testCelebrateThenShareAndTheNoteDoesNotReturnThisWeek]' passed (20.145 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testCelebrateUnderReduceMotionShowsAStillBloom]' passed (13.510 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/EngagementUITests.swift:163: error: -[WordFloraUITests.EngagementUITests testNewPlantCardOffersANameAndThePlantSaysHello] : XCTAssertTrue failed - Poppy
+Test Case '-[WordFloraUITests.EngagementUITests testNewPlantCardOffersANameAndThePlantSaysHello]' failed (31.046 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testNotNowKeepsTheButtonAndSavesNothing]' passed (18.248 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testPencilNameOfOnlyEmojiGoesBackToTheSpeciesName]' passed (28.701 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testQuietGardenShowsNamesOnly]' passed (7.940 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testShowOnMyWidgetFlipsToOnYourWidget]' passed (23.545 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testTheDailyQuestWaitsOnANoteVisit]' passed (18.650 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testTheNoteIsGoneAfterAVisitToTheGarden]' passed (14.557 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testUnderThirteenDailyBloomHasNoShareButton]' passed (12.736 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testUnderThirteenHasNoShareMyWeek]' passed (7.406 seconds).
+Test Case '-[WordFloraUITests.EngagementUITests testUnderThirteenWinCardHasNoShareButton]' passed (14.150 seconds).
+/Users/computer/Desktop/workspace/WordFlora/.claude/worktrees/agent-ad2c0f0e0aef65236/WordFloraUITests/EngagementUITests.swift:277: error: -[WordFloraUITests.EngagementUITests testWeeklyNoteShowsThePastWeek] : XCTAssertFalse failed
+Test Case '-[WordFloraUITests.EngagementUITests testWeeklyNoteShowsThePastWeek]' failed (8.295 seconds).
+	 Executed 21 tests, with 4 failures (0 unexpected) in 381.647 (381.683) seconds
+	 Executed 21 tests, with 4 failures (0 unexpected) in 381.647 (381.684) seconds
+	 Executed 21 tests, with 4 failures (0 unexpected) in 381.647 (381.686) seconds

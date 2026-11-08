@@ -49,6 +49,8 @@ struct NameStoryCard: View {
     }
 
     let content: Content
+    /// Share leaves the app: the caller passes `app.canShare` (ShareGate: hidden under 13 and for an unknown age).
+    var canShare = false
     @State private var expanded = false
     @Environment(\.accessibilityVoiceOverEnabled) private var voiceOver
     @Environment(\.dynamicTypeSize) private var typeSize
@@ -66,6 +68,9 @@ struct NameStoryCard: View {
     }
     /// The card's words sit inside these side paddings (the story text and the card), for the layout test.
     static let sidePadding: CGFloat = 18
+
+    /// Shows the Share button when sharing is allowed (`app.canShare`).
+    func shareable(_ allowed: Bool) -> NameStoryCard { var card = self; card.canShare = allowed; return card }
 
     init(content: Content) { self.content = content }
     init(plant: PlantInfo) { self.content = Content(plant: plant) }
@@ -112,12 +117,14 @@ struct NameStoryCard: View {
                     .accessibilityLabel(expanded ? "Show less" : "Tell me more")
                 }
                 Spacer(minLength: 8)
-                ShareLink(item: content.shareText) {
-                    Label("Share", systemImage: "square.and.arrow.up")
-                        .font(Theme.font(.subheadline, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
-                        .frame(minHeight: Theme.minTap)
+                if canShare {
+                    ShareLink(item: content.shareText) {
+                        Label("Share", systemImage: "square.and.arrow.up")
+                            .font(Theme.font(.subheadline, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
+                            .frame(minHeight: Theme.minTap)
+                    }
+                    .accessibilityLabel("Share this fact")
                 }
-                .accessibilityLabel("Share this fact")
             }
             .padding(.top, 8)
         }
