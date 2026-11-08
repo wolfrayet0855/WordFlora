@@ -348,6 +348,18 @@ struct ParentalGateSheet: View {
         }
     }
 
+    private var pinned: Bool { typeSize.isAccessibilitySize }
+
+    @ViewBuilder private var buttons: some View {
+        Button {
+            if ParentalGate.check(answer: answer, against: challenge) { onPass() } else { wrong = true }
+        } label: {
+            Text("Continue").multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+        }
+        .buttonStyle(PrimaryButtonStyle())
+        Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -371,22 +383,22 @@ struct ParentalGateSheet: View {
                         .fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("parentalGate.wrong")
                 }
-                Button {
-                    if ParentalGate.check(answer: answer, against: challenge) { onPass() } else { wrong = true }
-                } label: {
-                    // Room above and below the word: at AX5 its line (about 66 pt) filled the button exactly and the
-                    // audit read it as clipped.
-                    Text("Continue").multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                        .padding(.vertical, 8)
-                }
-                .buttonStyle(PrimaryButtonStyle())
-                Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
+                if !pinned { buttons }
             }
             .padding(Self.padding(typeSize))
             // Clear of the sheet's grabber and the scroll edge's soft fade, which the audit read as clipping the title.
             .padding(.top, typeSize.isAccessibilitySize ? 16 : 0)
-            // Room under Cancel so the last button never sits on the sheet's bottom edge (home indicator).
-            .padding(.bottom, typeSize.isAccessibilitySize ? 40 : 0)
+        }
+        // At the accessibility sizes the question is taller than the sheet: Continue and Cancel sit in a footer pinned
+        // under the scroll area (above the keyboard), so they are always whole and in view, never cut by the sheet's
+        // bottom edge (the audit read Continue as clipped there however tall it was).
+        .safeAreaInset(edge: .bottom, spacing: 0) {
+            if pinned {
+                VStack(spacing: 8) { buttons }
+                    .padding(.horizontal, Self.padding(typeSize)).padding(.top, 10).padding(.bottom, 6)
+                    .background(Color(UIColor.systemBackground))
+                    .overlay(alignment: .top) { Divider() }
+            }
         }
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)
