@@ -49,6 +49,39 @@ final class PlantNameTests: XCTestCase {
         XCTAssertEqual(PlantName.clean("7"), "7")
     }
 
+    func testMarksOnlyNamesClear() {
+        XCTAssertEqual(PlantName.clean("\u{0301}\u{0302}\u{0303}"), "", "combining marks with no base")
+        XCTAssertEqual(PlantName.clean(" \u{20DD}\u{20DD} "), "", "enclosing marks only")
+        XCTAssertEqual(PlantName.clean("\u{0345}\u{0345}"), "", "a mark that Unicode calls alphabetic is still not a base")
+    }
+
+    func testStackedMarksAreCutBackToTwoPerCharacter() {
+        let zalgo = "Z" + String(repeating: "\u{0336}", count: 30) + "ed"
+        let cleaned = PlantName.clean(zalgo)
+        XCTAssertEqual(cleaned, "Z\u{0336}\u{0336}ed")
+        XCTAssertEqual(cleaned.unicodeScalars.count, 5)
+        XCTAssertEqual(PlantName.clean("Việt"), "Việt", "a real two-mark accent stays")
+        XCTAssertEqual(PlantName.clean("❤️ Pip"), "❤️ Pip", "an emoji's variation selector stays")
+    }
+
+    func testBidiControlsAreRemoved() {
+        XCTAssertEqual(PlantName.clean("\u{202E}Sunny\u{202C}"), "Sunny")
+        XCTAssertEqual(PlantName.clean("Su\u{2066}nny\u{2069}\u{200F}"), "Sunny")
+        XCTAssertEqual(PlantName.clean("\u{202E}\u{2067}\u{200E}"), "", "controls only")
+    }
+
+    func testNamesFromSyncOrABackupPassTheSameRule() throws {
+        let app = try makeApp()
+        let plants = app.plants()
+        plants[0].nickname = "\u{202E}Rosie\u{202C}"
+        plants[1].nickname = "\u{0301}\u{0301}"
+        plants[2].nickname = "Pip"
+        app.reconcileSyncedData()
+        XCTAssertEqual(plants[0].nickname, "Rosie")
+        XCTAssertEqual(plants[1].nickname, "")
+        XCTAssertEqual(plants[2].nickname, "Pip")
+    }
+
     func testDisplayNameFallsBackToTheSpecies() {
         XCTAssertEqual(PlantName.display(nickname: "", species: "Daisy"), "Daisy")
         XCTAssertEqual(PlantName.display(nickname: "Sunny", species: "Daisy"), "Sunny")

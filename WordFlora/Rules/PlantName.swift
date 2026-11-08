@@ -7,13 +7,53 @@ import Foundation
 enum PlantName {
     static let maxLength = 16
 
-    /// Trims spaces and new lines, keeps at most 16 characters (whole characters, so an emoji or an accent is never
-    /// split), and gives "" when nothing is left with a letter or digit (empty, spaces, emoji or punctuation only).
+    /// Combining marks kept on one base character (enough for any real accent, e.g. Vietnamese "ệ"; stacked "Zalgo" text
+    /// is cut back to this).
+    static let maxMarksPerCharacter = 2
+
+    /// Removes bidi controls (they can reorder the text around the name), caps combining marks per character, trims
+    /// spaces and new lines, keeps at most 16 characters (whole characters, so an emoji or an accent is never split),
+    /// and gives "" when no character has a letter or digit as its base (empty, spaces, emoji, punctuation, or marks only).
     static func clean(_ typed: String) -> String {
-        let trimmed = typed.trimmingCharacters(in: .whitespacesAndNewlines)
+        var scalars = String.UnicodeScalarView()
+        scalars.append(contentsOf: typed.unicodeScalars.filter { !isBidiControl($0) })
+        let tamed = String(scalars).map(capMarks).joined()
+        let trimmed = tamed.trimmingCharacters(in: .whitespacesAndNewlines)
         let kept = String(trimmed.prefix(maxLength)).trimmingCharacters(in: .whitespacesAndNewlines)
-        let hasLetterOrDigit = kept.unicodeScalars.contains { CharacterSet.alphanumerics.contains($0) }
-        return hasLetterOrDigit ? kept : ""
+        return kept.contains(where: hasLetterOrDigitBase) ? kept : ""
+    }
+
+    /// U+061C, U+200E, U+200F, U+202A-U+202E, U+2066-U+2069.
+    static func isBidiControl(_ s: Unicode.Scalar) -> Bool {
+        switch s.value {
+        case 0x061C, 0x200E, 0x200F, 0x202A...0x202E, 0x2066...0x2069: return true
+        default: return false
+        }
+    }
+
+    private static func isMark(_ s: Unicode.Scalar) -> Bool {
+        switch s.properties.generalCategory {
+        case .nonspacingMark, .spacingMark, .enclosingMark: return true
+        default: return false
+        }
+    }
+
+    /// Keeps the character's non-mark scalars and its first `maxMarksPerCharacter` marks.
+    private static func capMarks(_ c: Character) -> String {
+        var marks = 0
+        var out = String.UnicodeScalarView()
+        for s in c.unicodeScalars {
+            // Variation selectors (U+FE00-FE0F) are marks by category but part of an emoji's look: always kept.
+            if isMark(s) && !(0xFE00...0xFE0F).contains(s.value) { marks += 1; if marks > maxMarksPerCharacter { continue } }
+            out.append(s)
+        }
+        return String(out)
+    }
+
+    /// The character starts with a letter or digit that is not itself a mark.
+    private static func hasLetterOrDigitBase(_ c: Character) -> Bool {
+        guard let base = c.unicodeScalars.first, !isMark(base) else { return false }
+        return base.properties.isAlphabetic || base.properties.numericType != nil
     }
 
     /// The name the app shows: the typed name, or the species name when there is none.
