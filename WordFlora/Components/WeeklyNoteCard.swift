@@ -53,22 +53,27 @@ struct WeeklyNoteCard: View {
                     .padding(.top, 2).accessibilityHidden(true)
             }
             VStack(alignment: .leading, spacing: 6) {
+                // The title alone is the VoiceOver header; the rows and closing line read next as one element.
                 Text(WeeklyNoteCopy.title).font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
-                ForEach(WeeklyNoteCopy.rows(summary, quiet: quiet), id: \.self) { row in
-                    Text(row).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
+                    .accessibilityAddTraits(.isHeader)
+                    .accessibilityIdentifier("weeklyNote.title")
+                VStack(alignment: .leading, spacing: 6) {
+                    ForEach(WeeklyNoteCopy.rows(summary, quiet: quiet), id: \.self) { row in
+                        Text(row).font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                    Text(WeeklyNoteCopy.closing(weekKey: summary.weekKey))
+                        .font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.successText)
                         .fixedSize(horizontal: false, vertical: true)
                 }
-                Text(WeeklyNoteCopy.closing(weekKey: summary.weekKey))
-                    .font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.successText)
-                    .fixedSize(horizontal: false, vertical: true)
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel(WeeklyNoteCopy.bodyLabel(summary, quiet: quiet))
+                .accessibilityIdentifier("weeklyNote.text")
             }
             Spacer(minLength: 0)
         }
-        .accessibilityElement(children: .ignore)
-        .accessibilityLabel(WeeklyNoteCopy.accessibilityLabel(summary, quiet: quiet))
-        .accessibilityAddTraits(.isHeader)
-        .accessibilityIdentifier("weeklyNote.text")
+        .accessibilityElement(children: .contain)
     }
 
     private var buttons: some View {

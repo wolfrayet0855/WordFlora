@@ -161,6 +161,11 @@ enum WeeklyNoteCopy {
 
     /// VoiceOver reads the card as one element: the title, then the rows in order, then the closing line.
     static func accessibilityLabel(_ s: WeeklyNote.Summary, quiet: Bool) -> String {
-        ([title + "."] + rows(s, quiet: quiet) + [closing(weekKey: s.weekKey)]).joined(separator: " ")
+        title + ". " + bodyLabel(s, quiet: quiet)
+    }
+
+    /// What VoiceOver reads after the title (the header): the rows in order, then the closing line.
+    static func bodyLabel(_ s: WeeklyNote.Summary, quiet: Bool) -> String {
+        (rows(s, quiet: quiet) + [closing(weekKey: s.weekKey)]).joined(separator: " ")
     }
 }

@@ -216,8 +216,10 @@ final class EngagementUITests: XCTestCase {
 
     func testWeeklyNoteShowsThePastWeek() {
         openWithNote()
+        let title = element("weeklyNote.title")
+        XCTAssertEqual(title.label, "Your week in the garden")
+        XCTAssertTrue(title.exists)
         let label = noteText.label
-        XCTAssertTrue(label.hasPrefix("Your week in the garden."), label)
         for row in ["You grew 12 words.", "You solved 2 Daily Blooms.", "New plants: ", "You said hello to 3 friends."] {
             XCTAssertTrue(label.contains(row), "\(row) in \(label)")
         }
@@ -226,6 +228,15 @@ final class EngagementUITests: XCTestCase {
         XCTAssertTrue(element("weeklyNote.share").waitForExistence(timeout: 3), "18+: Share my week")
         XCTAssertFalse(element("plus-offer-card").exists, "a note visit holds the Plus card back")
         shot("a-note-light")
+    }
+
+    /// One card at a time: on a note visit the daily quest waits; after Lovely it comes back on the next Home visit.
+    func testTheDailyQuestWaitsOnANoteVisit() {
+        openWithNote(["-uitest-quest=findWords"])
+        XCTAssertFalse(element("home.quest").exists, "the quest card waits while the weekly note shows")
+        app.buttons["weeklyNote.lovely"].tap()
+        XCTAssertTrue(note.waitForNonExistence(timeout: 3))
+        XCTAssertTrue(element("home.quest").waitForExistence(timeout: 3), "the quest returns once the note closes")
     }
 
     func testLovelyClosesAndTheNoteDoesNotReturnThisWeek() {
