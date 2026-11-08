@@ -58,6 +58,13 @@ final class TextFitScreensUITests: XCTestCase {
             let f = scroll.frame
             return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
         }() : nil
+        // A scroll view that runs to the screen's bottom edge (a sheet) draws under the home indicator: a control whose
+        // lower part sits in that last strip is not yet in view for clipped-text purposes (the grown-up sheet's Cancel).
+        let homeStrip: CGFloat = 34
+        let windowBottom = app.windows.firstMatch.frame.maxY
+        let clipView: CGRect? = visible.map { v in
+            v.maxY > windowBottom - homeStrip ? CGRect(x: v.minX, y: v.minY, width: v.width, height: windowBottom - homeStrip - v.minY) : v
+        }
         do {
             try app.performAccessibilityAudit(for: types) { issue in
                 if issue.auditType == .contrast {
@@ -67,7 +74,7 @@ final class TextFitScreensUITests: XCTestCase {
                 // The audit does not scroll: a control half below the visible area (the grown-up sheet's Cancel at AX5,
                 // under the sheet's bottom edge) reads as clipped text. Judged once it is fully in view, as the other
                 // suites treat words under a pinned footer; the test scrolls to Cancel and taps it.
-                if issue.auditType == .textClipped, let e = issue.element, let v = visible, !v.insetBy(dx: -1, dy: -1).contains(e.frame) {
+                if issue.auditType == .textClipped, let e = issue.element, let v = clipView, !v.insetBy(dx: -1, dy: -1).contains(e.frame) {
                     skipped.append("\(issue.compactDescription) on '\(e.label)' (partly out of view)"); return true
                 }
                 findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' [\(issue.element?.identifier ?? "")] \(issue.element.map { "\($0.frame)" } ?? "")")
@@ -232,7 +239,10 @@ final class TextFitScreensUITests: XCTestCase {
                 buy.tap()
                 let answer = app.textFields["parentalGate.answer"]
                 XCTAssertTrue(answer.waitForExistence(timeout: 5))
-                if size == Self.ax5 { audit("gate-ax5-\(dark ? "dark" : "light")") }
+                if size == Self.ax5 {
+                    sleep(2)                                     // the sheet finishes sliding up before the audit reads frames
+                    audit("gate-ax5-\(dark ? "dark" : "light")")
+                }
                 answer.tap()                                     // the number pad comes up
                 answer.typeText("1")
                 sleep(1); shot("gate", size, dark: dark, "-keyboard")
