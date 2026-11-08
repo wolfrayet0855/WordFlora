@@ -218,6 +218,18 @@
 	<string>$(ADMOB_INTERSTITIAL_ID)</string>
 	<key>AdMobRewardedUnitID</key>
 	<string>$(ADMOB_REWARDED_ID)</string>
+	<key>AdMobBannerGardenUnitID</key>
+	<string>$(ADMOB_BANNER_GARDEN_ID)</string>
+	<key>AdMobBannerGardenCollapsibleUnitID</key>
+	<string>$(ADMOB_BANNER_GARDEN_COLLAPSIBLE_ID)</string>
+	<key>AdMobRewardedHintUnitID</key>
+	<string>$(ADMOB_REWARDED_HINT_ID)</string>
+	<key>AdMobRewardedWakeUnitID</key>
+	<string>$(ADMOB_REWARDED_WAKE_ID)</string>
+	<key>AdMobAppOpenUnitID</key>
+	<string>$(ADMOB_APPOPEN_ID)</string>
+	<key>AdMobNativeUnitID</key>
+	<string>$(ADMOB_NATIVE_ID)</string>
 	<key>NSUserTrackingUsageDescription</key>
 	<string>This lets us show ads that are more relevant to you. You can still play fully if you say no.</string>
 	<key>CFBundleURLTypes</key>

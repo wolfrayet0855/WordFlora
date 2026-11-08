@@ -1239,6 +1239,7 @@
 				9A467E652C922C05007E28B8 /* Frameworks */,
 				9A467E662C922C05007E28B8 /* Resources */,
 				2DDA59AFCA2346E49496338B /* Embed Foundation Extensions */,
+				AD1D5C4EC4EC000000000001 /* Check ad ids */,
 			);
 			buildRules = (
 			);
@@ -1378,6 +1379,32 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		AD1D5C4EC4EC000000000001 /* Check ad ids */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 0;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/tools/build/check-ad-ids.sh",
+				"$(TARGET_BUILD_DIR)/$(INFOPLIST_PATH)",
+			);
+			name = "Check ad ids";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/ad-ids-checked",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/bin/sh \"${SRCROOT}/tools/build/check-ad-ids.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4E0AD44F5E87788DAF7B68A2 /* Sources */ = {

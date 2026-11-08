@@ -1,7 +1,18 @@
 // AdMob identifiers. These are Google's public TEST ids so debug builds never serve real ads.
 // Put real ids in Config/Ads.local.xcconfig (git-ignored) to override for release builds.
+// Nine unit keys plus the app id. A Release build fails its "Check ad ids" build phase if the local file is missing
+// or any Release id is a Google test id (tools/build/check-ad-ids.sh).
 ADMOB_APP_ID = ca-app-pub-3940256099942544~1458002511
-ADMOB_BANNER_ID = ca-app-pub-3940256099942544/2934735716
+// Anchored adaptive banner test id (the app requests an adaptive size).
+ADMOB_BANNER_ID = ca-app-pub-3940256099942544/2435281174
+// The Garden banner reuses the Home banner unit (owner decision 2026-11-07). In Release the local file's Home id wins
+// this reference, so the Garden key carries the real Home id with no line of its own.
+ADMOB_BANNER_GARDEN_ID = $(ADMOB_BANNER_ID)
+ADMOB_BANNER_GARDEN_COLLAPSIBLE_ID = ca-app-pub-3940256099942544/8388050270
 ADMOB_INTERSTITIAL_ID = ca-app-pub-3940256099942544/4411468910
 ADMOB_REWARDED_ID = ca-app-pub-3940256099942544/1712485313
+ADMOB_REWARDED_HINT_ID = ca-app-pub-3940256099942544/1712485313
+ADMOB_REWARDED_WAKE_ID = ca-app-pub-3940256099942544/1712485313
+ADMOB_APPOPEN_ID = ca-app-pub-3940256099942544/5575463023
+ADMOB_NATIVE_ID = ca-app-pub-3940256099942544/3986624511
 #include? "Ads.local.xcconfig"
