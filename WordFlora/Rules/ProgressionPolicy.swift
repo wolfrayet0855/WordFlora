@@ -30,7 +30,7 @@ enum PlantProgressCopy {
     /// Home, under the Garden Days line, e.g. "2 of 3 words to your next plant".
     static func homeLine(toward: Int, per: Int) -> String { "\(toward) of \(per) words to your next plant" }
     static let nextPlantLine = "One more word and a new plant arrives!"
-    /// Under the count line on the word before a plant. Nil otherwise.
+    /// In place of the count line on the word before a plant. Nil otherwise.
     static func nextLine(toward: Int, per: Int) -> String? { per - toward == 1 ? nextPlantLine : nil }
 }
 

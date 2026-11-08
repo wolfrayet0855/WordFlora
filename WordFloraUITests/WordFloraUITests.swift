@@ -62,7 +62,8 @@ final class WordFloraUITests: XCTestCase {
             XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
             tapLetters("LOTUS")
             XCTAssertTrue(app.staticTexts["Great word!"].waitForExistence(timeout: 6), "word \(n)")
-            XCTAssertTrue(app.staticTexts["\(n) of 3 words to your next plant."].exists, "word \(n)")
+            // Progress is said once: the count line on word 1, the nudge line instead of it on word 2.
+            XCTAssertEqual(app.staticTexts["\(n) of 3 words to your next plant."].exists, n == 1, "word \(n)")
             XCTAssertFalse(app.staticTexts["New plant found!"].exists, "no plant on word \(n)")
             XCTAssertFalse(app.buttons["Share this plant"].exists, "nothing to share without a plant")
             // The nudge: the next word, or a calm way to the garden; the extra line only on the word before the plant.

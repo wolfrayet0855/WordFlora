@@ -353,12 +353,14 @@ struct GameView: View {
                                 .allowsHitTesting(false)
                                 .accessibilityHidden(true)
                         }
-                    Text(PlantProgressCopy.winLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant))
-                        .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
-                        .fixedSize(horizontal: false, vertical: true)
+                    // On the word before a plant the nudge line replaces the count line (progress is said once).
                     if let next = PlantProgressCopy.nextLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant) {
                         Text(next)
                             .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.successText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        Text(PlantProgressCopy.winLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant))
+                            .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
                             .fixedSize(horizontal: false, vertical: true)
                     }
                     if let fact = vm.factAfterRound {
