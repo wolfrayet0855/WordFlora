@@ -25,7 +25,6 @@ struct SettingsView: View {
                     Text("Standard").tag(AppSettings.Difficulty.standard)
                     Text("Tricky").tag(AppSettings.Difficulty.tricky)
                 }
-                Toggle("Show streak", isOn: $s.showStreak)
                 // Speed bloom: 13+ only, Calm and Quiet Garden off; off by default and never suggested anywhere else.
                 if SpeedBloom.isOffered(ageBand: s.ageBand, calmMode: s.calmMode, quietGarden: s.quietGarden) {
                     Toggle(SpeedBloomCopy.toggle, isOn: $s.speedBloomOn).accessibilityIdentifier("settings.speedBloom")
