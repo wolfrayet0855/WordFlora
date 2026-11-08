@@ -87,6 +87,7 @@ struct AdCaps: Equatable {
         case "appOpenPerDay": appOpenPerDay = n
         case "appOpenMinBackground": appOpenMinBackground = v
         case "appOpenMinSessions": appOpenMinSessions = n
+        case "appOpenLoadBudget": appOpenLoadBudget = v
         case "collapsiblePerSession": collapsiblePerSession = n
         case "collapsiblePerDay": collapsiblePerDay = n
         case "collapsibleMinSessions": collapsibleMinSessions = n
@@ -117,6 +118,9 @@ struct AdLedger: Codable, Equatable {
     var lastFullScreenAt: Date?, lastAppOpenAt: Date?, lastNativeLoadAt: Date?, lastBackgroundAt: Date?
     /// R2: one whisper banked for the next garden word (stays banked across days; it is one letter, not a currency).
     var whisperBanked = false
+    /// H4 (G4b): the ad treatment last confirmed by the store ("none", "teen", "adult"; "" when never confirmed). A cold
+    /// launch reads it to raise the return cue before entitlements load; the ad is presented only once they confirm.
+    var cachedTreatment = ""
 
     /// A timestamp more than this far ahead of the clock is reset to now (a clock moved back by more than a day).
     static let clockSlack: TimeInterval = 86_400
@@ -134,6 +138,7 @@ struct AdLedger: Codable, Equatable {
         if l.day != today {
             l = AdLedger(day: today, lastFullScreenAt: lastFullScreenAt, lastAppOpenAt: lastAppOpenAt,
                          lastNativeLoadAt: lastNativeLoadAt, lastBackgroundAt: lastBackgroundAt, whisperBanked: whisperBanked)
+            l.cachedTreatment = cachedTreatment
         }
         func fix(_ d: Date?) -> Date? { d.map { $0.timeIntervalSince(now) > Self.clockSlack ? now : $0 } }
         l.lastFullScreenAt = fix(l.lastFullScreenAt)
@@ -167,7 +172,7 @@ struct AdLedger: Codable, Equatable {
 
     private enum CodingKeys: String, CodingKey {
         case day, appOpen, collapsible, nativeLoads, fullScreen, adWater, adHint, adWake, freeWater, freeHint, freeWake
-        case lastFullScreenAt, lastAppOpenAt, lastNativeLoadAt, lastBackgroundAt, whisperBanked
+        case lastFullScreenAt, lastAppOpenAt, lastNativeLoadAt, lastBackgroundAt, whisperBanked, cachedTreatment
     }
 
     /// Every key is optional, so a ledger written by an older or newer version still reads (missing counts are 0).
@@ -181,6 +186,7 @@ struct AdLedger: Codable, Equatable {
         lastFullScreenAt = date(.lastFullScreenAt); lastAppOpenAt = date(.lastAppOpenAt)
         lastNativeLoadAt = date(.lastNativeLoadAt); lastBackgroundAt = date(.lastBackgroundAt)
         whisperBanked = (try? c.decodeIfPresent(Bool.self, forKey: .whisperBanked)) ?? false
+        cachedTreatment = (try? c.decodeIfPresent(String.self, forKey: .cachedTreatment)) ?? ""
     }
 
     /// An empty, missing or corrupt string reads as an empty ledger (never a crash, never a lock-out).
