@@ -114,6 +114,9 @@ extension AppModel {
     /// (the same line as every other outbound path, `ParentalGate.isRequired`). The Sharer badge hides with it.
     var canShareBadges: Bool { BadgeShare.isAllowed(ageBand: settings.ageBand) }
 
+    /// Any share out of the app (Daily Bloom, a plant card, a plant fact, the weekly note): the same line as badges.
+    var canShare: Bool { ShareGate.isAllowed(ageBand: settings.ageBand) }
+
     /// Sharer: a badge card was shared (each badge and tier counts once).
     func noteBadgeShared(_ badgeId: String, tier: Int) {
         guard canShareBadges else { return }

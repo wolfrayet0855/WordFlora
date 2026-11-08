@@ -91,6 +91,7 @@
 		32B0BDF2B9904F58C4465D04 /* WidgetActions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FF5CF61BBF7BC272D7B55BB /* WidgetActions.swift */; };
 		3387AF69843656FF4847F8E8 /* wf-badgeGold.m4a in Resources */ = {isa = PBXBuildFile; fileRef = DA61364BB027900BC30E6C17 /* wf-badgeGold.m4a */; };
 		33BA691BF1E87DE5BB43E0B0 /* TendingUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F787992B59617103496CEE38 /* TendingUITests.swift */; };
+		97D12B4C3DEC269D8099E8E5 /* EngagementUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 27D280715356604010862055 /* EngagementUITests.swift */; };
 		347A410A75615F9238BE8729 /* PotArtView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5937A430C3FA390AF941B091 /* PotArtView.swift */; };
 		35E6F9E2E0FBEFA232A6E0B1 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25BA2007B9E2490E80F9FDF0 /* OnboardingView.swift */; };
 		B9D06F221ED1DB553336F356 /* GuideView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF69C9F1A9610F2E91FD0AE2 /* GuideView.swift */; };
@@ -606,6 +607,7 @@
 		56EA5C0B0F1AD4C2B9EB6E96 /* AppModel+Badges.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+Badges.swift"; sourceTree = "<group>"; };
 		857F2189635F58CB6E66E8D1 /* AppModel+WeatherSound.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+WeatherSound.swift"; sourceTree = "<group>"; };
 		F787992B59617103496CEE38 /* TendingUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendingUITests.swift; sourceTree = "<group>"; };
+		27D280715356604010862055 /* EngagementUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EngagementUITests.swift; sourceTree = "<group>"; };
 		F887962950E79A156ED26A3F /* ButterflyView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyView.swift; sourceTree = "<group>"; };
 		F9B200507C4629386A0C486C /* GardenWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenWidget.swift; sourceTree = "<group>"; };
 		FA93539A00F1E7EF4243E9F4 /* wf-wrong.m4a */ = {isa = PBXFileReference; includeInIndex = 1; path = "wf-wrong.m4a"; sourceTree = "<group>"; };
@@ -1146,6 +1148,7 @@
 				7D65EE66A938417ADBD5C554 /* GuideUITests.swift */,
 				7E47F17A0000000000000004 /* TextFitScreensUITests.swift */,
 				F787992B59617103496CEE38 /* TendingUITests.swift */,
+				27D280715356604010862055 /* EngagementUITests.swift */,
 				1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */,
 				4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */,
 				295580642BF641C3BDA83AE3 /* SpeedBloomUITests.swift */,
@@ -1375,6 +1378,7 @@
 				15E39A57FDD379D5CBBB32E0 /* GuideUITests.swift in Sources */,
 				7E47F17A0000000000000003 /* TextFitScreensUITests.swift in Sources */,
 				33BA691BF1E87DE5BB43E0B0 /* TendingUITests.swift in Sources */,
+				97D12B4C3DEC269D8099E8E5 /* EngagementUITests.swift in Sources */,
 				67D33D3868BCC5E3E36ABA02 /* WeatherUITests.swift in Sources */,
 				4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */,
 				DB95FCF40B0D4F70AA2976FD /* SpeedBloomUITests.swift in Sources */,

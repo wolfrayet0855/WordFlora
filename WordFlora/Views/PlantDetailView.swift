@@ -450,6 +450,7 @@ struct PlantDetailView: View {
 
         NameStoryCard(name: plant.name, botanicalName: plant.botanicalName, fact: plant.botanicalFact,
                       story: PlantCatalog.nameStory(for: plant.plantId))
+            .shareable(app.canShare)
             .onAppear { if plant.earnedCount > 0 { app.noteFactCardRead(plantId: plant.plantId) } }     // Wild Discovery badge
 
         statusBlock(plant, snap)

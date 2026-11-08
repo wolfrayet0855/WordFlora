@@ -344,15 +344,18 @@ struct GameView: View {
         }
     }
 
+    /// Sharing leaves the app: hidden under 13 and for an unknown age (ShareGate, as for badges).
     @ViewBuilder private var shareButton: some View {
-        if vm.isDaily {
+        if !app.canShare {
+            EmptyView()
+        } else if vm.isDaily {
             ShareLink(item: DailyShare.text(date: .now, calendar: .current, solved: true, petalsRemaining: vm.petalsRemaining,
                                             maxPetals: Economy.default.maxPetals, helpers: vm.helpersUsed, word: vm.currentWord)) {
                 Label("Share your Daily Bloom", systemImage: "square.and.arrow.up")
             }.buttonStyle(SecondaryButtonStyle())
         } else if let name = vm.earnedPlantName, let plant = app.plants().first(where: { $0.name == name }),
                   let card = PlantShareCard(plantName: plant.name, botanicalName: plant.botanicalName, imageName: plant.imageName, fact: plant.botanicalFact).rendered() {
-            ShareLink(item: card, preview: SharePreview(PlantShare.caption(plantName: plant.name, nickname: plant.nickname), image: card)) {
+            ShareLink(item: card, preview: SharePreview(PlantShare.caption(plantName: plant.name), image: card)) {
                 Label("Share this plant", systemImage: "square.and.arrow.up")
             }.buttonStyle(SecondaryButtonStyle())
         }
