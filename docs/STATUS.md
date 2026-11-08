@@ -561,4 +561,16 @@ Brief: `docs/pm/textfit-builder-brief.md`; Plus delta: `docs/pm/plus-flow-fable-
 - Audio session set up off the main thread at launch. Debug print of the App Group URL and `storeHome` (N6): remove after the owner runs it.
 - UI flags: `-uitest-store-slow`, `-uitest-store-fail`, `-uitest-album-all`, `-uitest-cloud=on|signin|unavailable`.
 
-**Tests**: `TextFitLayoutTests` (12 tests: every word of every touched grid and card at 375, 393 and 402 pt, xSmall to AX5), `TextFitScreensUITests` (shots and audits at AX XXXL light and dark), Paywall / Family / CloudSync unit tests. Results below.
+**Tests**: `TextFitLayoutTests` (12 tests: every word of every touched grid and card at 375, 393 and 402 pt, xSmall to AX5), `TextFitScreensUITests` (shots and audits at AX XXXL light and dark), Paywall / Family / CloudSync unit tests.
+
+**Results** (`WF G3 iPhone 17`, 402 pt, iOS 26.5, erased before the UI batches; one xcodebuild at a time)
+
+| Run | Result |
+|---|---|
+| Unit (`WordFloraTests`), final code | 1207 run, 1207 pass (incl. `TextFitLayoutTests` 13) |
+| `TextFitScreensUITests` | 15 tests; all green across the runs except the three fixed in the last commits (grown-up question at AX5, visitor detail title Dynamic Type), rerun in the final batch |
+| `DailyQuestUITests` | 6/6 (one Restore purchases, in Settings) |
+| `ParentalGateLinkUITests` | 6/6 (incl. under-13 Manage subscription in Settings) |
+| `SeasonsUITests` | 8/9, the shelf contrast red was the combined audit reflowing the Shed; the audit now runs the resizing checks apart (final batch) |
+
+Found on the way: the UI tests' `UICTContentSizeCategoryExtraExtraExtraLarge` is not a size name (the raw value is `UICTContentSizeCategoryXXXL`), so G3's xxxl tend-row test never ran at xxxLarge; fixed in both files. Shots: `docs/pm/shots/textfit/` (downscaled), full size in the session scratchpad.

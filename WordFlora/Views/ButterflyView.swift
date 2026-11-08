@@ -712,8 +712,10 @@ struct VisitorDetailSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
 
-    /// The title a step smaller and the sides tighter at the accessibility sizes, so "Hummingbird" stays whole.
-    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size.isAccessibilitySize ? .title3 : .title }
+    /// The title a step smaller only at AX5 (title3 there is still larger than title at AX4, so the text never shrinks as
+    /// the size grows, which the audit reads as Dynamic Type unsupported), and the sides tighter at the accessibility
+    /// sizes, so "Hummingbird" stays whole.
+    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size >= .accessibility5 ? .title3 : .title }
     static func sidePadding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 12 : 24 }
 
     var body: some View {

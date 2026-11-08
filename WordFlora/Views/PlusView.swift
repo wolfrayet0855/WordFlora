@@ -323,6 +323,26 @@ struct ParentalGateSheet: View {
     }
     static func padding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 12 : 24 }
 
+    /// The question. At the accessibility sizes it is two set lines ("What is" / "16 × 9?"), so it never wraps on its
+    /// own; VoiceOver hears it once.
+    @ViewBuilder private var question: some View {
+        let q = challenge.question
+        if typeSize.isAccessibilitySize, q.hasPrefix("What is ") {
+            VStack(spacing: 0) {
+                Text("What is")
+                Text(String(q.dropFirst("What is ".count)))
+            }
+            .font(Theme.font(.title, weight: .heavy))
+            .frame(maxWidth: .infinity)
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(q)
+        } else {
+            Text(q).font(Theme.font(.title, weight: .heavy))
+                .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                .frame(maxWidth: .infinity)
+        }
+    }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
@@ -334,9 +354,7 @@ struct ParentalGateSheet: View {
                 Text(ParentalGate.Copy.prompt).font(Theme.font(.callout)).multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
                     .frame(maxWidth: .infinity)
-                Text(challenge.question).font(Theme.font(.title, weight: .heavy))
-                    .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                    .frame(maxWidth: .infinity)
+                question
                 TextField("Answer", text: $answer).keyboardType(.numberPad).textFieldStyle(.roundedBorder)
                     .font(Theme.font(.body))
                     .frame(maxWidth: typeSize.isAccessibilitySize ? .infinity : 160).multilineTextAlignment(.center)

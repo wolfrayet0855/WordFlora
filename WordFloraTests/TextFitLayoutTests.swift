@@ -205,6 +205,16 @@ final class TextFitLayoutTests: XCTestCase {
         let room: (CGFloat, DynamicTypeSize) -> CGFloat = { s, d in s - 2 * 16 - 2 * ParentalGateSheet.padding(d) }
         check("gate title", [ParentalGate.Copy.title], style: .title2, weight: .bold, styleAt: ParentalGateSheet.titleStyle, room: room)
         check("gate prompt", [ParentalGate.Copy.prompt], style: .callout, room: room)
+        // At AX the question is two set lines; each line must fit whole (the widest: "19 × 9?").
+        for screen in screens {
+            for (cat, dts) in sizes where dts.isAccessibilitySize {
+                let f = font(.title, .heavy, cat)
+                for line in ["What is", "19 × 9?"] {
+                    let w = ceil((line as NSString).size(withAttributes: [.font: f]).width)
+                    XCTAssertLessThanOrEqual(w, room(screen, dts), "gate question line '\(line)', \(Int(screen)) pt, \(dts)")
+                }
+            }
+        }
     }
 
     /// A plan card: the card (16 pt padding) in the page gutters, the choice circle (about one body em) and a 10 pt gap.

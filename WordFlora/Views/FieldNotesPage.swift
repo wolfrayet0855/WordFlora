@@ -111,7 +111,8 @@ struct FieldNotesPage: View {
     /// (The spine is 18 pt with its holes inside it, so 24 still leaves 6 pt of paper before the words.)
     static func leading(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 24 : 34 }
     static func trailing(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 8 : 18 }
-    static func nameStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size.isAccessibilitySize ? .subheadline : .title3 }
+    /// Subheadline only at AX5 (the same size as title3 at AX4), so the name never shrinks as the text grows.
+    static func nameStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size >= .accessibility5 ? .subheadline : .title3 }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {

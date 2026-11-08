@@ -54,8 +54,15 @@ final class SeasonsUITests: XCTestCase {
             return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
         }() : nil
         var findings = [String](), skipped = [String]()
+        // Contrast and the rest first, on the page as it stands; then Dynamic Type and clipped text, each on its own:
+        // both grow the text and reflow the Shed (its pot cards grow with the text now), which moved the pots' pack
+        // title into the shelf's frame mid-check (as in TendingUITests' dynamicTypeApart).
+        let passes: [XCUIAccessibilityAuditType] = [XCUIAccessibilityAuditType.all.subtracting(ignoring).subtracting([.dynamicType, .textClipped]),
+                                                    XCUIAccessibilityAuditType.textClipped.subtracting(ignoring),
+                                                    XCUIAccessibilityAuditType.dynamicType.subtracting(ignoring)]
+        for types in passes where !types.isEmpty {
         do {
-            try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
+            try app.performAccessibilityAudit(for: types) { issue in
                 // Only elements inside the new surface are judged (a tool tile above it, partly overlapping the
                 // shelf's frame at AX sizes, belongs to the Shed's own audits).
                 if let r = region, let e = issue.element, !r.insetBy(dx: -1, dy: -1).contains(e.frame) { return true }
@@ -68,6 +75,7 @@ final class SeasonsUITests: XCTestCase {
                 return true
             }
         } catch { findings.append("\(name): audit failed to run: \(error)") }
+        }
         if !skipped.isEmpty { print("\(name): not judged, \(skipped.count): \(skipped.joined(separator: "; "))") }
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
