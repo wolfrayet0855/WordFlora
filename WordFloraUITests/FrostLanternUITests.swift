@@ -128,8 +128,10 @@ final class FrostLanternUITests: XCTestCase {
 
     func testAlbumShowsTheWinterFriends() {
         for dark in [false, true] {
-            launch(["-uitest-winter-friends"], size: Self.axxxl, dark: dark)
+            // The Visitors tile opens only once the butterfly game is unlocked: one found plant is not enough.
+            launch(["-uitest-winter-friends", "-uitest-everything"], size: Self.axxxl, dark: dark)
             app.buttons["Visitors"].tap()
+            XCTAssertTrue(app.navigationBars["Visitors"].waitForExistence(timeout: 5), "the Visitors page opened")
             // At AX XXXL the twelve cards take one column, so the winter friends sit far below the fold.
             let robin = element("visitor-robin")
             scrollTo(robin, max: 45)
