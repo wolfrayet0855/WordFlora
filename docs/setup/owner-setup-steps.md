@@ -224,11 +224,37 @@ Use for:       win-back
 
 Source: https://developer.apple.com/help/app-store-connect/manage-subscriptions/set-up-offer-codes
 
+### A15. Product 4: pack_frost_lantern (Frost & Lantern, non-consumable)
+The first seasonal pack (gate G3). In the app it is the **Seasons** row in Settings > WordFlora Plus (behind the grown-up question for under 13 and unknown ages) and, for 13 and up, a Seasons shelf in the Shed with the price. Children see the pack's pots only as soft outlines with "A grown-up can find this in Settings." (no price, lock or buy button). Plus does not include packs. While App Store Connect has no such product, the app shows no Seasons row, shelf, outlines or Lantern Keeper card at all.
+1. Sidebar > **Monetization** > **In-App Purchases** > **+** (not under Subscriptions) **(verify in UI)**.
+2. Fill in:
+```
+Type:           Non-Consumable
+Reference Name: Frost & Lantern Pack
+Product ID:     pack_frost_lantern
+Price (US):     $2.99
+Display Name:   Frost & Lantern
+Description:    Three winter pots and a badge. Pay once, no renewals.
+Family Sharing: ON   (cannot be turned off again once saved)
+```
+   The description is the G3 wording ("winter pots and a badge"). If G5 ships the scene, robin and wren and the snowdrop and hellebore under this same product, change it to "Three winter pots, the Lantern Keeper badge and a snowy garden scene. Pay once, no renewals." (and the same text in `Config/WordFlora.storekit`). Never promise more than the build delivers.
+3. **Availability:** the same territories as Plus. Review the auto-converted prices.
+4. **Review Information:** a screenshot of Settings > WordFlora Plus > Seasons (the pack card, its three pots, the price and the Buy button), taken from the G3/G6 build on an adult profile; and the note: "Non-consumable cosmetic pack of pots and a badge. Restore purchases is on the Plus page."
+5. Submit it **with the app version** next to `plus_lifetime` (app version page > **In-App Purchases and Subscriptions**) **(verify in UI)**. Not submitted if the plan's G5 fallback moves the pack to 1.1.
+
+Mirrors this local StoreKit entry (`Config/WordFlora.storekit`, used by the tests):
+```json
+{"displayPrice":"2.99","familyShareable":true,"internalID":"6745000004","productID":"pack_frost_lantern",
+ "referenceName":"Frost & Lantern Pack","type":"NonConsumable","localizations":[{"locale":"en_US",
+ "displayName":"Frost & Lantern","description":"Three winter pots and a badge. Pay once, no renewals."}]}
+```
+
 ### A: send back
 ```
-Product IDs (exact):       plus_yearly / plus_monthly / plus_lifetime
+Product IDs (exact):       plus_yearly / plus_monthly / plus_lifetime / pack_frost_lantern
 Subscription group name:   WordFlora Plus
 plus_lifetime Family Sharing ON: yes/no
+pack_frost_lantern Family Sharing ON: yes/no
 Offer codes created:       GARDENFRIEND yes/no, WELCOMEBACK yes/no
 Group ID (numeric, from the URL or group page, if shown): ______
 Apple ID app id (numeric, "Apple ID" in App Information): ______
