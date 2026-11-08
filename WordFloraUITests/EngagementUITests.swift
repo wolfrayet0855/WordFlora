@@ -224,7 +224,13 @@ final class EngagementUITests: XCTestCase {
         scrollTo(cont)
         XCTAssertTrue(cont.isHittable, "Continue is still reachable by scrolling")
         XCTAssertTrue(app.buttons["plantName.give"].exists)
+    }
+
+    /// Dark is set before launch (a mid-test switch did not reach the app); audited unscrolled.
+    func testAuditWinCardWithTheNameButtonAtAXXXLDark() {
         XCUIDevice.shared.appearance = .dark
+        winAPlant(Self.axXXXL)
+        XCTAssertTrue(app.buttons["plantName.give"].waitForExistence(timeout: 3))
         sleep(1)
         shot("b-win-card-axxxl-dark")
         audit("b-win-card-axxxl-dark")
@@ -343,10 +349,17 @@ final class EngagementUITests: XCTestCase {
         scrollTo(pin)
         sleep(1)
         auditScrolled("b-plant-widget-row-axxxl")
+    }
+
+    /// Dark is set before launch (a mid-test switch did not reach the app); the pinned state with its line.
+    func testAuditPlantPageWidgetRowAtAXXXLDark() {
+        XCUIDevice.shared.appearance = .dark
+        openPlant("Daisy", plantId: "daisy", extra: Self.axXXXL)
+        let pin = app.buttons["plant.showOnWidget"]
+        scrollTo(pin)
         pin.tap()
         XCTAssertTrue(element("plant.onWidget").waitForExistence(timeout: 3))
         scrollTo(element("plant.widgetLine"))
-        XCUIDevice.shared.appearance = .dark
         sleep(1)
         shot("b-plant-widget-row-axxxl-dark")
         auditScrolled("b-plant-widget-row-axxxl-dark")
