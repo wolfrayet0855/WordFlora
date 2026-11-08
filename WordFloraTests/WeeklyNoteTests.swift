@@ -202,6 +202,28 @@ final class WeeklyNoteTests: XCTestCase {
             .hasPrefix("Your week in the garden. You grew 12 words. New plants: Daisy and Clover. You said hello to 3 friends."))
     }
 
+    func testTilesHideZeroesAndUseSingularAndPlural() {
+        let all = WeeklyNoteCopy.tiles(WeeklyNote.Summary(words: 12, dailyBlooms: 2, newPlants: ["Daisy", "Clover"], friends: 3), quiet: false)
+        XCTAssertEqual(all.map(\.kind), [.words, .plants, .friends], "Daily Blooms count in the words")
+        XCTAssertEqual(all.map(\.number), ["12", "2", "3"])
+        XCTAssertEqual(all.map(\.label), ["words grown", "new plants", "friends said hello"])
+        let one = WeeklyNoteCopy.tiles(WeeklyNote.Summary(words: 1, newPlants: ["Daisy"], friends: 1), quiet: false)
+        XCTAssertEqual(one.map(\.label), ["word grown", "new plant", "friend said hello"])
+        XCTAssertEqual(WeeklyNoteCopy.tiles(WeeklyNote.Summary(words: 5), quiet: false).map(\.kind), [.words])
+        XCTAssertEqual(WeeklyNoteCopy.tiles(WeeklyNote.Summary(friends: 2), quiet: false).map(\.kind), [.friends])
+    }
+
+    func testQuietGardenTileHasNamesAndNoNumber() {
+        let s = WeeklyNote.Summary(words: 9, newPlants: ["Daisy", "Clover"], friends: 4)
+        let tiles = WeeklyNoteCopy.tiles(s, quiet: true)
+        XCTAssertEqual(tiles.count, 1)
+        XCTAssertNil(tiles[0].number)
+        XCTAssertEqual(tiles[0].label, "New in your garden: Daisy and Clover")
+        let label = WeeklyNoteCopy.accessibilityLabel(s, quiet: true)
+        XCTAssertNil(label.rangeOfCharacter(from: .decimalDigits), label)
+        XCTAssertEqual(WeeklyNoteCopy.tiles(WeeklyNote.Summary(words: 9), quiet: true), [])
+    }
+
     func testShareAllowedPerAgeBandAndNeverInQuietGarden() {
         let table: [(AgeBand?, Bool)] = [(nil, false), (.under13, false), (.thirteenPlus, true), (.eighteenPlus, true)]
         for (band, allowed) in table {
@@ -215,7 +237,11 @@ final class WeeklyNoteTests: XCTestCase {
         var lines = [WeeklyNoteCopy.title, WeeklyNoteCopy.celebrate, WeeklyNoteCopy.celebrateHint, WeeklyNoteCopy.celebrateTitle,
                      WeeklyNoteCopy.celebrateLine, WeeklyNoteCopy.celebrateDone, WeeklyNoteCopy.share, WeeklyNoteCopy.shareHint,
                      WeeklyNoteCopy.caption, WeeklyNoteCopy.shareHeader, WeeklyNoteCopy.tagline] + WeeklyNoteCopy.closings
-        for n in 0...99 { lines += [WeeklyNoteCopy.words(n), WeeklyNoteCopy.daily(n), WeeklyNoteCopy.friends(n)] }
+        lines.append(WeeklyNoteCopy.quietPlantsLabel)
+        for n in 0...99 {
+            lines += [WeeklyNoteCopy.words(n), WeeklyNoteCopy.daily(n), WeeklyNoteCopy.friends(n),
+                      WeeklyNoteCopy.wordsLabel(n), WeeklyNoteCopy.plantsLabel(n), WeeklyNoteCopy.friendsLabel(n)]
+        }
         for k in 1...names.count - 1 { lines += [WeeklyNoteCopy.plants(Array(names.prefix(k))), WeeklyNoteCopy.quietPlants(Array(names.prefix(k)))] }
         for line in lines { XCTAssertEqual(CopySafety.check(line), [], line) }
     }

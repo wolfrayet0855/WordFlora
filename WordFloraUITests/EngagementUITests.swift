@@ -264,9 +264,11 @@ final class EngagementUITests: XCTestCase {
         openWithNote()
         let label = note.label
         XCTAssertTrue(label.hasPrefix("Your week in the garden"), label)
-        for row in ["You grew 12 words.", "You solved 2 Daily Blooms.", "New plants: ", "You said hello to 3 friends."] {
+        for row in ["You grew 12 words.", "New plants: ", "You said hello to 3 friends."] {
             XCTAssertTrue(label.contains(row), "\(row) in \(label)")
         }
+        // The tiles are inside the one card element: their numbers and labels are not separate VoiceOver stops.
+        XCTAssertFalse(app.staticTexts["words grown"].exists)
         XCTAssertTrue(celebrate.exists)
         XCTAssertFalse(app.buttons["weeklyNote.lovely"].exists)
         XCTAssertFalse(app.buttons["weeklyNote.visit"].exists)
