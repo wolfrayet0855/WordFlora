@@ -12,7 +12,8 @@
 #
 # Override: ADS_CHECK_SKIP=1 (environment or build setting) skips the check, but ONLY when CODE_SIGNING_ALLOWED=NO,
 # i.e. an unsigned simulator proof build from a worktree, which never has the local file. A signed Release build
-# (archive, TestFlight, App Store) can never skip it.
+# and ANY archive (ACTION=install, even unsigned, since an archive can be signed at export) can never skip it.
+# Self-test: tools/ads/check-ad-ids-test.sh (fake plists, no real ids).
 #   Example: ADS_CHECK_SKIP=1 xcodebuild -configuration Release CODE_SIGNING_ALLOWED=NO ...
 set -u
 
@@ -21,6 +22,10 @@ stamp() { mkdir -p "${DERIVED_FILE_DIR}" && touch "${DERIVED_FILE_DIR}/ad-ids-ch
 [ "${CONFIGURATION:-}" = "Release" ] || { stamp; exit 0; }
 
 if [ "${ADS_CHECK_SKIP:-0}" = "1" ]; then
+  # An archive (xcodebuild archive runs ACTION=install) can be signed later at export and uploaded, so it is never skipped.
+  case "${ACTION:-build}" in
+    install|archive) echo "error: Check ad ids: never skipped for an archive."; exit 1 ;;
+  esac
   if [ "${CODE_SIGNING_ALLOWED:-YES}" = "NO" ]; then
     echo "warning: Check ad ids skipped (ADS_CHECK_SKIP=1 on an unsigned build). This build must never ship."
     stamp; exit 0
