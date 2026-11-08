@@ -290,10 +290,13 @@ final class AdsServiceWiringTests: XCTestCase {
         root.present(sheet, animated: false)
         XCTAssertNil(AdsService.anchor(from: root), "an interstitial or water/hint video refuses any sheet")
         XCTAssertTrue(AdsService.anchor(from: root, allowOwnSheet: true) === sheet, "R3 presents over the wake sheet")
-        sheet.dismiss(animated: false)
+        // A fresh window and root: a dismiss in the unit-test host is not finished in the same run loop turn.
+        let window2 = UIWindow(frame: CGRect(x: 0, y: 0, width: 390, height: 844))
+        let root2 = UIViewController(); window2.rootViewController = root2; window2.makeKeyAndVisible()
         let foreign = UIViewController()
-        root.present(foreign, animated: false)
-        XCTAssertNil(AdsService.anchor(from: root, allowOwnSheet: true), "never over someone else's sheet")
-        foreign.dismiss(animated: false)
+        root2.present(foreign, animated: false)
+        XCTAssertTrue(root2.presentedViewController === foreign)
+        XCTAssertNil(AdsService.anchor(from: root2, allowOwnSheet: true), "never over someone else's sheet")
+        XCTAssertNil(AdsService.anchor(from: root2), "nor any other ad")
     }
 }
