@@ -164,6 +164,7 @@ struct HomeView: View {
                             .textCase(.uppercase).kerning(1.4)
                             .font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.secondaryText)
                             .padding(.horizontal, 4)
+                            .sceneScrim()           // Frost & Lantern: loose text over the snow bank gets the 60 % scrim
                             .accessibilityAddTraits(.isHeader)
                         exploreGrid(unlocked)
                     }
@@ -185,7 +186,7 @@ struct HomeView: View {
                 .transition(.opacity)
             }
         }
-        .background(Color.appBackground.ignoresSafeArea())
+        .frostLanternBackground(app.showsWinterScene && !showNudge)      // the snowy lantern scene for pack owners
         .safeAreaInset(edge: .bottom) { if !showNudge { bannerArea } }
         .task(id: app.restExitAt) { await followReturnWindow() }
         .task { await app.prepareBannerIfAllowed() }
@@ -351,6 +352,7 @@ struct HomeView: View {
             Label(NudgeCardCopy.adNote, systemImage: "info.circle")
                 .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                .sceneScrim()
                 .frame(maxWidth: .infinity)
                 .accessibilityElement(children: .combine)
                 .accessibilityIdentifier("home.adNote")

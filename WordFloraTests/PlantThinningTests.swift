@@ -17,7 +17,8 @@ final class PlantThinningTests: XCTestCase {
         let m = try manifest()
         let names = Set(try PlantCatalog.load().map(\.imageName))
         XCTAssertEqual(names.count, 50)
-        XCTAssertEqual(Set(m.plants.keys), names)
+        // The 50 ladder plants and the Frost & Lantern glasshouse plants, nothing else.
+        XCTAssertEqual(Set(m.plants.keys), names.union(GlasshouseCatalog.all.map(\.imageName)))
     }
 
     func testEveryLayerAndSpriteImageIsInTheAssetCatalog() throws {

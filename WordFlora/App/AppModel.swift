@@ -122,12 +122,20 @@ final class AppModel {
     /// Merges a garden backup file best-of-each, then reloads what depends on the profile.
     func restoreGarden(from data: Data) -> Result<GardenBackup.RestoreReport, GardenBackup.ImportError> {
         let defs = (try? BadgeCatalog.load()) ?? []
+        syncGlasshouse()          // an owner's glasshouse rows exist first, so their care in the file merges too
         let result = GardenBackup.restore(data, into: context, badgeDefs: defs)
         if case .success = result { reconcileSyncedData(); syncToolUnlocks(); refreshBadgeFacts(announce: false) }
         return result
     }
 
+    /// The 50 ladder plants. Every count, badge, level and panorama reads this; the glasshouse plants (Frost & Lantern)
+    /// are kept apart (`glasshouseRows`, `plantRow`).
     func plants() -> [PlantCollectible] {
+        GlasshouseCatalog.ladder(allPlantRows(), id: \.plantId)
+    }
+
+    /// Every plant row, ladder and glasshouse.
+    func allPlantRows() -> [PlantCollectible] {
         let d = FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.level), SortDescriptor(\.name)])
         return (try? context.fetch(d)) ?? []
     }
@@ -289,7 +297,9 @@ final class AppModel {
         let turnedGolden = recordGoldenDay(plant, tending: action, at: date)
         let counter: BadgeCounter = { switch action { case .water: return .waterings; case .feed: return .feeds; case .prune: return .prunes; case .repot: return .repots; case .sun: return .suns; case .mist: return .mistSprays } }()
         var unlocks = badges.record(counter, now: date, quiet: quiet)
-        if repotOutcome == .happy { unlocks += badges.recordMark(.soilMatches, item: plant.plantId, now: date, quiet: quiet) }   // each plant once
+        if repotOutcome == .happy && !GlasshouseCatalog.isGlasshouse(plant.plantId) {      // each ladder plant once
+            unlocks += badges.recordMark(.soilMatches, item: plant.plantId, now: date, quiet: quiet)
+        }
         if tidy { unlocks += badges.record(.tidyTrims, now: date, quiet: quiet) }       // Pruning Pro: a trim at the right time
         unlocks += badges.recordDay(.tendDays, day: BadgeFacts.dayNumber(date, calendar: cal), now: date, quiet: quiet)
         if result.stageUp {
@@ -786,7 +796,8 @@ final class AppModel {
         if useLantern, !evening, let p = profile, p.glowLanterns > 0 { p.glowLanterns -= 1; lantern = true; try? context.save() }
         let flowering = plants().filter { $0.earnedCount > 0 && $0.stage >= 3 }.count
         let pace = butterflyPace(reduceMotion: reduceMotion, voiceOver: voiceOver, switchControl: switchControl, wake: wake)
-        return ButterflyGameModel(pool: VisitorSpawner.pool(evening: evening, lantern: lantern), floweringPlants: flowering,
+        return ButterflyGameModel(pool: VisitorSpawner.pool(evening: evening, lantern: lantern, season: seasonFriendPool),
+                                  floweringPlants: flowering,
                                   reduceMotion: reduceMotion, seed: butterflySeedOverride ?? seed, pace: pace,
                                   roundSeconds: wake || pace == .calm ? nil : butterflyRoundOverride)
     }
@@ -819,6 +830,7 @@ final class AppModel {
         var unlocks = badges.record(.visitorSpecies, value: a.species, now: t, quiet: quiet) + badges.record(.butterflyPlays, now: t, quiet: quiet)
         // Gentle Net: hellos to resting friends (wake games count too). Quiet Garden records nothing and shows no count.
         if !game.caughtGently.isEmpty { unlocks += badges.record(.gentleHellos, amount: game.caughtGently.count, now: t, quiet: quiet) }
+        unlocks += Self.recordLanternKeeperHellos(game.caught, into: &badges, on: t, quiet: quiet)       // winter friends
         summary.gentleHellos = quiet ? 0 : game.caughtGently.count
         for (counter, n) in BadgeFacts.catches(game.caught).sorted(by: { $0.key.rawValue < $1.key.rawValue }) where n > 0 {
             unlocks += badges.record(counter, amount: n, now: t, quiet: quiet)

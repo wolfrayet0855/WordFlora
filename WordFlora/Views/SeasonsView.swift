@@ -44,6 +44,7 @@ struct SeasonsView: View {
                 Text(pack.line).font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
                 PackPotsRow(pack: pack)
+                if pack.id == PackCatalog.frostLanternId { PackHoldsList() }      // G5: plants, friends and the scene
                 ForEach([PackCatalog.Copy.badgeLine, PackCatalog.Copy.keepLine, PackCatalog.Copy.notPlus], id: \.self) { line in
                     Text(line).font(Theme.font(.callout)).foregroundStyle(Color.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
@@ -91,7 +92,7 @@ struct SeasonsView: View {
             let outcome = await store.purchasePack(id)
             busy = false
             switch outcome {
-            case .success: message = PackCatalog.Copy.welcome
+            case .success: message = PackCatalog.Copy.welcome; app.syncGlasshouse()     // the glasshouse plants arrive
             case .pending: message = PackCatalog.Copy.pending
             case .awaitingApproval: message = PackCatalog.Copy.awaitingApproval
             case .cancelled: message = nil

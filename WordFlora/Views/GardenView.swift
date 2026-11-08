@@ -5,7 +5,9 @@ struct GardenView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
     @Environment(\.dynamicTypeSize) private var typeSize
-    @Query(sort: [SortDescriptor(\PlantCollectible.level), SortDescriptor(\PlantCollectible.name)]) private var plants: [PlantCollectible]
+    @Query(sort: [SortDescriptor(\PlantCollectible.level), SortDescriptor(\PlantCollectible.name)]) private var rows: [PlantCollectible]
+    /// The 50 ladder plants; the glasshouse plants (Frost & Lantern) have their own shelf below the levels.
+    private var plants: [PlantCollectible] { GlasshouseCatalog.ladder(rows, id: \.plantId) }
 
     private let levelNames = ["Seedling", "Sprout", "Bloom", "Grove", "Ancient"]
     /// B4: the banner's real anchored adaptive height, reported by the created banner (never a fixed 60 pt).
@@ -17,12 +19,14 @@ struct GardenView: View {
                 waterCard
                 Text("\(plants.filter { $0.earnedCount > 0 }.count) of \(plants.count) plants found")
                     .font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
+                    .sceneScrim()
                 ForEach(1...5, id: \.self) { level in
                     let inLevel = plants.filter { $0.level == level }
                     if !inLevel.isEmpty {
                         VStack(alignment: .leading, spacing: 10) {
                             Text("Level \(level) · \(levelNames[level - 1])")
                                 .font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
+                                .sceneScrim()
                             // A Grid (not a lazy grid), so the cards in a row share the row's height. Two columns,
                             // one at the accessibility sizes so every name keeps whole words (GridColumns).
                             let columns = GridColumns.count(.garden, for: typeSize)
@@ -37,13 +41,14 @@ struct GardenView: View {
                         }
                     }
                 }
+                GlasshouseSection(rows: app.glasshouseRows(from: rows)) { router.go(.plant($0)) }
             }
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.card)
         }
-        .background(Color.appBackground.ignoresSafeArea())
+        .frostLanternBackground(app.showsWinterScene)
         .safeAreaInset(edge: .bottom) { GardenBannerSlot(height: $bannerHeight) }     // G4b: collapsible first, then plain
         .task { await app.prepareBannerIfAllowed() }
-        .onAppear { app.markWeatherSeen() }      // witnessed first: opening the garden on a weather day starts its look
+        .onAppear { app.markWeatherSeen(); app.syncGlasshouse() }      // witnessed first: opening the garden on a weather day starts its look
         .navigationTitle("My Garden")
         .navigationBarTitleDisplayMode(.inline)
         .rewardToast($toast)

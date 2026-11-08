@@ -57,7 +57,7 @@ struct PlantDetailView: View {
         let id: Int
     }
 
-    private var plant: PlantCollectible? { app.plants().first { $0.plantId == plantId } }
+    private var plant: PlantCollectible? { app.plantRow(plantId) }      // ladder or glasshouse
     private var large: Bool { typeSize.isAccessibilitySize }
     /// Reduce Motion and Low Power Mode both get the short fade instead of the travelling effects.
     private var calm: Bool { reduceMotion || lowPower.isOn }
@@ -465,7 +465,7 @@ struct PlantDetailView: View {
                       story: PlantCatalog.nameStory(for: plant.plantId))
             .shareable(app.canShare)
             .onAppear { if plant.earnedCount > 0 { app.noteFactCardRead(plantId: plant.plantId) } }     // Wild Discovery badge
-        WidgetPinRow(plant: plant)      // Make it yours: "Show on my widget"
+        if !GlasshouseCatalog.isGlasshouse(plant.plantId) { WidgetPinRow(plant: plant) }      // Make it yours: "Show on my widget"
 
         statusBlock(plant, snap)
 

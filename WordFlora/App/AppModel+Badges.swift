@@ -59,7 +59,7 @@ extension AppModel {
 
     /// Wild Discovery: the plant page's fact card was shown for this plant (each plant counts once).
     func noteFactCardRead(plantId: String) {
-        guard !plantId.isEmpty, !badges.isMarked(.storiesRead, item: plantId) else { return }
+        guard !plantId.isEmpty, !GlasshouseCatalog.isGlasshouse(plantId), !badges.isMarked(.storiesRead, item: plantId) else { return }
         updateBadges(after: 0.6) { state, quiet, t in state.recordMark(.storiesRead, item: plantId, now: t, quiet: quiet) }
     }
 

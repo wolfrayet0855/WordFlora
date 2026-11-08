@@ -566,7 +566,7 @@ def stage_sheet(fn, title):
 
 def plant_files():
     write("plant_snowdrop.svg", svg_doc(200, 200, snowdrop_full(),
-          "Snowdrop (Galanthus nivalis), full bloom, 200 x 200 plant box. Groups = PlantThinning layers: ground, back (static), petals r<head>_s<i> (3 heads x 3 outer tepals), front (inner bells). Head pivots: (118,72) (70,88) (140,104)."))
+          "Snowdrop (Galanthus nivalis), full bloom, 200 x 200 plant box. Groups = PlantThinning layers: ground, back (static), petals r<head>_s<i> (3 heads x 3 outer tepals), front (inner bells). Head pivots: (118,64) (72,80) (138,94)."))
     write("plant_hellebore.svg", svg_doc(200, 200, hellebore_full(),
           "Hellebore (Helleborus orientalis, Lenten rose), full bloom, 200 x 200 plant box. Layers: ground, back, petals r<head>_s<k> (3 heads x 5 sepals), front (centres). Head pivots: (102,74) (60,104) (144,100)."))
     write("plant_snowdrop_stages.svg", stage_sheet(snowdrop_stage, "Reference, not shipped: ship only the layered full-bloom files. Snowdrop at stages 0-4 (LifeStats.stageNames). Each panel is a 200 x 200 plant box; panel 4 = plant_snowdrop.svg."))

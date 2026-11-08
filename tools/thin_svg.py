@@ -44,6 +44,10 @@ PLANTS_DIR = os.path.join(ROOT, 'WordFlora', 'Assets.xcassets', 'Plants')
 LAYERS_DIR = os.path.join(ROOT, 'WordFlora', 'Assets.xcassets', 'PlantLayers')
 MANIFEST = os.path.join(ROOT, 'WordFlora', 'Resources', 'PlantThinning.json')
 OVERRIDES = os.path.join(ROOT, 'tools', 'thinning_overrides.json')
+# The Frost & Lantern glasshouse plants: authored layered, flattened into this folder with their hand-tagged rings by
+# tools/split_layered_svg.py. Outside the 50-plant ladder (GlasshouseCatalog), built here the same way.
+GLASSHOUSE_DIR = os.path.join(ROOT, 'WordFlora', 'Assets.xcassets', 'Glasshouse')
+GLASSHOUSE_OVERRIDES = os.path.join(ROOT, 'tools', 'glasshouse_overrides.json')
 ROSE_RULE_CANDIDATES = [
     os.path.join(ROOT, 'notes', 'rose-rule.md'),
     os.path.join(ROOT, 'design-preview', 'tending', 'parts', 'notes', 'rose-rule.md'),
@@ -820,8 +824,16 @@ def build_plant(name, path, ov, rose_rule, rose_src=None):
     return entry, files
 
 
+def source_path(name):
+    for d in (PLANTS_DIR, GLASSHOUSE_DIR):
+        p = os.path.join(d, name + '.imageset', name + '.svg')
+        if os.path.exists(p):
+            return p
+    raise SystemExit('no plant art for ' + name)
+
+
 def dump(name):
-    _, nodes = load_tree(os.path.join(PLANTS_DIR, name + '.imageset', name + '.svg'))
+    _, nodes = load_tree(source_path(name))
     for n in nodes:
         depth, p = 0, n.parent
         while p:
@@ -834,17 +846,20 @@ def main():
     if len(sys.argv) > 2 and sys.argv[1] == '--dump':
         return dump(sys.argv[2])
     overrides = {}
-    if os.path.exists(OVERRIDES):
-        with open(OVERRIDES) as f:
-            overrides = json.load(f)
+    for path in (OVERRIDES, GLASSHOUSE_OVERRIDES):
+        if os.path.exists(path):
+            with open(path) as f:
+                overrides.update(json.load(f))
     overrides = {k: v for k, v in overrides.items() if not k.startswith('_')}
     rose_rule, rose_src = load_rose_rule()
     names = sorted(d[:-len('.imageset')] for d in os.listdir(PLANTS_DIR) if d.endswith('.imageset'))
+    if os.path.isdir(GLASSHOUSE_DIR):
+        names += sorted(d[:-len('.imageset')] for d in os.listdir(GLASSHOUSE_DIR) if d.endswith('.imageset'))
     manifest = {'version': 1, 'source': 'WordFlora/Assets.xcassets/Plants', 'frac': FRAC,
                 'roseRule': rose_src or 'pending', 'plants': {}}
     all_files = {}
     for name in names:
-        entry, files = build_plant(name, os.path.join(PLANTS_DIR, name + '.imageset', name + '.svg'),
+        entry, files = build_plant(name, source_path(name),
                                    overrides.get(name, {}), rose_rule, rose_src)
         manifest['plants'][name] = entry
         all_files.update(files)

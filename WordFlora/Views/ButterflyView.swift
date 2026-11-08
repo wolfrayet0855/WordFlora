@@ -498,6 +498,9 @@ struct VisitorsView: View {
                         .fixedSize(horizontal: false, vertical: true)     // both cards take the taller one's height
                     }
                 }
+                // Frost & Lantern's winter friends, after the twelve (never part of the count above).
+                SeasonFriendsSection(album: album, owned: app.ownedPacks.contains(PackCatalog.frostLanternId),
+                                     live: app.entitlements.packIsLive(PackCatalog.frostLanternId), columns: albumColumns) { detail = $0 }
             }
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.card)
         }
