@@ -135,9 +135,11 @@ final class AdFormatsG4bUITests: XCTestCase {
     // MARK: Native Shed card
 
     private var sponsored: XCUIElement { element("shed.sponsored") }
+    /// The Shed tile opens at the second level up; `-uitest-everything` opens every tile.
+    private static let shedOpen = ["-uitest-everything"]
 
     func testTheShedShowsTheSponsoredCardBelowThePotsAndReadsAdvertisementFirst() {
-        launch([])
+        launch(Self.shedOpen)
         openShed()
         scrollTo(sponsored)
         XCTAssertTrue(sponsored.waitForExistence(timeout: 5))
@@ -154,7 +156,7 @@ final class AdFormatsG4bUITests: XCTestCase {
 
     func testNoSponsoredSectionForUnderThirteenOrPlus() {
         for flag in ["-uitest-age=under13", "-uitest-plus"] {
-            launch([flag])
+            launch([flag] + Self.shedOpen)
             openShed()
             for _ in 0..<10 { app.swipeUp(velocity: .fast) }
             XCTAssertFalse(sponsored.waitForExistence(timeout: 2), flag)
@@ -164,7 +166,7 @@ final class AdFormatsG4bUITests: XCTestCase {
     }
 
     func testCalmNeverShowsAVideoCard() {
-        launch(["-uitest-calm", "-uitest-native-video"])
+        launch(["-uitest-calm", "-uitest-native-video"] + Self.shedOpen)
         openShed()
         for _ in 0..<10 { app.swipeUp(velocity: .fast) }
         XCTAssertFalse(sponsored.waitForExistence(timeout: 2))
@@ -223,9 +225,13 @@ final class AdFormatsG4bUITests: XCTestCase {
         var findings = [String](), skipped = [String]()
         let scroll = app.scrollViews.firstMatch, nav = app.navigationBars.firstMatch
         let top = nav.exists ? nav.frame.maxY + 64 : 0
+        // Rows that sit under the Garden banner slot are covered by it, so they are not judged.
+        let banner = element("gardenBanner")
+        let bottomLimit: CGFloat? = banner.exists ? banner.frame.minY - 8 : nil
         let visible: CGRect? = scroll.exists ? {
             let f = scroll.frame
-            return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
+            let bottom = min(f.maxY, bottomLimit ?? f.maxY)
+            return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: bottom - max(f.minY, top))
         }() : nil
         do {
             try app.performAccessibilityAudit(for: types) { issue in
@@ -262,7 +268,7 @@ final class AdFormatsG4bUITests: XCTestCase {
 
     /// The Shed scrolled to the sponsored card (header, badge, headline, media, body, call to action).
     private func auditShed(size: String, dark: Bool) {
-        launchForAudit([], size: size, dark: dark)
+        launchForAudit(Self.shedOpen, size: size, dark: dark)
         openShed()
         let card = element("nativeAdCard")
         scrollTo(card)
