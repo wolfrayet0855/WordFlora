@@ -120,6 +120,7 @@ final class AppModel {
     /// Merges a garden backup file best-of-each, then reloads what depends on the profile.
     func restoreGarden(from data: Data) -> Result<GardenBackup.RestoreReport, GardenBackup.ImportError> {
         let defs = (try? BadgeCatalog.load()) ?? []
+        syncGlasshouse()          // an owner's glasshouse rows exist first, so their care in the file merges too
         let result = GardenBackup.restore(data, into: context, badgeDefs: defs)
         if case .success = result { reconcileSyncedData(); syncToolUnlocks(); refreshBadgeFacts(announce: false) }
         return result
