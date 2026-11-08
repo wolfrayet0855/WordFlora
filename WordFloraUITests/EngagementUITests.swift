@@ -65,6 +65,9 @@ final class EngagementUITests: XCTestCase {
                     guard let e = issue.element else { skipped += 1; return true }
                     if !v.contains(e.frame) { return true }
                 }
+                // After a scroll, text slid under the bar is drawn blurred with no element: the audit reports it as
+                // "potentially inaccessible text" with nothing to point at. Text that has an element is still judged.
+                if issue.auditType == .elementDetection, visible != nil, issue.element == nil { skipped += 1; return true }
                 findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
                 return true
             }
@@ -159,9 +162,11 @@ final class EngagementUITests: XCTestCase {
         XCTAssertTrue(app.buttons["Home"].waitForExistence(timeout: 5))
         app.buttons["Home"].tap()
         app.buttons["Garden"].tap()
+        // The garden grid is lazy: a plant further down only exists once it scrolls into view.
+        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
         let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", species)).firstMatch
-        XCTAssertTrue(tile.waitForExistence(timeout: 3), species)
         scrollTo(tile)
+        XCTAssertTrue(tile.exists && tile.isHittable, species)
         tile.tap()
         XCTAssertTrue(app.navigationBars["Sunny"].waitForExistence(timeout: 5), "the plant page title reads the new name")
     }
