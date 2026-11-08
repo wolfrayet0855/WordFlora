@@ -78,12 +78,8 @@ This table is the existing `PrivacyInfo.xcprivacy` content (section C) turned in
 
 Open point, verify before submit: ATT is asked only of adults, but the label is global. Declaring Device ID as tracking is correct while the manifest says `NSPrivacyTracking` true. Under 13 and 13 to 17 never reach tracking, which does not change the label.
 
-### B2. Delta when AppLovin is added through AdMob mediation
-AppLovin is a third-party SDK you ship (`AppLovinSDK` pulled in by `GoogleMobileAdsMediationAppLovin`), so its collection counts as yours.
-- **Likely no new categories** beyond B1 for the ad-serving core: AppLovin's published data uses are Device ID (IDFA/IDFV), Advertising Data, Product Interaction, Coarse Location (IP), Performance and Crash data, used for Third-Party Advertising and Analytics. I could not fetch AppLovin's privacy-details page (hosts refused the fetch), so this is [inferred]; **verify** on https://developers.applovin.com/en/max/ios/overview/privacy (or its support.axon.ai mirror) and on the AppLovin "Apple privacy manifest and labels" page, and add any type it lists that B1 lacks (candidates: Other Usage Data, Precise Location only if you enable it, User ID if you pass one: you should not).
-- Tracking stays Yes for Device ID (no change). Purposes: still Third-Party Advertising, Analytics. Consider adding **Developer's Advertising or Marketing** only if you use AppLovin attribution (you will not).
-- Keep `NSPrivacyCollectedDataTypes` in the app manifest in step (C below). AppLovinSDK ships its own manifest; Xcode merges the SDK manifests into the Privacy Report.
-- Mediation adds no new Apple privacy question; the net change is verification, not new rows, unless AppLovin lists a type you lack.
+### B2. Ad formats in 1.0 (AdMob only)
+AppLovin and every other second network are out for 1.0 (owner, 2026-11-07); Unity is a 1.1 idea. All formats (banner, collapsible banner, interstitial, rewarded, app open, native) come from the one Google Mobile Ads SDK, so the label stays as B1: no new data types are expected from app-open, native or collapsible ads [inferred]. Confirm with the merged privacy report from the built bundle (G4a task B2, before the answer sheet is finalised). Mediation groups, if the owner makes them, are AdMob Network only. Tracking stays Yes for Device ID (adults who allow ATT); 13 to 17 get non-personalised ads and no ATT prompt; under 13 and unknown age never start the SDK.
 
 ## C. What must match `PrivacyInfo.xcprivacy`
 
@@ -91,17 +87,17 @@ Current app manifest (`WordFlora/PrivacyInfo.xcprivacy`): `NSPrivacyTracking` tr
 
 Match checklist:
 1. Every type and Linked/Tracking flag in B1 equals the app manifest. They do today.
-2. **`NSPrivacyTrackingDomains` is empty.** If tracking is Yes, Apple expects the tracking domains that your SDKs contact to be listed so iOS can block them when ATT is denied. Google's and AppLovin's SDKs ship their own manifests with their own domains; check Xcode Product > Archive > Generate Privacy Report to confirm the merged list, and add any missing domain to the app manifest if the report flags it [inferred; Apple doc: https://developer.apple.com/documentation/bundleresources/privacy-manifest-files].
-3. Required-reason APIs: UserDefaults is declared. If the app or any SDK uses file timestamps, system boot time, disk space, or active keyboard APIs, each needs its reason. Run the privacy report after adding AppLovin and compare.
+2. **`NSPrivacyTrackingDomains` is empty.** If tracking is Yes, Apple expects the tracking domains that your SDKs contact to be listed so iOS can block them when ATT is denied. Google's SDKs ship their own manifests with their own domains; check Xcode Product > Archive > Generate Privacy Report to confirm the merged list, and add any missing domain to the app manifest if the report flags it [inferred; Apple doc: https://developer.apple.com/documentation/bundleresources/privacy-manifest-files].
+3. Required-reason APIs: UserDefaults is declared. If the app or any SDK uses file timestamps, system boot time, disk space, or active keyboard APIs, each needs its reason. Run the privacy report after the app-open and native code lands (G4b) and compare.
 4. The privacy policy page (D1 in `owner-setup-steps.md`) must state the same data uses and the age-based rule (children never see ads).
 5. Widget extension: no collection, so no label row from it.
-6. Re-run the report when the AppLovin adapter lands; update both the manifest and the label in one change.
+6. Re-run the report when the new ad formats land; update both the manifest and the label in one change.
 
 ## D. Guidelines 1.3 and 5.1.4 for an app that serves different experiences by age [Apple, https://developer.apple.com/app-store/review/guidelines/]
 
 - 1.3 applies to the **Kids Category**. WordFlora does not opt in, so third-party ads and analytics are not banned by 1.3. The risk is 5.1.4(a): "Apps intended primarily for kids should not include third-party analytics or third-party advertising." A reviewer can ask whether the app is intended primarily for kids. WordFlora is mixed audience (plain word game with a neutral age screen), but the garden-and-flowers art and a younger age band mean you need the mixed-audience story ready: the under-13 path loads **no ads, no SDK start, no UMP, no ATT**, shown in `AdGate`.
 - 5.1.4(a): you may ask for birthdate only to comply with child-privacy laws and must offer real functionality regardless of age. The age screen offers three bands, not a date of birth; keep it that way, do not store a birthdate, and keep the whole game playable for every band.
-- 5.1.4(b): any app that collects or can share personal information from a minor needs a privacy policy and compliance with children's privacy law. A parental gate is not COPPA consent. The app never starts ads for under 13 or unknown age, so it does not disclose child data to ad networks; keep that guarantee true after AppLovin (see the AppLovin notes).
+- 5.1.4(b): any app that collects or can share personal information from a minor needs a privacy policy and compliance with children's privacy law. A parental gate is not COPPA consent. The app never starts ads for under 13 or unknown age, so it does not disclose child data to ad networks; keep that guarantee true for every ad format (a table-driven and fuzz test in G4a proves it).
 - 2.3.8 and 5.1.4(b) metadata: nothing "for kids" in name, subtitle, icon, screenshots, description. Describe it as for everyone.
 - 5.1.2(i): ATT permission is required for tracking and the app may not make the app depend on it. ATT is asked of adults only; the `NSUserTrackingUsageDescription` text must stay honest (it is).
 - 5.1.1(ii): consent can be withdrawn easily: keep the UMP privacy options row (already built: `privacyOptionsRequired`).
@@ -110,11 +106,11 @@ Match checklist:
 
 ## E. Things that conflict or are unsettled
 1. `owner-setup-steps.md` D2 expected 4+; the new system's Brazil value may differ (A4). Verify in UI.
-2. `owner-setup-steps.md` C6 says to set `tagForChildDirectedTreatment` / `tagForUnderAgeOfConsent`; Google now deprecates both in favour of `ageRestrictedTreatment` [Google, https://developers.google.com/admob/ios/targeting]. The code already uses the new property. See the AppLovin notes for the age-of-consent gap.
-3. `owner-setup-steps.md` C10 says "no mediation"; `monetization-majors.md` plans AppLovin at launch +60 days. This needs a ruling (owner decision), and the label cannot be submitted until it is made.
+2. `owner-setup-steps.md` C6 says to set `tagForChildDirectedTreatment` / `tagForUnderAgeOfConsent`; Google now deprecates both in favour of `ageRestrictedTreatment` [Google, https://developers.google.com/admob/ios/targeting]. The code already uses the new property. The G4a hardening also sets the under-age-of-consent flag for 13 to 17 on the UMP request.
+3. `owner-setup-steps.md` C10 says "no mediation"; the decision is now AdMob Network only, one mediation group per format (see `admob-console-one-pager.md`). No label change.
 
 ## Open questions for the owner
-1. Ship v1 without AppLovin (B1 label) and revise the label at +60 days, or include AppLovin up front?
+1. (Settled 2026-11-07) AdMob only for 1.0, the B1 label.
 2. Do you want to tick "age assurance" for the self-declared age screen?
 3. Do you accept 9+ if the questionnaire forces it?
 4. Is any first-party analytics planned (adds a label row)?
