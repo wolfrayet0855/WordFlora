@@ -42,7 +42,7 @@ struct NativeAdCard: View {
 
     var body: some View {
         NativeAdCardView(content: content, typeSize: typeSize, dark: scheme == .dark)
-            .accessibilityIdentifier("shed.nativeCard")
+            .accessibilityIdentifier("nativeAdCard")         // the same id as the UIKit card, whichever one the tree shows
     }
 }
 
