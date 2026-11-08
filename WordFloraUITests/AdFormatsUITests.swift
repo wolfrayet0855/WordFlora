@@ -9,7 +9,10 @@ final class AdFormatsUITests: XCTestCase {
     override func setUp() { continueAfterFailure = false }
 
     private func launch(_ extra: [String]) {
-        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-sessions=3", "-uitest-ads-fake", "-uitest-daytime"] + extra
+        // `-uitest-toast-hold`: the free row's toast shows at once (no video first), so it must outlast the 2 s check
+        // that no ad appeared.
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-sessions=3", "-uitest-ads-fake", "-uitest-daytime",
+                               "-uitest-toast-hold"] + extra
         app.launch()
     }
 
@@ -111,12 +114,24 @@ final class AdFormatsUITests: XCTestCase {
         var findings = [String](), skipped = [String]()
         let scroll = app.scrollViews.firstMatch, nav = app.navigationBars.firstMatch
         let top = nav.exists ? nav.frame.maxY + 64 : 0
+        // The Garden's banner slot is a bottom inset over the scroll view: a plant card scrolled under it is covered by
+        // the slot, not visible, so the visible area ends where the slot begins.
+        // The banner view at the slot's top ("gardenBanner", or its fake label in `-uitest-ads-fake`).
+        let slot = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'gardenBanner'")).firstMatch
         let visible: CGRect? = scroll.exists ? {
             let f = scroll.frame
-            return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
+            let bottom = slot.exists ? min(f.maxY, slot.frame.minY) : f.maxY
+            return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: bottom - max(f.minY, top))
         }() : nil
+        // The wake sheet opens at the medium detent: the plant page shows dimmed above it and is not reachable by
+        // VoiceOver while the sheet is modal, which the audit reports as text with no element. Not our sheet's text.
+        let sheetAtMedium = app.buttons["wake-butterflies"].exists
         do {
             try app.performAccessibilityAudit(for: types) { issue in
+                if sheetAtMedium, issue.element == nil || (issue.element?.label ?? "").isEmpty,
+                   issue.compactDescription.localizedCaseInsensitiveContains("inaccessible text") {
+                    skipped.append("\(issue.compactDescription) (behind the medium sheet)"); return true
+                }
                 if issue.auditType == .contrast {
                     guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
                     if let v = visible, !v.contains(e.frame) { return true }
