@@ -275,7 +275,8 @@ struct WordFloraApp: App {
                     // Keep the home-screen widget in step with what the player just did.
                     if phase == .background || phase == .inactive { WidgetCenter.shared.reloadAllTimelines(); app.refreshReminders() }
                     if phase == .active { app.refreshFreeDrops(); app.updateAmbience(); app.updateSyncFlag(); app.refreshQuestFromGarden() }
-                    if phase == .active { Task { await app.refreshCloudAccount() } }
+                    // (Not in UI tests: they set the row's state with -uitest-cloud, whatever the simulator's account.)
+                    if phase == .active && !CommandLine.arguments.contains("-uitest") { Task { await app.refreshCloudAccount() } }
                     if phase == .background { SoundPlayer.shared.stopAmbient() }
                 }
         }

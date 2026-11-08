@@ -155,6 +155,41 @@ final class TextFitScreensUITests: XCTestCase {
         }
     }
 
+    /// Settings once Plus is on ("WordFlora Plus is on · Yearly") and the iCloud row in each state
+    /// (docs/pm/plus-flow-fable-review.md N3, N4); the Plus page's plan line.
+    func testSettingsPlusRowAndICloudStates() {
+        for (name, extra) in [("free", [String]()), ("starts", ["-uitest-plus"]), ("on", ["-uitest-plus", "-uitest-cloud=on"]),
+                              ("signin", ["-uitest-plus", "-uitest-cloud=signin"]), ("unavailable", ["-uitest-plus", "-uitest-cloud=unavailable"])] {
+            launch(extra)
+            openSettings()
+            let row = app.buttons["settings.plus"], cloud = element("settings.cloudSync")
+            scrollTo(cloud)
+            XCTAssertTrue(cloud.exists, name)
+            if name == "free" {
+                XCTAssertTrue(cloud.label.contains("needs Plus"), cloud.label)
+            } else {
+                XCTAssertTrue(row.label.contains("WordFlora Plus is on"), row.label)
+                XCTAssertTrue(row.label.contains("Yearly"), row.label)
+            }
+            switch name {
+            case "starts": XCTAssertTrue(cloud.label.contains("starts next time"), cloud.label)
+            case "on": XCTAssertTrue(cloud.label.contains("iCloud sync is on"), cloud.label)
+            case "signin": XCTAssertTrue(cloud.label.contains("sign-in"), cloud.label)
+            case "unavailable": XCTAssertTrue(cloud.label.contains("isn't available"), cloud.label)
+            default: break
+            }
+            XCTAssertFalse(app.buttons["Restore purchases"].exists, "no Restore on the Settings page")
+            sleep(1); shot("settings-plus", nil, dark: false, "-\(name)")
+            if name == "starts" {
+                row.tap()
+                XCTAssertTrue(element("plus.planLine").waitForExistence(timeout: 5))
+                XCTAssertEqual(element("plus.planLine").label, "Yearly plan")
+                sleep(1); shot("plus", nil, dark: false, "-subscribed-planline")
+            }
+            app.terminate()
+        }
+    }
+
     // MARK: The grown-up question (screenshot 2)
 
     func testTheGrownUpSheetKeepsContinueAndCancelReachable() {
