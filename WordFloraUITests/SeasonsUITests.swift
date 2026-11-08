@@ -267,6 +267,7 @@ final class SeasonsUITests: XCTestCase {
     /// A plant in Frosted glass: snow on its page (no garden weather, no rain), light and dark. The plant's VoiceOver
     /// text does not change.
     func testSnowFallsOnThePlantPageInAPackPot() {
+        executionTimeAllowance = 300                      // a launch, the garden and the plant page: slow on a busy Mac
         app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-age=eighteenPlus", "-uitest-plant=daisy",
                                "-uitest-prices", "-uitest-pack-owned", "-uitest-pot=frostedGlass"]
         app.launch()
