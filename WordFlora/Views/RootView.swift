@@ -26,6 +26,7 @@ struct RootView: View {
                     .accessibilityIdentifier("degraded-store-banner")
             }
         }
+        .overlay { AppOpenCueHost() }                        // G4b: the return cue covers everything while it is up
         .tint(Color.successText)
     }
 
