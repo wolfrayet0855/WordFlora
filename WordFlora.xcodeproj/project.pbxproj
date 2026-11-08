@@ -174,6 +174,7 @@
 		8D71B5862E6878124BB379B1 /* WakeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B08CBCAEE1D5A24848BAF8 /* WakeTests.swift */; };
 		8E6670903E6120DF66036EBF /* HomeLayoutUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 394854942795553C29283849 /* HomeLayoutUITests.swift */; };
 		15E39A57FDD379D5CBBB32E0 /* GuideUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D65EE66A938417ADBD5C554 /* GuideUITests.swift */; };
+		7E47F17A0000000000000003 /* TextFitScreensUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E47F17A0000000000000004 /* TextFitScreensUITests.swift */; };
 		8EE94A601E0EFA010CB76EE6 /* Badges.json in Resources */ = {isa = PBXBuildFile; fileRef = DE3B9B93CE1A034E8C165CB7 /* Badges.json */; };
 		91FC2D3DEAB36F45F4159DF9 /* ToolEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354AFCC34AC1C9DA4BCA8467 /* ToolEngine.swift */; };
 		94D8860C3740EB26ADB252F0 /* ToolEngineTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 08D9F7603039699D755A5EDB /* ToolEngineTests.swift */; };
@@ -245,6 +246,7 @@
 		C56399AF5A9FB677D166E85A /* WordEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1953888CF19BF643304ED9AC /* WordEntry.swift */; };
 		C84708A999B2ED2665D94F0A /* TendAnimationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BEEF2341BC08BF94A6BDA7B /* TendAnimationTests.swift */; };
 		AF15A9EF3C97DDF9B5161099 /* TendRowLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2F21320793D53F9A3FFEF9D2 /* TendRowLayoutTests.swift */; };
+		7E47F17A0000000000000001 /* TextFitLayoutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E47F17A0000000000000002 /* TextFitLayoutTests.swift */; };
 		CAF520953ACDC90D8798366B /* ButterflyAndBadgeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB4718BD77C51EDD77A1A10A /* ButterflyAndBadgeTests.swift */; };
 		CDFE68830861208BA674F799 /* PlayerProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = B439F16CAD385FC83F8BE288 /* PlayerProfile.swift */; };
 		CEE0A8C8A89FF4365D45F346 /* PlantCatalog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9331FDFC4EAE840666B50749 /* PlantCatalog.swift */; };
@@ -406,6 +408,7 @@
 		2A7721B11B88B81E56630C05 /* PotPickerViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PotPickerViews.swift; sourceTree = "<group>"; };
 		2BEEF2341BC08BF94A6BDA7B /* TendAnimationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendAnimationTests.swift; sourceTree = "<group>"; };
 		2F21320793D53F9A3FFEF9D2 /* TendRowLayoutTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendRowLayoutTests.swift; sourceTree = "<group>"; };
+		7E47F17A0000000000000002 /* TextFitLayoutTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TextFitLayoutTests.swift; sourceTree = "<group>"; };
 		2EA96D7DD8E3103D3D959B4A /* ShedView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ShedView.swift; sourceTree = "<group>"; };
 		2F3914C3D6EB4B241FFAC14F /* RoseMeter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RoseMeter.swift; sourceTree = "<group>"; };
 		2F738E93544B38467408EB43 /* TendAnimationView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendAnimationView.swift; sourceTree = "<group>"; };
@@ -421,6 +424,7 @@
 		36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SharedDefaults.swift; sourceTree = "<group>"; };
 		394854942795553C29283849 /* HomeLayoutUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HomeLayoutUITests.swift; sourceTree = "<group>"; };
 		7D65EE66A938417ADBD5C554 /* GuideUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GuideUITests.swift; sourceTree = "<group>"; };
+		7E47F17A0000000000000004 /* TextFitScreensUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TextFitScreensUITests.swift; sourceTree = "<group>"; };
 		395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordFloraUITests.swift; sourceTree = "<group>"; };
 		3B62098E04C3095B889397EC /* WordProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordProvider.swift; sourceTree = "<group>"; };
 		3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRouter.swift; sourceTree = "<group>"; };
@@ -922,6 +926,7 @@
 				0A17B66E1750BA0EC6874EED /* LifeStatsTests.swift */,
 				2BEEF2341BC08BF94A6BDA7B /* TendAnimationTests.swift */,
 				2F21320793D53F9A3FFEF9D2 /* TendRowLayoutTests.swift */,
+				7E47F17A0000000000000002 /* TextFitLayoutTests.swift */,
 				4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */,
 				6DFCECE93C832460952F5760 /* MistMakerTests.swift */,
 				0B21CEF2BD93D0F31D80E2AA /* PackCatalogTests.swift */,
@@ -1136,6 +1141,7 @@
 				395CDD3E27977D727B9DDD11 /* WordFloraUITests.swift */,
 				394854942795553C29283849 /* HomeLayoutUITests.swift */,
 				7D65EE66A938417ADBD5C554 /* GuideUITests.swift */,
+				7E47F17A0000000000000004 /* TextFitScreensUITests.swift */,
 				F787992B59617103496CEE38 /* TendingUITests.swift */,
 				1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */,
 				4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */,
@@ -1364,6 +1370,7 @@
 				D107E764254121AC6777295F /* WordFloraUITests.swift in Sources */,
 				8E6670903E6120DF66036EBF /* HomeLayoutUITests.swift in Sources */,
 				15E39A57FDD379D5CBBB32E0 /* GuideUITests.swift in Sources */,
+				7E47F17A0000000000000003 /* TextFitScreensUITests.swift in Sources */,
 				33BA691BF1E87DE5BB43E0B0 /* TendingUITests.swift in Sources */,
 				67D33D3868BCC5E3E36ABA02 /* WeatherUITests.swift in Sources */,
 				4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */,
@@ -1429,6 +1436,7 @@
 				C0A400B31989FDA16B29412C /* LifeStatsTests.swift in Sources */,
 				C84708A999B2ED2665D94F0A /* TendAnimationTests.swift in Sources */,
 				AF15A9EF3C97DDF9B5161099 /* TendRowLayoutTests.swift in Sources */,
+				7E47F17A0000000000000001 /* TextFitLayoutTests.swift in Sources */,
 				73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */,
 				9FAD5FE246F295E93631912B /* MistMakerTests.swift in Sources */,
 				33F9745BFCE91884EC8E5B3C /* PackCatalogTests.swift in Sources */,

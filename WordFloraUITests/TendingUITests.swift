@@ -4,6 +4,7 @@ import XCTest
 private enum PotNames {
     static let all = ["Plain blue", "Terracotta", "Sage glaze", "Sunflower", "Mint", "Blossom", "Rose pink", "Living stones",
                       "Flytrap", "Starlight", "Jade vine", "Rainbow bark", "Dewdrop", "Honey stripe", "Moonlit", "Meadow"]
+    static let packIds: Set<String> = ["frostedGlass", "lanternRed", "snowflakeIndigo"]
 }
 
 /// The plant page's tend buttons, their effects and the fact card (T5).
@@ -48,15 +49,19 @@ final class TendingUITests: XCTestCase {
 
     private func element(_ id: String) -> XCUIElement { app.descendants(matching: .any)[id].firstMatch }
 
-    /// The sixteen pots sit in a 4 x 4 grid: four column positions, four row positions, every name whole.
-    private func assertFourByFour(_ prefix: String, _ context: String) {
+    /// The sixteen pots in their grid for the text size (GridColumns): 4 x 4 up to Large, one a row (sixteen rows,
+    /// full width) at the accessibility sizes. Every tile stays on screen; the words are measured in TextFitLayoutTests.
+    private func assertPotGrid(_ prefix: String, size: String, _ context: String) {
+        let columns = size.hasPrefix("Accessibility") ? 1 : 4
         let tiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH %@", prefix)).allElementsBoundByIndex
+            .filter { !PotNames.packIds.contains(String($0.identifier.dropFirst(prefix.count))) }
         XCTAssertEqual(tiles.count, 16, "\(context): sixteen pots")
         let xs = Set(tiles.map { Int($0.frame.minX.rounded()) }), ys = Set(tiles.map { Int($0.frame.minY.rounded()) })
-        XCTAssertEqual(xs.count, 4, "\(context): four columns, got x \(xs.sorted())")
-        XCTAssertEqual(ys.count, 4, "\(context): four rows, got y \(ys.sorted())")
+        XCTAssertEqual(xs.count, columns, "\(context): \(columns) column(s), got x \(xs.sorted())")
+        XCTAssertEqual(ys.count, 16 / columns, "\(context): \(16 / columns) rows, got y \(ys.sorted())")
         let width = app.windows.firstMatch.frame.width
         for t in tiles { XCTAssertLessThanOrEqual(t.frame.maxX, width + 0.5, "\(context): \(t.identifier) stays on screen") }
+        if columns == 1 { for t in tiles { XCTAssertGreaterThan(t.frame.width, width - 2 * 16 - 2, "\(context): \(t.identifier) is a full-width row") } }
     }
 
     private var toast: XCUIElement { element("tend-toast") }
@@ -362,35 +367,21 @@ final class TendingUITests: XCTestCase {
             XCTAssertTrue(terracotta.waitForExistence(timeout: 3))
             closeNewPill()
             sleep(1); shot("pot-pick-\(size)")
-            assertFourByFour("pot-tile-", "pick \(size)")
-            // Excused on pot tiles only (by identifier, or by name and tile size, never by position: the Dynamic Type check
-            // reflows the sheet), and each excused issue is printed. Everything else on the sheet, and every other check on the tiles, is judged.
-            // - Dynamic Type, on any pot tile: the tile words stop growing at xxxLarge (and shrink to fit one line) and
-            //   the Plus and In use pills at Large, so the 4 x 4 grid keeps its fixed tile height; VoiceOver reads the
-            //   full name, the state and the goal.
+            assertPotGrid("pot-tile-", size: size, "pick \(size)")
+            // Excused on pot tiles only (by identifier, or by name, never by position: the Dynamic Type check reflows the
+            // sheet), and each excused issue is printed. Everything else on the sheet, and every other check on the
+            // tiles (Dynamic Type and clipped text included: the tile words grow with every size now), is judged.
             // - Contrast, on pot tiles: the check samples the whole tile with its pot art, and flags the name on the
             //   ghost pots (a pale dashed outline on the soft tile, by design) and on Honey stripe (orange stripes) even
             //   though every name is now full ink (above 10:1 on both fills) and the goal line 7.07:1 light / 8.24:1
             //   dark (design-preview/repot-sheet/notes.md). Dropping this excuse was tried: all eleven ghost tiles and
-            //   Honey stripe are reported. Such a tile comes back without its identifier, as the pot's name with the
-            //   tile's frame ('Sage glaze', 84 x 104), so it is matched by name plus the fixed tile size.
-            let tiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'pot-tile-'")).allElementsBoundByIndex
-            let tileSize = tiles.first?.frame.size ?? .zero
-            XCTAssertEqual(tileSize.height, 104, accuracy: 0.5)
+            //   Honey stripe are reported. Such a tile comes back without its identifier, as the pot's name.
             let names = Set(PotNames.all)
-            // A tile, or a pot name inside one (one line, narrower than a tile).
-            func isTile(_ e: XCUIElement) -> Bool {
-                let tileSized = abs(e.frame.width - tileSize.width) < 1 && abs(e.frame.height - tileSize.height) < 1
-                let nameSized = e.frame.width <= tileSize.width && e.frame.height < 30
-                return (e.identifier.hasPrefix("pot-tile-") && tileSized) || (names.contains(e.label) && (tileSized || nameSized))
-            }
-            // The Plus and In use pills are hidden from VoiceOver (the tile label says "Plus" / "in use") but the audit
-            // still sees their words; they stop at Large on purpose, so only that check is excused on them.
-            func isPill(_ e: XCUIElement) -> Bool { ["Plus", "In use"].contains(e.label) && e.frame.height < 24 }
+            func isTile(_ e: XCUIElement) -> Bool { e.identifier.hasPrefix("pot-tile-") || names.contains(e.label) }
             // - "Potentially inaccessible text" with no element: the faded words of the last row under the footer
             //   (see `audit`). It never fails a resolved element; the tiles test checks that row scrolls clear.
             audit("pot-pick-\(size)", dynamicTypeApart: true, unresolvedUnderFooter: .elementDetection, excuse: { issue, e in
-                ([.contrast, .dynamicType].contains(issue.auditType) && isTile(e)) || (issue.auditType == .dynamicType && isPill(e))
+                issue.auditType == .contrast && isTile(e)
             })
             app.terminate()
         }
@@ -447,7 +438,7 @@ final class TendingUITests: XCTestCase {
         closeNewPill()
         let red = app.buttons["pot-tile-lanternRed"]
         let go = app.buttons["repot-go"]
-        for _ in 0..<10 where !(red.isHittable && red.frame.maxY <= go.frame.minY) { app.scrollViews.firstMatch.swipeUp(velocity: .slow); sleep(1) }
+        for _ in 0..<30 where !(red.isHittable && red.frame.maxY <= go.frame.minY) { app.scrollViews.firstMatch.swipeUp(velocity: .slow); sleep(1) }
         XCTAssertTrue(red.isHittable)
         XCTAssertEqual(red.label, "Lantern red pot, Seasons")
         XCTAssertTrue(app.buttons["pot-tile-frostedGlass"].exists); XCTAssertTrue(app.buttons["pot-tile-snowflakeIndigo"].exists)
@@ -486,16 +477,9 @@ final class TendingUITests: XCTestCase {
     }
 
     private func auditPackPicker(_ name: String) {
-        let tiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'pot-tile-'")).allElementsBoundByIndex
-        let tileSize = tiles.first?.frame.size ?? .zero
         let names = Set(PotNames.all + ["Frosted glass", "Lantern red", "Snowflake indigo"])
-        // The same tile excuses as the sixteen-pot picker audit (see auditPotPicker), now with the pack's names.
-        func isTile(_ e: XCUIElement) -> Bool {
-            let tileSized = abs(e.frame.width - tileSize.width) < 1 && abs(e.frame.height - tileSize.height) < 1
-            let nameSized = e.frame.width <= tileSize.width && e.frame.height < 30
-            return (e.identifier.hasPrefix("pot-tile-") && tileSized) || (names.contains(e.label) && (tileSized || nameSized))
-        }
-        func isPill(_ e: XCUIElement) -> Bool { ["Plus", "In use"].contains(e.label) && e.frame.height < 24 }
+        // The same tile excuse as the sixteen-pot picker audit (contrast only; see auditPotPicker), with the pack's names.
+        func isTile(_ e: XCUIElement) -> Bool { e.identifier.hasPrefix("pot-tile-") || names.contains(e.label) }
         // The pack's row makes the grid taller than the first screen even at the default size, so its tiles sit under
         // the footer's fade like the last row at accessibility sizes: unresolved clipped text there is noted too.
         // Words scrolled under the pinned footer (and its 28 pt fade) are cut there on purpose: a clipped-text issue on
@@ -503,11 +487,8 @@ final class TendingUITests: XCTestCase {
         let pinned = element("repot-summary").exists ? element("repot-summary") : app.buttons["repot-go"]
         let footerTop = pinned.frame.minY - 8 - 28
         audit(name, dynamicTypeApart: true, unresolvedUnderFooter: [.elementDetection, .textClipped], excuse: { issue, e in
-            ([.contrast, .dynamicType].contains(issue.auditType) && isTile(e)) || (issue.auditType == .dynamicType && isPill(e))
+            (issue.auditType == .contrast && isTile(e))
                 || (issue.auditType == .textClipped && e.frame.maxY > footerTop)
-                // The picked tile's one-line name shrinks to fit at the capped size; the audit reads the shrunk name on
-                // the whole tile (frame = tile, label = name) as clipped. VoiceOver reads the full name.
-                || (issue.auditType == .textClipped && isTile(e) && e.identifier.isEmpty)
         })
     }
 
@@ -517,9 +498,9 @@ final class TendingUITests: XCTestCase {
         if close.waitForExistence(timeout: 1) { close.tap(); sleep(1) }
     }
 
-    /// The sixteen tiles: one fixed height, rows aligned, and nothing under the pinned footer (the clipped
-    /// "Honey stripe" before). At the default size the whole grid sits above the footer on iPhone 17; at accessibility
-    /// sizes the last row scrolls up to sit fully above the button.
+    /// The sixteen tiles: the tiles in a row share one height (108 at the default size), rows aligned, and nothing
+    /// under the pinned footer (the clipped "Honey stripe" before). At the default size the whole grid sits above the
+    /// footer on iPhone 17; at accessibility sizes (one pot a row) the last row scrolls up to sit fully above the button.
     func testRepotTilesHaveOneHeightAndClearTheButton() {
         for size in ["Large", "AccessibilityL", "AccessibilityXXXL"] {
             open("Daisy", plantId: "daisy", extra: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategory\(size)"])
@@ -529,10 +510,12 @@ final class TendingUITests: XCTestCase {
             sleep(1)
             let tiles = app.buttons.matching(NSPredicate(format: "identifier BEGINSWITH 'pot-tile-'")).allElementsBoundByIndex
             XCTAssertEqual(tiles.count, 16, size)
-            let h = tiles.first?.frame.height ?? 0
-            for t in tiles { XCTAssertEqual(t.frame.height, h, accuracy: 0.5, "\(size): \(t.identifier) has the one tile height") }
-            XCTAssertEqual(h, size == "Large" ? 108 : 104, accuracy: 0.5, "\(size): the fixed tile height")
-            assertFourByFour("pot-tile-", "tiles \(size)")
+            for row in Dictionary(grouping: tiles, by: { Int($0.frame.minY.rounded()) }).values {
+                let h = row.first?.frame.height ?? 0
+                for t in row { XCTAssertEqual(t.frame.height, h, accuracy: 0.5, "\(size): \(t.identifier) has its row's height") }
+            }
+            if size == "Large" { XCTAssertEqual(tiles.first?.frame.height ?? 0, 108, accuracy: 0.5, "the default tile height") }
+            assertPotGrid("pot-tile-", size: size, "tiles \(size)")
             if size == "Large" {
                 let summary = element("repot-summary")
                 XCTAssertTrue(summary.exists)
@@ -541,7 +524,7 @@ final class TendingUITests: XCTestCase {
                 XCTAssertLessThanOrEqual(app.buttons["pot-tile-honeyStripe"].frame.maxY, summary.frame.minY, "Honey stripe is whole")
             } else {
                 let meadow = app.buttons["pot-tile-meadow"]
-                for _ in 0..<6 where !(meadow.isHittable && meadow.frame.maxY <= go.frame.minY) {
+                for _ in 0..<24 where !(meadow.isHittable && meadow.frame.maxY <= go.frame.minY) {
                     app.scrollViews.firstMatch.swipeUp(velocity: .slow); sleep(1)
                 }
                 XCTAssertTrue(meadow.isHittable, size)
@@ -602,7 +585,7 @@ final class TendingUITests: XCTestCase {
             app.buttons["Shed"].tap()
             let stones = app.buttons["shed-pot-livingStones"].firstMatch
             _ = app.buttons["shed.tool.can"].waitForExistence(timeout: 5)
-            for _ in 0..<14 where !(stones.exists && stones.isHittable) { app.swipeUp() }
+            for _ in 0..<30 where !(stones.exists && stones.isHittable) { app.swipeUp() }
             XCTAssertTrue(stones.label.contains("6 of 10 plants in level 3"), stones.label)
             XCTAssertTrue(app.buttons["shed-pot-dewdrop"].firstMatch.label.contains("3 of 7 garden days"))
             sleep(1); shot("pots-shed-\(name)")
@@ -675,9 +658,9 @@ final class TendingUITests: XCTestCase {
         XCTAssertEqual(app.buttons["pot-tile-terracotta"].label, "Terracotta pot")
     }
 
-    /// The Shed's 4 x 4 pot cards at accessibility sizes. As on the pick tiles, contrast (the check samples the pot art
-    /// with the text) and Dynamic Type (the card words stop growing at xxxLarge so four fit a row) are excused on pot
-    /// cards only; clipped text, hit regions, labels and traits are judged, and every check elsewhere.
+    /// The Shed's pot cards at accessibility sizes (one a row). As on the pick tiles, contrast (the check samples the pot
+    /// art with the text) is excused on pot cards only; Dynamic Type, clipped text, hit regions, labels and traits are
+    /// judged, and every check elsewhere.
     /// One size per test: each audit now runs in three passes, and both sizes in one test came close to the 2 minute
     /// allowance (104 s).
     func testTheShedPotsPassTheAuditAtAccessibilityL() { auditShedPots("AccessibilityL") }
@@ -703,7 +686,7 @@ final class TendingUITests: XCTestCase {
             // away at the one stop where only a tile's coloured edge was (QA, 2026-11-06). Every check that names an
             // element is still judged.
             audit("shed-pots-\(size)", dynamicTypeApart: true, unresolvedUnderFooter: .elementDetection, excuse: { issue, e in
-                [.contrast, .dynamicType].contains(issue.auditType) && e.identifier.hasPrefix("shed-pot-") && e.identifier != "shed-pot-hint"
+                issue.auditType == .contrast && e.identifier.hasPrefix("shed-pot-") && e.identifier != "shed-pot-hint"
             })
             app.terminate()
         }
@@ -731,7 +714,7 @@ final class TendingUITests: XCTestCase {
     /// Swipes until the page's last element is on screen and stops moving (no momentum left), then lets it settle.
     private func scrollToEnd(_ last: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
         var previous = CGRect.null
-        for _ in 0..<24 {
+        for _ in 0..<48 {
             if last.exists, last.isHittable, last.frame == previous { break }
             previous = last.exists ? last.frame : .null
             app.swipeUp()
@@ -749,10 +732,10 @@ final class TendingUITests: XCTestCase {
             app.buttons["Shed"].tap()
             let card = app.buttons["shed-pot-plainBlue"].firstMatch
             _ = app.buttons["shed.tool.can"].waitForExistence(timeout: 5)
-            for _ in 0..<12 where !(card.exists && card.isHittable) { app.swipeUp() }
+            for _ in 0..<30 where !(card.exists && card.isHittable) { app.swipeUp() }
             XCTAssertTrue(card.isHittable, "the pots grid is in the Shed")
             app.swipeUp(); sleep(1); shot("shed-pots-\(size)")
-            assertFourByFour("shed-pot-", "shed \(size)")
+            assertPotGrid("shed-pot-", size: size, "shed \(size)")
             app.swipeUp(); sleep(1); shot("shed-pots-\(size)-end")
             app.terminate()
         }

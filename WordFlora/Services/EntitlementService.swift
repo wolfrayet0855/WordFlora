@@ -42,7 +42,12 @@ final class EntitlementService {
 
     deinit { listener?.cancel() }
 
+    /// UI tests only (`-uitest-store-slow`): the store takes this long to answer, so the loading state can be seen.
+    private(set) var debugLoadDelay: UInt64 = 0
+    func debugSlowStore(seconds: UInt64) { debugLoadDelay = seconds }
+
     func loadProducts() async {
+        if debugLoadDelay > 0 { try? await Task.sleep(nanoseconds: debugLoadDelay * 1_000_000_000) }
         do {
             let found = try await Product.products(for: PlusPlan.plusProductIDs)
             var map = [PlusPlan: Product]()

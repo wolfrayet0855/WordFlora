@@ -103,6 +103,8 @@ struct WordFloraApp: App {
             model.entitlements.debugPreviewPrices(UITestPrices.local)
             model.entitlements.debugPreviewPackPrices(UITestPrices.packs)       // the pack is "offered": its surfaces show
         }
+        // The store answers slowly: the Plus page's loading state (no prices yet, no button, a spinner).
+        if uiTesting && args.contains("-uitest-store-slow") { model.entitlements.debugSlowStore(seconds: 90) }
         // Frost & Lantern owned (bought or family-shared): its two pots can be picked.
         if uiTesting && args.contains("-uitest-pack-owned") {
             var ids = model.entitlements.state.activeProductIDs; ids.insert(PackCatalog.frostLantern.productID)
@@ -130,6 +132,13 @@ struct WordFloraApp: App {
         if uiTesting && args.contains("-uitest-album") {
             var album = StickerAlbum()
             album.add(["monarch", "monarch", "ladybug", "honeybee"], on: Date.now)
+            model.profile?.albumJSON = album.json
+            try? model.context.save()
+        }
+        // Text-fit screens: every friend met once (the longest names, "Hummingbird", on the album, book and detail sheet).
+        if uiTesting && args.contains("-uitest-album-all") {
+            var album = StickerAlbum()
+            album.add(VisitorCatalog.all.map(\.id) + WeatherSticker.allCases.map(\.id), on: Date.now)   // and the weather stickers
             model.profile?.albumJSON = album.json
             try? model.context.save()
         }
