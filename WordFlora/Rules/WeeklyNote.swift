@@ -118,8 +118,11 @@ enum WeeklyNote {
 /// Every word on the weekly note and its share card (swept by CopySafety in WeeklyNoteTests).
 enum WeeklyNoteCopy {
     static let title = "Your week in the garden"
-    static let lovely = "Lovely"
-    static let visit = "Visit my garden"
+    static let celebrate = "Celebrate"
+    static let celebrateHint = "Shows a moment of flowers for your week."
+    static let celebrateTitle = "What a week!"
+    static let celebrateLine = "Your garden grew with you."
+    static let celebrateDone = "Done"
     static let share = "Share my week"
     static let shareHint = "Shares a picture of your week. No names or dates."
     static let caption = "My week in my WordFlora garden."
