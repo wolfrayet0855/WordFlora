@@ -57,8 +57,11 @@ final class BadgeMechanicsUITests: XCTestCase {
         let scroll = app.scrollViews.firstMatch
         let bar = app.navigationBars.firstMatch
         let top = bar.exists ? bar.frame.maxY + 64 : 0
+        // The scroll view runs under the home indicator: text whose lower part sits in that last 34 pt strip is not yet
+        // fully in view (the notebook's next page name at AX XXXL), so it is judged once scrolled up, like a scroll edge.
+        let bottom = min(scroll.exists ? scroll.frame.maxY : 0, app.windows.firstMatch.frame.maxY - 34)
         let visible: CGRect? = scroll.exists
-            ? CGRect(x: scroll.frame.minX, y: max(scroll.frame.minY, top), width: scroll.frame.width, height: scroll.frame.maxY - max(scroll.frame.minY, top))
+            ? CGRect(x: scroll.frame.minX, y: max(scroll.frame.minY, top), width: scroll.frame.width, height: bottom - max(scroll.frame.minY, top))
             : nil
         do {
             try app.performAccessibilityAudit(for: types) { issue in
@@ -240,6 +243,10 @@ final class BadgeMechanicsUITests: XCTestCase {
         audit("mist-ax5-dark")
         mist.tap()
         sleep(3)
+        // The tend toast is pinned over the page at accessibility sizes; the audit measured the tiles under it.
+        let toast = element("tend-toast")
+        if toast.exists { XCTAssertTrue(toast.waitForNonExistence(timeout: 8), "the toast goes") }
+        sleep(1)
         audit("mist-ax5-dark-done")
     }
 
