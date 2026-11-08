@@ -107,3 +107,41 @@ final class AdFormatsUITests: XCTestCase {
         XCUIDevice.shared.appearance = .light
     }
 }
+
+/// Faded bloom placement check (docs/pm/faded-bloom-offsets.md): the cue forced on for lithops and aloe vera (nudged)
+/// and clover (unchanged). Shots go to SCREENSHOT_DIR (and the result bundle) for a look by eye.
+final class FadedBloomShotUITests: XCTestCase {
+    let app = XCUIApplication()
+
+    override func setUp() { continueAfterFailure = false }
+
+    private func shot(_ name: String) {
+        let data = XCUIScreen.main.screenshot().pngRepresentation
+        if let dir = ProcessInfo.processInfo.environment["SCREENSHOT_DIR"] {
+            try? data.write(to: URL(fileURLWithPath: dir).appendingPathComponent("\(name).png"))
+        }
+        let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
+    }
+
+    private func check(_ id: String, _ name: String) {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-everything", "-uitest-plant=\(id)", "-uitest-tidytrim"]
+        app.launch()
+        app.buttons["Garden"].tap()
+        let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", name)).firstMatch
+        XCTAssertTrue(tile.waitForExistence(timeout: 8))
+        for _ in 0..<12 where !tile.isHittable { app.swipeUp() }
+        tile.tap()
+        XCTAssertTrue(app.buttons["tend-water"].waitForExistence(timeout: 8))
+        let moment = app.descendants(matching: .any)["badgeMoment"].firstMatch
+        if moment.waitForExistence(timeout: 4) { _ = moment.waitForNonExistence(timeout: 10) }
+        XCTAssertTrue(app.descendants(matching: .any)["plant.tidyCue"].firstMatch.waitForExistence(timeout: 5), "the cue shows")
+        shot("faded-bloom-\(id)")
+        app.terminate()
+    }
+
+    func testFadedBloomOnLithopsAloeVeraAndClover() {
+        check("lithops", "Lithops")
+        check("aloe_vera", "Aloe Vera")
+        check("clover", "Clover")
+    }
+}

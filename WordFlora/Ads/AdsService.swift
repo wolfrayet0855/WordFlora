@@ -301,6 +301,33 @@ final class AdsService {
     var fake = false
     var fakeWithholdsReward = false
 
+    /// One-off live probe for the collapsible test id (g4a brief 3.1 [verify]), Debug only. Loads one banner with
+    /// `["collapsible": "bottom"]` on the Debug (test) collapsible id and reports whether it loaded and was collapsible.
+    static func debugProbeCollapsibleTestID(in root: UIViewController) async -> (loaded: Bool, collapsible: Bool)? {
+        let id = unitID(.bannerGardenCollapsible)
+        guard id.contains(AdUnit.googleTestPublisher) else { return nil }        // never a real id
+        MobileAds.shared.requestConfiguration.maxAdContentRating = .general
+        await MobileAds.shared.start()
+        let banner = BannerView(adSize: currentOrientationAnchoredAdaptiveBanner(width: root.view.bounds.width))
+        banner.adUnitID = id
+        banner.rootViewController = root
+        root.view.addSubview(banner)
+        let probe = CollapsibleProbe(); banner.delegate = probe
+        let request = Request()
+        let extras = Extras(); extras.additionalParameters = ["collapsible": "bottom"]
+        request.register(extras)
+        banner.load(request)
+        for _ in 0..<60 where probe.result == nil { try? await Task.sleep(nanoseconds: 500_000_000) }
+        banner.removeFromSuperview()
+        return probe.result
+    }
+
+    private final class CollapsibleProbe: NSObject, BannerViewDelegate {
+        var result: (loaded: Bool, collapsible: Bool)?
+        func bannerViewDidReceiveAd(_ bannerView: BannerView) { result = (true, bannerView.isCollapsible) }
+        func bannerView(_ bannerView: BannerView, didFailToReceiveAdWithError error: Error) { result = (false, false) }
+    }
+
     private func fakePresent(reward: Bool) async -> (shown: Bool, earned: Bool) {
         guard let vc = Self.presentationAnchor() else { return (false, false) }
         return await withCheckedContinuation { continuation in
