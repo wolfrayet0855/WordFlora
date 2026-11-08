@@ -45,3 +45,5 @@ Items here are parked, not cut. Each needs the owner's go before it is built.
 
 ## Plus (owner, 2026-11-08)
 - Plus page after purchase: a more modern, tasteful confirmation (deferred to 1.1).
+
+- Release hygiene: 12 `-uitest-*` launch-argument names are still read in Release builds (WordFloraApp.swift:309, KeyboardView.swift:55, IntroBloomView, GameView:38, OnboardingView:42, TendAnimationView:115, BadgeMomentView, weather override in AppModel:47 and AppModel+WeatherHelpers:21): users cannot pass launch arguments, so harmless, but wrap each in #if DEBUG via one LaunchFlags helper (1.1).

@@ -13,7 +13,7 @@ Rewritten for the post-merge state (pre-written 2026-11-08; close the [fill] mar
 | G5 Frost & Lantern pack | Merged |
 | G6 regression, review, merge | Merged as c04329c; tagged v1.0-rc1 at [fill: sha] |
 
-Unit 1393 passed, 0 failed, 1 skipped on the hold tip 5588896 (merged-tip unit: pending: final proof runner); Release proof FAIL case verified, PASS case pending: final proof runner; the review found no blockers.
+Unit 1393 passed, 0 failed, 1 skipped on the hold tip 5588896 (merged-tip unit: done 2026-11-08: unit on merged tip c04329c 1393 passed, 0 failed, 1 skipped; Release PASS case passed (nine unit keys and app id real, Garden equals Home, no Google test id); Release binary string scan 0 for fake-ad, adcaps, collapsible probe and test ids; 12 -uitest launch-argument names remain in Release (harmless, moved to backlog)); Release proof FAIL case verified, PASS case done 2026-11-08: unit on merged tip c04329c 1393 passed, 0 failed, 1 skipped; Release PASS case passed (nine unit keys and app id real, Garden equals Home, no Google test id); Release binary string scan 0 for fake-ad, adcaps, collapsible probe and test ids; 12 -uitest launch-argument names remain in Release (harmless, moved to backlog); the review found no blockers.
 
 ## Owner items open (order and steps: `docs/pm/owner-final-checklist.md`)
 1. CloudKit Development schema run, then Production deploy; verify CD_lastMistedAt; fill the ledger in `docs/setup/cloudkit-new-fields.md`.
