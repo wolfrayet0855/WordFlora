@@ -17,17 +17,22 @@ enum DailyShare {
     }
 }
 
+/// Every share that leaves the app (Daily Bloom, a plant card, a badge card, the weekly note, a plant fact) uses this one
+/// line: hidden for players under 13 and when the age is not known (`ParentalGate.isRequired`).
+enum ShareGate {
+    static func isAllowed(ageBand: AgeBand?) -> Bool { !ParentalGate.isRequired(ageBand: ageBand) }
+}
+
 enum PlantShare {
-    static func caption(plantName: String, nickname: String) -> String {
-        nickname.isEmpty ? "I found a \(plantName) in WordFlora!" : "Meet \(nickname), my \(plantName) in WordFlora!"
-    }
+    /// The species name only: a typed plant name is the player's own and never leaves the device in a share.
+    static func caption(plantName: String) -> String { "I found a \(plantName) in WordFlora!" }
 }
 
 /// Sharing a badge card (design-preview/brand/v4/badges.html, section 4): a picture of the badge with its name, tier
 /// and line, and a plain caption. No name, no handle, no date, nothing about the player.
 enum BadgeShare {
     /// Sharing leaves the app: hidden for players under 13 and when the age is not known (`ParentalGate.isRequired`).
-    static func isAllowed(ageBand: AgeBand?) -> Bool { !ParentalGate.isRequired(ageBand: ageBand) }
+    static func isAllowed(ageBand: AgeBand?) -> Bool { ShareGate.isAllowed(ageBand: ageBand) }
 
     static let button = "Share this badge"
     static let header = "WORDFLORA BADGE"

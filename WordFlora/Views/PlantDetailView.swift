@@ -128,7 +128,7 @@ struct PlantDetailView: View {
         .sheet(isPresented: $showWake) { WakeSheet(plant: plant).environment(app) }   // Wake the seed
         .alert("Name your plant", isPresented: $renaming) {
             TextField("Name", text: $draftName)
-            Button("Save") { plant.nickname = String(draftName.prefix(16)); try? app.context.save() }
+            Button("Save") { app.rename(plant, to: draftName) }     // PlantName.clean: trim, 16 characters, "" for no letters
             Button("Cancel", role: .cancel) {}
         }
     }
@@ -463,7 +463,9 @@ struct PlantDetailView: View {
 
         NameStoryCard(name: plant.name, botanicalName: plant.botanicalName, fact: plant.botanicalFact,
                       story: PlantCatalog.nameStory(for: plant.plantId))
+            .shareable(app.canShare)
             .onAppear { if plant.earnedCount > 0 { app.noteFactCardRead(plantId: plant.plantId) } }     // Wild Discovery badge
+        WidgetPinRow(plant: plant)      // Make it yours: "Show on my widget"
 
         statusBlock(plant, snap)
 

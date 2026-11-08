@@ -107,6 +107,7 @@ final class AppModel {
     func reconcileSyncedData() {
         let defs = (try? BadgeCatalog.load()) ?? []
         DataReconciler.reconcile(context: context, badgeDefs: defs)
+        sanitizePlantNames()      // names from sync or a restored backup pass the same rule as typed ones (PlantName)
         game.reloadProfile()
         game.refreshLevel()
         badges = BadgeState(json: game.playerProfile?.badgesJSON ?? "", defs: defs)
