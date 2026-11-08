@@ -12,7 +12,9 @@ struct WeeklyNoteCard: View {
 
     @Environment(\.dynamicTypeSize) private var typeSize
     @ScaledMetric(relativeTo: .title3) private var iconSize: CGFloat = 20
-    @ScaledMetric(relativeTo: .title) private var artSize: CGFloat = 30
+    @ScaledMetric(relativeTo: .title) private var artSize: CGFloat = 36
+    /// Quiet Garden's one tile has no number, so its art is larger.
+    @ScaledMetric(relativeTo: .title) private var quietArtSize: CGFloat = 52
 
     private var shape: RoundedRectangle { RoundedRectangle(cornerRadius: 20, style: .continuous) }
 
@@ -21,10 +23,15 @@ struct WeeklyNoteCard: View {
             header
             let layout = typeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 10))
                                                       : AnyLayout(HStackLayout(alignment: .top, spacing: 10))
+            let tiles = WeeklyNoteCopy.tiles(summary, quiet: quiet)
+            // A week with one tile keeps it tile-sized (at most 200 pt, centred) rather than one wide band.
+            let single = tiles.count == 1 && !typeSize.isAccessibilitySize
             layout {
-                ForEach(WeeklyNoteCopy.tiles(summary, quiet: quiet), id: \.kind) { tile($0) }
+                ForEach(tiles, id: \.kind) { tile($0) }
             }
+            .frame(maxWidth: single ? 200 : .infinity)
             .fixedSize(horizontal: false, vertical: true)
+            .frame(maxWidth: .infinity)
             .padding(12)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -50,7 +57,7 @@ struct WeeklyNoteCard: View {
                 Text(WeeklyNoteCopy.title).font(Theme.font(.title3, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
                 Text(WeeklyNoteCopy.closing(weekKey: summary.weekKey))
-                    .font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                    .font(Theme.font(.subheadline)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
             }
             Spacer(minLength: 0)
@@ -63,11 +70,12 @@ struct WeeklyNoteCard: View {
     /// One tile: the plant art (new plants only), the big number (never in Quiet Garden), the label. Full ink on every
     /// tint, so the text stays above 4.5:1 in light and dark.
     private func tile(_ t: WeeklyNoteCopy.Tile) -> some View {
-        VStack(spacing: 4) {
+        let art = t.number == nil ? quietArtSize : artSize
+        return VStack(spacing: 4) {
             if t.kind == .plants, !plantArt.isEmpty {
-                HStack(spacing: -artSize * 0.25) {
+                HStack(spacing: -art * 0.25) {
                     ForEach(Array(plantArt.prefix(3).enumerated()), id: \.offset) { _, name in
-                        Image(name).resizable().scaledToFit().frame(width: artSize, height: artSize)
+                        Image(name).resizable().scaledToFit().frame(width: art, height: art)
                     }
                 }
                 .accessibilityHidden(true)
@@ -76,7 +84,8 @@ struct WeeklyNoteCard: View {
                 Text(number).font(Theme.font(.title, weight: .bold)).foregroundStyle(Color.appPrimaryText)
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
             }
-            Text(t.label).font(Theme.font(.footnote, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+            // With no number (Quiet Garden) the label carries the tile, so it reads a size up.
+            Text(t.label).font(Theme.font(t.number == nil ? .subheadline : .footnote, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
                 .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
         }
         .padding(.vertical, 12)
@@ -114,21 +123,31 @@ struct WeeklyNoteActions: View {
             .buttonStyle(CelebrateButtonStyle())
             .accessibilityHint(WeeklyNoteCopy.celebrateHint)
             .accessibilityIdentifier("weeklyNote.celebrate")
-            if canShare, let shareImage {
-                ShareLink(item: shareImage, message: Text(WeeklyNoteCopy.caption),
-                          preview: SharePreview(WeeklyNoteCopy.caption, image: shareImage)) {
-                    Label(WeeklyNoteCopy.share, systemImage: "square.and.arrow.up")
-                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+            // Share's place is decided from `canShare` at once, so Celebrate never shows full width and then shrinks while
+            // the picture renders; until then the slot holds an invisible copy of the button.
+            if canShare {
+                if let shareImage {
+                    ShareLink(item: shareImage, message: Text(WeeklyNoteCopy.caption),
+                              preview: SharePreview(WeeklyNoteCopy.caption, image: shareImage)) { shareLabel }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .accessibilityHint(WeeklyNoteCopy.shareHint)
+                        .accessibilityIdentifier("weeklyNote.share")
+                } else {
+                    Button {} label: { shareLabel }
+                        .buttonStyle(SecondaryButtonStyle())
+                        .opacity(0).disabled(true).accessibilityHidden(true)
                 }
-                .buttonStyle(SecondaryButtonStyle())
-                .accessibilityHint(WeeklyNoteCopy.shareHint)
-                .accessibilityIdentifier("weeklyNote.share")
             }
         }
         .onAppear {
             guard canShare, shareImage == nil else { return }
             shareImage = WeekShareCard(rows: WeeklyNoteCopy.rows(summary, quiet: false)).rendered()
         }
+    }
+
+    private var shareLabel: some View {
+        Label(WeeklyNoteCopy.share, systemImage: "square.and.arrow.up")
+            .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -162,14 +181,17 @@ struct WeeklyCelebrateView: View {
         ZStack {
             Color.appBackground.ignoresSafeArea()
             CelebrationBurst(requested: [.large], origin: .fromTop(ScreenInsets.top + 120), seed: 31)
+            GeometryReader { geo in
             ScrollView {
                 VStack(spacing: 20) {
                     let size: CGFloat = typeSize.isAccessibilitySize ? 96 : 140
-                    HStack(alignment: .bottom, spacing: -size * 0.2) {
-                        ForEach(Array(art.prefix(3).enumerated()), id: \.offset) { i, name in
+                    let plants = Array(art.prefix(3))
+                    HStack(alignment: .bottom, spacing: plants.count > 1 ? -size * 0.15 : 0) {
+                        ForEach(Array(plants.enumerated()), id: \.offset) { i, name in
+                            let side = Self.artSide(index: i, count: plants.count, size: size)
                             Image(name).resizable().scaledToFit()
-                                .frame(width: i == 1 ? size : size * 0.78, height: i == 1 ? size : size * 0.78)
-                                .zIndex(i == 1 ? 1 : 0)
+                                .frame(width: side, height: side)
+                                .zIndex(plants.count == 3 && i == 1 ? 1 : 0)
                         }
                     }
                     .accessibilityHidden(true)
@@ -189,11 +211,22 @@ struct WeeklyCelebrateView: View {
                 }
                 .padding(.horizontal, 24)
                 .padding(.vertical, 48)
-                .frame(maxWidth: .infinity)
+                // Centred in the screen while it fits; scrolls from the top when large text makes it taller.
+                .frame(maxWidth: .infinity, minHeight: geo.size.height)
+            }
             }
         }
         .sensoryFeedback(.impact(flexibility: .soft, intensity: 0.6), trigger: shown) { _, new in new && app.settings.hapticsOn }
         .onAppear { shown = true }
+    }
+
+    /// Plant sizes by count: one plant at full size; two side by side at the same size; three with the middle one large.
+    static func artSide(index: Int, count: Int, size: CGFloat) -> CGFloat {
+        switch count {
+        case 1: return size
+        case 2: return size * 0.85
+        default: return index == 1 ? size : size * 0.75
+        }
     }
 }
 

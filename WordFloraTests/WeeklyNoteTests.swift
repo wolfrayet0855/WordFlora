@@ -213,6 +213,14 @@ final class WeeklyNoteTests: XCTestCase {
         XCTAssertEqual(WeeklyNoteCopy.tiles(WeeklyNote.Summary(friends: 2), quiet: false).map(\.kind), [.friends])
     }
 
+    func testSplashPlantSizesFollowTheCount() {
+        XCTAssertEqual(WeeklyCelebrateView.artSide(index: 0, count: 1, size: 140), 140, "one plant at full size")
+        XCTAssertEqual(WeeklyCelebrateView.artSide(index: 0, count: 2, size: 140), WeeklyCelebrateView.artSide(index: 1, count: 2, size: 140))
+        XCTAssertEqual(WeeklyCelebrateView.artSide(index: 1, count: 3, size: 140), 140, "three: the middle one large")
+        XCTAssertLessThan(WeeklyCelebrateView.artSide(index: 0, count: 3, size: 140), 140)
+        XCTAssertEqual(WeeklyCelebrateView.artSide(index: 0, count: 3, size: 140), WeeklyCelebrateView.artSide(index: 2, count: 3, size: 140))
+    }
+
     func testQuietGardenTileHasNamesAndNoNumber() {
         let s = WeeklyNote.Summary(words: 9, newPlants: ["Daisy", "Clover"], friends: 4)
         let tiles = WeeklyNoteCopy.tiles(s, quiet: true)
