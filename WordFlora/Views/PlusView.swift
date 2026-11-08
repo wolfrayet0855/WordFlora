@@ -94,7 +94,8 @@ struct PlusView: View {
     // MARK: Plans
 
     @ViewBuilder private var plans: some View {
-        if store.loadFailed && !store.offersAnything {
+        // Failed, or loaded with a plan missing (no endless "Loading prices"): the Try again card.
+        if store.loadFailed && !(store.offers(.yearly) && store.offers(.monthly)) {
             Card {
                 Text(PaywallCopy.loadFailed).font(Theme.font(.callout)).foregroundStyle(Color.appPrimaryText)
                     .fixedSize(horizontal: false, vertical: true)
