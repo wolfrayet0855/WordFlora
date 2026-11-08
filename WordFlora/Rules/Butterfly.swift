@@ -5,6 +5,8 @@ struct VisitorSpecies: Equatable {
     var name: String
     var rarity: VisitorCatalog.Rarity
     var nightOnly = false
+    /// A season pack's friend (`VisitorCatalog.season`): visits only for the pack's owners. Nil for the twelve.
+    var packId: String? = nil
     /// Only fact-checked lines ship; every visitor has one (tested).
     var fact: String?
 }
@@ -34,7 +36,8 @@ enum VisitorCatalog {
         VisitorSpecies(id: "luna", name: "Luna Moth", rarity: .rare, nightOnly: true, fact: "A grown-up luna moth has no mouth. It does not need to eat!"),
     ]
 
-    static func species(_ id: String) -> VisitorSpecies? { all.first { $0.id == id } }
+    /// Any visitor by id, the twelve friends and the season friends (`season`, FrostLantern.swift).
+    static func species(_ id: String) -> VisitorSpecies? { all.first { $0.id == id } ?? season.first { $0.id == id } }
 }
 
 enum VisitorSpawner {
@@ -45,8 +48,9 @@ enum VisitorSpawner {
         return minutes >= 17 * 60 + 30 && minutes < 21 * 60 + 30
     }
 
-    static func pool(evening: Bool, lantern: Bool) -> [String] {
-        let day = VisitorCatalog.all.filter { !$0.nightOnly }.map(\.id)
+    /// `season`: the winter friends of the packs owned (`VisitorCatalog.seasonPool`); empty for everyone else.
+    static func pool(evening: Bool, lantern: Bool, season: [String] = []) -> [String] {
+        let day = VisitorCatalog.all.filter { !$0.nightOnly }.map(\.id) + season
         let night = VisitorCatalog.all.filter(\.nightOnly).map(\.id)
         // Evening features the night species (drawn twice as often) without locking out any day visitor.
         if evening { return day + night + night }
@@ -57,7 +61,7 @@ enum VisitorSpawner {
     /// (`WeatherDay.key`), mixed the same way the weather is so every device agrees. Only a suggestion: catching and
     /// meeting work as always.
     static func friendOfTheDay(seed: Int64, day: Int) -> VisitorSpecies {
-        let ids = pool(evening: false, lantern: false)
+        let ids = pool(evening: false, lantern: false)      // the twelve only: never a season friend
         let x = WeatherEngine.mix(UInt64(bitPattern: seed) ^ WeatherEngine.mix(UInt64(bitPattern: Int64(day)) &+ 0x5A17_F00D))
         return VisitorCatalog.species(ids[Int(x % UInt64(ids.count))])!
     }
@@ -113,7 +117,8 @@ struct StickerAlbum: Codable, Equatable {
     func count(of id: String) -> Int { counts[id] ?? 0 }
     func lastSeen(of id: String) -> Date? { seenAt[id] }
     /// Visitor species met. Weather stickers share the album (ids `weather.n`) but are not visitors, so they never count here.
-    var species: Int { counts.filter { $0.value > 0 && !WeatherSticker.isWeather($0.key) }.count }
+    /// Season friends (robin, wren) are not among the twelve either, so the count never passes 12.
+    var species: Int { counts.filter { $0.value > 0 && !WeatherSticker.isWeather($0.key) && !VisitorCatalog.isSeason($0.key) }.count }
     var isComplete: Bool { VisitorCatalog.all.allSatisfy { count(of: $0.id) > 0 } }
 }
 

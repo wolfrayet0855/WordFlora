@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E3F3D99FD414532BE56A6E30 /* FrostLanternUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6D4782FD083F1DBDB8B367E5 /* FrostLanternUITests.swift */; };
+		879BA935C9BCA279A2FC6681 /* FrostLanternTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 767130D51AFE266D2807BACC /* FrostLanternTests.swift */; };
+		7DBBFDDC89F2CA9D70C53B5A /* FrostLanternUITestFixtures.swift in Sources */ = {isa = PBXBuildFile; fileRef = A05E3FF2F4EA42FA4BD287F2 /* FrostLanternUITestFixtures.swift */; };
+		A3ADCC88E41D0E88804E060D /* AppModel+FrostLantern.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD4E5340B4F3A46C2518D372 /* AppModel+FrostLantern.swift */; };
+		EB9AC515F3FF6D87A344A591 /* FrostLanternViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B897998837015DFECABE6A74 /* FrostLanternViews.swift */; };
+		235637232F562B99D7E3A3D7 /* FrostLantern.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E53B3DCD21507A374F274A4 /* FrostLantern.swift */; };
 		0E2F7AB06E21FC7B2F530A6C /* SnowfallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F2AD3EC9A51474CCA866C9 /* SnowfallTests.swift */; };
 		E9A92F9AE905012CF57C333E /* SnowfallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AF7E26EA6FFC317E2B7E9D /* SnowfallView.swift */; };
 		32ADBFD0D7C3FB388DE2EED6 /* Snowfall.swift in Sources */ = {isa = PBXBuildFile; fileRef = F045C157335114DB89D4762C /* Snowfall.swift */; };
@@ -371,6 +377,12 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		6D4782FD083F1DBDB8B367E5 /* FrostLanternUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "FrostLanternUITests.swift"; sourceTree = "<group>"; };
+		767130D51AFE266D2807BACC /* FrostLanternTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "FrostLanternTests.swift"; sourceTree = "<group>"; };
+		A05E3FF2F4EA42FA4BD287F2 /* FrostLanternUITestFixtures.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "FrostLanternUITestFixtures.swift"; sourceTree = "<group>"; };
+		AD4E5340B4F3A46C2518D372 /* AppModel+FrostLantern.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "AppModel+FrostLantern.swift"; sourceTree = "<group>"; };
+		B897998837015DFECABE6A74 /* FrostLanternViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "FrostLanternViews.swift"; sourceTree = "<group>"; };
+		8E53B3DCD21507A374F274A4 /* FrostLantern.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = "FrostLantern.swift"; sourceTree = "<group>"; };
 		22F2AD3EC9A51474CCA866C9 /* SnowfallTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SnowfallTests.swift; sourceTree = "<group>"; };
 		03AF7E26EA6FFC317E2B7E9D /* SnowfallView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SnowfallView.swift; sourceTree = "<group>"; };
 		F045C157335114DB89D4762C /* Snowfall.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Snowfall.swift; sourceTree = "<group>"; };
@@ -797,6 +809,7 @@
 				F045C157335114DB89D4762C /* Snowfall.swift */,
 				1E72C046D44E8C67ECE69705 /* PotCatalog.swift */,
 				3FA71744038E31A37C76000E /* PackCatalog.swift */,
+				8E53B3DCD21507A374F274A4 /* FrostLantern.swift */,
 				8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */,
 				44AE174360904A32A8196B81 /* SpeedBloom.swift */,
 				8FDAD053638CA18F19E93110 /* Weather.swift */,
@@ -1002,6 +1015,7 @@
 				4EC67A29D2D1061C18F3E2C4 /* PotCatalogTests.swift */,
 				6DFCECE93C832460952F5760 /* MistMakerTests.swift */,
 				0B21CEF2BD93D0F31D80E2AA /* PackCatalogTests.swift */,
+				767130D51AFE266D2807BACC /* FrostLanternTests.swift */,
 				31A01BCA86B388E2D94431DD /* RestCardTests.swift */,
 				992A9B4D57314E9CA00E02F4 /* SpeedBloomTests.swift */,
 				90DC766F91AA9703F8E25487 /* ReturnNudgeTests.swift */,
@@ -1095,6 +1109,7 @@
 				68F12B5A8AA058CBD79EBE72 /* AppModel+WeeklyNote.swift */,
 				11CC00DE56C1380189D80E53 /* AppModel+PlantName.swift */,
 				B232E85C3513A789081EB59B /* EndgameUITestFixtures.swift */,
+				A05E3FF2F4EA42FA4BD287F2 /* FrostLanternUITestFixtures.swift */,
 				C6ED273B0B0598740662FBAA /* WeeklyNoteUITestFixture.swift */,
 				E68B27117994C86A30778F84 /* AppModel+Endgame.swift */,
 				F1F2AFCDE000EA56D659E322 /* AppModel+WeatherHelpers.swift */,
@@ -1103,6 +1118,7 @@
 				3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */,
 				C8CFA5BED25190317B98E622 /* GardenShortcuts.swift */,
 				F6DE66790651A2375FAF7C7B /* AppModel+Pots.swift */,
+				AD4E5340B4F3A46C2518D372 /* AppModel+FrostLantern.swift */,
 				56EA5C0B0F1AD4C2B9EB6E96 /* AppModel+Badges.swift */,
 				65D45F06E7424BC25908E6A3 /* AppModel+Ads.swift */,
 				ABF1212A4E968C83B4FDC5D4 /* AppModel+Weather.swift */,
@@ -1131,6 +1147,7 @@
 				41DC0A749A7EEA71E7F67108 /* PlantDetailView.swift */,
 				5A4C64F5ADBB45D602E50A5F /* PlusView.swift */,
 				514C53FB1BCEF8A269AAB8DA /* SeasonsView.swift */,
+				B897998837015DFECABE6A74 /* FrostLanternViews.swift */,
 				2EA96D7DD8E3103D3D959B4A /* ShedView.swift */,
 				D7DA8F2D5FF4FD7D8DEFF8E5 /* BadgesView.swift */,
 				0F9C06D6D14965C171C2F0EF /* BadgeDetailView.swift */,
@@ -1226,6 +1243,7 @@
 				2A73199BBAF18CA9278ADDD0 /* AdFormatsUITests.swift */,
 				295580642BF641C3BDA83AE3 /* SpeedBloomUITests.swift */,
 				B5E47FE04BE8071A44957A3B /* SeasonsUITests.swift */,
+				6D4782FD083F1DBDB8B367E5 /* FrostLanternUITests.swift */,
 				9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */,
 				8AB8C1CF6CE1E78960EB79CB /* BadgesUITests.swift */,
 			);
@@ -1484,6 +1502,7 @@
 				5A05D895F5E4539B13C442C3 /* AdFormatsUITests.swift in Sources */,
 				DB95FCF40B0D4F70AA2976FD /* SpeedBloomUITests.swift in Sources */,
 				F58845130B115C13F2B6124D /* SeasonsUITests.swift in Sources */,
+				E3F3D99FD414532BE56A6E30 /* FrostLanternUITests.swift in Sources */,
 				A9BC1C319B4BDB047932E1DA /* CelebrationUITests.swift in Sources */,
 				38A1261D135A45B95FC980BA /* BadgesUITests.swift in Sources */,
 			);
@@ -1556,6 +1575,7 @@
 				73D4F54D38CDEB506724B0E6 /* PotCatalogTests.swift in Sources */,
 				9FAD5FE246F295E93631912B /* MistMakerTests.swift in Sources */,
 				33F9745BFCE91884EC8E5B3C /* PackCatalogTests.swift in Sources */,
+				879BA935C9BCA279A2FC6681 /* FrostLanternTests.swift in Sources */,
 				54C470839654E5464D7662F7 /* RestCardTests.swift in Sources */,
 				4AAAA4BD0C544D608F6E3218 /* SpeedBloomTests.swift in Sources */,
 				35282ADD9C51A8171A4AAB3B /* ReturnNudgeTests.swift in Sources */,
@@ -1614,6 +1634,7 @@
 				EC8F3E9045AEE241BE154438 /* FamilyShareNudge.swift in Sources */,
 				D6F9BFB6268A91936268E317 /* DailyQuest.swift in Sources */,
 				338556715280368164F2204B /* EndgameUITestFixtures.swift in Sources */,
+				7DBBFDDC89F2CA9D70C53B5A /* FrostLanternUITestFixtures.swift in Sources */,
 				53E91C2DB5A51D34DC50AA2F /* WeeklyNoteUITestFixture.swift in Sources */,
 				A0B6C8A87C81F7910186DE0A /* AppModel+Endgame.swift in Sources */,
 				B7DB0BCD628066805667C2E7 /* AppModel+WeatherHelpers.swift in Sources */,
@@ -1689,6 +1710,7 @@
 				7E47F17A0000000000000005 /* CloudSync.swift in Sources */,
 				6F482CD15D77232746B4BDE5 /* PlusView.swift in Sources */,
 				AD509424FBF83D3CB692C137 /* SeasonsView.swift in Sources */,
+				EB9AC515F3FF6D87A344A591 /* FrostLanternViews.swift in Sources */,
 				7134B8F63F8B167F415D50C5 /* AdsService.swift in Sources */,
 				9CFC2E2027A52A83F018570A /* AdUnits.swift in Sources */,
 				B0E129A407B3E68D0AC5BD33 /* ShedView.swift in Sources */,
@@ -1751,7 +1773,9 @@
 				09D5BE69C253AC905680B44C /* MistSprayView.swift in Sources */,
 				7DD477E02162F248269BFF98 /* PotCatalog.swift in Sources */,
 				B0349328A8DEF02F2B75DA80 /* PackCatalog.swift in Sources */,
+				235637232F562B99D7E3A3D7 /* FrostLantern.swift in Sources */,
 				1C25F6844D201EE32D906D5F /* AppModel+Pots.swift in Sources */,
+				A3ADCC88E41D0E88804E060D /* AppModel+FrostLantern.swift in Sources */,
 				A66072D8C1AD1347B9133BA9 /* AppModel+Badges.swift in Sources */,
 				A8C421EE6EDBE9EB776163F2 /* AppModel+Ads.swift in Sources */,
 				8268EE14C8E89B8569354755 /* WeatherViews.swift in Sources */,

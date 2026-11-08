@@ -10,7 +10,9 @@ struct LevelMapView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var typeSize
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @Query private var plants: [PlantCollectible]
+    @Query private var rows: [PlantCollectible]
+    /// The ladder plants only (the glasshouse plants are not on the map).
+    private var plants: [PlantCollectible] { GlasshouseCatalog.ladder(rows, id: \.plantId) }
 
     private var oneColumn: Bool { typeSize.isAccessibilitySize }
 

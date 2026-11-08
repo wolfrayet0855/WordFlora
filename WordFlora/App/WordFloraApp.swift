@@ -177,6 +177,7 @@ struct WordFloraApp: App {
             try? model.context.save()
             for id in ["ladybug", "honeybee", "luna"] { model.collectFieldNote(id) }      // three of four: no tier yet
         }
+        if uiTesting { FrostLanternUITestFixtures.apply(args, to: model) }      // G5: glasshouse rows, winter friends
         if uiTesting && args.contains("-uitest-mist") {
             // Mist Maker: the mister in the Shed (the Mist button shows) and nine mists already, so the next earns bronze.
             var inv = model.inventory; inv.unlock(.mister); model.inventory = inv

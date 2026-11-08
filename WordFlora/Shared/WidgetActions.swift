@@ -61,7 +61,7 @@ enum WidgetActions {
                          typedNames: Bool = true) -> GardenSnapshot {
         let profile = (try? context.fetch(FetchDescriptor<PlayerProfile>()))?.first
         let earned = ((try? context.fetch(FetchDescriptor<PlantCollectible>(sortBy: [SortDescriptor(\.level), SortDescriptor(\.name)]))) ?? [])
-            .filter { $0.earnedCount > 0 }
+            .filter { $0.earnedCount > 0 && !$0.plantId.hasPrefix("glasshouse_") }     // ladder plants (GlasshouseCatalog.idPrefix)
         // The count the can holds once the free drops that are due arrive (a tap credits them first), and the next one's time.
         var water = 0, next: Date?
         if let profile {

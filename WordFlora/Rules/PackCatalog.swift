@@ -32,7 +32,7 @@ enum PackCatalog {
 
     static let frostLantern = SeasonPack(
         id: frostLanternId, productID: "pack_frost_lantern", name: "Frost & Lantern",
-        line: "Three winter pots for your garden. Pay once, no renewals.",
+        line: FrostLanternCopy.packLine,
         featuredFrom: (12, 1), featuredTo: (2, 28),
         potIds: [PotCatalog.lanternRed.id, PotCatalog.snowflakeIndigo.id],
         earnedPotId: PotCatalog.frostedGlass.id, badgeId: "lantern_keeper")
@@ -82,7 +82,7 @@ enum PackCatalog {
         static let ownedLine = "You have this pack. Its pots are in your Shed."
         static let buy = "Buy"
         static let notPlus = "Packs are separate from Plus."
-        static let badgeLine = "The Lantern Keeper badge is earned by play: grow plants in the Frosted glass pot."
+        static let badgeLine = FrostLanternCopy.badgeLine
         static let keepLine = "A pack pot already on a plant stays on it."
         static let shelfTitle = "Seasons"
         static let shelfButton = "Take a look"

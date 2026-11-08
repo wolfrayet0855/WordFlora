@@ -334,8 +334,9 @@ final class GameViewModel {
         }
     }
 
+    /// The ladder plants (the glasshouse plants never move the word level).
     private func allPlants() -> [PlantCollectible] {
-        (try? modelContext.fetch(FetchDescriptor<PlantCollectible>())) ?? []
+        GlasshouseCatalog.ladder((try? modelContext.fetch(FetchDescriptor<PlantCollectible>())) ?? [], id: \.plantId)
     }
     private func progress(of plants: [PlantCollectible]) -> [PlantProgress] {
         plants.map { PlantProgress(level: $0.level, earned: $0.earnedCount > 0, stage: $0.stage) }
