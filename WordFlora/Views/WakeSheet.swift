@@ -68,7 +68,13 @@ struct WakeSheet: View {
 
     private func needsLarge(_ s: Step) -> Bool {
         if typeSize.isAccessibilitySize { return true }
-        switch s { case .choose, .intro: return false; default: return true }
+        switch s {
+        // With R3's third row (gentle wake) the chooser no longer fits the medium detent: the second tile's line sat
+        // under the sheet's edge. Open it large so every tile is whole.
+        case .choose: return app.perkPath(.wake) != .hidden
+        case .intro: return false
+        default: return true
+        }
     }
 
     // MARK: Choose
