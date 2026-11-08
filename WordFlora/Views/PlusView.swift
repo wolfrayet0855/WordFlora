@@ -335,10 +335,15 @@ struct ParentalGateSheet: View {
     @State private var wrong = false
     @Environment(\.dynamicTypeSize) private var typeSize
 
+    /// At the accessibility sizes the title steps down and the sides tighten, so "grown-ups" stays whole (the
+    /// audit read it clipped at AX5; TextFitLayoutTests measures it).
+    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size.isAccessibilitySize ? .title3 : .title2 }
+    static func padding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 16 : 24 }
+
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
-                Text(ParentalGate.Copy.title).font(Theme.font(.title2, weight: .bold))
+                Text(ParentalGate.Copy.title).font(Theme.font(Self.titleStyle(typeSize), weight: .bold))
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                     .accessibilityAddTraits(.isHeader)
                 Text(ParentalGate.Copy.prompt).font(Theme.font(.callout)).multilineTextAlignment(.center)
@@ -364,7 +369,7 @@ struct ParentalGateSheet: View {
                 .buttonStyle(PrimaryButtonStyle())
                 Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
             }
-            .padding(24)
+            .padding(Self.padding(typeSize))
         }
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)

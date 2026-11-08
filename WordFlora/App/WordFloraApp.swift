@@ -120,6 +120,7 @@ struct WordFloraApp: App {
             default: break
             }
         }
+        if uiTesting && args.contains("-uitest-store-fail") { model.entitlements.debugFailStore() }
         if uiTesting && args.contains("-uitest-store-slow") { model.entitlements.debugSlowStore(seconds: 90) }
         // Frost & Lantern owned (bought or family-shared): its two pots can be picked.
         if uiTesting && args.contains("-uitest-pack-owned") {

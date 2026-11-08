@@ -8,7 +8,7 @@ import XCTest
 final class TextFitScreensUITests: XCTestCase {
     var app: XCUIApplication!
     static let ax5 = "UICTContentSizeCategoryAccessibilityXXXL"
-    static let xxxl = "UICTContentSizeCategoryExtraExtraExtraLarge"
+    static let xxxl = "UICTContentSizeCategoryXXXL"
 
     override func setUpWithError() throws {
         continueAfterFailure = false
@@ -76,6 +76,20 @@ final class TextFitScreensUITests: XCTestCase {
         for _ in 0..<max where !(e.exists && e.isHittable) { app.swipeUp(); usleep(400_000) }
     }
 
+    /// A Home tile by its name, scrolled into view first (at large text the tiles sit below the fold).
+    private func tapHome(_ name: String) {
+        let tile = app.buttons["tile-\(name)"]
+        XCTAssertTrue(tile.waitForExistence(timeout: 8), name)
+        scrollTo(tile)
+        tile.tap()
+    }
+
+    private func openVisitors() {
+        tapHome("Visitors")
+        let hello = app.buttons["Say hello"]
+        XCTAssertTrue(hello.waitForExistence(timeout: 5))
+    }
+
     private func openSettings() {
         XCTAssertTrue(app.buttons["Settings"].waitForExistence(timeout: 8))
         app.buttons["Settings"].tap()
@@ -137,8 +151,8 @@ final class TextFitScreensUITests: XCTestCase {
         sleep(1); shot("plus", Self.ax5, dark: false, "-loading")
         audit("plus-loading-ax5")
         app.terminate()
-        // No prices from the store: the failed state with Try again.
-        launch([], size: Self.ax5)
+        // The store answers with an error: the failed state with Try again.
+        launch(["-uitest-store-fail"], size: Self.ax5)
         openPlus()
         XCTAssertTrue(app.buttons["plus.tryAgain"].waitForExistence(timeout: 20), "the failed state")
         sleep(1); shot("plus", Self.ax5, dark: false, "-failed")
@@ -223,7 +237,7 @@ final class TextFitScreensUITests: XCTestCase {
         for size in [Self.xxxl, Self.ax5] {
             for dark in size == Self.ax5 ? [false, true] : [false] {
                 launch(["-uitest-allfound"], size: size, dark: dark)
-                app.buttons["Garden"].tap()
+                tapHome("Garden")
                 let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Passionflower'")).firstMatch
                 XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
                 sleep(1); shot("garden", size, dark: dark)
@@ -245,7 +259,7 @@ final class TextFitScreensUITests: XCTestCase {
     func testShedPotsToolsAndRepotSheet() {
         for size in [Self.xxxl, Self.ax5] {
             launch(["-uitest-gardened", "-uitest-everything", "-uitest-prices"], size: size)
-            app.buttons["Shed"].tap()
+            tapHome("Shed")
             XCTAssertTrue(app.buttons["shed.tool.can"].waitForExistence(timeout: 5))
             sleep(1); shot("shed-tools", size, dark: false)
             app.buttons["shed.tool.can"].tap()
@@ -258,7 +272,7 @@ final class TextFitScreensUITests: XCTestCase {
             sleep(1); shot("shed-pots", size, dark: false, "-pack")
             app.terminate()
             launch(["-uitest-plant=daisy", "-uitest-pots", "-uitest-prices"], size: size)
-            app.buttons["Garden"].tap()
+            tapHome("Garden")
             let daisy = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Daisy'")).firstMatch
             scrollTo(daisy)
             daisy.tap()
@@ -285,8 +299,7 @@ final class TextFitScreensUITests: XCTestCase {
         for size in [Self.xxxl, Self.ax5] {
             for dark in size == Self.ax5 ? [false, true] : [false] {
                 launch(["-uitest-album-all"], size: size, dark: dark)
-                app.buttons["Visitors"].tap()
-                XCTAssertTrue(app.buttons["Say hello"].waitForExistence(timeout: 5))
+                openVisitors()
                 sleep(1); shot("visitors", size, dark: dark)
                 if size == Self.ax5 { audit("visitors-ax5-\(dark ? "dark" : "light")") }
                 let humming = app.buttons["visitor-hummingbird"]
@@ -317,7 +330,8 @@ final class TextFitScreensUITests: XCTestCase {
     func testButterflyGameTitle() {
         for size in [nil, Self.ax5] {
             launch(["-uitest-album"], size: size)
-            app.buttons["Visitors"].tap()
+            openVisitors()
+            scrollTo(app.buttons["Say hello"])
             app.buttons["Say hello"].tap()
             XCTAssertTrue(app.navigationBars["Butterfly game"].waitForExistence(timeout: 5))
             sleep(2); shot("butterfly-game", size, dark: false)
@@ -356,7 +370,7 @@ final class TextFitScreensUITests: XCTestCase {
     func testQuietGardenPlantPage() {
         for size in [Self.xxxl, Self.ax5] {
             launch(["-uitest-plant=daisy", "-uitest-quiet", "-uitest-everything"], size: size)
-            app.buttons["Garden"].tap()
+            tapHome("Garden")
             let daisy = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Daisy'")).firstMatch
             scrollTo(daisy)
             daisy.tap()

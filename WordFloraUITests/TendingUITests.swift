@@ -262,7 +262,7 @@ final class TendingUITests: XCTestCase {
         open("Poppy", plantId: "poppy", extra: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
         app.swipeUp(); sleep(1); shot("card-poppy-large-scrolled")
         app.terminate()
-        open("Daisy", plantId: "daisy", extra: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryExtraExtraExtraLarge"])
+        open("Daisy", plantId: "daisy", extra: ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryXXXL"])
         sleep(1); shot("card-daisy-xxxl")
     }
 
@@ -394,7 +394,7 @@ final class TendingUITests: XCTestCase {
     func testSixTendButtonsKeepWholeWords() {
         let kinds = ["water", "feed", "sun", "prune", "mist", "repot"]
         for (name, extra) in [("default", [String]()),
-                              ("xxxl", ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryExtraExtraExtraLarge"]),
+                              ("xxxl", ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryXXXL"]),
                               ("ax5", ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"])] {
             open("Daisy", plantId: "daisy", extra: ["-uitest-everything"] + extra)
             let buttons = kinds.map { app.buttons["tend-\($0)"] }
