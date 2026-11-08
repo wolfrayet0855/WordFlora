@@ -9,7 +9,8 @@ struct RootView: View {
         Group {
             if app.onboarding.isComplete { mainStack(router: $router.path) } else { OnboardingView() }
         }
-        .accessibilityHidden(app.shownBadge != nil)          // the badge moment is modal while it shows
+        // The badge moment and the return cue are modal while they show: what they cover is hidden from VoiceOver.
+        .accessibilityHidden(app.shownBadge != nil || app.adFormats.cue != .hidden)
         .overlay {
             if let level = Self.uiTestCelebrate {
                 // UI tests: one still frame of a burst over the screen, for the accessibility audit.
