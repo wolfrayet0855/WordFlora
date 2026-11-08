@@ -198,7 +198,9 @@ private struct WakeTile: View {
                         Text(WakeCopy.suggestedBadge).font(Theme.font(.caption, weight: .bold)).foregroundStyle(Color.ink)
                             .padding(.horizontal, 8).padding(.vertical, 3).background(Color.appAccent, in: Capsule())
                     }
+                    // The title takes its full height (it was squeezed a fraction at the default size: clipped text).
                     Text(WakeCopy.title(challenge)).font(Theme.font(.headline, weight: .bold)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
                     Text(WakeCopy.subtitle(challenge)).font(Theme.font(.subheadline)).foregroundStyle(Color.secondaryText)
                         .fixedSize(horizontal: false, vertical: true)
                     if typeSize.isAccessibilitySize {
@@ -231,6 +233,7 @@ private struct WakeTile: View {
 
     private func chip(_ text: String) -> some View {
         Text(text).font(Theme.font(.caption, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+            .fixedSize(horizontal: false, vertical: true)
             .padding(.horizontal, 10).padding(.vertical, 4)
             .background(Color.appPrimaryText.opacity(0.07), in: Capsule())
     }
