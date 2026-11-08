@@ -307,14 +307,21 @@ final class EngagementUITests: XCTestCase {
         audit("a-note")
     }
 
-    func testAuditWeeklyNoteAtAXXXLLightAndDark() {
+    /// Audited unscrolled (after a scroll the audit judges text slid under the status bar), then scrolled only to check
+    /// that Share my week is reachable.
+    func testAuditWeeklyNoteAtAXXXL() {
         openWithNote(Self.axXXXL)
         sleep(1)
         audit("a-note-axxxl")
         let share = element("weeklyNote.share")
         scrollTo(share)
         XCTAssertTrue(share.isHittable, "Share my week is reachable")
+    }
+
+    /// Dark is set before launch: switching the appearance mid-test did not reach the app on these simulators.
+    func testAuditWeeklyNoteAtAXXXLDark() {
         XCUIDevice.shared.appearance = .dark
+        openWithNote(Self.axXXXL)
         sleep(1)
         shot("a-note-axxxl-dark")
         audit("a-note-axxxl-dark")
