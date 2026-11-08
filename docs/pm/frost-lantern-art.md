@@ -258,7 +258,7 @@ The plan asks for owner-checked facts. These are still **drafts**: each needs a 
 the G5 go/no-go. The app rule (`docs/research/visitor-facts.md`): one or two sentences, at most 16 words and 90
 characters, short words, `CopySafety.check` empty, no death or danger.
 
-- Robin: "Robins sing through the winter, not just in spring." (52 / 9)
+- Robin: "Robins sing through the winter, not just in spring." (51 / 9)
 - Wren: "A wren is tiny, but its song is remarkably loud." (48 / 10)
 - Snowdrop: "Snowdrops often bloom in January and February." (46 / 7)
 - Hellebore: "Hellebore flowers have petal-like parts called sepals that stay on for weeks." (77 / 12)
