@@ -96,7 +96,8 @@ final class FrostLanternUITests: XCTestCase {
 
     private func openGlasshouse(_ id: String) {
         // Back from a plant page lands on My Garden, not Home: open it from Home only when it is not already showing.
-        if !app.navigationBars["My Garden"].exists { openGarden() }
+        // Wait out the pop animation before deciding (on Home there is no such bar, so it costs one short wait).
+        if !app.navigationBars["My Garden"].waitForExistence(timeout: 2) { openGarden() }
         let tile = element("glasshouse.\(id)")
         scrollTo(tile)
         XCTAssertTrue(tile.waitForExistence(timeout: 5))
@@ -104,19 +105,20 @@ final class FrostLanternUITests: XCTestCase {
         XCTAssertTrue(app.buttons["tend-water"].waitForExistence(timeout: 5))
     }
 
-    func testGlasshousePlantPagesAtStageZeroAndFour() {
-        for grown in [false, true] {
-            for dark in [false, true] {
-                launch(grown ? ["-uitest-glasshouse-grown"] : [], dark: dark)
-                for id in ["glasshouse_snowdrop", "glasshouse_hellebore"] {
-                    openGlasshouse(id)
-                    shot("g5-\(id)-stage\(grown ? 4 : 0)-\(dark ? "dark" : "light")")
-                    app.navigationBars.buttons.firstMatch.tap()
-                }
-                app.terminate()
-            }
+    /// One launch per test (four launches with two pages each ran past the time allowance under load).
+    private func glasshousePages(grown: Bool, dark: Bool) {
+        launch(grown ? ["-uitest-glasshouse-grown"] : [], dark: dark)
+        for id in ["glasshouse_snowdrop", "glasshouse_hellebore"] {
+            openGlasshouse(id)
+            shot("g5-\(id)-stage\(grown ? 4 : 0)-\(dark ? "dark" : "light")")
+            app.navigationBars.buttons.firstMatch.tap()
         }
     }
+
+    func testGlasshousePlantPagesAtStageZeroLight() { glasshousePages(grown: false, dark: false) }
+    func testGlasshousePlantPagesAtStageZeroDark() { glasshousePages(grown: false, dark: true) }
+    func testGlasshousePlantPagesAtStageFourLight() { glasshousePages(grown: true, dark: false) }
+    func testGlasshousePlantPagesAtStageFourDark() { glasshousePages(grown: true, dark: true) }
 
     func testGlasshousePlantPageAudit() {
         launch(size: Self.axxxl, dark: true)
