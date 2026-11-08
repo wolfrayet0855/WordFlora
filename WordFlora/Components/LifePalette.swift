@@ -11,6 +11,9 @@ enum LifePalette {
     static let sun = dyn(0xB87F00, 0xF6C85A)
     static let leaf = dyn(0x5E8F1F, 0xA8D84A)
     static let leafBright = dyn(0x9BCB3C, 0xA8D84A)
+    /// The tend toast's tick: leaf green on the dark slab in light mode, deep green on the pale slab in dark mode
+    /// (6.0:1 and 4.1:1; leafBright alone is 1.3:1 on the dark-mode slab).
+    static let toastTick = dyn(0x9BCB3C, 0x2E7D32)
     static let leafInk = dyn(0x22331A, 0x1A2E1A)
     static let heart = dyn(0xD9506F, 0xF08AA3)
     static let petal = dyn(0xF2788A, 0xF58A9B)

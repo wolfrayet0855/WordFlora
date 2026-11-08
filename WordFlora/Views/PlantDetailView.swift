@@ -641,7 +641,8 @@ struct PlantDetailView: View {
         if let toast {
             HStack(spacing: 10) {
                 Image(systemName: toast.ok ? "checkmark.circle.fill" : "moon.fill")
-                    .foregroundStyle(toast.ok ? LifePalette.leafBright : Color.appBackground.opacity(0.85))
+                    .font(Theme.font(.body, weight: .semibold))       // scales with the text, a touch larger than it
+                    .foregroundStyle(toast.ok ? LifePalette.toastTick : Color.appBackground.opacity(0.85))
                     .accessibilityHidden(true)
                 Text(toast.text).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appBackground)
                     .fixedSize(horizontal: false, vertical: true)
