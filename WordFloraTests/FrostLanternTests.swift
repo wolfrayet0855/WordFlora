@@ -117,6 +117,9 @@ final class FrostLanternTests: XCTestCase {
         XCTAssertEqual(snow.heads.map(\.pivot), [[118, 64], [72, 80], [138, 94]])
         XCTAssertEqual(hell.heads.map(\.pivot), [[102, 74], [60, 104], [144, 100]])
         XCTAssertEqual(snow.heads.map(\.rings), [[0], [1], [2]])
+        // Nine tepals: the heads take turns, so every pip drops at least one (9, 6, 3, 2, 1, 0 showing).
+        XCTAssertEqual((0...5).map { snow.visiblePetals(pips: $0).count }, [0, 1, 2, 3, 6, 9])
+        for pips in 1...5 { XCTAssertFalse(snow.fallOrder(fromPips: pips).isEmpty, "snowdrop at \(pips)") }
         for p in [snow, hell] {
             XCTAssertEqual(p.layers.first?.kind, .ground)
             XCTAssertTrue(p.isNeverEmpty)

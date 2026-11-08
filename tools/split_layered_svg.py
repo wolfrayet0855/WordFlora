@@ -33,7 +33,10 @@ ET.register_namespace('', SVG_NS)
 
 # Head pivots in the 200 box, one per ring (docs/pm/g5-asset-readiness.md, the re-posed snowdrop).
 PLANTS = {
+    # Three heads of three tepals: the even share would keep one per head at 1 to 3 pips, so two pips would drop
+    # nothing. The heads take turns instead (petals showing at 0...5 pips): 9, 6, 3, 2, 1, 0 in all.
     'plant_snowdrop': {'pivots': [(118, 64), (72, 80), (138, 94)],
+                       'keptCounts': [[0, 1, 1, 1, 2, 3], [0, 0, 1, 1, 2, 3], [0, 0, 0, 1, 2, 3]],
                        'note': 'Glasshouse plant (Frost & Lantern): three nodding heads, three outer tepals each.'},
     'plant_hellebore': {'pivots': [(102, 74), (60, 104), (144, 100)],
                         'note': 'Glasshouse plant (Frost & Lantern): three heads, five sepals each.'},
@@ -143,7 +146,10 @@ def main():
             petals = [idx[k] for k in sorted(k for k in idx if k[0] == r)]
             if not petals:
                 raise SystemExit('%s: no petals for head %d' % (name, r))
-            rings.append({'elements': petals, 'pivot': list(pivot)})
+            ring = {'elements': petals, 'pivot': list(pivot)}
+            if 'keptCounts' in spec:
+                ring['keptCounts'] = spec['keptCounts'][r]
+            rings.append(ring)
         if len(idx) != sum(len(r['elements']) for r in rings):
             raise SystemExit('%s: petal groups outside the listed heads' % name)
         body = ET.tostring(root, encoding='unicode').replace('ns0:', '').replace(' xmlns:ns0="%s"' % SVG_NS, '')

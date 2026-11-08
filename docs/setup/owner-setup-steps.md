@@ -234,10 +234,10 @@ Reference Name: Frost & Lantern Pack
 Product ID:     pack_frost_lantern
 Price (US):     $2.99
 Display Name:   Frost & Lantern
-Description:    Winter pots, a snowy garden, two birds and two plants.
+Description:    Three winter pots and a badge. Pay once, no renewals.
 Family Sharing: ON   (cannot be turned off again once saved)
 ```
-   This is the G5 wording (the full pack: three pots, the snowy lantern garden behind Home and My Garden, the robin and wren, the snowdrop and hellebore; 54 characters, under the 55 limit). It matches `Config/WordFlora.storekit`. If the plan's G5 fallback applies, use the G3 wording instead: "Three winter pots and a badge. Pay once, no renewals." Never promise more than the build delivers.
+   This is the description the product was created with, and it matches `Config/WordFlora.storekit` (and `PackCatalogTests`). Optional, since G5 ships the whole pack: the owner may change the App Store Connect description to "Winter pots, a snowy garden, two birds and two plants." (54 characters, under the 55 limit). If so, change the same text in `Config/WordFlora.storekit` and the test in the same commit, so the local file always matches App Store Connect. Never promise more than the build delivers.
 3. **Availability:** the same territories as Plus. Review the auto-converted prices.
 4. **Review Information:** a screenshot of Settings > Purchases > Seasons (the pack card, its three pots, the price and the Buy button), taken from the G6 build on an adult profile; and the note: "Non-consumable cosmetic pack: three pots, a winter garden background, two bird visitors and two plants that grow with care. It does not change progress. Restore purchases is in the app's Settings, under Purchases."
 5. Submit it **with the app version** next to `plus_lifetime` (app version page > **In-App Purchases and Subscriptions**) **(verify in UI)**. Not submitted if the plan's G5 fallback moves the pack to 1.1.
@@ -246,7 +246,7 @@ Mirrors this local StoreKit entry (`Config/WordFlora.storekit`, used by the test
 ```json
 {"displayPrice":"2.99","familyShareable":true,"internalID":"6745000004","productID":"pack_frost_lantern",
  "referenceName":"Frost & Lantern Pack","type":"NonConsumable","localizations":[{"locale":"en_US",
- "displayName":"Frost & Lantern","description":"Winter pots, a snowy garden, two birds and two plants."}]}
+ "displayName":"Frost & Lantern","description":"Three winter pots and a badge. Pay once, no renewals."}]}
 ```
 
 ### A: send back
