@@ -174,7 +174,7 @@ enum WidgetCopy {
     static func emptyLine(unavailable: Bool) -> String { unavailable ? GardenFallback.widgetLine : firstPlant }
     /// Where the empty widget goes: the app itself when the store is not ready (the player may have plants), else a round.
     static func emptyURL(unavailable: Bool) -> URL { URL(string: unavailable ? "wordflora://" : "wordflora://play")! }
-    static func plantURL(_ plantId: String) -> URL { URL(string: "wordflora://plant/\(plantId)")! }
+    static func plantURL(_ plantId: String) -> URL { URL(string: "wordflora://plant/\(plantId)") ?? emptyURL(unavailable: false) }
 
     static func drops(_ n: Int) -> String { n == 1 ? "1 drop" : "\(n) drops" }
     static func waterLabel(name: String, water: Int, quiet: Bool) -> String {
