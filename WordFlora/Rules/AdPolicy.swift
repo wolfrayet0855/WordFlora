@@ -151,16 +151,23 @@ enum AdPolicy {
         return .yes(t)
     }
 
-    /// The calm guarantees every format obeys (spec 0.3), after the treatment.
+    /// The calm guarantees every format obeys (spec 0.3), after the treatment. Static formats (banner, collapsible,
+    /// native) live only on Home, Garden and the Shed, never on the puzzle screen, so a round left open in the
+    /// background does not hide them; the Home and Garden banner keeps exactly today's `showBanner` rules (spec 1.5).
     private static func commonBlock(_ f: AdFormat, _ i: AdInputs) -> AdBlock? {
         if !i.entitlementsLoaded { return .notLoaded }
         if !i.onboardingComplete { return .onboarding }
         if i.onPaywall { return .paywall }
-        if i.roundInProgress { return .puzzle }
+        if f.isFullScreen && i.roundInProgress { return .puzzle }
         if i.session.quietVisit { return .quiet }
-        if i.pendingCeremony { return .ceremony }
+        if i.pendingCeremony, !Self.isPlainBanner(f) { return .ceremony }
         if f.isFullScreen && i.sheetUp { return .sheetUp }
         return nil
+    }
+
+    private static func isPlainBanner(_ f: AdFormat) -> Bool {
+        if case .banner = f { return true }
+        return false
     }
 
     private static func formatBlock(_ f: AdFormat, _ i: AdInputs, caps: AdCaps) -> AdBlock? {

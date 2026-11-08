@@ -173,13 +173,20 @@ final class AdPolicyTests: XCTestCase {
             (.notLoaded, { $0.entitlementsLoaded = false }),
             (.onboarding, { $0.onboardingComplete = false }),
             (.paywall, { $0.onPaywall = true }),
-            (.puzzle, { $0.roundInProgress = true }),
             (.quiet, { $0.session.quietVisit = true }),
-            (.ceremony, { $0.pendingCeremony = true }),
         ]
         for (block, change) in cases {
             var i = base; change(&i)
             for f in Self.formats { XCTAssertEqual(decide(f, i), .no(block), "\(f) \(block)") }
+        }
+        // A word in progress blocks every full-screen format; banners and the Shed card are never on that screen.
+        var p = base; p.roundInProgress = true
+        for f in Self.formats { XCTAssertEqual(decide(f, p), f.isFullScreen ? .no(.puzzle) : .yes(.adult), "\(f) puzzle") }
+        // A pending ceremony blocks everything but the plain banner, which keeps today's rules (spec 1.5).
+        var c = base; c.pendingCeremony = true
+        for f in Self.formats {
+            let banner = f == .banner(.home) || f == .banner(.garden)
+            XCTAssertEqual(decide(f, c), banner ? .yes(.adult) : .no(.ceremony), "\(f) ceremony")
         }
     }
 
@@ -425,6 +432,24 @@ final class AdPolicyTests: XCTestCase {
         XCTAssertEqual(partial.day, 20261108)
         XCTAssertEqual(partial.adWater, 2)
         XCTAssertEqual(partial.fullScreen, 0)
+    }
+
+    // MARK: Copy
+
+    func testEveryPerkLineIsGentleAndVideoRowsSayVideo() {
+        XCTAssertEqual(AdPerkCopy.all.count, 16)
+        for line in AdPerkCopy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
+        for title in [AdPerkCopy.Water.adTitle, AdPerkCopy.Hint.adTitle, AdPerkCopy.Wake.adTitle] {
+            XCTAssertTrue(title.lowercased().contains("video"), title)
+        }
+        for free in [AdPerkCopy.Water.freeTitle, AdPerkCopy.Hint.freeTitle, AdPerkCopy.Hint.subtitle, AdPerkCopy.Hint.banked,
+                     AdPerkCopy.Wake.freeTitle, AdPerkCopy.Wake.freeSubtitle] {
+            XCTAssertFalse(free.lowercased().contains("plus"), "free rows never mention Plus: \(free)")
+            XCTAssertFalse(free.lowercased().contains("video") || free.lowercased().contains(" ad"), free)
+        }
+        // The spec's first wording would fail the linter; these are the replacements.
+        XCTAssertFalse(CopySafety.check("Your watering can is empty.").isEmpty)
+        XCTAssertFalse(CopySafety.check("A whisper is waiting for your next garden word").isEmpty)
     }
 
     // MARK: Debug overrides (compiled out of Release)

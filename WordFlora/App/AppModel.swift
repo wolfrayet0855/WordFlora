@@ -87,6 +87,7 @@ final class AppModel {
         refreshBadgeFacts(announce: false)       // badges added in an update arrive quietly for what is already done
         checkWelcomeBack()
         GardenIntentHost.container = container
+        adSession.startedAt = now()
     }
 
     /// Evaluated at launch and every time the app comes to the front, so a resume after a long absence is noticed too.
@@ -413,7 +414,14 @@ final class AppModel {
             + [doneLabels.water, doneLabels.feed, doneLabels.sun, wakeFirstLabel, LoveEngine.seedLine(name: name)]
     }
 
-    // MARK: Ads (spec sections 12, 16, 18, 19; ruling in section 20)
+    // MARK: Ads (spec sections 12, 16, 18, 19; ruling in section 20; AdPolicy in AppModel+Ads.swift)
+
+    /// This ad visit's in-memory counters (a cold launch, or back after `AdCaps.sessionBreak` in the background).
+    var adSession = AdSessionState()
+    /// The Plus or Seasons page is on screen (RootView keeps it in step with the route): no ad of any kind there.
+    var adOnPaywall = false
+    /// The treatment last seen, so a change to `.none` (Plus went live, an under-13 answer) releases cached ads (H5).
+    var lastAdTreatment: AdTreatment?
 
     func markPeakDismissed() { lastPeakAt = now() }
 
@@ -442,62 +450,79 @@ final class AppModel {
         return c
     }
 
-    func recordAdShown() {
-        guard let p = profile else { return }
+    /// Kept for the interstitial callers and tests: one pushed full-screen ad.
+    func recordAdShown() { recordFullScreen(kind: .interstitial(.oneMore)) }
+
+    /// Every full-screen ad (spec 1.6): `lastAdAt` for every kind, `adsToday` for pushed kinds, `rewardedToday` for
+    /// rewarded (synced, meaning widened, no new field), plus the device ledger and this visit's counters.
+    func recordFullScreen(kind: AdFormat) {
+        guard kind.isFullScreen, let p = profile else { return }
         let d = now(), cal = Calendar.current
-        p.roundsSinceAd = 0
         adShownThisSession = true
         p.lastAdAt = d
-        if let day = p.adsDay, cal.isDate(day, inSameDayAs: d) { p.adsToday += 1 } else { p.adsDay = cal.startOfDay(for: d); p.adsToday = 1 }
+        if kind.isPushed {
+            if case .interstitial = kind { p.roundsSinceAd = 0 }
+            if let day = p.adsDay, cal.isDate(day, inSameDayAs: d) { p.adsToday += 1 } else { p.adsDay = cal.startOfDay(for: d); p.adsToday = 1 }
+            adSession.pushedShown += 1
+        }
+        if case .rewarded = kind {
+            if let day = p.rewardedDay, cal.isDate(day, inSameDayAs: d) { p.rewardedToday += 1 } else { p.rewardedDay = cal.startOfDay(for: d); p.rewardedToday = 1 }
+            adSession.rewardedShown += 1
+        }
+        adSession.fullScreenShown += 1
+        var l = adLedger
+        l.fullScreen += 1
+        l.lastFullScreenAt = d
+        if kind == .appOpen { l.appOpen += 1; l.lastAppOpenAt = d }
+        adLedger = l
         try? context.save()
     }
 
+    /// R1 for the plant page and the Garden row: a water video can be offered now (the caller checks the can is dry).
     var canOfferRewarded: Bool {
-        guard let p = profile else { return false }
-        guard settings.completedSessions >= 1, entitlements.hasLoaded,
-              !ParentalGate.isRequired(ageBand: settings.ageBand), !entitlements.state.hasRemoveAds else { return false }
-        let today = p.rewardedDay.map { Calendar.current.isDate($0, inSameDayAs: now()) } ?? false
-        return (today ? p.rewardedToday : 0) < ButterflyRewards.rewardedPlaysPerDay
+        guard adsEnabled, profile != nil else { return false }
+        var i = adInputs()
+        i.perk.water = 0
+        return AdPolicy.decide(.rewarded(.water), i).isYes
     }
 
-    /// Two water drops per watched ad, three a day, never above the bank cap.
-    func grantRewardedDrops() {
+    /// Two water drops per use (video or free), never above the bank cap; the use counts toward R1's three a day.
+    func grantRewardedDrops(viaAd: Bool = true) {
         guard let p = profile else { return }
-        let d = now(), cal = Calendar.current
-        if let day = p.rewardedDay, cal.isDate(day, inSameDayAs: d) { p.rewardedToday += 1 } else { p.rewardedDay = cal.startOfDay(for: d); p.rewardedToday = 1 }
-        p.water = min(Economy.default.waterBankCap, p.water + 2)
+        var l = adLedger
+        l.recordPerk(.water, viaAd: viaAd)
+        adLedger = l
+        p.water = min(Economy.default.waterBankCap, p.water + AdCaps.current.waterReward)
         try? context.save()
     }
 
-    /// Checked again after every wait inside ad setup, so changes mid-way (age, subscription) stop everything.
+    /// Checked again after every wait inside ad setup and right before an ad is shown, so changes mid-way (age,
+    /// subscription, Plus) stop everything.
     var mayStillLoadAds: Bool {
-        adsEnabled && entitlements.hasLoaded
-            && AdGate.mayLoadAnyAd(isUnderThirteen: ParentalGate.isRequired(ageBand: settings.ageBand), hasRemoveAds: entitlements.state.hasRemoveAds)
+        adsEnabled && entitlements.hasLoaded && adTreatment != .none
     }
 
     /// Banner shows on Home and Garden only, from the second session, for free players who are not young.
     var showBanner: Bool {
-        adsEnabled && !quietVisit && entitlements.hasLoaded && onboarding.isComplete && settings.completedSessions >= 1
-            && AdGate.mayLoadAnyAd(isUnderThirteen: ParentalGate.isRequired(ageBand: settings.ageBand), hasRemoveAds: entitlements.state.hasRemoveAds)
+        adsEnabled && onboarding.isComplete && decide(.banner(.home)).isYes
     }
 
     /// Runs when the player taps "One more" on the resting card: at most one ad, only if every rule allows it.
     func adBeforeNextRound() async {
-        guard adsEnabled, !quietVisit else { return }
-        let ctx = adContext(choice: .oneMore)
-        guard AdGate.shouldShowInterstitial(ctx) else { return }
-        await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
-        if await ads.showInterstitial() { recordAdShown() }
+        guard adsEnabled, case .yes(let t) = decide(.interstitial(.oneMore)) else { return }
+        await ads.prepare(treatment: t, isStillAllowed: { self.mayStillLoadAds })
+        if await ads.showInterstitial(isStillAllowed: { self.mayStillLoadAds }) { recordFullScreen(kind: .interstitial(.oneMore)) }
     }
 
     /// True when tapping "One more" on the resting card would try an ad, so the card can say so beside the button.
     /// The same rules as `adBeforeNextRound`, judged as of the end of the celebration's quiet window: the card opens
     /// the moment a celebration is dismissed, and the earliest deliberate tap comes after that window.
     var adWouldPlayOnOneMore: Bool {
-        guard adsEnabled, !quietVisit else { return false }
-        var ctx = adContext(choice: .oneMore)
-        ctx.now = ctx.now.addingTimeInterval(ctx.peakWindowSeconds)
-        return AdGate.shouldShowInterstitial(ctx)
+        guard adsEnabled else { return false }
+        var i = adInputs()
+        i.now = i.now.addingTimeInterval(i.interstitial.peakWindowSeconds)
+        i.interstitial.now = i.now
+        return AdPolicy.decide(.interstitial(.oneMore), i).isYes
     }
 
     // MARK: Coming back soon after "That's enough for now" (docs/pm/ad-gate-return-nudge.md)
@@ -533,28 +558,66 @@ final class AppModel {
         case .free: return true
         case .nudge: return false
         case .adMayPlay:
-            guard adNoteShown else { return false }
-            await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
+            // The global budgets (spec 1.1) also apply; any "no" brings the nudge, never a wait.
+            guard adNoteShown, case .yes(let t) = decide(.interstitial(.playSoonAfterEnough)) else { return false }
+            await ads.prepare(treatment: t, isStillAllowed: { self.mayStillLoadAds })
             // An ad that cannot play (not loaded, offline, refused) brings the nudge, never a wait.
-            guard mayStillLoadAds, await ads.showInterstitial() else { return false }
-            recordAdShown()
+            guard mayStillLoadAds, await ads.showInterstitial(isStillAllowed: { self.mayStillLoadAds }) else { return false }
+            recordFullScreen(kind: .interstitial(.playSoonAfterEnough))
             return true
         }
     }
 
     func prepareBannerIfAllowed() async {
-        guard showBanner else { return }
-        await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
+        guard adsEnabled, onboarding.isComplete, case .yes(let t) = decide(.banner(.home)) else { return }
+        await ads.prepare(treatment: t, isStillAllowed: { self.mayStillLoadAds })
+        adSession.consentResolved = ads.canRequestAds
     }
 
-    /// Shows a player-initiated rewarded ad and, if completed, grants the drops.
+    /// R1 from the plant page: a player-initiated water video; true when the drops were granted.
     func watchRewardedAd() async -> Bool {
-        guard adsEnabled, canOfferRewarded else { return false }
-        await ads.prepare(ageBand: settings.ageBand, isStillAllowed: { self.mayStillLoadAds })
-        let earned = await ads.showRewarded()
-        adShownThisSession = true
-        if earned { grantRewardedDrops() }
-        return earned
+        guard canOfferRewarded else { return false }
+        return await watchRewarded(.water)
+    }
+
+    /// A rewarded perk on the player's tap (R1 water, R2 hint, R3 wake). Plus, under 13 and an unknown age get it free
+    /// (no video); teens and adults watch a video and get it when they finish. True when the perk was granted: water
+    /// and the whisper are granted here; the wake caller then wakes the seed (`gentleWake`).
+    func watchRewarded(_ perk: RewardedPerk) async -> Bool {
+        switch perkPath(perk) {
+        case .hidden:
+            return false
+        case .free:
+            grantPerk(perk, viaAd: false)
+            return true
+        case .ad(let t):
+            guard adsEnabled else { return false }
+            await ads.prepare(treatment: t, isStillAllowed: { self.mayStillLoadAds })
+            adSession.consentResolved = ads.canRequestAds
+            guard mayStillLoadAds else { return false }
+            let outcome = await ads.showRewarded(perk, isStillAllowed: { self.mayStillLoadAds })
+            if outcome.shown { recordFullScreen(kind: .rewarded(perk)) }
+            adSession.rewardedLoadFailed = ads.rewardedLoadFailed
+            guard outcome.earned else { return false }
+            grantPerk(perk, viaAd: true)
+            return true
+        }
+    }
+
+    private func grantPerk(_ perk: RewardedPerk, viaAd: Bool) {
+        switch perk {
+        case .water:
+            grantRewardedDrops(viaAd: viaAd)
+        case .hint:
+            var l = adLedger
+            l.recordPerk(.hint, viaAd: viaAd)
+            l.whisperBanked = true
+            adLedger = l
+        case .wake:
+            var l = adLedger
+            l.recordPerk(.wake, viaAd: viaAd)
+            adLedger = l
+        }
     }
 
     // MARK: Gentle Plus offer (PlusOfferPolicy)
@@ -883,6 +946,7 @@ final class AppModel {
     }
 
     func updateSyncFlag() {
+        adTreatmentChanged()                                    // H5: Plus went live, so cached ads go
         guard entitlements.hasLoaded else { return }          // a slow StoreKit start must never switch sync off
         let entitled = entitlements.state.hasCloudSync
         settings.cloudSyncEnabled = entitled
