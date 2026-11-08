@@ -34,8 +34,8 @@ Updated 2026-11-07 19:10.
 
 ## Owner tasks
 - CloudKit: confirm Production has the fields; deploy after G3 merge if not.
-- App Store Connect: `pack_frost_lantern` product (Family Sharing on), `plus_lifetime` Family Sharing on.
-- Done: AdMob console checklist, fact check.
+- Done by owner: `pack_frost_lantern` ($2.99) in App Store Connect, `plus_lifetime` with Family Sharing, AdMob console checklist, fact check. Do not relist.
+- Open: CloudKit Production deploy after G3 merge; Family Sharing on both subscriptions (confirm once); sandbox testers; offer codes; privacy URL; Paid Apps Agreement status.
 
 ## Scope admitted since freeze release (2026-11-07 evening)
 - Appearance follows system (Settings picker removed), in G3 branch.
