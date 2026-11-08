@@ -18,9 +18,14 @@ enum WeeklyNote {
         calendar.dateInterval(of: .weekOfYear, for: now)?.start ?? calendar.startOfDay(for: now)
     }
 
-    /// The week key: the day number of that Monday (stable across daylight saving and within one time zone).
+    /// The week key: the day number (days since 1 Jan 1970) of that Monday's local date. Built from the local year,
+    /// month and day, so it is the same across daylight saving and in every time zone.
     static func weekKey(_ now: Date, calendar: Calendar) -> Int {
-        calendar.ordinality(of: .day, in: .era, for: weekStart(now, calendar: calendar)) ?? 0
+        let d = calendar.dateComponents([.year, .month, .day], from: weekStart(now, calendar: calendar))
+        var utc = Calendar(identifier: .gregorian)
+        utc.timeZone = TimeZone(identifier: "UTC")!
+        guard let day = utc.date(from: DateComponents(year: d.year, month: d.month, day: d.day)) else { return 0 }
+        return Int((day.timeIntervalSince1970 / 86_400).rounded())
     }
 
     /// The past week: `[weekStart - 7 days, weekStart)`, counted in calendar days so a daylight saving week is whole.

@@ -47,6 +47,32 @@ final class EngagementUITests: XCTestCase {
         XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
     }
 
+    /// The audit for a scrolled plant page, as `TendingUITests`/`WordFloraUITests.audit`: contrast is judged only for text
+    /// wholly inside the visible scroll area. After a scroll, text slid under the bar or the inner scroll's edge is
+    /// clipped and blurred, and the audit then judges the wrong pixels (an unresolved element with no label).
+    private func auditScrolled(_ name: String) {
+        var findings = [String](), skipped = 0
+        let scroll = app.scrollViews.firstMatch, nav = app.navigationBars.firstMatch
+        let top = nav.exists ? nav.frame.maxY : 0
+        shot("audit-\(name)")
+        let visible: CGRect? = scroll.exists ? {
+            let f = scroll.frame
+            return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
+        }() : nil
+        do {
+            try app.performAccessibilityAudit(for: .all) { issue in
+                if issue.auditType == .contrast, let v = visible {
+                    guard let e = issue.element else { skipped += 1; return true }
+                    if !v.contains(e.frame) { return true }
+                }
+                findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' \(issue.element.map { "\($0.frame)" } ?? "")")
+                return true
+            }
+        } catch { findings.append("\(name): audit failed to run: \(error)") }
+        if skipped > 0 { print("\(name): contrast on \(skipped) clipped, unresolved element(s) not judged") }
+        XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
+    }
+
     /// Plays LOTUS (the only word in the UI test bank) to the win card.
     private func winAPlant(_ extra: [String] = []) {
         launch(["-uitest-word=LOTUS"] + extra)
@@ -296,9 +322,11 @@ final class EngagementUITests: XCTestCase {
 
     func testAuditPlantPageWidgetRow() {
         openPlant("Daisy", plantId: "daisy")
+        sleep(1)
+        audit("b-plant-top")
         scrollTo(app.buttons["plant.showOnWidget"])
         sleep(1)
-        audit("b-plant-widget-row")
+        auditScrolled("b-plant-widget-row")
     }
 
     func testAuditPlantPageWidgetRowAtAXXXL() {
@@ -306,13 +334,13 @@ final class EngagementUITests: XCTestCase {
         let pin = app.buttons["plant.showOnWidget"]
         scrollTo(pin)
         sleep(1)
-        audit("b-plant-widget-row-axxxl")
+        auditScrolled("b-plant-widget-row-axxxl")
         pin.tap()
         XCTAssertTrue(element("plant.onWidget").waitForExistence(timeout: 3))
         scrollTo(element("plant.widgetLine"))
         XCUIDevice.shared.appearance = .dark
         sleep(1)
         shot("b-plant-widget-row-axxxl-dark")
-        audit("b-plant-widget-row-axxxl-dark")
+        auditScrolled("b-plant-widget-row-axxxl-dark")
     }
 }

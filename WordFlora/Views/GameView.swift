@@ -322,7 +322,8 @@ struct GameView: View {
                     cardTitle(vm.earnedPlantIsNew ? "New plant found!" : "Your garden grew")
                     if let plant = app.plants().first(where: { $0.name == name }) {
                         PlantCard(plant: plant, standalone: true).frame(maxWidth: PlantCard.foundWidth(dynamicTypeSize))
-                        Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
+                        // Full ink: at 85% the audit reports the fact as low contrast on the dark card.
+                        Text(plant.botanicalFact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
                             .fixedSize(horizontal: false, vertical: true)
                         if vm.earnedPlantIsNew { NameOnArrivalRow(plant: plant) }      // Make it yours (PlantName)
                     }
