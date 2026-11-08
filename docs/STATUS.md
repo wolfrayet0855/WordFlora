@@ -567,10 +567,12 @@ Brief: `docs/pm/textfit-builder-brief.md`; Plus delta: `docs/pm/plus-flow-fable-
 
 | Run | Result |
 |---|---|
-| Unit (`WordFloraTests`), final code | 1207 run, 1207 pass (incl. `TextFitLayoutTests` 13) |
-| `TextFitScreensUITests` | 15 tests; all green across the runs except the three fixed in the last commits (grown-up question at AX5, visitor detail title Dynamic Type), rerun in the final batch |
+| Unit (`WordFloraTests`) | 1207 run, 1207 pass (`TextFitLayoutTests` 12 of 12 again in the final hold) |
+| `TendingUITests` (full, final hold 1) | 29/30; the red was G3's tend rows at real xxxLarge (second row not top-aligned); fixed in 2ed4b59, the three tend-row tests then 3/3 |
+| `TextFitScreensUITests` | all green across the runs except the grown-up sheet at AX5: the audit reads a different line as clipped after each fix (title, question, Cancel, now Continue at the sheet's bottom edge). Open, see the hand-off. Visitors page/book/detail last passed before 6227903 changed the Field Notes name back; not rerun after |
 | `DailyQuestUITests` | 6/6 (one Restore purchases, in Settings) |
 | `ParentalGateLinkUITests` | 6/6 (incl. under-13 Manage subscription in Settings) |
-| `SeasonsUITests` | 8/9, the shelf contrast red was the combined audit reflowing the Shed; the audit now runs the resizing checks apart (final batch) |
+| `SeasonsUITests` | 9/9 (shelf test green once its audit ran the resizing checks apart) |
+| SE (375 pt) | Plus page default and AX5, light and dark: green, every word whole |
 
 Found on the way: the UI tests' `UICTContentSizeCategoryExtraExtraExtraLarge` is not a size name (the raw value is `UICTContentSizeCategoryXXXL`), so G3's xxxl tend-row test never ran at xxxLarge; fixed in both files. Shots: `docs/pm/shots/textfit/` (downscaled), full size in the session scratchpad.
