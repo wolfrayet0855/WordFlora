@@ -109,7 +109,11 @@ final class EndgameUITests: XCTestCase {
         XCTAssertTrue(element("helper.windNet.out").waitForExistence(timeout: 3))
         XCTAssertFalse(app.buttons["helper.windNet.setOut"].exists)
         shot("shed-helpers-out")
-        XCTAssertFalse(app.staticTexts.containing(NSPredicate(format: "label CONTAINS[c] 'plus' OR label CONTAINS[c] 'price'")).firstMatch.exists)
+        // The helpers carry no Plus tag and no price (the pots further down the Shed have their own "Plus" tags).
+        let helperTexts = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'helper.'"))
+            .descendants(matching: .staticText)
+        XCTAssertFalse(helperTexts.matching(NSPredicate(format: "label CONTAINS[c] 'plus' OR label CONTAINS[c] 'price'")).firstMatch.exists)
+        XCTAssertFalse(element("shed.weatherChip").label.lowercased().contains("plus"))
     }
 
     func testTheShedHelpersAtAnAccessibilitySize() {
@@ -367,7 +371,7 @@ final class EndgameUITests: XCTestCase {
         scrollTo(book)
         book.tap()
         XCTAssertTrue(element("book.page.monarch").waitForExistence(timeout: 5))
-        audit("visitors-book")
+        audit("visitors-book", dynamicTypeApart: true)
         shot("visitors-book")
     }
 
