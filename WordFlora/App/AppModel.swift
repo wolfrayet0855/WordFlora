@@ -88,6 +88,8 @@ final class AppModel {
         checkWelcomeBack()
         GardenIntentHost.container = container
         adSession.startedAt = now()
+        game.whisperAvailable = { [weak self] in self?.whisperBanked ?? false }     // R2 (AppModel+Ads)
+        game.onWhisperUsed = { [weak self] in self?.spendWhisper() }
     }
 
     /// Evaluated at launch and every time the app comes to the front, so a resume after a long absence is noticed too.

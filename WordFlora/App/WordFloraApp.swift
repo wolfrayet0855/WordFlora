@@ -120,8 +120,11 @@ struct WordFloraApp: App {
             default: break
             }
         }
+        #if DEBUG
+        // Store fault fixtures: Debug only, so a Release build can never be slowed or failed by a launch argument.
         if uiTesting && args.contains("-uitest-store-fail") { model.entitlements.debugFailStore() }
         if uiTesting && args.contains("-uitest-store-slow") { model.entitlements.debugSlowStore(seconds: 90) }
+        #endif
         // Frost & Lantern owned (bought or family-shared): its two pots can be picked.
         if uiTesting && args.contains("-uitest-pack-owned") {
             var ids = model.entitlements.state.activeProductIDs; ids.insert(PackCatalog.frostLantern.productID)
@@ -247,7 +250,20 @@ struct WordFloraApp: App {
         // `-uitest-ads-offline`: ad rules stay live but the ad SDK never starts (no consent prompt, no real ad).
         if uiTesting && args.contains("-uitest-ads-offline") { model.ads.offline = true }
         if uiTesting && args.contains("-uitest-daytime") { model.uiTestDaytime = true }
-        if uiTesting && !args.contains("-uitest-ads") && !args.contains("-uitest-ads-offline") { model.adsEnabled = false }
+        #if DEBUG
+        // Rewarded perk fixtures: an empty can (R1) and one "still dreaming" wake try already made (R3).
+        if uiTesting && args.contains("-uitest-dry") { model.profile?.water = 0; try? model.context.save() }
+        if uiTesting && args.contains("-uitest-wake-dreamed") { model.settings.wakeDreamsInARow = 1 }
+        // `-uitest-ads-fake`: a plain "TEST AD" screen stands in for Google's SDK (closes on tap; grants the reward
+        // unless `-uitest-ads-fake-withhold`). Compiled out of Release with the fake itself (ruling H6).
+        if uiTesting && args.contains("-uitest-ads-fake") {
+            model.ads.fake = true
+            model.ads.fakeWithholdsReward = args.contains("-uitest-ads-fake-withhold")
+        }
+        #endif
+        if uiTesting && !args.contains("-uitest-ads") && !args.contains("-uitest-ads-offline") && !model.ads.isFake {
+            model.adsEnabled = false
+        }
         if uiTesting { model.plusOfferEnabled = false }
         if uiTesting && args.contains("-uitest-badges") {
             // Badges page tests: a gold, a silver and a bronze badge already earned (no moments).
@@ -279,6 +295,10 @@ struct WordFloraApp: App {
                     // (Not in UI tests: they set the row's state with -uitest-cloud, whatever the simulator's account.)
                     if phase == .active && !CommandLine.arguments.contains("-uitest") { Task { await app.refreshCloudAccount() } }
                     if phase == .background { SoundPlayer.shared.stopAmbient() }
+                    // Ad visits (spec 0.4): back after 30 min away starts fresh visit counters; the age or Plus check
+                    // runs again so cached ads are released when the treatment is none (H5).
+                    if phase == .background { app.noteAdBackground() }
+                    if phase == .active { app.noteAdActive() }
                 }
         }
     }

@@ -281,6 +281,15 @@ final class AdsService {
         return String(describing: type(of: vc)).contains("HostingController")
     }
 
+    /// The Debug fake presenter is on (always false in Release, where the fake does not exist).
+    var isFake: Bool {
+        #if DEBUG
+        return fake
+        #else
+        return false
+        #endif
+    }
+
     /// True when a full-screen ad could be presented right now (fed into `AdInputs.sheetUp`).
     static var canPresentFullScreen: Bool { presentationAnchor() != nil }
 

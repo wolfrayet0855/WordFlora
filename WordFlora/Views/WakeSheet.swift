@@ -85,10 +85,36 @@ struct WakeSheet: View {
                 ForEach(WakeRule.ordered(suggested: suggested), id: \.self) { c in
                     WakeTile(challenge: c, suggested: c == suggested) { step = .intro(c) }
                 }
+                gentleWakeRow
             }
             .padding(20)
         }
         .scrollBounceBehavior(.basedOnSize)
+        .rewardToast($toast)
+    }
+
+    @State private var toast: String?
+    @State private var watching = false
+
+    /// R3: a third, quieter way to wake, only after one "still dreaming" try; once a day. A video for 13 and over
+    /// without Plus ("The two challenges stay free"), free for Plus, under 13 and an unknown age. It wakes the seed
+    /// like a win but grants no sticker, badge progress, water, shed points or soil.
+    @ViewBuilder private var gentleWakeRow: some View {
+        RewardedPromptRow.forPath(app.perkPath(.wake), adTitle: AdPerkCopy.Wake.adTitle, freeTitle: AdPerkCopy.Wake.freeTitle,
+                                  adSubtitle: AdPerkCopy.Wake.adSubtitle, freeSubtitle: AdPerkCopy.Wake.freeSubtitle,
+                                  hasPlus: app.entitlements.state.hasPlus, identifier: "wake.gentle") {
+            guard !watching else { return }
+            watching = true
+            Task {
+                if await app.watchRewarded(.wake) {
+                    app.gentleWake(plant)
+                    toast = AdPerkCopy.Wake.toast(name: name)
+                    step = .awake
+                }
+                watching = false
+            }
+        }
+        .disabled(watching)
     }
 
     // MARK: Intro

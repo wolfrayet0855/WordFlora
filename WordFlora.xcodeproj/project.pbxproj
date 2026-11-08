@@ -113,6 +113,7 @@
 		49C9AEE30C6B929F87BAB3EF /* KeyboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C73101B54140F34289C21BFD /* KeyboardView.swift */; };
 		49FAB31C34389B1250039A76 /* GameRouter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3BBCC0F6B1868E67DF86A2DB /* GameRouter.swift */; };
 		4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */; };
+		5A05D895F5E4539B13C442C3 /* AdFormatsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A73199BBAF18CA9278ADDD0 /* AdFormatsUITests.swift */; };
 		DB95FCF40B0D4F70AA2976FD /* SpeedBloomUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295580642BF641C3BDA83AE3 /* SpeedBloomUITests.swift */; };
 		F58845130B115C13F2B6124D /* SeasonsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B5E47FE04BE8071A44957A3B /* SeasonsUITests.swift */; };
 		A9BC1C319B4BDB047932E1DA /* CelebrationUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */; };
@@ -134,6 +135,7 @@
 		5AC90C63AFA3930519F129FF /* WordFloraWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = E96DC5D77A1287D3DF73CD43 /* WordFloraWidgetBundle.swift */; };
 		5C79C89D5D157B3BC8D2F263 /* RestScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CFC7DA43D02448392F8774BC /* RestScene.swift */; };
 		5A7413E2F7CB9911B34CFF74 /* NudgeCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = A67EB350B6585FCD83878CE6 /* NudgeCard.swift */; };
+		FA5084E3909E14751FB8E315 /* RewardedPromptRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 040AFE24A9FE0BE9C32C31CE /* RewardedPromptRow.swift */; };
 		5E0A335D5FF8885586260FAB /* StreakEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99940443AEBC1F94C00E15D2 /* StreakEngine.swift */; };
 		617E6838EBE8B27619FA5225 /* SharedDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 36E9BF1EF350FCF2819C34C2 /* SharedDefaults.swift */; };
 		62DF6A94C532BAA7B67A1EC7 /* TapBurst.swift in Sources */ = {isa = PBXBuildFile; fileRef = D9550E7376E237963E1CA789 /* TapBurst.swift */; };
@@ -454,6 +456,7 @@
 		494B19877C303C1C4B6F6D08 /* AppModelTendingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AppModelTendingTests.swift; sourceTree = "<group>"; };
 		4A6305635D642316CCE8610F /* GameRecord.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GameRecord.swift; sourceTree = "<group>"; };
 		4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestCardUITests.swift; sourceTree = "<group>"; };
+		2A73199BBAF18CA9278ADDD0 /* AdFormatsUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = AdFormatsUITests.swift; sourceTree = "<group>"; };
 		295580642BF641C3BDA83AE3 /* SpeedBloomUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SpeedBloomUITests.swift; sourceTree = "<group>"; };
 		B5E47FE04BE8071A44957A3B /* SeasonsUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SeasonsUITests.swift; sourceTree = "<group>"; };
 		9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CelebrationUITests.swift; sourceTree = "<group>"; };
@@ -582,6 +585,7 @@
 		CA4FB003E686D225F4D94B47 /* StoreResolveTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StoreResolveTests.swift; sourceTree = "<group>"; };
 		CFC7DA43D02448392F8774BC /* RestScene.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RestScene.swift; sourceTree = "<group>"; };
 		A67EB350B6585FCD83878CE6 /* NudgeCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NudgeCard.swift; sourceTree = "<group>"; };
+		040AFE24A9FE0BE9C32C31CE /* RewardedPromptRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = RewardedPromptRow.swift; sourceTree = "<group>"; };
 		D1A934E0013AAE5EB7DE9896 /* TendingEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TendingEngineTests.swift; sourceTree = "<group>"; };
 		D34AFDFFEBD739E2F6A94842 /* GardenIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = GardenIntents.swift; sourceTree = "<group>"; };
 		D4518C576DB5D58EC7724F97 /* ReadAloudTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReadAloudTests.swift; sourceTree = "<group>"; };
@@ -890,6 +894,7 @@
 				5937A430C3FA390AF941B091 /* PotArtView.swift */,
 				CFC7DA43D02448392F8774BC /* RestScene.swift */,
 				A67EB350B6585FCD83878CE6 /* NudgeCard.swift */,
+				040AFE24A9FE0BE9C32C31CE /* RewardedPromptRow.swift */,
 			);
 			name = Components;
 			path = Components;
@@ -1175,6 +1180,7 @@
 				F787992B59617103496CEE38 /* TendingUITests.swift */,
 				1184B81C47C7FC44BEB0BDC0 /* WeatherUITests.swift */,
 				4A94B60CF3B06E6227AF087F /* RestCardUITests.swift */,
+				2A73199BBAF18CA9278ADDD0 /* AdFormatsUITests.swift */,
 				295580642BF641C3BDA83AE3 /* SpeedBloomUITests.swift */,
 				B5E47FE04BE8071A44957A3B /* SeasonsUITests.swift */,
 				9E16255A6CBEF624E0A11E1B /* CelebrationUITests.swift */,
@@ -1431,6 +1437,7 @@
 				33BA691BF1E87DE5BB43E0B0 /* TendingUITests.swift in Sources */,
 				67D33D3868BCC5E3E36ABA02 /* WeatherUITests.swift in Sources */,
 				4A0757A1DA096051D9003440 /* RestCardUITests.swift in Sources */,
+				5A05D895F5E4539B13C442C3 /* AdFormatsUITests.swift in Sources */,
 				DB95FCF40B0D4F70AA2976FD /* SpeedBloomUITests.swift in Sources */,
 				F58845130B115C13F2B6124D /* SeasonsUITests.swift in Sources */,
 				A9BC1C319B4BDB047932E1DA /* CelebrationUITests.swift in Sources */,
@@ -1697,6 +1704,7 @@
 				EDC9869F995C67A16F2AB495 /* PotPickerViews.swift in Sources */,
 				5C79C89D5D157B3BC8D2F263 /* RestScene.swift in Sources */,
 				5A7413E2F7CB9911B34CFF74 /* NudgeCard.swift in Sources */,
+				FA5084E3909E14751FB8E315 /* RewardedPromptRow.swift in Sources */,
 				7B821C6FCAD64E3AF76503B9 /* RestCardCopy.swift in Sources */,
 				034B011803214D91BC60121D /* SpeedBloom.swift in Sources */,
 				1355711493BE367E7DC6B3D7 /* ShedTools.swift in Sources */,

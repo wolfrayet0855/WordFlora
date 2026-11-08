@@ -11,12 +11,13 @@ import SwiftData
 final class AdsServiceWiringTests: XCTestCase {
     nonisolated private static let noon = Calendar.current.date(bySettingHour: 12, minute: 0, second: 0, of: Date(timeIntervalSince1970: 1_780_000_000))!
 
-    private func makeApp(_ band: AgeBand?, plus: Bool = false, sessions: Int = 9, now: @escaping () -> Date = { AdsServiceWiringTests.noon }) throws -> AppModel {
+    private func makeApp(_ band: AgeBand?, plus: Bool = false, sessions: Int = 9, entries: [WordEntry] = [],
+                         now: @escaping () -> Date = { AdsServiceWiringTests.noon }) throws -> AppModel {
         let container = try SharedContainer.make(inMemory: true)
         let settings = AppSettings(defaults: UserDefaults(suiteName: "wf-ads-\(UUID().uuidString)")!)
         settings.ageBand = band
         settings.onboardingComplete = true
-        let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: [], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
+        let bank = WordBank(schemaVersion: 1, bankVersion: "t", entries: entries, daily: DailyConfig(epoch: "2026-01-01", seed: 1))
         let app = AppModel(container: container, settings: settings, bank: bank, now: now)
         app.settings.completedSessions = sessions
         app.profile?.roundsSinceAd = 9
@@ -196,6 +197,38 @@ final class AdsServiceWiringTests: XCTestCase {
         app.noteAdActive()
         XCTAssertEqual(app.adSession.pushedShown, 0, "a new visit")
         XCTAssertEqual(app.adLedger.fullScreen, 1, "the day counts stay")
+    }
+
+    // MARK: R2 whisper in a round
+
+    private func entry(_ word: String) -> WordEntry {
+        WordEntry(id: "w-\(word)", word: word, display: word.capitalized, hint: "a hint", hint2: "second clue", fact: "a fact",
+                  level: 1, kind: .vocab, plantId: nil, tags: [], minAge: 6, dailyEligible: true, source: "t", license: "t", reviewedBy: "t")
+    }
+
+    func testABankedWhisperIsTheFourthRungAndIsSpentOnce() async throws {
+        let app = try makeApp(.under13)
+        _ = await app.watchRewarded(.hint)
+        XCTAssertTrue(app.whisperBanked)
+        app.game.start(entry: entry("BANANAS"))
+        XCTAssertTrue(app.game.whisperReady)
+        for _ in 0..<3 { app.game.useHelp() }                         // hint2, vowel A, first letter B
+        XCTAssertTrue(app.whisperBanked, "the three free rungs come first")
+        app.game.useHelp()
+        XCTAssertTrue(app.game.guessedLetters.contains("N"), "the most frequent unrevealed consonant")
+        XCTAssertFalse(app.whisperBanked)
+        XCTAssertFalse(app.game.whisperReady)
+    }
+
+    func testNoWhisperOnTheDailyBloom() async throws {
+        let app = try makeApp(.under13, entries: [entry("BANANAS")])
+        _ = await app.watchRewarded(.hint)
+        app.game.startDaily()
+        XCTAssertTrue(app.game.isDaily)
+        XCTAssertEqual(app.game.phase, .playing)
+        XCTAssertFalse(app.game.whisperReady, "the dot is hidden and the rung absent on the Daily Bloom")
+        for _ in 0..<6 { app.game.useHelp() }
+        XCTAssertTrue(app.whisperBanked, "the whisper stays banked for a garden word")
     }
 
     // MARK: R3
