@@ -102,10 +102,28 @@ struct SeasonsView: View {
 }
 
 /// The pack's card art (light and dark), with no words in it: the app draws every word below it on `appSurface`.
+/// Gentle falling snow over the card's sky (not in Quiet Garden; Calm halves it; Reduce Motion or Low Power: one
+/// still frame; paused off screen and when the app is not active).
 struct PackCardArt: View {
+    @Environment(AppModel.self) private var app
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.scenePhase) private var scenePhase
+    @State private var visible = false
+    @State private var lowPower = LowPowerWatch()
+
     var body: some View {
+        let calm = app.settings.calmMode
         Image("pack_frost_lantern_card").resizable().scaledToFit()
             .frame(maxWidth: .infinity)
+            .overlay {
+                if !app.settings.quietGarden {
+                    SnowfallView(count: Snowfall.count(base: Snowfall.cardCount, calm: calm), calm: calm,
+                                 still: reduceMotion || app.settings.reduceMotionOverride || lowPower.isOn,
+                                 paused: !visible || scenePhase != .active)
+                }
+            }
+            .onAppear { visible = true }
+            .onDisappear { visible = false }
             .clipShape(RoundedRectangle(cornerRadius: Theme.cardRadius))
             .accessibilityLabel(PackCatalog.Copy.cardLabel)
             .accessibilityAddTraits(.isImage)

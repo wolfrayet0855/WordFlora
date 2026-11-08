@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0E2F7AB06E21FC7B2F530A6C /* SnowfallTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F2AD3EC9A51474CCA866C9 /* SnowfallTests.swift */; };
+		E9A92F9AE905012CF57C333E /* SnowfallView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03AF7E26EA6FFC317E2B7E9D /* SnowfallView.swift */; };
+		32ADBFD0D7C3FB388DE2EED6 /* Snowfall.swift in Sources */ = {isa = PBXBuildFile; fileRef = F045C157335114DB89D4762C /* Snowfall.swift */; };
 		572A1180A9DD7BAF600EFF8B /* BadgeMechanicsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68B5FE708C15AE7814C68E3 /* BadgeMechanicsUITests.swift */; };
 		81F29407ED589E6A819F2AE3 /* ButterflyNetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1123A192A2FF5F0E507408A /* ButterflyNetUITests.swift */; };
 		B8AEEFAEC5E0F26A2F5D0029 /* BadgeMechanicsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D8CB4AACC4E7F47C423316 /* BadgeMechanicsTests.swift */; };
@@ -345,6 +348,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		22F2AD3EC9A51474CCA866C9 /* SnowfallTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SnowfallTests.swift; sourceTree = "<group>"; };
+		03AF7E26EA6FFC317E2B7E9D /* SnowfallView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SnowfallView.swift; sourceTree = "<group>"; };
+		F045C157335114DB89D4762C /* Snowfall.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = Snowfall.swift; sourceTree = "<group>"; };
 		D68B5FE708C15AE7814C68E3 /* BadgeMechanicsUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeMechanicsUITests.swift; sourceTree = "<group>"; };
 		B1123A192A2FF5F0E507408A /* ButterflyNetUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyNetUITests.swift; sourceTree = "<group>"; };
 		02D8CB4AACC4E7F47C423316 /* BadgeMechanicsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeMechanicsTests.swift; sourceTree = "<group>"; };
@@ -738,6 +744,7 @@
 				A60BDD5B19B690060D44B813 /* WakePuzzle.swift */,
 				E0F27137167AD56F3C378B56 /* PlantThinning.swift */,
 				3E9482B7E7B497DE1F68D020 /* LifeStats.swift */,
+				F045C157335114DB89D4762C /* Snowfall.swift */,
 				1E72C046D44E8C67ECE69705 /* PotCatalog.swift */,
 				3FA71744038E31A37C76000E /* PackCatalog.swift */,
 				8A263D5A17E647DA875FD1C1 /* RestCardCopy.swift */,
@@ -852,6 +859,7 @@
 				9D9DBF6CF922185F20488618 /* NameStoryCard.swift */,
 				52107D98E6FA3FE503D0BDC7 /* LayeredPlantView.swift */,
 				AF243532D79B05FABE12F6B1 /* RainOverlay.swift */,
+				03AF7E26EA6FFC317E2B7E9D /* SnowfallView.swift */,
 				333953FCC06979F201C1B1C1 /* WeatherArt.swift */,
 				748C3E58AF634BFCB1C7F6C7 /* WeatherSky.swift */,
 				D217012C1174A869182A6064 /* WeatherDrawing.swift */,
@@ -926,6 +934,7 @@
 				03B08CBCAEE1D5A24848BAF8 /* WakeTests.swift */,
 				0B50EBB1E418EE1EB9BB4CA6 /* PlantThinningTests.swift */,
 				0A17B66E1750BA0EC6874EED /* LifeStatsTests.swift */,
+				22F2AD3EC9A51474CCA866C9 /* SnowfallTests.swift */,
 				2BEEF2341BC08BF94A6BDA7B /* TendAnimationTests.swift */,
 				2F21320793D53F9A3FFEF9D2 /* TendRowLayoutTests.swift */,
 				7E47F17A0000000000000002 /* TextFitLayoutTests.swift */,
@@ -1437,6 +1446,7 @@
 				8D71B5862E6878124BB379B1 /* WakeTests.swift in Sources */,
 				73D43C070CF83BBA5CF8A575 /* PlantThinningTests.swift in Sources */,
 				C0A400B31989FDA16B29412C /* LifeStatsTests.swift in Sources */,
+				0E2F7AB06E21FC7B2F530A6C /* SnowfallTests.swift in Sources */,
 				C84708A999B2ED2665D94F0A /* TendAnimationTests.swift in Sources */,
 				AF15A9EF3C97DDF9B5161099 /* TendRowLayoutTests.swift in Sources */,
 				7E47F17A0000000000000001 /* TextFitLayoutTests.swift in Sources */,
@@ -1603,12 +1613,14 @@
 				6F181DE96041D599FC525ECC /* WakeSheet.swift in Sources */,
 				9F99330CB530CFAE00A42C3F /* WakePuzzleView.swift in Sources */,
 				AD106C34A7F8BE408F27C378 /* LifeStats.swift in Sources */,
+				32ADBFD0D7C3FB388DE2EED6 /* Snowfall.swift in Sources */,
 				89D5ED23DA9588AA0C10C640 /* LifePalette.swift in Sources */,
 				54ACC3979C866A48FFB28F86 /* PetalPipRow.swift in Sources */,
 				0D40FB8B459939AEF138E877 /* LifePanel.swift in Sources */,
 				6A3637FF809AEE76F03A30E6 /* NameStoryCard.swift in Sources */,
 				80C6C5F5EDC6DB0C83563F51 /* LayeredPlantView.swift in Sources */,
 				C0301098F862C6C9DF220D24 /* RainOverlay.swift in Sources */,
+				E9A92F9AE905012CF57C333E /* SnowfallView.swift in Sources */,
 				CE5FA8A1B7CBD2843E93DD49 /* WeatherArt.swift in Sources */,
 				A2EAA42710D96198BA88AAF1 /* WeatherSky.swift in Sources */,
 				0E49C416A031E189CF9E528C /* WeatherDrawing.swift in Sources */,
