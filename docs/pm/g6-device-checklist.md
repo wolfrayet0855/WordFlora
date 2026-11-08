@@ -17,6 +17,13 @@ Real AdMob ids are never written in any file, commit, log or message. Say "the R
 5. Update `STATUS.md`, `cloudkit-new-fields.md` and owner-steps D6b/D8 (Plus Forever, the pack, the redeem row, AdMob-only ads, return ad sentence, ads begin from session 3, under 13 and unknown age never see an ad).
 6. Hand the owner the tip commit hash.
 
+### A2. Classes and checks added since the first plan (run in the same batches, under the lock)
+
+- UI: `EngagementUITests` (weekly note, name your plant, widget pin, share gate), `RestCardHintUITests`, `FadedBloomShotUITests`, `AdFormatsUITests`, `TextFitScreensUITests`.
+- Unit: `TextFitLayoutTests`, the Seasons snow tests, `WidgetActionsTests`.
+- Release proof: `tools/ads/check-ad-ids.sh` and `tools/ads/check-ad-ids-test.sh` (the self-test of fifteen cases) both pass; counts only, no real ids printed.
+- Rerun `AdsServiceWiringTests` alone at the merge (timing red under load).
+
 ## Part B. Owner archive (Tue 11-17 evening)
 
 **Step 1. Archive from the MAIN checkout, not a worktree.** `Config/Ads.local.xcconfig` is git-ignored and absent from worktrees. A worktree archive has no real ids and would ship Google's test ids (the Release build-phase check from G4a should refuse it, but do not rely on that: do not try).
@@ -85,6 +92,39 @@ Follow `docs/setup/cloudkit-deploy-straight-to-prod.md` (parts 1 to 3). The orde
 - [ ] Crash-safety run, 20 minutes: background and foreground, airplane mode, light and dark, rotate lock, an interrupted purchase.
 - [ ] Wild Weather opt-in is off by default for all ages unless the player opts in.
 - [ ] Notification, widget and Siri launches show no ad.
+
+### C6. Widget on the device (from `docs/pm/widget-review.md` section 5)
+
+- [ ] 1. Small widget at the default text size: name, chip and button all visible, nothing clipped; repeat at the two largest accessibility sizes.
+- [ ] 2. Medium widget at the largest accessibility size: buttons visible and tappable.
+- [ ] 3. Tinted and Clear Home Screens (iOS 18 Tinted, iOS 26 Clear), light and dark: button text has enough contrast on both capsules; plant art acceptable as a tinted silhouette.
+- [ ] 4. Tap water: the number drops within a second; after two drinks the label reads "Watered today"; the Lock Screen gauge moves without waiting.
+- [ ] 5. "Said hello" after Say hello, then open the app: the daily quest hello count includes it and the plant page shows the hearts as loved today.
+- [ ] 6. Water from the widget, bring the app to the front without relaunching: Home shows the lower drop count and the growth. If not, log a 1.0 fix (refetch on `.active`).
+- [ ] 7. Widget added before the app is ever opened on a fresh install: the calm fallback, then a plant within 15 minutes.
+- [ ] 8. Lock Screen circular, rectangular and inline at Large text and with VoiceOver: labels make sense ("Daisy, growing, 40 percent").
+- [ ] 9. Control Center "Water my garden" responds, shows "Watering", and the Home Screen widget updates. Siri "Water my garden in WordFlora" with the app closed and open: the spoken line matches the widget; no ad on return.
+- [ ] 10. "Visit" deep link from the small widget opens Garden then the plant page; from the empty state opens a round; a tap during onboarding does nothing.
+- [ ] 11. Nickname set in the app shows on the widget; on the locked Lock Screen the widget does not show the species name (name privacy), only the player's chosen name.
+- [ ] 12. A free player (drop refresh): the widget refreshes after the free drop without waiting for the timeline.
+- [ ] 13. App Group checks 1 to 4 from section 4 of the review, once. Check 4 is the N6 Debug print in `WordFloraApp.init`: run Debug on the phone twice and read it both times (non-nil `file:///private/var/mobile/Containers/Shared/AppGroup/...` and `storeHome: Optional("group")` on the second run). Remove the print before Release.
+
+### C7. Audio (from `docs/pm/audio-review-rulings.md`)
+
+- [ ] Mist hiss sounds like a plant mister, not steam; no sharp "sss"; fine on AirPods at 50% and on the phone speaker.
+- [ ] Snip (pruning) level on the speaker and in headphones at half volume; if sharp, re-render with a low-pass is 1.1.
+- [ ] AAC loop seams: on a wind day and a puddles day with headphones at half volume, listen through at least three loop boundaries (8 s wind and storm, 6 s drought). A tick means convert that bed to PCM CAF (1.0 fix).
+- [ ] Level sweep at 50% and 100% speaker and AirPods at 50%: loud trio (correct, badge bronze, five-note flower) against soft trio (hiss, hail, thunder).
+- [ ] Tap the petal flower repeatedly for ten seconds: no distortion, no click when the sixth note cuts the first.
+
+### C8. Settings and flows
+
+- [ ] iCloud status row states: on and synced, off, signed out or restricted, waiting for the store; each reads sensibly and the row is absent until the store answers.
+- [ ] "Synced N minutes ago" appears after a real sync event (tend a plant on the other device) and the number moves.
+- [ ] One Restore only, in Settings (Purchases section); it says so when the App Store cannot be reached; none on the Plus page.
+- [ ] Grown-up gate flows: buy, Restore link-outs and Manage Subscription sit behind the question at every age under 13 and unknown; the question sheet reads at the largest text size.
+- [ ] Weekly note: appears on its day, once, dismisses, and does not repeat; under 13 sees the age-appropriate version.
+- [ ] Name your plant: set, change and clear a name; it shows on the plant page, Garden and widget; long names wrap at large text; sharing hides it.
 
 Anything that fails: write it down, mark blocker or 1.1, tell the lead. Blockers mean fixes, a new archive from the main checkout, a new build number and a recheck of the affected items.
 
