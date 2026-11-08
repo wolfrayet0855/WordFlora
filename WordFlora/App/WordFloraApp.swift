@@ -45,7 +45,14 @@ struct WordFloraApp: App {
                 bank = WordBank(schemaVersion: 1, bankVersion: "ui", entries: [entry], daily: DailyConfig(epoch: "2026-01-01", seed: 1))
             }
         }
-        let model = AppModel(container: container, settings: settings, bank: bank, storeEnabled: !uiTesting, launchedWithCloud: openedWithCloud, storeDegraded: degraded)
+        let model = AppModel(container: container, settings: settings, bank: bank, storeEnabled: !uiTesting, launchedWithCloud: openedWithCloud,
+                             cloudOpenFailed: wantsCloud && !openedWithCloud, storeDegraded: degraded)
+        #if DEBUG
+        // Settles the App Group question on a device (docs/pm/plus-flow-fable-review.md N6): a URL and "homeKey: group"
+        // on the second run mean the group works. Remove once the owner has run it.
+        print("appGroup:", FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: SharedDefaults.groupID) as Any,
+              "homeKey:", SharedDefaults.store.string(forKey: SharedContainer.homeKey) as Any)
+        #endif
         if uiTesting && args.contains("-uitest-gardened") {
             // A garden with one found plant and some supplies, for tending UI tests.
             model.plants().first?.earnedCount = 1
@@ -104,6 +111,15 @@ struct WordFloraApp: App {
             model.entitlements.debugPreviewPackPrices(UITestPrices.packs)       // the pack is "offered": its surfaces show
         }
         // The store answers slowly: the Plus page's loading state (no prices yet, no button, a spinner).
+        // Settings' iCloud row in a chosen state (on, needs a sign-in, unavailable).
+        if uiTesting, let c = args.first(where: { $0.hasPrefix("-uitest-cloud=") })?.dropFirst("-uitest-cloud=".count) {
+            switch c {
+            case "on": model.debugSetCloudStatus(.on)
+            case "signin": model.debugSetCloudStatus(.needsSignIn)
+            case "unavailable": model.debugSetCloudStatus(.unavailable)
+            default: break
+            }
+        }
         if uiTesting && args.contains("-uitest-store-slow") { model.entitlements.debugSlowStore(seconds: 90) }
         // Frost & Lantern owned (bought or family-shared): its two pots can be picked.
         if uiTesting && args.contains("-uitest-pack-owned") {
@@ -251,11 +267,15 @@ struct WordFloraApp: App {
                 .environment(router)
                 .modelContainer(app.container)
                 .onOpenURL { url in if app.onboarding.isComplete { router.open(url) } }
+                // Plus that arrives while the app is open (Ask to Buy approved, a family share, a code, a refund) sets
+                // the sync flag now, not one launch late.
+                .onChange(of: app.entitlements.state.hasCloudSync) { _, _ in app.updateSyncFlag() }
                 .onChange(of: scenePhase) { _, phase in
                     if phase == .active { app.reconcileSyncedData(); app.checkWelcomeBack() }
                     // Keep the home-screen widget in step with what the player just did.
                     if phase == .background || phase == .inactive { WidgetCenter.shared.reloadAllTimelines(); app.refreshReminders() }
                     if phase == .active { app.refreshFreeDrops(); app.updateAmbience(); app.updateSyncFlag(); app.refreshQuestFromGarden() }
+                    if phase == .active { Task { await app.refreshCloudAccount() } }
                     if phase == .background { SoundPlayer.shared.stopAmbient() }
                 }
         }

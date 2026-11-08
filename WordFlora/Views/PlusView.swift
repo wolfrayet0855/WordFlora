@@ -14,6 +14,9 @@ struct PlusView: View {
     @State private var afterGate: GatedAction = .purchase
     @State private var showManageSubscriptions = false
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+    @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
+    /// Counts the moments Plus turned on here (the haptic's trigger).
+    @State private var turnedOn = 0
 
     private enum GatedAction { case purchase, redeem, manageSubscriptions }
 
@@ -44,14 +47,15 @@ struct PlusView: View {
                     }
                 }.frame(maxWidth: .infinity, alignment: .leading)
 
-                if store.state.hasPlus { activeCard } else { plans }
+                if store.state.hasPlus {
+                    activeCard.transition(reduceMotion ? .opacity : .scale(scale: 0.96).combined(with: .opacity))
+                } else { plans }
                 // Outside the plans, so a message (a restore that turned Plus on) stays in view when the plans go.
                 if let message {
                     Text(message).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
                         .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
                         .accessibilityIdentifier("plus.message")
                 }
-                FamilyShareNudgeRow(placement: .plusPage)
 
                 VStack(spacing: 2) {
                     Button { restore() } label: {
@@ -64,7 +68,10 @@ struct PlusView: View {
                     .accessibilityIdentifier("plus.restore")
                     Button(PaywallCopy.redeem) { ask(then: .redeem) }.tapTarget()
                         .accessibilityIdentifier("plus.redeem")
-                    GatedLink("Manage subscription", url: Links.manageSubscriptions).tapTarget()
+                    // Only with a live subscription: a non-subscriber has nothing to manage.
+                    if store.state.hasActiveSubscription {
+                        GatedLink("Manage subscription", url: Links.manageSubscriptions).tapTarget()
+                    }
                     // Side by side, one under the other at the accessibility sizes.
                     let links = dynamicTypeSize.isAccessibilitySize ? AnyLayout(VStackLayout(spacing: 2)) : AnyLayout(HStackLayout(spacing: 8))
                     links {
@@ -75,6 +82,8 @@ struct PlusView: View {
                 .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
             }
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.card).padding(.bottom, Space.section)
+            // The plans give way to the active card with a soft spring (a fade with Reduce Motion).
+            .animation(reduceMotion ? .easeOut(duration: 0.2) : .spring(response: 0.4, dampingFraction: 0.8), value: store.state.hasPlus)
         }
         .background(Color.appBackground.ignoresSafeArea())
         .navigationTitle("Plus")
@@ -85,7 +94,10 @@ struct PlusView: View {
         }
         .manageSubscriptionsSheet(isPresented: $showManageSubscriptions)
         .onChange(of: message) { _, new in if let new { AccessibilityNotification.Announcement(new).post() } }
+        .sensoryFeedback(.success, trigger: turnedOn) { _, _ in app.settings.hapticsOn }
     }
+
+    private var reduceMotion: Bool { systemReduceMotion || app.settings.reduceMotionOverride }
 
     // MARK: Plans
 
@@ -161,8 +173,9 @@ struct PlusView: View {
 
     /// Plus Forever: the third choice, under the two plans. Same card and type sizes, no badge, never the default.
     private var lifetimeCard: some View {
+        // "$34.99 once" says it; the fine print under the button carries the full line when it is picked.
         choiceCard(.lifetime, title: PlusPlan.lifetimeName, badge: nil,
-                   lines: [(PaywallCopy.lifetimeLine, .secondaryText)],
+                   lines: [],
                    price: store.displayPrice(for: .lifetime).map { PaywallCopy.priceLine($0, choice: .lifetime) })
             .accessibilityIdentifier("plus.lifetime")
     }
@@ -217,8 +230,12 @@ struct PlusView: View {
                 Label(lifetime ? PaywallCopy.ownedLifetime : PaywallCopy.ownedSubscription, systemImage: "sparkles")
                     .font(Theme.font(.headline)).foregroundStyle(Color.successText)
                     .fixedSize(horizontal: false, vertical: true)
-                Text(lifetime ? PaywallCopy.ownedLifetimeDetail : PaywallCopy.ownedSubscriptionDetail).font(Theme.font(.callout))
-                    .fixedSize(horizontal: false, vertical: true)
+                // Which plan, and until when ("Yearly plan · renews Nov 7, 2027"); Plus Forever: "Paid once. No renewals."
+                Text(lifetime ? PaywallCopy.ownedLifetimeDetail
+                              : PaywallCopy.planLine(plan: store.state.activePlan ?? .yearly, renews: store.state.subscriptionRenews,
+                                                     endsAt: store.state.subscriptionEndsAt))
+                    .font(Theme.font(.callout)).fixedSize(horizontal: false, vertical: true)
+                    .accessibilityIdentifier("plus.planLine")
                 // Apple never cancels a subscription when Plus Forever is bought, so say it plainly.
                 if store.state.paysTwice {
                     Text(PaywallCopy.paysTwice).font(Theme.font(.callout, weight: .semibold))
@@ -289,8 +306,14 @@ struct PlusView: View {
             let outcome = await store.purchase(selected)
             busy = false
             switch outcome {
-            // Plus is on: the page turns into "You have WordFlora Plus" (or Plus Forever), which says it.
-            case .success: message = nil; app.updateSyncFlag()
+            // Plus is on: one clear moment (the card springs in, a success haptic, a line VoiceOver reads too).
+            case .success:
+                app.updateSyncFlag()
+                withAnimation(reduceMotion ? .easeOut(duration: 0.2) : .spring(response: 0.4, dampingFraction: 0.8)) {
+                    message = PaywallCopy.justOn(adsWereOn: !ParentalGate.isRequired(ageBand: app.settings.ageBand),
+                                                 syncNeedsRestart: app.syncNeedsRestart)
+                }
+                turnedOn += 1
             case .pending: message = PaywallCopy.pendingSlow
             case .awaitingApproval: message = PaywallCopy.awaitingApproval
             case .cancelled: message = nil

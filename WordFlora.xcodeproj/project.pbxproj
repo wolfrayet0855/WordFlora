@@ -228,6 +228,7 @@
 		B860D8B4DD8D2E8153E63AC1 /* WeatherSoundPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = E268793BEEF5DC12F0FEC59E /* WeatherSoundPlayer.swift */; };
 		BF1505CF8E342EDAE2B067A9 /* SimplerClueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FBDA79853A58ADD9A3C086E7 /* SimplerClueTests.swift */; };
 		BF85587E45FCFE74CE68D2B7 /* EntitlementService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 095F94DF6CFF0C826E3155B6 /* EntitlementService.swift */; };
+		7E47F17A0000000000000005 /* CloudSync.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7E47F17A0000000000000006 /* CloudSync.swift */; };
 		C01954BECB8A0A87686D11CE /* Share.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13457F8B016917B22CB55A1C /* Share.swift */; };
 		C0301098F862C6C9DF220D24 /* RainOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF243532D79B05FABE12F6B1 /* RainOverlay.swift */; };
 		CE5FA8A1B7CBD2843E93DD49 /* WeatherArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 333953FCC06979F201C1B1C1 /* WeatherArt.swift */; };
@@ -385,6 +386,7 @@
 		07E6A1305C8A4BB87A255C2F /* WordProviderTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WordProviderTests.swift; sourceTree = "<group>"; };
 		08D9F7603039699D755A5EDB /* ToolEngineTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ToolEngineTests.swift; sourceTree = "<group>"; };
 		095F94DF6CFF0C826E3155B6 /* EntitlementService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = EntitlementService.swift; sourceTree = "<group>"; };
+		7E47F17A0000000000000006 /* CloudSync.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CloudSync.swift; sourceTree = "<group>"; };
 		0A17B66E1750BA0EC6874EED /* LifeStatsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LifeStatsTests.swift; sourceTree = "<group>"; };
 		0B50EBB1E418EE1EB9BB4CA6 /* PlantThinningTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = PlantThinningTests.swift; sourceTree = "<group>"; };
 		0ED2AA84626C61A605393776 /* ButterflyGameModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyGameModel.swift; sourceTree = "<group>"; };
@@ -1079,6 +1081,7 @@
 				3B62098E04C3095B889397EC /* WordProvider.swift */,
 				BFEC756D07E4F0F6AC99837A /* DailyBloom.swift */,
 				095F94DF6CFF0C826E3155B6 /* EntitlementService.swift */,
+				7E47F17A0000000000000006 /* CloudSync.swift */,
 			);
 			name = Services;
 			path = Services;
@@ -1563,6 +1566,7 @@
 				06A793E2BE60065077304675 /* PlantDetailView.swift in Sources */,
 				F1EC73BEF7CC700E3392A9D0 /* Paywall.swift in Sources */,
 				BF85587E45FCFE74CE68D2B7 /* EntitlementService.swift in Sources */,
+				7E47F17A0000000000000005 /* CloudSync.swift in Sources */,
 				6F482CD15D77232746B4BDE5 /* PlusView.swift in Sources */,
 				AD509424FBF83D3CB692C137 /* SeasonsView.swift in Sources */,
 				7134B8F63F8B167F415D50C5 /* AdsService.swift in Sources */,

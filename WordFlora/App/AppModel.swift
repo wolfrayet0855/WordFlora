@@ -1,4 +1,5 @@
 import SwiftUI
+import CloudKit
 import SwiftData
 
 /// Composition root: owns the store, settings, the round view model and first-session flow.
@@ -19,7 +20,19 @@ final class AppModel {
     var adsEnabled = true
     /// True when this launch opened the iCloud-synced store.
     let launchedWithCloud: Bool
+    /// This launch wanted the CloudKit store (Plus) and could not open it (no usable iCloud account, or a store error).
+    let cloudOpenFailed: Bool
     private(set) var syncNeedsRestart = false
+    /// The iCloud account status, read while Plus is on (Settings' iCloud row).
+    private(set) var cloudAccount: CKAccountStatus?
+    /// The time of the latest CloudKit import or export, when this launch syncs (nil otherwise).
+    let cloudSync: CloudSyncMonitor?
+    /// Settings' iCloud row.
+    var cloudSyncStatus: CloudSyncStatus {
+        if let debugCloudStatus { return debugCloudStatus }
+        return CloudSyncStatus.status(hasPlus: entitlements.state.hasCloudSync, launchedWithCloud: launchedWithCloud,
+                               cloudOpenFailed: cloudOpenFailed, account: cloudAccount)
+    }
     private(set) var showWelcomeBack = false
     private(set) var welcomeLine = WelcomeBack.lines[0]
     /// True when the saved garden could not be opened and this launch is running on a temporary store.
@@ -45,9 +58,11 @@ final class AppModel {
     var context: ModelContext { container.mainContext }
 
     init(container: ModelContainer, settings: AppSettings = AppSettings(), bank: WordBank? = nil, now: @escaping () -> Date = { .now }, storeEnabled: Bool = false,
-         notifications: NotificationCenterProviding = SystemNotificationCenter(), launchedWithCloud: Bool = false, storeDegraded: Bool = false) {
+         notifications: NotificationCenterProviding = SystemNotificationCenter(), launchedWithCloud: Bool = false, cloudOpenFailed: Bool = false, storeDegraded: Bool = false) {
         self.storeDegraded = storeDegraded
         self.launchedWithCloud = launchedWithCloud
+        self.cloudOpenFailed = cloudOpenFailed
+        self.cloudSync = launchedWithCloud ? CloudSyncMonitor() : nil
         self.now = now
         self.reminders = ReminderScheduler(center: notifications)
         self.entitlements = EntitlementService(startListening: storeEnabled)
@@ -857,6 +872,16 @@ final class AppModel {
 
     /// SwiftData opens its store once per launch, so entitlement changes take effect on the next launch.
     /// A lapsed subscription reopens the same store without sync: nothing is deleted or reset.
+    /// Reads the iCloud account status while Plus is on (scene active), for Settings' iCloud row.
+    /// UI tests only (`-uitest-cloud=on|signin|unavailable`): the row as it reads in that state.
+    private(set) var debugCloudStatus: CloudSyncStatus?
+    func debugSetCloudStatus(_ s: CloudSyncStatus) { debugCloudStatus = s }
+
+    func refreshCloudAccount() async {
+        guard entitlements.state.hasCloudSync else { cloudAccount = nil; return }
+        cloudAccount = try? await CKContainer(identifier: SharedContainer.cloudContainerID).accountStatus()
+    }
+
     func updateSyncFlag() {
         guard entitlements.hasLoaded else { return }          // a slow StoreKit start must never switch sync off
         let entitled = entitlements.state.hasCloudSync

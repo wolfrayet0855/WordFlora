@@ -889,7 +889,9 @@ final class ParentalGateLinkUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].label.hasPrefix("WordFlora is complete without Plus."))
         shot("plus-grown-ups")
         expectGateThenCancel(after: app.buttons["Terms of Use"])
-        expectGateThenCancel(after: app.buttons["Manage subscription"])
+        // No subscription, so nothing to manage: the link only shows with a live subscription (the paysTwice
+        // "Cancel the subscription" button, behind the gate too, is checked with the owned states).
+        XCTAssertFalse(app.buttons["Manage subscription"].exists)
         expectGateThenCancel(after: app.buttons["plus.redeem"])
     }
 

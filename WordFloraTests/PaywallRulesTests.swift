@@ -88,11 +88,81 @@ final class PaywallRulesTests: XCTestCase {
     func testRestoreAndPageLines() {
         XCTAssertEqual(PaywallCopy.restoredOn, "Plus is on.")
         XCTAssertEqual(PaywallCopy.restoredNone, "No purchases found for this Apple ID.")
-        XCTAssertEqual(PaywallCopy.restore, FamilyShareNudge.Copy.button, "the one Restore button keeps its name")
+        XCTAssertEqual(PaywallCopy.restore, "Restore purchases", "the one Restore button keeps its name")
         for line in [PaywallCopy.loadFailed, PaywallCopy.tryAgain, PaywallCopy.loadingPrices, PaywallCopy.ownedSubscription,
-                     PaywallCopy.ownedSubscriptionDetail, PaywallCopy.failed, PaywallCopy.renewal, PaywallCopy.trialCTA] {
+                     PaywallCopy.failed, PaywallCopy.renewal, PaywallCopy.trialCTA, PaywallCopy.ownedLifetimeDetail] {
             XCTAssertTrue(PaywallCopy.all.contains(line), line)
         }
+        for line in PaywallCopy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
+    }
+
+    // MARK: You have Plus (docs/pm/plus-flow-fable-review.md N3)
+
+    func testJustOnSaysWhatChanged() {
+        XCTAssertEqual(PaywallCopy.justOn(adsWereOn: true, syncNeedsRestart: true), "Plus is on. Ads are off. iCloud sync starts next time you open WordFlora.")
+        XCTAssertEqual(PaywallCopy.justOn(adsWereOn: false, syncNeedsRestart: false), "Plus is on. Your garden syncs with iCloud.")
+        XCTAssertEqual(PaywallCopy.ownedLifetimeDetail, "Paid once. No renewals.")
+    }
+
+    func testActivePlanAndPlanLine() {
+        XCTAssertEqual(EntitlementState(activeProductIDs: ["plus_yearly"]).activePlan, .yearly)
+        XCTAssertEqual(EntitlementState(activeProductIDs: ["plus_monthly"]).activePlan, .monthly)
+        XCTAssertEqual(EntitlementState(activeProductIDs: ["plus_monthly", "plus_yearly"]).activePlan, .yearly, "yearly wins")
+        XCTAssertNil(EntitlementState(activeProductIDs: ["plus_lifetime"]).activePlan)
+        XCTAssertNil(EntitlementState().activePlan)
+        let end = Date(timeIntervalSince1970: 1_826_000_000)
+        XCTAssertEqual(PaywallCopy.planLine(plan: .yearly, renews: true, endsAt: nil), "Yearly plan")
+        let renews = PaywallCopy.planLine(plan: .yearly, renews: true, endsAt: end)
+        XCTAssertTrue(renews.hasPrefix("Yearly plan · renews "), renews)
+        let ends = PaywallCopy.planLine(plan: .monthly, renews: false, endsAt: end)
+        XCTAssertTrue(ends.hasPrefix("Monthly plan · ends ") && ends.hasSuffix(". Auto-renew is off."), ends)
+    }
+
+    func testSettingsRowSaysPlusIsOnForEveryAge() {
+        for band: AgeBand? in [.under13, nil, .thirteenPlus, .eighteenPlus] {
+            XCTAssertEqual(PlusEntry.rowTitle(ageBand: band, hasPlus: true), "WordFlora Plus is on")
+        }
+        XCTAssertEqual(PaywallCopy.planShort(EntitlementState(activeProductIDs: ["plus_yearly"])), "Yearly")
+        XCTAssertEqual(PaywallCopy.planShort(EntitlementState(activeProductIDs: ["plus_monthly"])), "Monthly")
+        XCTAssertEqual(PaywallCopy.planShort(EntitlementState(activeProductIDs: ["plus_lifetime", "plus_yearly"])), "Forever", "Plus Forever wins")
+        XCTAssertNil(PaywallCopy.planShort(EntitlementState()))
+    }
+
+    // MARK: iCloud sync status (N4)
+
+    func testCloudSyncStatusTable() {
+        typealias S = CloudSyncStatus
+        XCTAssertEqual(S.status(hasPlus: false, launchedWithCloud: false, cloudOpenFailed: false, account: nil), .needsPlus)
+        XCTAssertEqual(S.status(hasPlus: false, launchedWithCloud: true, cloudOpenFailed: false, account: .available), .needsPlus)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: true, cloudOpenFailed: false, account: .available), .on)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: .noAccount), .needsSignIn)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: true, account: .available), .unavailable)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: .restricted), .unavailable)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: .couldNotDetermine), .startsNextLaunch)
+        XCTAssertEqual(S.status(hasPlus: true, launchedWithCloud: false, cloudOpenFailed: false, account: nil), .startsNextLaunch)
+        XCTAssertEqual(S.on.title, "iCloud sync is on")
+        XCTAssertEqual(S.needsPlus.title, "iCloud sync is off (needs Plus)")
+        XCTAssertNil(S.startsNextLaunch.footnote)
+        for line in S.Copy.all {
+            XCTAssertEqual(CopySafety.check(line), [], line)
+            XCTAssertFalse(line.lowercased().contains("last"), line)
+        }
+        XCTAssertTrue(S.Copy.synced(Date.now.addingTimeInterval(-300)).hasPrefix("Synced "))
+    }
+
+    @MainActor
+    func testCloudSyncMonitorKeepsTheLatestSuccess() throws {
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: "textfit.cloudsync.test"))
+        defaults.removePersistentDomain(forName: "textfit.cloudsync.test")
+        let m = CloudSyncMonitor(defaults: defaults, listen: false)
+        XCTAssertNil(m.syncedAt, "no event, no time")
+        let t = Date(timeIntervalSince1970: 1_800_000_000)
+        m.record(end: t, ok: true)
+        XCTAssertEqual(m.syncedAt, t); XCTAssertFalse(m.lastFailed)
+        m.record(end: t.addingTimeInterval(60), ok: false)
+        XCTAssertEqual(m.syncedAt, t, "a failed export does not move the time"); XCTAssertTrue(m.lastFailed)
+        XCTAssertEqual(CloudSyncMonitor(defaults: defaults, listen: false).syncedAt, t, "kept across launches")
+        defaults.removePersistentDomain(forName: "textfit.cloudsync.test")
     }
 
     func testAllPaywallCopyPassesTheCopyLinter() {
@@ -151,7 +221,7 @@ final class PaywallRulesTests: XCTestCase {
             XCTAssertEqual(PlusEntry.sectionTitle(ageBand: band), "For grown-ups")
             XCTAssertEqual(PlusEntry.rowTitle(ageBand: band), "WordFlora Plus")
             XCTAssertEqual(PlusEntry.intro(ageBand: band),
-                           "WordFlora is complete without Plus. Plus removes ads for grown-up players and syncs the garden with iCloud. Family Sharing covers up to six people.")
+                           "WordFlora is complete without Plus. Plus removes ads for grown-up players and syncs the garden with iCloud.")
         }
         for band: AgeBand? in [.thirteenPlus, .eighteenPlus] {
             XCTAssertEqual(PlusEntry.sectionTitle(ageBand: band), "WordFlora Plus")

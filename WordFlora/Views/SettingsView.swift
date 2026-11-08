@@ -73,8 +73,18 @@ struct SettingsView: View {
                 Toggle("Show everything", isOn: $s.showEverything)
             }
             Section(PlusEntry.sectionTitle(ageBand: s.ageBand)) {
-                Button { router.go(.plus) } label: { Label(PlusEntry.rowTitle(ageBand: s.ageBand), systemImage: "sparkles") }
-                    .accessibilityIdentifier("settings.plus")
+                // Once Plus is on the row says so, with the plan ("WordFlora Plus is on · Yearly"), for every age.
+                let state = app.entitlements.state
+                Button { router.go(.plus) } label: {
+                    HStack {
+                        Label(PlusEntry.rowTitle(ageBand: s.ageBand, hasPlus: state.hasPlus), systemImage: "sparkles")
+                        if state.hasPlus, let short = PaywallCopy.planShort(state) {
+                            Spacer(minLength: 8)
+                            Text(short).foregroundStyle(Color.secondaryText)
+                        }
+                    }
+                }
+                .accessibilityIdentifier("settings.plus")
                 // Seasons: only while a pack is live (offered or owned); behind the grown-up question for under 13.
                 if PackCatalog.all.contains(where: { app.entitlements.packIsLive($0.id) }) {
                     Button { openSeasons() } label: {
@@ -86,10 +96,7 @@ struct SettingsView: View {
                     .accessibilityIdentifier("settings.seasons")
                 }
                 FamilyShareNudgeRow()
-                if app.entitlements.state.hasCloudSync {
-                    Label(app.syncNeedsRestart ? "iCloud sync starts the next time you open WordFlora" : "iCloud sync is on", systemImage: "icloud.fill")
-                        .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
-                }
+                cloudRow
             }
             Section("Your garden") {
                 Button { prepareBackup() } label: { Label(GardenBackup.Copy.backupTitle, systemImage: "square.and.arrow.up") }
@@ -128,6 +135,27 @@ struct SettingsView: View {
         .sheet(item: $seasonsGate) { challenge in
             ParentalGateSheet(challenge: challenge, onPass: { seasonsGate = nil; router.go(.seasons) }, onCancel: { seasonsGate = nil })
         }
+    }
+
+    /// iCloud sync as a status row (not a caption), for everyone: on, starts next time, needs Plus, needs a sign-in, or
+    /// unavailable, with what to do and, when this launch syncs, "Synced 5 minutes ago" (docs/pm/plus-flow-fable-review.md N4).
+    private var cloudRow: some View {
+        let status = app.cloudSyncStatus
+        return VStack(alignment: .leading, spacing: 4) {
+            Label(status.title, systemImage: status.symbol)
+                .font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
+                .fixedSize(horizontal: false, vertical: true)
+            if status == .on, let at = app.cloudSync?.syncedAt {
+                Text(CloudSyncStatus.Copy.synced(at)).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                    .accessibilityIdentifier("settings.cloudSync.synced")
+            }
+            if let note = status.footnote {
+                Text(note).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityIdentifier("settings.cloudSync")
     }
 
     private func openSeasons() {
