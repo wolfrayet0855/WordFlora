@@ -10,6 +10,8 @@ Mockups: `design-preview/admob/native-card.svg`, `app-open-cue.svg`, `rewarded-p
 
 ---
 
+_Cleaned up 2026-11-08 (G4a): numbers and unit counts below follow the three Review rulings at the end, which stay the record._
+
 ## 0. Rules every format obeys
 
 ### 0.1 Who sees ads (one function for all formats)
@@ -115,15 +117,15 @@ enum AdPolicy {
 
 | Cap | Value | Today | Store |
 |---|---|---|---|
-| Pushed ads per day | **6** (interstitial and app-open together) | 6, interstitial only | synced `adsToday` / `adsDay` (meaning widened, no new field) |
-| Pushed ads per session | **3** | none | memory |
-| Full-screen ads per day | **10** | none | ledger (`fullScreen`) + synced counts as a floor |
-| Full-screen ads per session | **5** | none | memory |
-| Min gap: any full-screen → next **pushed** | **180 s** | 180 s, interstitial → interstitial only | synced `lastAdAt` now set by every full-screen ad |
-| Min gap: any full-screen → next **rewarded** | **30 s** | none | ledger `lastFullScreenAt` |
-| Min gap: any full-screen → **app-open** | **30 min** | n/a | ledger |
-| Rewarded per day (all perks) | **5** | 3 (water only) | synced `rewardedToday` / `rewardedDay` (meaning widened) |
-| Rewarded per session | **3** | none | memory |
+| Pushed ads per day | **6** (interstitial and app-open together; ruled 11-07, unchanged) | 6, interstitial only | synced `adsToday` / `adsDay` (meaning widened, no new field) |
+| Pushed ads per session | **2** (ruled 11-07) | none | memory |
+| Full-screen ads per day | **8** (ruled 11-07) | none | ledger (`fullScreen`) + synced counts as a floor |
+| Full-screen ads per session | **4** (ruled 11-07) | none | memory |
+| Min gap: any full-screen → next **pushed** | **600 s** (ruled 11-07) | 180 s, interstitial → interstitial only | synced `lastAdAt` now set by every full-screen ad |
+| Min gap: any full-screen → next **rewarded** | **30 s** (ruled 11-07, unchanged) | none | ledger `lastFullScreenAt` |
+| Min gap: any full-screen → **app-open** | **30 min** (ruled 11-07, unchanged) | n/a | ledger |
+| Rewarded per day (all perks) | **5** (ruled 11-07, unchanged) | 3 (water only) | synced `rewardedToday` / `rewardedDay` (meaning widened) |
+| Rewarded per session | **3** (ruled 11-07, unchanged) | none | memory |
 | Celebration quiet window | 5 s | 5 s | memory |
 
 Interstitial's own rules stay exactly as today (every 3rd round, `oneMore` or `playSoonAfterEnough` only, never night, grace of 3 sessions or a level-up, never session 1). They now also obey the rows above. The resting card's "A short ad may play first." note is recomputed after any rewarded ad on that card (R2), so the note never lies.
@@ -160,13 +162,13 @@ A clock that moved backwards (`now < last`) counts as "gap not met"; if it is mo
 
 **UI.** The banner frame takes `bannerView.adSize.size.height` (B4); never a fixed 60 pt. The expanded state is drawn by Google with its own collapse control; the app adds nothing over it. Below the banner the same caption row as Home: "Go ad-free · Report an ad" (secondary text, caption font, wraps). Collapsible ads are Google demand only; a normal banner can come back for the same request **[Google, fetched]**; `isCollapsible` is read in `bannerViewDidReceiveAd` and only then is `collapsibleShown` counted.
 
-**Unit.** Separate unit `WordFlora_Banner_Garden_Collapsible` for reporting (the collapsible request uses it; refreshes and non-collapsible Garden loads use `WordFlora_Banner_Garden`).
+**Unit.** The collapsible request uses its own unit `WordFlora_Banner_Garden_Collapsible` (`ADMOB_BANNER_GARDEN_COLLAPSIBLE_ID`, auto-refresh off in the console). Garden refreshes and every non-collapsible Garden load use the **Home** banner id through `ADMOB_BANNER_GARDEN_ID` (owner decision 2026-11-07: Garden reuses Home; no Garden unit exists). **Handoff (option a):** one `BannerView` has one unit id, so G4b creates the Garden `BannerView` with the collapsible id and, on `bannerViewDidReceiveAd` (collapsible or not) or on dismissal, swaps in a second `BannerView` on the Home id, which then refreshes every 60 s.
 
 ### 1.4 Native ad (Garden Shed)
 
 **Placement.** One native card at the **bottom of the Garden Shed**, after the Pots section, under a section header "SPONSORED" and the line "Ads help keep WordFlora free." Never in the plant grid, the Garden, Home, Plant detail, the puzzle or any child-visible surface (children never get here with an ad anyway: treatment `.none`). The Shed is a browse screen with no puzzle and no timer, and the card sits below all game content, so it cannot be mistaken for a tool or a pot.
 
-**Trigger.** On Shed appear, if eligible and no ad is cached, `AdLoader` loads one native ad (`NativeAd`). A loaded ad is reused across Shed visits for up to **1 h** **[verify: Google's recommended native ad lifetime]**, then dropped. At most **1 load per 60 s**, at most **6 loads per day** (ledger `nativeLoads`).
+**Trigger.** On Shed appear, if eligible and no ad is cached, `AdLoader` loads one native ad (`NativeAd`). A loaded ad is reused across Shed visits for up to **30 min**, then dropped (Google's native guide: ads expire after an hour, so 1 h is the ceiling and 30 min is safe; [verify] resolved 2026-11-07). At most **1 load per 60 s**, at most **6 loads per day** (ledger `nativeLoads`).
 
 **Eligibility** (after 1.0): `completedSessions >= 2`, `consentResolved` (native never triggers UMP), `nativeLoads` within cap. Quiet Garden: allowed (static, not a prompt). Calm mode or Reduce Motion: allowed, but if `nativeAd.mediaContent.hasVideoContent` the ad is not displayed and not retried this visit (there is no image-only switch in the loader **[verify]**; if the console unit offers an image-only setting, the owner sets it and this check becomes a backstop). Video always `VideoOptions.startMuted = true`.
 
@@ -183,7 +185,7 @@ Dynamic Type: every `UILabel` uses `UIFontMetrics` scaled fonts with `adjustsFon
 
 ### 1.5 Banners (Home and Garden, existing)
 
-Unchanged except: B4 (real adaptive height on Garden), B6 (separate Garden unit), the collapsible first load (1.3), and banner eligibility now from `decide(.banner(slot))` with the same rules as `showBanner` today (from the second session, not during a weather visit on Home, not in `quietVisit`).
+Unchanged except: B4 (real adaptive height on Garden), B6 (Garden unit key, reusing the Home id), the collapsible first load (1.3), and banner eligibility now from `decide(.banner(slot))` with the same rules as `showBanner` today (from the second session, not during a weather visit on Home, not in `quietVisit`).
 
 ### 1.6 Interstitial (existing)
 
@@ -223,7 +225,7 @@ The brief's trigger ("stuck for 60 s in a round") would put an ad offer inside a
 - **Ad label:** "Ask the garden for a hint", sub-line "Short video · a whisper for your next word". **Free label:** same title, sub-line "A whisper for your next word".
 - **Effect:** banks **one whisper** (max 1 banked). In the next non-Daily, non-tutorial round, `HelpLadder` gains a fourth rung `.whisper` after hint2, vowel and first letter: it reveals the most frequent unrevealed consonant, under the same rule as the other rungs (never the last unrevealed letter, so the player always makes the final guess). Costs no petal. The Help button shows a small leaf dot while a whisper is banked (VoiceOver hint "A whisper is waiting"). Never usable on the Daily Bloom (its result is shared, so it must stay equal for everyone). A whisper unused by the end of the day stays banked (it is one letter, not a currency).
 - **Cap:** **2 a day**, ad or free.
-- After the ad closes, `adWouldPlayOnOneMore` is recomputed (the 180 s gap now blocks the interstitial, so the "short ad" note disappears).
+- After the ad closes, `adWouldPlayOnOneMore` is recomputed (the 600 s gap now blocks the interstitial, so the "short ad" note disappears).
 
 ### R3 Wake a sleeping seed
 
@@ -257,11 +259,11 @@ A reinstall or second device resets only the per-perk split, never the synced da
 
 ```swift
 struct AdCaps: Equatable {
-    var pushedPerDay = 6, pushedPerSession = 3, fullScreenPerDay = 10, fullScreenPerSession = 5
-    var gapToPushed: TimeInterval = 180, gapToRewarded: TimeInterval = 30, gapToAppOpen: TimeInterval = 1800
+    var pushedPerDay = 6, pushedPerSession = 2, fullScreenPerDay = 8, fullScreenPerSession = 4      // ruled 11-07
+    var gapToPushed: TimeInterval = 600, gapToRewarded: TimeInterval = 30, gapToAppOpen: TimeInterval = 1800
     var appOpenPerDay = 1, appOpenMinBackground: TimeInterval = 4 * 3600, appOpenMinSessions = 3, appOpenLoadBudget: TimeInterval = 2.5
     var collapsiblePerSession = 1, collapsiblePerDay = 2, collapsibleMinSessions = 3
-    var nativeMinSessions = 2, nativeReuse: TimeInterval = 3600, nativeLoadGap: TimeInterval = 60, nativeLoadsPerDay = 6
+    var nativeMinSessions = 2, nativeReuse: TimeInterval = 1800, nativeLoadGap: TimeInterval = 60, nativeLoadsPerDay = 6
     var rewardedPerDay = 5, rewardedPerSession = 3, waterPerDay = 3, hintPerDay = 2, wakePerDay = 1, waterReward = 2
     var sessionBreak: TimeInterval = 1800
     // interstitial keeps AdGate.Context's frequency 3, minGapSeconds 180, maxPerDay 6, peakWindowSeconds 5
@@ -270,7 +272,7 @@ struct AdCaps: Equatable {
 ```
 
 - **No remote config.** Release always uses the literals above (the `current` override path is `#if DEBUG` only, so it is compiled out).
-- **Debug override:** launch argument `-adcaps "appOpenMinBackground=60,appOpenMinSessions=0,gapToPushed=5"` (key=value, unknown keys ignored with a console warning), and the preset `-uitest-adcaps-fast` (all gaps 1 to 5 s, sessions 0, caps unchanged so cap tests still bite). Also fix the stale comment `// remote-config tunables` in `AdGate.Context` to "compile-time defaults".
+- **Debug override:** launch argument `-adcaps "appOpenMinBackground=60,appOpenMinSessions=0,gapToPushed=5"` (key=value, unknown keys ignored with a console warning), and the preset `-uitest-adcaps-fast` (all gaps 1 to 5 s, sessions 0, caps unchanged so cap tests still bite). The stale `AdGate.Context` comment now reads "compile-time defaults" (done in G4a).
 - Changing any Release number is an app update and an **[OWNER]** decision.
 
 ---
@@ -285,7 +287,7 @@ struct AdCaps: Equatable {
 4. **App-open rows:** first launch (`completedSessions` 0, 1, 2) no; 3 yes; background 3 h 59 min no, 4 h yes; round in progress no; from link no; consent pending no; ATT not determined (adult) no; teen with ATT not determined yes (teens never get ATT, `attResolved` is true); Calm, Quiet, night, ceremony no; second of the day no; 29 min after any full-screen no; pushed budget used no.
 5. **Collapsible rows:** session 2 no, 3 yes; second in session no; third in day no; Calm, Quiet, VoiceOver, AX size no (and the plain banner still yes).
 6. **Native rows:** consent pending no; load gap and daily load cap; Calm + video → not shown.
-7. **Budgets:** pushed 6/day shared by interstitial and app-open; 3 per session; full-screen 10/day; gaps 180 / 30 / 1800 s; backwards clock.
+7. **Budgets:** pushed 6/day shared by interstitial and app-open; 2 per session; full-screen 8/day and 4 per session; gaps 600 / 30 / 1800 s; backwards clock.
 8. **Rewarded perks:** each perk's cap (3/2/1), global 5/day, 3/session; R1 needs water 0; R2 hidden after a loss, on Daily, when banked; R3 needs `wakeDreamsInARow >= 1`; Quiet Garden → `.hidden` for 13+, `.free` for Plus and under-13; HelpLadder `.whisper` rung order, never the last letter, ignored on Daily; R3 grants no badge/album/water.
 9. **Interstitial regression:** all existing `AdGate` tests unchanged and green.
 10. **Ledger:** day rollover resets counts; JSON round trip; corrupt JSON reads as empty; no change to `PlayerProfile` (a test asserts the SwiftData model's property list equals the G3 list).
@@ -310,7 +312,7 @@ UI tests keep `ads.offline` for layout; a new `-uitest-ads-fake` injects a `Fake
 
 ### 4.5 Release checks
 
-B3 extended: Release `.xcarchive` Info.plist has real ids for all nine unit keys and none of Google's `3940256099942544` ids; Debug has only test ids. Privacy report diff (B2) after the native and app-open code is in.
+B3 extended: Release `.xcarchive` Info.plist has real ids for all nine unit keys (eight distinct real unit ids plus the app id; `AdMobBannerGardenUnitID` equals `AdMobBannerUnitID`, the reuse decision) and none of Google's test ids; Debug has only test ids. A Release build phase (`tools/ads/check-ad-ids.sh`) fails the build otherwise. Privacy report diff (B2) after the native and app-open code is in.
 
 ---
 
@@ -330,24 +332,24 @@ B3 extended: Release `.xcarchive` Info.plist has real ids for all nine unit keys
 | Unit name (AdMob) | Format | xcconfig key / Info.plist key | Status |
 |---|---|---|---|
 | `WordFlora_Banner_Home` | Banner | `ADMOB_BANNER_ID` / `AdMobBannerUnitID` | exists |
-| `WordFlora_Banner_Garden` | Banner | `ADMOB_BANNER_GARDEN_ID` / `AdMobBannerGardenUnitID` | new (B6) |
-| `WordFlora_Banner_Garden_Collapsible` | Banner (app adds collapsible extras) | `ADMOB_BANNER_GARDEN_COLLAPSIBLE_ID` / `AdMobBannerGardenCollapsibleUnitID` | new |
+| `WordFlora_Banner_Garden` | Banner | `ADMOB_BANNER_GARDEN_ID` / `AdMobBannerGardenUnitID` | **reuse Home id** (not created; owner decision 2026-11-07) |
+| `WordFlora_Banner_Garden_Collapsible` | Banner (app adds collapsible extras) | `ADMOB_BANNER_GARDEN_COLLAPSIBLE_ID` / `AdMobBannerGardenCollapsibleUnitID` | new, created 2026-11-07 |
 | `WordFlora_Interstitial_RoundBreak` | Interstitial | `ADMOB_INTERSTITIAL_ID` / `AdMobInterstitialUnitID` | exists |
-| `WordFlora_Rewarded_Water` | Rewarded, reward 2 "Drops" | `ADMOB_REWARDED_ID` / `AdMobRewardedUnitID` | exists |
-| `WordFlora_Rewarded_Hint` | Rewarded, reward 1 "Whisper" | `ADMOB_REWARDED_HINT_ID` / `AdMobRewardedHintUnitID` | new |
-| `WordFlora_Rewarded_Wake` | Rewarded, reward 1 "Wake" | `ADMOB_REWARDED_WAKE_ID` / `AdMobRewardedWakeUnitID` | new |
-| `WordFlora_AppOpen_Return` | App open | `ADMOB_APPOPEN_ID` / `AdMobAppOpenUnitID` | new |
-| `WordFlora_Native_Shed` | Native advanced | `ADMOB_NATIVE_ID` / `AdMobNativeUnitID` | new |
+| `WordFlora_Rewarded_Water` | Rewarded, reward 2 "Drops" (console item `Drops`; the app ignores it) | `ADMOB_REWARDED_ID` / `AdMobRewardedUnitID` | exists |
+| `WordFlora_Rewarded_Hint` | Rewarded, reward 1 "Whisper" | `ADMOB_REWARDED_HINT_ID` / `AdMobRewardedHintUnitID` | new, created 2026-11-07 |
+| `WordFlora_Rewarded_Wake` | Rewarded, reward 1 "Wake" | `ADMOB_REWARDED_WAKE_ID` / `AdMobRewardedWakeUnitID` | new, created 2026-11-07 |
+| `WordFlora_AppOpen_Return` | App open | `ADMOB_APPOPEN_ID` / `AdMobAppOpenUnitID` | new, created 2026-11-07 |
+| `WordFlora_Native_Shed` | Native advanced | `ADMOB_NATIVE_ID` / `AdMobNativeUnitID` | new, created 2026-11-07 |
 
-Each new key falls back to an existing id if empty (Garden → Home banner; hint/wake → water rewarded), so a missing id never breaks a build. Real ids go in `Config/Ads.local.xcconfig` with `[config=Release]` as today. The app ignores the console's reward amount (it uses its own constants; B7).
+Each new key falls back to an existing id of the same format if empty (Garden → Home banner; collapsible → Garden → Home; hint/wake → water rewarded); app open and native have no fallback, an empty id switches that format off. A missing id never breaks a build. Real ids go in `Config/Ads.local.xcconfig` with `[config=Release]` as today. The app ignores the console's reward amount (it uses its own constants; B7).
 
 ### 5.3 AdMob console steps (owner, about 1.5 h; update `owner-setup-steps.md` C3 and C10 in G4)
 
-1. Create the six new units above (C3). Copy ids to the builder.
+1. The five new units above were created 2026-11-07 (C3); the Garden banner reuses the Home unit. Ids are in the local file.
 2. App open unit: no special settings. Native unit: if an option to limit to image ads appears, leave both image and video on (the app filters video in Calm) **[verify in UI]**.
 3. **Frequency capping as a backstop** in each unit's advanced settings **[verify in UI]**: App open 1 impression per user per day; Interstitial 6 per day; Rewarded none; Banners none. The app's caps stay the real rule.
-4. Mediation groups, AdMob Network only, one per format: Banner, Interstitial, Rewarded, **App open**, **Native** (ready for Unity in 1.1).
-5. Banner refresh 60 s on all three banner units.
+4. Mediation groups, AdMob Network only, one per format: Banner, Interstitial, Rewarded, **App open**, **Native** (exist; ready for Unity in 1.1).
+5. Banner refresh 60 s on the Home banner unit (two banner units in all; the Home id also serves Garden); refresh **off** on the collapsible unit.
 6. Blocking controls: sensitive categories blocked (as C6), app max content rating G. Native ads use the same controls. Ad review center weekly for the first month, native included.
 7. Privacy & messaging: no change (AdMob is alone). Test devices registered.
 8. app-ads.txt unchanged (one Google line).
@@ -371,8 +373,8 @@ Each new key falls back to an existing id if empty (Garden → Home banner; hint
 | **Gate G4a subtotal** | **20.0** |
 | App-open: lifecycle (`lastBackgroundAt`, link flag, round flag), cue view, load with 2.5 s budget, tests | 5.0 |
 | Collapsible Garden banner (extras, `isCollapsible`, counters, B4 height already done) | 2.0 |
-| Native: `NativeAdCardView` (UIKit, scaled fonts), loader + reuse, Calm video filter, fake assets, audits | 6.0 |
-| Privacy report re-diff, owner-steps C3/C10 update, `AdFormatsUITests` run | 2.0 |
+| Native: `NativeAdCardView` (UIKit, scaled fonts), loader + 30 min reuse, Calm video filter, fake assets, audits | 6.0 |
+| Privacy report re-diff, `AdFormatsUITests` run (owner-steps C3/C10 done in G4a) | 2.0 |
 | **Gate G4b subtotal** | **15.0** |
 | **Total** | **35.0** (G4 was planned at 4 h after AppLovin was dropped, 14 h before) |
 
@@ -401,12 +403,12 @@ At about 14 builder-hours a calendar day (status review), 35 h is about 2.5 days
 
 ## 7. Revenue and UX risks, with mitigations
 
-**Estimated uplift** (base case of `revenue-compensation.md`, about 1,470 ad-eligible free daily players at 10,000 monthly): R1 to R3 +$60 to $120/mo; app-open +$50 to $90 (about 0.15 to 0.2 a day per daily player at about $8 eCPM); native +$30 to $60; collapsible +$10 to $25. Total about **+$150 to $295/mo** on today's $665 of 13+ ads. These are estimates, not benchmarks for a calm word game; measure as in `ad-network-alternatives.md` 1.4.
+**Estimated uplift** (base case of `revenue-compensation.md`, about 1,470 ad-eligible free daily players at 10,000 monthly): R1 to R3 +$60 to $120/mo; app-open +$50 to $90 (about 0.15 to 0.2 a day per daily player at about $8 eCPM); native +$30 to $60; collapsible +$10 to $25. Total about **+$90 to $205/mo** on today's $665 of 13+ ads (review estimate, ruled 11-07; the first estimate was $150 to $295). These are estimates, not benchmarks for a calm word game; measure as in `ad-network-alternatives.md` 1.4.
 
 | Risk | Mitigation |
 |---|---|
 | **Calm tone** broken by a return ad | Once a day at most, only after 4 h away, never in Calm, Quiet, at night, after a link, or over a word in progress; a branded cue with Skip; 2.5 s budget then the garden. Watch D7 retention ad-exposed vs not; if it moves more than 2 points, set `appOpenPerDay` to 0 in the next update first |
-| **Churn from over-monetising** | Pushed ads still 6 a day total (app-open shares the interstitial cap, it does not add to it); 3 pushed per session; rewarded is opt-in and Plus gets every perk free, which makes Plus more valuable rather than ads more frequent |
+| **Churn from over-monetising** | Pushed ads still 6 a day total (app-open shares the interstitial cap, it does not add to it); 2 pushed per session; rewarded is opt-in and Plus gets every perk free, which makes Plus more valuable rather than ads more frequent |
 | **Pay-to-win** | Single-player, no leaderboards; whisper never on the Daily Bloom (shared); wake by video grants no badges or stickers; caps equal for ad and free paths |
 | **Children** | Treatment `.none` checked first in `decide`; table and fuzz tests; children get every perk free and never see a video word or a Plus price |
 | **Collapsible covering play** | Garden only (no puzzle there), once per session, twice a day, not in Calm, Quiet, VoiceOver, Switch Control or AX sizes; Google's own collapse control |
