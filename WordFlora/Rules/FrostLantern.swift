@@ -113,7 +113,8 @@ enum FrostLanternCopy {
     static let seasonHintOwned = "Say hello in the game"
     /// Not owned: the soft outline with the same line as the pack pots (no price, no lock).
     static var seasonHintNotOwned: String { PotCatalog.packHint }
-    static let packLine = "Three winter pots, a snowy lantern garden, two winter friends and two glasshouse plants. Pay once, no renewals."
+    /// Kept short (two lines on the Shed shelf at the default size; it wraps freely at every size).
+    static let packLine = "Winter pots, a snowy garden, birds and plants. Pay once, no renewals."
     static let badgeLine = "The Lantern Keeper badge is earned by play: grow plants in the Frosted glass pot, or say hello to a winter friend."
     static let badgeBlurb = "Grow plants in the Frosted glass pot or meet winter friends"
     static let holdsPlants = "Two glasshouse plants: Snowdrop and Hellebore"
