@@ -117,13 +117,13 @@ final class SeasonsUITests: XCTestCase {
         audit("seasons-owned")
     }
 
-    /// Under 13: the row sits in "For grown-ups" and asks the grown-up question first; no price on Settings.
+    /// Under 13: the row sits in "Purchases" and asks the grown-up question first; no price on Settings.
     func testTheSeasonsRowIsBehindTheGrownUpQuestionForUnder13() {
         launch(age: "under13", ["-uitest-prices"])
         openSettings()
         let row = app.buttons["settings.seasons"]
         scrollTo(row)
-        XCTAssertTrue(app.staticTexts["For grown-ups"].exists)
+        XCTAssertTrue(app.staticTexts["Purchases"].exists)
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS '$'")).firstMatch.exists)
         row.tap()
         let answer = app.textFields["parentalGate.answer"]

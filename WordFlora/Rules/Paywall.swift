@@ -157,11 +157,13 @@ enum PaywallCopy {
     }
     static let restore = "Restore purchases"
     /// The purchase went through but Plus had not shown up yet.
-    static let pendingSlow = "Almost there. If Plus is not on in a moment, tap Restore purchases."
+    static let pendingSlow = "Almost there. If Plus is not on in a moment, tap Restore purchases in Settings."
     /// Ask to Buy (StoreKit pending): a grown-up must approve, maybe hours later.
     static let awaitingApproval = "Sent to a grown-up to approve. Plus turns on once it's approved."
-    static let failed = "We couldn't confirm that purchase. If you see a charge, tap Restore purchases."
-    static let restoredOn = "Plus is on."
+    static let failed = "We couldn't confirm that purchase. If you see a charge, tap Restore purchases in Settings."
+    /// After the app's one Restore purchases (WordFlora Settings, Plus section): it brings back Plus, Plus Forever and
+    /// any season pack, so one line covers them all. Never gated: it never charges.
+    static let restoredOn = "Your purchases are back."
     static let restoredNone = "No purchases found for this Apple ID."
 
     /// Plus Forever's one honest line, on its row and under the button.
@@ -242,6 +244,10 @@ enum PlusEntry {
 
     /// Once Plus is on, every age sees the same row: it says so (the owner could not tell after buying).
     static let isOn = "WordFlora Plus is on"
+
+    /// Settings groups everything bought under one header, for every age (owner, 2026-11-07): the Plus row, Seasons,
+    /// Restore purchases and, for a live subscription, Manage subscription. The rows keep their own grown-up gates.
+    static let purchasesTitle = "Purchases"
 
     static func sectionTitle(ageBand: AgeBand?) -> String { ParentalGate.isRequired(ageBand: ageBand) ? grownUps : PlusPlan.groupName }
     static func rowTitle(ageBand: AgeBand?, hasPlus: Bool = false) -> String {

@@ -7,7 +7,7 @@ final class FamilyShareNudgeTests: XCTestCase {
     private let now = Date(timeIntervalSince1970: 2_000_000_000)
     private var cal: Calendar { var c = Calendar(identifier: .gregorian); c.timeZone = TimeZone(identifier: "America/New_York")!; return c }
 
-    /// 13 and up see no family line anywhere: the one Restore purchases button is on the Plus page (owner, 2026-11-07).
+    /// 13 and up see no family line anywhere: the one Restore purchases is in WordFlora Settings (owner, 2026-11-07).
     func testTeensAndAdultsSeeNoFamilyLine() {
         for band: AgeBand in [.thirteenPlus, .eighteenPlus] {
             for placement in [FamilyShareNudge.Placement.settings, .plusPage] {

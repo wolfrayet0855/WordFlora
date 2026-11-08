@@ -883,7 +883,7 @@ final class ParentalGateLinkUITests: XCTestCase {
         scrollTo(row)
         XCTAssertEqual(row.label, "WordFlora Plus", "no ad or price pitch on the young player's row")
         XCTAssertFalse(app.buttons["Remove ads and sync with iCloud"].exists)
-        XCTAssertTrue(app.staticTexts["For grown-ups"].exists, "the section is for grown-ups")
+        XCTAssertTrue(app.staticTexts["Purchases"].exists, "everything bought sits under Purchases")
         row.tap()
         XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.staticTexts["plus.grownUpsIntro"].label.hasPrefix("WordFlora is complete without Plus."))
@@ -920,8 +920,8 @@ final class ParentalGateLinkUITests: XCTestCase {
         let note = app.otherElements["familyShare.grownUps"]
         let button = app.buttons["familyShare.grownUpsButton"]
         scrollTo(button)
-        XCTAssertTrue(button.exists, "the grown-ups' note sits in the For grown-ups section")
-        XCTAssertTrue(app.staticTexts["For grown-ups"].exists)
+        XCTAssertTrue(button.exists, "the grown-ups' note sits in the Purchases section")
+        XCTAssertTrue(app.staticTexts["Purchases"].exists)
         let line = app.staticTexts.matching(NSPredicate(format: "label == %@", FamilyCopy.line)).firstMatch
         XCTAssertTrue(line.exists || note.exists, "the grown-ups' line is on screen")
         XCTAssertFalse(app.buttons["familyShare.restore"].exists, "no Restore line for a young player")
@@ -958,9 +958,9 @@ final class ParentalGateLinkUITests: XCTestCase {
         scrollTo(app.buttons["Privacy Policy"])
         XCTAssertTrue(app.buttons["Privacy Policy"].exists)
         XCTAssertTrue(app.buttons["Report an ad"].exists)
-        XCTAssertFalse(app.staticTexts["For grown-ups"].exists)
         let row = app.buttons["settings.plus"]
         scrollTo(row)
+        XCTAssertTrue(app.staticTexts["Purchases"].exists, "the same Purchases header for every age")
         XCTAssertEqual(row.label, "Remove ads and sync with iCloud", "the grown-up row is unchanged")
         row.tap()
         XCTAssertTrue(app.staticTexts["WordFlora Plus"].waitForExistence(timeout: 5))

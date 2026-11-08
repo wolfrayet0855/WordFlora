@@ -111,7 +111,7 @@ Description:   Remove all ads and sync your garden across your devices.
 7. **Review Information:** upload a screenshot of your paywall (any iPhone size accepted by the field; required before submit) and paste review notes:
 ```
 WordFlora Plus removes ads and enables iCloud sync of the player's garden progress.
-Open Settings > WordFlora Plus (or tap "Remove ads" on Home) to reach the paywall.
+Open Settings > Purchases > the WordFlora Plus row (or tap "Remove ads" on Home) to reach the paywall. Restore purchases is its own row in Settings > Purchases (the only one in the app).
 Yearly: $12.99/year with a 3-day free trial for new subscribers. Monthly: $3.99/month, no trial.
 Purchases are behind a parental gate for players who said they are under 13.
 Restore Purchases and Manage Subscription are in Settings.
@@ -192,7 +192,7 @@ Description:    No ads, iCloud sync and Plus pots. Pay once, no renewals.
 Family Sharing: ON   (cannot be turned off again once saved)
 ```
 3. **Availability:** all territories you sell the subscriptions in. Review the auto-converted prices like A6.
-4. **Review Information:** a screenshot of the Plus page showing the three rows (Plus Forever is the third), and the note: "Non-consumable lifetime unlock of the same features as the WordFlora Plus subscription. Restore purchases is on the same page."
+4. **Review Information:** a screenshot of the Plus page showing the three rows (Plus Forever is the third), and the note: "Non-consumable lifetime unlock of the same features as the WordFlora Plus subscription. Restore purchases is in the app's Settings, under Purchases."
 5. Submit it **with the app version** (app version page > **In-App Purchases and Subscriptions** > add `plus_lifetime` next to the two subscriptions) **(verify in UI)**.
 6. Never discount it in the app. If the yearly price changes, keep lifetime at about 2.5 to 3 times the yearly price (`docs/research/monetization-majors.md` section 1).
 
@@ -219,13 +219,13 @@ Eligibility:   expired subscribers
 Use for:       win-back
 ```
 2. Set a redemption limit and an end date on each (custom codes have a cap you choose; Apple allows up to 1M redemptions per app per quarter).
-3. Test: TestFlight build > Settings > WordFlora Plus > **Redeem a code** > enter the code. Plus should turn on within a moment of the sheet closing.
+3. Test: TestFlight build > Settings > Purchases > WordFlora Plus > **Redeem a code** > enter the code. Plus should turn on within a moment of the sheet closing.
 4. One-time codes for teachers and reviewers can be generated later from the same screen (batches of 500 to 25,000, they expire within 6 months).
 
 Source: https://developer.apple.com/help/app-store-connect/manage-subscriptions/set-up-offer-codes
 
 ### A15. Product 4: pack_frost_lantern (Frost & Lantern, non-consumable)
-The first seasonal pack (gate G3). In the app it is the **Seasons** row in Settings > WordFlora Plus (behind the grown-up question for under 13 and unknown ages) and, for 13 and up, a Seasons shelf in the Shed with the price. Children see the pack's pots only as soft outlines with "A grown-up can find this in Settings." (no price, lock or buy button). Plus does not include packs. While App Store Connect has no such product, the app shows no Seasons row, shelf, outlines or Lantern Keeper card at all.
+The first seasonal pack (gate G3). In the app it is the **Seasons** row in Settings > Purchases (behind the grown-up question for under 13 and unknown ages) and, for 13 and up, a Seasons shelf in the Shed with the price. Children see the pack's pots only as soft outlines with "A grown-up can find this in Settings." (no price, lock or buy button). Plus does not include packs. While App Store Connect has no such product, the app shows no Seasons row, shelf, outlines or Lantern Keeper card at all.
 1. Sidebar > **Monetization** > **In-App Purchases** > **+** (not under Subscriptions) **(verify in UI)**.
 2. Fill in:
 ```
@@ -239,7 +239,7 @@ Family Sharing: ON   (cannot be turned off again once saved)
 ```
    The description is the G3 wording ("winter pots and a badge"). If G5 ships the scene, robin and wren and the snowdrop and hellebore under this same product, change it to "Three winter pots, the Lantern Keeper badge and a snowy garden scene. Pay once, no renewals." (and the same text in `Config/WordFlora.storekit`). Never promise more than the build delivers.
 3. **Availability:** the same territories as Plus. Review the auto-converted prices.
-4. **Review Information:** a screenshot of Settings > WordFlora Plus > Seasons (the pack card, its three pots, the price and the Buy button), taken from the G3/G6 build on an adult profile; and the note: "Non-consumable cosmetic pack of pots and a badge. Restore purchases is on the Plus page."
+4. **Review Information:** a screenshot of Settings > Purchases > Seasons (the pack card, its three pots, the price and the Buy button), taken from the G3/G6 build on an adult profile; and the note: "Non-consumable cosmetic pack of pots and a badge. Restore purchases is in the app's Settings, under Purchases."
 5. Submit it **with the app version** next to `plus_lifetime` (app version page > **In-App Purchases and Subscriptions**) **(verify in UI)**. Not submitted if the plan's G5 fallback moves the pack to 1.1.
 
 Mirrors this local StoreKit entry (`Config/WordFlora.storekit`, used by the tests):

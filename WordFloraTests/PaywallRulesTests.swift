@@ -73,7 +73,7 @@ final class PaywallRulesTests: XCTestCase {
         XCTAssertEqual(EntitlementService.outcome(storeKitPending: false), .pending)
         XCTAssertEqual(PaywallCopy.awaitingApproval, "Sent to a grown-up to approve. Plus turns on once it's approved.")
         XCTAssertFalse(PaywallCopy.awaitingApproval.contains("Restore"), "no tapping Restore while a grown-up decides")
-        XCTAssertEqual(PaywallCopy.pendingSlow, "Almost there. If Plus is not on in a moment, tap Restore purchases.")
+        XCTAssertEqual(PaywallCopy.pendingSlow, "Almost there. If Plus is not on in a moment, tap Restore purchases in Settings.")
         XCTAssertFalse(PackCatalog.Copy.awaitingApproval.contains("Restore"))
         for line in PackCatalog.Copy.all { XCTAssertEqual(CopySafety.check(line), [], line) }
     }
@@ -86,7 +86,7 @@ final class PaywallRulesTests: XCTestCase {
     }
 
     func testRestoreAndPageLines() {
-        XCTAssertEqual(PaywallCopy.restoredOn, "Plus is on.")
+        XCTAssertEqual(PaywallCopy.restoredOn, "Your purchases are back.", "Plus or a pack: one line for both")
         XCTAssertEqual(PaywallCopy.restoredNone, "No purchases found for this Apple ID.")
         XCTAssertEqual(PaywallCopy.restore, "Restore purchases", "the one Restore button keeps its name")
         for line in [PaywallCopy.loadFailed, PaywallCopy.tryAgain, PaywallCopy.loadingPrices, PaywallCopy.ownedSubscription,
@@ -119,6 +119,8 @@ final class PaywallRulesTests: XCTestCase {
     }
 
     func testSettingsRowSaysPlusIsOnForEveryAge() {
+        XCTAssertEqual(PlusEntry.purchasesTitle, "Purchases")
+        XCTAssertEqual(CopySafety.check(PlusEntry.purchasesTitle), [])
         for band: AgeBand? in [.under13, nil, .thirteenPlus, .eighteenPlus] {
             XCTAssertEqual(PlusEntry.rowTitle(ageBand: band, hasPlus: true), "WordFlora Plus is on")
         }

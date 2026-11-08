@@ -5,6 +5,8 @@ struct SettingsView: View {
     @Environment(AppModel.self) private var app
     @Environment(GameRouter.self) private var router
     @State private var reminderDenied = false
+    @State private var restoring = false
+    @State private var restoreMessage: String?
     @State private var exportDoc: GardenBackupDocument?
     @State private var exporting = false
     @State private var importing = false
@@ -72,7 +74,7 @@ struct SettingsView: View {
             Section("Garden") {
                 Toggle("Show everything", isOn: $s.showEverything)
             }
-            Section(PlusEntry.sectionTitle(ageBand: s.ageBand)) {
+            Section {
                 // Once Plus is on the row says so, with the plan ("WordFlora Plus is on · Yearly"), for every age.
                 let state = app.entitlements.state
                 Button { router.go(.plus) } label: {
@@ -95,8 +97,33 @@ struct SettingsView: View {
                     }
                     .accessibilityIdentifier("settings.seasons")
                 }
+                // The app's one Restore purchases (owner, 2026-11-07): Plus, Plus Forever and season packs. Never behind the
+                // grown-up question, since it never charges.
+                Button { restorePurchases() } label: {
+                    HStack(spacing: 8) {
+                        Label(PaywallCopy.restore, systemImage: "arrow.clockwise")
+                        if restoring { Spacer(minLength: 8); ProgressView().accessibilityHidden(true) }
+                    }
+                }
+                .disabled(restoring)
+                .accessibilityIdentifier("settings.restore")
+                if let restoreMessage {
+                    Text(restoreMessage).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .accessibilityIdentifier("settings.restoreMessage")
+                }
+                // Only with a live subscription (none for Plus Forever alone or a free player); behind the grown-up
+                // question for under 13 and unknown ages, like every link that leaves the app.
+                if state.hasActiveSubscription {
+                    GatedLink("Manage subscription", url: Links.manageSubscriptions)
+                        .accessibilityIdentifier("settings.manageSubscription")
+                }
                 FamilyShareNudgeRow()
                 cloudRow
+            } header: {
+                Text(PlusEntry.purchasesTitle).font(Theme.font(.footnote, weight: .semibold))
+                    .fixedSize(horizontal: false, vertical: true)
+                    .accessibilityAddTraits(.isHeader)
             }
             Section("Your garden") {
                 Button { prepareBackup() } label: { Label(GardenBackup.Copy.backupTitle, systemImage: "square.and.arrow.up") }
@@ -134,6 +161,21 @@ struct SettingsView: View {
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $seasonsGate) { challenge in
             ParentalGateSheet(challenge: challenge, onPass: { seasonsGate = nil; router.go(.seasons) }, onCancel: { seasonsGate = nil })
+        }
+    }
+
+    /// One sync at a time, then one line under the row, read to VoiceOver.
+    private func restorePurchases() {
+        guard !restoring else { return }
+        restoring = true; restoreMessage = nil
+        Task {
+            await app.entitlements.restore()
+            app.updateSyncFlag()
+            restoring = false
+            let state = app.entitlements.state
+            let line = state.hasPlus || !state.ownedPacks.isEmpty ? PaywallCopy.restoredOn : PaywallCopy.restoredNone
+            restoreMessage = line
+            AccessibilityNotification.Announcement(line).post()
         }
     }
 

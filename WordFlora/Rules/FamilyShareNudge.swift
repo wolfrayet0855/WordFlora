@@ -5,7 +5,7 @@ import Foundation
 ///   "For grown-ups" section of Settings, on at most one day a week, off in Quiet Garden. Its one button asks the
 ///   grown-up question (`ParentalGate`) before the Plus page opens. No countdown, no pressure line for the child.
 /// - 13 and up: nothing. The Restore line it used to carry is retired (owner, 2026-11-07: one Restore purchases
-///   button, on the Plus page; docs/pm/plus-flow-fable-review.md N1). The benefits already say "Share it with your family".
+///   in the whole app, in WordFlora Settings; docs/pm/plus-flow-fable-review.md N1). The benefits already say "Share it with your family".
 /// Plus owners and Quiet Garden see nothing.
 enum FamilyShareNudge {
     enum Audience: Equatable {

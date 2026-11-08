@@ -129,25 +129,26 @@ final class DailyQuestUITests: XCTestCase {
         app.buttons["Settings"].tap()
     }
 
-    /// Owner, 2026-11-07: one Restore purchases button, on the Plus page; none in WordFlora Settings and no family line
-    /// for 13 and up (docs/pm/plus-flow-fable-review.md N1).
-    func testGrownUpsSeeNoFamilyLineAndThePlusPageHasOneRestore() {
+    /// Owner, 2026-11-07 (final): one Restore purchases in the whole app, in WordFlora Settings' Plus section; none on
+    /// the Plus page or Seasons, and no family line for 13 and up.
+    func testOneRestorePurchasesInSettingsAndNoneOnThePlusPage() {
         app.launchArguments = ["-uitest", "-uitest-onboarded"]             // a grown-up (18+)
         app.launch()
         openSettings()
+        let restore = app.buttons["settings.restore"]
+        scrollTo(restore)
+        XCTAssertTrue(restore.exists)
+        XCTAssertEqual(restore.label, "Restore purchases")
+        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == 'Restore purchases'")).count, 1, "exactly one Restore purchases")
+        XCTAssertFalse(element("familyShare.nudge").exists)
+        audit("settings-restore", within: restore)
         let plusRow = app.buttons["settings.plus"]
         scrollTo(plusRow)
-        for _ in 0..<2 { app.swipeUp() }
-        XCTAssertFalse(element("familyShare.nudge").exists)
-        XCTAssertFalse(app.buttons["Restore purchases"].exists, "no Restore on the Settings page")
-        scrollTo(plusRow)
         plusRow.tap()
-        let restore = app.buttons["plus.restore"]
-        XCTAssertTrue(restore.waitForExistence(timeout: 5))
-        scrollTo(restore)
-        XCTAssertEqual(app.buttons.matching(NSPredicate(format: "label == 'Restore purchases'")).count, 1, "exactly one Restore purchases")
-        XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS 'family phone'")).firstMatch.exists)
-        audit("plus-one-restore", within: restore)
+        XCTAssertTrue(app.buttons["plus.redeem"].waitForExistence(timeout: 5))
+        scrollTo(app.buttons["Privacy Policy"])
+        XCTAssertFalse(app.buttons["Restore purchases"].exists, "no Restore on the Plus page")
+        XCTAssertFalse(app.buttons["plus.restore"].exists)
     }
 
     func testKidsAndPlusOwnersNeverSeeTheFamilyLine() {
@@ -155,13 +156,13 @@ final class DailyQuestUITests: XCTestCase {
             app.launchArguments = ["-uitest", "-uitest-onboarded"] + extra
             app.launch()
             openSettings()
-            // The row is named by age ("WordFlora Plus" under 13, in the "For grown-ups" section), so it is found by id.
+            // The row is named by age ("WordFlora Plus" under 13, in the "Purchases" section), so it is found by id.
             let plusRow = app.buttons["settings.plus"]
             scrollTo(plusRow)
             XCTAssertTrue(plusRow.exists, "\(extra)")
             XCTAssertFalse(element("familyShare.nudge").exists, "\(extra)")
             plusRow.tap()
-            XCTAssertTrue(app.buttons["Restore purchases"].waitForExistence(timeout: 5), "\(extra)")
+            XCTAssertTrue(app.buttons["plus.redeem"].waitForExistence(timeout: 5), "\(extra)")
             XCTAssertFalse(element("familyShare.nudge").exists, "\(extra)")
             app.terminate()
         }

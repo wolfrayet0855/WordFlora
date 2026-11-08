@@ -202,10 +202,9 @@ final class TextFitLayoutTests: XCTestCase {
 
     /// The grown-up question sheet: the sheet sits about 16 pt in from each edge on iOS 26, then its own padding.
     func testGrownUpSheetTitle() {
-        check("gate title", [ParentalGate.Copy.title], style: .title2, weight: .bold, styleAt: ParentalGateSheet.titleStyle,
-              room: { s, d in s - 2 * 16 - 2 * ParentalGateSheet.padding(d) })
-        check("gate question", ["What is 19 × 9?"], style: .title, weight: .heavy,
-              room: { s, d in s - 2 * 16 - 2 * ParentalGateSheet.padding(d) })
+        let room: (CGFloat, DynamicTypeSize) -> CGFloat = { s, d in s - 2 * 16 - 2 * ParentalGateSheet.padding(d) }
+        check("gate title", [ParentalGate.Copy.title], style: .title2, weight: .bold, styleAt: ParentalGateSheet.titleStyle, room: room)
+        check("gate prompt", [ParentalGate.Copy.prompt], style: .callout, room: room)
     }
 
     /// A plan card: the card (16 pt padding) in the page gutters, the choice circle (about one body em) and a 10 pt gap.

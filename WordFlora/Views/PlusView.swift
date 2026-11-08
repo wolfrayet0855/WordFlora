@@ -6,7 +6,6 @@ struct PlusView: View {
     @Environment(AppModel.self) private var app
     @State private var selected: PlusChoice = .yearly
     @State private var busy = false
-    @State private var restoring = false
     @State private var retrying = false
     @State private var message: String?
     @State private var gate: ParentalGate.Challenge?
@@ -58,14 +57,7 @@ struct PlusView: View {
                 }
 
                 VStack(spacing: 2) {
-                    Button { restore() } label: {
-                        HStack(spacing: 6) {
-                            if restoring { ProgressView().accessibilityHidden(true) }
-                            Text(PaywallCopy.restore)
-                        }
-                    }
-                    .tapTarget().disabled(restoring)
-                    .accessibilityIdentifier("plus.restore")
+                    // Restore purchases lives in WordFlora Settings only (owner, 2026-11-07): one for the whole app.
                     Button(PaywallCopy.redeem) { ask(then: .redeem) }.tapTarget()
                         .accessibilityIdentifier("plus.redeem")
                     // Only with a live subscription: a non-subscriber has nothing to manage.
@@ -260,18 +252,6 @@ struct PlusView: View {
         Task { await store.loadProducts(); retrying = false }
     }
 
-    /// One sync at a time, then a line that says what happened.
-    private func restore() {
-        guard !restoring else { return }
-        restoring = true; message = nil
-        Task {
-            await store.restore()
-            app.updateSyncFlag()
-            restoring = false
-            message = store.state.hasPlus ? PaywallCopy.restoredOn : PaywallCopy.restoredNone
-        }
-    }
-
     /// Young players and unknown ages answer the grown-up question before any purchase, code or store sheet.
     private func ask(then action: GatedAction) {
         afterGate = action
@@ -337,14 +317,18 @@ struct ParentalGateSheet: View {
 
     /// At the accessibility sizes the title steps down and the sides tighten, so "grown-ups" stays whole (the
     /// audit read it clipped at AX5; TextFitLayoutTests measures it).
-    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle { size.isAccessibilitySize ? .title3 : .title2 }
-    static func padding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 16 : 24 }
+    /// The title steps down through the accessibility sizes so "grown-ups" never breaks at its hyphen.
+    static func titleStyle(_ size: DynamicTypeSize) -> Font.TextStyle {
+        size >= .accessibility4 ? .subheadline : (size.isAccessibilitySize ? .headline : .title2)
+    }
+    static func padding(_ size: DynamicTypeSize) -> CGFloat { size.isAccessibilitySize ? 12 : 24 }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 16) {
                 Text(ParentalGate.Copy.title).font(Theme.font(Self.titleStyle(typeSize), weight: .bold))
                     .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
+                    .frame(maxWidth: .infinity)
                     .accessibilityAddTraits(.isHeader)
                 Text(ParentalGate.Copy.prompt).font(Theme.font(.callout)).multilineTextAlignment(.center)
                     .fixedSize(horizontal: false, vertical: true)
@@ -370,6 +354,8 @@ struct ParentalGateSheet: View {
                 Button("Cancel") { onCancel() }.frame(minHeight: Theme.minTap)
             }
             .padding(Self.padding(typeSize))
+            // Clear of the sheet's grabber and the scroll edge's soft fade, which the audit read as clipping the title.
+            .padding(.top, typeSize.isAccessibilitySize ? 16 : 0)
         }
         .scrollBounceBehavior(.basedOnSize)
         .scrollDismissesKeyboard(.interactively)

@@ -84,6 +84,16 @@ final class TextFitScreensUITests: XCTestCase {
         tile.tap()
     }
 
+    /// With every plant found the Grand Garden and "What grows next" play once at launch; step through them.
+    private func passGrandGarden() {
+        guard element("grandGarden.title").waitForExistence(timeout: 6) else { return }
+        let next = app.buttons["grandGarden.next"]
+        scrollTo(next); next.tap()
+        let done = app.buttons["whatsNext.done"]
+        if done.waitForExistence(timeout: 5) { scrollTo(done); done.tap() }
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 5))
+    }
+
     private func openVisitors() {
         tapHome("Visitors")
         let hello = app.buttons["Say hello"]
@@ -192,7 +202,7 @@ final class TextFitScreensUITests: XCTestCase {
             case "unavailable": XCTAssertTrue(cloud.label.contains("isn't available"), cloud.label)
             default: break
             }
-            XCTAssertFalse(app.buttons["Restore purchases"].exists, "no Restore on the Settings page")
+            XCTAssertTrue(app.buttons["settings.restore"].exists, "the one Restore purchases is here")
             sleep(1); shot("settings-plus", nil, dark: false, "-\(name)")
             if name == "starts" {
                 row.tap()
@@ -236,7 +246,8 @@ final class TextFitScreensUITests: XCTestCase {
     func testGardenAndBadges() {
         for size in [Self.xxxl, Self.ax5] {
             for dark in size == Self.ax5 ? [false, true] : [false] {
-                launch(["-uitest-allfound"], size: size, dark: dark)
+                launch(["-uitest-allfound", "-uitest-everything"], size: size, dark: dark)
+                passGrandGarden()                                // every plant found: the Grand Garden plays first
                 tapHome("Garden")
                 let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH 'Passionflower'")).firstMatch
                 XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
@@ -298,7 +309,7 @@ final class TextFitScreensUITests: XCTestCase {
     func testVisitorsPageBookFieldNotesAndDetail() {
         for size in [Self.xxxl, Self.ax5] {
             for dark in size == Self.ax5 ? [false, true] : [false] {
-                launch(["-uitest-album-all"], size: size, dark: dark)
+                launch(["-uitest-album-all", "-uitest-everything"], size: size, dark: dark)
                 openVisitors()
                 sleep(1); shot("visitors", size, dark: dark)
                 if size == Self.ax5 { audit("visitors-ax5-\(dark ? "dark" : "light")") }
@@ -329,7 +340,7 @@ final class TextFitScreensUITests: XCTestCase {
     /// The game's title on the evening sky in light mode (run in the evening; the bar is navy with a white title).
     func testButterflyGameTitle() {
         for size in [nil, Self.ax5] {
-            launch(["-uitest-album"], size: size)
+            launch(["-uitest-album", "-uitest-everything"], size: size)
             openVisitors()
             scrollTo(app.buttons["Say hello"])
             app.buttons["Say hello"].tap()

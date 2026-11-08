@@ -6,8 +6,6 @@ import SwiftUI
 struct SeasonsView: View {
     @Environment(AppModel.self) private var app
     @State private var busy = false
-    @State private var restoring = false
-    @State private var restoreMessage: String?
     @State private var message: String?
     @State private var gate: ParentalGate.Challenge?
 
@@ -21,22 +19,7 @@ struct SeasonsView: View {
                 if packs.isEmpty {
                     Text("Nothing here right now.").font(Theme.font(.body)).foregroundStyle(Color.appPrimaryText)
                 }
-                Button { restore(packs) } label: {
-                    HStack(spacing: 6) {
-                        if restoring { ProgressView().accessibilityHidden(true) }
-                        Text(PackCatalog.Copy.restore)
-                    }
-                }
-                .font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText).tapTarget()
-                .disabled(restoring)
-                .frame(maxWidth: .infinity)
-                .accessibilityIdentifier("seasons.restore")
-                if let restoreMessage {
-                    Text(restoreMessage).font(Theme.font(.callout, weight: .semibold)).foregroundStyle(Color.appPrimaryText)
-                        .multilineTextAlignment(.center).fixedSize(horizontal: false, vertical: true)
-                        .frame(maxWidth: .infinity)
-                        .accessibilityIdentifier("seasons.restoreMessage")
-                }
+                // No Restore here: the app's one Restore purchases is in WordFlora Settings, and it brings packs back too.
             }
             .padding(.horizontal, Space.gutter).padding(.vertical, Space.card).padding(.bottom, Space.section)
         }
@@ -44,7 +27,6 @@ struct SeasonsView: View {
         .navigationTitle(PackCatalog.Copy.seasonsTitle)
         .navigationBarTitleDisplayMode(.inline)
         .task { await store.loadPackProducts() }
-        .onChange(of: restoreMessage) { _, new in if let new { AccessibilityNotification.Announcement(new).post() } }
         .onChange(of: message) { _, new in if let new { AccessibilityNotification.Announcement(new).post() } }
         .sheet(item: $gate) { challenge in
             ParentalGateSheet(challenge: challenge, onPass: { gate = nil; buy(PackCatalog.frostLantern.id) }, onCancel: { gate = nil })
@@ -94,17 +76,6 @@ struct SeasonsView: View {
         }
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("seasons.pack.\(pack.id)")
-    }
-
-    /// One sync at a time, then a line that says whether a pack came back.
-    private func restore(_ packs: [SeasonPack]) {
-        guard !restoring else { return }
-        restoring = true; restoreMessage = nil
-        Task {
-            await store.restore()
-            restoring = false
-            restoreMessage = packs.contains { store.ownsPack($0.id) } ? PackCatalog.Copy.restoredPack : PackCatalog.Copy.restoredNone
-        }
     }
 
     /// Young players and unknown ages answer the grown-up question before the purchase.
