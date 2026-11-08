@@ -68,12 +68,8 @@ struct SettingsView: View {
                 Text("At most one a day, never at night, and they stop on their own if you take a break.").font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 if reminderDenied { Text("Notifications are off for WordFlora. You can allow them in your device settings.").font(.footnote).foregroundStyle(Color.appDanger) }
             }
-            Section("Appearance") {
-                Picker("Theme", selection: $s.appearance) {
-                    Text("System").tag(AppSettings.Appearance.system)
-                    Text("Light").tag(AppSettings.Appearance.light)
-                    Text("Dark").tag(AppSettings.Appearance.dark)
-                }.pickerStyle(.segmented)
+            // Light and dark follow the system (owner ruling 2026-11-07): no theme picker.
+            Section("Garden") {
                 Toggle("Show everything", isOn: $s.showEverything)
             }
             Section(PlusEntry.sectionTitle(ageBand: s.ageBand)) {
@@ -126,7 +122,6 @@ struct SettingsView: View {
         .fullScreenCover(isPresented: $showGuide) {
             GuideView(mode: .replay) { showGuide = false }
                 .environment(app)
-                .preferredColorScheme(app.settings.colorScheme)
         }
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)

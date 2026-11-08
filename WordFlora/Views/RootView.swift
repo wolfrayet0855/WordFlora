@@ -27,7 +27,6 @@ struct RootView: View {
             }
         }
         .tint(Color.successText)
-        .preferredColorScheme(app.settings.colorScheme)
     }
 
     /// `-uitest-celebrate=<level>` (small, medium, large, calm, reduceMotion) draws that burst over the app.

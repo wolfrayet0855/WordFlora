@@ -542,8 +542,7 @@ final class TendingUITests: XCTestCase {
     func testPotScreensPartWayUpTheLadder() {
         executionTimeAllowance = 300          // three looks, two launches each, scrolling the whole Shed: about 2 minutes
         let looks: [(String, XCUIDevice.Appearance, [String])] = [
-            // The app's own dark setting too: the device switch does not always reach a freshly launched app in time.
-            ("light", .light, []), ("dark", .dark, ["-uitest-dark"]),
+            ("light", .light, []), ("dark", .dark, []),
             ("axl", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"]),
         ]
         for (name, look, extra) in looks {
@@ -578,12 +577,12 @@ final class TendingUITests: XCTestCase {
     /// tapped and the soil row in view (E). Part way up the ladder, as in the mockup.
     /// One test per look, so each stays well inside the time allowance (the four launches together ran past it).
     func testRepotSheetScreensLikeTheMockupLight() { repotSheetLooksLikeTheMockup("light", .light, []) }
-    func testRepotSheetScreensLikeTheMockupDark() { repotSheetLooksLikeTheMockup("dark", .dark, ["-uitest-dark"]) }
+    func testRepotSheetScreensLikeTheMockupDark() { repotSheetLooksLikeTheMockup("dark", .dark, []) }
     func testRepotSheetScreensLikeTheMockupAccessibilityL() {
         repotSheetLooksLikeTheMockup("axl", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityL"])
     }
     func testRepotSheetScreensLikeTheMockupDarkReduceMotion() {
-        repotSheetLooksLikeTheMockup("reduce-dark", .dark, ["-uitest-dark", "-uitest-reduce-motion"])
+        repotSheetLooksLikeTheMockup("reduce-dark", .dark, ["-uitest-reduce-motion"])
     }
 
     private func repotSheetLooksLikeTheMockup(_ name: String, _ look: XCUIDevice.Appearance, _ extra: [String]) {

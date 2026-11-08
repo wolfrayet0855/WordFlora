@@ -589,7 +589,7 @@ On first launch the app asks "How old are you?" with three buttons: Under 13, 13
 HOW TO REACH EACH SCREEN
 - Play a puzzle: Home > Play. Tap letters to guess the plant word; win to grow a plant. Daily Bloom is the card under Play.
 - Garden, Shed, Visitors, Levels, Badges: tiles on Home (some unlock as you play; locked tiles show a hint).
-- Settings: the Settings button on Home. It holds Calm mode, Quiet Garden, Garden weather, Reminders, Appearance, the Plus row, backup and restore of the garden file, Privacy and ads, and About.
+- Settings: the Settings button on Home. It holds Calm mode, Quiet Garden, Garden weather, Reminders, Show everything, the Plus row, backup and restore of the garden file, Privacy and ads, and About. Light and dark always follow the iPhone's own setting (no theme picker).
 
 PLUS, PURCHASES AND THE PARENTAL GATE
 - Open Home > Settings. The Plus row is near the bottom. For 18+ and 13-17 it is labelled "Remove ads and sync with iCloud"; for under 13 the section is titled "For grown-ups" and the row is "WordFlora Plus".

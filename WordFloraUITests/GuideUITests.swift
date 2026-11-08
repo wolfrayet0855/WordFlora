@@ -229,7 +229,11 @@ final class GuideUITests: XCTestCase {
     }
 
     func testScreenshotsLight() { shootAll("guide-light", []) }
-    func testScreenshotsDark() { shootAll("guide-dark", ["-uitest-dark"]) }
+    func testScreenshotsDark() {
+        XCUIDevice.shared.appearance = .dark       // light and dark follow the system
+        defer { XCUIDevice.shared.appearance = .light }
+        shootAll("guide-dark", [])
+    }
     func testScreenshotsReduceMotion() { shootAll("guide-rm", ["-uitest-reduce-motion"]) }
     func testScreenshotsAccessibilityText() { shootAll("guide-ax", Self.axText) }
 }
@@ -347,7 +351,11 @@ final class QuietGardenOfferUITests: XCTestCase {
     }
 
     func testAuditAtDefaultSize() { openOffer(["-uitest-reduce-motion"]); sleep(1); audit("quiet-offer") }
-    func testAuditInDark() { openOffer(["-uitest-reduce-motion", "-uitest-dark"]); sleep(1); audit("quiet-offer-dark") }
+    func testAuditInDark() {
+        XCUIDevice.shared.appearance = .dark
+        defer { XCUIDevice.shared.appearance = .light }
+        openOffer(["-uitest-reduce-motion"]); sleep(1); audit("quiet-offer-dark")
+    }
     func testAuditAtAccessibilitySize() {
         openOffer(Self.axText + ["-uitest-reduce-motion"])
         sleep(1)
@@ -360,8 +368,9 @@ final class QuietGardenOfferUITests: XCTestCase {
     // MARK: Screenshots (compared by eye with design-preview/quiet-garden/shots; run with TEST_RUNNER_SCREENSHOT_DIR=<dir>)
 
     func testScreenshots() {
-        for (name, extra) in [("quiet-offer-light", []), ("quiet-offer-dark", ["-uitest-dark"]),
+        for (name, extra) in [("quiet-offer-light", []), ("quiet-offer-dark", []),
                               ("quiet-offer-rm", ["-uitest-reduce-motion"]), ("quiet-offer-ax", Self.axText)] {
+            XCUIDevice.shared.appearance = name == "quiet-offer-dark" ? .dark : .light     // dark follows the system
             openOffer(extra)
             sleep(1)
             shot(name)

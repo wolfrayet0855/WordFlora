@@ -3,7 +3,6 @@ import SwiftUI
 /// Player preferences, stored in UserDefaults (never in the game store). Spec sections 8, 18, 19.
 @Observable
 final class AppSettings {
-    enum Appearance: String, CaseIterable { case system, light, dark }
     enum Difficulty: String, CaseIterable { case auto, gentle, standard, tricky }
 
     private let defaults: UserDefaults
@@ -21,7 +20,6 @@ final class AppSettings {
     var remindMe: Bool { didSet { defaults.set(remindMe, forKey: "remindMe") } }
     var reminderHour: Int { didSet { defaults.set(reminderHour, forKey: "reminderHour") } }
     var reminderMinute: Int { didSet { defaults.set(reminderMinute, forKey: "reminderMinute") } }
-    var appearance: Appearance { didSet { defaults.set(appearance.rawValue, forKey: "appearance") } }
     var difficulty: Difficulty { didSet { defaults.set(difficulty.rawValue, forKey: "difficulty") } }
     var assistLevel: Int { didSet { defaults.set(assistLevel, forKey: "assistLevel") } }
     var ageBand: AgeBand? { didSet { defaults.set(ageBand?.rawValue, forKey: "ageBand") } }
@@ -70,9 +68,6 @@ final class AppSettings {
     }
 
     var isUnderThirteen: Bool { ageBand == .under13 }
-    var colorScheme: ColorScheme? {
-        switch appearance { case .system: return nil; case .light: return .light; case .dark: return .dark }
-    }
 
     init(defaults: UserDefaults = SharedDefaults.store) {
         self.defaults = defaults
@@ -91,7 +86,6 @@ final class AppSettings {
         remindMe = bool("remindMe", false)
         reminderHour = defaults.object(forKey: "reminderHour") == nil ? 17 : defaults.integer(forKey: "reminderHour")
         reminderMinute = defaults.integer(forKey: "reminderMinute")
-        appearance = defaults.string(forKey: "appearance").flatMap(Appearance.init(rawValue:)) ?? .system
         difficulty = defaults.string(forKey: "difficulty").flatMap(Difficulty.init(rawValue:)) ?? .auto
         assistLevel = defaults.object(forKey: "assistLevel") == nil ? AssistTuner.defaultLevel(isUnderThirteen: age == .under13) : defaults.integer(forKey: "assistLevel")
         ageBand = age

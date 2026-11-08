@@ -19,7 +19,7 @@ final class BadgeMechanicsUITests: XCTestCase {
 
     private func launch(_ extra: [String], size: String? = nil, dark: Bool = false) {
         if dark { XCUIDevice.shared.appearance = .dark }
-        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-everything"] + extra + (dark ? ["-uitest-dark"] : [])
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-everything"] + extra
             + (size.map { ["-UIPreferredContentSizeCategoryName", $0] } ?? [])
         app.launch()
     }
@@ -182,7 +182,7 @@ final class BadgeMechanicsUITests: XCTestCase {
 
     private func openFern(size: String? = nil, dark: Bool = false) {
         if dark { XCUIDevice.shared.appearance = .dark }
-        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-plant=fern", "-uitest-mist"] + (dark ? ["-uitest-dark"] : [])
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-plant=fern", "-uitest-mist"]
             + (size.map { ["-UIPreferredContentSizeCategoryName", $0] } ?? [])
         app.launch()
         app.buttons["Garden"].tap()

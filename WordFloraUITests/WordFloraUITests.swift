@@ -482,7 +482,7 @@ final class WordFloraUITests: XCTestCase {
         }
         func open(_ word: String, probes: Bool = false) {
             app.terminate()
-            app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-word=\(word)"] + (dark ? ["-uitest-dark"] : [])
+            app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-word=\(word)"]
                 + (probes ? ["-uitest-key-probes"] : []) + (size.map { ["-UIPreferredContentSizeCategoryName", $0] } ?? [])
             app.launch()
             app.buttons["Play"].tap()
@@ -634,9 +634,9 @@ final class FidelityScreensUITests: XCTestCase {
         let a = XCTAttachment(data: data, uniformTypeIdentifier: "public.png"); a.name = name; a.lifetime = .keepAlways; add(a)
     }
 
-    /// light, dark (device and app switch, as the device switch does not always reach a fresh app), largest text size.
+    /// light, dark (the device appearance; the app follows the system), largest text size.
     private static let looks: [(String, XCUIDevice.Appearance, [String])] = [
-        ("light", .light, []), ("dark", .dark, ["-uitest-dark"]),
+        ("light", .light, []), ("dark", .dark, []),
         ("ax5", .light, ["-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]),
     ]
 

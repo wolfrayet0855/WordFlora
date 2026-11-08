@@ -214,7 +214,7 @@ struct WordFloraApp: App {
         if uiTesting && args.contains("-uitest-gentlenet") {
             model.updateBadges(announce: false) { state, _, t in state.record(.gentleHellos, amount: 9, now: t) }
         }
-        if uiTesting && args.contains("-uitest-dark") { model.settings.appearance = .dark }
+        // `-uitest-dark` is gone: light and dark follow the system, so UI tests set XCUIDevice.shared.appearance.
         if uiTesting, let n = args.first(where: { $0.hasPrefix("-uitest-sessions=") }).flatMap({ Int($0.dropFirst("-uitest-sessions=".count)) }) {
             model.settings.completedSessions = n            // past the first sessions, so the ad rules can say yes
         }
