@@ -58,6 +58,7 @@ struct WakeSheet: View {
             .padding(8)
         }
         .background(Color.appBackground.ignoresSafeArea())
+        .rewardToast($toast, announce: false)          // R3: the success view says it too, so VoiceOver hears it once
         .presentationDetents([.medium, .large], selection: $detent)
         .presentationDragIndicator(.visible)
         .onAppear { detent = needsLarge(.choose) ? .large : .medium; app.pauseBadgeMoments(.sheet, true) }
@@ -90,7 +91,6 @@ struct WakeSheet: View {
             .padding(20)
         }
         .scrollBounceBehavior(.basedOnSize)
-        .rewardToast($toast)
     }
 
     @State private var toast: String?
@@ -102,7 +102,7 @@ struct WakeSheet: View {
     @ViewBuilder private var gentleWakeRow: some View {
         RewardedPromptRow.forPath(app.perkPath(.wake), adTitle: AdPerkCopy.Wake.adTitle, freeTitle: AdPerkCopy.Wake.freeTitle,
                                   adSubtitle: AdPerkCopy.Wake.adSubtitle, freeSubtitle: AdPerkCopy.Wake.freeSubtitle,
-                                  hasPlus: app.entitlements.state.hasPlus, identifier: "wake.gentle") {
+                                  hasPlus: app.entitlements.state.hasPlus, identifier: "wake.gentle", busy: watching) {
             guard !watching else { return }
             watching = true
             Task {

@@ -9,7 +9,7 @@ struct GardenView: View {
 
     private let levelNames = ["Seedling", "Sprout", "Bloom", "Grove", "Ancient"]
     /// B4: the banner's real anchored adaptive height, reported by the created banner (never a fixed 60 pt).
-    @State private var bannerHeight: CGFloat = 50
+    @State private var bannerHeight: CGFloat = AdBannerView.slotHeight
 
     var body: some View {
         ScrollView {
@@ -68,7 +68,7 @@ struct GardenView: View {
                         .font(Theme.font(.headline)).foregroundStyle(Color.appPrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
                     RewardedPromptRow.forPath(path, adTitle: AdPerkCopy.Water.adTitle, freeTitle: AdPerkCopy.Water.freeTitle,
-                                              hasPlus: app.entitlements.state.hasPlus, identifier: "garden.waterPerk") {
+                                              hasPlus: app.entitlements.state.hasPlus, identifier: "garden.waterPerk", busy: watching) {
                         guard !watching else { return }
                         watching = true
                         Task {

@@ -9,15 +9,23 @@ struct RewardedPromptRow: View {
     let isVideo: Bool
     var caption: String? = nil
     let identifier: String
+    /// A video is loading after the tap: a spinner stands in for the icon (the row is disabled by its host).
+    var busy = false
     let action: () -> Void
 
     var body: some View {
         Button(action: action) {
             HStack(alignment: .top, spacing: Space.m) {
-                Image(systemName: isVideo ? "play.rectangle.fill" : "leaf.fill")
-                    .font(Theme.font(.title3))
-                    .foregroundStyle(Color.successText)
-                    .accessibilityHidden(true)
+                Group {
+                    if busy {
+                        ProgressView()
+                    } else {
+                        Image(systemName: isVideo ? "play.rectangle.fill" : "leaf.fill")
+                            .font(Theme.font(.title3))
+                            .foregroundStyle(Color.successText)
+                    }
+                }
+                .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: Space.xs) {
                     Text(title)
                         .font(Theme.font(.body, weight: .semibold))
@@ -54,12 +62,12 @@ struct RewardedPromptRow: View {
     /// The row for a perk path, or nothing when the perk is hidden.
     @ViewBuilder
     static func forPath(_ path: PerkPath, adTitle: String, freeTitle: String, adSubtitle: String? = nil, freeSubtitle: String? = nil,
-                        hasPlus: Bool, identifier: String, action: @escaping () -> Void) -> some View {
+                        hasPlus: Bool, identifier: String, busy: Bool = false, action: @escaping () -> Void) -> some View {
         switch path {
         case .hidden:
             EmptyView()
         case .ad:
-            RewardedPromptRow(title: adTitle, subtitle: adSubtitle, isVideo: true, identifier: identifier, action: action)
+            RewardedPromptRow(title: adTitle, subtitle: adSubtitle, isVideo: true, identifier: identifier, busy: busy, action: action)
         case .free:
             RewardedPromptRow(title: freeTitle, subtitle: freeSubtitle, isVideo: false,
                               caption: hasPlus ? AdPerkCopy.plusCaption : nil, identifier: identifier, action: action)
@@ -71,6 +79,16 @@ struct RewardedPromptRow: View {
 /// so Reduce Motion needs no variant). VoiceOver hears it once.
 struct RewardToastModifier: ViewModifier {
     @Binding var message: String?
+    /// False when the screen that follows says the same thing itself (the wake success view), so VoiceOver hears it once.
+    var announce = true
+
+    /// 2.5 s; UI test audits (`-uitest-toast-hold`, Debug only) keep it up for a minute so it can be audited.
+    static var restNanoseconds: UInt64 {
+        #if DEBUG
+        if ProcessInfo.processInfo.arguments.contains("-uitest-toast-hold") { return 60_000_000_000 }
+        #endif
+        return 2_500_000_000
+    }
 
     func body(content: Content) -> some View {
         content.overlay(alignment: .top) {
@@ -87,8 +105,8 @@ struct RewardToastModifier: ViewModifier {
                     .transition(.opacity)
                     .accessibilityIdentifier("rewardToast")
                     .task(id: message) {
-                        AccessibilityNotification.Announcement(message).post()
-                        try? await Task.sleep(nanoseconds: 2_500_000_000)
+                        if announce { AccessibilityNotification.Announcement(message).post() }
+                        try? await Task.sleep(nanoseconds: Self.restNanoseconds)
                         withAnimation(.easeOut(duration: 0.3)) { self.message = nil }
                     }
             }
@@ -98,5 +116,7 @@ struct RewardToastModifier: ViewModifier {
 }
 
 extension View {
-    func rewardToast(_ message: Binding<String?>) -> some View { modifier(RewardToastModifier(message: message)) }
+    func rewardToast(_ message: Binding<String?>, announce: Bool = true) -> some View {
+        modifier(RewardToastModifier(message: message, announce: announce))
+    }
 }

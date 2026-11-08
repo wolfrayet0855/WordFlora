@@ -91,21 +91,93 @@ final class AdFormatsUITests: XCTestCase {
 
     // MARK: Audits (light and dark, default and the largest accessibility size)
 
-    func testTheWaterRowPassesTheAccessibilityAudit() throws {
-        for size in [UIContentSizeCategory.large, .accessibilityExtraExtraExtraLarge] {
-            for look in [XCUIDevice.Appearance.light, .dark] {
-                XCUIDevice.shared.appearance = look
-                app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-sessions=3", "-uitest-ads-fake", "-uitest-dry",
-                                       "-UIPreferredContentSizeCategoryName", size.rawValue]
-                app.launch()
-                openGarden()
-                XCTAssertTrue(waterRow.waitForExistence(timeout: 5))
-                try app.performAccessibilityAudit(for: [.contrast, .dynamicType, .textClipped, .hitRegion, .sufficientElementDescription])
-                app.terminate()
-            }
-        }
+    override func tearDown() {
         XCUIDevice.shared.appearance = .light
+        super.tearDown()
     }
+
+    private static let axXXXL = UIContentSizeCategory.accessibilityExtraExtraExtraLarge.rawValue
+    private static let large = UIContentSizeCategory.large.rawValue
+
+    /// Every audit type, the same way as TextFitScreensUITests: contrast and clipped text are judged only for elements
+    /// fully inside the visible scroll area (the audit does not scroll); Dynamic Type and clipped text run apart.
+    private func audit(_ name: String) {
+        auditOnce(name, types: XCUIAccessibilityAuditType.all.subtracting([.dynamicType, .textClipped]))
+        auditOnce(name + "-textClipped", types: .textClipped)
+        auditOnce(name + "-dynamicType", types: .dynamicType)
+    }
+
+    private func auditOnce(_ name: String, types: XCUIAccessibilityAuditType) {
+        var findings = [String](), skipped = [String]()
+        let scroll = app.scrollViews.firstMatch, nav = app.navigationBars.firstMatch
+        let top = nav.exists ? nav.frame.maxY + 64 : 0
+        let visible: CGRect? = scroll.exists ? {
+            let f = scroll.frame
+            return CGRect(x: f.minX, y: max(f.minY, top), width: f.width, height: f.maxY - max(f.minY, top))
+        }() : nil
+        do {
+            try app.performAccessibilityAudit(for: types) { issue in
+                if issue.auditType == .contrast {
+                    guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
+                    if let v = visible, !v.contains(e.frame) { return true }
+                }
+                if issue.auditType == .textClipped, let e = issue.element, let v = visible, !v.insetBy(dx: -1, dy: -1).contains(e.frame) {
+                    skipped.append("\(issue.compactDescription) on '\(e.label)' (partly out of view)"); return true
+                }
+                findings.append("\(name): \(issue.auditType.rawValue) - \(issue.compactDescription) | '\(issue.element?.label ?? "")' [\(issue.element?.identifier ?? "")] \(issue.element.map { "\($0.frame)" } ?? "")")
+                return true
+            }
+        } catch { findings.append("\(name): audit failed to run: \(error)") }
+        if !skipped.isEmpty { print("\(name): not judged, \(skipped.count) issue(s): \(skipped.joined(separator: "; "))") }
+        XCTAssertTrue(findings.isEmpty, findings.joined(separator: "\n"))
+    }
+
+    private func launchForAudit(_ extra: [String], size: String, dark: Bool) {
+        XCUIDevice.shared.appearance = dark ? .dark : .light
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-sessions=3", "-uitest-ads-fake", "-uitest-toast-hold",
+                               "-UIPreferredContentSizeCategoryName", size] + extra
+        app.launch()
+    }
+
+    /// Garden with the R1 video row, then its toast after the fake ad.
+    private func auditGarden(size: String, dark: Bool) {
+        launchForAudit(["-uitest-dry"], size: size, dark: dark)
+        openGarden()
+        XCTAssertTrue(waterRow.waitForExistence(timeout: 5))
+        for _ in 0..<4 where !waterRow.isHittable { app.swipeDown() }
+        let tag = "garden-\(dark ? "dark" : "light")-\(size == Self.large ? "default" : "axxxl")"
+        audit(tag)
+        waterRow.tap()
+        let ad = app.descendants(matching: .any)["fakeAd"]
+        XCTAssertTrue(ad.waitForExistence(timeout: 5)); ad.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["rewardToast"].firstMatch.waitForExistence(timeout: 5))
+        audit(tag + "-toast")
+    }
+
+    /// The wake sheet with the R3 row, then its toast.
+    private func auditWake(size: String, dark: Bool) {
+        launchForAudit(["-uitest-seed", "-uitest-wake-dreamed"], size: size, dark: dark)
+        openWakeSheet()
+        let row = app.buttons["wake.gentle"]
+        for _ in 0..<6 where !row.isHittable { app.swipeUp() }
+        XCTAssertTrue(row.waitForExistence(timeout: 5))
+        let tag = "wake-\(dark ? "dark" : "light")-\(size == Self.large ? "default" : "axxxl")"
+        audit(tag)
+        row.tap()
+        let ad = app.descendants(matching: .any)["fakeAd"]
+        XCTAssertTrue(ad.waitForExistence(timeout: 5)); ad.tap()
+        XCTAssertTrue(app.descendants(matching: .any)["rewardToast"].firstMatch.waitForExistence(timeout: 5))
+        audit(tag + "-toast")
+    }
+
+    func testAuditGardenLightDefault() { auditGarden(size: Self.large, dark: false) }
+    func testAuditGardenDarkDefault() { auditGarden(size: Self.large, dark: true) }
+    func testAuditGardenLightAXXXL() { auditGarden(size: Self.axXXXL, dark: false) }
+    func testAuditGardenDarkAXXXL() { auditGarden(size: Self.axXXXL, dark: true) }
+    func testAuditWakeLightDefault() { auditWake(size: Self.large, dark: false) }
+    func testAuditWakeDarkDefault() { auditWake(size: Self.large, dark: true) }
+    func testAuditWakeLightAXXXL() { auditWake(size: Self.axXXXL, dark: false) }
+    func testAuditWakeDarkAXXXL() { auditWake(size: Self.axXXXL, dark: true) }
 }
 
 /// Faded bloom placement check (docs/pm/faded-bloom-offsets.md): the cue forced on for lithops and aloe vera (nudged)
