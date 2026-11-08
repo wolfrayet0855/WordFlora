@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="100" height="100">
+  <!-- Mist Maker: dew beads laid over the plant's leaves after a mist, and the whole effect in Reduce Motion
+       (0.25 s cross-fade in, held 1.2 s, 0.4 s fade out). Bead body #CFE6F5, rim #7CC4F0, white glint. -->
+  <g stroke="#7CC4F0" stroke-width="1.4" fill="#CFE6F5" fill-opacity=".9">
+    <path d="M24 30 c 4 5 5 8 0 9.5 c -5 -1.5 -4 -4.5 0 -9.5 Z"/>
+    <path d="M70 22 c 5 6 6 10 0 11.5 c -6 -1.5 -5 -5.5 0 -11.5 Z"/>
+    <path d="M48 52 c 4 5 5 8 0 9.5 c -5 -1.5 -4 -4.5 0 -9.5 Z"/>
+    <path d="M78 62 c 3.5 4.5 4.5 7 0 8.5 c -4.5 -1.5 -3.5 -4 0 -8.5 Z"/>
+    <path d="M18 70 c 3.5 4.5 4.5 7 0 8.5 c -4.5 -1.5 -3.5 -4 0 -8.5 Z"/>
+  </g>
+  <g fill="#fff"><circle cx="22.6" cy="35" r="1.2"/><circle cx="68.4" cy="28" r="1.4"/><circle cx="46.6" cy="57" r="1.2"/>
+    <circle cx="76.8" cy="66.5" r="1"/><circle cx="16.8" cy="74.5" r="1"/></g>
+</svg>

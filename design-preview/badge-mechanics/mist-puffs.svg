@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" width="160" height="100">
+  <!-- Mist Maker: the spray at full spread. Origin = the nozzle at (8,50); it fans right over the leaves.
+       Droplets #7CC4F0 (the mister art's water), white with a #7CC4F0 rim so they read on light pots, puffs #E2F1FB at 82% (stays light, not smoky, on the dark garden).
+       24 droplets and 3 puffs; mist-puffs-calm.svg draws 12 droplets and 1 puff. -->
+  <g fill="#E2F1FB" fill-opacity=".82">
+    <path d="M70 42 c -6 -10 8 -16 14 -10 c 4 -8 18 -6 18 4 c 10 0 12 14 2 16 c -2 8 -16 8 -20 2 c -8 4 -18 -4 -14 -12 Z"/>
+    <path d="M112 22 c -4 -7 6 -11 10 -7 c 3 -6 13 -4 13 3 c 7 0 8 10 1 11 c -1 6 -11 6 -14 1 c -6 3 -13 -3 -10 -8 Z"/>
+    <path d="M110 66 c -4 -7 6 -11 10 -7 c 3 -6 13 -4 13 3 c 7 0 8 10 1 11 c -1 6 -11 6 -14 1 c -6 3 -13 -3 -10 -8 Z"/>
+  </g>
+  <g fill="#7CC4F0">
+    <circle cx="22" cy="48" r="2.4"/><circle cx="34" cy="44" r="2.8"/><circle cx="46" cy="38" r="2.2"/><circle cx="58" cy="30" r="3"/>
+    <circle cx="36" cy="56" r="2.2"/><circle cx="52" cy="62" r="2.8"/><circle cx="66" cy="70" r="2.4"/><circle cx="90" cy="18" r="2.6"/>
+    <circle cx="96" cy="78" r="3"/><circle cx="128" cy="44" r="2.4"/><circle cx="142" cy="30" r="2"/><circle cx="140" cy="62" r="2.6"/>
+  </g>
+  <g fill="#fff" stroke="#7CC4F0" stroke-width="1.2">
+    <circle cx="28" cy="52" r="2"/><circle cx="44" cy="50" r="2.4"/><circle cx="62" cy="48" r="2.8"/><circle cx="76" cy="26" r="2.2"/>
+    <circle cx="80" cy="60" r="2.6"/><circle cx="104" cy="40" r="3"/><circle cx="118" cy="56" r="2.2"/><circle cx="104" cy="88" r="2"/>
+    <circle cx="150" cy="48" r="2.2"/><circle cx="122" cy="14" r="1.8"/><circle cx="84" cy="44" r="1.8"/><circle cx="132" cy="80" r="2"/>
+  </g>
+</svg>

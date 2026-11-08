@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Badge Mechanics Art</title>
+<link rel="stylesheet" href="../theme.css">
+<style>
+  /* Spec: docs/pm/badge-mechanics-art.md. ?theme=dark|light, ?section=assets|notes|net|prune|mist, ?static=1 freezes motion. */
+  :root{--parchment:#F6EBD3;--ink:#5B4A32;--rose:#F2788A;--leaf:#3F8A4A;--sky1:#DCEFFB;--sky2:#F4FAEF}
+  [data-theme=dark]{--sky1:#1F3A4A;--sky2:#1A2E1A}
+  body{padding:16px;max-width:1000px;margin:0 auto}
+  h1{font-size:22px;margin:4px 0 2px} h2{font-size:17px;margin:22px 0 8px}
+  .sub{color:var(--muted);font-size:13px;margin:0 0 12px}
+  .row{display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start}
+  .card{background:var(--surface);border-radius:18px;box-shadow:var(--shadow);padding:12px}
+  .cap{font-size:12px;color:var(--muted);margin-top:6px;text-align:center;max-width:300px}
+  .tile{width:118px;height:118px;border-radius:14px;display:grid;place-items:center;border:1px solid var(--line)}
+  .tile.l{background:#FAF7F0}.tile.d{background:#1A2E1A}.tile img{max-width:96px;max-height:96px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+  .asset{display:flex;gap:6px;flex-direction:column}
+  .asset .pair{display:flex;gap:6px}
+  .asset code{font-size:11px;color:var(--muted)}
+  /* Field Notes page */
+  .page{position:relative;width:300px;height:400px;font-family:"Chalkboard SE","Marker Felt",ui-rounded,system-ui,sans-serif;color:var(--ink)}
+  [data-theme=dark] .page{filter:brightness(.92)}
+  .page > img.bg{position:absolute;inset:0;width:300px;height:400px}
+  .page .stk{position:absolute;left:96px;top:50px;width:108px;height:108px;filter:sepia(.4) saturate(.85) contrast(1.02)}
+  .page .stk.unmet{filter:grayscale(1) brightness(1.6) opacity(.35)}
+  .page .name{position:absolute;left:58px;top:190px;font-size:19px;font-weight:700}
+  .page .met{position:absolute;left:180px;top:194px;font-size:12.5px;opacity:.8}
+  .page .fact{position:absolute;left:58px;top:224px;width:210px;font-size:14.5px;line-height:28px}
+  .page .stamp{position:absolute;right:22px;bottom:34px;width:84px;height:84px;opacity:.9}
+  .btns{display:flex;gap:8px;margin-top:10px;justify-content:center}
+  .btn{font:600 15px ui-rounded,system-ui,sans-serif;border-radius:22px;padding:10px 16px;min-height:44px;border:2px solid var(--line);background:var(--surface);color:var(--text);display:inline-flex;align-items:center;gap:6px}
+  .btn.go{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+  .btn.done{background:color-mix(in srgb,var(--success) 18%,var(--surface));border-color:color-mix(in srgb,var(--success) 50%,transparent)}
+  .toast{font:600 14px ui-rounded,system-ui,sans-serif;background:var(--surface);border:2px solid color-mix(in srgb,var(--leaf) 50%,transparent);border-radius:16px;padding:8px 12px;display:inline-flex;gap:8px;align-items:center;margin-top:8px}
+  .toast img{width:22px;height:22px}
+  /* Gentle Net */
+  .sky{position:relative;width:300px;height:300px;border-radius:18px;overflow:hidden;background:linear-gradient(var(--sky1),var(--sky2))}
+  .sky .halo{position:absolute;left:90px;top:176px;width:120px}
+  .sky .flower{position:absolute;left:100px;top:150px;width:100px}
+  .sky .vis{position:absolute;left:105px;top:136px;width:90px;transform-origin:50% 50%}
+  .sky .vis .wings{animation:rest 2.4s ease-in-out infinite;transform-origin:50% 50%}
+  @keyframes rest{0%,100%{transform:scaleX(1)}50%{transform:scaleX(.42)}}
+  .sky .fly{position:absolute;left:26px;top:40px;width:56px;opacity:.95}
+  .sky .pill{position:absolute;left:60px;top:22px;width:180px;height:44px}
+  .sky .pill span{position:absolute;left:44px;top:11px;font:600 17px ui-rounded,system-ui,sans-serif;color:#2C3E2C}
+  .sticker{position:relative;width:110px;height:110px}
+  .sticker img.s{width:110px}
+  .sticker img.h{position:absolute;right:0;top:2px;width:34px}
+  /* Pruning / Mist plant */
+  .pot{position:relative;width:260px;height:300px;border-radius:18px;background:var(--stage);overflow:hidden}
+  .pot svg.plant{position:absolute;left:0;top:0}
+  .pot .fb{position:absolute;width:80px}
+  .pot .bud{position:absolute;width:48px}
+  .pot .petal{position:absolute;width:26px;animation:fall 2.2s ease-in infinite}
+  @keyframes fall{0%{transform:translate(0,0) rotate(0);opacity:1}80%{opacity:1}100%{transform:translate(14px,120px) rotate(70deg);opacity:0}}
+  .pot .mist{position:absolute;left:96px;top:52px;width:170px;animation:spray 1.6s ease-out infinite;transform-origin:0 50%}
+  @keyframes spray{0%{transform:scale(.3);opacity:0}25%{opacity:1}100%{transform:scale(1);opacity:0}}
+  .pot .mister{position:absolute;left:4px;top:70px;width:72px}
+  .pot .dew{position:absolute;left:70px;top:100px;width:150px}
+  .line{font:600 14px ui-rounded,system-ui,sans-serif;margin-top:8px;max-width:260px}
+  .tend{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px;max-width:300px}
+  .tend .btn{padding:8px 10px}
+  .tend .btn{font-size:14px;padding:8px 12px}
+  .static *{animation:none!important}
+  .static .sky .vis .wings{transform:scaleX(.6)}
+  .static .pot .mist{opacity:1;transform:none}
+  .static .pot .petal{transform:translate(8px,40px) rotate(30deg)}
+  section[hidden]{display:none}
+</style>
+<script src="../theme.js"></script>
+<script>
+  (function(){var q=new URLSearchParams(location.search);var t=q.get('theme');if(t)document.documentElement.setAttribute('data-theme',t);
+    window.__q=q;})();
+</script>
+</head>
+<body>
+<h1>Badge mechanics art</h1>
+<p class="sub">Field Notes, Gentle Net, Pruning Pro and Mist Maker. Spec: docs/pm/badge-mechanics-art.md</p>
+
+<!-- Plant drawing reused by the Pruning and Mist panels (PetalKit stem/leaf colours, FlowerView rose bloom). -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <g id="plant">
+      <path d="M100 286 h60 l-8 -56 h-44 Z" fill="#C98A4B" stroke="#9A5F2A" stroke-width="3" stroke-linejoin="round"/>
+      <rect x="102" y="222" width="56" height="14" rx="5" fill="#9A5F2A"/>
+      <path d="M130 224 C 128 180 120 140 92 104 M130 224 C 132 170 140 120 168 90 M130 224 C 130 180 130 120 130 70" stroke="#4E9A55" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M128 190 C 104 186 88 170 86 156 C 108 156 124 170 128 190 Z" fill="#5FA860" stroke="#3F8A4A" stroke-width="2.4"/>
+      <path d="M133 176 C 156 170 170 152 170 140 C 148 142 136 158 133 176 Z" fill="#3F8A4A" stroke="#2F6E38" stroke-width="2.4"/>
+      <path d="M130 140 C 112 132 104 118 106 106 C 122 112 130 124 130 140 Z" fill="#5FA860" stroke="#3F8A4A" stroke-width="2.4"/>
+    </g>
+    <!-- The mister from brand/v4/svg/tools/mister-t1-color.svg without its medallion. -->
+    <g id="mister">
+      <rect x="28" y="46" width="34" height="40" rx="11" fill="#5FA05A"/><rect x="32" y="60" width="26" height="22" rx="7" fill="#7CC4F0"/>
+      <rect x="37" y="36" width="16" height="12" rx="3" fill="#3F7A45"/><rect x="32" y="22" width="32" height="14" rx="6" fill="#C98A4B"/>
+      <rect x="62" y="25" width="11" height="7" rx="3.5" fill="#9A5F2A"/>
+      <path d="M58 38 q8 1 9 12" fill="none" stroke="#3F7A45" stroke-width="4" stroke-linecap="round"/>
+    </g>
+    <g id="bloom">
+      <g fill="#F2788A" stroke="#D9566C" stroke-width="2">
+        <ellipse cx="0" cy="-14" rx="8" ry="13"/><ellipse cx="0" cy="-14" rx="8" ry="13" transform="rotate(72)"/>
+        <ellipse cx="0" cy="-14" rx="8" ry="13" transform="rotate(144)"/><ellipse cx="0" cy="-14" rx="8" ry="13" transform="rotate(216)"/>
+        <ellipse cx="0" cy="-14" rx="8" ry="13" transform="rotate(288)"/>
+      </g>
+      <circle r="7.5" fill="#E8A838"/><circle r="4.5" fill="#F5C858"/>
+    </g>
+  </defs>
+</svg>
+
+<section id="assets">
+<h2>Assets, light and dark</h2>
+<div class="grid">
+  <div class="asset"><div class="pair"><div class="tile l"><img src="leaf-stamp.svg"></div><div class="tile d"><img src="leaf-stamp.svg"></div></div><code>leaf-stamp.svg</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="notebook-page.svg"></div><div class="tile d"><img src="notebook-page.svg" style="filter:brightness(.92)"></div></div><code>notebook-page.svg (dark: 92% brightness)</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="gentle-hello-heart.svg" style="width:56px"></div><div class="tile d"><img src="gentle-hello-heart.svg" style="width:56px"></div></div><code>gentle-hello-heart.svg</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="gentle-hello-pill.svg"></div><div class="tile d"><img src="gentle-hello-pill.svg"></div></div><code>gentle-hello-pill.svg</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="resting-halo.svg"></div><div class="tile d"><img src="resting-halo.svg"></div></div><code>resting-halo.svg</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="faded-bloom.svg"></div><div class="tile d"><img src="faded-bloom.svg"></div></div><code>faded-bloom.svg</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="faded-petal.svg" style="width:44px"></div><div class="tile d"><img src="faded-petal.svg" style="width:44px"></div></div><code>faded-petal.svg</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="fresh-bud.svg" style="width:60px"></div><div class="tile d"><img src="fresh-bud.svg" style="width:60px"></div></div><code>fresh-bud.svg</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="mist-puffs.svg"></div><div class="tile d"><img src="mist-puffs.svg"></div></div><code>mist-puffs.svg</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="mist-puffs-calm.svg"></div><div class="tile d"><img src="mist-puffs-calm.svg"></div></div><code>mist-puffs-calm.svg (Calm)</code></div>
+  <div class="asset"><div class="pair"><div class="tile l"><img src="dewy-drops.svg"></div><div class="tile d"><img src="dewy-drops.svg"></div></div><code>dewy-drops.svg (Reduce Motion)</code></div>
+</div>
+</section>
+
+<section id="notes">
+<h2>Field Notes: a notebook page per friend</h2>
+<div class="row">
+  <div>
+    <div class="page"><img class="bg" src="notebook-page.svg" alt="">
+      <img class="stk" src="../brand/v4/svg/visitors/monarch-sticker.svg" alt="">
+      <div class="name">Monarch</div><div class="met">Met on 4 Nov</div>
+      <div class="fact">Monarchs fly thousands of miles to the same warm forests every winter.</div>
+    </div>
+    <div class="btns"><span class="btn">&#9654; Listen</span><span class="btn go">I read it!</span></div>
+    <div class="cap">1. Before: sepia sticker, fact, Listen and I read it!</div>
+  </div>
+  <div>
+    <div class="page"><img class="bg" src="notebook-page.svg" alt="">
+      <img class="stk" src="../brand/v4/svg/visitors/monarch-sticker.svg" alt="">
+      <div class="name">Monarch</div><div class="met">Met on 4 Nov</div>
+      <div class="fact">Monarchs fly thousands of miles to the same warm forests every winter.</div>
+      <img class="stamp" src="leaf-stamp.svg" alt="">
+    </div>
+    <div class="btns"><span class="btn">&#9654; Listen</span><span class="btn done">&#10003; Stamped</span></div>
+    <div style="text-align:center"><span class="toast"><img src="leaf-stamp.svg" alt="">Page added to your notebook.</span></div>
+    <div class="cap">2. After: the leaf stamp presses in at the bottom corner</div>
+  </div>
+  <div>
+    <div class="page"><img class="bg" src="notebook-page.svg" alt="">
+      <img class="stk unmet" src="../brand/v4/svg/visitors/luna-sticker.svg" alt="">
+      <div class="name" style="opacity:.6">A new friend</div>
+      <div class="fact" style="opacity:.7">Meet this friend to fill this page.</div>
+    </div>
+    <div class="cap">3. A friend not met yet: faint outline, no buttons, no stamp spot</div>
+  </div>
+</div>
+</section>
+
+<section id="net">
+<h2>Gentle Net: a hello to a resting friend</h2>
+<div class="row">
+  <div>
+    <div class="sky">
+      <img class="fly" src="../brand/v4/svg/visitors/cabbagewhite-a.svg" alt="">
+      <img class="halo" src="resting-halo.svg" alt="">
+      <svg class="flower" viewBox="-50 -50 100 100"><use href="#bloom" transform="scale(1.6)"/></svg>
+      <svg class="vis" viewBox="0 0 100 100"><g class="wings"><image href="../brand/v4/svg/visitors/monarch-idle.svg" width="100" height="100"/></g></svg>
+    </div>
+    <div class="cap">1. One visitor rests on a flower for about 3 s: wings open and close slowly, a gold halo under it</div>
+  </div>
+  <div>
+    <div class="sky">
+      <div class="pill"><img src="gentle-hello-pill.svg" alt="" style="width:180px"><span>Gentle hello!</span></div>
+      <img class="halo" src="resting-halo.svg" alt="" style="opacity:.4">
+      <svg class="flower" viewBox="-50 -50 100 100"><use href="#bloom" transform="scale(1.6)"/></svg>
+    </div>
+    <div class="cap">2. A hello while it rests: the net lowers softly, the pill floats up and fades</div>
+  </div>
+  <div class="card" style="text-align:center">
+    <div class="row" style="justify-content:center">
+      <div class="sticker"><img class="s" src="../brand/v4/svg/visitors/monarch-sticker.svg" alt=""><img class="h" src="gentle-hello-heart.svg" alt=""></div>
+      <div class="sticker"><img class="s" src="../brand/v4/svg/visitors/honeybee-sticker.svg" alt=""></div>
+    </div>
+    <div class="line">3 friends said hello &middot; 1 gentle hello</div>
+    <div class="cap">3. Round summary: the heart sits on gently greeted stickers</div>
+  </div>
+</div>
+</section>
+
+<section id="prune">
+<h2>Pruning Pro: a tidy trim at the right time</h2>
+<div class="row">
+  <div>
+    <div class="pot">
+      <svg class="plant" width="260" height="300" viewBox="0 0 260 300"><use href="#plant"/><use href="#bloom" x="130" y="64"/><use href="#bloom" x="168" y="86"/></svg>
+      <img class="fb" src="faded-bloom.svg" alt="" style="left:52px;top:64px">
+    </div>
+    <div class="line">A faded flower is ready for a snip.</div>
+    <div class="cap">1. On some days one bloom has faded (tan, drooping)</div>
+  </div>
+  <div>
+    <div class="pot">
+      <svg class="plant" width="260" height="300" viewBox="0 0 260 300"><use href="#plant"/><use href="#bloom" x="130" y="64"/><use href="#bloom" x="168" y="86"/></svg>
+      <img class="petal" src="faded-petal.svg" alt="" style="left:80px;top:96px">
+    </div>
+    <div class="line">Snip! A tidy trim.<br><span style="font-weight:500">Snipping faded flowers helps new ones grow.</span></div>
+    <div class="cap">2. After the trim: one dry petal drifts down (Reduce Motion: cross-fade)</div>
+  </div>
+  <div>
+    <div class="pot">
+      <svg class="plant" width="260" height="300" viewBox="0 0 260 300"><use href="#plant"/><use href="#bloom" x="130" y="64"/><use href="#bloom" x="168" y="86"/></svg>
+      <img class="bud" src="fresh-bud.svg" alt="" style="left:68px;top:74px">
+    </div>
+    <div class="cap">3. Next visit: a fresh bud where the faded bloom was</div>
+  </div>
+</div>
+</section>
+
+<section id="mist">
+<h2>Mist Maker: a real Mist action</h2>
+<div class="row">
+  <div>
+    <div class="pot">
+      <svg class="plant" width="260" height="300" viewBox="0 0 260 300"><use href="#plant"/></svg>
+      <img class="mist" src="mist-puffs.svg" alt="" style="left:62px;top:74px">
+      <svg class="mister" viewBox="24 18 52 70"><use href="#mister"/></svg>
+    </div>
+    <div class="tend"><span class="btn">Water</span><span class="btn">Feed</span><span class="btn">Sun</span><span class="btn">Prune</span><span class="btn go">Mist</span></div>
+    <div class="cap">1. Mist: a fine spray fans over the leaves (0.9 s, soft hiss)</div>
+  </div>
+  <div>
+    <div class="pot">
+      <svg class="plant" width="260" height="300" viewBox="0 0 260 300"><use href="#plant"/></svg>
+      <img class="dew" src="dewy-drops.svg" alt="">
+    </div>
+    <div class="tend"><span class="btn">Water</span><span class="btn">Feed</span><span class="btn">Sun</span><span class="btn">Prune</span><span class="btn done">Misty today</span></div>
+    <div class="line">Fern is fresh and misty today. More mist tomorrow!</div>
+    <div class="cap">2. After (and the whole Reduce Motion version): dew beads cross-fade in</div>
+  </div>
+  <div>
+    <div class="pot">
+      <svg class="plant" width="260" height="300" viewBox="0 0 260 300"><use href="#plant"/></svg>
+      <img class="mist" src="mist-puffs-calm.svg" alt="" style="left:62px;top:74px">
+      <svg class="mister" viewBox="24 18 52 70"><use href="#mister"/></svg>
+    </div>
+    <div class="line">Fern loves misty air!</div>
+    <div class="cap">3. Calm: half the droplets, no sound. Humidity lovers get the extra line</div>
+  </div>
+</div>
+</section>
+
+<script>
+  var q=window.__q;
+  if(q.get('static'))document.body.classList.add('static');
+  var only=q.get('section');
+  if(only)document.querySelectorAll('section').forEach(function(s){s.hidden=s.id!==only});
+  if(only)document.querySelector('h1').hidden=document.querySelector('.sub').hidden=true;
+</script>
+</body>
+</html>
