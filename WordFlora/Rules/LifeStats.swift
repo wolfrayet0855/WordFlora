@@ -81,7 +81,7 @@ enum LifeStats {
     static let sunWords = ["Bright", "Ready for sun"]
     static let happyWords = ["Happy", "Cosy"]
     static let restWord = "Resting"
-    static let loveLines = ["Full of energy", "Lots of energy", "Hellos help", "Ready for a hello", "Ready for you"]
+    static let loveLines = ["Full of energy", "Lots of energy", "Some energy", "Ready for a hello", "Ready for you"]
     static let gentleRain = "Gentle rain"
     static let rainAndThunder = "Rain and soft thunder"
 

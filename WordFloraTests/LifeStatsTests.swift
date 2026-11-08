@@ -94,7 +94,7 @@ final class LifeStatsTests: XCTestCase {
         XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 30, fed: 30, pruned: 30, loved: 1, waterDay: hours(-200))).hearts, 1)
         XCTAssertEqual(LifeStats.snapshot(inputs(waters: 2, sunny: 1, fed: 1, loved: 1)).loveLine, "Full of energy")
         XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 30)).loveLine, "Ready for a hello")
-        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 1)).heartsLabel, "Energy, 1 of 5 hearts. Hellos help")
+        XCTAssertEqual(LifeStats.snapshot(inputs(waters: 0, sunny: nil, loved: 1)).heartsLabel, "Energy, 1 of 5 hearts. Some energy")
         XCTAssertEqual(LifeStats.snapshot(inputs(waters: 1, sunny: 1, fed: 1, loved: 1)).heartsLabel, "Energy, 4 of 5 hearts. Lots of energy")
         XCTAssertEqual(LifeStats.energyTitle, "Energy")
         XCTAssertEqual(LifeStats.keyLine, "Love keeps its petals.", "the petals stay love")
