@@ -371,7 +371,16 @@ final class EndgameUITests: XCTestCase {
         scrollTo(book)
         book.tap()
         XCTAssertTrue(element("book.page.monarch").waitForExistence(timeout: 5))
-        audit("visitors-book", dynamicTypeApart: true)
+        // Each page's name steps down one text style at the accessibility sizes (title3 to subheadline) so the longest
+        // name stays whole (FieldNotesPage.nameStyle, measured in TextFitLayoutTests). The Dynamic Type check reads that
+        // deliberate step as "partially unsupported"; only the page names are excused, and only for that check.
+        // A page reads as one element whose label starts with its name and a full stop ("Monarch. ...", "A new friend. ...").
+        let pageLabels = app.descendants(matching: .any).matching(NSPredicate(format: "identifier BEGINSWITH 'book.page.'"))
+            .allElementsBoundByIndex.map(\.label)
+        audit("visitors-book", dynamicTypeApart: true) { issue in
+            guard issue.auditType == .dynamicType, let name = issue.element?.label, !name.isEmpty else { return false }
+            return pageLabels.contains { $0.hasPrefix(name + ".") }
+        }
         shot("visitors-book")
     }
 
