@@ -87,6 +87,8 @@ struct HomeView: View {
     @State private var weatherVisit = false
     @State private var weatherPuzzle = false
     @State private var weatherPuzzleClosed = 0
+    /// The weekly garden note for this visit (WeeklyNote); recorded as seen when it first shows.
+    @State private var weeklyNote: WeeklyNote.Summary?
     @Environment(\.accessibilityReduceMotion) private var systemReduceMotion
     private let reportsLayout = LineProbe.enabled
 
@@ -120,6 +122,13 @@ struct HomeView: View {
 
                         // Garden weather (empty in Calm mode and Quiet Garden): a chip, then the card or the banner.
                         if let chip = weather.chip { WeatherChip(text: chip, kind: weather.chipKind) }
+
+                        if let note = weeklyNote {
+                            WeeklyNoteCard(summary: note, quiet: app.settings.quietGarden, canShare: app.canShareWeek,
+                                           onLovely: { animate { weeklyNote = nil } },
+                                           onVisit: { weeklyNote = nil; router.go(.garden) })
+                                .transition(.opacity)
+                        }
 
                         if app.showWelcomeBack || app.plusOffer != nil || weather.card != nil || weather.banner != nil {
                             VStack(spacing: 10) {
@@ -174,7 +183,9 @@ struct HomeView: View {
         .onAppear {
             app.refreshWeather(); app.markWeatherSeen()
             if app.homeWeather.quietsOffers { weatherVisit = true }      // no ad banner in a visit with the weather
-            app.checkPlusOffer(); playAdNote = app.returnVisit == .adMayPlay
+            showWeeklyNoteIfDue()
+            if weeklyNote == nil { app.checkPlusOffer() }     // a note visit holds the Plus card back
+            playAdNote = app.returnVisit == .adMayPlay
         }
         .grandGardenCeremony()
         .fullScreenCover(isPresented: $weatherPuzzle, onDismiss: { weatherPuzzleClosed += 1 }) { WeatherPuzzleSheet { weatherPuzzle = false }.environment(app) }
@@ -304,6 +315,14 @@ struct HomeView: View {
     }
 
     private func closeNudge() { showNudge = false }
+
+    /// The weekly note waits while a weather card or banner, or the welcome card, is up (a later visit this week).
+    private func showWeeklyNoteIfDue() {
+        guard weeklyNote == nil else { return }
+        let w = app.homeWeather
+        weeklyNote = app.takeWeeklyNote(otherCardShowing: w.card != nil || w.banner != nil || app.showWelcomeBack,
+                                        nudgeShowing: showNudge)
+    }
 
     /// The honest ad note follows the 3 minute window: judged as Home appears or the window starts, and dropped when
     /// it ends. Nothing on screen counts down.
