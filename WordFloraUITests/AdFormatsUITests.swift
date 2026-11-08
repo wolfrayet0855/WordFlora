@@ -137,6 +137,11 @@ final class AdFormatsUITests: XCTestCase {
                    issue.compactDescription.localizedCaseInsensitiveContains("inaccessible text") {
                     skipped.append("\(issue.compactDescription) (behind the medium sheet)"); return true
                 }
+                // Same for clipped text with no element while the sheet is up: the dimmed page behind it. (The wake
+                // tiles' own titles and chips now take their full height; a named element is still judged.)
+                if sheetAtMedium, issue.auditType == .textClipped, issue.element == nil || (issue.element?.label ?? "").isEmpty {
+                    skipped.append("\(issue.compactDescription) (no element, behind the medium sheet)"); return true
+                }
                 if issue.auditType == .contrast {
                     guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
                     if let v = visible, !v.contains(e.frame) { return true }
