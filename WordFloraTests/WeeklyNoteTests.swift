@@ -50,6 +50,40 @@ final class WeeklyNoteTests: XCTestCase {
                        WeeklyNote.weekKey(date(2026, 10, 19, 0, 30), calendar: cal), "the same week across the change")
     }
 
+    /// New Year 2026/27: Mon 28 Dec 2026 starts a week that ends in 2027 (ISO week 53); Mon 4 Jan 2027 starts the next.
+    func testWeekKeyAcrossNewYear() {
+        let dec28 = WeeklyNote.weekKey(date(2026, 12, 28, 0, 0), calendar: cal)
+        for d in [date(2026, 12, 31, 23, 59), date(2027, 1, 1, 0, 0), date(2027, 1, 3, 23, 59)] {
+            XCTAssertEqual(WeeklyNote.weekKey(d, calendar: cal), dec28, "\(d) is in the week of Mon 28 Dec")
+        }
+        let jan4 = WeeklyNote.weekKey(date(2027, 1, 4, 0, 0), calendar: cal)
+        XCTAssertEqual(jan4 - dec28, 7)
+        XCTAssertEqual(WeeklyNote.weekKey(date(2027, 1, 5), calendar: cal), jan4)
+        let past = WeeklyNote.pastWeek(date(2027, 1, 5), calendar: cal)
+        XCTAssertEqual(past.lowerBound, date(2026, 12, 28, 0, 0))
+        XCTAssertEqual(past.upperBound, date(2027, 1, 4, 0, 0))
+        // A win on New Year's Day counts in the week shown on Mon 4 Jan.
+        let s = WeeklyNote.summary(rounds: [win(date(2027, 1, 1, 0, 30)), win(date(2026, 12, 27, 23, 0))], friendsSeenAt: [:],
+                                   now: date(2027, 1, 4, 9), calendar: cal)
+        XCTAssertEqual(s.words, 1)
+    }
+
+    /// The New Year week on summer time (Sydney) keys the same as in London, and a spring-forward week (London,
+    /// 29 Mar 2026, 167 hours) is still one whole week.
+    func testWeekKeyAcrossYearEndAndSpringForward() {
+        let sydney = TimeZone(identifier: "Australia/Sydney")!
+        let syd = WeeklyNote.calendar(timeZone: sydney)
+        XCTAssertEqual(WeeklyNote.weekKey(date(2027, 1, 3, 23, 59, tz: sydney), calendar: syd),
+                       WeeklyNote.weekKey(date(2026, 12, 28, 0, 1, tz: sydney), calendar: syd))
+        XCTAssertEqual(WeeklyNote.weekKey(date(2027, 1, 1, 12, tz: sydney), calendar: syd),
+                       WeeklyNote.weekKey(date(2027, 1, 1, 12), calendar: cal), "the same local week key in Sydney and London")
+        let week = WeeklyNote.pastWeek(date(2026, 3, 30, 9), calendar: cal)
+        XCTAssertEqual(week.lowerBound, date(2026, 3, 23, 0, 0))
+        XCTAssertEqual(week.upperBound.timeIntervalSince(week.lowerBound), 7 * 86_400 - 3_600)
+        XCTAssertEqual(WeeklyNote.weekKey(date(2026, 3, 29, 23, 0), calendar: cal),
+                       WeeklyNote.weekKey(date(2026, 3, 23, 0, 30), calendar: cal))
+    }
+
     func testATimeZoneChangeKeepsTheSameLocalWeek() {
         let tokyo = TimeZone(identifier: "Asia/Tokyo")!
         let ny = TimeZone(identifier: "America/New_York")!
