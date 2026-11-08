@@ -92,9 +92,9 @@ extension AppModel {
         return actionState(.prune, plant: plant).isReady
     }
 
-    /// Where the faded bloom sits on the plant art (fractions of its size).
+    /// Where the faded bloom sits on the plant art (fractions of its size), with the plant's own nudge applied.
     func fadedBloomSpot(_ plant: PlantCollectible) -> (x: Double, y: Double) {
-        FadedBloom.spot(seed: fadedBloomSeed, plantId: plant.plantId, day: fadedBloomToday)
+        FadedBloom.placedSpot(seed: fadedBloomSeed, plantId: plant.plantId, day: fadedBloomToday)
     }
 
     /// The fresh bud after a tidy trim, on later visits while the shears rest.

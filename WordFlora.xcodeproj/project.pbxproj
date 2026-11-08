@@ -10,6 +10,7 @@
 		572A1180A9DD7BAF600EFF8B /* BadgeMechanicsUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D68B5FE708C15AE7814C68E3 /* BadgeMechanicsUITests.swift */; };
 		81F29407ED589E6A819F2AE3 /* ButterflyNetUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1123A192A2FF5F0E507408A /* ButterflyNetUITests.swift */; };
 		B8AEEFAEC5E0F26A2F5D0029 /* BadgeMechanicsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 02D8CB4AACC4E7F47C423316 /* BadgeMechanicsTests.swift */; };
+		12E343DDD240EE64957A7E47 /* FadedBloomOffsetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9A9FBFE1EBFC17228D2BFDF7 /* FadedBloomOffsetTests.swift */; };
 		B4D85A26A2AE3706ED07C6DA /* ButterflyNetTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C1EA7292FB8ECBD24B622C5A /* ButterflyNetTests.swift */; };
 		CCE97CB406660310AFDE68CE /* FadedBloomArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEC523C72D5B948F83E2AA0A /* FadedBloomArt.swift */; };
 		5DD9BE4A3935F4060FD1AD97 /* ButterflyNetArt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 66AB430D7963B57E4664839F /* ButterflyNetArt.swift */; };
@@ -348,6 +349,7 @@
 		D68B5FE708C15AE7814C68E3 /* BadgeMechanicsUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeMechanicsUITests.swift; sourceTree = "<group>"; };
 		B1123A192A2FF5F0E507408A /* ButterflyNetUITests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyNetUITests.swift; sourceTree = "<group>"; };
 		02D8CB4AACC4E7F47C423316 /* BadgeMechanicsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BadgeMechanicsTests.swift; sourceTree = "<group>"; };
+		9A9FBFE1EBFC17228D2BFDF7 /* FadedBloomOffsetTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FadedBloomOffsetTests.swift; sourceTree = "<group>"; };
 		C1EA7292FB8ECBD24B622C5A /* ButterflyNetTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyNetTests.swift; sourceTree = "<group>"; };
 		FEC523C72D5B948F83E2AA0A /* FadedBloomArt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FadedBloomArt.swift; sourceTree = "<group>"; };
 		66AB430D7963B57E4664839F /* ButterflyNetArt.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ButterflyNetArt.swift; sourceTree = "<group>"; };
@@ -878,6 +880,7 @@
 			children = (
 				FEBDDE6A731F2B904C2CB598 /* PetalNotesTests.swift */,
 				02D8CB4AACC4E7F47C423316 /* BadgeMechanicsTests.swift */,
+				9A9FBFE1EBFC17228D2BFDF7 /* FadedBloomOffsetTests.swift */,
 				C1EA7292FB8ECBD24B622C5A /* ButterflyNetTests.swift */,
 				F725B7EC73EBDA9867091EBF /* LivingTouchTests.swift */,
 				69A7ED5DBA0DE0EC9D1EAA81 /* FamilyShareNudgeTests.swift */,
@@ -1390,6 +1393,7 @@
 			files = (
 				7064F8E27F339CDC045E8101 /* PetalNotesTests.swift in Sources */,
 				B8AEEFAEC5E0F26A2F5D0029 /* BadgeMechanicsTests.swift in Sources */,
+				12E343DDD240EE64957A7E47 /* FadedBloomOffsetTests.swift in Sources */,
 				B4D85A26A2AE3706ED07C6DA /* ButterflyNetTests.swift in Sources */,
 				00B09BCDB3D7D7FB1B3AB22F /* LivingTouchTests.swift in Sources */,
 				5C752B59DF1F73D729FC9A2D /* FamilyShareNudgeTests.swift in Sources */,
