@@ -220,11 +220,18 @@ final class BadgeMechanicsUITests: XCTestCase {
         shot("mist-done")
     }
 
-    /// AX XXXL dark: the tend row wraps (Mist sits in the page with Prune) and the page passes the audit.
+    /// AX XXXL dark: the tend buttons are full-width tiles in the page (TendRowLayout); Mist passes the audit.
     func testAuditTheMistButtonAtAXXXLInDark() {
         openFern(size: Self.axXXXL, dark: true)
         let mist = app.buttons["tend-mist"]
-        scrollTo(mist)
+        // Big tiles: scroll gently until the whole Mist tile sits inside the scroll area (a full swipe can jump past it).
+        let scroll = app.scrollViews.firstMatch
+        for _ in 0..<12 where !(mist.isHittable && mist.frame.minY >= scroll.frame.minY && mist.frame.maxY <= scroll.frame.maxY) {
+            let start = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.6))
+            let step: CGFloat = mist.frame.minY < scroll.frame.minY ? 160 : -160
+            start.press(forDuration: 0.1, thenDragTo: start.withOffset(CGVector(dx: 0, dy: step)))
+            sleep(1)
+        }
         XCTAssertTrue(mist.isHittable)
         XCTAssertGreaterThanOrEqual(mist.frame.height, 44)
         let screen = app.windows.firstMatch.frame

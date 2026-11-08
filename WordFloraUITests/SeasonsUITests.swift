@@ -56,7 +56,9 @@ final class SeasonsUITests: XCTestCase {
         var findings = [String](), skipped = [String]()
         do {
             try app.performAccessibilityAudit(for: XCUIAccessibilityAuditType.all.subtracting(ignoring)) { issue in
-                if let r = region, let e = issue.element, !r.intersects(e.frame) { return true }
+                // Only elements inside the new surface are judged (a tool tile above it, partly overlapping the
+                // shelf's frame at AX sizes, belongs to the Shed's own audits).
+                if let r = region, let e = issue.element, !r.insetBy(dx: -1, dy: -1).contains(e.frame) { return true }
                 if issue.auditType == .contrast, let v = visible {
                     guard let e = issue.element else { skipped.append(issue.compactDescription); return true }
                     if !v.contains(e.frame) { return true }
