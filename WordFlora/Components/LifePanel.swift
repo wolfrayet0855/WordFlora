@@ -235,7 +235,31 @@ enum TendKind: String, CaseIterable, Equatable {
     static let wakeCaption = "Tap the seed"
     static let moreTomorrow = "More tomorrow"
     static let trimLater = "Trim in 2 days"
-    static let trimmed = "Trimmed"
+    /// The done title on the Prune button: the check badge and "Trim in 2 days" say it is done. "Trimmed" broke
+    /// mid-word ("Trimme / d") once Mist made the row six buttons wide.
+    static let trimmed = "Trim"
+}
+
+/// How the tend buttons are laid out, from the text size alone, so every word keeps a whole line (no mid-word
+/// breaks, no shrinking, no capped type, no ViewThatFits). Measured in docs/pm/toolbar-fit-review.md and checked by
+/// TendRowLayoutTests at 375 pt:
+/// - below the accessibility sizes, pinned at the bottom: five or six buttons always in rows of three (3 + 3 or
+///   3 + 2; "More tomorrow" does not fit a fifth or sixth of the row); four in one row up to Large, else two and two.
+/// - accessibility sizes: one full-width tile per button (icon beside the words), in the page's scroll content.
+/// (Lead ruling 2026-11-07, docs/pm/toolbar-fit-review.md.)
+enum TendRowLayout {
+    static func columns(buttons: Int, typeSize: DynamicTypeSize) -> Int {
+        if typeSize.isAccessibilitySize { return 1 }
+        switch buttons {
+        case 5...: return 3
+        case 4: return typeSize > .large ? 2 : 4
+        default: return buttons
+        }
+    }
+    /// The gap between tiles: a little tighter for a row of six.
+    static func spacing(columns: Int) -> CGFloat { columns > 5 ? 6 : 8 }
+    /// The tile's side padding inside its frame (the words' width is the tile width minus twice this).
+    static let tilePadding: CGFloat = 2
 }
 
 /// What one tend button shows for its action state: lit when ready, softly checked when done for today,
@@ -296,29 +320,19 @@ struct TendActionButton: View {
     @Environment(\.dynamicTypeSize) private var typeSize
     @State private var squeeze = false
 
-    /// From accessibility size 3 up, a 2 x 2 tile has no room for the icon beside two lines of words: the icon goes on
-    /// top and only the title shows, shrinking to fit one line (the caption is still the VoiceOver value).
-    private var compact: Bool { large && typeSize >= .accessibility3 }
-
     var body: some View {
         Button(action: action) {
             Group {
-                if compact {
-                    VStack(spacing: 4) {
-                        dot(34)
-                        Text(look.title).font(Theme.font(.body, weight: .heavy)).foregroundStyle(Color.appPrimaryText)
-                            .lineLimit(1).minimumScaleFactor(0.4)
-                    }
-                    .frame(maxWidth: .infinity, minHeight: 64)
-                    .padding(.vertical, 6).padding(.horizontal, 6)
-                } else if large {
+                if large {
+                    // Accessibility sizes: a full-width tile, icon beside the title and caption, at every size up to
+                    // AX XXXL (no shrinking, nothing hidden; TendRowLayout).
                     HStack(spacing: 10) { dot(40); words(alignment: .leading) }
                         .frame(maxWidth: .infinity, minHeight: 64, alignment: .leading)
-                        .padding(.horizontal, 10)
+                        .padding(.horizontal, 10).padding(.vertical, 6)
                 } else {
                     VStack(spacing: 4) { dot(44); words(alignment: .center); Spacer(minLength: 0) }
                         .frame(maxWidth: .infinity, minHeight: 64, maxHeight: .infinity)
-                        .padding(.vertical, 8).padding(.horizontal, 2)
+                        .padding(.vertical, 8).padding(.horizontal, TendRowLayout.tilePadding)
                 }
             }
             .background(Color.appSurface, in: RoundedRectangle(cornerRadius: 18))

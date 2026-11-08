@@ -160,6 +160,9 @@ struct PlantDetailView: View {
             stage(plant, snap, wx, plantSize: 132, plantTop: 52, cloudTop: 0)
             ScrollView {
                 VStack(alignment: .leading, spacing: 16) {
+                    // Accessibility sizes: the tend buttons are full-width tiles at the top of the page, so every
+                    // word keeps a whole line at every size (TendRowLayout); the toast stays pinned at the bottom.
+                    VStack(spacing: 8) { ForEach(tendKinds, id: \.self) { tendButton($0, plant) } }
                     LifeSheet(snapshot: snap, collapsed: panelHidden) { togglePanel() }
                     below(plant, snap)
                 }
@@ -453,12 +456,6 @@ struct PlantDetailView: View {
 
         if !quiet { resources }
 
-        if large && showsPrune {
-            tendButton(.prune, plant)
-        }
-        if large && app.showsMist {
-            tendButton(.mist, plant)
-        }
         if showMistTip {
             Text(MistMakerCopy.tip).font(Theme.font(.footnote)).foregroundStyle(Color.secondaryText)
                 .fixedSize(horizontal: false, vertical: true)
@@ -556,19 +553,32 @@ struct PlantDetailView: View {
         }
     }
 
+    /// The tend buttons in order: Water, Feed, Sun, then Prune and Mist once their tools are in the Shed, then Repot.
+    private var tendKinds: [TendKind] {
+        [TendKind.water, .feed, .sun] + (showsPrune ? [.prune] : []) + (app.showsMist ? [.mist] : []) + [.repot]
+    }
+
     private func actionBar(_ plant: PlantCollectible) -> some View {
         Group {
             if large {
-                Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-                    GridRow { tendButton(.water, plant); tendButton(.feed, plant) }
-                    GridRow { tendButton(.sun, plant); tendButton(.repot, plant) }
-                }
+                // The tiles live in the page at accessibility sizes; the pinned strip only carries the toast.
+                Color.clear.frame(height: 1).accessibilityHidden(true)
             } else {
-                HStack(spacing: 8) {
-                    ForEach([TendKind.water, .feed, .sun] + (showsPrune ? [.prune] : []) + (app.showsMist ? [.mist] : []) + [.repot],
-                            id: \.self) { tendButton($0, plant) }
+                let kinds = tendKinds
+                let columns = TendRowLayout.columns(buttons: kinds.count, typeSize: typeSize)
+                let gap = TendRowLayout.spacing(columns: columns)
+                if columns >= kinds.count {
+                    HStack(spacing: gap) { ForEach(kinds, id: \.self) { tendButton($0, plant) } }
+                        .fixedSize(horizontal: false, vertical: true)       // every tile as tall as the tallest
+                } else {
+                    // Rows of three (or two): every word keeps a whole line (TendRowLayout).
+                    Grid(horizontalSpacing: gap, verticalSpacing: gap) {
+                        ForEach(Array(stride(from: 0, to: kinds.count, by: columns)), id: \.self) { i in
+                            GridRow { ForEach(kinds[i..<min(i + columns, kinds.count)], id: \.self) { tendButton($0, plant) } }
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                    }
                 }
-                .fixedSize(horizontal: false, vertical: true)       // every tile as tall as the tallest
             }
         }
         .padding(.horizontal, Space.gutter).padding(.top, 10).padding(.bottom, 6)
