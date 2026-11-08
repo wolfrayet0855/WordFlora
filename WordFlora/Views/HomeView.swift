@@ -554,8 +554,9 @@ struct HomeView: View {
                 }
                 .frame(height: bannerHeight)                 // B4: the adaptive height, never a fixed 50 pt
                 HStack(spacing: 16) {
-                    Button("Go ad-free") { router.go(.plus) }
-                    Link("Report an ad", destination: Links.reportAd)
+                    // Caption text, 44 pt tap targets (hit-area audit; as the Garden slot).
+                    Button("Go ad-free") { router.go(.plus) }.tapTarget()
+                    Link("Report an ad", destination: Links.reportAd).tapTarget()
                 }
                 .font(Theme.font(.caption)).foregroundStyle(Color.secondaryText)
                 .opacity(app.ads.started ? 1 : 0)
