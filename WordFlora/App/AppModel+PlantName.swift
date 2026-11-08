@@ -14,6 +14,16 @@ extension AppModel {
         return name
     }
 
+    /// Names that arrive from iCloud sync or a restored backup file go through the same rule as typed ones.
+    func sanitizePlantNames() {
+        var changed = false
+        for plant in plants() where !plant.nickname.isEmpty {
+            let clean = PlantName.clean(plant.nickname)
+            if clean != plant.nickname { plant.nickname = clean; changed = true }
+        }
+        if changed { try? context.save() }
+    }
+
     func isOnWidget(_ plant: PlantCollectible) -> Bool { profile?.widgetPlantID == plant.plantId }
 
     /// Puts this plant on the widget: the pin syncs with the garden and the widget redraws at once.
