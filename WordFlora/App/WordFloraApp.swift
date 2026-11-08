@@ -127,6 +127,11 @@ struct WordFloraApp: App {
             var ids = model.entitlements.state.activeProductIDs; ids.insert(PackCatalog.frostLantern.productID)
             model.entitlements.debugForce(EntitlementState(activeProductIDs: ids))
         }
+        // Every found plant already sits in this pot (Frost & Lantern's snowfall on the plant page).
+        if uiTesting, let id = args.first(where: { $0.hasPrefix("-uitest-pot=") })?.dropFirst("-uitest-pot=".count) {
+            for p in model.plants() where p.earnedCount > 0 { p.potId = String(id) }
+            try? model.context.save()
+        }
         // Plus Forever owned, alone or beside a subscription that is still renewing (the "charged twice" note).
         if uiTesting && args.contains("-uitest-plus-forever") {
             model.entitlements.debugForce(EntitlementState(activeProductIDs: [PlusPlan.lifetimeID]))

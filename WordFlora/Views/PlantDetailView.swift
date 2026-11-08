@@ -193,6 +193,9 @@ struct PlantDetailView: View {
         // Garden weather art: Reduce Motion (system or the app's switch) and Low Power hold one still frame.
         let weatherStill = reduceMotion || app.settings.reduceMotionOverride || lowPower.isOn
         let weatherSpec = wx.map { WeatherArt.spec($0.kind, look: $0.look) }
+        // Frost & Lantern pots bring a gentle snowfall when the sky is free (no garden weather, no rain, not Quiet Garden).
+        let snows = Snowfall.showsOnStage(potId: plant.potId, quietGarden: app.settings.quietGarden, weather: wx != nil, raining: raining)
+        let snowCount = Snowfall.count(base: Snowfall.stageCount, calm: app.settings.calmMode)
 
         return ZStack(alignment: .top) {
             if raining {
@@ -211,6 +214,11 @@ struct PlantDetailView: View {
             if let wx {
                 WeatherOverlay(kind: wx.kind, look: wx.look, layer: .back, size: s, still: weatherStill, paused: paused)
                     .padding(.top, plantTop)
+            }
+            if snows {
+                SnowfallView(count: snowCount, calm: app.settings.calmMode, still: weatherStill, paused: paused,
+                             groundY: groundY, layers: [0])
+                    .frame(height: rowTop)
             }
 
             // The plant's pot stands behind it (the seed pot draws its own). The repot effect brings its own pots.
@@ -243,6 +251,11 @@ struct PlantDetailView: View {
             if let wx {
                 WeatherOverlay(kind: wx.kind, look: wx.look, layer: .front, size: s, still: weatherStill, paused: paused)
                     .padding(.top, plantTop)
+            }
+            if snows {
+                SnowfallView(count: snowCount, calm: app.settings.calmMode, still: weatherStill, paused: paused,
+                             groundY: groundY, layers: [1, 2])
+                    .frame(height: rowTop)
             }
 
             if raining && !reduceMotion {
@@ -628,7 +641,8 @@ struct PlantDetailView: View {
         if let toast {
             HStack(spacing: 10) {
                 Image(systemName: toast.ok ? "checkmark.circle.fill" : "moon.fill")
-                    .foregroundStyle(toast.ok ? LifePalette.leafBright : Color.appBackground.opacity(0.85))
+                    .font(Theme.font(.body, weight: .semibold))       // scales with the text, a touch larger than it
+                    .foregroundStyle(toast.ok ? LifePalette.toastTick : Color.appBackground.opacity(0.85))
                     .accessibilityHidden(true)
                 Text(toast.text).font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.appBackground)
                     .fixedSize(horizontal: false, vertical: true)

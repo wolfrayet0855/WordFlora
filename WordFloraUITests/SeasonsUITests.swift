@@ -235,4 +235,59 @@ final class SeasonsUITests: XCTestCase {
         XCTAssertTrue(card.exists)
         XCTAssertFalse(app.staticTexts.matching(NSPredicate(format: "label CONTAINS '$'")).firstMatch.exists)
     }
+
+    // MARK: Falling snow (docs/pm/frost-lantern-snow-and-plant-review.md)
+
+    private func openSeasons() {
+        openSettings()
+        let row = app.buttons["settings.seasons"]
+        scrollTo(row); row.tap()
+        XCTAssertTrue(app.navigationBars["Seasons"].waitForExistence(timeout: 5))
+    }
+
+    /// The snow over the card is hidden from VoiceOver: the card keeps its one image label, and the audit passes.
+    func testSnowFallsOnTheSeasonsCardLightAndDark() {
+        executionTimeAllowance = 300
+        for dark in [false, true] {
+            // The appearance is set before each launch: switching it under a running app did not always take.
+            XCUIDevice.shared.appearance = dark ? .dark : .light
+            launch(age: "eighteenPlus", ["-uitest-prices", "-uitest-pack-owned"])
+            openSeasons()
+            XCTAssertTrue(app.images["Three winter pots on a snowy shelf, with lanterns and a robin"].exists)
+            let name = "snow-seasons-\(dark ? "dark" : "light")"
+            sleep(2); shot(name)
+            audit(name)
+            app.terminate()
+        }
+    }
+
+    /// Reduce Motion (the app's switch): one still frame, the flakes stay visible.
+    func testSnowIsAStillFrameUnderReduceMotion() {
+        launch(age: "eighteenPlus", ["-uitest-prices", "-uitest-pack-owned", "-uitest-reduce-motion"])
+        openSeasons()
+        sleep(1); shot("snow-seasons-still")
+    }
+
+    /// A plant in Frosted glass: snow on its page (no garden weather, no rain), light and dark. The plant's VoiceOver
+    /// text does not change.
+    func testSnowFallsOnThePlantPageInAPackPot() {
+        executionTimeAllowance = 400                      // two launches, the garden and the plant page: slow on a busy Mac
+        for dark in [false, true] {
+            XCUIDevice.shared.appearance = dark ? .dark : .light
+            app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-age=eighteenPlus", "-uitest-plant=daisy",
+                                   "-uitest-prices", "-uitest-pack-owned", "-uitest-pot=frostedGlass"]
+            app.launch()
+            app.buttons["Garden"].tap()
+            let tile = app.buttons.matching(NSPredicate(format: "label BEGINSWITH %@", "Daisy")).firstMatch
+            _ = tile.waitForExistence(timeout: 3)
+            for _ in 0..<10 where !(tile.exists && tile.isHittable) { app.swipeUp() }
+            tile.tap()
+            XCTAssertTrue(app.buttons["tend-water"].waitForExistence(timeout: 5))
+            let moment = element("badgeMoment")
+            if moment.waitForExistence(timeout: 4) { XCTAssertTrue(moment.waitForNonExistence(timeout: 10)) }
+            sleep(2); shot("snow-plant-\(dark ? "dark" : "light")")
+            XCTAssertTrue(app.buttons["tend-water"].isHittable, "the snow never takes taps")
+            app.terminate()
+        }
+    }
 }

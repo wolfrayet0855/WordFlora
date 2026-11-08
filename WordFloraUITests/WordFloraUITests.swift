@@ -62,17 +62,67 @@ final class WordFloraUITests: XCTestCase {
             XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
             tapLetters("LOTUS")
             XCTAssertTrue(app.staticTexts["Great word!"].waitForExistence(timeout: 6), "word \(n)")
-            XCTAssertTrue(app.staticTexts["\(n) of 3 words to your next plant."].exists, "word \(n)")
+            // Progress is said once: the count line on word 1, the nudge line instead of it on word 2.
+            XCTAssertEqual(app.staticTexts["\(n) of 3 words to your next plant."].exists, n == 1, "word \(n)")
             XCTAssertFalse(app.staticTexts["New plant found!"].exists, "no plant on word \(n)")
             XCTAssertFalse(app.buttons["Share this plant"].exists, "nothing to share without a plant")
-            if n == 1 { shot("word-toward-plant") }
-            app.buttons["Continue"].tap()
+            // The nudge: the next word, or a calm way to the garden; the extra line only on the word before the plant.
+            let nextLine = app.staticTexts["One more word and a new plant arrives!"]
+            if n == 2 { XCTAssertTrue(nextLine.exists, "word 2") } else { XCTAssertFalse(nextLine.exists, "word 1") }
+            XCTAssertTrue(app.buttons["winCard.tendGarden"].exists, "word \(n)")
+            XCTAssertEqual(app.buttons["winCard.tendGarden"].label, "Tend my garden")
+            if n == 1 { sleep(1); shot("word-toward-plant") }
+            if n == 2 { sleep(1); shot("word-before-plant") }
+            app.buttons["Next word"].tap()
         }
         XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
         tapLetters("LOTUS")
         XCTAssertTrue(app.staticTexts["New plant found!"].waitForExistence(timeout: 6), "the third word brings the plant")
         XCTAssertFalse(app.staticTexts["Great word!"].exists)
         shot("third-word-plant")
+    }
+
+    /// "Tend my garden" on a word with no plant closes the card and opens the garden (the calm way out of the round).
+    func testTheWinCardCanGoTendTheGarden() {
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-word=LOTUS"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 8))
+        app.buttons["Play"].tap()
+        XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
+        tapLetters("LOTUS")
+        let tend = app.buttons["winCard.tendGarden"]
+        XCTAssertTrue(tend.waitForExistence(timeout: 6))
+        XCTAssertTrue(app.buttons["Next word"].exists)
+        for _ in 0..<6 where !tend.isHittable { app.swipeUp() }
+        tend.tap()
+        XCTAssertTrue(app.navigationBars["My Garden"].waitForExistence(timeout: 5))
+        XCTAssertFalse(app.staticTexts["Great word!"].exists)
+    }
+
+    /// The win card at the largest text size, dark: the pips, both lines and both buttons fit and can be reached.
+    func testTheWinCardFitsAtAccessibilityXXXLDark() {
+        XCUIDevice.shared.appearance = .dark
+        defer { XCUIDevice.shared.appearance = .light }
+        app.launchArguments = ["-uitest", "-uitest-onboarded", "-uitest-gardened", "-uitest-word=LOTUS",
+                               "-UIPreferredContentSizeCategoryName", "UICTContentSizeCategoryAccessibilityXXXL"]
+        app.launch()
+        XCTAssertTrue(app.buttons["Play"].waitForExistence(timeout: 8))
+        app.buttons["Play"].tap()
+        for n in 1...2 {
+            XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5))
+            tapLetters("LOTUS")
+            let next = app.buttons["Next word"]
+            XCTAssertTrue(next.waitForExistence(timeout: 6), "word \(n)")
+            if n == 2 {
+                sleep(2); shot("word-before-plant-axxxl-dark")
+                for _ in 0..<6 where !app.buttons["winCard.tendGarden"].isHittable { app.swipeUp() }
+                XCTAssertTrue(app.buttons["winCard.tendGarden"].isHittable)
+                shot("word-before-plant-axxxl-dark-buttons")
+                return
+            }
+            for _ in 0..<6 where !next.isHittable { app.swipeUp() }
+            next.tap()
+        }
     }
 
     func testWrongGuessesEndWithARestingReveal() {
@@ -787,7 +837,7 @@ final class FidelityScreensUITests: XCTestCase {
             for n in 1...3 {
                 XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5), "word \(n)")
                 for ch in "LOTUS" { app.buttons[String(ch)].tap() }
-                let next = app.buttons["Continue"]
+                let next = app.buttons.matching(NSPredicate(format: "label IN %@", ["Continue", "Next word"])).firstMatch
                 XCTAssertTrue(next.waitForExistence(timeout: 8), "word \(n)")
                 if n == 1 { sleep(2); shot("puzzle-win-card-\(look.0)") }
                 for _ in 0..<6 where !next.isHittable { app.swipeUp() }

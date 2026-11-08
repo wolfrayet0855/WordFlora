@@ -29,6 +29,9 @@ enum PlantProgressCopy {
     static func winLine(toward: Int, per: Int) -> String { homeLine(toward: toward, per: per) + "." }
     /// Home, under the Garden Days line, e.g. "2 of 3 words to your next plant".
     static func homeLine(toward: Int, per: Int) -> String { "\(toward) of \(per) words to your next plant" }
+    static let nextPlantLine = "One more word and a new plant arrives!"
+    /// In place of the count line on the word before a plant. Nil otherwise.
+    static func nextLine(toward: Int, per: Int) -> String? { per - toward == 1 ? nextPlantLine : nil }
 }
 
 /// One stop on the Garden Path level map: what the medal draws and what the card says.

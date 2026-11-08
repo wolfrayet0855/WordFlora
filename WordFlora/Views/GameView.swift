@@ -14,6 +14,9 @@ struct GameView: View {
     /// The win: a dim at once, petals over it, the card at 0.7 s above them (design-preview/celebrate, confetti "large").
     @State private var winDim = false
     @State private var winBurst: [CelebrationLevel]?
+    /// A word that brings no plant: its pip on the card fills with a soft pop 0.35 s after the card appears.
+    @State private var pipPopped = false
+    @State private var pipPuff = 0
     /// The letter just found: its tiles pop with a small puff of petals.
     @State private var tilePop: TilePop?
     @State private var showRestCard = false
@@ -134,7 +137,18 @@ struct GameView: View {
                 if arrived || vm.isDaily { levels.append(.large) }
                 winBurst = levels.isEmpty ? nil : levels
                 withAnimation(.easeOut(duration: reduceMotion ? 0.15 : 0.3)) { winDim = true }
-                DispatchQueue.main.asyncAfter(deadline: .now() + (reduceMotion ? 0.15 : 0.7)) {
+                let cardAt = reduceMotion ? 0.15 : 0.7
+                pipPopped = false
+                if !arrived {
+                    // The word's pip fills once the card is up, with a small petal puff and one soft tap.
+                    DispatchQueue.main.asyncAfter(deadline: .now() + cardAt + 0.35) {
+                        guard vm.phase == .won, vm.earnedPlantName == nil, showEarned else { return }
+                        pipPopped = true
+                        pipPuff += 1
+                        if app.settings.hapticsOn { UIImpactFeedbackGenerator(style: .soft).impactOccurred(intensity: 0.5) }
+                    }
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + cardAt) {
                     showEarned = true
                     if arrived && app.settings.hapticsOn {      // a soft lub-dub as the new plant appears
                         let g = UIImpactFeedbackGenerator(style: .soft); g.impactOccurred(intensity: 0.6)
@@ -328,10 +342,27 @@ struct GameView: View {
                 } else {
                     // No plant this round: the word counts toward the next one.
                     cardTitle(PlantProgressCopy.winTitle)
-                    // HOOK (progress meter): the visual words-toward-plant meter (mocked separately) goes here.
-                    Text(PlantProgressCopy.winLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant))
-                        .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
-                        .fixedSize(horizontal: false, vertical: true)
+                    WordsToPlantPips(filled: vm.wordsTowardPlant, total: vm.wordsPerPlant, popped: pipPopped,
+                                     reduceMotion: reduceMotion, calm: app.settings.calmMode || app.settings.quietGarden)
+                        .padding(.vertical, 2)
+                        .overlay {
+                            // A small puff from the pip that just filled (Calm: the gentle drift; Reduce Motion: a still arc).
+                            PetalPuff(trigger: pipPuff, level: app.celebrationLevel(.small, systemReduceMotion: systemReduceMotion), arcRadius: 28)
+                                .frame(width: 120, height: 120)
+                                .offset(x: WordsToPlantPips.offset(filled: vm.wordsTowardPlant, total: vm.wordsPerPlant))
+                                .allowsHitTesting(false)
+                                .accessibilityHidden(true)
+                        }
+                    // On the word before a plant the nudge line replaces the count line (progress is said once).
+                    if let next = PlantProgressCopy.nextLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant) {
+                        Text(next)
+                            .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.successText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    } else {
+                        Text(PlantProgressCopy.winLine(toward: vm.wordsTowardPlant, per: vm.wordsPerPlant))
+                            .font(Theme.font(.callout, weight: .semibold)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                     if let fact = vm.factAfterRound {
                         Text(fact).font(Theme.font(.callout)).multilineTextAlignment(.center).foregroundStyle(Color.appPrimaryText.opacity(0.85))
                             .fixedSize(horizontal: false, vertical: true)
@@ -339,7 +370,17 @@ struct GameView: View {
                 }
                 shareButton
                 if vm.roseDropped { Label("A Rose of Jericho is in your satchel", systemImage: "leaf.circle.fill").font(Theme.font(.subheadline, weight: .semibold)).foregroundStyle(Color.successText) }
-                Button("Continue") { showEarned = false; winDim = false; winBurst = nil; app.markPeakDismissed(); afterRound() }.buttonStyle(PrimaryButtonStyle())
+                // A word with no plant names what the tap does: the next word, or a calm way out to the garden.
+                // (The Daily Bloom goes home after its card and the tutorial hands off, so they keep "Continue".)
+                Button(vm.earnedPlantName == nil && !vm.isDaily && !tutorial ? "Next word" : "Continue") { closeWinCard(); afterRound() }.buttonStyle(PrimaryButtonStyle())
+                if vm.earnedPlantName == nil && !tutorial {
+                    Button("Tend my garden") {
+                        closeWinCard(); app.pauseBadgeMoments(.round, false)
+                        router.home(); router.go(.garden)
+                    }
+                    .buttonStyle(SecondaryButtonStyle())
+                    .accessibilityIdentifier("winCard.tendGarden")
+                }
             }
         }
     }
@@ -524,6 +565,11 @@ struct GameView: View {
 
     static func tutorialEntry(in bank: WordBank) -> WordEntry {
         bank.entries.first { $0.id == "l1-seed" } ?? bank.entries.first { $0.level == 1 && $0.kind == .vocab } ?? bank.entries[0]
+    }
+
+    private func closeWinCard() {
+        showEarned = false; winDim = false; winBurst = nil; pipPopped = false; pipPuff = 0
+        app.markPeakDismissed()
     }
 
     private func afterRound() {

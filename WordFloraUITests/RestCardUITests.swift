@@ -44,7 +44,7 @@ final class RestCardUITests: XCTestCase {
         for n in 1...3 {
             XCTAssertTrue(app.buttons["L"].waitForExistence(timeout: 5), "word \(n)")
             for ch in "LOTUS" { app.buttons[String(ch)].tap() }
-            let next = app.buttons["Continue"]
+            let next = app.buttons.matching(NSPredicate(format: "label IN %@", ["Continue", "Next word"])).firstMatch
             XCTAssertTrue(next.waitForExistence(timeout: 8), "word \(n)")
             for _ in 0..<6 where !next.isHittable { app.swipeUp() }
             next.tap()
